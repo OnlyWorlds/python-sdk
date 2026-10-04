@@ -2,7 +2,7 @@
 name = "onlyworlds"
 readme = "README.md"
 dynamic = ["version"]
-description = "OnlyWorlds for Python: the world folder format (read, write, push). Draft."
+description = "OnlyWorlds for Python: the world folder format (read, write, push) and a client for the v2 API."
 requires-python = ">=3.12"
 license = "MIT"
 dependencies = []

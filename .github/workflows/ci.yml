@@ -20,3 +20,16 @@ jobs:
       - run: uv run ruff check .
       - run: uv run mypy --strict src
       - run: uv run python codegen/generate_schema.py --check
+
+  wire:
+    # keel's own OpenAPI document and the public demo world, read only. Red here with
+    # the gates above green means the server moved under the client, not that a change broke it.
+    runs-on: ubuntu-latest
+    env:
+      OW_OPENAPI: https://www.onlyworlds.com/api/v2/openapi.json
+      OW_LIVE: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+      - run: uv sync
+      - run: uv run pytest -q tests/test_wire.py tests/test_live.py
