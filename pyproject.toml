@@ -1,0 +1,46 @@
+[project]
+name = "onlyworlds"
+readme = "README.md"
+dynamic = ["version"]
+description = "OnlyWorlds for Python: the world folder format (read, write, push). Draft."
+requires-python = ">=3.12"
+license = "MIT"
+dependencies = []
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Typing :: Typed",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8",
+    "ruff>=0.6",
+    "mypy>=1.11",
+    "pyyaml>=6",          # build-time only: codegen imports the vendored schema walk
+    "types-PyYAML",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.version]
+path = "src/onlyworlds/_version.py"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/onlyworlds"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 120
+target-version = "py312"
+extend-exclude = ["codegen/schema-dist"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "SIM", "RUF"]
+
+[tool.mypy]
+strict = true
+files = ["src", "tests", "codegen/generate_schema.py"]

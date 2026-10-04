@@ -1,0 +1,13 @@
+{
+  "_what": "The recorded pin for the vendored OnlyWorlds schema distribution (codegen/schema-dist/, copied byte-exact). Do not edit by hand; re-vendor from the pinned tag and review the diff. Same pin as the npm SDK (Development/OnlyWorlds/sdk/codegen/schema-pin.json) on purpose: two clients, one schema.",
+  "_why_manifest_sha256": "Verifying the tree against its own MANIFEST.json only proves internal consistency. If the tag moved, the manifest moved with it. The hash recorded here is the one first accepted, which is what makes a moved tag visible.",
+  "repo": "https://github.com/OnlyWorlds/schema-dist",
+  "tag": "v0.30.1-dist.15",
+  "commit": "6a4b2a70f5c3b48958578a5a8ba84af4ae436110",
+  "manifest_sha256": "9472b3d4a40546df68df0e7fc42a762a7e775d269f508066df140932c503f8e3",
+  "canonical_version": "00.30.01",
+  "dist_serial": 15,
+  "published": "2026-09-18",
+  "pinned_at": "2026-09-28",
+  "pinned_by": "Kael (Assembly) — tree copied from the npm SDK's vendored dist.15; 31/31 files re-hashed against MANIFEST.json; MANIFEST self-hash matched against (a) the SDK's pin record and (b) `git show v0.30.1-dist.15:MANIFEST.json` in the local schema-dist checkout, whose tag resolves to the commit above"
+}
