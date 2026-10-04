@@ -103,7 +103,7 @@ class ApiError(Exception):
 
     @property
     def is_owner_only(self) -> bool:
-        """A contributor tried a world-level change, such as ``patch_world`` (403 ``owner_only``, keel D72)."""
+        """A member key (a co-builder's too) tried what only the owner may do, such as ``patch_world`` (403)."""
         return self.status == 403 and self.code == "owner_only"
 
     @property
