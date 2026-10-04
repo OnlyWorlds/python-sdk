@@ -49,3 +49,6 @@ def test_field_kinds() -> None:
     assert "world" not in FIELD_KINDS["character"] and "id" not in FIELD_KINDS["character"]
     # ruling collective-equipment-target: the v2 target, not the decommissioned v1 one
     assert FIELD_KINDS["collective"]["equipment"] == "multi_link"
+
+def test_probe_fails_on_purpose() -> None:
+    assert False, "CI probe: this branch is deleted after the run"
