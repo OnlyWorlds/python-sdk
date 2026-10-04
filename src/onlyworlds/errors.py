@@ -101,6 +101,11 @@ class ApiError(Exception):
         return self.status == 403 and self.code == "not_author"
 
     @property
+    def is_owner_only(self) -> bool:
+        """A contributor tried a world-level change, such as ``patch_world`` (403 ``owner_only``, keel D72)."""
+        return self.status == 403 and self.code == "owner_only"
+
+    @property
     def is_busy(self) -> bool:
         """keel's admission control turned the request away (503 ``server_busy``); see ``retry_after``."""
         return self.status == 503 and self.code == "server_busy"

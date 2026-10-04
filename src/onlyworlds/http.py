@@ -157,6 +157,10 @@ class BulkResult:
     order (success slots echo ``id`` / ``created_at`` / ``updated_at``; error slots carry
     ``error`` with a ``code``, e.g. ``id_conflict`` or ``not_author``). ``was_replay`` is
     true when the server replayed a stored answer for a reused Idempotency-Key.
+
+    After an ``atomic=True`` request with ``errors`` true, NOTHING was written: the slots of
+    the items that would have succeeded still say 201, with the ids and timestamps they would
+    have had (keel spec, "counterfactual 201s"). Do not record those ids as created.
     """
 
     errors: bool
@@ -385,6 +389,9 @@ class Client:
 
         Always sends an ``Idempotency-Key`` (yours, or a fresh one), so a retry after a lost
         answer replays the stored success instead of failing with ``id_conflict``.
+
+        ``name`` is the one required field, and "required" means the key must be present: ``""``
+        and ``None`` are accepted and stored as ``""`` (by keel's ruling, nameless Markers exist).
         """
         t = _segment(element_type, _TYPE, "element type")
         body = sanitize_payload(element)

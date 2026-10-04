@@ -185,6 +185,7 @@ def test_a_feed_that_says_more_without_moving_is_refused(make_client: MakeClient
         (409, "invalid_request", "id_conflict", "is_id_conflict"),
         (409, "idempotency_error", "idempotency_error", "is_idempotency_conflict"),
         (403, "permission_error", "not_author", "is_not_author"),
+        (403, "permission_error", "owner_only", "is_owner_only"),
         (503, "api_error", "server_busy", "is_busy"),
         (401, "authentication_error", "key_revoked", "is_auth_error"),
         (422, "invalid_request", "invalid_field", "is_validation_error"),
@@ -197,6 +198,7 @@ def test_each_error_has_its_own_flag_and_no_other(
         "is_id_conflict",
         "is_idempotency_conflict",
         "is_not_author",
+        "is_owner_only",
         "is_busy",
         "is_auth_error",
         "is_validation_error",
@@ -216,7 +218,8 @@ def test_flat_and_unparseable_envelopes(make_client: MakeClient) -> None:
     assert (bare.code, bare.is_not_author, bare.is_auth_error) == (None, False, False)
     html = ApiError("GET", "x", Response(502, b"<html>bad gateway</html>", {}))
     assert html.code is None and "502" in str(html)
-    assert ApiError("GET", "x", jresp(403, {"error": {"code": "owner_only"}})).is_not_author is False
+    owner_only = ApiError("GET", "x", jresp(403, {"error": {"code": "owner_only"}}))
+    assert (owner_only.is_not_author, owner_only.is_owner_only) == (False, True)
 
 
 def test_a_409_without_a_code_is_neither_conflict() -> None:
