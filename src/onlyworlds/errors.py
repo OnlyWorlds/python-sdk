@@ -78,6 +78,7 @@ class ApiError(Exception):
 
     @property
     def is_auth_error(self) -> bool:
+        """``world_gone`` is reserved: keel never emits it (a deleted world's key reads as ``invalid_credentials``)."""
         return self.code in ("invalid_credentials", "key_revoked", "world_gone")
 
     @property
