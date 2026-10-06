@@ -110,6 +110,57 @@ def test_unmatched_membership_refused(tmp_path: Path, make_client: MakeClient) -
         push(base, edit, client=make_client(FakeTransport()), log_path=tmp_path / "log.jsonl")
 
 
+def test_created_by_is_never_sent(tmp_path: Path) -> None:
+    """keel drops created_by on a write but still bumps change_seq: sending it rewrites the element for nothing."""
+    base, edit = folders(
+        tmp_path,
+        {"character": [wire_char(C1, "A", created_by="m-1"), wire_char(C2, "B", created_by="m-1")]},
+        {"character": [wire_char(C1, "A"), wire_char(C2, "B2", created_by=None)]},
+    )
+    plan = plan_push(base, edit)
+    assert [(p.id, p.fields) for p in plan.patches] == [(C2, {"name": "B2"})]
+
+
+def test_generic_pair_is_sent_whole(tmp_path: Path) -> None:
+    """keel 422s a PATCH that carries one half of a generic link ("must be set together")."""
+    m1 = "m0000000-0000-7000-8000-000000000001"
+
+    def pin(eid: str, et: str) -> dict[str, Any]:
+        return {"id": P1, "type": "pin", "name": "p", "map": m1, "element_type": et, "element_id": eid}
+
+    base, edit = folders(tmp_path, {"pin": [pin(C1, "character")]}, {"pin": [pin(C2, "character")]})
+    assert plan_push(base, edit).patches[0].fields == {"element_id": C2, "element_type": "character"}
+    base, edit = folders(tmp_path / "2", {"pin": [pin(C1, "character")]}, {"pin": [pin(C1, "creature")]})
+    assert plan_push(base, edit).patches[0].fields == {"element_type": "creature", "element_id": C1}
+
+
+@pytest.mark.parametrize(
+    ("status", "code"),
+    [(401, "invalid_credentials"), (401, "key_revoked"), (429, "rate_limited"), (403, "permission_error")],
+)
+def test_a_refused_key_stops_the_run(tmp_path: Path, make_client: MakeClient, status: int, code: str) -> None:
+    """A wrong PIN on every patch would lock the key (10 failures, 15 minutes) for every tool that uses it."""
+    chars = [wire_char(f"c0000000-0000-7000-8000-00000000000{i}", "A") for i in range(5)]
+    edited = [{**c, "name": "B"} for c in chars]
+    base, edit = folders(tmp_path, {"character": chars}, {"character": edited})
+    t = FakeTransport(handler=lambda *_: jresp(status, {"error": {"code": code}}))
+    log = tmp_path / "log.jsonl"
+    res = push(base, edit, client=make_client(t), log_path=log, workers=1)
+    assert len(t.calls) == 1 and res.attempted == 1 and res.aborted and str(status) in res.aborted
+    t2 = FakeTransport(handler=echo())
+    assert push(base, edit, client=make_client(t2), log_path=log, workers=1).ok == 5  # nothing was marked done
+
+
+def test_not_author_does_not_stop_the_run(tmp_path: Path, make_client: MakeClient) -> None:
+    base, edit = folders(
+        tmp_path, {"character": [wire_char(C1, "A"), wire_char(C2, "A")]},
+        {"character": [wire_char(C1, "B"), wire_char(C2, "B")]},
+    )  # fmt: skip
+    t = FakeTransport(script=[jresp(403, {"error": {"code": "not_author"}})], handler=echo())
+    res = push(base, edit, client=make_client(t), log_path=tmp_path / "log.jsonl", workers=1)
+    assert (res.ok, len(res.failed), res.aborted) == (1, 1, None)
+
+
 def test_429_then_success_honors_retry_after(tmp_path: Path, make_client: MakeClient, sleeps: list[float]) -> None:
     base, edit = folders(tmp_path, {"character": [wire_char(C1, "A")]}, {"character": [wire_char(C1, "B")]})
     t = FakeTransport(script=[jresp(429, {"error": {}}, {"Retry-After": "7"})], handler=echo())

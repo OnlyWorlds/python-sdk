@@ -16,10 +16,17 @@ never by the diff that was sent.
 
 Never sent, whatever the diff says: ``id``; the wire's server-managed fields
 (``world``, ``type``, ``created_at``, ``updated_at``, ``change_seq``: the npm SDK's
-``sanitizePayload`` list, each of which 422s a write); Atlas's in-file sync stamps
+``sanitizePayload`` list, each of which 422s a write); ``created_by``, which keel drops
+from a write but still answers with a fresh ``change_seq`` (a folder without the key
+would otherwise rewrite every member-made element on every run); Atlas's in-file sync stamps
 ``local_updated_at`` / ``server_updated_at`` and ``image_media_id`` (spec §5, "not
 schema fields: strip them"). Atlas-written pins and markers spell their links
 ``map_id`` / ``zone_id``; the diff reads them as the wire's ``map`` / ``zone`` (spec §5).
+
+A generic link's two halves (Pin's ``element_type`` / ``element_id``) go together when
+either changed: keel refuses a write that sets one half. The run stops at the first
+answer that refuses the key itself (``stops_run``): a wrong PIN repeated across a push
+locks the key for every tool that uses it.
 """
 
 from __future__ import annotations
@@ -36,7 +43,8 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
-from ._schema import FIELD_KINDS
+from ._schema import FIELD_KINDS, GENERIC_PAIRS
+from .errors import ApiError
 from .folder import Folder, FolderElement, read_folder
 from .http import Client
 
@@ -47,6 +55,7 @@ __all__ = [
     "PushResult",
     "plan_push",
     "push",
+    "stops_run",
     "verify_level",
     "wire_view",
 ]
@@ -59,6 +68,7 @@ NOT_SENT = frozenset(
         "created_at",
         "updated_at",
         "change_seq",
+        "created_by",
         "local_updated_at",
         "server_updated_at",
         "image_media_id",
@@ -182,6 +192,10 @@ def plan_push(baseline: Folder | str | os.PathLike[str], folder: Folder | str | 
             for k in keys
             if not _equal_on_wire(f.type, k, new.get(k), old.get(k))
         }
+        for pair in GENERIC_PAIRS.get(f.type, ()):
+            if any(k in changed for k in pair):
+                for k in pair:
+                    changed.setdefault(k, new[k] if k in new else _cleared(f.type, k))
         if changed:
             plan.patches.append(Patch(f.type, eid, changed))
     plan.patches.sort(key=lambda p: (p.type, p.id))
@@ -197,6 +211,19 @@ class PushResult:
     failed: list[dict[str, Any]] = field(default_factory=list)
     retries: int = 0
     log_path: Path | None = None
+    #: why the run stopped early (``stops_run``); patches it never sent are not logged, so a rerun sends them
+    aborted: str | None = None
+
+
+def stops_run(error: ApiError) -> bool:
+    """An answer about the key, not the element: every later patch would get it too.
+
+    401 (``invalid_credentials``, ``key_revoked``), 429 ``rate_limited`` (keel's failed-PIN
+    throttle, its only 429), and any 403 but ``not_author``, which is about one element.
+    """
+    if error.status == 401 or (error.status == 429 and error.code == "rate_limited"):
+        return True
+    return error.status == 403 and not error.is_not_author
 
 
 def _load_done(log_path: Path) -> tuple[set[str], set[str]]:
@@ -264,10 +291,13 @@ def push(
         client = Client(api_key, pin)
 
     lock = threading.Lock()
+    stop = threading.Event()
     log.parent.mkdir(parents=True, exist_ok=True)
     with log.open("a", encoding="utf-8", newline="\n") as fh:
 
         def one(p: Patch) -> None:
+            if stop.is_set():
+                return
             got = client.send("PATCH", f"{p.type}/{p.id}/", p.fields)
             code = got.response.status if got.response is not None else 0
             mismatch_fields: list[str] = []
@@ -295,6 +325,11 @@ def push(
             if code != 200:
                 body = got.response.body[:300].decode("utf-8", "replace") if got.response is not None else ""
                 rec["error"] = got.error or body
+                if got.response is not None and stops_run(ApiError("PATCH", f"{p.type}/{p.id}/", got.response)):
+                    stop.set()
+                    with lock:
+                        if result.aborted is None:
+                            result.aborted = f"{code}: {body[:200]}"
             with lock:
                 fh.write(json.dumps(rec, ensure_ascii=True) + "\n")
                 fh.flush()

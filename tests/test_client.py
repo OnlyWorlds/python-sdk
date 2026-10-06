@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import re
+import uuid
 from collections.abc import Callable
 from typing import Any
 
@@ -147,9 +148,50 @@ def test_bulk_body_flag_key_and_replay(make_client: MakeClient) -> None:
     r = c.bulk([{"type": "character", "element": {"name": "A", "type": "character", "created_at": "x"}}], atomic=True,
                idempotency_key="b-1")  # fmt: skip
     assert r.errors and r.was_replay and r.items[1]["error"]["code"] == "id_conflict"
-    assert t.calls[0].body == {"items": [{"type": "character", "element": {"name": "A"}}], "atomic": True}
+    sent = t.calls[0].body
+    assert uuid.UUID(sent["items"][0]["element"].pop("id")).version == 5  # derived from your key "b-1"
+    assert sent == {"items": [{"type": "character", "element": {"name": "A"}}], "atomic": True}
     assert t.calls[0].headers["Idempotency-Key"] == "b-1" and t.calls[0].url.endswith("/bulk/")
     assert c.bulk([]).was_replay is False
+
+
+def test_bulk_resend_after_a_lost_answer_names_the_same_elements(make_client: MakeClient) -> None:
+    """keel stores a bulk answer only after the batch commits: a 502 after the commit replays
+    nothing, so an id-less item resent as id-less would be created twice. Ids given are kept."""
+    ok = {"errors": False, "items": [{"status": 201}, {"status": 201}]}
+    t = FakeTransport(script=[jresp(502, {}), jresp(200, ok)])
+    item = {"name": "A"}
+    make_client(t).bulk([{"type": "character", "element": item}, {"type": "character", "element": {"id": "c-1"}}])
+    first, second = (call.body["items"] for call in t.calls)
+    assert first == second and V7.match(first[0]["element"]["id"]) and first[1]["element"]["id"] == "c-1"
+    assert item == {"name": "A"}  # the caller's dict is not touched
+
+
+def test_your_key_with_the_same_elements_sends_the_same_body(make_client: MakeClient) -> None:
+    """Calling again with your own Idempotency-Key must replay, not 409 idempotency_error (staging, 10-06)."""
+    ok = {"errors": False, "items": [{"status": 201}, {"status": 201}]}
+    t = FakeTransport(
+        handler=lambda *_: jresp(200, ok) if _[0] == "POST" and _[1].endswith("/bulk/") else jresp(201, {})
+    )
+    c = make_client(t)
+    items = [{"type": "character", "element": {"name": "A"}}, {"type": "character", "element": {"name": "B"}}]
+    c.bulk(items, idempotency_key="k-1")
+    c.bulk(items, idempotency_key="k-1")
+    c.bulk(items, idempotency_key="k-2")
+    c.create("character", {"name": "A"}, idempotency_key="k-1")
+    c.create("character", {"name": "A"}, idempotency_key="k-1")
+    one, two, other = (call.body["items"] for call in t.calls[:3])
+    assert one == two and one[0]["element"]["id"] != one[1]["element"]["id"]
+    assert other[0]["element"]["id"] != one[0]["element"]["id"]
+    assert t.calls[3].body == t.calls[4].body
+
+
+def test_rate_limited_429_is_never_retried(make_client: MakeClient, sleeps: list[float]) -> None:
+    """keel's only v2 429 is the failed-PIN throttle: each retry is one more failure toward a locked key."""
+    t = FakeTransport(script=[jresp(429, {"error": {"code": "rate_limited"}}, {"Retry-After": "900"})])
+    with pytest.raises(ApiError) as e:
+        make_client(t).get("character", "c-1")
+    assert e.value.code == "rate_limited" and len(t.calls) == 1 and sleeps == []
 
 
 def test_bulk_without_items_is_an_error(make_client: MakeClient) -> None:

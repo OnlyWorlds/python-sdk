@@ -549,3 +549,8 @@ FIELD_KINDS: dict[str, dict[str, str]] = {
         "principles": "multi_link",
     },
 }
+
+# type -> ((type column, id column), ...): each generic link's two halves. A write sets both or neither.
+GENERIC_PAIRS: dict[str, tuple[tuple[str, str], ...]] = {
+    "pin": (("element_type", "element_id"),),
+}

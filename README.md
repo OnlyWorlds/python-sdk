@@ -9,8 +9,8 @@ The old `onlyworlds` 0.30.0 on TestPyPI is a different, earlier package for the 
 ## What is here
 
 - `write_folder` / `read_folder`: OW Folder Format **v0.3.6**. Filenames `<slug>--<last 8 of id>.json` (NFKD, 40-character cap, re-trimmed; an unsluggable name falls back to the full id), the writer collision rule with an id-ascending tie-break, LF / 2-space / `ensure_ascii=False` / trailing newline / key order as received, empty type directories omitted, canonical `world.json` keys (`time_current`). The reader takes `elements/` plus legacy `spatial/` (kept apart, merged by `all_elements()`), skips id-less and unparseable files without touching them, lets the body's type beat its directory, and never mutates the folder.
-- `plan_push` / `push` / `verify_level`: baseline, field-level diff, PATCH only the changed fields, retries on 429/5xx honouring `Retry-After`, a sent-vs-returned mismatch check, and an append-only jsonl log so a rerun skips what landed (keyed on a fingerprint of each patch, not only the id).
-- `Client`: the v2 API with an injectable transport (stdlib `urllib` by default). `health`, `get_world`, `patch_world`; `list_page`, `iter_elements`, `get`, `create`, `upsert`, `patch`, `delete`, `edit_links`; `bulk`; `changes` and `walk_changes`. Elements are plain dicts. Writes strip what the API rejects (`world`, `type`, `created_at`, `updated_at`, `change_seq`) and keep extension fields. `create` gives an element without an id a UUIDv7, and `create` and `bulk` always send an `Idempotency-Key`, so the client can retry 429, 5xx and lost answers without duplicating anything. Errors are `ApiError` with the envelope's `code`, `param` and `doc_url` and flags for the cases a caller handles differently: `is_id_conflict`, `is_idempotency_conflict`, `is_not_author`, `is_busy`, `is_auth_error`, `is_validation_error`.
+- `plan_push` / `push` / `verify_level`: baseline, field-level diff, PATCH only the changed fields (never `created_by`; a generic link's two halves together), retries on 429/5xx honouring `Retry-After`, a stop at the first answer that refuses the key itself (401, a wrong-PIN 429, a 403 other than `not_author`), a sent-vs-returned mismatch check, and an append-only jsonl log so a rerun skips what landed (keyed on a fingerprint of each patch, not only the id).
+- `Client`: the v2 API with an injectable transport (stdlib `urllib` by default). `health`, `get_world`, `patch_world`; `list_page`, `iter_elements`, `get`, `create`, `upsert`, `patch`, `delete`, `edit_links`; `bulk`; `changes` and `walk_changes`. Elements are plain dicts. Writes strip what the API rejects (`world`, `type`, `created_at`, `updated_at`, `change_seq`) and keep extension fields. `create` and `bulk` give an element without an id one (a UUIDv7, or derived from your own `Idempotency-Key` so a repeat call with that key replays) and always send an `Idempotency-Key`, so a retry after a lost answer rewrites the same elements instead of creating them twice. A 429 `rate_limited` is never retried: on keel it means a wrong PIN. Errors are `ApiError` with the envelope's `code`, `param` and `doc_url` and flags for the cases a caller handles differently: `is_id_conflict`, `is_idempotency_conflict`, `is_not_author`, `is_busy`, `is_auth_error`, `is_validation_error`.
 - `export_world` (GET only).
 - The 22 element types and each field's kind are **generated** from the schema distribution vendored at `codegen/schema-dist/` (byte-exact, MANIFEST sha256 recorded in `codegen/schema-pin.json`), never hand-listed.
 
@@ -21,7 +21,9 @@ Not yet: typed element models, the account routes, the snapshot writer.
 ```python
 from onlyworlds import Client
 
-client = Client("ow_r_...")  # a read key; writes also need the world's PIN: Client(key, pin)
+client = Client("ow_r_...")  # a read key needs no PIN; a write key does: Client(key, pin)
+# the PIN is the world's for the owner's key, the member's own account PIN for a member key,
+# and the seat's ow_s_ secret for an agent seat (the world PIN is refused for both)
 for character in client.iter_elements("character", expand=["species"]):
     print(character["name"])
 
@@ -59,7 +61,9 @@ The client (2026-10-04):
 - **Scripted tests** cover every call's verb, path, headers and body, the error flags, the retry rule (a retried create repeats the same id and key), bulk replay and the change walk. Five mutants of the client (a lost strip field, a loose conflict flag, a fresh key per attempt, a lenient `Retry-After`, a stuck cursor) each fail the suite.
 - **Against keel's OpenAPI document** (`tests/test_wire.py`): passes on the live document, and fails on each of eight deliberately broken copies of it (a route, a parameter, a field kind, a page key, an error key, a write field, a new read field, a `required` list).
 - **Live reads** against the demo world: health, world, a page, sparse fields, and the change feed.
-- **Not checked on the wire: writes.** `create`, `upsert`, `patch`, `delete`, `edit_links` and `bulk` are checked against the document and scripted answers, not against a server, because the only world used so far is the read-only demo. The document does not describe `/changes`, `/bulk` or the world-meta body, so those rest on scripted tests and the reads above.
+- **Writes on the wire** (`tests/test_staging_writes.py`, 11 tests against a scratch world on keel-staging, an owner and a contributor key; 2026-10-04, rerun 2026-10-06): create, idempotent replay, PUT and PATCH, links, bulk (partial, atomic, cycles, replay), the change feed, a contributor's limits, PINs, cross-world ids, the extension cap. Skipped unless the `OW_STAGING_*` keys are set; never in CI.
+
+The first review against keel (Skeld, 2026-10-06) found four faults, each fixed with a test watched failing on the old code: push sent `created_by`; push sent half of Pin's `element_type`/`element_id` pair; a wrong-PIN 429 was retried and push carried on; and an id-less bulk item could be created twice on a resend.
 
 ## Format rulings behind it
 
@@ -67,7 +71,7 @@ Three questions this code raised were ruled in the folder spec (§5 and its chan
 
 ## Next
 
-A write check against a scratch world, a review of the first release by the owner of the wire contract, then PyPI `0.1.0`.
+Skeld's re-read of the four fixes, then PyPI `0.1.0`.
 
 ## License
 

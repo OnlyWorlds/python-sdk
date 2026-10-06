@@ -8,13 +8,16 @@ OpenAPI document, which ``tests/test_wire.py`` compares the client with):
   ``type`` / ``created_at`` / ``updated_at`` / ``change_seq``: the typed calls strip them;
 - lists are ``{data, has_more, next_cursor}``, continued with ``?cursor=``;
 - ``Idempotency-Key`` on POST and ``/bulk`` replays the first successful answer for 24 h;
-- 429 carries ``Retry-After``; under load keel answers 503 ``server_busy`` with
+- 429 carries ``Retry-After``; on v2 its only 429 is ``rate_limited``, the failed-PIN
+  throttle (10 failures lock the key for 15 minutes); under load keel answers 503 ``server_busy`` with
   ``Retry-After: 5`` (keel D71, 2026-09-28).
 
 One difference from the TypeScript SDK, on purpose: this client retries 429, 5xx and
-no-response failures itself (``RetryPolicy``; ``attempts=1`` turns it off). A retried
-create stays safe because every ``create`` and ``bulk`` sends an ``Idempotency-Key`` (yours,
-or one it makes), and ``create`` mints a UUIDv7 id when the element has none.
+no-response failures itself (``RetryPolicy``; ``attempts=1`` turns it off), except a 429
+``rate_limited``, which on keel means a wrong PIN. A retried write stays safe because every
+``create`` and ``bulk`` sends an ``Idempotency-Key`` (yours, or one it makes), and both mint
+a UUIDv7 id for an element that has none: keel stores a bulk answer only after the batch
+commits, so a resend after a lost answer must name the same elements to stay a rewrite.
 """
 
 from __future__ import annotations
@@ -32,7 +35,7 @@ from typing import Any, Protocol
 
 from ._ids import uuid7
 from ._version import __version__
-from .errors import ApiError, parse_retry_after
+from .errors import ApiError, error_code, parse_retry_after
 
 __all__ = [
     "API_BASE",
@@ -60,6 +63,22 @@ READ_ONLY_FIELDS: tuple[str, ...] = ("world", "type", "created_at", "updated_at"
 
 _TYPE = re.compile(r"^[a-z][a-z0-9_]*$")
 _ID = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_.-]*$")
+#: Namespace for ids derived from a caller's Idempotency-Key (``_minted_id``).
+_KEYED_IDS = uuid.UUID("0199b6a0-6f0e-7c2a-9d1e-3b5c7a8e4f21")
+
+
+def _minted_id(idempotency_key: str | None, index: int) -> str:
+    """An id for an element that has none.
+
+    With the caller's own Idempotency-Key, the id is derived from the key and the
+    element's position (UUIDv5), so the same key with the same elements sends the same
+    body and keel replays it. Without one, a fresh UUIDv7: the client made the key, and
+    only its own retries, which resend the body unchanged, can reuse it. Keel takes any
+    UUID as an element id (D70b).
+    """
+    if idempotency_key:
+        return str(uuid.uuid5(_KEYED_IDS, f"{idempotency_key}\n{index}"))
+    return uuid7()
 
 
 def sanitize_payload(payload: Mapping[str, Any]) -> dict[str, Any]:
@@ -116,6 +135,9 @@ class UrllibTransport:
 class RetryPolicy:
     """Retry 429, any 5xx, and transport exceptions; honor ``Retry-After``.
 
+    Never a 429 with code ``rate_limited``: keel sends it for a wrong PIN, and each retry is
+    one more failure toward locking the key.
+
     Waits ``Retry-After`` when the server sends a valid one (whole seconds or an HTTP
     date), otherwise ``min(cap, base * 2**attempt)``. ``attempts`` counts every try,
     the first included.
@@ -126,8 +148,10 @@ class RetryPolicy:
     cap: float = 30.0
     max_retry_after: float = 120.0
 
-    def should_retry(self, status: int) -> bool:
-        return status == 429 or status >= 500
+    def should_retry(self, status: int, code: str | None = None) -> bool:
+        if status == 429:
+            return code != "rate_limited"
+        return status >= 500
 
     def delay(self, attempt: int, response: Response | None) -> float:
         backoff: float = min(self.cap, self.base * (2.0**attempt))
@@ -264,7 +288,8 @@ class Client:
             except Exception as exc:  # no response at all: timeouts, resets, DNS
                 response, reason = None, f"{type(exc).__name__}: {exc}"
             else:
-                if not self.retry.should_retry(response.status):
+                code = error_code(response.body) if response.status == 429 else None
+                if not self.retry.should_retry(response.status, code):
                     return Attempted(response, len(reasons), reasons)
                 reason = str(response.status)
             if attempt == self.retry.attempts - 1:
@@ -385,7 +410,9 @@ class Client:
     def create(
         self, element_type: str, element: Mapping[str, Any], *, idempotency_key: str | None = None
     ) -> dict[str, Any]:
-        """``POST /{type}``: create. Gives the element a UUIDv7 ``id`` when it has none.
+        """``POST /{type}``: create. Gives the element an ``id`` when it has none: a UUIDv7, or,
+        with your ``idempotency_key``, one derived from it, so calling again with the same key
+        and element replays the stored success.
 
         Always sends an ``Idempotency-Key`` (yours, or a fresh one), so a retry after a lost
         answer replays the stored success instead of failing with ``id_conflict``.
@@ -396,7 +423,7 @@ class Client:
         t = _segment(element_type, _TYPE, "element type")
         body = sanitize_payload(element)
         if not body.get("id"):
-            body["id"] = uuid7()
+            body["id"] = _minted_id(idempotency_key, 0)
         key = idempotency_key or str(uuid.uuid4())
         return self._element(self.call("POST", f"{t}/", body, {"Idempotency-Key": key}), "POST", t)
 
@@ -458,13 +485,18 @@ class Client:
 
         Partial success is the default (HTTP 200: read each slot's numeric ``status``);
         ``atomic=True`` is all or nothing. Links are validated against the whole batch, so
-        send items in any order, cycles included. Always sends an ``Idempotency-Key``.
+        send items in any order, cycles included. Always sends an ``Idempotency-Key``, and
+        gives every element without an ``id`` one (``create``'s rule, per position), so a
+        resend after a lost answer rewrites the same elements instead of creating them twice.
         """
+        elements = []
+        for index, it in enumerate(items):
+            element = sanitize_payload(it["element"])
+            if not element.get("id"):
+                element["id"] = _minted_id(idempotency_key, index)
+            elements.append({"type": _segment(str(it["type"]), _TYPE, "element type"), "element": element})
         body = {
-            "items": [
-                {"type": _segment(str(it["type"]), _TYPE, "element type"), "element": sanitize_payload(it["element"])}
-                for it in items
-            ],
+            "items": elements,
             "atomic": atomic,
         }
         key = idempotency_key or str(uuid.uuid4())

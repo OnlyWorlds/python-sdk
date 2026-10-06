@@ -18,7 +18,7 @@ from typing import TYPE_CHECKING, Any
 if TYPE_CHECKING:
     from .http import Response
 
-__all__ = ["ApiError", "parse_retry_after"]
+__all__ = ["ApiError", "error_code", "parse_retry_after"]
 
 _DELAY_SECONDS = re.compile(r"^[0-9]+$")
 
@@ -51,6 +51,15 @@ def _envelope(body: bytes) -> dict[str, Any]:
     return data if isinstance(data, dict) else {}
 
 
+def error_code(body: bytes) -> str | None:
+    """The machine ``code`` of an error body, whichever envelope shape carries it; None when there is none."""
+    env = _envelope(body)
+    raw_error = env.get("error")
+    nested: dict[str, Any] = raw_error if isinstance(raw_error, dict) else {}
+    code = env.get("code") or nested.get("code") or (raw_error if isinstance(raw_error, str) else None)
+    return code if isinstance(code, str) else None
+
+
 class ApiError(Exception):
     """A non-2xx answer. ``status`` and ``response`` always; the rest comes from the envelope when there is one."""
 
@@ -62,8 +71,7 @@ class ApiError(Exception):
         env = _envelope(response.body)
         raw_error = env.get("error")
         nested: dict[str, Any] = raw_error if isinstance(raw_error, dict) else {}
-        code = env.get("code") or nested.get("code") or (raw_error if isinstance(raw_error, str) else None)
-        self.code: str | None = code if isinstance(code, str) else None
+        self.code: str | None = error_code(response.body)
         etype = env.get("type") or nested.get("type")
         self.type: str | None = etype if isinstance(etype, str) else None
         param = env.get("param") if env.get("param") is not None else nested.get("param")
