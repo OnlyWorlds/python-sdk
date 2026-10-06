@@ -34,8 +34,10 @@ from dataclasses import dataclass, field
 from typing import Any, Protocol
 
 from ._ids import uuid7
+from ._schema import FIELD_KINDS
 from ._version import __version__
 from .errors import ApiError, error_code, parse_retry_after
+from .folder import WIRE_TO_DISK_WORLD_KEYS
 
 __all__ = [
     "API_BASE",
@@ -48,6 +50,7 @@ __all__ = [
     "RetryPolicy",
     "Transport",
     "UrllibTransport",
+    "check_kinds",
     "sanitize_payload",
 ]
 
@@ -84,6 +87,41 @@ def _minted_id(idempotency_key: str | None, index: int) -> str:
 def sanitize_payload(payload: Mapping[str, Any]) -> dict[str, Any]:
     """A copy of ``payload`` without the fields the API rejects on write (see ``READ_ONLY_FIELDS``)."""
     return {k: v for k, v in payload.items() if k not in READ_ONLY_FIELDS}
+
+
+#: ``GET /world`` keys that ``PATCH /world`` refuses (keel's writable set has neither), dropped
+#: like ``READ_ONLY_FIELDS`` so a read body is writable. ``public_read`` changes through sharing.
+WORLD_READ_ONLY_FIELDS: tuple[str, ...] = ("id", "public_read")
+_DISK_TO_WIRE_WORLD_KEYS = {disk: wire for wire, disk in WIRE_TO_DISK_WORLD_KEYS.items()}
+
+
+def check_kinds(element_type: str, element: Mapping[str, Any]) -> None:
+    """Refuse, before sending, a value keel would store as something else.
+
+    keel is lenient by design (spec §6): it stores ``int(value)`` for an integer field, cutting
+    ``2.5`` to ``2``, and the ``repr`` of a list sent to a text field, both with a 200. So: an
+    integer field takes an int or an integral float (never a bool), a text field a string, each
+    or None. Fields outside the schema (extensions) are not checked.
+    """
+    kinds = FIELD_KINDS.get(element_type, {})
+    for key, value in element.items():
+        kind = kinds.get(key)
+        if value is None or kind is None:
+            continue
+        if kind == "integer":
+            if isinstance(value, bool) or not (
+                isinstance(value, int) or (isinstance(value, float) and value.is_integer())
+            ):
+                raise ValueError(
+                    f"{element_type}.{key} is an integer field; {value!r} would be stored as another value"
+                )
+        elif kind == "text" and not isinstance(value, str):
+            raise ValueError(f"{element_type}.{key} is a text field; {value!r} is not a string")
+
+
+def _same_stored(a: Any, b: Any) -> bool:
+    """Equal as keel stores it: a text field's ``None`` and ``""`` are one state."""
+    return a == b or (a in (None, "") and b in (None, ""))
 
 
 def _segment(value: str, pattern: re.Pattern[str], what: str) -> str:
@@ -133,10 +171,11 @@ class UrllibTransport:
 
 @dataclass(frozen=True)
 class RetryPolicy:
-    """Retry 429, any 5xx, and transport exceptions; honor ``Retry-After``.
+    """Retry 429, 502, 503, 504 and transport exceptions, and a 500 once; honor ``Retry-After``.
 
     Never a 429 with code ``rate_limited``: keel sends it for a wrong PIN, and each retry is
-    one more failure toward locking the key.
+    one more failure toward locking the key. keel's 500 is an unhandled exception, almost
+    always the same on every try, so it gets one retry, not the full budget.
 
     Waits ``Retry-After`` when the server sends a valid one (whole seconds or an HTTP
     date), otherwise ``min(cap, base * 2**attempt)``. ``attempts`` counts every try,
@@ -148,10 +187,13 @@ class RetryPolicy:
     cap: float = 30.0
     max_retry_after: float = 120.0
 
-    def should_retry(self, status: int, code: str | None = None) -> bool:
+    def should_retry(self, status: int, code: str | None = None, attempt: int = 0) -> bool:
+        """``attempt`` is the try that got ``status``, the first being 0."""
         if status == 429:
             return code != "rate_limited"
-        return status >= 500
+        if status == 500:
+            return attempt == 0
+        return status in (502, 503, 504)
 
     def delay(self, attempt: int, response: Response | None) -> float:
         backoff: float = min(self.cap, self.base * (2.0**attempt))
@@ -198,9 +240,13 @@ class ChangeWalk:
 
     ``for op in walk`` yields each op (``upsert`` carries ``element``, ``delete`` carries
     ``deleted_at``). Afterwards ``cursor`` is the opaque position to persist for the next
-    incremental pull (never parse it, it never expires) and ``head`` is the world's current
-    ``change_seq``. If a persisted position is ever ahead of ``head``, the server was
-    restored: pull again from the start rather than assuming you are caught up.
+    incremental pull (pass back exactly what you got: never parse or build one) and ``head``
+    is the world's current ``change_seq``.
+
+    A stored cursor can be refused: ``ApiError.is_resync_required`` (409), when a guest's view
+    of the world changed or the key's role did. Then drop the cursor, walk again from the
+    start, and replace the local copy rather than merging into it. A guest never receives
+    delete ops, so only the replace removes what it no longer sees.
     """
 
     def __init__(self, client: Client, since: str | None = None, *, limit: int | None = None):
@@ -289,7 +335,7 @@ class Client:
                 response, reason = None, f"{type(exc).__name__}: {exc}"
             else:
                 code = error_code(response.body) if response.status == 429 else None
-                if not self.retry.should_retry(response.status, code):
+                if not self.retry.should_retry(response.status, code, attempt):
                     return Attempted(response, len(reasons), reasons)
                 reason = str(response.status)
             if attempt == self.retry.attempts - 1:
@@ -322,8 +368,19 @@ class Client:
         return data
 
     def patch_world(self, partial: Mapping[str, Any]) -> dict[str, Any]:
-        """``PATCH /world``: a partial meta update. World-meta edits do NOT appear in ``/changes``."""
-        data = self.call("PATCH", "world/", sanitize_payload(partial))
+        """``PATCH /world``: a partial meta update (owner key only). World-meta edits do NOT appear
+        in ``/changes``.
+
+        Takes back a ``get_world()`` body: ``id``, ``public_read`` and the timestamps are dropped
+        (``public_read`` is not writable here). A folder ``world.json``'s ``time_current`` is sent
+        as the wire's ``time_range_current``. keel refuses any other key it does not write (422).
+        """
+        body = {
+            _DISK_TO_WIRE_WORLD_KEYS.get(k, k): v
+            for k, v in sanitize_payload(partial).items()
+            if k not in WORLD_READ_ONLY_FIELDS
+        }
+        data = self.call("PATCH", "world/", body)
         if not isinstance(data, dict):
             raise ValueError(f"PATCH /world returned no object: {str(data)[:200]}")
         return data
@@ -422,22 +479,42 @@ class Client:
         """
         t = _segment(element_type, _TYPE, "element type")
         body = sanitize_payload(element)
+        check_kinds(t, body)
         if not body.get("id"):
             body["id"] = _minted_id(idempotency_key, 0)
         key = idempotency_key or str(uuid.uuid4())
-        return self._element(self.call("POST", f"{t}/", body, {"Idempotency-Key": key}), "POST", t)
+        got = self.send("POST", f"{t}/", body, {"Idempotency-Key": key})
+        if got.response is None:
+            raise ConnectionError(f"POST {t}/: {got.error}")
+        if got.response.status == 409 and got.retries and error_code(got.response.body) == "id_conflict":
+            # An earlier try may have committed before its answer was lost, and the retry
+            # arrived before keel stored the replay: read it back. Only an exact match is ours.
+            try:
+                stored = self.get(t, str(body["id"]))
+            except ApiError:
+                stored = None
+            if stored is not None and all(_same_stored(stored.get(k), v) for k, v in body.items()):
+                return stored
+            raise ApiError("POST", f"{t}/", got.response)
+        if not 200 <= got.response.status < 300:
+            raise ApiError("POST", f"{t}/", got.response)
+        return self._element(got.response.json(), "POST", t)
 
     def upsert(self, element_type: str, element_id: str, element: Mapping[str, Any]) -> dict[str, Any]:
         """``PUT /{type}/{id}``: replace by client id, creating if absent. The local-first write."""
         t = _segment(element_type, _TYPE, "element type")
         i = _segment(element_id, _ID, "element id")
-        return self._element(self.call("PUT", f"{t}/{i}/", sanitize_payload(element)), "PUT", t)
+        body = sanitize_payload(element)
+        check_kinds(t, body)
+        return self._element(self.call("PUT", f"{t}/{i}/", body), "PUT", t)
 
     def patch(self, element_type: str, element_id: str, partial: Mapping[str, Any]) -> dict[str, Any]:
         """``PATCH /{type}/{id}``: a partial update. Arrays REPLACE wholesale; for links use ``edit_links``."""
         t = _segment(element_type, _TYPE, "element type")
         i = _segment(element_id, _ID, "element id")
-        return self._element(self.call("PATCH", f"{t}/{i}/", sanitize_payload(partial)), "PATCH", t)
+        body = sanitize_payload(partial)
+        check_kinds(t, body)
+        return self._element(self.call("PATCH", f"{t}/{i}/", body), "PATCH", t)
 
     def delete(self, element_type: str, element_id: str) -> None:
         """``DELETE /{type}/{id}``: 204, also when it is already gone. The server scrubs the id from every link."""
@@ -492,6 +569,7 @@ class Client:
         elements = []
         for index, it in enumerate(items):
             element = sanitize_payload(it["element"])
+            check_kinds(str(it["type"]), element)
             if not element.get("id"):
                 element["id"] = _minted_id(idempotency_key, index)
             elements.append({"type": _segment(str(it["type"]), _TYPE, "element type"), "element": element})

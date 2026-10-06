@@ -33,6 +33,7 @@ from .http import (
     RetryPolicy,
     Transport,
     UrllibTransport,
+    check_kinds,
     sanitize_payload,
 )
 from .push import Patch, PushPlan, PushResult, plan_push, push, verify_level
@@ -62,6 +63,7 @@ __all__ = [
     "UrllibTransport",
     "WriteReport",
     "__version__",
+    "check_kinds",
     "element_filename",
     "export_world",
     "parse_retry_after",

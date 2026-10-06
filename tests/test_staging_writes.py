@@ -109,9 +109,11 @@ def test_name_is_required_but_may_be_empty_and_null_is_not_zero(owner: Client, m
     zero = owner.create("character", {"name": "Zero", "height": 0})
     made += [("character", unset["id"]), ("character", zero["id"])]
     assert (unset["height"], zero["height"]) == (None, 0)
-    with pytest.raises(ApiError) as bad:
-        owner.create("character", {"name": "StrInt", "height": "tall"})
+    with pytest.raises(ApiError) as bad:  # the raw call: the typed create refuses this before sending
+        owner.call("POST", "character/", {"id": str(uuid7()), "name": "StrInt", "height": "tall"})
     assert (bad.value.status, bad.value.param) == (422, "height")
+    with pytest.raises(ValueError, match=r"character\.height"):
+        owner.create("character", {"name": "StrInt", "height": "tall"})
 
 
 def test_links_dedupe_tolerate_absent_ids_and_are_scrubbed_on_delete(

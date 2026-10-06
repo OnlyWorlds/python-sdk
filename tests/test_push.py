@@ -271,3 +271,16 @@ def test_verify_level(tmp_path: Path) -> None:
     fresh = tmp_path / "fresh"
     write_folder(fresh, WORLD, {"character": [wire_char(C1, "B", change_seq=100, updated_at="now")]})
     assert verify_level(fresh, edit).patches == []
+
+
+def test_a_value_keel_would_store_as_another_is_not_pushed(tmp_path: Path, make_client: MakeClient) -> None:
+    """A folder holding 2.5 in an integer field: keel would store 2 with a 200, so push refuses it locally."""
+    base, edit = folders(
+        tmp_path,
+        {"character": [wire_char(C1, "A"), wire_char(C2, "A")]},
+        {"character": [wire_char(C1, "B"), wire_char(C2, "A", birth_date=2.5)]},
+    )
+    t = FakeTransport(handler=echo())
+    res = push(base, edit, client=make_client(t), log_path=tmp_path / "log.jsonl", workers=1)
+    assert res.ok == 1 and len(res.failed) == 1 and "birth_date" in res.failed[0]["error"]
+    assert [c.url.rsplit("/", 2)[-2] for c in t.calls] == [C1]

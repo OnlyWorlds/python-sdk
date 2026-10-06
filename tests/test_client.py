@@ -278,3 +278,83 @@ def test_retry_after_is_strict() -> None:
     e = ApiError("GET", "x", env(429, "rate_limited", "rate_limited", {"Retry-After": "7"}))
     assert e.retry_after == 7.0
     assert ApiError("GET", "x", env(429, "rate_limited", "rate_limited", {"Retry-After": "1.5"})).retry_after is None
+
+
+# --- Skeld's review, B1-B5 and the guest feed (2026-10-06) ---------------------------------
+
+
+@pytest.mark.parametrize(
+    ("etype", "field", "value"),
+    [
+        ("pin", "x", 2.5),
+        ("pin", "x", True),
+        ("pin", "x", "3"),
+        ("character", "description", ["a"]),
+        ("character", "name", 7),
+    ],
+)
+def test_a_value_keel_would_store_as_another_is_refused_before_sending(
+    make_client: MakeClient, etype: str, field: str, value: Any
+) -> None:
+    """keel stores int(2.5) == 2 and the repr of a list on a text field, both with a 200 (lenient by design)."""
+    t = FakeTransport()
+    c = make_client(t)
+    for write in (
+        lambda: c.create(etype, {"name": "n", field: value}),
+        lambda: c.upsert(etype, "e-1", {"name": "n", field: value}),
+        lambda: c.patch(etype, "e-1", {field: value}),
+        lambda: c.bulk([{"type": etype, "element": {"name": "n", field: value}}]),
+    ):
+        with pytest.raises(ValueError, match=f"{etype}.{field}"):
+            write()
+    assert t.calls == []
+
+
+def test_integral_floats_none_and_extensions_pass_the_kind_check(make_client: MakeClient) -> None:
+    t = FakeTransport(handler=lambda *_: jresp(200, {"id": "p-1"}))
+    make_client(t).patch("pin", "p-1", {"x": 3.0, "y": None, "description": "", "x_tool_n": 2.5})
+    assert t.calls[0].body == {"x": 3.0, "y": None, "description": "", "x_tool_n": 2.5}
+
+
+def test_a_retried_create_that_already_landed_is_read_back(make_client: MakeClient) -> None:
+    """The first try committed, its answer was lost, the retry beat keel's replay record: 409 id_conflict."""
+    conflict = jresp(409, {"error": {"code": "id_conflict"}})
+    stored = {"id": "c-1", "name": "A", "description": "", "type": "character"}
+    t = FakeTransport(script=[jresp(502, {}), conflict, jresp(200, stored)])
+    assert make_client(t).create("character", {"id": "c-1", "name": "A", "description": None}) == stored
+    assert [c.method for c in t.calls] == ["POST", "POST", "GET"]
+
+    other = {**stored, "name": "B"}  # someone else's element under that id: still a conflict
+    t = FakeTransport(script=[jresp(502, {}), conflict, jresp(200, other)])
+    with pytest.raises(ApiError) as e:
+        make_client(t).create("character", {"id": "c-1", "name": "A"})
+    assert e.value.is_id_conflict
+
+    t = FakeTransport(script=[conflict])  # no retry: the id was taken before this call
+    with pytest.raises(ApiError):
+        make_client(t).create("character", {"id": "c-1", "name": "A"})
+    assert len(t.calls) == 1
+
+
+@pytest.mark.parametrize(("status", "tries"), [(500, 2), (501, 1), (502, 3), (503, 3), (504, 3), (505, 1)])
+def test_which_5xx_are_retried(make_client: MakeClient, status: int, tries: int) -> None:
+    """keel's 500 is an unhandled exception, almost always deterministic: once at most."""
+    t = FakeTransport(handler=lambda *_: jresp(status, {}))
+    with pytest.raises(ApiError):
+        make_client(t, attempts=3).get("character", "c-1")
+    assert len(t.calls) == tries
+
+
+def test_permission_and_resync_predicates() -> None:
+    def err(status: int, code: str) -> ApiError:
+        return ApiError("GET", "x", jresp(status, {"error": {"type": "x", "code": code}}))
+
+    assert err(403, "permission_error").is_permission_error and not err(403, "not_author").is_permission_error
+    assert err(409, "resync_required").is_resync_required and not err(409, "id_conflict").is_resync_required
+
+
+def test_patch_world_takes_back_a_get_world_body_and_a_folder_spelling(make_client: MakeClient) -> None:
+    t = FakeTransport(handler=lambda *_: jresp(200, {"id": "w"}))
+    body = {"id": "w", "name": "W", "public_read": True, "created_at": "a", "updated_at": "b", "time_current": 5}
+    make_client(t).patch_world(body)
+    assert t.calls[0].body == {"name": "W", "time_range_current": 5}

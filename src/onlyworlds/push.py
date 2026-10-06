@@ -46,7 +46,7 @@ from typing import Any
 from ._schema import FIELD_KINDS, GENERIC_PAIRS
 from .errors import ApiError
 from .folder import Folder, FolderElement, read_folder
-from .http import Client
+from .http import Client, check_kinds
 
 __all__ = [
     "NOT_SENT",
@@ -297,6 +297,15 @@ def push(
 
         def one(p: Patch) -> None:
             if stop.is_set():
+                return
+            try:
+                check_kinds(p.type, p.fields)
+            except ValueError as exc:
+                refused = {"id": p.id, "type": p.type, "code": 0, "fields": sorted(p.fields), "error": str(exc)}
+                with lock:
+                    result.failed.append(refused)
+                    if on_failure:
+                        on_failure(refused)
                 return
             got = client.send("PATCH", f"{p.type}/{p.id}/", p.fields)
             code = got.response.status if got.response is not None else 0

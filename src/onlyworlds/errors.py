@@ -115,6 +115,19 @@ class ApiError(Exception):
         return self.status == 403 and self.code == "owner_only"
 
     @property
+    def is_permission_error(self) -> bool:
+        """The key is valid but lacks the scope (403 ``permission_error``): a read key on a write
+        route, or a member key on a surface that refuses members. Retrying will not help."""
+        return self.status == 403 and self.code == "permission_error"
+
+    @property
+    def is_resync_required(self) -> bool:
+        """``/changes`` refused the cursor (409 ``resync_required``): a guest's view of the world
+        changed, or the key's role did (a guest's cursor has another shape). Drop the cursor,
+        walk again from the start, and REPLACE the local copy: what the key no longer sees must go."""
+        return self.status == 409 and self.code == "resync_required"
+
+    @property
     def is_busy(self) -> bool:
         """keel's admission control turned the request away (503 ``server_busy``); see ``retry_after``."""
         return self.status == 503 and self.code == "server_busy"
