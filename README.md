@@ -2,7 +2,7 @@
 
 **Pre-release (`0.1.0.dev0`). Not on PyPI yet.** The Python package for OnlyWorlds: the world folder format (read, write, push) and a client for the v2 API. Python 3.12+, no runtime dependencies.
 
-Its version is its own semver and does not track the schema's. The schema version it was generated from is a constant in the package (`v0.30.1-dist.15`, canonical 00.30.01).
+Its version is its own semver and does not track the schema's. The schema it was generated from is in the package: `onlyworlds.SCHEMA_VERSION` and `onlyworlds.SCHEMA_DIST_TAG`.
 
 The old `onlyworlds` 0.30.0 on TestPyPI is a different, earlier package for the v1 API (`/api/worldapi/`). It is not related to this code.
 
