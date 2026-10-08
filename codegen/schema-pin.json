@@ -1,5 +1,5 @@
 {
-  "_what": "The recorded pin for the vendored OnlyWorlds schema distribution (codegen/schema-dist/, copied byte-exact). Do not edit by hand; re-vendor from the pinned tag and review the diff. Kept equal to the npm SDK's pin (Development/OnlyWorlds/sdk/codegen/schema-pin.json) on purpose: two clients, one schema.",
+  "_what": "The recorded pin for the vendored OnlyWorlds schema distribution (codegen/schema-dist/, copied byte-exact). Do not edit by hand; re-vendor from the pinned tag and review the diff. Kept equal to the npm SDK's pin (github.com/OnlyWorlds/sdk, codegen/schema-pin.json) on purpose: two clients, one schema.",
   "_why_manifest_sha256": "Verifying the tree against its own MANIFEST.json only proves internal consistency. If the tag moved, the manifest moved with it. The hash recorded here is the one first accepted, which is what makes a moved tag visible.",
   "repo": "https://github.com/OnlyWorlds/schema-dist",
   "tag": "v0.30.2-dist.16",
@@ -9,5 +9,5 @@
   "dist_serial": 16,
   "published": "2026-10-08",
   "pinned_at": "2026-10-08",
-  "pinned_by": "Kael (Assembly) — tree from `git archive v0.30.2-dist.16` in the local schema-dist checkout; 31/31 files re-hashed against MANIFEST.json; MANIFEST self-hash matched against the raw file GitHub serves at the tag, whose ref resolves to the commit above"
+  "pinned_by": "The maintainer: tree from `git archive` of the tag in a schema-dist checkout; 31/31 files re-hashed against MANIFEST.json; MANIFEST self-hash matched against the raw file GitHub serves at the tag, whose ref resolves to the commit above."
 }
