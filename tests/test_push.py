@@ -121,6 +121,17 @@ def test_created_by_is_never_sent(tmp_path: Path) -> None:
     assert [(p.id, p.fields) for p in plan.patches] == [(C2, {"name": "B2"})]
 
 
+def test_atlas_local_only_fields_stay_home(tmp_path: Path) -> None:
+    """Atlas's ATLAS_LOCAL_ONLY_FIELDS never reach the wire; its wire extensions (atlas_color...) do."""
+    base, edit = folders(
+        tmp_path,
+        {"character": [wire_char(C1, "A")]},
+        {"character": [wire_char(C1, "A", atlas_aliases=["Al"], atlas_page_pub=True, atlas_color="#fff")]},
+    )
+    plan = plan_push(base, edit)
+    assert [(p.id, p.fields) for p in plan.patches] == [(C1, {"atlas_color": "#fff"})]
+
+
 def test_generic_pair_is_sent_whole(tmp_path: Path) -> None:
     """keel 422s a PATCH that carries one half of a generic link ("must be set together")."""
     m1 = "m0000000-0000-7000-8000-000000000001"

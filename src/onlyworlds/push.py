@@ -16,12 +16,15 @@ never by the diff that was sent.
 
 Never sent, whatever the diff says: ``id``; the wire's server-managed fields
 (``world``, ``type``, ``created_at``, ``updated_at``, ``change_seq``: the npm SDK's
-``sanitizePayload`` list, each of which 422s a write); ``created_by``, which keel drops
+``sanitizePayload`` list; keel ignores ``world`` and 422s the rest); ``created_by``, which keel drops
 from a write but still answers with a fresh ``change_seq`` (a folder without the key
 would otherwise rewrite every member-made element on every run); Atlas's in-file sync stamps
 ``local_updated_at`` / ``server_updated_at`` and ``image_media_id`` (spec §5, "not
-schema fields: strip them"). Atlas-written pins and markers spell their links
-``map_id`` / ``zone_id``; the diff reads them as the wire's ``map`` / ``zone`` (spec §5).
+schema fields: strip them"); Atlas's local-only extension fields (``ATLAS_LOCAL_ONLY_FIELDS``
+in Atlas's ``src/core/constants.ts``, Temper's list, h17 #1240). Atlas's other ``atlas_*`` fields
+(colour, opacity, label, shape, calendar) travel on purpose and are sent like any extension.
+Atlas-written pins and markers spell their links ``map_id`` / ``zone_id``; the diff reads
+them as the wire's ``map`` / ``zone`` (spec §5).
 
 A generic link's two halves (Pin's ``element_type`` / ``element_id``) go together when
 either changed: keel refuses a write that sets one half. The run stops at the first
@@ -72,6 +75,14 @@ NOT_SENT = frozenset(
         "local_updated_at",
         "server_updated_at",
         "image_media_id",
+        "atlas_richtext_json",
+        "atlas_aliases",
+        "atlas_dismissed_suggestions",
+        "atlas_page_blocks",
+        "atlas_page_refs",
+        "atlas_page_intent",
+        "atlas_page_theme",
+        "atlas_page_pub",
     }
 )
 _LEGACY_LINK_SPELLINGS: Mapping[str, Mapping[str, str]] = {
