@@ -51,7 +51,7 @@ for character in client.iter_elements("character", expand=["species"]):
 
 ## World folders
 
-A world folder is one JSON file per element, in [the world folder format](https://github.com/OnlyWorlds/toolkit/blob/main/knowledge/world-folder.md). [Atlas](https://atlas.onlyworlds.com), the OnlyWorlds editor, reads and writes the same format.
+A world folder is one JSON file per element, in [the world folder format](https://onlyworlds.github.io/docs/schema/folders). [Atlas](https://atlas.onlyworlds.com), the OnlyWorlds editor, reads and writes the same format.
 
 ```python
 from onlyworlds import export_world, read_folder
