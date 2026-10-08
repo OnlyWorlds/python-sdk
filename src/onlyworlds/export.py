@@ -1,7 +1,7 @@
 """Export a world from the wire to a folder: ``GET /world`` + every type's list, through the folder writer.
 
-This is the package-shaped half of Skeld's Sikelia ``export_folder.py``. The folder
-it writes carries the SERVER world id (like his) and no ``api`` block and no
+This is the package-shaped half of an earlier export script, ``export_folder.py``. The folder
+it writes carries the SERVER world id (like the script's) and no ``api`` block and no
 ``snapshot_*`` keys: it is an export, the baseline a push diffs against. It is
 not a snapshot (§4.2: fresh world id, provenance block, coherence bracket) and it
 is not a linked folder (§4.1: ``api`` block); those writers are later slices.

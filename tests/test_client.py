@@ -280,7 +280,7 @@ def test_retry_after_is_strict() -> None:
     assert ApiError("GET", "x", env(429, "rate_limited", "rate_limited", {"Retry-After": "1.5"})).retry_after is None
 
 
-# --- Skeld's review, B1-B5 and the guest feed (2026-10-06) ---------------------------------
+# --- Review findings B1-B5 and the guest feed (2026-10-06) ---------------------------------
 
 
 @pytest.mark.parametrize(

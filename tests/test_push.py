@@ -253,7 +253,7 @@ def test_rerun_skips_what_landed_but_not_a_new_edit(tmp_path: Path, make_client:
     assert t3.calls[0].body == {"name": "A3"}
 
 
-def test_reads_skelds_original_log_format(tmp_path: Path, make_client: MakeClient) -> None:
+def test_reads_original_log_format(tmp_path: Path, make_client: MakeClient) -> None:
     base, edit = folders(tmp_path, {"character": [wire_char(C1, "A")]}, {"character": [wire_char(C1, "B")]})
     log = tmp_path / "log.jsonl"
     log.write_text(json.dumps({"id": C1, "type": "character", "code": 200, "mismatch": False, "retries": 0}) + "\n")

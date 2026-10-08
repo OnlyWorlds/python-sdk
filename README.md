@@ -63,7 +63,7 @@ The client (2026-10-04):
 - **Live reads** against the demo world: health, world, a page, sparse fields, and the change feed.
 - **Writes on the wire** (`tests/test_staging_writes.py`, 11 tests against a scratch world on keel-staging, an owner and a contributor key; 2026-10-04, rerun 2026-10-06): create, idempotent replay, PUT and PATCH, links, bulk (partial, atomic, cycles, replay), the change feed, a contributor's limits, PINs, cross-world ids, the extension cap. Skipped unless the `OW_STAGING_*` keys are set; never in CI.
 
-The first review against keel (Skeld, 2026-10-06) found four faults, each fixed with a test watched failing on the old code: push sent `created_by`; push sent half of Pin's `element_type`/`element_id` pair; a wrong-PIN 429 was retried and push carried on; and an id-less bulk item could be created twice on a resend.
+The first review against keel (2026-10-06) found four faults, each fixed with a test watched failing on the old code: push sent `created_by`; push sent half of Pin's `element_type`/`element_id` pair; a wrong-PIN 429 was retried and push carried on; and an id-less bulk item could be created twice on a resend.
 
 ## Format rulings behind it
 

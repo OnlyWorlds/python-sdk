@@ -1,6 +1,6 @@
 """Push a world folder's edits to the wire: changed fields only, against a baseline export.
 
-The loop (from Skeld's Sikelia ``push_folder.py``, its package-shaped half):
+The loop (from an earlier script, ``push_folder.py``; this is its package-shaped half):
 
 1. ``baseline`` = a folder exported from the wire BEFORE the edits; ``folder`` = the edited one.
 2. Field-level diff per element; only fields that differ are sent (PATCH semantics:
@@ -21,7 +21,7 @@ from a write but still answers with a fresh ``change_seq`` (a folder without the
 would otherwise rewrite every member-made element on every run); Atlas's in-file sync stamps
 ``local_updated_at`` / ``server_updated_at`` and ``image_media_id`` (spec §5, "not
 schema fields: strip them"); Atlas's local-only extension fields (``ATLAS_LOCAL_ONLY_FIELDS``
-in Atlas's ``src/core/constants.ts``, Temper's list, h17 #1240). Atlas's other ``atlas_*`` fields
+in Atlas's ``src/core/constants.ts``). Atlas's other ``atlas_*`` fields
 (colour, opacity, label, shape, calendar) travel on purpose and are sent like any extension.
 Atlas-written pins and markers spell their links ``map_id`` / ``zone_id``; the diff reads
 them as the wire's ``map`` / ``zone`` (spec §5).
@@ -240,7 +240,7 @@ def stops_run(error: ApiError) -> bool:
 def _load_done(log_path: Path) -> tuple[set[str], set[str]]:
     """(fingerprints that landed, ids that landed under a log line with no fingerprint).
 
-    The second set reads logs written by Skeld's original script, which keyed on id alone.
+    The second set reads logs written by the original script, which keyed on id alone.
     """
     prints: set[str] = set()
     legacy_ids: set[str] = set()

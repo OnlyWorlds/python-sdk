@@ -1,6 +1,6 @@
-"""Reader conformance: Temper's shared fixture (Atlas repo), answered from its expected.json, zero bytes touched.
+"""Reader conformance: the shared fixture from the Atlas repo, answered from its expected.json, zero bytes touched.
 
-The fixture is Temper's and stays in her repo; this test reads it in place and
+The fixture stays in the Atlas repo; this test reads it in place and
 skips (loudly) where it is absent. Override the path with OW_CONFORMANCE_FIXTURE.
 """
 
