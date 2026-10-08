@@ -1,6 +1,6 @@
 # onlyworlds (Python)
 
-A Python client for the [OnlyWorlds](https://onlyworlds.github.io) API, and a reader and writer for OnlyWorlds world folders (a world as a folder of JSON files). Python 3.12+, no runtime dependencies.
+OnlyWorlds is an open standard for worldbuilding data: 22 element types (characters, locations, events, laws and the rest) that any tool can read and write. This is a Python client for its API, and a reader and writer for OnlyWorlds world folders (a world as a folder of JSON files). Python 3.12+, no runtime dependencies.
 
 **Pre-release.** It is not on PyPI yet; install it from GitHub.
 
@@ -12,7 +12,7 @@ pip install git+https://github.com/OnlyWorlds/python-sdk
 
 ## First run
 
-Moppetopia is a public demo world. Its read-only key needs no account:
+Moppetopia is a public demo world. Its read-only key, `0000000001`, needs no account:
 
 ```python
 from onlyworlds import Client
@@ -36,7 +36,7 @@ Create a world at [onlyworlds.com](https://www.onlyworlds.com); its keys are on 
 
 - An `ow_r_` key reads, with no PIN: `Client("ow_r_…")`.
 - An `ow_w_` key reads and writes. Writes also send a PIN: `Client("ow_w_…", "…")`.
-- For code that writes, give it its own [agent seat](https://onlyworlds.github.io/docs/development/agents): the seat's key and its `ow_s_` secret (passed as the PIN) work in one world, and you can remove them without touching your account PIN.
+- For code that writes, give it its own [agent seat](https://onlyworlds.github.io/docs/development/agents), a key for one tool or script. The seat's key and its `ow_s_` secret (passed as the PIN) work in one world, and you can remove them without touching your account PIN.
 
 Elements are plain dicts:
 
@@ -51,7 +51,7 @@ for character in client.iter_elements("character", expand=["species"]):
 
 ## World folders
 
-A world folder is one JSON file per element, in [the world folder format](https://github.com/OnlyWorlds/toolkit/blob/main/knowledge/world-folder.md). Atlas reads and writes the same format.
+A world folder is one JSON file per element, in [the world folder format](https://github.com/OnlyWorlds/toolkit/blob/main/knowledge/world-folder.md). [Atlas](https://atlas.onlyworlds.com), the OnlyWorlds editor, reads and writes the same format.
 
 ```python
 from onlyworlds import export_world, read_folder
@@ -61,7 +61,7 @@ folder = read_folder("moppetopia")
 print(folder.world["name"], len(folder.elements), "elements")
 ```
 
-`write_folder(root, world, elements)` writes one. Reading never changes a file, and a file without an id is skipped and left alone.
+`write_folder(root, world, elements)` writes a folder from a world dict and a dict of element lists by type. Reading never changes a file, and a file without an id is skipped and left alone.
 
 To send a folder's edits back, keep a copy exported before you edited, then push the difference:
 
@@ -107,7 +107,6 @@ Three groups of tests run only when asked:
 - `OW_OPENAPI=https://www.onlyworlds.com/api/v2/openapi.json` (or a saved copy): checks the client's routes, parameters and fields against the API's own OpenAPI document.
 - `OW_LIVE=1`: read-only calls against the demo world.
 
-An older, unrelated `onlyworlds` 0.30.0 on TestPyPI was an earlier package for the v1 API.
 
 ## License
 
