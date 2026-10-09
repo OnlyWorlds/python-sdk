@@ -19,15 +19,13 @@ from onlyworlds import Client
 
 client = Client("0000000001")
 print(client.get_world()["name"])
-for c in client.list_page("character", limit=3)["data"]:
+for c in client.list_page("character", filter={"name__icontains": "fluffington"})["data"]:
     print(" ", c["name"])
 ```
 
 ```
 Moppetopia
-  Admiral Splashworth
   Admiral Fluffington
-  Captain Snoot
 ```
 
 ## Your own world
