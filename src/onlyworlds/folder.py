@@ -1,6 +1,6 @@
 """The OnlyWorlds world folder: filenames, the writer, the reader.
 
-Spec: OnlyWorlds Folder Format v0.3.6.
+Spec: OnlyWorlds Folder Format v0.3.7.
 Section numbers below are that document's.
 
 ::
@@ -55,7 +55,7 @@ __all__ = [
 ]
 
 #: The spec version this module writes and reads against (§4.2 ``format_version``).
-FORMAT_VERSION = "0.3.6"
+FORMAT_VERSION = "0.3.7"
 
 ELEMENTS_DIR = "elements"
 WORLD_FILE = "world.json"
