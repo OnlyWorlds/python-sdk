@@ -1,87 +1,56 @@
 # OnlyWorlds schema-dist
 
-Generated artifacts only. Nobody edits this repo by hand; keel (the OnlyWorlds
-platform) regenerates and publishes it after any schema change. If you found a
-problem here, the fix happens upstream — open an issue, don't send a PR
-against generated files.
+The OnlyWorlds schema, packaged for tools: the YAML, a reference decoder, the rulings that resolve what the YAML leaves open, and hashes to pin by.
 
-## What this is
+The files here are generated. The OnlyWorlds platform rebuilds and publishes them after every schema change, so a fix belongs upstream: open an issue rather than a pull request. The standard itself lives in [OnlyWorlds/OnlyWorlds](https://github.com/OnlyWorlds/OnlyWorlds).
 
-- `schema/*.yaml` — the 22 OnlyWorlds element types + `base_properties` +
-  `world`, byte-identical to the Council-governed standard
-  (github.com/OnlyWorlds/OnlyWorlds). No presentation keys.
-- `presentation.json` — family + icon **defaults** per type, plus the four
-  family **colours** (`colors.families`, light/dark pairs). Defaults, not
-  authority: tools are free to override, and Atlas remaps wholesale for dark
-  mode. `_meta.provenance` records why the four-family split exists so it is
-  not re-litigated by taste, and points at the measurement record.
-  **Do not change a hex without re-running CVD validation** — the World green
-  is pinned by the accessibility budget, not by preference.
-  *(Colours were withheld through serial 5 on the position that "the palette
-  lives in each consumer". That cost a new consumer any legitimate source for
-  them, which is how a sixth hardcoded copy gets born; published from serial 6.)*
-- `walk/schema_walk.py` — THE official schema reader. Vendor it or port it,
-  but keep its semantics; it is the one decoder of what the YAMLs mean.
-  Requires PyYAML; no other dependency, and nothing from the platform.
-  **Pass a `note` sink** (`flatten_fields(doc, slug, note=print)`): an unknown
-  field type is *skipped*, and with the default no-op sink it is skipped
-  silently, so a pinned older walk meeting a newer schema loses fields with no
-  signal. Opt-in extras, all off by default: `include_required`,
-  `include_desc`, `include_sections`.
-- `walk/rulings.yaml` — semantic rulings the YAML cannot carry (nullability,
-  extension passthrough, drift resolutions). Emitters in every language honor
-  these rows rather than re-deriving the conventions.
-- `VERSION` — canonical schema version, dist serial, publish date. Three lines
-  of `key: value`, not a bare version string; parse it, do not `strip()` it.
-- `MANIFEST.json` — sha256 of every file above. It does **not** hash itself,
-  so the tree holds one more file than the manifest has entries. Verify the
-  listed files; do not diff the manifest against a directory listing.
+## Contents
 
-## How to consume
+| File | What it is |
+|---|---|
+| `schema/*.yaml` | the 22 element types, `base_properties` and `world`, byte-identical to the standard |
+| `presentation.json` | default family and icon per type, and the four family colours as light/dark pairs. Defaults: tools may override them. The colours were checked for colour-vision deficiency, so re-run that check before changing one |
+| `walk/schema_walk.py` | the reference decoder: reads the YAML and returns each type's fields. One module; its only dependency is PyYAML |
+| `walk/rulings.yaml` | rulings the YAML cannot carry (nullability, extension fields, known divergences). Code generators in any language should follow these rows |
+| `VERSION` | three `key: value` lines: the canonical schema version, the dist serial, the publish date |
+| `MANIFEST.json` | the sha256 of every file above (not of itself) |
 
-Pin by tag for humans, **verify by hash for machines** — git tags are mutable,
-sha256 is not, so MANIFEST.json is the real pin and the tag is ergonomics.
-Fetch your pinned tag, hash-compare against MANIFEST.json in CI, and fail on
-mismatch.
+## Using it
 
-**Record the MANIFEST.json hash on your side** — in your lockfile, your CI
-config, wherever your pin lives. Comparing a fetched tree against the manifest
-that came with it only proves the tree is internally consistent; if the tag
-moved, the manifest moved with it and both agree perfectly about the wrong
-content. Recording the hash you first accepted is what makes a moved tag
-visible. This is the `go.sum` pattern, and it exists because supply-chain
-incidents have been built on exactly that gap.
+```python
+import yaml
+from schema_walk import flatten_fields  # vendored from walk/
 
-Print the pin's age from `VERSION`'s publish date on every check and warn when
-it grows old — **a check that compares you to what you chose can never tell
-you your choice went stale.** Warn, never fail: failing on age turns a guard
-into a nag, and people delete nags.
+doc = yaml.safe_load(open("schema/character.yaml", encoding="utf-8"))
+fields = flatten_fields(doc, "character", note=print)
+# [{'name': 'physicality', 'kind': 'scalar_str'}, {'name': 'mentality', 'kind': 'scalar_str'}, ...]
+```
 
-## Tags
+Pass a `note` sink. A field type the walk does not know is skipped, and with the default sink it is skipped silently, so an older walk reading a newer schema would lose fields without a word. Extra output is opt-in: `include_required`, `include_desc`, `include_sections`.
 
-`v<canonical-version>-dist.<serial>` — e.g. `v0.30.0-dist.1`. The canonical
-part tracks the schema standard; the serial increments per publish of the same
-canonical version (a presentation fix, a new ruling row). Canonical itself
-carries no tags, so this convention starts here rather than inheriting one.
+Parse `VERSION` as key-value lines; it is not a bare version string.
+
+## Pinning
+
+Pin a tag for people and a hash for machines. Tags can move; hashes can't.
+
+1. Fetch your pinned tag.
+2. Record the hash of `MANIFEST.json` on your side (a lockfile, your CI config). Comparing a tree only against the manifest that came with it proves the two agree, not that they are the files you accepted.
+3. In CI, check every listed file against the manifest and fail on a mismatch.
+4. Print the pin's age from `VERSION`'s publish date and warn when it grows old. Warn, don't fail.
+
+Tags read `v<canonical-version>-dist.<serial>`, for example `v0.30.2-dist.16`. The serial counts publishes of the same canonical version, such as a presentation fix or a new ruling.
 
 ## Vendoring
 
-Copying these files into your own repo is a supported path, not a workaround:
-it is what makes an offline or air-gapped build possible. The walk is one
-module with a single third-party import (PyYAML) and no platform code, so it
-travels. Vendor it, record the hash, and re-run the check when you update.
+Copying these files into your repo is supported, and it makes offline builds possible. Editing your copy is not: the walk is the one decoder of what the YAML means, and a patched copy is how one standard turns into several. If you need something the walk does not return, open an issue; the opt-in flags were added that way.
 
-What is *not* supported is editing your copy. The walk is the one decoder of
-what the YAMLs mean, and a forked decoder is how a standard quietly becomes
-several standards. If your emitter needs something the walk does not return,
-**ask for it upstream** rather than patching locally: that is what the opt-in
-flags are, and they were added exactly this way.
+The list of element types is a literal inside the walk, so a 23rd type would arrive as a new dist.
 
-One known edge, stated rather than hidden: `ELEMENT_TYPES` is a literal inside
-the walk. A 23rd element type would require a new dist, not a local edit.
+## Links
 
-## What this is not
+[The standard](https://github.com/OnlyWorlds/OnlyWorlds) · [Docs](https://onlyworlds.github.io) · [TypeScript SDK](https://github.com/OnlyWorlds/sdk) · [Python SDK](https://github.com/OnlyWorlds/python-sdk) · [Unity SDK](https://github.com/OnlyWorlds/unity-sdk) · [Council](https://council.onlyworlds.com)
 
-Not a product. No support promise, no compatibility contract beyond the pinned
-version, no deprecation ceremony. It is plumbing, and it stays boring — that
-is the design, not a stage it will grow out of.
+## Licence
+
+MIT. See [LICENSE](LICENSE).
