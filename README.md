@@ -2,13 +2,13 @@
 
 OnlyWorlds is an open standard for worldbuilding data: 22 element types (characters, locations, events, laws and the rest) that any tool can read and write. This is a Python client for its API, and a reader and writer for OnlyWorlds world folders (a world as a folder of JSON files). Python 3.12+, no runtime dependencies.
 
-**Pre-release.** It is not on PyPI yet; install it from GitHub.
-
 ## Install
 
 ```bash
-pip install git+https://github.com/OnlyWorlds/python-sdk
+pip install onlyworlds
 ```
+
+The newest unreleased code: `pip install git+https://github.com/OnlyWorlds/python-sdk`.
 
 ## First run
 
