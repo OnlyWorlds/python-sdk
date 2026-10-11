@@ -134,10 +134,15 @@ def test_read_write_round_trip_is_byte_identical(tmp_path: Path) -> None:
 
 
 def test_world_json_carries_the_three_unit_settings_under_the_same_spelling():
-    """Canonical 00.31.00: length_unit, mass_unit and distance_unit are wire and disk keys alike (folder spec v0.3.7)."""
+    """Canonical 00.31.00: length_unit, mass_unit and distance_unit are wire and disk keys alike.
+
+    Folder spec v0.3.7.
+    """
     from onlyworlds.folder import world_for_disk
 
-    world = {"id": "w1", "name": "W", "time_range_current": 5, "length_unit": "cm", "mass_unit": "kg", "distance_unit": "km"}
+    units = {"length_unit": "cm", "mass_unit": "kg", "distance_unit": "km"}
+    world = {"id": "w1", "name": "W", "time_range_current": 5, **units}
     out = world_for_disk(world)
     assert (out["length_unit"], out["mass_unit"], out["distance_unit"]) == ("cm", "kg", "km")
-    assert [k for k in out if k != "format_version"] == ["id", "name", "time_current", "length_unit", "mass_unit", "distance_unit"]
+    keys = [k for k in out if k != "format_version"]
+    assert keys == ["id", "name", "time_current", "length_unit", "mass_unit", "distance_unit"]
