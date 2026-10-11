@@ -73,7 +73,9 @@ result = push("moppetopia-before", "moppetopia", api_key="ow_w_â€¦", pin="ow_s_â
 
 ## Errors
 
-A failed call raises `ApiError` with the API's `code`, `param` (the field that failed) and `doc_url`, and flags for the cases you handle differently: `is_validation_error`, `is_auth_error`, `is_not_author`, `is_owner_only`, `is_id_conflict`, `is_resync_required`, `is_busy`.
+A failed call raises `ApiError` with the API's `code`, `param` (the field that failed) and `doc_url`, and flags for the cases you handle differently: `is_validation_error`, `is_auth_error`, `is_not_author`, `is_owner_only`, `is_id_conflict`, `is_resync_required`, `is_busy`, `is_precondition_failed`.
+
+To write only if nobody changed an element since you read it, pass its `change_seq`: `client.patch("character", el["id"], {"name": "Mine"}, if_match=el["change_seq"])` (on `edit_links` too). If it moved, nothing is written and `PreconditionFailed` is raised, whose `current` is the element as it is now. The server never merges: compare the copy you edited from with `current`, and send again with `if_match=current["change_seq"]` or ask which version to keep.
 
 ## The change feed
 

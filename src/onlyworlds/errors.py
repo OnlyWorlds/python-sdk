@@ -131,3 +131,30 @@ class ApiError(Exception):
     def is_busy(self) -> bool:
         """keel's admission control turned the request away (503 ``server_busy``); see ``retry_after``."""
         return self.status == 503 and self.code == "server_busy"
+
+    @property
+    def is_precondition_failed(self) -> bool:
+        """A write sent with ``if_match`` found the element moved past that ``change_seq``
+        (412 ``precondition_failed``, keel #210): nothing written, nothing merged. The error is a
+        ``PreconditionFailed``, whose ``current`` is the element as it is now."""
+        return self.status == 412 and self.code == "precondition_failed"
+
+
+class PreconditionFailed(ApiError):
+    """412 ``precondition_failed`` (keel #210): the element changed since the ``change_seq`` sent as
+    ``if_match``. ``current`` is the element as it is now, as this key sees it (None if a response
+    ever lacks it). The check is per element and the server never merges: compare the copy you
+    edited from with ``current``; when the fields you changed are not the ones that moved, send
+    again with ``if_match=current["change_seq"]``; when the same field moved on both sides, ask."""
+
+    def __init__(self, method: str, path: str, response: Response):
+        super().__init__(method, path, response)
+        cur = _envelope(response.body).get("current")
+        self.current: dict[str, Any] | None = cur if isinstance(cur, dict) else None
+
+
+def api_error(method: str, path: str, response: Response) -> ApiError:
+    """The right ``ApiError`` for a non-2xx answer: ``PreconditionFailed`` for a 412 ``precondition_failed``."""
+    if response.status == 412 and error_code(response.body) == "precondition_failed":
+        return PreconditionFailed(method, path, response)
+    return ApiError(method, path, response)

@@ -15,7 +15,7 @@ from collections.abc import Iterator
 import pytest
 
 from onlyworlds import Client, uuid7
-from onlyworlds.errors import ApiError
+from onlyworlds.errors import ApiError, PreconditionFailed
 
 _NEED = (
     "OW_STAGING_BASE",
@@ -262,3 +262,23 @@ def test_unicode_and_the_extension_cap(owner: Client, made: list[tuple[str, str]
     ext = owner.create("character", {"name": "ext", "x_probe_flag": True})
     made.append(("character", ext["id"]))
     assert ext["x_probe_flag"] is True
+
+
+def test_only_if_unchanged_lands_on_a_match_refuses_a_stale_one(owner: Client, made: list[tuple[str, str]]) -> None:
+    """keel #210: If-Match on PATCH and the links route; a stale token writes nothing and hands back ``current``."""
+    el = owner.create("character", {"name": "Only if unchanged"})
+    sp = owner.create("species", {"name": "Only if unchanged, species"})
+    made.extend([("character", el["id"]), ("species", sp["id"])])
+    s0 = el["change_seq"]
+    p1 = owner.patch("character", el["id"], {"description": "first"}, if_match=s0)
+    assert p1["description"] == "first" and p1["change_seq"] > s0
+    with pytest.raises(PreconditionFailed) as stale:
+        owner.patch("character", el["id"], {"description": "stale"}, if_match=s0)
+    assert stale.value.status == 412 and stale.value.current is not None
+    assert (stale.value.current["change_seq"], stale.value.current["description"]) == (p1["change_seq"], "first")
+    assert owner.get("character", el["id"])["description"] == "first"  # the refused write changed nothing
+    with pytest.raises(PreconditionFailed):
+        owner.edit_links("character", el["id"], "species", add=[sp["id"]], if_match=s0)
+    linked = owner.edit_links("character", el["id"], "species", add=[sp["id"]], if_match=p1["change_seq"])
+    assert linked["species"] == [sp["id"]]
+    assert owner.patch("character", el["id"], {"description": "no header"})["description"] == "no header"

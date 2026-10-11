@@ -10,7 +10,7 @@ from typing import Any
 import pytest
 from conftest import FakeTransport, jresp
 
-from onlyworlds import ApiError, Client, Response, parse_retry_after, sanitize_payload, uuid7
+from onlyworlds import ApiError, Client, PreconditionFailed, Response, parse_retry_after, sanitize_payload, uuid7
 
 ID = "018f0000-0000-7000-8000-000000000001"
 V7 = re.compile(r"^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$")
@@ -351,6 +351,54 @@ def test_permission_and_resync_predicates() -> None:
 
     assert err(403, "permission_error").is_permission_error and not err(403, "not_author").is_permission_error
     assert err(409, "resync_required").is_resync_required and not err(409, "id_conflict").is_resync_required
+
+
+# --- only if unchanged (keel #210) ----------------------------------------
+
+PRECONDITION_412 = {
+    "error": {
+        "type": "invalid_request", "code": "precondition_failed", "param": "If-Match",
+        "message": "The element has changed since change_seq 41 (now 44).", "doc_url": "https://x/precondition_failed",
+    },
+    "current": {"type": "character", "id": ID, "name": "Theirs", "change_seq": 44},
+}  # fmt: skip
+
+
+def test_if_match_sends_a_quoted_change_seq_on_patch_and_links_and_nothing_without(make_client: MakeClient) -> None:
+    t = FakeTransport(handler=lambda *a: jresp(200, {"id": ID, "name": "K", "change_seq": 45}))
+    c = make_client(t)
+    c.patch("character", ID, {"name": "Mine"}, if_match=44)
+    c.edit_links("character", ID, "friends", add=["a"], if_match=7)
+    c.patch("character", ID, {"name": "Mine"})
+    assert t.calls[0].headers["If-Match"] == '"44"'
+    assert t.calls[1].headers["If-Match"] == '"7"'
+    assert "If-Match" not in t.calls[2].headers
+
+
+@pytest.mark.parametrize("bad", [4.5, -1, "44", True, None.__class__])
+def test_an_if_match_that_is_not_a_whole_number_raises_before_sending(make_client: MakeClient, bad: Any) -> None:
+    t = FakeTransport(handler=lambda *a: jresp(200, {}))
+    with pytest.raises(ValueError, match="if_match"):
+        make_client(t).patch("character", ID, {"name": "K"}, if_match=bad)
+    assert t.calls == []
+
+
+def test_a_412_is_precondition_failed_carrying_current(make_client: MakeClient) -> None:
+    t = FakeTransport(handler=lambda *a: jresp(412, PRECONDITION_412))
+    with pytest.raises(PreconditionFailed) as got:
+        make_client(t).patch("character", ID, {"name": "Mine"}, if_match=41)
+    e = got.value
+    assert isinstance(e, ApiError) and e.is_precondition_failed and e.status == 412
+    assert e.current == PRECONDITION_412["current"] and e.param == "If-Match"
+    assert not e.is_validation_error and not e.is_id_conflict
+    assert not ApiError("PATCH", "x", jresp(409, {"error": {"code": "id_conflict"}})).is_precondition_failed
+
+
+def test_a_412_without_current_still_parses(make_client: MakeClient) -> None:
+    t = FakeTransport(handler=lambda *a: jresp(412, {"error": PRECONDITION_412["error"]}))
+    with pytest.raises(PreconditionFailed) as got:
+        make_client(t).patch("character", ID, {"name": "Mine"}, if_match=41)
+    assert got.value.current is None
 
 
 def test_patch_world_takes_back_a_get_world_body_and_a_folder_spelling(make_client: MakeClient) -> None:

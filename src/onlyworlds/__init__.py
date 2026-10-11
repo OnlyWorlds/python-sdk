@@ -8,7 +8,7 @@ version runs on its own semver.
 from ._ids import uuid7
 from ._schema import ELEMENT_TYPES, FIELD_KINDS, SCHEMA_DIST_TAG, SCHEMA_MANIFEST_SHA256, SCHEMA_VERSION
 from ._version import __version__
-from .errors import parse_retry_after
+from .errors import PreconditionFailed, parse_retry_after
 from .export import export_world
 from .folder import (
     FORMAT_VERSION,
@@ -54,6 +54,7 @@ __all__ = [
     "Folder",
     "FolderElement",
     "Patch",
+    "PreconditionFailed",
     "PushPlan",
     "PushResult",
     "Response",

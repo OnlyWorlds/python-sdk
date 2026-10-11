@@ -36,7 +36,7 @@ from typing import Any, Protocol
 from ._ids import uuid7
 from ._schema import FIELD_KINDS
 from ._version import __version__
-from .errors import ApiError, error_code, parse_retry_after
+from .errors import ApiError, api_error, error_code, parse_retry_after
 from .folder import WIRE_TO_DISK_WORLD_KEYS
 
 __all__ = [
@@ -128,6 +128,15 @@ def _segment(value: str, pattern: re.Pattern[str], what: str) -> str:
     if not isinstance(value, str) or not pattern.match(value):
         raise ValueError(f"{what} {value!r} is not a valid path segment")
     return value
+
+
+def _if_match(change_seq: int | None) -> dict[str, str] | None:
+    """The ``If-Match`` header for a ``change_seq`` (keel #210), or None. A bool is not a number here."""
+    if change_seq is None:
+        return None
+    if isinstance(change_seq, bool) or not isinstance(change_seq, int) or change_seq < 0:
+        raise ValueError(f"if_match must be a whole number (an element's change_seq), got {change_seq!r}")
+    return {"If-Match": f'"{change_seq}"'}
 
 
 @dataclass(frozen=True)
@@ -351,7 +360,7 @@ class Client:
         if got.response is None:
             raise ConnectionError(f"{method} {path}: {got.error}")
         if not 200 <= got.response.status < 300:
-            raise ApiError(method, path, got.response)
+            raise api_error(method, path, got.response)
         return got.response.json()
 
     # --- the world ------------------------------------------------------------
@@ -508,13 +517,20 @@ class Client:
         check_kinds(t, body)
         return self._element(self.call("PUT", f"{t}/{i}/", body), "PUT", t)
 
-    def patch(self, element_type: str, element_id: str, partial: Mapping[str, Any]) -> dict[str, Any]:
-        """``PATCH /{type}/{id}``: a partial update. Arrays REPLACE wholesale; for links use ``edit_links``."""
+    def patch(
+        self, element_type: str, element_id: str, partial: Mapping[str, Any], *, if_match: int | None = None
+    ) -> dict[str, Any]:
+        """``PATCH /{type}/{id}``: a partial update. Arrays REPLACE wholesale; for links use ``edit_links``.
+
+        ``if_match`` (keel #210): the element's ``change_seq`` as you read it. The update lands only
+        if nobody changed the element since; otherwise nothing is written and ``PreconditionFailed``
+        (412) is raised, whose ``current`` is the element as it is now. Omit it for an unconditional write.
+        """
         t = _segment(element_type, _TYPE, "element type")
         i = _segment(element_id, _ID, "element id")
         body = sanitize_payload(partial)
         check_kinds(t, body)
-        return self._element(self.call("PATCH", f"{t}/{i}/", body), "PATCH", t)
+        return self._element(self.call("PATCH", f"{t}/{i}/", body, _if_match(if_match)), "PATCH", t)
 
     def delete(self, element_type: str, element_id: str) -> None:
         """``DELETE /{type}/{id}``: 204, also when it is already gone. The server scrubs the id from every link."""
@@ -530,18 +546,19 @@ class Client:
         *,
         add: Iterable[str] = (),
         remove: Iterable[str] = (),
+        if_match: int | None = None,
     ) -> dict[str, Any]:
         """``POST /{type}/{id}/links/{field}``: an atomic add and remove on one multi-link field.
 
         Adds dedupe, removes of absent ids are tolerated, added ids must exist in this world.
-        Returns the whole updated element.
+        Returns the whole updated element. ``if_match`` works as on ``patch``: a link write moves
+        the element too.
         """
         t = _segment(element_type, _TYPE, "element type")
         i = _segment(element_id, _ID, "element id")
         f = _segment(link_field, _TYPE, "link field")
-        return self._element(
-            self.call("POST", f"{t}/{i}/links/{f}", {"add": list(add), "remove": list(remove)}), "POST", t
-        )
+        body = {"add": list(add), "remove": list(remove)}
+        return self._element(self.call("POST", f"{t}/{i}/links/{f}", body, _if_match(if_match)), "POST", t)
 
     @staticmethod
     def _element(data: Any, method: str, element_type: str) -> dict[str, Any]:
