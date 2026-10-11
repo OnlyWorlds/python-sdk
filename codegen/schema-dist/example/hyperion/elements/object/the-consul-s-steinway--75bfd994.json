@@ -1,0 +1,30 @@
+{
+  "type": "object",
+  "id": "068e2e56-d4b9-7c40-8000-173975bfd994",
+  "name": "The Consul’s Steinway",
+  "description": "",
+  "supertype": "",
+  "subtype": "",
+  "image_url": "",
+  "aesthetics": "",
+  "utility": "",
+  "origins": "",
+  "weight": null,
+  "amount": null,
+  "parent_object": "068e2e8c-e2f4-7e4c-8000-8abcf4e8e286",
+  "location": null,
+  "language": null,
+  "materials": [],
+  "technology": [],
+  "effects": [],
+  "abilities": [],
+  "consumes": [],
+  "affinities": [],
+  "created_at": "2025-10-05T21:38:53.295331+00:00",
+  "updated_at": "2026-07-23T11:22:17.241738+00:00",
+  "change_seq": 95,
+  "created_by": null,
+  "atlas_aliases": [
+    "Steinway"
+  ]
+}

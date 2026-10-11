@@ -1,281 +1,213 @@
-# Semantic rulings the schema YAMLs cannot carry — THE ruling table.
+# Rulings the schema YAMLs cannot carry: the conventions every decoder, code
+# generator and client follows, whatever its language.
 #
-# Read by emitters alongside schema_walk.py; shipped in schema-dist walk/.
-# Each row is a convention that at least two implementations previously
-# re-derived independently (the collective.equipment drift, 2026-07-23, is the
-# founding case — specs agreed while rulings drifted). Rows are added only by
-# schema-authority ruling (Skeld, Orrery register); a row names its evidence.
+# Read alongside schema_walk.py; shipped in schema-dist as walk/rulings.yaml.
+# A row exists because two implementations once settled the same question in
+# different ways. Rows are added by the schema's maintainers, and each names
+# its evidence.
 #
-# Format: id · applies_to · rule (the binding sentence) · rationale · since · status
-#         · probe (OPTIONAL) — what was actually CHECKED, with its control and
-#           its residue cleanup, for rows whose authority rests on a live
-#           measurement. A consumer cannot re-derive a probe and will not know
-#           to doubt a verdict; recording the method is what makes the verdict
-#           trustworthy downstream (Quillon, 2026-07-28). Omit on rows ruled
-#           from design rather than measurement.
+# Format: id · applies_to · rule (the binding text) · rationale · since · status
+#         · probe (optional): what was checked, with its control, for rows that
+#           rest on a measurement. A reader cannot repeat a measurement it was
+#           not told about, so the method is recorded with the verdict.
 
 rulings:
   - id: nullable-by-default
     applies_to: all fields
     rule: >
-      ONLY `name` is required. Every other field is optional and nullable on
-      the wire. A client whose runtime cannot express "value or unset" must
-      represent unset explicitly; collapsing null to 0 or "" silently
-      overwrites "the author never set this."
-      (Captain's product ruling 2026-07-28: pin/marker `required:` lists are
-      being DROPPED from canonical — mapless pins are a legitimate app
-      pattern, and the wire never enforced them. Until that YAML bump lands,
-      the lists still appear in the schema files; emitters should not
-      hard-fail on them. `marker.order` becomes optional with a convention:
-      absent `order`, consumers SHOULD sort by `created_at` WHERE PRESENT;
-      absent both, marker order is UNDEFINED and a consumer MAY use any
-      stable order. `order` exists for inserting between existing markers.
-      ⚑ The fallback is ADVISORY, not a consumer MUST — corrected
-      2026-07-28 after Temper reported Atlas sorts in file-scan order and
-      offered to bout it. It cannot be a MUST: `created_at` is itself
-      optional on element bodies (a writer MUST NOT synthesize timestamps
-      it does not have), so a legal hand-authored folder can contain
-      markers with neither key, and a normative rule that some conforming
-      inputs make unsatisfiable is the `writable` defect again. The real
-      fix is upstream: a writer emitting a zone SHOULD write `order`.
-      Sorting harder does not recover vertex sequence a file never
-      recorded — a `created_at` sort is equally capable of drawing a
-      plausible-looking wrong polygon.)
+      Only `id` and `name` are required of an element (`required: ["Id",
+      "Name"]` in base_properties.yaml). Every other field is optional: unset
+      is null for an integer or a single link, an empty array for a multi
+      link, and the empty string for a string (see `string-empty-is-unset`).
+      A client whose runtime cannot express "value or unset" must represent
+      unset explicitly; collapsing null to 0 silently overwrites "the author
+      never set this". Creating an element over the API, a client may leave
+      `id` out and the server mints one; `name` is always required.
+      `marker.order` is optional too. Absent `order`, a consumer SHOULD sort
+      markers by `created_at` where present; absent both, marker order is
+      undefined and a consumer MAY use any stable order. This fallback is
+      advisory, not a MUST: `created_at` is itself optional in a world
+      folder (a writer must not invent timestamps it does not have), so a
+      valid folder can hold markers with neither key. A writer emitting
+      markers that trace a line or a polygon SHOULD write `order`; sorting
+      cannot recover a vertex sequence the data never recorded.
     rationale: >
-      A level-0 character and a level-unknown character are different claims.
-      70 scalar ints ride this; three emitters (Django null=True, TS
-      `number | null`, C# SerializableNullable<T>) each re-derived it from
-      folklore before this row existed.
+      A level-0 character and a level-unknown character are different
+      claims. Integer fields ride on this; TypeScript (`number | null`), C#
+      (a nullable wrapper) and the platform's storage (null allowed) each
+      had to be told it.
     since: "2026-07-28"
     status: >
-      ruled — wire probe 2026-07-28: the v2 API does NOT enforce pin/marker
-      required lists (a mapless pin POSTs 201 with map/x/y null). So
-      `required` is schema intent, not wire enforcement: writers SHOULD
-      treat these fields as required; readers MUST tolerate null in them.
-      Whether keel should add enforcement is an open product question
-      (existing data may legally contain such rows).
+      ruled. Since canonical 00.30.02 the only `required:` list in the
+      schema is base_properties'; the pin and marker lists were dropped
+      (a pin with no map is a legitimate pattern).
     probe: >
-      What was CHECKED, so a third consumer need not re-derive it and knows
-      when to doubt it (Quillon's ask, 2026-07-28: "a row that says what was
-      checked is worth more than a row that says what was decided").
-      Re-run 2026-07-28 21:21 UTC against production, world W11:
-      (1) POST /api/v2/marker/ with body `{name}` only — map/zone/x/y/order
-      all absent — returned 201 with all five null;
-      (2) POST /api/v2/pin/ with `{name}` only — map/element/x/y absent —
+      Checked 2026-07-28 against the production API, on a test world:
+      (1) POST /api/v2/marker/ with only `name` (map, zone, x, y, order
+      absent) returned 201 with all five null;
+      (2) POST /api/v2/pin/ with only `name` (map, element, x, y absent)
       returned 201 with all four null;
-      (3) CONTROL, and the row is worthless without it: POST /api/v2/pin/
-      with a nonexistent map FK returned 400 `invalid_link`, typed, with
-      `param: "map"`. The endpoint DOES validate; it just does not enforce
-      `required`. Without (3), the 201s are equally explained by an endpoint
-      that validates nothing.
+      (3) control: POST /api/v2/pin/ with a nonexistent map id returned 400
+      `invalid_link` with `param: "map"`, so the endpoint does validate
+      links; it did not enforce the lists. Without (3), the 201s would be
+      equally explained by an endpoint that validates nothing.
       Both probe elements deleted (204) and re-fetched (404); no residue.
-      Source side same date: `grep -n required schema/*.yaml` returns five
-      hits in three files — base_properties (Id/Name/World), marker (5),
-      pin (4). The two ability.yaml hits are the word inside prose
-      descriptions. That is the entire population.
 
   - id: required-world-wire-caveat
-    applies_to: base_properties.World
+    applies_to: base_properties.World (`world`)
     rule: >
-      `required: World` speaks storage truth (every element row has a world),
-      NOT wire truth: the v2 API rejects `world` in POST/PATCH bodies — the
-      API key header determines the world. Wire clients must not send it.
+      `world` is declared in base_properties.yaml but is not part of an
+      element's body. The API decides an element's world from the key it is
+      called with: it never returns `world` in an element body, and a POST or
+      PATCH body that carries it is accepted with the key ignored (not an
+      error, never applied). In a world folder, the folder is the world.
+      Clients should not send it.
     rationale: >
-      The one place the YAML's required list and the wire contract disagree.
-      Canonical truing rides the next YAML version bump (with Character.status).
+      The one base field whose YAML declaration and data disagree. It names
+      where an element is stored, which the key or the folder already says.
     since: "2026-07-28"
-    status: ruled — canonical truing pending
+    status: ruled
 
   - id: string-empty-is-unset
     applies_to: all scalar string fields
     rule: >
-      For STRINGS, `""` IS the wire's unset — keel stores them
-      `blank=True, default=""` and never nullable, so a string field is empty
-      or it has content; there is no third state. Consumers MUST NOT
+      For strings, `""` is the unset value: the platform stores every string
+      field as never-null with an empty default, so a string field is empty
+      or it has content, and there is no third state. Consumers MUST NOT
       distinguish `""` from absent for strings, and MUST NOT round-trip a
-      distinction the wire cannot carry.
-      Corollary that bites in browsers: never render an empty string into a
-      URL-valued attribute — `<img src="">` makes the browser re-request the
-      current page as an image. Check emptiness before emitting the attribute.
+      distinction the data cannot carry.
+      A corollary that bites in browsers: never render an empty string into a
+      URL-valued attribute. `<img src="">` makes the browser re-request the
+      current page as an image. Check for empty before emitting the attribute.
     rationale: >
-      Boss's census (2026-07-28) proposed the philosophically cleaner rule —
-      null and "" as distinct claims, matching the int convention. It was
-      REFUSED against keel's storage truth: writing it would have minted a
-      promise the platform does not keep, which is the exact disease this
-      table treats. His edge finding survives whole; only the null half was
-      wrong. Note the asymmetry with `nullable-by-default` is real and
-      deliberate: ints carry three states, strings carry two.
+      A cleaner rule was proposed: null and "" as distinct claims, matching
+      integers. It was refused because the platform's storage cannot keep
+      it, and a convention must not promise what the platform does not do.
+      The asymmetry with `nullable-by-default` is real and deliberate:
+      integers carry three states, strings two.
     since: "2026-07-28"
     status: >
-      ruled — reopening requires a keel storage migration on the table, not a
-      convention change. The authority here is exercised as much in what the
-      table refuses as in what it records.
+      ruled. Reopening it needs a storage change on the platform, not a
+      convention change.
     probe: >
-      Checked against keel's STORAGE rather than against the wire or the
-      proposal: the model fields are declared `blank=True, default=""` and
-      are not nullable, so no third state exists to round-trip. This is why
-      Boss's philosophically-correct null rule was REFUSED - writing it would
-      have minted a promise the platform does not keep. Source-read of the
-      generated models; no live write, no residue.
+      Checked against the platform's storage rather than the wire: its model
+      fields for strings are declared blank-allowed with an empty default and
+      are not nullable, so no third state exists to round-trip. A read of the
+      generated models; no write, no residue.
 
   - id: change-seq-not-unique
     applies_to: change_seq on any element; the /changes cursor
     rule: >
       `change_seq` is NOT unique within a world. A bulk import stamps every
-      element it creates with a single seq (measured: a demo world with all
-      164 elements at `change_seq: 1`). Consumers MUST NOT diff, dedupe, or
-      key on seq alone. Pagination is unaffected — the cursor carries an id
-      tiebreak and is lossless — but any sync or diff logic treating seq as a
-      per-element identity breaks on exactly the worlds a parse pipeline
-      produces.
-      Two companions: the world `head` COUNTS DELETES, so it can exceed the
-      maximum live element seq and MUST NOT be derived from element bodies;
-      and the `/changes` cursor is polymorphic — a `"seq:uuid"` string when
-      changes return, a bare integer when the array is empty.
+      element it creates with one seq (measured: a demo world with all 164
+      elements at `change_seq: 1`). Consumers MUST NOT diff, dedupe or key on
+      seq alone. Pagination is unaffected (the cursor carries an id
+      tiebreak and loses nothing), but sync or diff logic that treats seq as
+      a per-element identity breaks on exactly the worlds an import produces.
+      Two companions: the world's `head` counts deletes, so it can exceed the
+      highest live element seq and MUST NOT be derived from element bodies;
+      and the `/changes` cursor has two shapes, a `"seq:uuid"` string when
+      changes return and a bare integer when the array is empty.
     rationale: >
-      Measured by Kael 2026-07-28 across four real worlds (1,710 element
-      bodies) while building the folder writer. The dangerous case is not
-      exotic: bulk-imported and parsed worlds are precisely the ones most
-      likely to be snapshotted per chapter, so a seq-keyed differ fails first
-      on the workload the format exists to serve.
+      Measured 2026-07-28 across four live worlds (1,710 element bodies)
+      while building a folder writer. The dangerous case is not exotic:
+      imported worlds are the ones most likely to be snapshotted and
+      compared, so a seq-keyed differ fails first on the workload the format
+      exists to serve.
     since: "2026-07-28"
-    status: ruled — wire-measured, four worlds
+    status: ruled, measured on the wire across four worlds
     probe: >
-      Kael's measurement across FOUR live worlds via the v2 API, not one: a
-      bulk-imported demo world returned all 164 elements at `change_seq: 1`,
-      which is the finding; incrementally-built worlds showed distinct seqs,
-      which is the control proving the collapse is a property of bulk import
-      rather than of the field itself. The head-counts-deletes companion was
-      read from keel's cursor source, not inferred from the wire. Read-only,
-      no residue. Note the shape of the trap: a consumer testing only against
-      an incrementally-built world sees unique seqs forever and concludes the
-      opposite - the failing case is exactly the world a parse pipeline makes.
+      Four live worlds read through the v2 API. A bulk-imported demo world
+      returned all 164 elements at `change_seq: 1`, which is the finding;
+      worlds built one element at a time showed distinct seqs, the control
+      showing the collapse comes from bulk import, not from the field. The
+      head-counts-deletes companion was read from the platform's cursor
+      source. Read-only, no residue. Note the shape of the trap: a consumer
+      testing only against a world built by hand sees unique seqs and
+      concludes the opposite.
+
   - id: unknown-field-types-must-be-surfaced
     applies_to: any consumer walking the schema
     rule: >
-      A consumer that meets a field type it does not recognise MUST surface it.
-      `schema_walk.flatten_fields` SKIPS unknown types and reports them through
-      the `note` sink, which defaults to a no-op — so a vendored walk pinned at
-      an older dist, meeting a newer schema, drops the new field in total
-      silence. Vendors MUST pass a real sink (log, warn, or fail; the policy is
+      A consumer that meets a field type it does not recognise MUST surface
+      it. `schema_walk.flatten_fields` skips unknown types and reports them
+      through the `note` sink, which defaults to a no-op, so a vendored walk
+      from an older dist, meeting a newer schema, drops the new field in
+      silence. Vendors MUST pass a real sink (log, warn or fail; the policy is
       theirs). Emitting a partial type from a schema you cannot fully read is
       the failure this row exists to prevent.
     rationale: >
-      Found by Kael on 2026-07-28 reading the dist as its first consumer, and
-      named by him as the sharpest supply risk in the artifact. The walk itself
-      cannot choose the policy — an emitter mid-migration may legitimately want
-      to continue past an unknown type — so the obligation sits with the
-      consumer and the default stays non-fatal. Raising unilaterally would
-      convert a silent failure into a hard one at a schema bump, which is worse
-      for everyone downstream.
+      Found by the dist's first consumer, reading it as an outsider would.
+      The walk cannot choose the policy for every caller (an emitter in the
+      middle of a migration may want to carry on past an unknown type), so
+      the obligation sits with the consumer and the default stays non-fatal.
+      Raising by default would turn a silent failure into a hard one at a
+      schema bump, which is worse for everyone downstream.
     since: "2026-07-28"
-    status: ruled — README instructs vendors to pass a sink
+    status: ruled; the README tells vendors to pass a sink
 
   - id: collective-equipment-target
     applies_to: collective.equipment
     rule: >
-      Target is Object, per the YAML. The v1 implementation (Construct) is
-      decommissioned; keel serves per YAML, settled by dump data.
+      The target is Object, as the YAML says. An earlier API version stored
+      it as Construct; that version is retired, and the platform serves it
+      as Object.
     rationale: >
-      The founding drift case: specs agreed while emitter rulings drifted for
-      five days, benign only by luck. This table exists because of this row.
+      Two implementations read the same YAML and disagreed on this field
+      while their specs agreed. It is the case that started this table.
     since: "2026-07-23"
     status: ruled
     probe: >
-      Settled by DUMP DATA rather than by reading either spec: the production
-      database was queried for live collective.equipment values and they
-      resolve to Object, matching the YAML and not v1's Construct. Chosen as
-      the method precisely because both written sources agreed while the
-      implementations disagreed — when specs concur and behaviour differs,
-      only stored data breaks the tie. No residue (read-only query).
+      Settled by stored data rather than by either spec: the production
+      values of collective.equipment resolve to Object, matching the YAML.
+      Chosen because both written sources agreed while the implementations
+      differed; when specs agree and behaviour differs, only stored data
+      breaks the tie. Read-only query, no residue.
 
   - id: extension-passthrough
-    applies_to: unmodeled fields (x_* and tool-prefixed)
+    applies_to: fields the schema does not model (`x_`, and the tool prefixes `atlas_` and `shadow_`)
     rule: >
       Extension fields round-trip unconditionally: preserved on read, merged
       back on write, never dropped, and never behind an opt-in flag.
     rationale: >
-      The never-whitelist law — "passthrough that depends on a caller
-      remembering to ask for it fails exactly when it matters" (Quillon,
-      2026-07-28). A tool that drops another tool's state breaks the
-      portability promise the standard exists to make.
+      A passthrough that depends on a caller remembering to ask for it fails
+      exactly when it matters. A tool that drops another tool's data breaks
+      the portability the standard exists to provide.
     since: "2026-07-28"
     status: ruled
 
   - id: maximum-is-advisory-and-zero-means-unbounded
-    applies_to: "`maximum:` on integer fields (41 fields across 17 types)"
+    applies_to: "`maximum:` and `minimum:` on integer fields"
     rule: >
-      `maximum:` is ADVISORY. No emitter may generate range validation from it,
-      and no consumer may treat a value as rejected for exceeding it.
-      Two populations, one key, and they mean different things:
-      `maximum: 100` (15 fields) is a genuine 0-100 attribute scale authored
-      deliberately - the six character attributes, their six mirrors on trait,
-      plus ability.potency, relation.intensity, species.aggression (whose
-      descriptions say "on a relative scale of 0 to 100" in words).
-      `maximum: 0` (26 fields) is a SENTINEL FOR "NO MAXIMUM", never a real
-      constraint - every one of the 26 is an unbounded world-unit quantity
-      (every date field, weight, height, count, elevation, duration, life_span).
-      A collective whose member count may not exceed zero is not a constraint
-      anyone authored.
-      Until canonical drops the sentinel, an emitter honoring `maximum` naively
-      would cap 26 fields at zero across every backend. THE WALK DROPPING
-      `maximum` IS THEREFORE LOAD-BEARING, not a gap: it has been protecting
-      three consumers silently.
+      Bounds are ADVISORY. No emitter may generate range validation from
+      them, and no consumer may treat a value as rejected for exceeding one.
+      Today the schema carries `maximum: 100` on 15 fields (the six
+      character attributes, their six mirrors on trait, ability.potency,
+      relation.intensity and species.aggression: genuine 0-100 or -100 to
+      100 scales) and a `minimum:` on the same 15.
+      In copies of the schema older than canonical 00.30.01, `maximum: 0`
+      appears on 26 more fields (dates, weights, heights, counts, durations)
+      and means "no maximum", never a cap at zero. A consumer reading such a
+      copy must not honour it.
+      The walk does not return bounds, and will not: the API does not enforce
+      them, so a decoder carrying them would ship a constraint the platform
+      does not keep.
     rationale: >
-      ⚑ INTENT CONFIRMED BY THE AUTHOR (Captain, 2026-07-29): `maximum: 0`
-      was AUTHORED to mean "no maximum". So this is a deliberate convention,
-      not a placeholder that escaped review - and that makes the case for
-      changing it stronger rather than weaker, because a convention that
-      inverts a standard keyword will keep being read as the keyword by
-      everyone who was not told. The standard already contains its own
-      correct answer: `trait.yaml` declares proper signed ranges on all six
-      of its attributes with no sentinel, and absence already means
-      unbounded. Nothing needs inventing; 26 fields need aligning with the
-      six that got it right.
-      THE DANGER IS ASYMMETRIC AND THAT IS THE POINT: the diligent
-      implementer is the one who breaks this, because honoring a declared
-      constraint is the correct instinct everywhere else in the standard
-      (Kael's framing, 2026-07-29). A careless emitter that ignores
-      constraints is accidentally safe here; a careful one is not. That
-      inversion is why the rule lives in this table rather than in a comment.
-      Found by Kael 2026-07-29 while generating FIELD_SCHEMA, chasing a public
-      `integer_max`/`max` type member that zero entries have ever used. He
-      correctly did NOT ask for the walk to carry `maximum` - propagating the
-      broken half into three languages under the authority of the one decoder
-      is the worse outcome. Same shape as `required:` on pin/marker: a key
-      whose meaning depends on its value, ruled the same way (schema intent,
-      not wire enforcement). Canonical fix is to DELETE the key from the 26,
-      not to teach every consumer a sentinel; it rides the motion cohort.
+      The danger is asymmetric: a careful implementer is the one who breaks
+      this, because honouring a declared constraint is the right instinct
+      everywhere else in the standard. A careless emitter that ignores bounds
+      is accidentally safe; a careful one would cap 26 fields at zero. If a tool
+      wants the numbers for display (a slider's range), it reads them from
+      the YAML as a hint and still accepts any integer.
     since: "2026-07-29"
     status: >
-      ruled - advisory. The MEANING was ruled independently by Captain the
-      same day ("maximum: 0 means no maximum"), converging with the reading
-      the measurement forced; the ENFORCEMENT question is closed by the probe
-      below.
-      ⚑ RESOLVED 2026-07-29 in canonical 00.30.01: the 26 sentinels are
-      STRIPPED and the 8 missing floors added. The historical note stays
-      because a consumer holding a pre-00.30.01 copy still sees the trap.
-      ★ THE WALK STAYS SILENT ON BOUNDS - PERMANENTLY, not pending. An
-      earlier draft of this row left the door open ("only then may the walk
-      carry it"). Closed on Kael's argument, which reversed his own accepted
-      proposal: the wire does not enforce (charisma 9999 stored against a
-      maximum of 100), so a walk carrying `maximum` would ship a constraint
-      the platform does not keep - and any consumer reading a bound is
-      tempted to enforce it, with the prohibition living in a different file
-      from the data. That is the same ground `string-empty-is-unset` refused
-      Boss's cleaner null rule on. The table does not mint promises the
-      platform does not keep, including for its own proposals. If a docs
-      consumer ever needs the numbers they belong in the presentation tier
-      as a display hint, never in the decoder.
+      ruled, advisory. Canonical 00.30.01 removed the 26 `maximum: 0`
+      sentinels and added floors where they were missing; the note on older
+      copies stays because pinned consumers can still hold one.
     probe: >
-      Two independent checks, source and wire, because either alone is weaker.
-      SOURCE: keel contains ZERO MaxValueValidator - grep across the codebase
-      returns nothing outside .venv - and `codegen/generate_models.py` states
-      the omission deliberately ("Integer fields all nullable; `maximum:`
-      constraints ignored ... range constraints are not expressed at the DB
-      layer"). So the intent is documented, not accidental.
-      WIRE: POST /api/v2/character/ with `charisma: 9999` against a field the
-      schema caps at 100 returned 201 and STORED 9999 verbatim. Probe element
-      deleted (204) and re-fetched (404); no residue. The wire does not
-      enforce, matching the source read - which is what makes the advisory
-      ruling safe rather than merely convenient.
+      Two checks, source and wire, because either alone is weaker.
+      Source: the platform's code carries no range validator for any integer
+      field, and its model generator says so deliberately.
+      Wire: POST /api/v2/character/ with `charisma: 9999`, against a field
+      the schema caps at 100, returned 201 and stored 9999. The probe
+      element was deleted (204) and re-fetched (404); no residue.

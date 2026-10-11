@@ -1,0 +1,56 @@
+{
+  "type": "character",
+  "id": "068e2ddb-83c6-71a7-8000-a45b8b711e25",
+  "name": "The Consul",
+  "description": "Last seen on the balcony of a spaceship, over Hyperion.",
+  "supertype": "Human",
+  "subtype": "",
+  "image_url": "",
+  "physicality": "",
+  "mentality": "Unflappable",
+  "background": "",
+  "motivations": "",
+  "reputation": "",
+  "height": null,
+  "weight": null,
+  "birth_date": null,
+  "charisma": null,
+  "coercion": null,
+  "competence": null,
+  "compassion": null,
+  "creativity": null,
+  "courage": null,
+  "level": null,
+  "hit_points": null,
+  "STR": null,
+  "DEX": null,
+  "CON": null,
+  "INT": null,
+  "WIS": null,
+  "CHA": null,
+  "birthplace": null,
+  "location": "068e2e4b-a594-71b2-8000-cd7b6283dd71",
+  "species": [],
+  "traits": [],
+  "abilities": [
+    "068e2e60-fc37-789e-8000-a64560195ff8"
+  ],
+  "languages": [],
+  "objects": [
+    "068e2e56-d4b9-7c40-8000-173975bfd994",
+    "068e2e8c-e2f4-7e4c-8000-8abcf4e8e286"
+  ],
+  "institutions": [
+    "068e2f37-840a-7b3b-8000-41b6b6872c95"
+  ],
+  "family": [],
+  "friends": [],
+  "rivals": [],
+  "created_at": "2025-10-05T21:06:00.235828+00:00",
+  "updated_at": "2026-07-24T07:37:14.656337+00:00",
+  "change_seq": 118,
+  "created_by": null,
+  "atlas_aliases": [
+    "Consul"
+  ]
+}

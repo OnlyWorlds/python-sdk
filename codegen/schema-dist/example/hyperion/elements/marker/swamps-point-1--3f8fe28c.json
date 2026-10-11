@@ -1,0 +1,19 @@
+{
+  "type": "marker",
+  "id": "2226926d-8bf8-4877-ae02-94693f8fe28c",
+  "name": "Swamps - Point 1",
+  "description": "",
+  "supertype": "",
+  "subtype": "",
+  "image_url": "",
+  "x": 585,
+  "y": 731,
+  "z": null,
+  "order": 1,
+  "map": "2d277ba6-22e4-440b-9ef3-7f28153cd291",
+  "zone": "7fe67de4-de36-41eb-be50-3198d138f887",
+  "created_at": "2026-07-22T19:17:36.659156+00:00",
+  "updated_at": "2026-07-23T11:22:19.536327+00:00",
+  "change_seq": 106,
+  "created_by": null
+}

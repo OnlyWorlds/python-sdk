@@ -1,0 +1,19 @@
+{
+  "type": "marker",
+  "id": "bc87d8d3-283a-4ec9-8e30-bf0148b3cfa2",
+  "name": "Swamps - Point 5",
+  "description": "",
+  "supertype": "",
+  "subtype": "",
+  "image_url": "",
+  "x": 387,
+  "y": 757,
+  "z": null,
+  "order": 5,
+  "map": "2d277ba6-22e4-440b-9ef3-7f28153cd291",
+  "zone": "7fe67de4-de36-41eb-be50-3198d138f887",
+  "created_at": "2026-07-22T19:17:36.702468+00:00",
+  "updated_at": "2026-07-23T11:22:20.136743+00:00",
+  "change_seq": 109,
+  "created_by": null
+}

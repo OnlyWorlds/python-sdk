@@ -1,0 +1,35 @@
+{
+  "type": "creature",
+  "id": "068e92e3-cf64-7fd4-8000-2b8be79a4c7c",
+  "name": "Greater Green Saurian",
+  "description": "Friendly with GGS, usually",
+  "supertype": "",
+  "subtype": "",
+  "image_url": "",
+  "appearance": "",
+  "habits": "",
+  "demeanor": "",
+  "status": "",
+  "weight": null,
+  "height": null,
+  "birth_date": null,
+  "challenge_rating": null,
+  "hit_points": null,
+  "armor_class": null,
+  "speed": null,
+  "location": "068e2e4b-a594-71b2-8000-cd7b6283dd71",
+  "zone": "7fe67de4-de36-41eb-be50-3198d138f887",
+  "species": [
+    "068e2e72-3d17-7a23-8000-b8f0d24e2d1e"
+  ],
+  "traits": [
+    "068e6db2-91a2-783e-8000-ec27dff0708a"
+  ],
+  "abilities": [],
+  "languages": [],
+  "actions": [],
+  "created_at": "2025-10-10T16:03:08.962126+00:00",
+  "updated_at": "2026-07-23T11:22:20.743722+00:00",
+  "change_seq": 112,
+  "created_by": null
+}

@@ -1,0 +1,21 @@
+{
+  "type": "language",
+  "id": "068e92ee-d9d0-7612-8000-3d87f856e44c",
+  "name": "Western Musical Notation",
+  "description": "For c sharp minor and all that",
+  "supertype": "",
+  "subtype": "",
+  "image_url": "",
+  "phonology": "",
+  "grammar": "",
+  "lexicon": "",
+  "writing": "",
+  "status": "",
+  "classification": null,
+  "spread": [],
+  "dialects": [],
+  "created_at": "2025-10-10T16:06:05.613345+00:00",
+  "updated_at": "2025-10-10T16:06:05.614072+00:00",
+  "change_seq": 1,
+  "created_by": null
+}

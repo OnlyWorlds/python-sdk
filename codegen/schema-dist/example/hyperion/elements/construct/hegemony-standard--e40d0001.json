@@ -1,0 +1,59 @@
+{
+  "type": "construct",
+  "id": "068e92e1-63df-7d1f-8000-4ca1e40d0001",
+  "name": "Hegemony Standard",
+  "description": "The Hegemony’s standard reckoning: years counted from the pivot, with everything before it dated in the Old Earth era.",
+  "supertype": "Calendar",
+  "subtype": "",
+  "image_url": "",
+  "rationale": "",
+  "history": "",
+  "status": "",
+  "reach": "",
+  "start_date": null,
+  "end_date": null,
+  "founder": null,
+  "custodian": null,
+  "characters": [],
+  "objects": [],
+  "locations": [],
+  "species": [],
+  "creatures": [],
+  "institutions": [],
+  "traits": [],
+  "collectives": [],
+  "zones": [],
+  "abilities": [],
+  "phenomena": [],
+  "languages": [],
+  "families": [],
+  "relations": [],
+  "titles": [],
+  "constructs": [],
+  "events": [],
+  "narratives": [],
+  "created_at": "2026-07-23T11:22:21.636549+00:00",
+  "updated_at": "2026-07-23T11:22:21.636561+00:00",
+  "change_seq": 117,
+  "created_by": null,
+  "atlas_calendar": {
+    "eras": [
+      {
+        "name": "Old Earth",
+        "start": 0,
+        "abbrev": "O.E.",
+        "restart": true,
+        "direction": "down"
+      },
+      {
+        "name": "PC",
+        "start": 0,
+        "restart": true,
+        "year_base": 0
+      }
+    ],
+    "grain": "Year",
+    "format": "{year} {era}",
+    "version": 1
+  }
+}

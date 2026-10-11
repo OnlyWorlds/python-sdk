@@ -1,0 +1,32 @@
+{
+  "type": "collective",
+  "id": "068e92dd-ce97-79b4-8000-90a11218fc88",
+  "name": "Pack of Bellowing Saurians",
+  "description": "Raging around the swamps of Hyperion",
+  "supertype": "",
+  "subtype": "",
+  "image_url": "",
+  "composition": "",
+  "activity": "",
+  "disposition": "",
+  "state": "",
+  "count": null,
+  "formation_date": null,
+  "operator": null,
+  "equipment": [],
+  "abilities": [],
+  "symbolism": [],
+  "species": [
+    "068e2e72-3d17-7a23-8000-b8f0d24e2d1e"
+  ],
+  "characters": [],
+  "creatures": [
+    "068e2e71-8f4d-7de0-8000-dfbd8406227d",
+    "068e92e3-cf64-7fd4-8000-2b8be79a4c7c"
+  ],
+  "phenomena": [],
+  "created_at": "2025-10-10T16:01:32.911998+00:00",
+  "updated_at": "2025-10-10T16:01:32.912407+00:00",
+  "change_seq": 1,
+  "created_by": null
+}

@@ -1,0 +1,45 @@
+{
+  "type": "event",
+  "id": "068e8bcf-9136-7d63-8000-a61f8b461fb6",
+  "name": "The Primal Performance",
+  "description": "The Consul performs for bellowing saurians",
+  "supertype": "",
+  "subtype": "",
+  "image_url": "",
+  "history": "",
+  "challenges": "",
+  "consequences": "",
+  "start_date": 12,
+  "end_date": null,
+  "triggers": [],
+  "characters": [
+    "068e2ddb-83c6-71a7-8000-a45b8b711e25"
+  ],
+  "objects": [
+    "068e2e56-d4b9-7c40-8000-173975bfd994"
+  ],
+  "locations": [
+    "068e2e4b-a594-71b2-8000-cd7b6283dd71"
+  ],
+  "species": [],
+  "creatures": [],
+  "institutions": [],
+  "traits": [],
+  "collectives": [],
+  "zones": [],
+  "abilities": [
+    "068e2e60-fc37-789e-8000-a64560195ff8"
+  ],
+  "phenomena": [
+    "068e92f8-11fd-7052-8000-b9355be90c7d"
+  ],
+  "languages": [],
+  "families": [],
+  "relations": [],
+  "titles": [],
+  "constructs": [],
+  "created_at": "2025-10-10T07:59:53.075662+00:00",
+  "updated_at": "2026-07-23T11:22:18.238060+00:00",
+  "change_seq": 100,
+  "created_by": null
+}

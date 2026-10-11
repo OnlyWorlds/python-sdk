@@ -1,7 +1,7 @@
 {
   "_meta": {
     "what": "Presentation DEFAULTS (family + icon + family colours) per element type. Defaults, not authority \u2014 tools may override, and Atlas remaps wholesale for dark mode.",
-    "provenance": "Four-family palette adopted S308 (2026-07) for measured CVD separation: the prior 22-hue set left Title/Trait at deltaE 1.3 for deutan viewers. Values validated; re-litigate with a validator run, not taste. Measurements: Orrery product/schema/element-palette-measurements.md.",
+    "provenance": "Four-family palette adopted 2026-07 for measured colour-vision-deficiency separation: the previous 22-hue set left Title and Trait at deltaE 1.3 for deutan viewers. Values validated; change one only after re-running a colour-vision check, not by taste.",
     "families": [
       "agents",
       "world",
@@ -87,7 +87,7 @@
     },
     "marker": {
       "family": "world",
-      "icon": "location_on"
+      "icon": "polyline"
     },
     "narrative": {
       "family": "temporal",
@@ -123,7 +123,7 @@
     },
     "zone": {
       "family": "world",
-      "icon": "architecture"
+      "icon": "pentagon"
     }
   }
 }

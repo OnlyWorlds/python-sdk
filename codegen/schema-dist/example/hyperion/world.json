@@ -1,0 +1,20 @@
+{
+  "id": "068e012b-52a9-79bf-8000-26bb67891425",
+  "name": "Hyperion",
+  "description": "",
+  "image_url": "https://i.imgur.com/Damdiwv.jpeg",
+  "time_format_names": [],
+  "time_format_equivalents": [],
+  "time_basic_unit": "Year",
+  "time_range_min": -300,
+  "time_range_max": 100,
+  "time_current": 0,
+  "length_unit": "",
+  "mass_unit": "",
+  "distance_unit": "",
+  "public_read": false,
+  "owner_character": null,
+  "created_at": "2025-10-03T18:15:17.166381+00:00",
+  "updated_at": "2026-07-23T11:22:21.831337+00:00",
+  "format_version": "0.3.7"
+}

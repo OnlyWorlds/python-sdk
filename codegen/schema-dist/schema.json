@@ -1,0 +1,2901 @@
+{
+  "kinds": {
+    "scalar_str": "a string; the empty string means unset",
+    "scalar_int": "an integer, or null for unset",
+    "single": "one element's id (a UUID string), or null; `target` names its type",
+    "multi": "an array of element ids (UUID strings), possibly empty; `target` names their type",
+    "generic": "a link to an element of any type, carried as two keys: `type_key` holds the type's slug, `id_key` the element's id; both set or both null",
+    "list": "an array; `items` gives the kind of each entry (World fields only)"
+  },
+  "base": [
+    {
+      "name": "id",
+      "kind": "scalar_str",
+      "required": true,
+      "desc": "Unique identifier for the element, uuidv7 format"
+    },
+    {
+      "name": "name",
+      "kind": "scalar_str",
+      "required": true,
+      "desc": "Name of the element"
+    },
+    {
+      "name": "description",
+      "kind": "scalar_str",
+      "required": false,
+      "desc": "Any kind of details about the element"
+    },
+    {
+      "name": "supertype",
+      "kind": "scalar_str",
+      "required": false,
+      "desc": "The top level category to which the element belongs"
+    },
+    {
+      "name": "subtype",
+      "kind": "scalar_str",
+      "required": false,
+      "desc": "The sub level category through which the element is further classified"
+    },
+    {
+      "name": "image_url",
+      "kind": "scalar_str",
+      "required": false,
+      "desc": "URL to an image representing the element"
+    },
+    {
+      "name": "world",
+      "kind": "scalar_str",
+      "required": false,
+      "desc": "UUID of the world the element is part of"
+    }
+  ],
+  "types": {
+    "ability": [
+      {
+        "name": "activation",
+        "kind": "scalar_str",
+        "desc": "Method or conditions under which the ability is activated",
+        "section": "Mechanics",
+        "required": false
+      },
+      {
+        "name": "duration",
+        "kind": "scalar_int",
+        "desc": "Length of time the ability remains active or its effects persist, measured in TIME units",
+        "section": "Mechanics",
+        "required": false
+      },
+      {
+        "name": "potency",
+        "kind": "scalar_int",
+        "desc": "Relative measure of the ability's inherent potency or force, used for scaling or comparison purposes",
+        "section": "Mechanics",
+        "required": false
+      },
+      {
+        "name": "range",
+        "kind": "scalar_int",
+        "desc": "Effective reach or distance at which the ability can be used, in the world's distance unit (World distance_unit)",
+        "section": "Mechanics",
+        "required": false
+      },
+      {
+        "name": "effects",
+        "kind": "multi",
+        "target": "phenomenon",
+        "desc": "Phenomena that result from the ability's use, such as environmental changes or sensory effects",
+        "section": "Mechanics",
+        "required": false
+      },
+      {
+        "name": "challenges",
+        "kind": "scalar_str",
+        "desc": "Describes specific difficulties or constraints that make the ability hard to master or use effectively",
+        "section": "Mechanics",
+        "required": false
+      },
+      {
+        "name": "talents",
+        "kind": "multi",
+        "target": "trait",
+        "desc": "Traits that naturally enhance or improve performance with this ability",
+        "section": "Mechanics",
+        "required": false
+      },
+      {
+        "name": "requisites",
+        "kind": "multi",
+        "target": "construct",
+        "desc": "Constructs that must be satisfied for the ability to be used, such as rituals, permissions, or required roles",
+        "section": "Mechanics",
+        "required": false
+      },
+      {
+        "name": "prevalence",
+        "kind": "scalar_str",
+        "desc": "How widely the ability is known or practiced, and potential clues to its origins and cultural diffusion",
+        "section": "World",
+        "required": false
+      },
+      {
+        "name": "tradition",
+        "kind": "single",
+        "target": "construct",
+        "desc": "A construct that expresses the conceptual, social, or institutional system this ability operates within",
+        "section": "World",
+        "required": false
+      },
+      {
+        "name": "source",
+        "kind": "single",
+        "target": "phenomenon",
+        "desc": "The phenomenon that serves as the enabling force or condition that allows this ability to function",
+        "section": "World",
+        "required": false
+      },
+      {
+        "name": "locus",
+        "kind": "single",
+        "target": "location",
+        "desc": "Location where the ability is most strongly rooted, developed, or traditionally practiced",
+        "section": "World",
+        "required": false
+      },
+      {
+        "name": "instruments",
+        "kind": "multi",
+        "target": "object",
+        "desc": "Objects or tools required to activate, channel, or perform the ability",
+        "section": "World",
+        "required": false
+      },
+      {
+        "name": "systems",
+        "kind": "multi",
+        "target": "construct",
+        "desc": "Magic frameworks or structures that the ability associates with",
+        "section": "World",
+        "required": false
+      }
+    ],
+    "collective": [
+      {
+        "name": "composition",
+        "kind": "scalar_str",
+        "desc": "Internal structure or demographic makeup of the collective",
+        "section": "Formation",
+        "required": false
+      },
+      {
+        "name": "count",
+        "kind": "scalar_int",
+        "desc": "Number of members in the collective (approximate or exact)",
+        "section": "Formation",
+        "required": false
+      },
+      {
+        "name": "formation_date",
+        "kind": "scalar_int",
+        "desc": "Date the collective was formed, using world TIME units",
+        "section": "Formation",
+        "required": false
+      },
+      {
+        "name": "operator",
+        "kind": "single",
+        "target": "institution",
+        "desc": "Institution that manages or directs the collective",
+        "section": "Formation",
+        "required": false
+      },
+      {
+        "name": "equipment",
+        "kind": "multi",
+        "target": "object",
+        "desc": "Tools or gear in possession of and/or regularly used by the collective",
+        "section": "Formation",
+        "required": false
+      },
+      {
+        "name": "activity",
+        "kind": "scalar_str",
+        "desc": "Primary behaviors or actions the collective engages in",
+        "section": "Dynamics",
+        "required": false
+      },
+      {
+        "name": "disposition",
+        "kind": "scalar_str",
+        "desc": "Emotional control or volatility expressed by the collective",
+        "section": "Dynamics",
+        "required": false
+      },
+      {
+        "name": "state",
+        "kind": "scalar_str",
+        "desc": "Current condition or operational status of the collective",
+        "section": "Dynamics",
+        "required": false
+      },
+      {
+        "name": "abilities",
+        "kind": "multi",
+        "target": "ability",
+        "desc": "Abilities commonly shared among members of the collective, or abilities of that collective as a whole",
+        "section": "Dynamics",
+        "required": false
+      },
+      {
+        "name": "symbolism",
+        "kind": "multi",
+        "target": "construct",
+        "desc": "Cultural expressions, rituals, or symbols that unify or distinguish the collective",
+        "section": "Dynamics",
+        "required": false
+      },
+      {
+        "name": "species",
+        "kind": "multi",
+        "target": "species",
+        "desc": "Species that compose or participate in the collective",
+        "section": "World",
+        "required": false
+      },
+      {
+        "name": "characters",
+        "kind": "multi",
+        "target": "character",
+        "desc": "Characters who are members of the collective",
+        "section": "World",
+        "required": false
+      },
+      {
+        "name": "creatures",
+        "kind": "multi",
+        "target": "creature",
+        "desc": "Creatures associated with or included in the collective",
+        "section": "World",
+        "required": false
+      },
+      {
+        "name": "phenomena",
+        "kind": "multi",
+        "target": "phenomenon",
+        "desc": "Phenomena that influence or characterize the collective",
+        "section": "World",
+        "required": false
+      }
+    ],
+    "character": [
+      {
+        "name": "physicality",
+        "kind": "scalar_str",
+        "desc": "The character's visible physical features and body attributes",
+        "section": "Constitution",
+        "required": false
+      },
+      {
+        "name": "mentality",
+        "kind": "scalar_str",
+        "desc": "The character's mindset, emotional tone, and style of thinking",
+        "section": "Constitution",
+        "required": false
+      },
+      {
+        "name": "height",
+        "kind": "scalar_int",
+        "desc": "The character's approximate or exact height, in the world's length unit (World length_unit)",
+        "section": "Constitution",
+        "required": false
+      },
+      {
+        "name": "weight",
+        "kind": "scalar_int",
+        "desc": "The character's approximate or exact weight, in the world's mass unit (World mass_unit)",
+        "section": "Constitution",
+        "required": false
+      },
+      {
+        "name": "species",
+        "kind": "multi",
+        "target": "species",
+        "desc": "Species the character might belong to",
+        "section": "Constitution",
+        "required": false
+      },
+      {
+        "name": "traits",
+        "kind": "multi",
+        "target": "trait",
+        "desc": "Traits for notable behavioral, physical, or systemic characteristics",
+        "section": "Constitution",
+        "required": false
+      },
+      {
+        "name": "abilities",
+        "kind": "multi",
+        "target": "ability",
+        "desc": "Abilities the character might perform, control, or invoke",
+        "section": "Constitution",
+        "required": false
+      },
+      {
+        "name": "background",
+        "kind": "scalar_str",
+        "desc": "History, upbringing, or formative experiences of the character",
+        "section": "Origins",
+        "required": false
+      },
+      {
+        "name": "motivations",
+        "kind": "scalar_str",
+        "desc": "Core desires, goals, or values that drive the character's choices and behavior",
+        "section": "Origins",
+        "required": false
+      },
+      {
+        "name": "birth_date",
+        "kind": "scalar_int",
+        "desc": "Moment of birth, expressed in the world's TIME units",
+        "section": "Origins",
+        "required": false
+      },
+      {
+        "name": "birthplace",
+        "kind": "single",
+        "target": "location",
+        "desc": "Location where the character was born",
+        "section": "Origins",
+        "required": false
+      },
+      {
+        "name": "languages",
+        "kind": "multi",
+        "target": "language",
+        "desc": "Languages the character can understand, speak, or use for communication",
+        "section": "Origins",
+        "required": false
+      },
+      {
+        "name": "reputation",
+        "kind": "scalar_str",
+        "desc": "Brief summary of the character's current condition, role, or predicament",
+        "section": "World",
+        "required": false
+      },
+      {
+        "name": "location",
+        "kind": "single",
+        "target": "location",
+        "desc": "The character's present physical location",
+        "section": "World",
+        "required": false
+      },
+      {
+        "name": "objects",
+        "kind": "multi",
+        "target": "object",
+        "desc": "Key objects owned by or symbolically linked to the character",
+        "section": "World",
+        "required": false
+      },
+      {
+        "name": "institutions",
+        "kind": "multi",
+        "target": "institution",
+        "desc": "Institutions the character is affiliated with",
+        "section": "World",
+        "required": false
+      },
+      {
+        "name": "charisma",
+        "kind": "scalar_int",
+        "desc": "Ability to attract, inspire, and influence others",
+        "section": "Personality",
+        "required": false
+      },
+      {
+        "name": "coercion",
+        "kind": "scalar_int",
+        "desc": "Capacity to dominate, intimidate, or apply force to shape outcomes",
+        "section": "Personality",
+        "required": false
+      },
+      {
+        "name": "competence",
+        "kind": "scalar_int",
+        "desc": "Skill in planning, understanding, and managing complex systems or situations",
+        "section": "Personality",
+        "required": false
+      },
+      {
+        "name": "compassion",
+        "kind": "scalar_int",
+        "desc": "Willingness to empathize with and care for others",
+        "section": "Personality",
+        "required": false
+      },
+      {
+        "name": "creativity",
+        "kind": "scalar_int",
+        "desc": "Ability to generate novel ideas, perspectives, or solutions",
+        "section": "Personality",
+        "required": false
+      },
+      {
+        "name": "courage",
+        "kind": "scalar_int",
+        "desc": "Readiness to face danger, risk, or adversity",
+        "section": "Personality",
+        "required": false
+      },
+      {
+        "name": "family",
+        "kind": "multi",
+        "target": "family",
+        "desc": "Families the character belongs to by blood or adoption",
+        "section": "Social",
+        "required": false
+      },
+      {
+        "name": "friends",
+        "kind": "multi",
+        "target": "character",
+        "desc": "Characters the character considers close allies or companions",
+        "section": "Social",
+        "required": false
+      },
+      {
+        "name": "rivals",
+        "kind": "multi",
+        "target": "character",
+        "desc": "Characters the character is in active opposition or competition with",
+        "section": "Social",
+        "required": false
+      },
+      {
+        "name": "level",
+        "kind": "scalar_int",
+        "desc": "Progression rank of the character in a game system",
+        "section": "TTRPG",
+        "required": false
+      },
+      {
+        "name": "hit_points",
+        "kind": "scalar_int",
+        "desc": "Total health available to the character",
+        "section": "TTRPG",
+        "required": false
+      },
+      {
+        "name": "STR",
+        "kind": "scalar_int",
+        "desc": "Physical force and carrying capacity",
+        "section": "TTRPG",
+        "required": false
+      },
+      {
+        "name": "DEX",
+        "kind": "scalar_int",
+        "desc": "Agility, coordination, and reflexes",
+        "section": "TTRPG",
+        "required": false
+      },
+      {
+        "name": "CON",
+        "kind": "scalar_int",
+        "desc": "Endurance and resistance to strain",
+        "section": "TTRPG",
+        "required": false
+      },
+      {
+        "name": "INT",
+        "kind": "scalar_int",
+        "desc": "Reasoning, memory, and learning",
+        "section": "TTRPG",
+        "required": false
+      },
+      {
+        "name": "WIS",
+        "kind": "scalar_int",
+        "desc": "Intuition, awareness, and judgment",
+        "section": "TTRPG",
+        "required": false
+      },
+      {
+        "name": "CHA",
+        "kind": "scalar_int",
+        "desc": "Persuasiveness and personal magnetism",
+        "section": "TTRPG",
+        "required": false
+      }
+    ],
+    "construct": [
+      {
+        "name": "rationale",
+        "kind": "scalar_str",
+        "desc": "The internal reasoning, structure, or justification of how the construct functions or makes sense within the world",
+        "section": "Nature",
+        "required": false
+      },
+      {
+        "name": "history",
+        "kind": "scalar_str",
+        "desc": "The historical development or ideation of the construct, and its place in wider historical contexts",
+        "section": "Nature",
+        "required": false
+      },
+      {
+        "name": "status",
+        "kind": "scalar_str",
+        "desc": "The present condition or operational status of the construct",
+        "section": "Nature",
+        "required": false
+      },
+      {
+        "name": "reach",
+        "kind": "scalar_str",
+        "desc": "The geographic, cultural, or political extent of the construct's influence",
+        "section": "Nature",
+        "required": false
+      },
+      {
+        "name": "start_date",
+        "kind": "scalar_int",
+        "desc": "The point in time when the construct began or was first established (uses world's TIME definition)",
+        "section": "Nature",
+        "required": false
+      },
+      {
+        "name": "end_date",
+        "kind": "scalar_int",
+        "desc": "The point in time when the construct ceased to function or lost its meaning",
+        "section": "Nature",
+        "required": false
+      },
+      {
+        "name": "founder",
+        "kind": "single",
+        "target": "character",
+        "desc": "Character who conceived or initiated the construct",
+        "section": "Nature",
+        "required": false
+      },
+      {
+        "name": "custodian",
+        "kind": "single",
+        "target": "institution",
+        "desc": "Institution maintaining, enforcing, or exploiting the construct",
+        "section": "Nature",
+        "required": false
+      },
+      {
+        "name": "characters",
+        "kind": "multi",
+        "target": "character",
+        "desc": "Characters relevant to the construct",
+        "section": "Involves",
+        "required": false
+      },
+      {
+        "name": "objects",
+        "kind": "multi",
+        "target": "object",
+        "desc": "Objects relevant to the construct",
+        "section": "Involves",
+        "required": false
+      },
+      {
+        "name": "locations",
+        "kind": "multi",
+        "target": "location",
+        "desc": "Locations relevant to the construct",
+        "section": "Involves",
+        "required": false
+      },
+      {
+        "name": "species",
+        "kind": "multi",
+        "target": "species",
+        "desc": "Species relevant to the construct",
+        "section": "Involves",
+        "required": false
+      },
+      {
+        "name": "creatures",
+        "kind": "multi",
+        "target": "creature",
+        "desc": "Creatures relevant to the construct",
+        "section": "Involves",
+        "required": false
+      },
+      {
+        "name": "institutions",
+        "kind": "multi",
+        "target": "institution",
+        "desc": "Institutions relevant to the construct",
+        "section": "Involves",
+        "required": false
+      },
+      {
+        "name": "traits",
+        "kind": "multi",
+        "target": "trait",
+        "desc": "Traits relevant to the construct",
+        "section": "Involves",
+        "required": false
+      },
+      {
+        "name": "collectives",
+        "kind": "multi",
+        "target": "collective",
+        "desc": "Collectives relevant to the construct",
+        "section": "Involves",
+        "required": false
+      },
+      {
+        "name": "zones",
+        "kind": "multi",
+        "target": "zone",
+        "desc": "Zones relevant to the construct",
+        "section": "Involves",
+        "required": false
+      },
+      {
+        "name": "abilities",
+        "kind": "multi",
+        "target": "ability",
+        "desc": "Abilities relevant to the construct",
+        "section": "Involves",
+        "required": false
+      },
+      {
+        "name": "phenomena",
+        "kind": "multi",
+        "target": "phenomenon",
+        "desc": "Phenomena relevant to the construct",
+        "section": "Involves",
+        "required": false
+      },
+      {
+        "name": "languages",
+        "kind": "multi",
+        "target": "language",
+        "desc": "Languages relevant to the construct",
+        "section": "Involves",
+        "required": false
+      },
+      {
+        "name": "families",
+        "kind": "multi",
+        "target": "family",
+        "desc": "Families relevant to the construct",
+        "section": "Involves",
+        "required": false
+      },
+      {
+        "name": "relations",
+        "kind": "multi",
+        "target": "relation",
+        "desc": "Relations relevant to the construct",
+        "section": "Involves",
+        "required": false
+      },
+      {
+        "name": "titles",
+        "kind": "multi",
+        "target": "title",
+        "desc": "Titles relevant to the construct",
+        "section": "Involves",
+        "required": false
+      },
+      {
+        "name": "constructs",
+        "kind": "multi",
+        "target": "construct",
+        "desc": "Other constructs relevant to the construct",
+        "section": "Involves",
+        "required": false
+      },
+      {
+        "name": "events",
+        "kind": "multi",
+        "target": "event",
+        "desc": "Events relevant to the construct",
+        "section": "Involves",
+        "required": false
+      },
+      {
+        "name": "narratives",
+        "kind": "multi",
+        "target": "narrative",
+        "desc": "Narratives relevant to the construct",
+        "section": "Involves",
+        "required": false
+      }
+    ],
+    "creature": [
+      {
+        "name": "appearance",
+        "kind": "scalar_str",
+        "desc": "Visual description of the creature",
+        "section": "Biology",
+        "required": false
+      },
+      {
+        "name": "weight",
+        "kind": "scalar_int",
+        "desc": "Approximate or exact weight of the creature, in the world's mass unit (World mass_unit)",
+        "section": "Biology",
+        "required": false
+      },
+      {
+        "name": "height",
+        "kind": "scalar_int",
+        "desc": "Approximate height of the creature, in the world's length unit (World length_unit)",
+        "section": "Biology",
+        "required": false
+      },
+      {
+        "name": "species",
+        "kind": "multi",
+        "target": "species",
+        "desc": "Species this creature belongs to",
+        "section": "Biology",
+        "required": false
+      },
+      {
+        "name": "habits",
+        "kind": "scalar_str",
+        "desc": "Typical behaviors, instincts, or recurring actions the creature tends to display",
+        "section": "Behavior",
+        "required": false
+      },
+      {
+        "name": "demeanor",
+        "kind": "scalar_str",
+        "desc": "The emotional tone or attitude the creature conveys through posture, expression, or aggression",
+        "section": "Behavior",
+        "required": false
+      },
+      {
+        "name": "traits",
+        "kind": "multi",
+        "target": "trait",
+        "desc": "Traits that influence the creature's behavior, capabilities, or appearance",
+        "section": "Behavior",
+        "required": false
+      },
+      {
+        "name": "abilities",
+        "kind": "multi",
+        "target": "ability",
+        "desc": "Innate or learned abilities the creature can perform or activate",
+        "section": "Behavior",
+        "required": false
+      },
+      {
+        "name": "languages",
+        "kind": "multi",
+        "target": "language",
+        "desc": "Languages the creature can understand, speak, or otherwise use to communicate",
+        "section": "Behavior",
+        "required": false
+      },
+      {
+        "name": "status",
+        "kind": "scalar_str",
+        "desc": "Current situation or classification of the creature",
+        "section": "World",
+        "required": false
+      },
+      {
+        "name": "birth_date",
+        "kind": "scalar_int",
+        "desc": "The time of the creature's birth, recorded in the world's defined TIME unit",
+        "section": "World",
+        "required": false
+      },
+      {
+        "name": "location",
+        "kind": "single",
+        "target": "location",
+        "desc": "Specific location where the creature is currently found or most associated with",
+        "section": "World",
+        "required": false
+      },
+      {
+        "name": "zone",
+        "kind": "single",
+        "target": "zone",
+        "desc": "Larger area or region commonly inhabited or currently claimed by the creature",
+        "section": "World",
+        "required": false
+      },
+      {
+        "name": "challenge_rating",
+        "kind": "scalar_int",
+        "desc": "Difficulty or threat level of the creature in a gameplay context",
+        "section": "TTRPG",
+        "required": false
+      },
+      {
+        "name": "hit_points",
+        "kind": "scalar_int",
+        "desc": "Total health or durability value in combat",
+        "section": "TTRPG",
+        "required": false
+      },
+      {
+        "name": "armor_class",
+        "kind": "scalar_int",
+        "desc": "Defense rating against physical attacks or effects",
+        "section": "TTRPG",
+        "required": false
+      },
+      {
+        "name": "speed",
+        "kind": "scalar_int",
+        "desc": "Typical movement speed, in the world's distance unit (World distance_unit) per round",
+        "section": "TTRPG",
+        "required": false
+      },
+      {
+        "name": "actions",
+        "kind": "multi",
+        "target": "ability",
+        "desc": "Combat or tactical abilities the creature can perform or use",
+        "section": "TTRPG",
+        "required": false
+      }
+    ],
+    "event": [
+      {
+        "name": "history",
+        "kind": "scalar_str",
+        "desc": "Historical context and background of the event",
+        "section": "Nature",
+        "required": false
+      },
+      {
+        "name": "challenges",
+        "kind": "scalar_str",
+        "desc": "Adversity or difficulties faced during the event",
+        "section": "Nature",
+        "required": false
+      },
+      {
+        "name": "consequences",
+        "kind": "scalar_str",
+        "desc": "Outcomes and impacts resulting from the event",
+        "section": "Nature",
+        "required": false
+      },
+      {
+        "name": "start_date",
+        "kind": "scalar_int",
+        "desc": "Date on which the event began",
+        "section": "Nature",
+        "required": false
+      },
+      {
+        "name": "end_date",
+        "kind": "scalar_int",
+        "desc": "Date on which the event concluded",
+        "section": "Nature",
+        "required": false
+      },
+      {
+        "name": "triggers",
+        "kind": "multi",
+        "target": "event",
+        "desc": "Events that precipitated this event",
+        "section": "Nature",
+        "required": false
+      },
+      {
+        "name": "characters",
+        "kind": "multi",
+        "target": "character",
+        "desc": "Key characters relevant to the event",
+        "section": "Involves",
+        "required": false
+      },
+      {
+        "name": "objects",
+        "kind": "multi",
+        "target": "object",
+        "desc": "Objects relevant to the event",
+        "section": "Involves",
+        "required": false
+      },
+      {
+        "name": "locations",
+        "kind": "multi",
+        "target": "location",
+        "desc": "Locations relevant to the event",
+        "section": "Involves",
+        "required": false
+      },
+      {
+        "name": "species",
+        "kind": "multi",
+        "target": "species",
+        "desc": "Species relevant to the event",
+        "section": "Involves",
+        "required": false
+      },
+      {
+        "name": "creatures",
+        "kind": "multi",
+        "target": "creature",
+        "desc": "Creatures relevant to the event",
+        "section": "Involves",
+        "required": false
+      },
+      {
+        "name": "institutions",
+        "kind": "multi",
+        "target": "institution",
+        "desc": "Institutions relevant to the event",
+        "section": "Involves",
+        "required": false
+      },
+      {
+        "name": "traits",
+        "kind": "multi",
+        "target": "trait",
+        "desc": "Traits relevant to the event",
+        "section": "Involves",
+        "required": false
+      },
+      {
+        "name": "collectives",
+        "kind": "multi",
+        "target": "collective",
+        "desc": "Groups or collectives relevant to the event",
+        "section": "Involves",
+        "required": false
+      },
+      {
+        "name": "zones",
+        "kind": "multi",
+        "target": "zone",
+        "desc": "Zones relevant to the event",
+        "section": "Involves",
+        "required": false
+      },
+      {
+        "name": "abilities",
+        "kind": "multi",
+        "target": "ability",
+        "desc": "Abilities relevant to the event",
+        "section": "Involves",
+        "required": false
+      },
+      {
+        "name": "phenomena",
+        "kind": "multi",
+        "target": "phenomenon",
+        "desc": "Natural or supernatural phenomena relevant to the event",
+        "section": "Involves",
+        "required": false
+      },
+      {
+        "name": "languages",
+        "kind": "multi",
+        "target": "language",
+        "desc": "Languages relevant to the event",
+        "section": "Involves",
+        "required": false
+      },
+      {
+        "name": "families",
+        "kind": "multi",
+        "target": "family",
+        "desc": "Families relevant to the event",
+        "section": "Involves",
+        "required": false
+      },
+      {
+        "name": "relations",
+        "kind": "multi",
+        "target": "relation",
+        "desc": "Interpersonal or political relations relevant to the event",
+        "section": "Involves",
+        "required": false
+      },
+      {
+        "name": "titles",
+        "kind": "multi",
+        "target": "title",
+        "desc": "Titles relevant to the event",
+        "section": "Involves",
+        "required": false
+      },
+      {
+        "name": "constructs",
+        "kind": "multi",
+        "target": "construct",
+        "desc": "Concepts, laws, or built entities relevant to the event",
+        "section": "Involves",
+        "required": false
+      }
+    ],
+    "family": [
+      {
+        "name": "spirit",
+        "kind": "scalar_str",
+        "desc": "The core values or shared ethos that the family embodies",
+        "section": "Identity",
+        "required": false
+      },
+      {
+        "name": "history",
+        "kind": "scalar_str",
+        "desc": "Background or origin story of the family",
+        "section": "Identity",
+        "required": false
+      },
+      {
+        "name": "traditions",
+        "kind": "multi",
+        "target": "construct",
+        "desc": "Cultural practices, symbols, or customs overseen by the family",
+        "section": "Identity",
+        "required": false
+      },
+      {
+        "name": "traits",
+        "kind": "multi",
+        "target": "trait",
+        "desc": "Traits possibly found among members of the family",
+        "section": "Identity",
+        "required": false
+      },
+      {
+        "name": "abilities",
+        "kind": "multi",
+        "target": "ability",
+        "desc": "Abilities or special qualities possibly present in the family",
+        "section": "Identity",
+        "required": false
+      },
+      {
+        "name": "languages",
+        "kind": "multi",
+        "target": "language",
+        "desc": "Languages spoken by, or associated with the family",
+        "section": "Identity",
+        "required": false
+      },
+      {
+        "name": "ancestors",
+        "kind": "multi",
+        "target": "character",
+        "desc": "Notable forebears or historic characters in the family's lineage",
+        "section": "Identity",
+        "required": false
+      },
+      {
+        "name": "reputation",
+        "kind": "scalar_str",
+        "desc": "Current social, political, or general standing of the family",
+        "section": "World",
+        "required": false
+      },
+      {
+        "name": "estates",
+        "kind": "multi",
+        "target": "location",
+        "desc": "Key locations owned, governed, or symbolically tied to the family",
+        "section": "World",
+        "required": false
+      },
+      {
+        "name": "governs",
+        "kind": "multi",
+        "target": "institution",
+        "desc": "Institutions administered or managed by the family",
+        "section": "World",
+        "required": false
+      },
+      {
+        "name": "heirlooms",
+        "kind": "multi",
+        "target": "object",
+        "desc": "Important objects or artifacts handed down by the family",
+        "section": "World",
+        "required": false
+      },
+      {
+        "name": "creatures",
+        "kind": "multi",
+        "target": "creature",
+        "desc": "Creatures owned, bonded to, or representing the family",
+        "section": "World",
+        "required": false
+      }
+    ],
+    "institution": [
+      {
+        "name": "doctrine",
+        "kind": "scalar_str",
+        "desc": "Core belief, mission, or purpose that drives the institution",
+        "section": "Foundation",
+        "required": false
+      },
+      {
+        "name": "founding_date",
+        "kind": "scalar_int",
+        "desc": "Date when the institution was established, in the world's TIME format",
+        "section": "Foundation",
+        "required": false
+      },
+      {
+        "name": "parent_institution",
+        "kind": "single",
+        "target": "institution",
+        "desc": "Institution that governs, embodies, or originated this one",
+        "section": "Foundation",
+        "required": false
+      },
+      {
+        "name": "zones",
+        "kind": "multi",
+        "target": "zone",
+        "desc": "Areas the institution controls or claims authority over",
+        "section": "Claims",
+        "required": false
+      },
+      {
+        "name": "objects",
+        "kind": "multi",
+        "target": "object",
+        "desc": "Significant objects owned or tied to the institution's operations, holdings, or identity",
+        "section": "Claims",
+        "required": false
+      },
+      {
+        "name": "creatures",
+        "kind": "multi",
+        "target": "creature",
+        "desc": "Creatures under the institution's protection, use, or symbolic control",
+        "section": "Claims",
+        "required": false
+      },
+      {
+        "name": "status",
+        "kind": "scalar_str",
+        "desc": "Current political, cultural, or functional standing of the institution in the world",
+        "section": "World",
+        "required": false
+      },
+      {
+        "name": "allies",
+        "kind": "multi",
+        "target": "institution",
+        "desc": "Institutions this one actively cooperates or aligns with",
+        "section": "World",
+        "required": false
+      },
+      {
+        "name": "adversaries",
+        "kind": "multi",
+        "target": "institution",
+        "desc": "Institutions this one opposes, competes with, or is in conflict with",
+        "section": "World",
+        "required": false
+      },
+      {
+        "name": "constructs",
+        "kind": "multi",
+        "target": "construct",
+        "desc": "Conceptual, procedural, or structural systems created or maintained by the institution",
+        "section": "World",
+        "required": false
+      }
+    ],
+    "language": [
+      {
+        "name": "phonology",
+        "kind": "scalar_str",
+        "desc": "The language's sound systems, including phonemes, tone, and pronunciation rules",
+        "section": "Structure",
+        "required": false
+      },
+      {
+        "name": "grammar",
+        "kind": "scalar_str",
+        "desc": "Rules governing syntax, morphology, and sentence structure",
+        "section": "Structure",
+        "required": false
+      },
+      {
+        "name": "lexicon",
+        "kind": "scalar_str",
+        "desc": "Vocabulary principles or full word lists used in the language",
+        "section": "Structure",
+        "required": false
+      },
+      {
+        "name": "writing",
+        "kind": "scalar_str",
+        "desc": "Script or notation system used to represent the language in written form",
+        "section": "Structure",
+        "required": false
+      },
+      {
+        "name": "classification",
+        "kind": "single",
+        "target": "construct",
+        "desc": "Linguistic group or typological category the language belongs to",
+        "section": "Structure",
+        "required": false
+      },
+      {
+        "name": "status",
+        "kind": "scalar_str",
+        "desc": "Current vitality, reputation, or dominance of the language",
+        "section": "World",
+        "required": false
+      },
+      {
+        "name": "spread",
+        "kind": "multi",
+        "target": "location",
+        "desc": "Geographical areas where the language is used or spoken",
+        "section": "World",
+        "required": false
+      },
+      {
+        "name": "dialects",
+        "kind": "multi",
+        "target": "language",
+        "desc": "Variants or dialect languages derived from the language",
+        "section": "World",
+        "required": false
+      }
+    ],
+    "law": [
+      {
+        "name": "declaration",
+        "kind": "scalar_str",
+        "desc": "The formal wording, expression, or decree of the law",
+        "section": "Code",
+        "required": false
+      },
+      {
+        "name": "purpose",
+        "kind": "scalar_str",
+        "desc": "The intent, motivation, or justification for the law's creation",
+        "section": "Code",
+        "required": false
+      },
+      {
+        "name": "date",
+        "kind": "scalar_int",
+        "desc": "Date the law was formally established, in world TIME units",
+        "section": "Code",
+        "required": false
+      },
+      {
+        "name": "parent_law",
+        "kind": "single",
+        "target": "law",
+        "desc": "A law that this law derives from, modifies, or enhances",
+        "section": "Code",
+        "required": false
+      },
+      {
+        "name": "penalties",
+        "kind": "multi",
+        "target": "construct",
+        "desc": "Consequences intended to be applied when the law is contravened",
+        "section": "Code",
+        "required": false
+      },
+      {
+        "name": "author",
+        "kind": "single",
+        "target": "institution",
+        "desc": "The institution that created or issued the law",
+        "section": "World",
+        "required": false
+      },
+      {
+        "name": "locations",
+        "kind": "multi",
+        "target": "location",
+        "desc": "Locations where the law is supported or enforced",
+        "section": "World",
+        "required": false
+      },
+      {
+        "name": "zones",
+        "kind": "multi",
+        "target": "zone",
+        "desc": "Zones where the law is supported or enforced",
+        "section": "World",
+        "required": false
+      },
+      {
+        "name": "prohibitions",
+        "kind": "multi",
+        "target": "construct",
+        "desc": "Things that the law explicitly or effectively forbids",
+        "section": "World",
+        "required": false
+      },
+      {
+        "name": "adjudicators",
+        "kind": "multi",
+        "target": "title",
+        "desc": "Titles responsible for interpreting or ruling on the law's application and jurisdiction",
+        "section": "World",
+        "required": false
+      },
+      {
+        "name": "enforcers",
+        "kind": "multi",
+        "target": "title",
+        "desc": "Titles responsible for enforcing or imposing the law",
+        "section": "World",
+        "required": false
+      }
+    ],
+    "location": [
+      {
+        "name": "form",
+        "kind": "scalar_str",
+        "desc": "Visual and environmental aspects of the location",
+        "section": "Setting",
+        "required": false
+      },
+      {
+        "name": "function",
+        "kind": "scalar_str",
+        "desc": "Main use, role, or purpose of the location within the world",
+        "section": "Setting",
+        "required": false
+      },
+      {
+        "name": "founding_date",
+        "kind": "scalar_int",
+        "desc": "Date on which the location was founded, established, or designated",
+        "section": "Setting",
+        "required": false
+      },
+      {
+        "name": "parent_location",
+        "kind": "single",
+        "target": "location",
+        "desc": "Wider location that this location is part of",
+        "section": "Setting",
+        "required": false
+      },
+      {
+        "name": "populations",
+        "kind": "multi",
+        "target": "collective",
+        "desc": "Distinct collective groups or communities residing within the location",
+        "section": "Setting",
+        "required": false
+      },
+      {
+        "name": "political_climate",
+        "kind": "scalar_str",
+        "desc": "Political structure, stability, and dynamics of the location",
+        "section": "Politics",
+        "required": false
+      },
+      {
+        "name": "primary_power",
+        "kind": "single",
+        "target": "institution",
+        "desc": "Institution that has the highest degree of political control over the location",
+        "section": "Politics",
+        "required": false
+      },
+      {
+        "name": "governing_title",
+        "kind": "single",
+        "target": "title",
+        "desc": "Governing figure assigned by the location's primary power",
+        "section": "Politics",
+        "required": false
+      },
+      {
+        "name": "secondary_powers",
+        "kind": "multi",
+        "target": "institution",
+        "desc": "Institutions with significant political control",
+        "section": "Politics",
+        "required": false
+      },
+      {
+        "name": "zone",
+        "kind": "single",
+        "target": "zone",
+        "desc": "Zone of interest that is associated with the location",
+        "section": "Politics",
+        "required": false
+      },
+      {
+        "name": "rival",
+        "kind": "single",
+        "target": "location",
+        "desc": "Location with an active, traditional, or historical rivalry with this one",
+        "section": "Politics",
+        "required": false
+      },
+      {
+        "name": "partner",
+        "kind": "single",
+        "target": "location",
+        "desc": "Location with active, cooperative, or historical ties to this one",
+        "section": "Politics",
+        "required": false
+      },
+      {
+        "name": "customs",
+        "kind": "scalar_str",
+        "desc": "Cultural practices, habits, or festivals",
+        "section": "World",
+        "required": false
+      },
+      {
+        "name": "founders",
+        "kind": "multi",
+        "target": "character",
+        "desc": "Individual(s) who founded or named the location",
+        "section": "World",
+        "required": false
+      },
+      {
+        "name": "cults",
+        "kind": "multi",
+        "target": "construct",
+        "desc": "Significant religious constructs practiced or recognized at the location",
+        "section": "World",
+        "required": false
+      },
+      {
+        "name": "delicacies",
+        "kind": "multi",
+        "target": "species",
+        "desc": "Organisms or other species locally consumed or celebrated as specialty foods",
+        "section": "World",
+        "required": false
+      },
+      {
+        "name": "extraction_methods",
+        "kind": "multi",
+        "target": "construct",
+        "desc": "Techniques or strategies used to gather natural resources",
+        "section": "Production",
+        "required": false
+      },
+      {
+        "name": "extraction_goods",
+        "kind": "multi",
+        "target": "construct",
+        "desc": "Products and materials that are gathered or obtained",
+        "section": "Production",
+        "required": false
+      },
+      {
+        "name": "industry_methods",
+        "kind": "multi",
+        "target": "construct",
+        "desc": "Techniques or workflows used to refine or manufacture goods",
+        "section": "Production",
+        "required": false
+      },
+      {
+        "name": "industry_goods",
+        "kind": "multi",
+        "target": "construct",
+        "desc": "Products and materials that are refined or manufactured",
+        "section": "Production",
+        "required": false
+      },
+      {
+        "name": "infrastructure",
+        "kind": "scalar_str",
+        "desc": "Roads, ports, and other physical systems that enable the movement of goods and people",
+        "section": "Commerce",
+        "required": false
+      },
+      {
+        "name": "extraction_markets",
+        "kind": "multi",
+        "target": "location",
+        "desc": "Locations that receive extracted goods through trade, interchange, or seizure",
+        "section": "Commerce",
+        "required": false
+      },
+      {
+        "name": "industry_markets",
+        "kind": "multi",
+        "target": "location",
+        "desc": "Locations that receive industrial goods through trade, interchange, or seizure",
+        "section": "Commerce",
+        "required": false
+      },
+      {
+        "name": "currencies",
+        "kind": "multi",
+        "target": "construct",
+        "desc": "Trade media recognized or circulated at the location",
+        "section": "Commerce",
+        "required": false
+      },
+      {
+        "name": "architecture",
+        "kind": "scalar_str",
+        "desc": "Look, form, and materials used in the built environment and location design",
+        "section": "Construction",
+        "required": false
+      },
+      {
+        "name": "buildings",
+        "kind": "multi",
+        "target": "object",
+        "desc": "Notable structural objects at the location",
+        "section": "Construction",
+        "required": false
+      },
+      {
+        "name": "building_methods",
+        "kind": "multi",
+        "target": "construct",
+        "desc": "Techniques or systems used to construct structures at the location",
+        "section": "Construction",
+        "required": false
+      },
+      {
+        "name": "defensibility",
+        "kind": "scalar_str",
+        "desc": "Qualities of natural, constructed, and implemented defenses at the location",
+        "section": "Defense",
+        "required": false
+      },
+      {
+        "name": "elevation",
+        "kind": "scalar_int",
+        "desc": "Height or elevation of the location relative to surrounding terrain, in the world's distance unit (World distance_unit)",
+        "section": "Defense",
+        "required": false
+      },
+      {
+        "name": "fighters",
+        "kind": "multi",
+        "target": "construct",
+        "desc": "Military units or forces responsible for defending the location",
+        "section": "Defense",
+        "required": false
+      },
+      {
+        "name": "defensive_objects",
+        "kind": "multi",
+        "target": "object",
+        "desc": "Objects or installations for defending the location",
+        "section": "Defense",
+        "required": false
+      }
+    ],
+    "map": [
+      {
+        "name": "background_color",
+        "kind": "scalar_str",
+        "desc": "Color of the space around the map when zoomed out",
+        "section": "Details",
+        "required": false
+      },
+      {
+        "name": "hierarchy",
+        "kind": "scalar_int",
+        "desc": "To associate or differentiate between maps with a common parent",
+        "section": "Details",
+        "required": false
+      },
+      {
+        "name": "width",
+        "kind": "scalar_int",
+        "desc": "In pixels",
+        "section": "Details",
+        "required": false
+      },
+      {
+        "name": "height",
+        "kind": "scalar_int",
+        "desc": "In pixels",
+        "section": "Details",
+        "required": false
+      },
+      {
+        "name": "depth",
+        "kind": "scalar_int",
+        "desc": "In pixels",
+        "section": "Details",
+        "required": false
+      },
+      {
+        "name": "parent_map",
+        "kind": "single",
+        "target": "map",
+        "desc": "Map within which this map is contained",
+        "section": "Details",
+        "required": false
+      },
+      {
+        "name": "location",
+        "kind": "single",
+        "target": "location",
+        "desc": "Location element that this map represents",
+        "section": "Details",
+        "required": false
+      }
+    ],
+    "marker": [
+      {
+        "name": "map",
+        "kind": "single",
+        "target": "map",
+        "desc": "Map this marker is placed on",
+        "section": "Details",
+        "required": false
+      },
+      {
+        "name": "zone",
+        "kind": "single",
+        "target": "zone",
+        "desc": "Zone that is defined by this marker",
+        "section": "Details",
+        "required": false
+      },
+      {
+        "name": "x",
+        "kind": "scalar_int",
+        "desc": "x coordinate, from bottom left of the map",
+        "section": "Details",
+        "required": false
+      },
+      {
+        "name": "y",
+        "kind": "scalar_int",
+        "desc": "y coordinate, from bottom left of the map",
+        "section": "Details",
+        "required": false
+      },
+      {
+        "name": "z",
+        "kind": "scalar_int",
+        "desc": "z coordinate, in case of depth",
+        "section": "Details",
+        "required": false
+      },
+      {
+        "name": "order",
+        "kind": "scalar_int",
+        "desc": "Sequence position when markers define a polygon or line (0 = first point); without it, markers keep the order they were made in",
+        "section": "Details",
+        "required": false
+      }
+    ],
+    "narrative": [
+      {
+        "name": "story",
+        "kind": "scalar_str",
+        "desc": "Content of the narrative, as told or remembered",
+        "section": "Context",
+        "required": false
+      },
+      {
+        "name": "consequences",
+        "kind": "scalar_str",
+        "desc": "Outcomes or legacy of the narrative",
+        "section": "Context",
+        "required": false
+      },
+      {
+        "name": "start_date",
+        "kind": "scalar_int",
+        "desc": "Date when the narrative begins, measured in world TIME units",
+        "section": "Context",
+        "required": false
+      },
+      {
+        "name": "end_date",
+        "kind": "scalar_int",
+        "desc": "Date when the narrative ends, measured in world TIME units",
+        "section": "Context",
+        "required": false
+      },
+      {
+        "name": "order",
+        "kind": "scalar_int",
+        "desc": "Position of this narrative within a parent narrative's sequence",
+        "section": "Context",
+        "required": false
+      },
+      {
+        "name": "parent_narrative",
+        "kind": "single",
+        "target": "narrative",
+        "desc": "Larger narrative that this narrative takes place in",
+        "section": "Context",
+        "required": false
+      },
+      {
+        "name": "protagonist",
+        "kind": "single",
+        "target": "character",
+        "desc": "Primary character of the narrative",
+        "section": "Context",
+        "required": false
+      },
+      {
+        "name": "antagonist",
+        "kind": "single",
+        "target": "character",
+        "desc": "Opposing character of the narrative",
+        "section": "Context",
+        "required": false
+      },
+      {
+        "name": "narrator",
+        "kind": "single",
+        "target": "character",
+        "desc": "Character credited with telling or recording the narrative",
+        "section": "Context",
+        "required": false
+      },
+      {
+        "name": "conservator",
+        "kind": "single",
+        "target": "institution",
+        "desc": "Institution that preserves or curates the narrative",
+        "section": "Context",
+        "required": false
+      },
+      {
+        "name": "events",
+        "kind": "multi",
+        "target": "event",
+        "desc": "Events relevant to the narrative",
+        "section": "Involves",
+        "required": false
+      },
+      {
+        "name": "characters",
+        "kind": "multi",
+        "target": "character",
+        "desc": "Characters relevant to the narrative",
+        "section": "Involves",
+        "required": false
+      },
+      {
+        "name": "objects",
+        "kind": "multi",
+        "target": "object",
+        "desc": "Objects relevant to the narrative",
+        "section": "Involves",
+        "required": false
+      },
+      {
+        "name": "locations",
+        "kind": "multi",
+        "target": "location",
+        "desc": "Locations relevant to the narrative",
+        "section": "Involves",
+        "required": false
+      },
+      {
+        "name": "species",
+        "kind": "multi",
+        "target": "species",
+        "desc": "Species relevant to the narrative",
+        "section": "Involves",
+        "required": false
+      },
+      {
+        "name": "creatures",
+        "kind": "multi",
+        "target": "creature",
+        "desc": "Creatures relevant to the narrative",
+        "section": "Involves",
+        "required": false
+      },
+      {
+        "name": "institutions",
+        "kind": "multi",
+        "target": "institution",
+        "desc": "Institutions relevant to the narrative",
+        "section": "Involves",
+        "required": false
+      },
+      {
+        "name": "traits",
+        "kind": "multi",
+        "target": "trait",
+        "desc": "Traits relevant to the narrative",
+        "section": "Involves",
+        "required": false
+      },
+      {
+        "name": "collectives",
+        "kind": "multi",
+        "target": "collective",
+        "desc": "Groups relevant to the narrative",
+        "section": "Involves",
+        "required": false
+      },
+      {
+        "name": "zones",
+        "kind": "multi",
+        "target": "zone",
+        "desc": "Zones relevant to the narrative",
+        "section": "Involves",
+        "required": false
+      },
+      {
+        "name": "abilities",
+        "kind": "multi",
+        "target": "ability",
+        "desc": "Abilities relevant to the narrative",
+        "section": "Involves",
+        "required": false
+      },
+      {
+        "name": "phenomena",
+        "kind": "multi",
+        "target": "phenomenon",
+        "desc": "Phenomena relevant to the narrative",
+        "section": "Involves",
+        "required": false
+      },
+      {
+        "name": "languages",
+        "kind": "multi",
+        "target": "language",
+        "desc": "Languages relevant to the narrative",
+        "section": "Involves",
+        "required": false
+      },
+      {
+        "name": "families",
+        "kind": "multi",
+        "target": "family",
+        "desc": "Families relevant to the narrative",
+        "section": "Involves",
+        "required": false
+      },
+      {
+        "name": "relations",
+        "kind": "multi",
+        "target": "relation",
+        "desc": "Relationships relevant to the narrative",
+        "section": "Involves",
+        "required": false
+      },
+      {
+        "name": "titles",
+        "kind": "multi",
+        "target": "title",
+        "desc": "Titles relevant to the narrative",
+        "section": "Involves",
+        "required": false
+      },
+      {
+        "name": "constructs",
+        "kind": "multi",
+        "target": "construct",
+        "desc": "Constructs relevant to the narrative",
+        "section": "Involves",
+        "required": false
+      },
+      {
+        "name": "laws",
+        "kind": "multi",
+        "target": "law",
+        "desc": "Laws relevant to the narrative",
+        "section": "Involves",
+        "required": false
+      }
+    ],
+    "object": [
+      {
+        "name": "aesthetics",
+        "kind": "scalar_str",
+        "desc": "Appearance, design, or visual presentation of the object",
+        "section": "Form",
+        "required": false
+      },
+      {
+        "name": "weight",
+        "kind": "scalar_int",
+        "desc": "Approximate or exact mass of the object, in the world's mass unit (World mass_unit)",
+        "section": "Form",
+        "required": false
+      },
+      {
+        "name": "amount",
+        "kind": "scalar_int",
+        "desc": "The number of identical units in this object entry",
+        "section": "Form",
+        "required": false
+      },
+      {
+        "name": "parent_object",
+        "kind": "single",
+        "target": "object",
+        "desc": "Larger object that this one is part of or contained within",
+        "section": "Form",
+        "required": false
+      },
+      {
+        "name": "materials",
+        "kind": "multi",
+        "target": "construct",
+        "desc": "The physical matter that constitutes the object",
+        "section": "Form",
+        "required": false
+      },
+      {
+        "name": "technology",
+        "kind": "multi",
+        "target": "construct",
+        "desc": "Mechanisms relating to the object's design or operation",
+        "section": "Form",
+        "required": false
+      },
+      {
+        "name": "utility",
+        "kind": "scalar_str",
+        "desc": "Intended purpose or primary use of the object",
+        "section": "Function",
+        "required": false
+      },
+      {
+        "name": "effects",
+        "kind": "multi",
+        "target": "phenomenon",
+        "desc": "Phenomena potentially triggered or emitted on object use",
+        "section": "Function",
+        "required": false
+      },
+      {
+        "name": "abilities",
+        "kind": "multi",
+        "target": "ability",
+        "desc": "Abilities that the object grants or enables",
+        "section": "Function",
+        "required": false
+      },
+      {
+        "name": "consumes",
+        "kind": "multi",
+        "target": "construct",
+        "desc": "What might be used or depleted on object use",
+        "section": "Function",
+        "required": false
+      },
+      {
+        "name": "origins",
+        "kind": "scalar_str",
+        "desc": "Background or history of the object",
+        "section": "World",
+        "required": false
+      },
+      {
+        "name": "location",
+        "kind": "single",
+        "target": "location",
+        "desc": "Physical place where the object is currently located or stored",
+        "section": "World",
+        "required": false
+      },
+      {
+        "name": "language",
+        "kind": "single",
+        "target": "language",
+        "desc": "Required to read, understand, or activate the object",
+        "section": "World",
+        "required": false
+      },
+      {
+        "name": "affinities",
+        "kind": "multi",
+        "target": "trait",
+        "desc": "Traits that resonate with or enhance the object's use, function, or effects",
+        "section": "World",
+        "required": false
+      }
+    ],
+    "phenomenon": [
+      {
+        "name": "expression",
+        "kind": "scalar_str",
+        "desc": "How the phenomenon manifests or takes shape in the world",
+        "section": "Mechanics",
+        "required": false
+      },
+      {
+        "name": "effects",
+        "kind": "scalar_str",
+        "desc": "The primary outcomes or changes caused by the phenomenon",
+        "section": "Mechanics",
+        "required": false
+      },
+      {
+        "name": "duration",
+        "kind": "scalar_int",
+        "desc": "The amount of time the phenomenon lasts, measured in world TIME units",
+        "section": "Mechanics",
+        "required": false
+      },
+      {
+        "name": "catalysts",
+        "kind": "multi",
+        "target": "object",
+        "desc": "Objects or materials that initiate or enhance the phenomenon",
+        "section": "Mechanics",
+        "required": false
+      },
+      {
+        "name": "empowerments",
+        "kind": "multi",
+        "target": "ability",
+        "desc": "Abilities that initiate or enhance the phenomenon, or are initiated or enhanced by it",
+        "section": "Mechanics",
+        "required": false
+      },
+      {
+        "name": "mythology",
+        "kind": "scalar_str",
+        "desc": "Cultural, religious, or narrative meaning associated with the phenomenon",
+        "section": "World",
+        "required": false
+      },
+      {
+        "name": "system",
+        "kind": "single",
+        "target": "phenomenon",
+        "desc": "Broader phenomenon that this one is part of or linked to",
+        "section": "World",
+        "required": false
+      },
+      {
+        "name": "triggers",
+        "kind": "multi",
+        "target": "construct",
+        "desc": "Conceptual mechanisms or patterns that cause the phenomenon to activate",
+        "section": "World",
+        "required": false
+      },
+      {
+        "name": "wielders",
+        "kind": "multi",
+        "target": "character",
+        "desc": "Characters capable of intentionally directing or controlling the phenomenon",
+        "section": "World",
+        "required": false
+      },
+      {
+        "name": "environments",
+        "kind": "multi",
+        "target": "location",
+        "desc": "Locations where the phenomenon occurs or is known to manifest",
+        "section": "World",
+        "required": false
+      }
+    ],
+    "pin": [
+      {
+        "name": "map",
+        "kind": "single",
+        "target": "map",
+        "desc": "Map that the pin is placed on",
+        "section": "Details",
+        "required": false
+      },
+      {
+        "name": "element",
+        "kind": "generic",
+        "desc": "The element this pin places on the map, of any type",
+        "section": "Details",
+        "required": false,
+        "type_key": "element_type",
+        "id_key": "element_id"
+      },
+      {
+        "name": "x",
+        "kind": "scalar_int",
+        "desc": "x coordinate, from bottom left of the map",
+        "section": "Details",
+        "required": false
+      },
+      {
+        "name": "y",
+        "kind": "scalar_int",
+        "desc": "y coordinate, from bottom left of the map",
+        "section": "Details",
+        "required": false
+      },
+      {
+        "name": "z",
+        "kind": "scalar_int",
+        "desc": "z coordinate, in case of depth (optional)",
+        "section": "Details",
+        "required": false
+      }
+    ],
+    "relation": [
+      {
+        "name": "background",
+        "kind": "scalar_str",
+        "desc": "History and origin of the relation",
+        "section": "Nature",
+        "required": false
+      },
+      {
+        "name": "start_date",
+        "kind": "scalar_int",
+        "desc": "Date when the relation began, defined in world TIME units",
+        "section": "Nature",
+        "required": false
+      },
+      {
+        "name": "end_date",
+        "kind": "scalar_int",
+        "desc": "Date when the relation ended if any, defined in world TIME units",
+        "section": "Nature",
+        "required": false
+      },
+      {
+        "name": "intensity",
+        "kind": "scalar_int",
+        "desc": "Significance of the relation, on a relative scale of 0 to 100",
+        "section": "Nature",
+        "required": false
+      },
+      {
+        "name": "actor",
+        "kind": "single",
+        "target": "character",
+        "desc": "Primary character defining the relation",
+        "section": "Nature",
+        "required": false
+      },
+      {
+        "name": "events",
+        "kind": "multi",
+        "target": "event",
+        "desc": "Events where the relation is involved or relevant",
+        "section": "Nature",
+        "required": false
+      },
+      {
+        "name": "characters",
+        "kind": "multi",
+        "target": "character",
+        "desc": "Characters relevant to the relation",
+        "section": "Involves",
+        "required": false
+      },
+      {
+        "name": "objects",
+        "kind": "multi",
+        "target": "object",
+        "desc": "Objects relevant to the relation",
+        "section": "Involves",
+        "required": false
+      },
+      {
+        "name": "locations",
+        "kind": "multi",
+        "target": "location",
+        "desc": "Locations relevant to the relation",
+        "section": "Involves",
+        "required": false
+      },
+      {
+        "name": "species",
+        "kind": "multi",
+        "target": "species",
+        "desc": "Species relevant to the relation",
+        "section": "Involves",
+        "required": false
+      },
+      {
+        "name": "creatures",
+        "kind": "multi",
+        "target": "creature",
+        "desc": "Creatures relevant to the relation",
+        "section": "Involves",
+        "required": false
+      },
+      {
+        "name": "institutions",
+        "kind": "multi",
+        "target": "institution",
+        "desc": "Institutions relevant to the relation",
+        "section": "Involves",
+        "required": false
+      },
+      {
+        "name": "traits",
+        "kind": "multi",
+        "target": "trait",
+        "desc": "Traits relevant to the relation",
+        "section": "Involves",
+        "required": false
+      },
+      {
+        "name": "collectives",
+        "kind": "multi",
+        "target": "collective",
+        "desc": "Collectives relevant to the relation",
+        "section": "Involves",
+        "required": false
+      },
+      {
+        "name": "zones",
+        "kind": "multi",
+        "target": "zone",
+        "desc": "Zones relevant to the relation",
+        "section": "Involves",
+        "required": false
+      },
+      {
+        "name": "abilities",
+        "kind": "multi",
+        "target": "ability",
+        "desc": "Abilities relevant to the relation",
+        "section": "Involves",
+        "required": false
+      },
+      {
+        "name": "phenomena",
+        "kind": "multi",
+        "target": "phenomenon",
+        "desc": "Phenomena relevant to the relation",
+        "section": "Involves",
+        "required": false
+      },
+      {
+        "name": "languages",
+        "kind": "multi",
+        "target": "language",
+        "desc": "Languages relevant to the relation",
+        "section": "Involves",
+        "required": false
+      },
+      {
+        "name": "families",
+        "kind": "multi",
+        "target": "family",
+        "desc": "Families relevant to the relation",
+        "section": "Involves",
+        "required": false
+      },
+      {
+        "name": "titles",
+        "kind": "multi",
+        "target": "title",
+        "desc": "Titles relevant to the relation",
+        "section": "Involves",
+        "required": false
+      },
+      {
+        "name": "constructs",
+        "kind": "multi",
+        "target": "construct",
+        "desc": "Concepts, contracts, or principles relevant to the relation",
+        "section": "Involves",
+        "required": false
+      },
+      {
+        "name": "narratives",
+        "kind": "multi",
+        "target": "narrative",
+        "desc": "Narratives relevant to the relation",
+        "section": "Involves",
+        "required": false
+      }
+    ],
+    "species": [
+      {
+        "name": "appearance",
+        "kind": "scalar_str",
+        "desc": "Typical physical or form features of the species",
+        "section": "Biology",
+        "required": false
+      },
+      {
+        "name": "life_span",
+        "kind": "scalar_int",
+        "desc": "Average or typical life expectancy of an individual, defined in world TIME units",
+        "section": "Biology",
+        "required": false
+      },
+      {
+        "name": "weight",
+        "kind": "scalar_int",
+        "desc": "Average or typical adult weight, in the world's mass unit (World mass_unit)",
+        "section": "Biology",
+        "required": false
+      },
+      {
+        "name": "nourishment",
+        "kind": "multi",
+        "target": "species",
+        "desc": "Other species consumed as food sources",
+        "section": "Biology",
+        "required": false
+      },
+      {
+        "name": "reproduction",
+        "kind": "multi",
+        "target": "construct",
+        "desc": "Reproductive method(s) of the species",
+        "section": "Biology",
+        "required": false
+      },
+      {
+        "name": "adaptations",
+        "kind": "multi",
+        "target": "ability",
+        "desc": "Special physiological or evolutionary abilities",
+        "section": "Biology",
+        "required": false
+      },
+      {
+        "name": "instincts",
+        "kind": "scalar_str",
+        "desc": "Innate behavioral drives and survival tendencies",
+        "section": "Psychology",
+        "required": false
+      },
+      {
+        "name": "sociality",
+        "kind": "scalar_str",
+        "desc": "Typical patterns of social behavior",
+        "section": "Psychology",
+        "required": false
+      },
+      {
+        "name": "temperament",
+        "kind": "scalar_str",
+        "desc": "Overall behavioral disposition",
+        "section": "Psychology",
+        "required": false
+      },
+      {
+        "name": "communication",
+        "kind": "scalar_str",
+        "desc": "Typical methods and approaches of interaction",
+        "section": "Psychology",
+        "required": false
+      },
+      {
+        "name": "aggression",
+        "kind": "scalar_int",
+        "desc": "General aggressiveness level, on relative scale of 0 to 100",
+        "section": "Psychology",
+        "required": false
+      },
+      {
+        "name": "traits",
+        "kind": "multi",
+        "target": "trait",
+        "desc": "Behavioral patterns associated with the species",
+        "section": "Psychology",
+        "required": false
+      },
+      {
+        "name": "role",
+        "kind": "scalar_str",
+        "desc": "The species' ecological or cultural function in the world",
+        "section": "World",
+        "required": false
+      },
+      {
+        "name": "parent_species",
+        "kind": "single",
+        "target": "species",
+        "desc": "Species that the species is considered a subspecies of",
+        "section": "World",
+        "required": false
+      },
+      {
+        "name": "locations",
+        "kind": "multi",
+        "target": "location",
+        "desc": "Locations associated with the species or its habitat",
+        "section": "World",
+        "required": false
+      },
+      {
+        "name": "zones",
+        "kind": "multi",
+        "target": "zone",
+        "desc": "Zones associated with the species or its habitat",
+        "section": "World",
+        "required": false
+      },
+      {
+        "name": "affinities",
+        "kind": "multi",
+        "target": "phenomenon",
+        "desc": "Phenomena associated with the species or its behavior",
+        "section": "World",
+        "required": false
+      }
+    ],
+    "title": [
+      {
+        "name": "authority",
+        "kind": "scalar_str",
+        "desc": "Rights or powers granted by the title",
+        "section": "Mandate",
+        "required": false
+      },
+      {
+        "name": "eligibility",
+        "kind": "scalar_str",
+        "desc": "Conditions or qualifications for receiving or holding the title",
+        "section": "Mandate",
+        "required": false
+      },
+      {
+        "name": "grant_date",
+        "kind": "scalar_int",
+        "desc": "Date on which the title was granted, defined in world TIME units",
+        "section": "Mandate",
+        "required": false
+      },
+      {
+        "name": "revoke_date",
+        "kind": "scalar_int",
+        "desc": "Date on which the title ended or was revoked, defined in world TIME units",
+        "section": "Mandate",
+        "required": false
+      },
+      {
+        "name": "issuer",
+        "kind": "single",
+        "target": "institution",
+        "desc": "Institution that formally created or granted the title",
+        "section": "Mandate",
+        "required": false
+      },
+      {
+        "name": "body",
+        "kind": "single",
+        "target": "institution",
+        "desc": "Institution in which the title functions or holds relevance",
+        "section": "Mandate",
+        "required": false
+      },
+      {
+        "name": "superior_title",
+        "kind": "single",
+        "target": "title",
+        "desc": "Another title that has authority over this one",
+        "section": "Mandate",
+        "required": false
+      },
+      {
+        "name": "holders",
+        "kind": "multi",
+        "target": "character",
+        "desc": "Characters who currently hold or represent the title",
+        "section": "Mandate",
+        "required": false
+      },
+      {
+        "name": "symbols",
+        "kind": "multi",
+        "target": "object",
+        "desc": "Objects that symbolize or authorize the title",
+        "section": "Mandate",
+        "required": false
+      },
+      {
+        "name": "status",
+        "kind": "scalar_str",
+        "desc": "Current state or general condition of the title",
+        "section": "World",
+        "required": false
+      },
+      {
+        "name": "history",
+        "kind": "scalar_str",
+        "desc": "Background information on the title's origin, evolution, or significance",
+        "section": "World",
+        "required": false
+      },
+      {
+        "name": "characters",
+        "kind": "multi",
+        "target": "character",
+        "desc": "Characters otherwise relevant to the title",
+        "section": "World",
+        "required": false
+      },
+      {
+        "name": "institutions",
+        "kind": "multi",
+        "target": "institution",
+        "desc": "Institutions relevant to the title",
+        "section": "World",
+        "required": false
+      },
+      {
+        "name": "families",
+        "kind": "multi",
+        "target": "family",
+        "desc": "Families relevant to the title",
+        "section": "World",
+        "required": false
+      },
+      {
+        "name": "zones",
+        "kind": "multi",
+        "target": "zone",
+        "desc": "Zones relevant to the title",
+        "section": "World",
+        "required": false
+      },
+      {
+        "name": "locations",
+        "kind": "multi",
+        "target": "location",
+        "desc": "Locations relevant to the title",
+        "section": "World",
+        "required": false
+      },
+      {
+        "name": "objects",
+        "kind": "multi",
+        "target": "object",
+        "desc": "Objects otherwise relevant to the title",
+        "section": "World",
+        "required": false
+      },
+      {
+        "name": "constructs",
+        "kind": "multi",
+        "target": "construct",
+        "desc": "Constructs relevant to the title",
+        "section": "World",
+        "required": false
+      },
+      {
+        "name": "laws",
+        "kind": "multi",
+        "target": "law",
+        "desc": "Laws relevant to the title",
+        "section": "World",
+        "required": false
+      },
+      {
+        "name": "collectives",
+        "kind": "multi",
+        "target": "collective",
+        "desc": "Collectives relevant to the title",
+        "section": "World",
+        "required": false
+      },
+      {
+        "name": "creatures",
+        "kind": "multi",
+        "target": "creature",
+        "desc": "Creatures relevant to the title",
+        "section": "World",
+        "required": false
+      },
+      {
+        "name": "phenomena",
+        "kind": "multi",
+        "target": "phenomenon",
+        "desc": "Phenomena relevant to the title",
+        "section": "World",
+        "required": false
+      },
+      {
+        "name": "species",
+        "kind": "multi",
+        "target": "species",
+        "desc": "Species relevant to the title",
+        "section": "World",
+        "required": false
+      },
+      {
+        "name": "languages",
+        "kind": "multi",
+        "target": "language",
+        "desc": "Languages relevant to the title",
+        "section": "World",
+        "required": false
+      }
+    ],
+    "trait": [
+      {
+        "name": "social_effects",
+        "kind": "scalar_str",
+        "desc": "Relating to social relationships, reputation, or interaction dynamics",
+        "section": "Qualitative",
+        "required": false
+      },
+      {
+        "name": "physical_effects",
+        "kind": "scalar_str",
+        "desc": "Relating to physical changes, limitations, or enhancements",
+        "section": "Qualitative",
+        "required": false
+      },
+      {
+        "name": "functional_effects",
+        "kind": "scalar_str",
+        "desc": "Relating to practical or learned performance or aptitude",
+        "section": "Qualitative",
+        "required": false
+      },
+      {
+        "name": "personality_effects",
+        "kind": "scalar_str",
+        "desc": "Relating to temperament, mental state, or personality expression",
+        "section": "Qualitative",
+        "required": false
+      },
+      {
+        "name": "behaviour_effects",
+        "kind": "scalar_str",
+        "desc": "Relating to visible aspects and patterns of behavior",
+        "section": "Qualitative",
+        "required": false
+      },
+      {
+        "name": "charisma",
+        "kind": "scalar_int",
+        "desc": "Affecting a character's charisma score",
+        "section": "Quantitative",
+        "required": false
+      },
+      {
+        "name": "coercion",
+        "kind": "scalar_int",
+        "desc": "Affecting a character's coercion score",
+        "section": "Quantitative",
+        "required": false
+      },
+      {
+        "name": "competence",
+        "kind": "scalar_int",
+        "desc": "Affecting a character's competence score",
+        "section": "Quantitative",
+        "required": false
+      },
+      {
+        "name": "compassion",
+        "kind": "scalar_int",
+        "desc": "Affecting a character's compassion score",
+        "section": "Quantitative",
+        "required": false
+      },
+      {
+        "name": "creativity",
+        "kind": "scalar_int",
+        "desc": "Affecting a character's creativity score",
+        "section": "Quantitative",
+        "required": false
+      },
+      {
+        "name": "courage",
+        "kind": "scalar_int",
+        "desc": "Affecting a character's courage score",
+        "section": "Quantitative",
+        "required": false
+      },
+      {
+        "name": "significance",
+        "kind": "scalar_str",
+        "desc": "Describes the trait's societal, symbolic, or systemic presence",
+        "section": "World",
+        "required": false
+      },
+      {
+        "name": "anti_trait",
+        "kind": "single",
+        "target": "trait",
+        "desc": "Opposing trait that contradicts or nullifies the trait",
+        "section": "World",
+        "required": false
+      },
+      {
+        "name": "empowered_abilities",
+        "kind": "multi",
+        "target": "ability",
+        "desc": "Abilities strengthened or enabled by the trait",
+        "section": "World",
+        "required": false
+      }
+    ],
+    "zone": [
+      {
+        "name": "role",
+        "kind": "scalar_str",
+        "desc": "The operational function or intent of the zone",
+        "section": "Scope",
+        "required": false
+      },
+      {
+        "name": "start_date",
+        "kind": "scalar_int",
+        "desc": "Date when the zone becomes extant or relevant, defined in world TIME units",
+        "section": "Scope",
+        "required": false
+      },
+      {
+        "name": "end_date",
+        "kind": "scalar_int",
+        "desc": "Date when the zone ceases to be meaningful or enforced, defined in world TIME units",
+        "section": "Scope",
+        "required": false
+      },
+      {
+        "name": "phenomena",
+        "kind": "multi",
+        "target": "phenomenon",
+        "desc": "Phenomena that affect, define, or occur within the zone",
+        "section": "Scope",
+        "required": false
+      },
+      {
+        "name": "linked_zones",
+        "kind": "multi",
+        "target": "zone",
+        "desc": "Other zones that are associated with the zone",
+        "section": "Scope",
+        "required": false
+      },
+      {
+        "name": "context",
+        "kind": "scalar_str",
+        "desc": "Historical and key knowledge about the zone",
+        "section": "World",
+        "required": false
+      },
+      {
+        "name": "populations",
+        "kind": "multi",
+        "target": "collective",
+        "desc": "Distinct collective groups or communities residing within the zone",
+        "section": "World",
+        "required": false
+      },
+      {
+        "name": "titles",
+        "kind": "multi",
+        "target": "title",
+        "desc": "Titles assigned to represent, manage, or protect the zone",
+        "section": "World",
+        "required": false
+      },
+      {
+        "name": "principles",
+        "kind": "multi",
+        "target": "construct",
+        "desc": "Influential mechanics acted within, upon, or by the zone",
+        "section": "World",
+        "required": false
+      }
+    ]
+  },
+  "world": [
+    {
+      "name": "id",
+      "kind": "scalar_str",
+      "required": false,
+      "desc": "Unique identifier for the world, uuidv7 format"
+    },
+    {
+      "name": "name",
+      "kind": "scalar_str",
+      "required": false,
+      "desc": "Name of the world"
+    },
+    {
+      "name": "description",
+      "kind": "scalar_str",
+      "required": false,
+      "desc": "Detailed description of the world"
+    },
+    {
+      "name": "image_url",
+      "kind": "scalar_str",
+      "required": false,
+      "desc": "URL to an image representing the world"
+    },
+    {
+      "name": "api_key",
+      "kind": "scalar_str",
+      "required": false,
+      "desc": "Unique API key for external access (uniqueness enforced by application)"
+    },
+    {
+      "name": "version",
+      "kind": "scalar_str",
+      "required": false,
+      "desc": "The version of the OnlyWorlds data format this world instance conforms to"
+    },
+    {
+      "name": "user",
+      "kind": "scalar_str",
+      "required": false,
+      "desc": "UUID of the user who owns this world"
+    },
+    {
+      "name": "time_format_equivalents",
+      "kind": "list",
+      "items": "scalar_int",
+      "required": false,
+      "desc": "List of integers representing the equivalent number of basic units for each time format step (e.g., [1, 7, 30, 365] for Day, Week, Month, Year if basic unit is Day)"
+    },
+    {
+      "name": "time_format_names",
+      "kind": "list",
+      "items": "scalar_str",
+      "required": false,
+      "desc": "List of strings for the names of time format steps (e.g., ['Day', 'Week', 'Month', 'Year'])"
+    },
+    {
+      "name": "time_basic_unit",
+      "kind": "scalar_str",
+      "required": false,
+      "desc": "The fundamental unit of time measurement (e.g., 'Year', 'Day')"
+    },
+    {
+      "name": "time_range_min",
+      "kind": "scalar_int",
+      "required": false,
+      "desc": "The earliest point in time representable or tracked in the world's timeline"
+    },
+    {
+      "name": "time_range_max",
+      "kind": "scalar_int",
+      "required": false,
+      "desc": "The latest point in time representable or tracked in the world's timeline"
+    },
+    {
+      "name": "time_current",
+      "kind": "scalar_int",
+      "required": false,
+      "desc": "The current point in time within the world's timeline"
+    },
+    {
+      "name": "length_unit",
+      "kind": "scalar_str",
+      "required": false,
+      "desc": "The unit the world's lengths are counted in (Character and Creature height), as free text. Recommended: 'mm', 'cm', 'm', 'in', 'ft'; a world's own unit ('hands') is shown as written"
+    },
+    {
+      "name": "mass_unit",
+      "kind": "scalar_str",
+      "required": false,
+      "desc": "The unit the world's masses are counted in (Character, Creature, Object and Species weight), as free text. Recommended: 'g', 'kg', 't', 'lb'; a world's own unit ('stone') is shown as written"
+    },
+    {
+      "name": "distance_unit",
+      "kind": "scalar_str",
+      "required": false,
+      "desc": "The unit the world's distances are counted in (Ability range, Creature speed, Location elevation), as free text. Recommended: 'm', 'km', 'ft', 'mi'; a world's own unit ('leagues') is shown as written"
+    }
+  ]
+}

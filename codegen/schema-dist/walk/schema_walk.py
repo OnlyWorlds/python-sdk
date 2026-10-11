@@ -1,38 +1,44 @@
 #!/usr/bin/env python3
-"""The OnlyWorlds schema walk — THE official reader of the schema YAMLs.
+"""The OnlyWorlds schema walk: the reference decoder of the schema YAMLs.
 
-Extracted 2026-07-28 from generate_models.py (Skeld) so that one walk serves
-every consumer: keel's Django emitter, the npm SDK's TypeScript emitter, the
-Unity SDK's C# emitter, and schema-dist (which publishes this file). Twelve
-programs have needed to know what the schema *means*; ten stale copies were
-deleted on 2026-07-28. This module is the one decoder. Do not copy it — import
-it, or vendor it via schema-dist and verify against MANIFEST.json.
+One walk serves every program that needs to know what the schema means: the
+platform's own model generator, the TypeScript, Unity and Python SDKs, and
+schema-dist, which publishes this file. Do not fork it. Import it, or vendor it
+from schema-dist and verify it against MANIFEST.json; if you need something it
+does not return, ask for it upstream.
 
-The walk is wrapper-agnostic: it reads `properties:` (canonical semantics) and
-ignores presentation keys (`family`, `icon`), which live in presentation.json.
-Pointing it at a plain canonical checkout gives correct answers.
+The walk reads `properties:` and ignores the presentation keys (`family`,
+`icon`), which schema-dist publishes in presentation.json. A plain checkout of
+the standard (github.com/OnlyWorlds/OnlyWorlds, `schema/`) decodes the same.
 
-Semantic rulings that emitters must honor live in rulings.yaml beside this
-file — data, not prose, so three languages inherit one convention instead of
-re-deriving it (see the collective.equipment drift, 2026-07-23).
+Rulings the YAML cannot carry (nullability, empty strings, extension fields)
+live in rulings.yaml beside this file, as data, so every language follows one
+convention.
 
-Field spec shape returned by flatten_fields():
-    {name, kind, target?, required?}   kind in
-    {scalar_str, scalar_int, single, multi, generic}
-`required` is only present when include_required=True (opt-in so existing
-emitters' output stays byte-identical until they choose to read it).
+Two ways in:
+    flatten_fields(doc, slug, note=print)  -> one type's fields, in order
+    decode_schema(schema_dir, note=print)  -> the whole schema: base fields,
+                                              the 22 types, the World
+From a shell, `python schema_walk.py <schema_dir>` prints decode_schema's
+result as JSON: the same bytes schema-dist ships as schema.json.
+
+A field spec from flatten_fields:
+    {name, kind, target?}   kind in {scalar_str, scalar_int, single, multi, generic}
+plus `required`, `desc` and `section` when asked for (all opt-in, so existing
+callers get the same output).
 """
 
 from __future__ import annotations
 
+import json
+import sys
 from pathlib import Path
 from typing import Callable
 
 import yaml
 
-# The 22 element types. world.yaml is the world container (hand-built model, flat
-# schema shape) and base_properties.yaml supplies the shared header — neither is a
-# generated element type.
+# The 22 element types. world.yaml (the world container, a flat shape) and
+# base_properties.yaml (the fields every element shares) are not element types.
 ELEMENT_TYPES = [
     "ability", "collective", "character", "construct", "creature", "event",
     "family", "institution", "language", "law", "location", "map", "marker",
@@ -40,17 +46,30 @@ ELEMENT_TYPES = [
     "trait", "zone",
 ]
 
-# category (YAML link target, singular TitleCase) → the type slug used everywhere
-# else. Just a lowercase, but kept explicit so an odd category surfaces loudly.
+# A link's `category:` (singular TitleCase) -> the type slug used everywhere
+# else. Just a lowercase, kept explicit so an unknown category is reported.
 KNOWN_CATEGORIES = {t.capitalize(): t for t in ELEMENT_TYPES}
 KNOWN_CATEGORIES["World"] = "world"
 
-# Presentation wrapper keys (keel-only, never canonical). The walk ignores them;
-# publish_dist.py strips them into presentation.json.
+# Presentation keys some copies of the YAML carry at top level. The walk
+# ignores them; schema-dist strips them out into presentation.json.
 WRAPPER_KEYS = ("family", "icon")
 
+# What each kind means in element data (on the wire and in a world folder).
+# Shipped inside schema.json so a reader of the JSON needs nothing else.
+KINDS = {
+    "scalar_str": "a string; the empty string means unset",
+    "scalar_int": "an integer, or null for unset",
+    "single": "one element's id (a UUID string), or null; `target` names its type",
+    "multi": "an array of element ids (UUID strings), possibly empty; `target` names their type",
+    "generic": "a link to an element of any type, carried as two keys: "
+               "`type_key` holds the type's slug, `id_key` the element's id; "
+               "both set or both null",
+    "list": "an array; `items` gives the kind of each entry (World fields only)",
+}
 
-def _noop(msg: str) -> None:  # default note sink — emitters pass their own
+
+def _noop(msg: str) -> None:  # default note sink; pass your own
     return None
 
 
@@ -60,10 +79,8 @@ def load_yaml(schema_dir: Path, name: str) -> dict:
 
 
 def required_names(doc: dict) -> set[str]:
-    """Union of every `required:` list in the document — top-level (the
-    base_properties shape) and per-group (the pin/marker shape). Names are
-    returned as written in the YAML; callers compare against field names,
-    which are lowercase in the grouped element files."""
+    """Union of every `required:` list in the document, top-level and
+    per-group. Names are returned as written in the YAML."""
     req: set[str] = set()
     for r in doc.get("required", []) or []:
         req.add(r)
@@ -82,34 +99,28 @@ def flatten_fields(
     include_desc: bool = False,
     include_sections: bool = False,
 ) -> list[dict]:
-    """Walk the grouped YAML (Constitution/Origins/... → properties → fields) and
-    return a flat, ordered list of field specs. Each spec:
+    """Walk one element type's grouped YAML (sections -> properties -> fields)
+    and return its fields as a flat, ordered list of specs:
         {name, kind, target?}  where kind in
         {scalar_str, scalar_int, single, multi, generic}
 
-    Opt-in extras, all defaulting OFF so existing emitters get byte-identical
-    output (the same shape as include_required):
-      include_desc     — adds `desc` from the YAML's description, when present.
-                         353 of 355 fields carry one; they are the source of the
-                         SDK's JSDoc and of SCHEMA.md, the package's AI-legibility
-                         artifact. Requested by Kael 2026-07-28: without this the
-                         one-decoder rule would have forced him to either delete
-                         ~365 JSDoc lines or run a second parser over the same
-                         YAML, i.e. re-create the copy we just deleted ten of.
-      include_sections — adds `section`, the YAML group a field came from
-                         (Constitution, Origins, ...). Same rationale: the SDK
-                         exports ELEMENT_SECTIONS and gates it with tests.
+    Opt-in extras, all off by default:
+      include_required -- adds `required` (bool).
+      include_desc     -- adds `desc`, the YAML's description, when present.
+      include_sections -- adds `section`, the YAML group the field sits in
+                          (Constitution, Origins, ...).
     """
     fields: list[dict] = []
     props = doc.get("properties", {})
     for group_name, group in props.items():
         group_props = group.get("properties")
         if group_props is None:
-            # A property sitting directly at top level (not inside a group object).
-            # None of the 22 element YAMLs do this, but handle it rather than drop.
+            # A property directly at top level, not inside a group. No element
+            # type does this (base_properties.yaml does; decode_schema reads it
+            # with _flat_fields instead). Parsed rather than dropped.
             note(
                 f"{type_slug}: top-level property `{group_name}` outside a group "
-                f"object — parsed directly."
+                f"object, parsed directly."
             )
             _collect_field(group_name, group, type_slug, fields, note,
                            include_desc, group_name if include_sections else None)
@@ -118,16 +129,15 @@ def flatten_fields(
             _collect_field(fname, fspec, type_slug, fields, note,
                            include_desc, group_name if include_sections else None)
 
-    # Dedupe by field name (keep first). relation.yaml declares `events` in BOTH
-    # the Nature and Involves groups — a YAML irregularity. A field maps to one
-    # column; a duplicate would produce two identical columns + a colliding index.
+    # A field declared in two groups is kept once (the first). A body has one
+    # key per name, so a duplicate would be two specs for one key.
     seen: set[str] = set()
     deduped: list[dict] = []
     for f in fields:
         if f["name"] in seen:
             note(
                 f"{type_slug}.{f['name']}: field declared more than once across "
-                f"groups (YAML irregularity) — kept first, dropped duplicate."
+                f"groups; kept the first, dropped the duplicate."
             )
             continue
         seen.add(f["name"])
@@ -173,28 +183,26 @@ def _collect_field(
         target = _resolve_target(fname, fspec, type_slug, note)
         out.append({"name": fname, "kind": "multi", "target": target})
     elif ftype == "generic-link":
-        # pin.element only. ContentType + UUID in production; the spike stores the
-        # UUID plus a type discriminator, both opaque UUIDField/CharField.
+        # pin.element is the only one.
+        type_key = fspec.get("content_type_field_name", "element_type")
+        id_key = fspec.get("object_id_field_name", "element_id")
         note(
-            f"{type_slug}.{fname}: `generic-link` (link to any element type). "
-            f"Emitted as element_id UUIDField + element_type CharField pair; the "
-            f"target is resolved at the application layer, not a fixed category."
+            f"{type_slug}.{fname}: `generic-link`, a link to an element of any "
+            f"type. In data it is two keys, not `{fname}`: `{type_key}` (the "
+            f"type's slug, such as \"character\") and `{id_key}` (the element's "
+            f"UUID), both set or both null."
         )
         out.append({"name": fname, "kind": "generic"})
     elif ftype == "array":
-        # world.yaml only (time_format_*). Not an element type — should never hit.
-        note(f"{type_slug}.{fname}: unexpected `array` scalar — skipped.")
+        # Only world.yaml has arrays, and it is not an element type.
+        note(f"{type_slug}.{fname}: unexpected `array` field, skipped.")
     else:
-        # ⚑ THE SILENT-DROP PATH (Kael, 2026-07-28): the default sink is _noop, so
-        # a VENDORED older walk meeting a NEWER schema drops the new field with no
-        # signal at all — the failure that does not fail loudly, which is the shape
-        # of every bug this week. A consumer pinning an old dist and never passing
-        # `note` is exactly the case. The walk cannot decide the policy (an emitter
-        # mid-migration may legitimately want to continue), so it stays a note —
-        # but the README now tells vendors to pass a sink, and rulings.yaml carries
-        # the row. Raising here unilaterally would break emitters on a schema bump,
-        # which trades a silent failure for a hard one at the worst moment.
-        note(f"{type_slug}.{fname}: unknown YAML type `{ftype}` — skipped.")
+        # The default sink is a no-op, so a vendored older walk meeting a newer
+        # schema would drop the new field in silence. The walk cannot choose
+        # the policy for every caller (one mid-migration may want to carry on),
+        # so it reports and skips; callers pass a sink and decide. See the
+        # `unknown-field-types-must-be-surfaced` row in rulings.yaml.
+        note(f"{type_slug}.{fname}: unknown YAML type `{ftype}`, skipped.")
         return
 
     _decorate()
@@ -208,14 +216,106 @@ def _resolve_target(
 ) -> str | None:
     cat = fspec.get("category")
     if cat is None:
-        note(f"{type_slug}.{fname}: link with no `category` — target unresolved.")
+        note(f"{type_slug}.{fname}: link with no `category`, target unresolved.")
         return None
     slug = KNOWN_CATEGORIES.get(cat)
     if slug is None:
-        note(f"{type_slug}.{fname}: link category `{cat}` not a known element type.")
+        note(f"{type_slug}.{fname}: link category `{cat}` is not a known element type.")
         return cat.lower()
-
-    # collective.equipment drift RESOLVED 2026-07: v1 (which implemented Construct)
-    # is decommissioned; keel is production and serves per YAML (Object), settled
-    # by dump data (1 row). Special-case warnings removed 2026-07-23.
     return slug
+
+
+_SCALAR_KINDS = {"string": "scalar_str", "integer": "scalar_int"}
+
+
+def _flat_fields(
+    doc: dict,
+    owner: str,
+    note: Callable[[str], None],
+    lowercase: bool,
+) -> list[dict]:
+    """The flat shape (base_properties.yaml, world.yaml): properties directly
+    under `properties:`, no groups, no links."""
+    req = {r.lower() if lowercase else r for r in doc.get("required", []) or []}
+    out: list[dict] = []
+    for raw_name, fspec in (doc.get("properties") or {}).items():
+        name = raw_name.lower() if lowercase else raw_name
+        ftype = fspec.get("type")
+        if ftype in _SCALAR_KINDS:
+            spec: dict = {"name": name, "kind": _SCALAR_KINDS[ftype]}
+        elif ftype == "array":
+            item_type = (fspec.get("items") or {}).get("type")
+            if item_type not in _SCALAR_KINDS:
+                note(f"{owner}.{name}: array of `{item_type}`, skipped.")
+                continue
+            spec = {"name": name, "kind": "list", "items": _SCALAR_KINDS[item_type]}
+        else:
+            note(f"{owner}.{name}: unknown YAML type `{ftype}`, skipped.")
+            continue
+        spec["required"] = name in req
+        if fspec.get("description") is not None:
+            spec["desc"] = fspec["description"]
+        out.append(spec)
+    return out
+
+
+def decode_schema(
+    schema_dir: str | Path,
+    note: Callable[[str], None] = _noop,
+) -> dict:
+    """The whole schema, decoded: what schema-dist ships as schema.json.
+
+        {"kinds": {kind: meaning},
+         "base":  [field, ...],          every element's shared fields
+         "types": {slug: [field, ...]},  each type's own fields, in YAML order
+         "world": [field, ...]}          the World's fields
+
+    Field names are the keys used in element data (on the wire and in a world
+    folder). base_properties.yaml capitalises its names (`Id`, `Image_URL`);
+    data spells them in lowercase (`id`, `image_url`), so `base` gives them in
+    lowercase. Every field carries `required`, and `desc` when the YAML has a
+    description; type fields carry `section`; a generic link carries
+    `type_key` and `id_key`, the two keys that hold it in data.
+    """
+    schema_dir = Path(schema_dir)
+    base = _flat_fields(load_yaml(schema_dir, "base_properties"),
+                        "base_properties", note, lowercase=True)
+    types: dict[str, list[dict]] = {}
+    for slug in ELEMENT_TYPES:
+        doc = load_yaml(schema_dir, slug)
+        fields = flatten_fields(doc, slug, note, include_required=True,
+                                include_desc=True, include_sections=True)
+        for f in fields:
+            if f["kind"] == "generic":
+                fspec = doc["properties"][f["section"]]["properties"][f["name"]]
+                f["type_key"] = fspec.get("content_type_field_name", "element_type")
+                f["id_key"] = fspec.get("object_id_field_name", "element_id")
+        types[slug] = fields
+    world = _flat_fields(load_yaml(schema_dir, "world"), "world", note,
+                         lowercase=False)
+    return {"kinds": dict(KINDS), "base": base, "types": types, "world": world}
+
+
+def dumps_schema(decoded: dict) -> str:
+    """decode_schema's result as JSON text, exactly as schema.json is written:
+    two-space indent, ASCII-escaped, LF, one trailing newline."""
+    return json.dumps(decoded, indent=2, ensure_ascii=True) + "\n"
+
+
+def main(argv: list[str] | None = None) -> int:
+    argv = sys.argv[1:] if argv is None else argv
+    if len(argv) != 1 or argv[0] in ("-h", "--help"):
+        print("usage: python schema_walk.py <schema_dir>   "
+              "(prints the decoded schema as JSON; notes go to stderr)")
+        return 2
+
+    def to_stderr(msg: str) -> None:
+        print(msg, file=sys.stderr)
+
+    text = dumps_schema(decode_schema(argv[0], note=to_stderr))
+    sys.stdout.buffer.write(text.encode("ascii"))
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
