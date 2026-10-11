@@ -1,0 +1,104 @@
+name: release
+
+# Publishes onlyworlds to PyPI when a version tag (v0.1.1) is pushed, through PyPI's trusted
+# publishing: GitHub proves this workflow's identity to PyPI (OIDC), so no PyPI token exists
+# anywhere. Set up once on pypi.org, the onlyworlds project, Publishing, "Add a trusted
+# publisher": GitHub, owner OnlyWorlds, repository python-sdk, workflow release.yml,
+# environment pypi.
+#
+# The gates run first and a red one stops the publish. After the publish the job reads PyPI
+# back: the version is live, its files have the sha256 of the ones built here, and a clean
+# install from PyPI reads the public demo world.
+#
+# Grant: the Captain, 2026-10-11 (OW Infra h37 #3053): releases are the maintainer's.
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+
+      - name: The tag names the version the package carries
+        run: |
+          v="$(sed -n 's/^__version__ = "\(.*\)"$/\1/p' src/onlyworlds/_version.py)"
+          if [ "v$v" != "$GITHUB_REF_NAME" ]; then
+            echo "tag $GITHUB_REF_NAME, but _version.py says $v"; exit 1
+          fi
+          if curl -sf "https://pypi.org/pypi/onlyworlds/$v/json" > /dev/null; then
+            echo "$v is already on PyPI"; exit 1
+          fi
+
+      - run: uv sync
+      - run: uv run pytest -q
+      - run: uv run ruff check .
+      - run: uv run mypy --strict src
+      - run: uv run python codegen/generate_schema.py --check
+      - run: uv build
+      - run: uvx twine check dist/*
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+  publish:
+    needs: build
+    runs-on: ubuntu-latest
+    environment: pypi
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
+      - uses: pypa/gh-action-pypi-publish@release/v1
+
+  verify:
+    needs: publish
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
+      - uses: astral-sh/setup-uv@v5
+      - name: Read it back from PyPI
+        run: |
+          v="${GITHUB_REF_NAME#v}"
+          for i in 1 2 3 4 5 6 7 8 9 10; do
+            curl -sf "https://pypi.org/pypi/onlyworlds/$v/json" > meta.json && break
+            echo "not visible yet ($i)"; sleep 15
+          done
+          python3 - "$v" <<'PY'
+          import hashlib, json, pathlib, sys
+          meta = json.load(open("meta.json"))
+          served = {u["filename"]: u["digests"]["sha256"] for u in meta["urls"]}
+          built = {p.name: hashlib.sha256(p.read_bytes()).hexdigest() for p in pathlib.Path("dist").iterdir()}
+          if served != built:
+              print("PyPI serves", served, "but this run built", built)
+              sys.exit(1)
+          print(f"PyPI serves {sys.argv[1]}: {len(built)} files, identical to this run's build")
+          PY
+      - name: A clean install reads the demo world
+        run: |
+          v="${GITHUB_REF_NAME#v}"
+          uv venv /tmp/clean
+          uv pip install --python /tmp/clean/bin/python --no-cache "onlyworlds==$v"
+          /tmp/clean/bin/python -I -c "
+          import onlyworlds
+          from onlyworlds import Client
+          assert onlyworlds.__version__ == '$v', onlyworlds.__version__
+          print(Client('0000000001').get_world()['name'])
+          "
