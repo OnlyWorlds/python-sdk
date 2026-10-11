@@ -62,7 +62,7 @@ Pass a `note` sink. A field type the walk does not know is skipped, and with the
 
 ## Versions
 
-`VERSION` holds `key: value` lines; it is not a bare version string. The canonical version is written zero-padded there and without the padding in tags: canonical `00.31.00` is tagged `v0.31.0-dist.<serial>`. The serial counts publishes of the same canonical version, such as a presentation fix or a new ruling.
+`VERSION` holds `key: value` lines; it is not a bare version string. The canonical version is written zero-padded there and without the padding in tags: canonical `00.32.00` is tagged `v0.32.0-dist.<serial>`. The serial counts publishes of the same canonical version, such as a presentation fix or a new ruling.
 
 ## Pinning
 

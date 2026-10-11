@@ -23,10 +23,9 @@
     "example/hyperion/elements/marker/swamps-point-3--ea668c31.json": "4cc41e877b2a65ccd98f7ba99269f690a7376077b23d73b210ee3c88fafc8509",
     "example/hyperion/elements/marker/swamps-point-4--4e843a51.json": "24b489a8a2a569aea6508e0c7b63c087c90fc03d9d7261bca0ef6593149a7efe",
     "example/hyperion/elements/marker/swamps-point-5--48b3cfa2.json": "46106b8c97e2f95e4973384558e2e5d243fa1e8330c9d5751a3fb2c830e16ba7",
+    "example/hyperion/elements/narrative/a-world-in-a-sentence--2f7bc2f5.json": "508c36c757fdbc602126bd7c970664add802666193fb4f41d655b2965dfac13e",
     "example/hyperion/elements/narrative/chapter-1--39fd9536.json": "551f6a41ab05c7d8b45ca659c540bb8cdd0c2a492341d7e457190fcf2ebfd020",
     "example/hyperion/elements/narrative/hyperion--bb17eaba.json": "a60867b9d2df1f9451498ac0d17ceb4fb7b911dd624ba02b8d5398d7c4e1feae",
-    "example/hyperion/elements/narrative/new-book--08afd034.json": "294a4efc6067c891dec3eaeec12e4f2137eca9ffc637210bda345dcf6e3bebdf",
-    "example/hyperion/elements/narrative/new-page--2f7bc2f5.json": "1fe86a75bf223a87b44f27b0555604abb9d63661a9ddceee2b0b2514092069b5",
     "example/hyperion/elements/narrative/story-of-the-old-piano--2a6553ca.json": "dd0db85f8cebe8662c6d518a86cbd45b1301d251bf4538a302d30ad540314ef6",
     "example/hyperion/elements/object/ebony-spaceship--f4e8e286.json": "ca58edba90b6a50016dac127ee2526247c1ab7b552774faddf1bd83e4ae263fe",
     "example/hyperion/elements/object/spaceship-balcony--dd75923a.json": "4853b29c222c05d278ab947eb45b7d6dab23135b20db51c015629c167553dafe",
@@ -40,7 +39,7 @@
     "example/hyperion/world.json": "eeaa6f45d6c232e7aae2114a40eb68a7d30fa7eadcb9e51e6a77908db8d738bb",
     "LICENSE": "ab9469f20388ba53771315ed7cb94461d5e3de6e0113bd8f0280f3364434fe18",
     "presentation.json": "776b5e48d9b27c1d99baabfdaffe7d2fe3995580450452c26e5ab7e30176264f",
-    "README.md": "0478b0be204b8683b3f8ea2da37d3ba3cc968a3ed6aa81c994c99242e5773892",
+    "README.md": "9123ef1aa34c0da03aacec90d6ab005ca029e460f7085c4f139bf70f21ed541f",
     "schema/ability.yaml": "9fb53aa50af02134714e804b7e4c54652b63dd7adc11dd4aef991c64503205fc",
     "schema/base_properties.yaml": "9d1d6b11ebae8405a3d9845fe8b186059c57e8f7474c9a0665d229025396cb2c",
     "schema/character.yaml": "8bf572cb676024e86c4f7502a0b7f5bdfb2531071633f6f184e446f4e39efa3a",
@@ -63,11 +62,11 @@
     "schema/species.yaml": "6df722fe713b1b5adbde591b4664e808292126b489d99c7b469349b5af7e6cd5",
     "schema/title.yaml": "36ef98440f238c731bdb433102fda890794cde31031e05ce8fe56b70801e96ad",
     "schema/trait.yaml": "261df723f603809d71c9ddf5faf27a0f0ba92186f544e56cea95911051d2359d",
-    "schema/world.yaml": "f4e875e80802a77f21afe8334cdb5918299d64cb52007abd050b131d59cf9d04",
+    "schema/world.yaml": "167091ddf5637abeae9a81a49c82f837cafea2437635ce6610cc4d2ccc3794ed",
     "schema/zone.yaml": "9474902bf71703ac82495b28ad253266edc0ffc69894ac8846e3934b268c81a5",
-    "schema.json": "9ebf22d585e30d72dd4d17a1b09016d620a5ef0b2b806c5d0800efb0588bbb2e",
-    "VERSION": "5a20f5f044a10a717a369d6424dacf43d299b8cebfa3e1e23cad12cfda42aea8",
+    "schema.json": "ecaf341bc379a61c50453ee2ee950730a890b11c9a49bb829242de1ca146a112",
+    "VERSION": "6713d4ccc498131e79e81204ec90284b82f28f24add3137597180fef2a4cf760",
     "walk/rulings.yaml": "75fff534c7dd47763ba79d489a31c7792b4f0569e5d3cbbf44f46e677e92deef",
-    "walk/schema_walk.py": "519f431f496e28b2745d6c3773ecbd0174b26175b10fcf49eb527aaed43b895b"
+    "walk/schema_walk.py": "0ab025b14a05e87890075b6750d1224f8c560b92246b8f35280605a4115e2966"
   }
 }

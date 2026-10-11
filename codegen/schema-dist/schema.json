@@ -2,6 +2,7 @@
   "kinds": {
     "scalar_str": "a string; the empty string means unset",
     "scalar_int": "an integer, or null for unset",
+    "scalar_bool": "true or false (world.public_read, since canonical 00.32.00)",
     "single": "one element's id (a UUID string), or null; `target` names its type",
     "multi": "an array of element ids (UUID strings), possibly empty; `target` names their type",
     "generic": "a link to an element of any type, carried as two keys: `type_key` holds the type's slug, `id_key` the element's id; both set or both null",
@@ -2824,22 +2825,22 @@
       "desc": "URL to an image representing the world"
     },
     {
-      "name": "api_key",
+      "name": "created_at",
       "kind": "scalar_str",
       "required": false,
-      "desc": "Unique API key for external access (uniqueness enforced by application)"
+      "desc": "When the world was created, as the tool holding it recorded it"
     },
     {
-      "name": "version",
+      "name": "updated_at",
       "kind": "scalar_str",
       "required": false,
-      "desc": "The version of the OnlyWorlds data format this world instance conforms to"
+      "desc": "When the world's own settings last changed (its name, description, image, time and units)"
     },
     {
-      "name": "user",
-      "kind": "scalar_str",
+      "name": "public_read",
+      "kind": "scalar_bool",
       "required": false,
-      "desc": "UUID of the user who owns this world"
+      "desc": "Whether the world can be read by anyone, without a credential"
     },
     {
       "name": "time_format_equivalents",

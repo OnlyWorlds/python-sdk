@@ -60,6 +60,7 @@ WRAPPER_KEYS = ("family", "icon")
 KINDS = {
     "scalar_str": "a string; the empty string means unset",
     "scalar_int": "an integer, or null for unset",
+    "scalar_bool": "true or false (world.public_read, since canonical 00.32.00)",
     "single": "one element's id (a UUID string), or null; `target` names its type",
     "multi": "an array of element ids (UUID strings), possibly empty; `target` names their type",
     "generic": "a link to an element of any type, carried as two keys: "
@@ -225,7 +226,7 @@ def _resolve_target(
     return slug
 
 
-_SCALAR_KINDS = {"string": "scalar_str", "integer": "scalar_int"}
+_SCALAR_KINDS = {"string": "scalar_str", "integer": "scalar_int", "boolean": "scalar_bool"}
 
 
 def _flat_fields(
