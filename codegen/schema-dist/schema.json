@@ -13,7 +13,7 @@
       "name": "id",
       "kind": "scalar_str",
       "required": true,
-      "desc": "Unique identifier for the element, uuidv7 format"
+      "desc": "Unique identifier for the element, a UUID. New ids are minted as uuidv7; ids minted earlier as uuidv4 remain valid"
     },
     {
       "name": "name",
