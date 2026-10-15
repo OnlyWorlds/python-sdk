@@ -411,11 +411,26 @@ def test_patch_world_takes_back_a_get_world_body_and_a_folder_spelling(make_clie
 # --- keel #299: the agent declaration -------------------------------------
 
 
-def test_agent_header_is_opt_in(make_client: MakeClient) -> None:
-    t = FakeTransport(handler=lambda *a: jresp(200, {"id": ID, "name": "K"}))
-    make_client(t).get("character", ID)
-    assert "X-OW-Agent" not in t.calls[-1].headers
+def test_agent_header_on_the_six_element_writes_only(make_client: MakeClient) -> None:
+    body = {"id": ID, "name": "K", "type": "character", "items": [], "data": [], "has_more": False}
+    t = FakeTransport(handler=lambda *a: jresp(200, body))
+    make_client(t).patch("character", ID, {"name": "K2"})
+    assert "X-OW-Agent" not in t.calls[-1].headers  # off by default
     agent = Client("ow_w_testkey", "1234", transport=t, agent=True)
+    t.calls.clear()
+    agent.create("character", {"name": "A"})
+    agent.upsert("character", ID, {"name": "K"})
+    agent.patch("character", ID, {"name": "K2"}, if_match=3)
+    agent.edit_links("character", ID, "friends", add=["a"])
+    agent.bulk([{"type": "character", "element": {"name": "B"}}])
+    agent.delete("character", ID)
+    assert [(c.method, c.headers.get("X-OW-Agent")) for c in t.calls] == [
+        ("POST", "1"), ("PUT", "1"), ("PATCH", "1"), ("POST", "1"), ("POST", "1"), ("DELETE", "1")
+    ]
+    assert t.calls[2].headers["If-Match"] == '"3"'  # the write's own headers survive
+    t.calls.clear()
     agent.get("character", ID)
-    agent.patch("character", ID, {"name": "K2"})
-    assert [c.headers.get("X-OW-Agent") for c in t.calls[1:]] == ["1", "1"]
+    agent.list_page("character")
+    agent.get_world()
+    agent.patch_world({"name": "W"})
+    assert [c.headers.get("X-OW-Agent") for c in t.calls] == [None, None, None, None]

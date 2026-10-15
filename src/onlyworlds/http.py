@@ -302,8 +302,9 @@ class Client:
         changes_page_size: int = 100,
         agent: bool = False,
     ):
-        """``agent=True`` declares the caller an AI agent: every request carries ``X-OW-Agent``,
-        and keel records its writes as agent-made (``changed_via: "declared"``, keel #299; keel
+        """``agent=True`` declares the caller an AI agent: every element write (create, upsert,
+        patch, delete, edit_links, bulk: the operations keel's document declares it on) carries
+        ``X-OW-Agent``, and keel records those writes as agent-made (``changed_via: "declared"``, keel #299; keel
         stores that the header was there, never its value). Off by default, and off in any tool
         a person uses: it describes the caller. An agent seat's key counts as an agent without it."""
         if not api_key:
@@ -318,8 +319,15 @@ class Client:
         self._headers = {"API-Key": api_key, "Accept": "application/json", "User-Agent": user_agent}
         if pin:
             self._headers["API-Pin"] = pin
-        if agent is True:
-            self._headers["X-OW-Agent"] = "1"  # presence is the declaration (D104)
+        self._agent = agent is True
+
+    def _writing(self, headers: Mapping[str, str] | None = None) -> dict[str, str] | None:
+        """An element write's headers: with ``X-OW-Agent`` when this client is an agent (presence is
+        the declaration, D104; keel declares it on the element writes only)."""
+        out = dict(headers or {})
+        if self._agent:
+            out["X-OW-Agent"] = "1"
+        return out or None
 
     def __repr__(self) -> str:  # never print credentials
         return f"Client(base_url={self.base_url!r})"
@@ -499,7 +507,7 @@ class Client:
         if not body.get("id"):
             body["id"] = _minted_id(idempotency_key, 0)
         key = idempotency_key or str(uuid.uuid4())
-        got = self.send("POST", f"{t}/", body, {"Idempotency-Key": key})
+        got = self.send("POST", f"{t}/", body, self._writing({"Idempotency-Key": key}))
         if got.response is None:
             raise ConnectionError(f"POST {t}/: {got.error}")
         if got.response.status == 409 and got.retries and error_code(got.response.body) == "id_conflict":
@@ -522,7 +530,7 @@ class Client:
         i = _segment(element_id, _ID, "element id")
         body = sanitize_payload(element)
         check_kinds(t, body)
-        return self._element(self.call("PUT", f"{t}/{i}/", body), "PUT", t)
+        return self._element(self.call("PUT", f"{t}/{i}/", body, self._writing()), "PUT", t)
 
     def patch(
         self, element_type: str, element_id: str, partial: Mapping[str, Any], *, if_match: int | None = None
@@ -537,13 +545,13 @@ class Client:
         i = _segment(element_id, _ID, "element id")
         body = sanitize_payload(partial)
         check_kinds(t, body)
-        return self._element(self.call("PATCH", f"{t}/{i}/", body, _if_match(if_match)), "PATCH", t)
+        return self._element(self.call("PATCH", f"{t}/{i}/", body, self._writing(_if_match(if_match))), "PATCH", t)
 
     def delete(self, element_type: str, element_id: str) -> None:
         """``DELETE /{type}/{id}``: 204, also when it is already gone. The server scrubs the id from every link."""
         t = _segment(element_type, _TYPE, "element type")
         i = _segment(element_id, _ID, "element id")
-        self.call("DELETE", f"{t}/{i}/")
+        self.call("DELETE", f"{t}/{i}/", None, self._writing())
 
     def edit_links(
         self,
@@ -565,7 +573,8 @@ class Client:
         i = _segment(element_id, _ID, "element id")
         f = _segment(link_field, _TYPE, "link field")
         body = {"add": list(add), "remove": list(remove)}
-        return self._element(self.call("POST", f"{t}/{i}/links/{f}", body, _if_match(if_match)), "POST", t)
+        headers = self._writing(_if_match(if_match))
+        return self._element(self.call("POST", f"{t}/{i}/links/{f}", body, headers), "POST", t)
 
     @staticmethod
     def _element(data: Any, method: str, element_type: str) -> dict[str, Any]:
@@ -602,7 +611,7 @@ class Client:
             "atomic": atomic,
         }
         key = idempotency_key or str(uuid.uuid4())
-        got = self.send("POST", "bulk/", body, {"Idempotency-Key": key})
+        got = self.send("POST", "bulk/", body, self._writing({"Idempotency-Key": key}))
         if got.response is None:
             raise ConnectionError(f"POST bulk/: {got.error}")
         if not 200 <= got.response.status < 300:
