@@ -406,3 +406,16 @@ def test_patch_world_takes_back_a_get_world_body_and_a_folder_spelling(make_clie
     body = {"id": "w", "name": "W", "public_read": True, "created_at": "a", "updated_at": "b", "time_current": 5}
     make_client(t).patch_world(body)
     assert t.calls[0].body == {"name": "W", "time_range_current": 5}
+
+
+# --- keel #299: the agent declaration -------------------------------------
+
+
+def test_agent_header_is_opt_in(make_client: MakeClient) -> None:
+    t = FakeTransport(handler=lambda *a: jresp(200, {"id": ID, "name": "K"}))
+    make_client(t).get("character", ID)
+    assert "X-OW-Agent" not in t.calls[-1].headers
+    agent = Client("ow_w_testkey", "1234", transport=t, agent=True)
+    agent.get("character", ID)
+    agent.patch("character", ID, {"name": "K2"})
+    assert [c.headers.get("X-OW-Agent") for c in t.calls[1:]] == ["1", "1"]

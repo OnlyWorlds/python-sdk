@@ -121,6 +121,17 @@ def test_created_by_is_never_sent(tmp_path: Path) -> None:
     assert [(p.id, p.fields) for p in plan.patches] == [(C2, {"name": "B2"})]
 
 
+def test_changed_by_and_changed_via_are_never_sent(tmp_path: Path) -> None:
+    """keel #299: the last write's author and door are read-only like created_by, and every push restamps them."""
+    base, edit = folders(
+        tmp_path,
+        {"character": [wire_char(C1, "A", changed_by="m-1", changed_via="api"), wire_char(C2, "B", changed_via="mcp")]},
+        {"character": [wire_char(C1, "A", changed_by=None, changed_via="declared"), wire_char(C2, "B2")]},
+    )
+    plan = plan_push(base, edit)
+    assert [(p.id, p.fields) for p in plan.patches] == [(C2, {"name": "B2"})]
+
+
 def test_atlas_local_only_fields_stay_home(tmp_path: Path) -> None:
     """Atlas's ATLAS_LOCAL_ONLY_FIELDS never reach the wire; its wire extensions (atlas_color...) do."""
     base, edit = folders(

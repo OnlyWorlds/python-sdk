@@ -60,8 +60,8 @@ USER_AGENT = f"onlyworlds-py/{__version__}"
 #: Fields the API must never receive on a write. A BLACKLIST, never a whitelist:
 #: namespaced extension fields (``atlas_*`` / ``shadow_*`` / ``x_*``) must pass through
 #: untouched, because tools round-trip their own state through other tools' writes.
-#: ``created_by`` is not here: keel drops it silently on a write (spec §4), so a read body
-#: round-trips as it is.
+#: ``created_by``, ``changed_by`` and ``changed_via`` are not here: keel drops them silently on
+#: a write (spec §4; keel #299), so a read body round-trips as it is.
 READ_ONLY_FIELDS: tuple[str, ...] = ("world", "type", "created_at", "updated_at", "change_seq")
 
 _TYPE = re.compile(r"^[a-z][a-z0-9_]*$")
@@ -300,7 +300,12 @@ class Client:
         user_agent: str = USER_AGENT,
         page_size: int = 100,
         changes_page_size: int = 100,
+        agent: bool = False,
     ):
+        """``agent=True`` declares the caller an AI agent: every request carries ``X-OW-Agent``,
+        and keel records its writes as agent-made (``changed_via: "declared"``, keel #299; keel
+        stores that the header was there, never its value). Off by default, and off in any tool
+        a person uses: it describes the caller. An agent seat's key counts as an agent without it."""
         if not api_key:
             raise ValueError("api_key is required")
         self.base_url = base_url.rstrip("/")
@@ -313,6 +318,8 @@ class Client:
         self._headers = {"API-Key": api_key, "Accept": "application/json", "User-Agent": user_agent}
         if pin:
             self._headers["API-Pin"] = pin
+        if agent is True:
+            self._headers["X-OW-Agent"] = "1"  # presence is the declaration (D104)
 
     def __repr__(self) -> str:  # never print credentials
         return f"Client(base_url={self.base_url!r})"
