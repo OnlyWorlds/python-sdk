@@ -28,7 +28,7 @@ SOURCE = os.environ.get("OW_OPENAPI")
 pytestmark = pytest.mark.skipif(not SOURCE, reason="set OW_OPENAPI to keel's OpenAPI document (URL or file)")
 
 ID = "018f0000-0000-7000-8000-000000000001"
-SERVER_MANAGED = {"id", "type", "created_at", "updated_at", "change_seq", "created_by"}
+SERVER_MANAGED = {"id", "type", "created_at", "updated_at", "change_seq", "created_by", "changed_by", "changed_via"}
 KIND = {"text": "string", "integer": "integer", "multi_link": "array", "single_link": "string"}
 
 
