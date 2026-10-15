@@ -2,6 +2,10 @@
 
 The package version runs on its own semver; the schema it is generated from is `SCHEMA_DIST_TAG`.
 
+## 0.4.0 (2026-10-16)
+
+- **A retry that meets its own first try still running now waits and replays (keel #307, D105).** After a timeout the client resends with the same Idempotency-Key; if the first request is still running, keel answers 409 `idempotency_in_flight` with `Retry-After: 1`. The retry policy now retries that 409 (and only that one), so `create` and `bulk` get the first answer's replay instead of an error. `ApiError.is_idempotency_in_flight` names it when the retries run out.
+
 ## 0.3.0 (2026-10-15)
 
 - **The door of every write (keel #299, D104).** `Client(..., agent=True)` sends `X-OW-Agent` on every element write (create, upsert, patch, delete, edit_links, bulk: the operations keel's document declares it on; never on reads or `patch_world`), and keel records those writes as agent-made (`changed_via: "declared"`); keel stores that the header was there, never its value. Off by default, and off in any tool a person uses: it describes the caller. An agent seat's key counts as an agent without it.

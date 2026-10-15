@@ -100,6 +100,12 @@ class ApiError(Exception):
         return self.status == 409 and self.code == "idempotency_error"
 
     @property
+    def is_idempotency_in_flight(self) -> bool:
+        """A request with this Idempotency-Key is still running (409 ``idempotency_in_flight``, keel
+        #307). The client retries it by itself; seen here only when the retries ran out."""
+        return self.status == 409 and self.code == "idempotency_in_flight"
+
+    @property
     def is_id_conflict(self) -> bool:
         """The id is already taken (409 ``id_conflict``). Retrying will not help; the id is the problem."""
         return self.status == 409 and self.code == "id_conflict"

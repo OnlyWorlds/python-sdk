@@ -194,6 +194,28 @@ def test_rate_limited_429_is_never_retried(make_client: MakeClient, sleeps: list
     assert e.value.code == "rate_limited" and len(t.calls) == 1 and sleeps == []
 
 
+def test_a_timeout_then_in_flight_retries_to_the_replay(make_client: MakeClient, sleeps: list[float]) -> None:
+    """keel #307: a retry after a timeout can meet the first request still running (409
+    idempotency_in_flight, Retry-After 1); the next try, same key and body, gets the replay."""
+    in_flight = {"error": {"type": "idempotency_error", "code": "idempotency_in_flight"}}
+    t = FakeTransport(script=[
+        TimeoutError("read timed out"),
+        jresp(409, in_flight, {"Retry-After": "1"}),
+        jresp(201, {"id": ID, "name": "A", "type": "character"}, {"Idempotent-Replay": "true"}),
+    ])
+    made = make_client(t).create("character", {"name": "A"}, idempotency_key="k-9")
+    assert made["id"] == ID and len(t.calls) == 3 and sleeps[1] == 1.0
+    assert len({c.headers["Idempotency-Key"] for c in t.calls}) == 1
+    assert t.calls[0].body == t.calls[1].body == t.calls[2].body
+
+
+def test_a_key_conflict_409_is_never_retried(make_client: MakeClient, sleeps: list[float]) -> None:
+    t = FakeTransport(script=[jresp(409, {"error": {"type": "idempotency_error", "code": "idempotency_error"}})])
+    with pytest.raises(ApiError) as e:
+        make_client(t).create("character", {"name": "A"}, idempotency_key="k-9")
+    assert e.value.is_idempotency_conflict and not e.value.is_idempotency_in_flight and len(t.calls) == 1
+
+
 def test_bulk_without_items_is_an_error(make_client: MakeClient) -> None:
     with pytest.raises(ValueError, match="no items"):
         make_client(FakeTransport(script=[jresp(200, {"errors": False})])).bulk([])

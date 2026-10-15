@@ -180,7 +180,12 @@ class UrllibTransport:
 
 @dataclass(frozen=True)
 class RetryPolicy:
-    """Retry 429, 502, 503, 504 and transport exceptions, and a 500 once; honor ``Retry-After``.
+    """Retry 429, 502, 503, 504, transport exceptions and a 409 ``idempotency_in_flight``, and a
+    500 once; honor ``Retry-After``.
+
+    A 409 ``idempotency_in_flight`` (keel #307, D105) means a request with the same
+    Idempotency-Key is still running, which is what a retry after a timeout meets: the
+    retry, same key and body, replays its answer once the first has finished.
 
     Never a 429 with code ``rate_limited``: keel sends it for a wrong PIN, and each retry is
     one more failure toward locking the key. keel's 500 is an unhandled exception, almost
@@ -200,6 +205,8 @@ class RetryPolicy:
         """``attempt`` is the try that got ``status``, the first being 0."""
         if status == 429:
             return code != "rate_limited"
+        if status == 409:
+            return code == "idempotency_in_flight"
         if status == 500:
             return attempt == 0
         return status in (502, 503, 504)
@@ -358,7 +365,7 @@ class Client:
             except Exception as exc:  # no response at all: timeouts, resets, DNS
                 response, reason = None, f"{type(exc).__name__}: {exc}"
             else:
-                code = error_code(response.body) if response.status == 429 else None
+                code = error_code(response.body) if response.status in (409, 429) else None
                 if not self.retry.should_retry(response.status, code, attempt):
                     return Attempted(response, len(reasons), reasons)
                 reason = str(response.status)
