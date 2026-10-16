@@ -1,6 +1,6 @@
 """The OnlyWorlds world folder: filenames, the writer, the reader.
 
-Spec: OnlyWorlds Folder Format v0.3.7.
+Spec: OnlyWorlds Folder Format v0.3.8.
 Section numbers below are that document's.
 
 ::
@@ -55,7 +55,7 @@ __all__ = [
 ]
 
 #: The spec version this module writes and reads against (§4.2 ``format_version``).
-FORMAT_VERSION = "0.3.7"
+FORMAT_VERSION = "0.3.8"
 
 ELEMENTS_DIR = "elements"
 WORLD_FILE = "world.json"
@@ -306,8 +306,15 @@ class Folder:
     ignored_dirs: list[Path] = field(default_factory=list)
 
     def all_elements(self) -> dict[str, FolderElement]:
-        """The union Atlas reads: ``elements/`` plus ``spatial/``; ``elements/`` wins on a shared id."""
+        """The union Atlas reads: ``elements/`` plus ``spatial/``; ``elements/`` wins on a shared id (§4, v0.3.8)."""
         return {**self.legacy, **self.elements}
+
+    @property
+    def in_both_layouts(self) -> list[str]:
+        """Ids found under both ``elements/`` and ``spatial/``, sorted. A writer never leaves one so
+        (§4, v0.3.8, one id one file), so each is a folder some writer got wrong: a reader serves the
+        ``elements/`` copy (``all_elements``) and SHOULD log these."""
+        return sorted(self.elements.keys() & self.legacy.keys())
 
     @property
     def server_world_id(self) -> str | None:

@@ -117,3 +117,26 @@ def test_reader_edges(tmp_path: Path) -> None:
 def test_missing_everything_is_empty_not_an_error(tmp_path: Path) -> None:
     f = read_folder(tmp_path)
     assert f.world is None and f.elements == {} and f.skipped == []
+
+
+def test_an_id_in_both_layouts_serves_elements_and_is_named(tmp_path: Path) -> None:
+    """§4, v0.3.8 (one id, one file): a reader that finds an id in both layouts serves the
+    ``elements/`` copy and SHOULD log it; ``in_both_layouts`` names it, whichever copy is newer."""
+    pid, other = "11111111-2222-4333-8444-5555555555b1", "11111111-2222-4333-8444-5555555555b2"
+    copies = (
+        ("elements", "from elements", "2026-01-01T00:00:00Z"),
+        ("spatial", "from spatial", "2026-12-31T00:00:00Z"),
+    )
+    for layout, name, stamp in copies:
+        d = tmp_path / layout / "pin"
+        d.mkdir(parents=True)
+        body = {"id": pid, "name": name, "local_updated_at": stamp}
+        (d / f"p--{pid[-8:]}.json").write_text(json.dumps(body), encoding="utf-8")
+    only = {"id": other, "name": "only legacy"}
+    (tmp_path / "spatial" / "pin" / f"q--{other[-8:]}.json").write_text(json.dumps(only), encoding="utf-8")
+    f = read_folder(tmp_path)
+    # elements/ wins, even against a newer spatial/ stamp
+    assert f.all_elements()[pid].body["name"] == "from elements"
+    assert f.all_elements()[other].body["name"] == "only legacy"
+    assert f.in_both_layouts == [pid]
+    assert read_folder(tmp_path, legacy=False).in_both_layouts == []
