@@ -11,12 +11,15 @@ classifiers = [
     "Typing :: Typed",
 ]
 
+[project.optional-dependencies]
+okf = ["PyYAML>=6"]       # onlyworlds.okf, the OKF bundle export; the core imports no YAML
+
 [dependency-groups]
 dev = [
     "pytest>=8",
     "ruff>=0.6",
     "mypy>=1.11",
-    "pyyaml>=6",          # build-time only: codegen imports the vendored schema walk
+    "pyyaml>=6",          # codegen imports the vendored schema walk; tests/test_okf.py needs it too
     "types-PyYAML",
 ]
 

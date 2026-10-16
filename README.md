@@ -1,6 +1,6 @@
 # onlyworlds (Python)
 
-OnlyWorlds is an open standard for worldbuilding data: 22 element types (characters, locations, events, laws and the rest) that any tool can read and write. This is a Python client for its API, and a reader and writer for OnlyWorlds world folders (a world as a folder of JSON files). Python 3.12+, no runtime dependencies.
+OnlyWorlds is an open standard for worldbuilding data: 22 element types (characters, locations, events, laws and the rest) that any tool can read and write. This is a Python client for its API, and a reader and writer for OnlyWorlds world folders (a world as a folder of JSON files). Python 3.12+, no runtime dependencies (the optional OKF export needs PyYAML).
 
 ## Install
 
@@ -71,6 +71,24 @@ result = push("moppetopia-before", "moppetopia", api_key="ow_w_â€¦", pin="ow_s_â
 
 `push` sends only the fields that changed, retries what the server asks it to retry, checks that what came back is what it sent, and logs every write, so running it again skips what already landed. `dry_run=True` shows the plan without sending it.
 
+## Export to OKF
+
+A world folder can be written as a bundle in [Open Knowledge Format](https://github.com/GoogleCloudPlatform/open-knowledge-format) (OKF) v0.2: one markdown file per element, with its fields in the frontmatter, its text under headings and its links as markdown links, plus an index per type. This needs PyYAML, which the rest of the package does not:
+
+```bash
+pip install "onlyworlds[okf]"
+python -m onlyworlds.okf moppetopia moppetopia-okf
+```
+
+```python
+from onlyworlds.okf import export_okf
+
+report = export_okf("moppetopia", "moppetopia-okf")
+print(report.elements, "elements,", len(report.notes), "notes")
+```
+
+The output directory must not exist yet. Anything the export leaves out (a file that isn't an element, a key that isn't a field, a link to the wrong type) is listed in `report.notes`; the command prints these on stderr. The same folder always gives the same bytes.
+
 ## Errors
 
 A failed call raises `ApiError` with the API's `code`, `param` (the field that failed) and `doc_url`, and flags for the cases you handle differently: `is_validation_error`, `is_auth_error`, `is_not_author`, `is_owner_only`, `is_id_conflict`, `is_resync_required`, `is_busy`, `is_precondition_failed`.
@@ -106,6 +124,8 @@ Three groups of tests run only when asked:
 - `OW_CONFORMANCE_FIXTURE=<path>`: the folder-format conformance fixture from the Atlas repo.
 - `OW_OPENAPI=https://www.onlyworlds.com/api/v2/openapi.json` (or a saved copy): checks the client's routes, parameters and fields against the API's own OpenAPI document.
 - `OW_LIVE=1`: read-only calls against the demo world.
+
+`OKF_REFERENCE_SRC=<path>` (the `src/` of an open-knowledge-format checkout) also runs OKF's own parser and viewer over an exported bundle.
 
 
 ## License
