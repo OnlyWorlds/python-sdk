@@ -45,7 +45,9 @@ Each element concept:
     viewers that draw the link graph from bodies draw it. Body links are
     relative: the reference viewer at the pinned commit skips `/` links. A
     text line markdown would read as a heading (`#`, or a `===`/`---`
-    underline) is escaped with a backslash, so text cannot make a section.
+    underline) is escaped with a backslash, so text cannot make a section;
+    so is a line that already begins with a backslash, so a reader removes
+    one backslash from each such line and gets the text back.
   - unset values (the empty string, null, an empty list) are left out.
     Extension keys (`x_`, `atlas_`, `shadow_`) are carried as they are; the
     server and folder keys the package never pushes (``push.NOT_SENT``) are
@@ -264,13 +266,13 @@ def _heading(name: str) -> str:
     return words[:1].upper() + words[1:]
 
 
-_FAKE_HEADING = re.compile(r" {0,3}#| {0,3}(=+|-+)[ \t]*$")
+_FAKE_HEADING = re.compile(r" {0,3}[#\\]| {0,3}(=+|-+)[ \t]*$")
 
 
 def escape_text(text: str) -> str:
     """A text field as body markdown: LF, outer blank lines trimmed, and a backslash before any
     line markdown would read as a heading (`# x`, or a `===`/`---` line that would underline the
-    line above)."""
+    line above) or that already begins with one (else `# x` and `\\# x` would read the same)."""
     out = []
     for line in str(text).replace("\r\n", "\n").replace("\r", "\n").strip("\n").split("\n"):
         if _FAKE_HEADING.match(line):

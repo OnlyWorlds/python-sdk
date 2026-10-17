@@ -89,7 +89,7 @@ def escape_text(text: str) -> str:
     """The body's text rule: a line markdown would read as a heading is escaped."""
     out = []
     for line in text.replace("\r\n", "\n").replace("\r", "\n").strip("\n").split("\n"):
-        if re.match(r" {0,3}#", line) or re.fullmatch(r" {0,3}(=+|-+)[ \t]*", line):
+        if re.match(r" {0,3}[#\\]", line) or re.fullmatch(r" {0,3}(=+|-+)[ \t]*", line):
             i = len(line) - len(line.lstrip(" "))
             line = line[:i] + "\\" + line[i:]
         out.append(line)
@@ -507,6 +507,17 @@ def test_nit_text_cannot_make_a_section(world: World) -> None:
     _, body = world.doc("character/the-consul--*.md")
     assert "\\# Fake section\n  \\## Fake too\nplain\n\\===\n\\---" in body
     assert "\n# Fake" not in body
+
+
+def test_nit_an_escaped_line_reads_back(world: World) -> None:
+    """A line that already begins with a backslash gets one more, so `# x` and `\\# x` stay apart."""
+    world.edit(
+        "elements/character/the-consul--*.json",
+        lambda b: b.update(background="# x\n\\# x\n  \\ y\n    \\ z"),
+    )
+    assert world.run()[0] == 0
+    _, body = world.doc("character/the-consul--*.md")
+    assert "\\# x\n\\\\# x\n  \\\\ y\n    \\ z" in body
 
 
 def test_nit_hyperion_run_is_quiet(world: World) -> None:
