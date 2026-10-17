@@ -2,6 +2,11 @@
 
 The package version runs on its own semver; the schema it is generated from is `SCHEMA_DIST_TAG`.
 
+## 0.5.1 (2026-10-17)
+
+- **The reader skips a dot-prefixed file in a type directory**, a tool's litter rather than an element, and lists it in `Folder.skipped`, even when it holds a valid body. Before, it was read like any file, and one that sorted first could stand in for the real element (Skeld's clarification of the folder spec, 2026-10-17).
+- **`Folder.time_current` prefers a non-null `time_current`**: a null one beside `time_range_current` now reads the range, where it read null.
+
 ## 0.5.0 (2026-10-17)
 
 - **Folder format v0.3.8, one id, one file (§4).** A writer never leaves an element's id under both `elements/` and the legacy `spatial/`, and a reader that finds one in both serves the `elements/` copy. `write_folder` already wrote a whole folder under `elements/` only, and `Folder.all_elements()` already served `elements/` on a shared id, so nothing changes in what either does. `FORMAT_VERSION` (the `format_version` a written `world.json` declares) is now `"0.3.8"`; folders stamped `"0.3.7"` stay valid.

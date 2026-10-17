@@ -114,6 +114,24 @@ def test_reader_edges(tmp_path: Path) -> None:
     assert f.time_current == 5
 
 
+def test_a_dotfile_in_a_type_dir_is_skipped_and_a_null_time_current_reads_the_range(tmp_path: Path) -> None:
+    """Skeld's two clarifications (2026-10-17): a dot-prefixed file in a type directory is a tool's
+    litter, not an element, even when it holds a valid body with the same id as a real file; and
+    prefer ``time_current`` means a non-null one."""
+    eid = "11111111-2222-4333-8444-5555555555c1"
+    d = tmp_path / "elements" / "character"
+    d.mkdir(parents=True)
+    (d / ".tmp-a.json").write_text(json.dumps({"id": eid, "name": "litter"}), encoding="utf-8")
+    (d / f"real--{eid[-8:]}.json").write_text(json.dumps({"id": eid, "name": "real"}), encoding="utf-8")
+    world = {"id": "w", "name": "W", "time_current": None, "time_range_current": 7}
+    (tmp_path / "world.json").write_text(json.dumps(world), encoding="utf-8")
+    f = read_folder(tmp_path)
+    assert f.elements[eid].body["name"] == "real"
+    assert f.duplicates == []
+    assert [s.path.name for s in f.skipped] == [".tmp-a.json"]
+    assert f.time_current == 7
+
+
 def test_missing_everything_is_empty_not_an_error(tmp_path: Path) -> None:
     f = read_folder(tmp_path)
     assert f.world is None and f.elements == {} and f.skipped == []

@@ -329,12 +329,15 @@ class Folder:
 
     @property
     def time_current(self) -> Any:
-        """§5: accept both spellings forever, prefer ``time_current``."""
+        """§5: accept both spellings forever, prefer a non-null ``time_current`` (a null one beside
+        ``time_range_current`` reads the range: Skeld's clarification, 2026-10-17)."""
         if self.world is None:
             return None
-        if "time_current" in self.world:
+        if self.world.get("time_current") is not None:
             return self.world["time_current"]
-        return self.world.get("time_range_current")
+        if "time_range_current" in self.world:
+            return self.world["time_range_current"]
+        return self.world.get("time_current")
 
 
 def _reject_constant(token: str) -> Any:
@@ -350,7 +353,8 @@ def read_folder(root: str | os.PathLike[str], *, legacy: bool = True) -> Folder:
     """Read a world folder. Opens files for reading only; the folder is never mutated.
 
     - Every ``*.json`` in a type directory is ingested and keyed on its in-file ``id``;
-      the filename is never parsed (§3.1).
+      the filename is never parsed (§3.1). A dot-prefixed file there is a tool's litter,
+      not an element: skipped and listed (Skeld's clarification, 2026-10-17).
     - A file that is not JSON, not an object, or has no non-empty string ``id`` is
       skipped, recorded in ``skipped``, and left where it is (§4.1).
     - A declared ``type`` beats the directory the file sits in; an absent one is
@@ -391,6 +395,9 @@ def read_folder(root: str | os.PathLike[str], *, legacy: bool = True) -> Folder:
                 folder.ignored_dirs.append(tdir)
                 continue
             for path in sorted(p for p in tdir.iterdir() if p.is_file() and p.name.lower().endswith(".json")):
+                if path.name.startswith("."):
+                    folder.skipped.append(SkippedFile(path, "a dot-prefixed file: a tool's litter, not an element"))
+                    continue
                 try:
                     body = _load_json(path)
                 except (ValueError, UnicodeDecodeError) as exc:
