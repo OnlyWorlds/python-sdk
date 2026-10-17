@@ -60,8 +60,8 @@ portable copy).
 
 Nothing is dropped in silence. Each of these is a note (on stderr from the
 command line, in ``OkfReport.notes`` from Python): a file the folder reader
-skipped (not JSON, not an object, no `id`), a dot-prefixed file (tool-private:
-folder format §4.1 says skip it, leave it, log it), a directory that is not a
+skipped (not JSON, not an object, no `id`, a dot-prefixed file: a tool's litter,
+not an element, as the folder spec clarifies), a directory that is not a
 type directory, an id in both `elements/` and the legacy `spatial/` (the
 `elements/` copy is served, folder format v0.3.8), a key that is not a field
 of its type, a field kind this exporter does not know, and a link left out
@@ -110,12 +110,13 @@ from ._schema import (
     SECTIONS,
     WORLD_FIELDS,
 )
+from ._version import __version__
 from .folder import WIRE_TO_DISK_WORLD_KEYS, WORLD_FILE, Folder, read_folder
 from .push import NOT_SENT
 
 __all__ = ["EXPORTER", "OKF_COMMIT", "OKF_VERSION", "FolderError", "OkfReport", "build_bundle", "export_okf", "main"]
 
-EXPORTER = "onlyworlds-okf-export/0.1"
+EXPORTER = f"onlyworlds-py/{__version__}"
 OKF_VERSION = "0.2"
 OKF_REPO = "https://github.com/GoogleCloudPlatform/open-knowledge-format"
 OKF_COMMIT = "ad30107c31c06aec8a7d5636e0d1058118604e6f"
@@ -196,18 +197,10 @@ def _elements(folder: Folder, note: Note) -> list[tuple[str, dict[str, Any]]]:
     for s in folder.skipped:
         if s.path.parent == folder.root and s.path.name == WORLD_FILE:
             continue
-        rel = _rel(folder, s.path)
-        note(
-            f"{rel}: dot-prefixed, tool-private; skipped"
-            if s.path.name.startswith(".")
-            else f"{rel}: {s.reason}; skipped"
-        )
+        note(f"{_rel(folder, s.path)}: {s.reason}; skipped")
     for d in folder.ignored_dirs:
         note(f"{_rel(folder, d)}/: not a type directory; skipped")
     for dup in folder.duplicates:
-        if dup.ignored.name.startswith("."):
-            note(f"{_rel(folder, dup.ignored)}: dot-prefixed, tool-private; skipped")
-            continue
         raise FolderError(f"{_rel(folder, dup.ignored)}: duplicate id {dup.id} (also {_rel(folder, dup.kept)})")
     for eid in folder.in_both_layouts:
         legacy, served = folder.legacy[eid].path, folder.elements[eid].path
@@ -221,9 +214,7 @@ def _elements(folder: Folder, note: Note) -> list[tuple[str, dict[str, Any]]]:
     out: list[tuple[str, dict[str, Any]]] = []
     for el in found:
         rel = _rel(folder, el.path)
-        if el.path.name.startswith("."):
-            note(f"{rel}: dot-prefixed, tool-private; skipped")
-        elif el.type not in ELEMENT_TYPES:
+        if el.type not in ELEMENT_TYPES:
             note(f"{rel}: `type` {el.type!r} is not one of the 22 types; skipped")
         else:
             out.append((el.type, el.body))
