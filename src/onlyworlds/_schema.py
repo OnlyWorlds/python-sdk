@@ -2,7 +2,7 @@
 # Regenerate: python codegen/generate_schema.py  (CI/test: --check)
 # Source: https://github.com/OnlyWorlds/schema-dist @ v0.32.0-dist.23 (a76a2a9ea4bbc8f26d8abd430dc8b1db7382902e)
 
-"""Schema provenance and the 22 element types, generated from the pinned schema distribution."""
+"""Schema provenance, the 22 element types and their fields, from the pinned schema distribution."""
 
 SCHEMA_DIST_TAG = "v0.32.0-dist.23"
 SCHEMA_VERSION = "00.32.00"
@@ -554,3 +554,417 @@ FIELD_KINDS: dict[str, dict[str, str]] = {
 GENERIC_PAIRS: dict[str, tuple[tuple[str, str], ...]] = {
     "pin": (("element_type", "element_id"),),
 }
+
+# Every element's shared fields (base_properties.yaml), in schema order, as data spells them.
+BASE_FIELDS: tuple[str, ...] = ("id", "name", "description", "supertype", "subtype", "image_url", "world")
+
+# The World's fields (world.yaml), in schema order.
+WORLD_FIELDS: tuple[str, ...] = (
+    "id", "name", "description", "image_url", "created_at", "updated_at", "public_read", "time_format_equivalents",
+    "time_format_names", "time_basic_unit", "time_range_min", "time_range_max", "time_current", "length_unit",
+    "mass_unit", "distance_unit",
+)
+
+# type -> ((section, (field, ...)), ...): each type's own fields in schema order, under the YAML
+# group that holds them. A generic link is listed by its own name (pin's `element`); GENERIC_LINKS
+# names the two keys that hold it in data.
+SECTIONS: dict[str, tuple[tuple[str, tuple[str, ...]], ...]] = {
+    "ability": (
+        ("Mechanics", ("activation", "duration", "potency", "range", "effects", "challenges", "talents", "requisites")),
+        ("World", ("prevalence", "tradition", "source", "locus", "instruments", "systems")),
+    ),
+    "collective": (
+        ("Formation", ("composition", "count", "formation_date", "operator", "equipment")),
+        ("Dynamics", ("activity", "disposition", "state", "abilities", "symbolism")),
+        ("World", ("species", "characters", "creatures", "phenomena")),
+    ),
+    "character": (
+        ("Constitution", ("physicality", "mentality", "height", "weight", "species", "traits", "abilities")),
+        ("Origins", ("background", "motivations", "birth_date", "birthplace", "languages")),
+        ("World", ("reputation", "location", "objects", "institutions")),
+        ("Personality", ("charisma", "coercion", "competence", "compassion", "creativity", "courage")),
+        ("Social", ("family", "friends", "rivals")),
+        ("TTRPG", ("level", "hit_points", "STR", "DEX", "CON", "INT", "WIS", "CHA")),
+    ),
+    "construct": (
+        ("Nature", ("rationale", "history", "status", "reach", "start_date", "end_date", "founder", "custodian")),
+        ("Involves", (
+            "characters", "objects", "locations", "species", "creatures", "institutions", "traits", "collectives",
+            "zones", "abilities", "phenomena", "languages", "families", "relations", "titles", "constructs", "events",
+            "narratives",
+        )),
+    ),
+    "creature": (
+        ("Biology", ("appearance", "weight", "height", "species")),
+        ("Behavior", ("habits", "demeanor", "traits", "abilities", "languages")),
+        ("World", ("status", "birth_date", "location", "zone")),
+        ("TTRPG", ("challenge_rating", "hit_points", "armor_class", "speed", "actions")),
+    ),
+    "event": (
+        ("Nature", ("history", "challenges", "consequences", "start_date", "end_date", "triggers")),
+        ("Involves", (
+            "characters", "objects", "locations", "species", "creatures", "institutions", "traits", "collectives",
+            "zones", "abilities", "phenomena", "languages", "families", "relations", "titles", "constructs",
+        )),
+    ),
+    "family": (
+        ("Identity", ("spirit", "history", "traditions", "traits", "abilities", "languages", "ancestors")),
+        ("World", ("reputation", "estates", "governs", "heirlooms", "creatures")),
+    ),
+    "institution": (
+        ("Foundation", ("doctrine", "founding_date", "parent_institution")),
+        ("Claims", ("zones", "objects", "creatures")),
+        ("World", ("status", "allies", "adversaries", "constructs")),
+    ),
+    "language": (
+        ("Structure", ("phonology", "grammar", "lexicon", "writing", "classification")),
+        ("World", ("status", "spread", "dialects")),
+    ),
+    "law": (
+        ("Code", ("declaration", "purpose", "date", "parent_law", "penalties")),
+        ("World", ("author", "locations", "zones", "prohibitions", "adjudicators", "enforcers")),
+    ),
+    "location": (
+        ("Setting", ("form", "function", "founding_date", "parent_location", "populations")),
+        ("Politics", (
+            "political_climate", "primary_power", "governing_title", "secondary_powers", "zone", "rival", "partner",
+        )),
+        ("World", ("customs", "founders", "cults", "delicacies")),
+        ("Production", ("extraction_methods", "extraction_goods", "industry_methods", "industry_goods")),
+        ("Commerce", ("infrastructure", "extraction_markets", "industry_markets", "currencies")),
+        ("Construction", ("architecture", "buildings", "building_methods")),
+        ("Defense", ("defensibility", "elevation", "fighters", "defensive_objects")),
+    ),
+    "map": (
+        ("Details", ("background_color", "hierarchy", "width", "height", "depth", "parent_map", "location")),
+    ),
+    "marker": (
+        ("Details", ("map", "zone", "x", "y", "z", "order")),
+    ),
+    "narrative": (
+        ("Context", (
+            "story", "consequences", "start_date", "end_date", "order", "parent_narrative", "protagonist", "antagonist",
+            "narrator", "conservator",
+        )),
+        ("Involves", (
+            "events", "characters", "objects", "locations", "species", "creatures", "institutions", "traits",
+            "collectives", "zones", "abilities", "phenomena", "languages", "families", "relations", "titles",
+            "constructs", "laws",
+        )),
+    ),
+    "object": (
+        ("Form", ("aesthetics", "weight", "amount", "parent_object", "materials", "technology")),
+        ("Function", ("utility", "effects", "abilities", "consumes")),
+        ("World", ("origins", "location", "language", "affinities")),
+    ),
+    "phenomenon": (
+        ("Mechanics", ("expression", "effects", "duration", "catalysts", "empowerments")),
+        ("World", ("mythology", "system", "triggers", "wielders", "environments")),
+    ),
+    "pin": (
+        ("Details", ("map", "element", "x", "y", "z")),
+    ),
+    "relation": (
+        ("Nature", ("background", "start_date", "end_date", "intensity", "actor", "events")),
+        ("Involves", (
+            "characters", "objects", "locations", "species", "creatures", "institutions", "traits", "collectives",
+            "zones", "abilities", "phenomena", "languages", "families", "titles", "constructs", "narratives",
+        )),
+    ),
+    "species": (
+        ("Biology", ("appearance", "life_span", "weight", "nourishment", "reproduction", "adaptations")),
+        ("Psychology", ("instincts", "sociality", "temperament", "communication", "aggression", "traits")),
+        ("World", ("role", "parent_species", "locations", "zones", "affinities")),
+    ),
+    "title": (
+        ("Mandate", (
+            "authority", "eligibility", "grant_date", "revoke_date", "issuer", "body", "superior_title", "holders",
+            "symbols",
+        )),
+        ("World", (
+            "status", "history", "characters", "institutions", "families", "zones", "locations", "objects",
+            "constructs", "laws", "collectives", "creatures", "phenomena", "species", "languages",
+        )),
+    ),
+    "trait": (
+        ("Qualitative", (
+            "social_effects", "physical_effects", "functional_effects", "personality_effects", "behaviour_effects",
+        )),
+        ("Quantitative", ("charisma", "coercion", "competence", "compassion", "creativity", "courage")),
+        ("World", ("significance", "anti_trait", "empowered_abilities")),
+    ),
+    "zone": (
+        ("Scope", ("role", "start_date", "end_date", "phenomena", "linked_zones")),
+        ("World", ("context", "populations", "titles", "principles")),
+    ),
+}
+
+# type -> {link field: the type it links to}, for every single and multi link.
+LINK_TARGETS: dict[str, dict[str, str]] = {
+    "ability": {
+        "effects": "phenomenon",
+        "talents": "trait",
+        "requisites": "construct",
+        "tradition": "construct",
+        "source": "phenomenon",
+        "locus": "location",
+        "instruments": "object",
+        "systems": "construct",
+    },
+    "collective": {
+        "operator": "institution",
+        "equipment": "object",
+        "abilities": "ability",
+        "symbolism": "construct",
+        "species": "species",
+        "characters": "character",
+        "creatures": "creature",
+        "phenomena": "phenomenon",
+    },
+    "character": {
+        "species": "species",
+        "traits": "trait",
+        "abilities": "ability",
+        "birthplace": "location",
+        "languages": "language",
+        "location": "location",
+        "objects": "object",
+        "institutions": "institution",
+        "family": "family",
+        "friends": "character",
+        "rivals": "character",
+    },
+    "construct": {
+        "founder": "character",
+        "custodian": "institution",
+        "characters": "character",
+        "objects": "object",
+        "locations": "location",
+        "species": "species",
+        "creatures": "creature",
+        "institutions": "institution",
+        "traits": "trait",
+        "collectives": "collective",
+        "zones": "zone",
+        "abilities": "ability",
+        "phenomena": "phenomenon",
+        "languages": "language",
+        "families": "family",
+        "relations": "relation",
+        "titles": "title",
+        "constructs": "construct",
+        "events": "event",
+        "narratives": "narrative",
+    },
+    "creature": {
+        "species": "species",
+        "traits": "trait",
+        "abilities": "ability",
+        "languages": "language",
+        "location": "location",
+        "zone": "zone",
+        "actions": "ability",
+    },
+    "event": {
+        "triggers": "event",
+        "characters": "character",
+        "objects": "object",
+        "locations": "location",
+        "species": "species",
+        "creatures": "creature",
+        "institutions": "institution",
+        "traits": "trait",
+        "collectives": "collective",
+        "zones": "zone",
+        "abilities": "ability",
+        "phenomena": "phenomenon",
+        "languages": "language",
+        "families": "family",
+        "relations": "relation",
+        "titles": "title",
+        "constructs": "construct",
+    },
+    "family": {
+        "traditions": "construct",
+        "traits": "trait",
+        "abilities": "ability",
+        "languages": "language",
+        "ancestors": "character",
+        "estates": "location",
+        "governs": "institution",
+        "heirlooms": "object",
+        "creatures": "creature",
+    },
+    "institution": {
+        "parent_institution": "institution",
+        "zones": "zone",
+        "objects": "object",
+        "creatures": "creature",
+        "allies": "institution",
+        "adversaries": "institution",
+        "constructs": "construct",
+    },
+    "language": {
+        "classification": "construct",
+        "spread": "location",
+        "dialects": "language",
+    },
+    "law": {
+        "parent_law": "law",
+        "penalties": "construct",
+        "author": "institution",
+        "locations": "location",
+        "zones": "zone",
+        "prohibitions": "construct",
+        "adjudicators": "title",
+        "enforcers": "title",
+    },
+    "location": {
+        "parent_location": "location",
+        "populations": "collective",
+        "primary_power": "institution",
+        "governing_title": "title",
+        "secondary_powers": "institution",
+        "zone": "zone",
+        "rival": "location",
+        "partner": "location",
+        "founders": "character",
+        "cults": "construct",
+        "delicacies": "species",
+        "extraction_methods": "construct",
+        "extraction_goods": "construct",
+        "industry_methods": "construct",
+        "industry_goods": "construct",
+        "extraction_markets": "location",
+        "industry_markets": "location",
+        "currencies": "construct",
+        "buildings": "object",
+        "building_methods": "construct",
+        "fighters": "construct",
+        "defensive_objects": "object",
+    },
+    "map": {
+        "parent_map": "map",
+        "location": "location",
+    },
+    "marker": {
+        "map": "map",
+        "zone": "zone",
+    },
+    "narrative": {
+        "parent_narrative": "narrative",
+        "protagonist": "character",
+        "antagonist": "character",
+        "narrator": "character",
+        "conservator": "institution",
+        "events": "event",
+        "characters": "character",
+        "objects": "object",
+        "locations": "location",
+        "species": "species",
+        "creatures": "creature",
+        "institutions": "institution",
+        "traits": "trait",
+        "collectives": "collective",
+        "zones": "zone",
+        "abilities": "ability",
+        "phenomena": "phenomenon",
+        "languages": "language",
+        "families": "family",
+        "relations": "relation",
+        "titles": "title",
+        "constructs": "construct",
+        "laws": "law",
+    },
+    "object": {
+        "parent_object": "object",
+        "materials": "construct",
+        "technology": "construct",
+        "effects": "phenomenon",
+        "abilities": "ability",
+        "consumes": "construct",
+        "location": "location",
+        "language": "language",
+        "affinities": "trait",
+    },
+    "phenomenon": {
+        "catalysts": "object",
+        "empowerments": "ability",
+        "system": "phenomenon",
+        "triggers": "construct",
+        "wielders": "character",
+        "environments": "location",
+    },
+    "pin": {
+        "map": "map",
+    },
+    "relation": {
+        "actor": "character",
+        "events": "event",
+        "characters": "character",
+        "objects": "object",
+        "locations": "location",
+        "species": "species",
+        "creatures": "creature",
+        "institutions": "institution",
+        "traits": "trait",
+        "collectives": "collective",
+        "zones": "zone",
+        "abilities": "ability",
+        "phenomena": "phenomenon",
+        "languages": "language",
+        "families": "family",
+        "titles": "title",
+        "constructs": "construct",
+        "narratives": "narrative",
+    },
+    "species": {
+        "nourishment": "species",
+        "reproduction": "construct",
+        "adaptations": "ability",
+        "traits": "trait",
+        "parent_species": "species",
+        "locations": "location",
+        "zones": "zone",
+        "affinities": "phenomenon",
+    },
+    "title": {
+        "issuer": "institution",
+        "body": "institution",
+        "superior_title": "title",
+        "holders": "character",
+        "symbols": "object",
+        "characters": "character",
+        "institutions": "institution",
+        "families": "family",
+        "zones": "zone",
+        "locations": "location",
+        "objects": "object",
+        "constructs": "construct",
+        "laws": "law",
+        "collectives": "collective",
+        "creatures": "creature",
+        "phenomena": "phenomenon",
+        "species": "species",
+        "languages": "language",
+    },
+    "trait": {
+        "anti_trait": "trait",
+        "empowered_abilities": "ability",
+    },
+    "zone": {
+        "phenomena": "phenomenon",
+        "linked_zones": "zone",
+        "populations": "collective",
+        "titles": "title",
+        "principles": "construct",
+    },
+}
+
+# type -> {generic link field: (type key, id key)}: the walk's names for the two keys that hold it.
+GENERIC_LINKS: dict[str, dict[str, tuple[str, str]]] = {
+    "pin": {"element": ("element_type", "element_id")},
+}
+
+# Prefixes of the extension keys a tool may add to any element (dist walk/lint_folder.py).
+EXTENSION_PREFIXES: tuple[str, ...] = ("x_", "atlas_", "shadow_")

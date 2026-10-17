@@ -256,6 +256,11 @@ wheels = [
 name = "onlyworlds"
 source = { editable = "." }
 
+[package.optional-dependencies]
+okf = [
+    { name = "pyyaml" },
+]
+
 [package.dev-dependencies]
 dev = [
     { name = "mypy" },
@@ -266,6 +271,8 @@ dev = [
 ]
 
 [package.metadata]
+requires-dist = [{ name = "pyyaml", marker = "extra == 'okf'", specifier = ">=6" }]
+provides-extras = ["okf"]
 
 [package.metadata.requires-dev]
 dev = [

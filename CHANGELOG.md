@@ -2,6 +2,12 @@
 
 The package version runs on its own semver; the schema it is generated from is `SCHEMA_DIST_TAG`.
 
+## 0.6.0 (2026-10-17)
+
+- **Export a world folder to Open Knowledge Format (OKF) v0.2** (`onlyworlds.okf`, Keel #191): `export_okf(folder, out_dir)` or `python -m onlyworlds.okf FOLDER OUT-DIR` writes one markdown concept per element (fields in the frontmatter, text under headings, links as bundle paths and as markdown links), the World as `world.md`, and an index per type. The same folder gives the same bytes. Nothing is left out in silence: a file the reader skipped, a key that is not a field of its type, or a link that is not an id or points at the wrong type is a note in the returned `OkfReport` (stderr from the command line). Ported from schema-dist's `walk/okf_export.py`, it reads through `read_folder` and the generated schema tables. It differs from the branch on purpose: no `generated` actor (OKF §7 asks for a `human:` actor on hand-written words, and a folder does not say who wrote them), in-prose `ow://` references become links into the bundle, and a text line that already begins with a backslash gets one more, so every escaped line reads back.
+- **PyYAML only for OKF**: the export needs the new `okf` extra (`pip install "onlyworlds[okf]"`). `import onlyworlds` still imports nothing outside the standard library.
+- **The schema module grows** (same pin, `v0.32.0-dist.23`): `BASE_FIELDS`, `WORLD_FIELDS`, `SECTIONS` (each type's fields under their schema groups, in order), `LINK_TARGETS`, `GENERIC_LINKS` and `EXTENSION_PREFIXES`, generated from the vendored walk like the rest and checked against `FIELD_KINDS` and `GENERIC_PAIRS` at generation.
+
 ## 0.5.1 (2026-10-17)
 
 - **The reader skips a dot-prefixed file in a type directory**, a tool's litter rather than an element, and lists it in `Folder.skipped`, even when it holds a valid body. Before, it was read like any file, and one that sorted first could stand in for the real element (Skeld's clarification of the folder spec, 2026-10-17).
