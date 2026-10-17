@@ -73,7 +73,7 @@ result = push("moppetopia-before", "moppetopia", api_key="ow_w_â€¦", pin="ow_s_â
 
 ## Export to OKF
 
-A world folder can be written as a bundle in [Open Knowledge Format](https://github.com/GoogleCloudPlatform/open-knowledge-format) (OKF) v0.2: one markdown file per element, with its fields in the frontmatter, its text under headings and its links as markdown links, plus an index per type. This needs PyYAML, which the rest of the package does not:
+A world folder can be written as a bundle in [Open Knowledge Format](https://github.com/GoogleCloudPlatform/open-knowledge-format) (OKF) v0.2: one markdown file per element, with its fields in the frontmatter, its text under headings and its links (in-prose `ow://` references included) as markdown links, plus an index per type. This needs PyYAML, which the rest of the package does not:
 
 ```bash
 pip install "onlyworlds[okf]"

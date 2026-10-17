@@ -24,12 +24,12 @@ Each element concept:
     theirs (`BigQuery Table`): `OnlyWorlds Character`. `title` is the element's
     name, `description` its description. Never `verified`: an export confirms
     nothing.
-  - `generated.by` is this exporter, a machine actor, and `generated.at` the
-    element's `updated_at`. OKF §7 asks for a `human:` actor on hand-authored
-    content; the words are the world's authors', but the bundle names no
-    author (the folder does not say who wrote what) and these files are
-    generated, so the machine actor is the true one. Consumers therefore read
-    the bundle as unverified (§5.3).
+  - no `generated` either. OKF §7 says producers MUST use a `human:` actor
+    for hand-authored content, and the words are the world's authors'; but
+    the folder does not say who wrote what, so a `human:` actor would be
+    invented and a machine actor would be false. With no trust frontmatter a
+    concept is unverified and still conformant (§5.3, §11). The exporter is
+    named once, in world.md's `onlyworlds_export` block.
   - scalar fields sit in the frontmatter under their OnlyWorlds names: `id`,
     `supertype`, `subtype`, `image_url` and every integer field. A field
     whose name OKF defines (§4.1, §5, §10: `status` and the like) would be
@@ -51,7 +51,12 @@ Each element concept:
   - unset values (the empty string, null, an empty list) are left out.
     Extension keys (`x_`, `atlas_`, `shadow_`) are carried as they are; the
     server and folder keys the package never pushes (``push.NOT_SENT``) are
-    not, except `updated_at` as `generated.at`.
+    not, `updated_at` included.
+  - an in-prose element reference in a text field, `[Label](ow://<type>/<id>)`
+    (folder format, in-prose references), becomes a relative link to that
+    element's concept, so a markdown viewer can follow it; one to an id the
+    folder does not hold stays as written and is listed in
+    ``OkfReport.unresolved``.
 
 world.md carries the World's schema fields (`time_current` read from
 `time_range_current` when only that spelling is present, folder format §5),
@@ -91,7 +96,6 @@ import sys
 import unicodedata
 from collections.abc import Callable, Mapping
 from dataclasses import dataclass, field
-from datetime import datetime
 from pathlib import Path
 from typing import Any
 
@@ -282,17 +286,6 @@ def escape_text(text: str) -> str:
     return "\n".join(out)
 
 
-def _timestamp(value: Any) -> str | None:
-    """An ISO 8601 datetime with an explicit offset (SPEC §5), else None."""
-    if not isinstance(value, str):
-        return None
-    try:
-        parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
-    except ValueError:
-        return None
-    return value if parsed.tzinfo is not None else None
-
-
 def _unset(value: Any) -> bool:
     return value is None or value == "" or value == []
 
@@ -301,12 +294,8 @@ def _fm_key(name: str) -> str:
     return f"ow_{name}" if name in OKF_KEYS else name
 
 
-def _generated(body: Mapping[str, Any]) -> dict[str, str]:
-    gen = {"by": EXPORTER}
-    at = _timestamp(body.get("updated_at"))
-    if at:
-        gen["at"] = at
-    return gen
+# An in-prose reference as a markdown link target (atlas `src/core/ow-links.ts`, OW_LINK_HREF_RE).
+_OW_LINK = re.compile(r"\]\(ow://([A-Za-z_]+)/([\w-]+)\)")
 
 
 class _Links:
@@ -329,8 +318,23 @@ class _Links:
             self.note(f"{self.here}: `{name}` -> a {actual}, expected {target}; left out")
             return None
         self.report.links += 1
-        rel = "../" + self.paths[eid] if "/" in self.here else self.paths[eid]
-        return "/" + self.paths[eid], f"[{_link_text(self.names[eid])}]({rel})"
+        return "/" + self.paths[eid], f"[{_link_text(self.names[eid])}]({self._rel(eid)})"
+
+    def _rel(self, eid: str) -> str:
+        return "../" + self.paths[eid] if "/" in self.here else self.paths[eid]
+
+    def prose(self, name: str, text: str) -> str:
+        """A text field's `](ow://<type>/<id>)` link targets as relative bundle paths; one to an
+        id the folder does not hold stays as written and is listed as unresolved."""
+
+        def swap(m: re.Match[str]) -> str:
+            eid = m.group(2)
+            if eid not in self.paths:
+                self.report.unresolved.append(f"{self.here}: `{name}` (prose) -> {eid}")
+                return m.group(0)
+            return f"]({self._rel(eid)})"
+
+        return _OW_LINK.sub(swap, text)
 
 
 # --- one element
@@ -355,7 +359,6 @@ def element_doc(
         fm["title"] = str(body["name"])
     if not _unset(body.get("description")):
         fm["description"] = str(body["description"])
-    fm["generated"] = _generated(body)
     known = set(NOT_SENT)
     for name in BASE_FIELDS:
         known.add(name)
@@ -403,7 +406,7 @@ def element_doc(
             kind = kinds[slug].get(name)
             if kind == "text":
                 open_section(section)
-                blocks.append(("text", f"## {_heading(name)}\n\n{escape_text(str(value))}"))
+                blocks.append(("text", f"## {_heading(name)}\n\n{links.prose(name, escape_text(str(value)))}"))
             elif kind == "integer":
                 fm[_fm_key(name)] = value
             elif kind == "single_link":
@@ -454,7 +457,6 @@ def world_doc(
         fm["title"] = str(world["name"])
     if not _unset(world.get("description")):
         fm["description"] = str(world["description"])
-    fm["generated"] = _generated(world)
     known = {*WORLD_DROPPED, "owner_character"}
     for name in WORLD_FIELDS:
         known.add(name)

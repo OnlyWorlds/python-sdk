@@ -175,7 +175,7 @@ def test_type_title_description(bundle: Bundle) -> None:
         assert fm["type"] == "OnlyWorlds " + src["type"].capitalize(), rel
         assert fm["title"] == src["name"], rel
         assert fm.get("description", "") == (src.get("description") or ""), rel
-        assert fm["generated"] == {"by": okf.EXPORTER, "at": src["updated_at"]}
+        assert "generated" not in fm, rel  # no actor: the folder does not say who wrote what (OKF §7)
         assert "verified" not in fm, rel
 
 
@@ -199,10 +199,15 @@ def test_scalars_and_extensions_match_source(bundle: Bundle) -> None:
 
 def test_text_fields_match_source(bundle: Bundle) -> None:
     checked = 0
+    path_of = {fm["id"]: rel for rel, (fm, _) in bundle.docs.items() if "id" in fm}
+
+    def prose(text: str) -> str:  # an in-prose ow:// target becomes the relative path of its concept
+        return re.sub(r"\]\(ow://[A-Za-z_]+/([\w-]+)\)", lambda m: f"](../{path_of[m.group(1)]})", text)
+
     for rel, (fm, body) in bundle.docs.items():
         src = bundle.sources[fm["id"]]
         expected = {
-            heading(name): escape_text(src[name])
+            heading(name): prose(escape_text(src[name]))
             for name in type_fields(src["type"])
             if FIELD_KINDS[src["type"]].get(name) == "text" and src.get(name)
         }
@@ -531,8 +536,36 @@ def test_nit_only_stderr_redirected(world: World) -> None:
     assert code == 0
 
 
-def test_nit_generated_by_is_explained() -> None:
+def test_in_prose_ow_links_point_into_the_bundle(bundle: Bundle) -> None:
+    """Hyperion's one-sentence narrative links three elements in its story as ow://: each becomes a
+    relative link to that element's concept, and no ow:// target is left in any body."""
+    rel, (_, body) = next((r, d) for r, d in bundle.docs.items() if r.startswith("narrative/a-world-in-a-sentence--"))
+    targets = re.findall(r"\]\(([^)]+)\)", body)
+    for t in ("../title/", "../institution/", "../character/"):
+        hit = [x for x in targets if x.startswith(t)]
+        assert hit and all((bundle.out / "narrative" / x).resolve().is_file() for x in hit), (rel, t)
+    assert not any("](ow://" in b for _, b in bundle.docs.values())
+
+
+def test_nit_an_ow_link_to_an_absent_id_stays_and_is_listed(world: World) -> None:
+    ghost = "00000000-0000-7000-8000-000000000000"
+    world.edit(
+        "elements/character/the-consul--*.json",
+        lambda b: b.update(background=f"See [nobody](ow://character/{ghost})."),
+    )
+    assert world.run()[0] == 0
+    _, body = world.doc("character/the-consul--*.md")
+    assert f"[nobody](ow://character/{ghost})" in body
+
+
+def test_nit_no_actor_is_explained() -> None:
     assert "human:" in (okf.__doc__ or "")
+
+
+def test_world_names_no_actor_and_the_exporter_once(bundle: Bundle) -> None:
+    fm, _ = split(bundle.files["world.md"].decode("utf-8"))
+    assert "generated" not in fm
+    assert fm["onlyworlds_export"]["exporter"] == okf.EXPORTER
 
 
 # --- the package's conditions
