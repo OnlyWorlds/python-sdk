@@ -73,7 +73,7 @@ result = push("moppetopia-before", "moppetopia", api_key="ow_w_â€¦", pin="ow_s_â
 
 ## Export to OKF
 
-A world folder can be written as a bundle in [Open Knowledge Format](https://github.com/GoogleCloudPlatform/open-knowledge-format) (OKF) v0.2: one markdown file per element, with its fields in the frontmatter, its text under headings and its links (in-prose `ow://` references included) as markdown links, plus an index per type. This needs PyYAML, which the rest of the package does not:
+A world folder can be exported as a valid [Open Knowledge Format](https://github.com/GoogleCloudPlatform/open-knowledge-format) (OKF) 0.2 bundle, as the spec stands at one pinned commit (`onlyworlds.okf.OKF_COMMIT`): one markdown file per element, with its fields in the frontmatter, its text under headings and its links (in-prose `ow://` references included) as markdown links, plus an index per type. This needs PyYAML, which the rest of the package does not:
 
 ```bash
 pip install "onlyworlds[okf]"
@@ -87,7 +87,7 @@ report = export_okf("moppetopia", "moppetopia-okf")
 print(report.elements, "elements,", len(report.notes), "notes")
 ```
 
-The output directory must not exist yet. Anything the export leaves out (a file that isn't an element, a key that isn't a field, a link to the wrong type) is listed in `report.notes`; the command prints these on stderr. The same folder always gives the same bytes.
+The output directory must not exist yet. Anything the export leaves out (a file that isn't an element, a key that isn't a field, a link to the wrong type) is listed in `report.notes`; the command prints these on stderr. The same folder always gives the same bytes. What a bundle never carries: the server's bookkeeping (`change_seq`, `created_at`, who wrote what) and the world's key, so a bundle is a copy to read elsewhere, not a folder to sync.
 
 ## Errors
 

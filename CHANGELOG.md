@@ -2,7 +2,7 @@
 
 The package version runs on its own semver; the schema it is generated from is `SCHEMA_DIST_TAG`.
 
-## 0.6.0 (unreleased)
+## 0.6.0 (2026-10-17)
 
 - **Export a world folder to Open Knowledge Format (OKF) v0.2** (`onlyworlds.okf`, Keel #191): `export_okf(folder, out_dir)` or `python -m onlyworlds.okf FOLDER OUT-DIR` writes one markdown concept per element (fields in the frontmatter, text under headings, links as bundle paths and as markdown links), the World as `world.md`, and an index per type. The same folder gives the same bytes. Nothing is left out in silence: a file the reader skipped, a key that is not a field of its type, or a link that is not an id or points at the wrong type is a note in the returned `OkfReport` (stderr from the command line). Ported from schema-dist's `walk/okf_export.py`, it reads through `read_folder` and the generated schema tables. It differs from the branch on purpose: no `generated` actor (OKF §7 asks for a `human:` actor on hand-written words, and a folder does not say who wrote them), in-prose `ow://` references become links into the bundle, and a text line that already begins with a backslash gets one more, so every escaped line reads back.
 - **PyYAML only for OKF**: the export needs the new `okf` extra (`pip install "onlyworlds[okf]"`). `import onlyworlds` still imports nothing outside the standard library.

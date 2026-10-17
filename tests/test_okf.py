@@ -28,11 +28,13 @@ yaml = pytest.importorskip("yaml", reason='onlyworlds.okf needs PyYAML: pip inst
 
 from onlyworlds import okf  # noqa: E402
 from onlyworlds._schema import (  # noqa: E402
+    BASE_FIELDS,
     EXTENSION_PREFIXES,
     FIELD_KINDS,
     GENERIC_LINKS,
     SCHEMA_VERSION,
     SECTIONS,
+    WORLD_FIELDS,
 )
 from onlyworlds.push import NOT_SENT  # noqa: E402
 
@@ -556,6 +558,25 @@ def test_nit_an_ow_link_to_an_absent_id_stays_and_is_listed(world: World) -> Non
     assert world.run()[0] == 0
     _, body = world.doc("character/the-consul--*.md")
     assert f"[nobody](ow://character/{ghost})" in body
+
+
+# Frontmatter keys an OnlyWorlds field takes as `ow_<name>`, because OKF gives that name a meaning.
+# None today; a schema bump that adds one fails the test below until it is added here and the
+# CHANGELOG says how that field is written (#360: decided, not found by a reader).
+OKF_RENAMED: frozenset[str] = frozenset()
+
+
+def test_no_frontmatter_field_takes_an_okf_key_unannounced() -> None:
+    """Every field the exporter writes into frontmatter (not text: that goes in the body) against
+    the keys OKF defines."""
+    frontmatter = (
+        {n for kinds in FIELD_KINDS.values() for n, kind in kinds.items() if kind != "text"}
+        | (set(BASE_FIELDS) - {"name", "description", "world"})
+        | (set(WORLD_FIELDS) - {"name", "description"})
+        | {n for links in GENERIC_LINKS.values() for n in links}
+    )
+    assert len(frontmatter) > 100, "the schema tables read as empty"
+    assert frontmatter & okf.OKF_KEYS == OKF_RENAMED
 
 
 def test_nit_no_actor_is_explained() -> None:
