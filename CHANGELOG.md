@@ -2,6 +2,13 @@
 
 The package version runs on its own semver; the schema it is generated from is `SCHEMA_DIST_TAG`.
 
+## Unreleased
+
+- **Folder format v0.3.9, the provenance lines (§4.2).** `export_world` writes two keys into `world.json`: `source`, `{server, world, at}` (the client's API origin, the world's id, and when the export began, as an ISO timestamp in UTC), and `exported_as`, `{kind, role, character}`, which slice the key reads. `exported_as` comes from `GET /me` through one function, `onlyworlds.export.exported_as`: an owner key gives `{"kind": "owner", "role": "owner", "character": null}`, a co-builder or contributor `{"kind": "member", "role": <its role>, "character": null}`, a guest of any kind (person, agent seat, player) `{"kind": "character", "role": "guest", "character": {"id", "name"}}` with the name read from `GET /character/{id}`. When `/me` is refused or missing, a guest has no Character, or its Character cannot be read, the key is left out: absent, never guessed. `FORMAT_VERSION` is now `"0.3.9"`; folders stamped `"0.3.8"` stay valid.
+- **`Client.me()`**: `GET /me`, who this key is (`{world, scope, kind, role, membership, character, name?}`).
+- **`write_folder` keeps `source` and `exported_as`** like any other world key, so a folder rewritten from a read one (a what-if branch) keeps its parent's verbatim.
+- **The OKF export carries `source` and `exported_as`** into `world.md`'s frontmatter as the folder holds them, beside `format_version`, `writable` and the `snapshot_*` keys, so a bundle made from one Character's slice still says so. Before, they would have been noted as not World fields and left out.
+
 ## 0.6.0 (2026-10-17)
 
 - **Export a world folder to Open Knowledge Format (OKF) v0.2** (`onlyworlds.okf`, Keel #191): `export_okf(folder, out_dir)` or `python -m onlyworlds.okf FOLDER OUT-DIR` writes one markdown concept per element (fields in the frontmatter, text under headings, links as bundle paths and as markdown links), the World as `world.md`, and an index per type. The same folder gives the same bytes. Nothing is left out in silence: a file the reader skipped, a key that is not a field of its type, or a link that is not an id or points at the wrong type is a note in the returned `OkfReport` (stderr from the command line). Ported from schema-dist's `walk/okf_export.py`, it reads through `read_folder` and the generated schema tables. It differs from the branch on purpose: no `generated` actor (OKF §7 asks for a `human:` actor on hand-written words, and a folder does not say who wrote them), in-prose `ow://` references become links into the bundle, and a text line that already begins with a backslash gets one more, so every escaped line reads back.

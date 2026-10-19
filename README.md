@@ -59,7 +59,9 @@ folder = read_folder("moppetopia")
 print(folder.world["name"], len(folder.elements), "elements")
 ```
 
-`write_folder(root, world, elements)` writes a folder from a world dict and a dict of element lists by type. Reading never changes a file, and a file without an id is skipped and left alone.
+An exported folder's `world.json` says where it came from and which part of the world it holds: `source` names the server, the world's id and when it was exported, and `exported_as` says whether the key read the whole world as its owner, as a member (with its role), or as one Character (a guest's slice). When the server can't say which (`GET /me` refused or missing), `exported_as` is left out rather than guessed.
+
+`write_folder(root, world, elements)` writes a folder from a world dict and a dict of element lists by type, keeping every key the world dict has. Reading never changes a file, and a file without an id is skipped and left alone.
 
 To send a folder's edits back, keep a copy exported before you edited, then push the difference:
 

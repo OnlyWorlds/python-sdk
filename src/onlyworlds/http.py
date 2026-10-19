@@ -391,6 +391,18 @@ class Client:
         """``GET /health``: the liveness pulse."""
         return self.call("GET", "health/")
 
+    def me(self) -> dict[str, Any]:
+        """``GET /me``: who this key is, ``{world, scope, kind, role, membership, character, name?}``.
+
+        ``kind`` is ``owner`` for an owner-minted or classic key, else the membership's (``person``,
+        ``agent``, ``player``); ``role`` is ``owner``, ``co_builder``, ``contributor`` or ``guest``;
+        ``character`` is the member's Character id, or None.
+        """
+        data = self.call("GET", "me/")
+        if not isinstance(data, dict):
+            raise ValueError(f"GET /me returned no object: {str(data)[:200]}")
+        return data
+
     def get_world(self) -> dict[str, Any]:
         """``GET /world``: the world's meta (name, calendar and time fields, ``public_read``)."""
         data = self.call("GET", "world/")

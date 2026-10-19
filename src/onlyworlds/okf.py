@@ -61,7 +61,10 @@ Each element concept:
 world.md carries the World's schema fields (`time_current` read from
 `time_range_current` when only that spelling is present, folder format §5),
 its extension keys, `owner_character` (as a link), `format_version`,
-`writable` and every `snapshot_*` key. The `api` block is dropped: it is a
+`writable`, the provenance lines `source` and `exported_as` (folder format
+v0.3.9: where the folder came from and which slice it is, so a bundle made
+from one Character's slice still says so) and every `snapshot_*` key, each
+as the folder holds it. The `api` block is dropped: it is a
 credential and a sync switch, not world content (folder format §4.1, the
 portable copy).
 
@@ -136,7 +139,7 @@ OKF_KEYS = frozenset(
     }
 )  # fmt: skip
 # world.json keys the folder format defines beside the schema's (§4.2, §5).
-WORLD_FOLDER_KEYS = ("format_version", "writable")
+WORLD_FOLDER_KEYS = ("format_version", "writable", "source", "exported_as")
 WORLD_DROPPED = ("api", *WIRE_TO_DISK_WORLD_KEYS)
 # Every break str.splitlines() honours: the reference parser splits the
 # frontmatter on these, so a string holding one is written double-quoted.

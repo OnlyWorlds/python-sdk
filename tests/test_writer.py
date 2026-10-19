@@ -73,6 +73,10 @@ def test_world_for_disk_rules() -> None:
     assert both["time_current"] == 2 and both["time_range_current"] == 1  # neither dropped
     kept = world_for_disk({"id": "w", "name": "n", "format_version": "0.3.4"})
     assert kept["format_version"] == "0.3.4"  # carried, never rewritten
+    src = {"server": "https://www.onlyworlds.com", "world": "w0", "at": "2026-10-19T10:00:00.000Z"}
+    slice_ = {"kind": "character", "role": "guest", "character": {"id": "c", "name": "Mira"}}
+    branch = world_for_disk({"id": "w", "name": "n", "source": src, "exported_as": slice_})
+    assert branch["source"] == src and branch["exported_as"] == slice_  # v0.3.9: a branch keeps its parent's
     linked = world_for_disk({"id": "w", "name": "n", "snapshot_counts": {"character": 9}})
     assert "snapshot_counts" not in linked  # v0.3.6: a non-snapshot MUST NOT carry it
     snap = world_for_disk({"id": "w", "name": "n", "snapshot_of": "s", "snapshot_counts": {"x": 9}}, {"character": 2})

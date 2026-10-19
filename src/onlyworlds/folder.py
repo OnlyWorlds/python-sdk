@@ -1,6 +1,6 @@
 """The OnlyWorlds world folder: filenames, the writer, the reader.
 
-Spec: OnlyWorlds Folder Format v0.3.8.
+Spec: OnlyWorlds Folder Format v0.3.9.
 Section numbers below are that document's.
 
 ::
@@ -55,7 +55,7 @@ __all__ = [
 ]
 
 #: The spec version this module writes and reads against (§4.2 ``format_version``).
-FORMAT_VERSION = "0.3.8"
+FORMAT_VERSION = "0.3.9"
 
 ELEMENTS_DIR = "elements"
 WORLD_FILE = "world.json"
@@ -175,6 +175,9 @@ def world_for_disk(world: Mapping[str, Any], counts: Mapping[str, int] | None = 
       removed otherwise.
     - ``format_version`` is written at a folder's birth; a value already carried
       is kept, never rewritten.
+    - ``source`` and ``exported_as`` (§4.2, v0.3.9) are carried like any key, so a
+      folder rewritten from a read one keeps its parent's verbatim; ``export_world``
+      is what writes them fresh.
     """
     wid = world.get("id")
     if not isinstance(wid, str) or not wid:

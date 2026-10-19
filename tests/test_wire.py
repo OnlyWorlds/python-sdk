@@ -76,6 +76,7 @@ def _recorder() -> tuple[Client, FakeTransport]:
 def test_every_route_and_query_parameter_the_client_sends_exists(doc: dict[str, Any]) -> None:
     c, t = _recorder()
     c.health()
+    c.me()
     c.get_world()
     c.patch_world({"name": "x"})
     c.bulk([{"type": "character", "element": {"name": "x"}}])

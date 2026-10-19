@@ -432,6 +432,8 @@ def test_2_4_world_keys_carried(world: World) -> None:
         snapshot_label="ch05",
         snapshot_counts={"character": 3},
         writable=False,
+        source={"server": "https://www.onlyworlds.com", "world": "w", "at": "2026-10-19T10:00:00.000Z"},
+        exported_as={"kind": "character", "role": "guest", "character": {"id": consul_id, "name": "The Consul"}},
         api={"world_id": "w", "api_key": "secret"},
     )
     world_path.write_text(json.dumps(data), encoding="utf-8")
@@ -440,7 +442,10 @@ def test_2_4_world_keys_carried(world: World) -> None:
     fm, _ = split((world.out / "world.md").read_text(encoding="utf-8"))
     assert fm["time_current"] == 7
     assert "time_range_current" not in fm
-    for key in ("x_calendar", "atlas_style", "snapshot_label", "snapshot_counts", "writable", "format_version"):
+    for key in (
+        "x_calendar", "atlas_style", "snapshot_label", "snapshot_counts", "writable", "format_version", "source",
+        "exported_as",
+    ):  # fmt: skip
         assert fm[key] == data[key], key
     assert fm["owner_character"] == "/character/" + consul.stem + ".md"
     assert "api" not in fm
