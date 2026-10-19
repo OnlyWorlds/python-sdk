@@ -4,6 +4,8 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+- **`is_resync_required`** names every case keel sends it for since its hidden mark (keel #421), not only a guest's; a `/changes` delete row carries `reason` (`deleted`, `hidden`, `out_of_view`), read as any other key of the row.
+
 ## 0.7.1 (2026-10-20)
 
 - **The reset rule says keep.** `ApiError.is_resync_required` and the feed's docstring: on a 409 `resync_required`, walk again from the start and keep what the local copy holds that the new walk does not name; a reset never empties a copy. They said replace. Keel says keep since PR 104 (the Captain's ruling, 2026-10-20: sharing is forward-only). Nothing in the package acted on it, so no behaviour changes.
