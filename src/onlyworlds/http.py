@@ -451,12 +451,21 @@ class Client:
         expand: Sequence[str] | None = None,
         fields: Sequence[str] | None = None,
         filter: Mapping[str, str | int | bool] | None = None,
+        view_as: str | None = None,
     ) -> dict[str, Any]:
         """``GET /{type}``: one cursor page, ``{data, has_more, next_cursor}``.
 
         ``expand`` replaces the named links' ids with stubs one level deep; ``fields`` keeps
         only the named keys. Only ``name__icontains``, ``supertype`` and ``subtype`` filter
         (anything else is a 422 naming it); ``ordering`` is a 422 too. Filter or sort here.
+
+        ``view_as`` (keel #421, sent as ``as``) reads as another reader of this world would: a
+        membership id (a person, an agent seat or a player seat) as that member's own key, a
+        Character id as a guest of that Character with no membership, ``"public"`` as everything
+        not hidden. The owner's keys only (a key with no member): a member key gets 403
+        ``view_as_owner_only`` (``is_view_as_owner_only``). An element hidden from that reader
+        is 404, never 410; an unknown value is 422 (``param`` as). Only while keel's hidden mark
+        is on; until then keel answers 422 (an unknown parameter).
         """
         t = _segment(element_type, _TYPE, "element type")
         query = self._query(
@@ -466,6 +475,7 @@ class Client:
                 "expand": ",".join(expand) if expand else None,
                 "fields": ",".join(fields) if fields else None,
                 **(filter or {}),
+                "as": view_as,
             }
         )
         page = self.call("GET", f"{t}/?{query}")
@@ -481,11 +491,14 @@ class Client:
         expand: Sequence[str] | None = None,
         fields: Sequence[str] | None = None,
         filter: Mapping[str, str | int | bool] | None = None,
+        view_as: str | None = None,
     ) -> Iterator[dict[str, Any]]:
-        """Every element of a type, walking the cursor pages."""
+        """Every element of a type, walking the cursor pages. ``view_as``: see ``list_page``."""
         cursor: str | None = None
         while True:
-            page = self.list_page(element_type, limit=limit, cursor=cursor, expand=expand, fields=fields, filter=filter)
+            page = self.list_page(
+                element_type, limit=limit, cursor=cursor, expand=expand, fields=fields, filter=filter, view_as=view_as
+            )
             yield from page.get("data", [])
             if not page.get("has_more"):
                 return
@@ -500,12 +513,18 @@ class Client:
         *,
         expand: Sequence[str] | None = None,
         fields: Sequence[str] | None = None,
+        view_as: str | None = None,
     ) -> dict[str, Any]:
-        """``GET /{type}/{id}``."""
+        """``GET /{type}/{id}``. ``view_as`` (keel #421, sent as ``as``): see ``list_page``; an
+        element hidden from that reader is 404, never 410."""
         t = _segment(element_type, _TYPE, "element type")
         i = _segment(element_id, _ID, "element id")
         query = self._query(
-            {"expand": ",".join(expand) if expand else None, "fields": ",".join(fields) if fields else None}
+            {
+                "expand": ",".join(expand) if expand else None,
+                "fields": ",".join(fields) if fields else None,
+                "as": view_as,
+            }
         )
         return self._element(self.call("GET", f"{t}/{i}/" + (f"?{query}" if query else "")), "GET", t)
 

@@ -5,6 +5,7 @@ The package version runs on its own semver; the schema it is generated from is `
 ## Unreleased
 
 - **`is_resync_required`** names every case keel sends it for since its hidden mark (keel #421), not only a guest's; a `/changes` delete row carries `reason` (`deleted`, `hidden`, `out_of_view`), read as any other key of the row.
+- **`view_as=`** on `get`, `list_page` and `iter_elements`, sent as `as` (keel #421, view as): the owner's key reads as a member (a membership id), as a Character's guest (a Character id) or as the public (`"public"`). A member key gets 403 `view_as_owner_only` (`is_view_as_owner_only`); an element hidden from that reader is 404, never 410; an unknown value is 422. Until keel's hidden mark is on, keel answers 422 (an unknown parameter).
 
 ## 0.7.1 (2026-10-20)
 

@@ -72,6 +72,25 @@ def test_list_query_is_built_not_concatenated(make_client: MakeClient) -> None:
     assert q == "limit=5&cursor=a%20b%26c%3D1&expand=friends,location&fields=name&name__icontains=x%20y&supertype=s"
 
 
+def test_view_as_is_sent_as_as_on_get_and_list_and_only_when_given(make_client: MakeClient) -> None:
+    page = {"data": [], "has_more": False, "next_cursor": None}
+    t = FakeTransport(handler=lambda *a: jresp(200, {"id": ID, "name": "K", **page}))
+    c = make_client(t)
+    c.list_page("character", limit=5, filter={"supertype": "s"}, view_as="public")
+    list(c.iter_elements("character", limit=5, view_as=ID))
+    c.get("character", ID, fields=["name"], view_as="public")
+    c.list_page("character", limit=5)
+    c.get("character", ID)
+    queries = [x.url.split("?", 1)[1] if "?" in x.url else "" for x in t.calls]
+    assert queries == [
+        "limit=5&supertype=s&as=public",
+        f"limit=5&as={ID}",
+        "fields=name&as=public",
+        "limit=5",
+        "",
+    ]
+
+
 def test_default_page_size_is_the_clients(make_client: MakeClient) -> None:
     t = FakeTransport(script=[jresp(200, {"data": [], "has_more": False, "next_cursor": None})])
     make_client(t).list_page("map")
@@ -250,6 +269,7 @@ def test_a_feed_that_says_more_without_moving_is_refused(make_client: MakeClient
         (409, "idempotency_error", "idempotency_error", "is_idempotency_conflict"),
         (403, "permission_error", "not_author", "is_not_author"),
         (403, "permission_error", "owner_only", "is_owner_only"),
+        (403, "permission_error", "view_as_owner_only", "is_view_as_owner_only"),
         (503, "api_error", "server_busy", "is_busy"),
         (401, "authentication_error", "key_revoked", "is_auth_error"),
         (422, "invalid_request", "invalid_field", "is_validation_error"),
@@ -263,6 +283,7 @@ def test_each_error_has_its_own_flag_and_no_other(
         "is_idempotency_conflict",
         "is_not_author",
         "is_owner_only",
+        "is_view_as_owner_only",
         "is_busy",
         "is_auth_error",
         "is_validation_error",

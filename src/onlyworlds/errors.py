@@ -121,6 +121,13 @@ class ApiError(Exception):
         return self.status == 403 and self.code == "owner_only"
 
     @property
+    def is_view_as_owner_only(self) -> bool:
+        """A member key sent ``view_as`` (403 ``view_as_owner_only``, keel #421): reading as another
+        reader is the owner's, from a key with no member. Only while keel's hidden mark is on; until
+        then ``as`` is an unknown parameter (422)."""
+        return self.status == 403 and self.code == "view_as_owner_only"
+
+    @property
     def is_permission_error(self) -> bool:
         """The key is valid but lacks the scope (403 ``permission_error``): a read key on a write
         route, or a member key on a surface that refuses members. Retrying will not help."""
