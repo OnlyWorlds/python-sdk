@@ -4,6 +4,8 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+## 0.7.0 (2026-10-19)
+
 - **Folder format v0.3.9, the provenance lines (§4.2).** `export_world` writes two keys into `world.json`: `source`, `{server, world, at}` (the client's API origin, the world's id, and when the export began, as an ISO timestamp in UTC), and `exported_as`, `{kind, role, character}`, which slice the key reads. `exported_as` comes from `GET /me` through one function, `onlyworlds.export.exported_as`: an owner key gives `{"kind": "owner", "role": "owner", "character": null}`, a co-builder or contributor `{"kind": "member", "role": <its role>, "character": null}`, a guest of any kind (person, agent seat, player) `{"kind": "character", "role": "guest", "character": {"id", "name"}}` with the name read from `GET /character/{id}`. When `/me` is refused or missing, a guest has no Character, or its Character cannot be read, the key is left out: absent, never guessed. `FORMAT_VERSION` is now `"0.3.9"`; folders stamped `"0.3.8"` stay valid.
 - **`Client.me()`**: `GET /me`, who this key is (`{world, scope, kind, role, membership, character, name?}`).
 - **`write_folder` keeps `source` and `exported_as`** like any other world key, so a folder rewritten from a read one (a what-if branch) keeps its parent's verbatim.

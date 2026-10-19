@@ -38,7 +38,7 @@ _UNAVAILABLE = (ApiError, ConnectionError, OSError, ValueError)
 def exported_as(me: Mapping[str, Any] | None, character_name: Callable[[str], str | None]) -> dict[str, Any] | None:
     """The ``exported_as`` line (§4.2, v0.3.9) for a ``GET /me`` answer, or None: write none.
 
-    The one place the mapping lives (pending the spec owner's confirmation):
+    The one place the mapping lives (the spec owner's table, Skeld h50 #7910):
 
     - ``kind: owner`` (an owner-minted or classic key) -> owner, role owner, no character;
     - a member with role ``co_builder`` or ``contributor`` -> member, its role, no character;
