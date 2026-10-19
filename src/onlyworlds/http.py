@@ -259,10 +259,12 @@ class ChangeWalk:
     incremental pull (pass back exactly what you got: never parse or build one) and ``head``
     is the world's current ``change_seq``.
 
-    A stored cursor can be refused: ``ApiError.is_resync_required`` (409), when a guest's view
-    of the world changed or the key's role did. Then drop the cursor, walk again from the
-    start, and keep what the local copy holds that the new walk does not name: a reset never
-    empties a copy (keel PR 104; sharing is forward-only).
+    A stored cursor can be refused: ``ApiError.is_resync_required`` (409), when what the key
+    may see changed (a guest's slice, an element unhidden from a contributor: keel #421) or
+    its role did. Then drop the cursor, walk again from the start, and keep what the local
+    copy holds that the new walk does not name: a reset never empties a copy (keel PR 104;
+    sharing is forward-only). A delete op's ``reason`` (``deleted``, ``hidden``,
+    ``out_of_view``) says why it left; remove it in every case.
     """
 
     def __init__(self, client: Client, since: str | None = None, *, limit: int | None = None):
@@ -642,7 +644,9 @@ class Client:
         return BulkResult(bool(data.get("errors")), data["items"], replay, data)
 
     def changes(self, *, since: str | None = None, limit: int | None = None) -> dict[str, Any]:
-        """``GET /changes``: one page of the ordered change feed, ``{cursor, changes, has_more, head}``.
+        """``GET /changes``: one page of the ordered change feed,
+        ``{cursor, changes, has_more, head, epoch}`` (``epoch``: a guest's or a contributor's
+        view epoch, else null).
 
         The cursor is opaque and never expires. No ``since`` is a full export. It is the
         heaviest route on the platform: keep ``limit`` polite.
