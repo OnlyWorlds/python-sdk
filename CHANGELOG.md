@@ -4,6 +4,10 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+## 0.10.1 (2026-10-20)
+
+Folder format v0.3.11 (§3.3: a re-key never rewrites `x_identity_key`, the cross-world identity convention's key, Council #451). Nothing here re-keys, so the writer's behaviour is unchanged; `FORMAT_VERSION` and the `format_version` a written folder declares move to `0.3.11`.
+
 ## 0.10.0 (2026-10-20)
 
 Public fields on a known-of stub (keel PR 117, Keel #448), live in production. The schema is repinned to schema-dist `v0.32.1-dist.28` (canonical `00.32.01`; only `presentation.json` and its manifest moved), ahead of `@onlyworlds/sdk`'s dist.27 pin.
