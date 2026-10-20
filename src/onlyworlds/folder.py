@@ -122,6 +122,7 @@ def known_of_for_disk(body: Mapping[str, Any]) -> dict[str, Any]:
 ELEMENTS_DIR = "elements"
 WORLD_FILE = "world.json"
 LEGACY_SPATIAL_DIR = "spatial"
+RECORDS_DIR = "records"  # §4.5: world data that is not elements; this reader never opens it
 LEGACY_SPATIAL_TYPES: tuple[str, ...] = ("map", "pin", "zone", "marker")
 
 #: What every importer's --help ends with: the ids an import writes are its source's, so a source goes
