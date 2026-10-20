@@ -11,6 +11,9 @@ name: release
 # install from PyPI reads the public demo world.
 #
 # Grant: the Captain, 2026-10-11 (OW Infra h37 #3053): releases are the maintainer's.
+#
+# Once PyPI serves it, a last job makes the tag a GitHub release, its body the version's
+# CHANGELOG entry: the shared What's new page reads GitHub releases (OW Infra h37 #8766).
 
 on:
   push:
@@ -115,3 +118,19 @@ jobs:
           assert onlyworlds.__version__ == '$v', onlyworlds.__version__
           print(Client('0000000001').get_world()['name'])
           "
+
+  github-release:
+    needs: verify
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: The tag becomes a GitHub release, its body this version's CHANGELOG entry
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          v="${GITHUB_REF_NAME#v}"
+          awk -v h="$v" '$1=="##" { if (f) exit; if ($2==h) { f=1; next } } f' CHANGELOG.md > notes.md
+          grep -q '[^[:space:]]' notes.md || { echo "CHANGELOG.md's '## $v' entry is empty"; exit 1; }
+          gh release create "$GITHUB_REF_NAME" --verify-tag --title "onlyworlds $v" --notes-file notes.md
