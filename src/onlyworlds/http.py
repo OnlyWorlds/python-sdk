@@ -261,10 +261,14 @@ class ChangeWalk:
 
     A stored cursor can be refused: ``ApiError.is_resync_required`` (409), when what the key
     may see changed (a guest's slice, an element unhidden from a contributor: keel #421) or
-    its role did. Then drop the cursor, walk again from the start, and keep what the local
-    copy holds that the new walk does not name: a reset never empties a copy (keel PR 104;
-    sharing is forward-only). A delete op's ``reason`` (``deleted``, ``hidden``,
-    ``out_of_view``) says why it left; remove it in every case.
+    its role did. Then drop the cursor and walk again from the start. What the local copy
+    holds that the new walk does not name follows ``ApiError.resync_reason`` (keel #421, while
+    keel's hidden mark is on): ``role`` (the key's own role or membership moved), keep it;
+    ``view`` (something left its view), drop it; no reason, keep it: a reset never empties a
+    copy (keel PR 104; sharing is forward-only). A guest never receives delete ops, so the
+    409 is its only sign that something left. A delete op's ``reason`` (``deleted``,
+    ``hidden``, ``out_of_view``) says why it left; remove it in every case. Never empty a
+    copy on your own.
     """
 
     def __init__(self, client: Client, since: str | None = None, *, limit: int | None = None):
@@ -665,7 +669,10 @@ class Client:
     def changes(self, *, since: str | None = None, limit: int | None = None) -> dict[str, Any]:
         """``GET /changes``: one page of the ordered change feed,
         ``{cursor, changes, has_more, head, epoch}`` (``epoch``: a guest's or a contributor's
-        view epoch, else null).
+        view epoch, else null). While keel's hidden mark is on, ``epoch_reason`` sits beside
+        ``epoch`` (keel #421): why the epoch last moved, ``role`` (keep what a walk from the
+        start no longer names) or ``view`` (drop it), null when ``epoch`` is. It names the last
+        move only; a 409's ``resync_reason`` covers every move since your cursor.
 
         The cursor is opaque and never expires. No ``since`` is a full export. It is the
         heaviest route on the platform: keep ``limit`` polite.

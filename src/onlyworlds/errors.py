@@ -138,9 +138,25 @@ class ApiError(Exception):
         """``/changes`` refused the cursor (409 ``resync_required``): what this key may see changed
         (a guest's slice moved; an element hidden from a contributor was unhidden; the key's role
         moved to or from guest or contributor, whose cursors have other shapes; keel #421). Drop the
-        cursor, walk again from the start, and keep what the local copy holds that the new walk does
-        not name: a reset never empties a copy (keel PR 104; sharing is forward-only)."""
+        cursor and walk again from the start. What to do with what the local copy holds that the new
+        walk does not name is ``resync_reason``'s: ``role``, keep it; ``view``, drop it. Without a
+        reason (keel's hidden mark off), keep it: a reset never empties a copy (keel PR 104; sharing
+        is forward-only). Never empty the copy on your own."""
         return self.status == 409 and self.code == "resync_required"
+
+    @property
+    def resync_reason(self) -> str | None:
+        """Why ``/changes`` refused the cursor, from the 409 ``resync_required`` envelope's ``reason``
+        (keel #421, only while keel's hidden mark is on): ``"role"`` (this key's own role or membership
+        moved: keep what the local copy holds that the new walk does not name; it is out of view now,
+        not gone) or ``"view"`` (something left this key's view: a delete, a hide, an unhide, a
+        Character change; drop what the new walk does not name). When both happened since the
+        cursor, keel says ``"role"``. None for any other error, or when keel sends no reason."""
+        if not self.is_resync_required:
+            return None
+        raw_error = _envelope(self.response.body).get("error")
+        reason = raw_error.get("reason") if isinstance(raw_error, dict) else None
+        return reason if reason in ("role", "view") else None
 
     @property
     def is_busy(self) -> bool:

@@ -312,6 +312,21 @@ def test_a_409_without_a_code_is_neither_conflict() -> None:
     assert (e.is_id_conflict, e.is_idempotency_conflict) == (False, False)
 
 
+def test_resync_reason_reads_the_409_envelope() -> None:
+    """keel #421, keel PR 103: with the hidden mark on, the 409 resync_required says why in ``reason``."""
+    for reason in ("role", "view"):
+        body = {"error": {"type": "invalid_request", "code": "resync_required", "message": "m", "param": "since",
+                          "doc_url": "https://x/resync_required", "reason": reason}}
+        e = ApiError("GET", "changes/", jresp(409, body))
+        assert (e.is_resync_required, e.resync_reason) == (True, reason)
+    plain = ApiError("GET", "changes/", env(409, "invalid_request", "resync_required"))
+    assert (plain.is_resync_required, plain.resync_reason) == (True, None)
+    odd = {"error": {"code": "resync_required", "reason": "something"}}
+    assert ApiError("GET", "changes/", jresp(409, odd)).resync_reason is None
+    other = {"error": {"type": "invalid_request", "code": "id_conflict", "reason": "role"}}
+    assert ApiError("POST", "bulk/", jresp(409, other)).resync_reason is None
+
+
 def test_retry_after_is_strict() -> None:
     assert parse_retry_after("5") == 5.0 and parse_retry_after(" 30 ") == 30.0
     for bad in ["1.5", "-1", "+5", "5.0", "soon", "", None]:
