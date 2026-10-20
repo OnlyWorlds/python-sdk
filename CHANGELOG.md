@@ -4,6 +4,10 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+## 0.8.1 (2026-10-20)
+
+- **The schema**, repinned to schema-dist `v0.32.1-dist.26` (canonical `00.32.01`, the Captain's word, h55 #8395): one description changed, an Event's `characters` are the Characters who know about it (present, aware or involved). `SCHEMA_VERSION` is `00.32.01`; `ELEMENT_TYPES` and `FIELD_KINDS` are unchanged. Equal to `@onlyworlds/sdk` 4.38.0's pin.
+
 ## 0.8.0 (2026-10-20)
 
 The hidden mark (keel #421), live in production since 2026-10-20 09:24.

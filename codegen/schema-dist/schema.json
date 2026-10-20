@@ -900,7 +900,7 @@
         "name": "characters",
         "kind": "multi",
         "target": "character",
-        "desc": "Key characters relevant to the event",
+        "desc": "Characters who know about the event: they were present, aware of it, or involved in it",
         "section": "Involves",
         "required": false
       },

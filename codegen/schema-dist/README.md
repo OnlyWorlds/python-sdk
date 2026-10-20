@@ -11,6 +11,7 @@ The files here are generated. The OnlyWorlds platform rebuilds and publishes the
 | `schema.json` | the decoded schema: every field of every type with its kind, link target and description. Plain JSON, so any language or engine reads it without Python or a YAML parser |
 | `schema/*.yaml` | the 22 element types, `base_properties` and `world`: the same content as the standard's YAML. The bytes differ (LF line endings, blank lines), the parsed data does not |
 | `example/hyperion/` | Hyperion, the public example world, as a world folder. Every file in it passes the decoded schema |
+| `example/world-export.json` | the world-export envelope (`format: onlyworlds-world-export`, the portal's one-file download) for one small fixed world: a single link, a multi-link, an extension field. It is the emitter's own output, pinned by a keel test, so a reader of the envelope tests against the real shape |
 | `presentation.json` | default family and icon per type, and the four family colours as light/dark pairs. Defaults: tools may override them. The colours were checked for colour-vision deficiency, so re-run that check before changing one |
 | `walk/schema_walk.py` | the reference decoder, in Python: reads the YAML and returns each type's fields. `schema.json` is its output. One module; its only dependency is PyYAML |
 | `walk/rulings.yaml` | rulings the YAML cannot carry (nullability, empty strings, extension fields). Code in any language should follow these rows |
@@ -33,7 +34,7 @@ Each field has a `kind`, explained in `kinds` at the top of the file:
 - `generic`: a link to an element of any type. Only `pin.element` has it. In data it is two keys, `element_type` (the type's slug, such as `"character"`) and `element_id` (the UUID), both set or both null; `type_key` and `id_key` name them.
 - `list`: an array (World fields only); `items` gives the kind of each entry.
 
-Only `id` and `name` are required. Element bodies read from the API also carry keys the schema does not declare: `type`, `created_at`, `updated_at`, `change_seq` and `created_by`, all set by the server. Fields starting `x_` (and the tool prefixes `atlas_`, `shadow_`) are extensions, which a tool keeps and writes back unchanged. `walk/rulings.yaml` has the rest.
+Only `id` and `name` are required. Element bodies read from the API also carry keys the schema does not declare: `type`, `created_at`, `updated_at`, `change_seq`, `created_by`, `changed_by` and `changed_via`, all set by the server. Fields starting `x_` (and the tool prefixes `atlas_`, `shadow_`) are extensions, which a tool keeps and writes back unchanged. `walk/rulings.yaml` has the rest.
 
 ## The example world
 
@@ -71,7 +72,7 @@ One line per problem (`elements/creature/x.json: `characters` is not a field of 
 
 ## Versions
 
-`VERSION` holds `key: value` lines; it is not a bare version string. The canonical version is written zero-padded there and without the padding in tags: canonical `00.32.00` is tagged `v0.32.0-dist.<serial>`. The serial counts publishes of the same canonical version, such as a presentation fix or a new ruling.
+`VERSION` holds `key: value` lines; it is not a bare version string. The canonical version is written zero-padded there and without the padding in tags: canonical `00.32.01` is tagged `v0.32.1-dist.<serial>`. The serial counts publishes of the same canonical version, such as a presentation fix or a new ruling.
 
 ## Pinning
 
