@@ -62,9 +62,10 @@ __all__ = [
 FORMAT_VERSION = "0.3.10"
 
 #: §4.4 (v0.3.10; keel PR 113): the stub marker. keel hands a guest an element it reaches only
-#: through its own Character's sheet as a stub, ``known_of: true``, every field but these unset.
+#: through its own Character's sheet as a stub, ``known_of: true``: these keys, its type's public
+#: fields with their values (keel PR 117, Keel #448: ``PUBLIC_FIELDS``), every other field unset.
 KNOWN_OF = "known_of"
-#: The keys a stub keeps (§4.4, keel's ``KNOWN_OF_KEEPS``); a writer writes these and ``known_of`` only.
+#: The keys every stub keeps (§4.4, keel's ``KNOWN_OF_BASE``): written even when empty.
 KNOWN_OF_KEEPS: frozenset[str] = frozenset(
     {"id", "type", "name", "description", "supertype", "subtype", "image_url", "created_at", "updated_at", "change_seq"}
 )
@@ -79,13 +80,22 @@ def is_known_of(body: Mapping[str, Any]) -> bool:
     return body.get(KNOWN_OF) is True
 
 
+def _is_set(value: Any) -> bool:
+    """A value is anything but ``""``, ``None`` and ``[]``: ``0`` and ``False`` are values."""
+    return not (value is None or (isinstance(value, str) and value == "") or (isinstance(value, list) and not value))
+
+
 def known_of_for_disk(body: Mapping[str, Any]) -> dict[str, Any]:
-    """A stub as §4.4 writes it: the kept keys in received order, then ``known_of: true``.
+    """A stub as §4.4 writes it, its keys in received order, then ``known_of: true``: every
+    ``KNOWN_OF_KEEPS`` key, and every other key the server sent with a value.
 
     The unset fields keel serves (``""``, ``null``, ``[]``) are left out, never written:
-    on disk they would read as a whole element with nothing filled in.
+    on disk they would read as a whole element with nothing filled in. Anything else it
+    sent is kept, whatever the field (a Character's public ``physicality``, ``height``,
+    ``species``: keel PR 117), since a writer never drops data it has (§3). This reads the
+    body, never ``PUBLIC_FIELDS``, so a type that gains public fields needs no change here.
     """
-    out = {k: v for k, v in body.items() if k in KNOWN_OF_KEEPS}
+    out = {k: v for k, v in body.items() if k != KNOWN_OF and (k in KNOWN_OF_KEEPS or _is_set(v))}
     out[KNOWN_OF] = True
     return out
 
@@ -240,7 +250,8 @@ def write_folder(
     Bodies are written whole and untouched: no field stripped, added or reordered
     (§3.3 binds foreign values byte-for-byte, §4.2 keeps server-managed fields).
     The one exception is a stub (``known_of: true``, §4.4): it is written as it is,
-    its kept keys and ``known_of`` only, never its unset fields (``known_of_for_disk``).
+    its kept keys, the fields it holds a value for and ``known_of``, never its unset
+    fields (``known_of_for_disk``).
     Within a type, a repeated id keeps its LAST body (id-keyed overwrite, the
     spec's answer to a keyset walk that met a mid-walk write), so a stub that later
     arrives whole is written whole, without ``known_of`` (§4.4 rule 4). The same id

@@ -287,6 +287,7 @@ def test_each_error_has_its_own_flag_and_no_other(
         "is_busy",
         "is_auth_error",
         "is_validation_error",
+        "is_known_of_not_writable",
     ]
     t = FakeTransport(script=[env(status, etype, code)])
     with pytest.raises(ApiError) as caught:
@@ -294,6 +295,13 @@ def test_each_error_has_its_own_flag_and_no_other(
     e = caught.value
     assert (e.status, e.type, e.code) == (status, etype, code) and e.doc_url == f"https://x/{code}"
     assert [f for f in flags if getattr(e, f)] == [flag]
+
+
+def test_known_of_not_writable_is_a_validation_error_with_its_own_flag() -> None:
+    e = ApiError("PATCH", "x", jresp(422, {"error": {"code": "known_of_not_writable", "param": "known_of"}}))
+    assert (e.is_known_of_not_writable, e.is_validation_error, e.param) == (True, True, "known_of")
+    other = ApiError("PATCH", "x", jresp(422, {"error": {"code": "invalid_field"}}))
+    assert (other.is_known_of_not_writable, other.is_validation_error) == (False, True)
 
 
 def test_flat_and_unparseable_envelopes(make_client: MakeClient) -> None:

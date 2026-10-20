@@ -15,6 +15,7 @@ from conftest import FakeTransport, jresp
 from onlyworlds import (
     FORMAT_VERSION,
     KNOWN_OF_KEEPS,
+    PUBLIC_FIELDS,
     Client,
     export_world,
     is_known_of,
@@ -23,6 +24,7 @@ from onlyworlds import (
     read_folder,
     write_folder,
 )
+from onlyworlds.folder import known_of_for_disk
 from onlyworlds.http import Response
 
 MakeClient = Callable[..., Client]
@@ -111,6 +113,55 @@ def test_export_writes_a_served_stub_as_a_stub(tmp_path: Path, make_client: Make
     assert set(dev_file(tmp_path / "out")) == KEPT | {"known_of"}
     f = read_folder(tmp_path / "out")
     assert f.known_of == [DEV] and not f.elements[MARA].known_of
+
+
+# keel PR 117 (Keel #448): a stub also carries its type's public fields, with their values.
+SPECIES = "s0000000-0000-7000-8000-000000000001"
+
+
+def public_stub_dev(**kw: Any) -> dict[str, Any]:
+    """Dev as keel serves him since PR 117: the public fields in their wire place, every key sent."""
+    body = stub_dev()
+    body.pop("known_of")
+    body.update({"physicality": "Tall", "height": 180, "weight": None, "species": [SPECIES], "reputation": "", **kw})
+    body["known_of"] = True
+    return body
+
+
+def test_public_fields_come_from_the_dist() -> None:
+    assert PUBLIC_FIELDS["character"] == ("physicality", "height", "weight", "species", "reputation")
+    assert len(PUBLIC_FIELDS) == 22 and all(PUBLIC_FIELDS[t] == () for t in PUBLIC_FIELDS if t != "character")
+
+
+def test_a_stub_keeps_every_field_sent_with_a_value() -> None:
+    out = known_of_for_disk(public_stub_dev())
+    assert out["physicality"] == "Tall" and out["height"] == 180 and out["species"] == [SPECIES]
+    for unset in ("weight", "reputation", "location", "friends", "STR", "created_by", "changed_via"):
+        assert unset not in out, unset  # "", null, [] never written
+    assert out["subtype"] == "" and out["image_url"] is None  # the kept keys, even when empty
+    assert list(out) == [k for k in public_stub_dev() if k in out]  # received order, known_of last
+
+
+def test_zero_and_false_are_values_null_and_empty_are_not() -> None:
+    out = known_of_for_disk(public_stub_dev(height=0, species=[], weight=None, x_flag=False))
+    assert out["height"] == 0 and out["x_flag"] is False
+    assert "species" not in out and "weight" not in out
+
+
+def test_the_rule_reads_the_body_not_public_fields() -> None:
+    # A field no PUBLIC_FIELDS names (a later serial's, or another type's) is kept when it holds a value.
+    out = known_of_for_disk({**stub_dev(), "location": "l1", "STR": 3})
+    assert (out["location"], out["STR"]) == ("l1", 3)
+
+
+def test_a_public_stub_is_written_with_its_values_and_read_back(tmp_path: Path) -> None:
+    write_folder(tmp_path / "w", WORLD, {"character": [public_stub_dev(), mara()]})
+    on_disk = dev_file(tmp_path / "w")
+    assert set(on_disk) == KEPT | {"physicality", "height", "species", "known_of"}
+    assert (on_disk["physicality"], on_disk["height"], on_disk["species"]) == ("Tall", 180, [SPECIES])
+    f = read_folder(tmp_path / "w")
+    assert f.elements[DEV].known_of and f.elements[DEV].body["height"] == 180
+    assert "reputation" not in f.elements[DEV].body
 
 
 # --- rule 2: a reader treats it as known of --------------------------------------------------

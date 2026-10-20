@@ -2,12 +2,12 @@
   "_what": "The recorded pin for the vendored OnlyWorlds schema distribution (codegen/schema-dist/, copied byte-exact). Do not edit by hand; re-vendor from the pinned tag and review the diff. Kept equal to the npm SDK's pin (github.com/OnlyWorlds/sdk, codegen/schema-pin.json) on purpose: two clients, one schema.",
   "_why_manifest_sha256": "Verifying the tree against its own MANIFEST.json only proves internal consistency. If the tag moved, the manifest moved with it. The hash recorded here is the one first accepted, which is what makes a moved tag visible.",
   "repo": "https://github.com/OnlyWorlds/schema-dist",
-  "tag": "v0.32.1-dist.27",
-  "commit": "dae4ffeb4d03fce753f69fbc28e7fdabf66b324f",
-  "manifest_sha256": "0d6564666eda5041947ad2fb74a396c016b03d36ef38d013d2745d27171e6f9a",
+  "tag": "v0.32.1-dist.28",
+  "commit": "96c3ffa2edc6f7df6a9ac1a86606eacf7d8d89a4",
+  "manifest_sha256": "9ce11f0d15c9632c55aec0fb0cbfebf07600d282aec641de7ba8c160279b0515",
   "canonical_version": "00.32.01",
-  "dist_serial": 27,
+  "dist_serial": 28,
   "published": "2026-10-20",
   "pinned_at": "2026-10-20",
-  "pinned_by": "The maintainer: tree from `git archive` of the tag in a schema-dist checkout; files re-hashed against MANIFEST.json by generate_schema.py; MANIFEST self-hash matched against the raw file GitHub serves at the tag, whose ref resolves to the commit above. Same tag and hash as the npm SDK's pin."
+  "pinned_by": "The maintainer: tree from `git archive` of the tag in a schema-dist checkout; files re-hashed against MANIFEST.json by generate_schema.py; MANIFEST self-hash matched against the raw file GitHub serves at the tag, whose ref resolves to the commit above. Ahead of the npm SDK's pin (dist.27) at pinning: dist.28 adds presentation.json `types.<type>.public`, which this package reads and the SDK does not yet."
 }

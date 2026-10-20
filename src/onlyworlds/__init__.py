@@ -6,7 +6,14 @@ version runs on its own semver.
 """
 
 from ._ids import uuid7
-from ._schema import ELEMENT_TYPES, FIELD_KINDS, SCHEMA_DIST_TAG, SCHEMA_MANIFEST_SHA256, SCHEMA_VERSION
+from ._schema import (
+    ELEMENT_TYPES,
+    FIELD_KINDS,
+    PUBLIC_FIELDS,
+    SCHEMA_DIST_TAG,
+    SCHEMA_MANIFEST_SHA256,
+    SCHEMA_VERSION,
+)
 from ._version import __version__
 from .errors import PreconditionFailed, parse_retry_after
 from .export import export_world
@@ -46,6 +53,7 @@ __all__ = [
     "FIELD_KINDS",
     "FORMAT_VERSION",
     "KNOWN_OF_KEEPS",
+    "PUBLIC_FIELDS",
     "READ_ONLY_FIELDS",
     "SCHEMA_DIST_TAG",
     "SCHEMA_MANIFEST_SHA256",

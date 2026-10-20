@@ -128,6 +128,13 @@ class ApiError(Exception):
         return self.status == 403 and self.code == "view_as_owner_only"
 
     @property
+    def is_known_of_not_writable(self) -> bool:
+        """A write body carried ``known_of`` (422 ``known_of_not_writable``, ``param`` known_of; keel
+        PR 117): a stub is never written back. The client refuses a ``known_of: true`` body before
+        sending and never sends another value of it, so this comes only from a body sent around it."""
+        return self.status == 422 and self.code == "known_of_not_writable"
+
+    @property
     def is_permission_error(self) -> bool:
         """The key is valid but lacks the scope (403 ``permission_error``): a read key on a write
         route, or a member key on a surface that refuses members. Retrying will not help."""

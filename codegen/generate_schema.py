@@ -190,6 +190,27 @@ def extension_prefixes() -> tuple[str, ...]:
     return prefixes
 
 
+def public_fields(types: list[str], layout: dict[str, Any]) -> dict[str, list[str]]:
+    """type -> the fields the platform shows on a known-of stub beside the base keys, from the dist's
+    presentation.json ``types.<type>.public`` (keel's field tag ``public: true``, Keel #448). Every type
+    must list one (``[]`` for none), and each name must be one of that type's own schema fields."""
+    presentation: dict[str, Any] = json.loads((DIST / "presentation.json").read_text(encoding="utf-8"))
+    by_type = presentation.get("types")
+    if not isinstance(by_type, dict) or sorted(by_type) != sorted(types):
+        raise SystemExit(f"presentation.json types {sorted(by_type or {})} disagree with ELEMENT_TYPES {types}")
+    out: dict[str, list[str]] = {}
+    for t in types:
+        names = by_type[t].get("public")
+        if not isinstance(names, list) or not all(isinstance(n, str) for n in names):
+            raise SystemExit(f"presentation.json types.{t}.public is not a list of field names: {names!r}")
+        own = {n for _, fields in layout["sections"][t] for n in fields}
+        stray = [n for n in names if n not in own]
+        if stray or len(set(names)) != len(names):
+            raise SystemExit(f"presentation.json types.{t}.public {names}: not {t}'s own fields, or repeated: {stray}")
+        out[t] = names
+    return out
+
+
 def element_types(walk: Any) -> list[str]:
     from_walk: list[str] = list(walk.ELEMENT_TYPES)
     from_files = sorted(p.stem for p in (DIST / "schema").glob("*.yaml") if p.stem not in NON_ELEMENT_SCHEMA_FILES)
@@ -205,6 +226,7 @@ def render(
     pairs: dict[str, list[tuple[str, str]]],
     layout: dict[str, Any],
     prefixes: tuple[str, ...],
+    public: dict[str, list[str]],
 ) -> str:
     def strs(names: list[str]) -> str:
         return "(" + ", ".join(f'"{n}"' for n in names) + ("," if len(names) == 1 else "") + ")"
@@ -294,6 +316,13 @@ def render(
         ],
         "}",
         "",
+        "# type -> the fields the platform shows on a known-of stub (``known_of: true``) beside its name,",
+        "# description, supertype, subtype and picture: presentation.json ``types.<type>.public`` (keel's field",
+        "# tag, Keel #448). For display; what a stub holds is what the server sent (folder.known_of_for_disk).",
+        "PUBLIC_FIELDS: dict[str, tuple[str, ...]] = {",
+        *[line for t in types for line in wrapped(f'    "{t}": ', public[t], ",")],
+        "}",
+        "",
         "# Prefixes of the extension keys a tool may add to any element (dist walk/lint_folder.py).",
         f"EXTENSION_PREFIXES: tuple[str, ...] = {strs(list(prefixes))}",
         "",
@@ -310,7 +339,7 @@ def main() -> int:
     types = element_types(walk)
     kinds, pairs = field_kinds(walk, types), generic_pairs(walk, types)
     layout = layout_tables(decoded_schema(walk), types, kinds, pairs)
-    text = render(pin, types, kinds, pairs, layout, extension_prefixes())
+    text = render(pin, types, kinds, pairs, layout, extension_prefixes(), public_fields(types, layout))
     if args.check:
         current = OUT.read_bytes().decode("utf-8") if OUT.is_file() else ""
         if current != text:

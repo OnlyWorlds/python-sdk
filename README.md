@@ -108,7 +108,7 @@ saved_cursor = walk.cursor  # opaque: keep it, don't parse it
 
 ## Schema
 
-The 22 element types and each field's kind are generated from the published [schema distribution](https://github.com/OnlyWorlds/schema-dist); `onlyworlds.SCHEMA_VERSION` and `onlyworlds.SCHEMA_DIST_TAG` say which one. The package's own version doesn't track the schema's.
+The 22 element types and each field's kind are generated from the published [schema distribution](https://github.com/OnlyWorlds/schema-dist); `onlyworlds.SCHEMA_VERSION` and `onlyworlds.SCHEMA_DIST_TAG` say which one. `onlyworlds.PUBLIC_FIELDS` names, per type, the fields OnlyWorlds shows on a known-of element (one a guest sees only one step out) beside its name and description. The package's own version doesn't track the schema's.
 
 Not yet: typed element models, the account routes, a snapshot writer.
 

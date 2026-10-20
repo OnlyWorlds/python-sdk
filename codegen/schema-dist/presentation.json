@@ -1,6 +1,7 @@
 {
   "_meta": {
     "what": "Presentation DEFAULTS (family + icon + family colours) per element type. Defaults, not authority \u2014 tools may override, and Atlas remaps wholesale for dark mode.",
+    "public": "Per type, the fields the OnlyWorlds platform shows on a 'known of' element (one a reader knows of but does not see whole) beside its name, description, supertype, subtype and picture. Platform behaviour, not a default to override; an empty list means those base fields only.",
     "provenance": "Four-family palette adopted 2026-07 for measured colour-vision-deficiency separation: the previous 22-hue set left Title and Trait at deltaE 1.3 for deutan viewers. Values validated; change one only after re-running a colour-vision check, not by taste.",
     "families": [
       "agents",
@@ -39,91 +40,119 @@
   "types": {
     "ability": {
       "family": "abstract",
-      "icon": "auto_fix_normal"
+      "icon": "auto_fix_normal",
+      "public": []
     },
     "collective": {
       "family": "agents",
-      "icon": "groups_3"
+      "icon": "groups_3",
+      "public": []
     },
     "character": {
       "family": "agents",
-      "icon": "person"
+      "icon": "person",
+      "public": [
+        "physicality",
+        "height",
+        "weight",
+        "species",
+        "reputation"
+      ]
     },
     "construct": {
       "family": "world",
-      "icon": "api"
+      "icon": "api",
+      "public": []
     },
     "creature": {
       "family": "agents",
-      "icon": "bug_report"
+      "icon": "bug_report",
+      "public": []
     },
     "event": {
       "family": "temporal",
-      "icon": "saved_search"
+      "icon": "saved_search",
+      "public": []
     },
     "family": {
       "family": "agents",
-      "icon": "supervisor_account"
+      "icon": "supervisor_account",
+      "public": []
     },
     "institution": {
       "family": "agents",
-      "icon": "account_balance"
+      "icon": "account_balance",
+      "public": []
     },
     "language": {
       "family": "abstract",
-      "icon": "edit_road"
+      "icon": "edit_road",
+      "public": []
     },
     "law": {
       "family": "abstract",
-      "icon": "gpp_bad"
+      "icon": "gpp_bad",
+      "public": []
     },
     "location": {
       "family": "world",
-      "icon": "castle"
+      "icon": "castle",
+      "public": []
     },
     "map": {
       "family": "world",
-      "icon": "map"
+      "icon": "map",
+      "public": []
     },
     "marker": {
       "family": "world",
-      "icon": "polyline"
+      "icon": "polyline",
+      "public": []
     },
     "narrative": {
       "family": "temporal",
-      "icon": "menu_book"
+      "icon": "menu_book",
+      "public": []
     },
     "object": {
       "family": "world",
-      "icon": "webhook"
+      "icon": "webhook",
+      "public": []
     },
     "phenomenon": {
       "family": "temporal",
-      "icon": "thunderstorm"
+      "icon": "thunderstorm",
+      "public": []
     },
     "pin": {
       "family": "world",
-      "icon": "push_pin"
+      "icon": "push_pin",
+      "public": []
     },
     "relation": {
       "family": "temporal",
-      "icon": "link"
+      "icon": "link",
+      "public": []
     },
     "species": {
       "family": "agents",
-      "icon": "crib"
+      "icon": "crib",
+      "public": []
     },
     "title": {
       "family": "abstract",
-      "icon": "military_tech"
+      "icon": "military_tech",
+      "public": []
     },
     "trait": {
       "family": "abstract",
-      "icon": "flaky"
+      "icon": "flaky",
+      "public": []
     },
     "zone": {
       "family": "world",
-      "icon": "pentagon"
+      "icon": "pentagon",
+      "public": []
     }
   }
 }

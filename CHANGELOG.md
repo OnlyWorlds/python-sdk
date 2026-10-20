@@ -4,6 +4,14 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+## 0.10.0 (2026-10-20)
+
+Public fields on a known-of stub (keel PR 117, Keel #448), live in production. The schema is repinned to schema-dist `v0.32.1-dist.28` (canonical `00.32.01`; only `presentation.json` and its manifest moved), ahead of `@onlyworlds/sdk`'s dist.27 pin.
+
+- **A stub keeps every field keel sent it with a value.** keel now serves a known-of stub its type's public fields with their values (a Character's `physicality`, `height`, `weight`, `species`, `reputation`; no other type's yet), every other key still sent blank. `known_of_for_disk` (and so `write_folder` and `export_world`) writes the `KNOWN_OF_KEEPS` keys as before, plus every other key the body holds a value for, in received order, then `known_of: true`. A value is anything but `""`, `null` and `[]`: `0` and `false` are kept. Before, it wrote the kept keys only and dropped the public fields keel serves (folder spec §3: a writer never drops data it has). The rule reads the body, not a list, so a type that gains public fields needs no new release.
+- **`PUBLIC_FIELDS`**: type -> the fields shown on a stub beside its name, description, supertype, subtype and picture, all 22 types (`()` for none), generated from the dist's `presentation.json` `types.<type>.public` and checked by `generate_schema.py --check`. For display; what a stub holds is what the server sent.
+- **`ApiError.is_known_of_not_writable`**: 422 `known_of_not_writable` (`param` known_of), keel's answer to a write body carrying `known_of`. The client already refuses a stub before sending and never sends another `known_of`, so this comes only from a body sent around it.
+
 ## 0.9.0 (2026-10-20)
 
 Known of (keel PR 113), live in production since 2026-10-20 13:47, and folder format v0.3.10. The schema is repinned to schema-dist `v0.32.1-dist.27` (only its example moved), equal to `@onlyworlds/sdk` 4.40.0's pin.
