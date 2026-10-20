@@ -4,6 +4,10 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+## 0.10.2 (2026-10-20)
+
+- **The OKF export keeps a stub's mark.** A known-of element (`known_of: true`, folder format §4.4) is now written with `known_of: true` in its concept's frontmatter, and `OkfReport.known_of` counts them (the command line's summary says "N known of" when there are any). Before, `known_of` was dropped with the other `push.NOT_SENT` keys, so a stub read as a whole element whose absent fields looked empty rather than unknown.
+
 ## 0.10.1 (2026-10-20)
 
 Folder format v0.3.11 (§3.3: a re-key never rewrites `x_identity_key`, the cross-world identity convention's key, Council #451). Nothing here re-keys, so the writer's behaviour is unchanged; `FORMAT_VERSION` and the `format_version` a written folder declares move to `0.3.11`.

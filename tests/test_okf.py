@@ -536,6 +536,24 @@ def test_nit_hyperion_run_is_quiet(world: World) -> None:
     assert run(HYPERION, world.out) == (0, "")
 
 
+def test_a_known_of_stub_keeps_its_mark(world: World) -> None:
+    """§4.4: a stub is known of, never whole; NOT_SENT must not drop `known_of` in silence."""
+    from onlyworlds.folder import KNOWN_OF_KEEPS
+
+    def to_stub(b: dict[str, Any]) -> None:
+        kept = {k: v for k, v in b.items() if k in KNOWN_OF_KEEPS}
+        b.clear()
+        b.update(kept, known_of=True)
+
+    world.edit("elements/character/the-consul--*.json", to_stub)
+    report = okf.export_okf(world.src, world.out)
+    assert report.known_of == 1
+    fm, _ = world.doc("character/the-consul--*.md")
+    assert fm["known_of"] is True
+    whole, _ = world.doc("character/rachmaninov--*.md")
+    assert "known_of" not in whole
+
+
 def test_nit_only_stderr_redirected(world: World) -> None:
     out = io.TextIOWrapper(io.BytesIO(), encoding="utf-8")
     with redirect_stdout(out), redirect_stderr(io.StringIO()):

@@ -51,7 +51,10 @@ Each element concept:
   - unset values (the empty string, null, an empty list) are left out.
     Extension keys (`x_`, `atlas_`, `shadow_`) are carried as they are; the
     server and folder keys the package never pushes (``push.NOT_SENT``) are
-    not, `updated_at` included.
+    not, `updated_at` included, with one exception: a known-of stub (folder
+    format §4.4) keeps `known_of: true` in its frontmatter, because a stub is
+    an element known of, never a whole one, and its absent fields are unknown
+    rather than empty (``OkfReport.known_of`` counts them).
   - an in-prose element reference in a text field, `[Label](ow://<type>/<id>)`
     (folder format, in-prose references), becomes a relative link to that
     element's concept, so a markdown viewer can follow it; one to an id the
@@ -120,7 +123,7 @@ from ._schema import (
     WORLD_FIELDS,
 )
 from ._version import __version__
-from .folder import WIRE_TO_DISK_WORLD_KEYS, WORLD_FILE, Folder, read_folder
+from .folder import KNOWN_OF, WIRE_TO_DISK_WORLD_KEYS, WORLD_FILE, Folder, is_known_of, read_folder
 from .push import NOT_SENT
 
 __all__ = ["EXPORTER", "OKF_COMMIT", "OKF_VERSION", "FolderError", "OkfReport", "build_bundle", "export_okf", "main"]
@@ -164,6 +167,8 @@ class OkfReport:
     elements: int = 0
     types: int = 0
     files: int = 0
+    #: elements written as known-of stubs (``known_of: true`` in their frontmatter, §4.4)
+    known_of: int = 0
     links: int = 0
     #: ``<file>: `<field>` -> <id>`` for each link to an id the folder does not hold
     unresolved: list[str] = field(default_factory=list)
@@ -369,6 +374,9 @@ def element_doc(
             continue
         if not _unset(body.get(name)):
             fm[_fm_key(name)] = body[name]
+    if is_known_of(body):  # §4.4: known of, never whole; NOT_SENT would drop the mark in silence
+        fm[_fm_key(KNOWN_OF)] = True
+        report.known_of += 1
 
     blocks: list[tuple[str, str]] = []  # (kind, text): kind "text" or "link"
     current: str | None = None
@@ -606,6 +614,7 @@ def main(argv: list[str] | None = None) -> int:
     print(
         f"exported {report.elements} elements in {report.types} types to {args.out}: "
         f"{report.files} files, {report.links} links, {len(report.unresolved)} unresolved"
+        + (f", {report.known_of} known of" if report.known_of else "")
     )
     return 0
 
