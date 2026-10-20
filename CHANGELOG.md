@@ -4,7 +4,9 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
-Known-of stubs (keel PR 113, B16; keel #421 §7g), staged, not live: keel PR 113 is not merged.
+## 0.9.0 (2026-10-20)
+
+Known of (keel PR 113), live in production since 2026-10-20 13:47, and folder format v0.3.10. The schema is repinned to schema-dist `v0.32.1-dist.27` (only its example moved), equal to `@onlyworlds/sdk` 4.40.0's pin.
 
 - **Folder format v0.3.10, known-of elements (§4.4).** keel hands a guest or player an element it reaches only through its own Character's sheet as a stub, `known_of: true`, keeping `id`, `type`, `name`, `description`, `supertype`, `subtype`, `image_url`, `created_at`, `updated_at` and `change_seq` (`KNOWN_OF_KEEPS`) and every other field unset. `write_folder` (and so `export_world`) writes a stub as it is: its kept keys and `known_of: true`, never the unset `""`, `null` and `[]` (`folder.known_of_for_disk`). Every other body is still written untouched. A stub that later arrives whole is written whole, without `known_of` (a repeated id keeps its last body). `FORMAT_VERSION` is now `"0.3.10"`; folders stamped `"0.3.9"` stay valid.
 - **`is_known_of(body)`**: true only for `known_of: true`. The reader flags a stub (`FolderElement.known_of`) and lists them (`Folder.known_of`), and fills in nothing for the fields it lacks: they are unknown, not empty.

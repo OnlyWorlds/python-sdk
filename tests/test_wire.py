@@ -22,13 +22,17 @@ from typing import Any
 import pytest
 from conftest import FakeTransport, jresp
 
+import onlyworlds.http as _http
 from onlyworlds import ELEMENT_TYPES, FIELD_KINDS, ApiError, Client
 
 SOURCE = os.environ.get("OW_OPENAPI")
 pytestmark = pytest.mark.skipif(not SOURCE, reason="set OW_OPENAPI to keel's OpenAPI document (URL or file)")
 
 ID = "018f0000-0000-7000-8000-000000000001"
-SERVER_MANAGED = {"id", "type", "created_at", "updated_at", "change_seq", "created_by", "changed_by", "changed_via"}
+# The fields keel keeps that the schema does not carry, read from the package itself, never a list kept
+# here: the read-only fields it strips before a write (a hand list missed `known_of`, keel PR 113, the
+# hour it went live), plus the ones keel ignores on write and the id.
+SERVER_MANAGED = (set(_http.READ_ONLY_FIELDS) - {"world"}) | {"id", "created_by", "changed_by", "changed_via"}
 KIND = {"text": "string", "integer": "integer", "multi_link": "array", "single_link": "string"}
 
 
