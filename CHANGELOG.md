@@ -4,6 +4,10 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+## 0.10.3 (2026-10-20)
+
+- **The schema**, repinned to schema-dist `v0.32.2-dist.29` (canonical `00.32.02`, Skeld, OW Council h58 #8811): two descriptions changed, a Narrative's `start_date` is when it is first told or recorded and its `end_date` when it stops being told (empty while still told); the span it recounts lives on its events. `SCHEMA_VERSION` is `00.32.02`; `ELEMENT_TYPES`, `FIELD_KINDS` and `PUBLIC_FIELDS` are unchanged. Equal to `@onlyworlds/sdk` 4.42.0's pin.
+
 ## 0.10.2 (2026-10-20)
 
 - **The OKF export keeps a stub's mark.** A known-of element (`known_of: true`, folder format §4.4) is now written with `known_of: true` in its concept's frontmatter, and `OkfReport.known_of` counts them (the command line's summary says "N known of" when there are any). Before, `known_of` was dropped with the other `push.NOT_SENT` keys, so a stub read as a whole element whose absent fields looked empty rather than unknown.

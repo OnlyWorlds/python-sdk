@@ -1705,14 +1705,14 @@
       {
         "name": "start_date",
         "kind": "scalar_int",
-        "desc": "Date when the narrative begins, measured in world TIME units",
+        "desc": "Date when the narrative is first told or recorded, measured in world TIME units; the span it recounts lives on its events",
         "section": "Context",
         "required": false
       },
       {
         "name": "end_date",
         "kind": "scalar_int",
-        "desc": "Date when the narrative ends, measured in world TIME units",
+        "desc": "Date when the narrative stops being told, measured in world TIME units; empty while it is still told",
         "section": "Context",
         "required": false
       },
