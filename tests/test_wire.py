@@ -161,7 +161,13 @@ def test_the_list_envelope_names_are_the_ones_iter_elements_follows(doc: dict[st
 
 def test_every_key_of_the_error_envelope_reaches_apierror(doc: dict[str, Any]) -> None:
     err = doc["components"]["schemas"]["Error"]["properties"]["error"]
-    assert set(err["properties"]) == {"type", "code", "message", "param", "doc_url"}
+    five = {"type", "code", "message", "param", "doc_url"}
+    # keel #421 PR 103: with the hidden mark on, a 409 resync_required's envelope also carries `reason`.
+    assert set(err["properties"]) in (five, five | {"reason"})
+    if "reason" in err["properties"]:
+        resync = {"error": {"type": "invalid_request", "code": "resync_required", "message": "m", "param": "since",
+                            "doc_url": "https://x/e", "reason": "role"}}
+        assert ApiError("GET", "x", jresp(409, resync)).resync_reason == "role"
     first_type = err["properties"]["type"]["enum"][0]
     body = {"error": {"type": first_type, "code": "probe", "message": "m", "param": "p", "doc_url": "https://x/e"}}
     e = ApiError("GET", "x", jresp(422, body))

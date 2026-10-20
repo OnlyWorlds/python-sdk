@@ -4,6 +4,10 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+## 0.8.0 (2026-10-20)
+
+The hidden mark (keel #421), live in production since 2026-10-20 09:24.
+
 - **`is_resync_required`** names every case keel sends it for since its hidden mark (keel #421), not only a guest's; a `/changes` delete row carries `reason` (`deleted`, `hidden`, `out_of_view`), read as any other key of the row.
 - **`view_as=`** on `get`, `list_page` and `iter_elements`, sent as `as` (keel #421, view as): the owner's key reads as a member (a membership id), as a Character's guest (a Character id) or as the public (`"public"`). A member key gets 403 `view_as_owner_only` (`is_view_as_owner_only`); an element hidden from that reader is 404, never 410; an unknown value is 422. Until keel's hidden mark is on, keel answers 422 (an unknown parameter).
 - **`ApiError.resync_reason`** (`"role"`, `"view"` or None): why `/changes` answered 409 `resync_required`, from the envelope's `reason` (keel #421, keel PR 103; only while keel's hidden mark is on). A `/changes` page then carries `epoch_reason` beside `epoch`, read as any other key of the page.
