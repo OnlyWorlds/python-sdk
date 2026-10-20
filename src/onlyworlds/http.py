@@ -6,6 +6,8 @@ OpenAPI document, which ``tests/test_wire.py`` compares the client with):
 - credentials in ``API-Key`` / ``API-Pin`` headers; ``ow_r_`` read keys need no PIN;
 - a body never carries ``world`` (the key names the world) or the server-managed
   ``type`` / ``created_at`` / ``updated_at`` / ``change_seq``: the typed calls strip them;
+- a known-of stub (``known_of: true``, keel PR 113) is never written: the typed element
+  writes refuse one before sending, and strip any other ``known_of``;
 - lists are ``{data, has_more, next_cursor}``, continued with ``?cursor=``;
 - ``Idempotency-Key`` on POST and ``/bulk`` replays the first successful answer for 24 h;
 - 429 carries ``Retry-After``; on v2 its only 429 is ``rate_limited``, the failed-PIN
@@ -61,8 +63,10 @@ USER_AGENT = f"onlyworlds-py/{__version__}"
 #: namespaced extension fields (``atlas_*`` / ``shadow_*`` / ``x_*``) must pass through
 #: untouched, because tools round-trip their own state through other tools' writes.
 #: ``created_by``, ``changed_by`` and ``changed_via`` are not here: keel drops them silently on
-#: a write (spec §4; keel #299), so a read body round-trips as it is.
-READ_ONLY_FIELDS: tuple[str, ...] = ("world", "type", "created_at", "updated_at", "change_seq")
+#: a write (spec §4; keel #299), so a read body round-trips as it is. ``known_of`` (keel PR 113)
+#: is an unknown field to keel's writes (a 422): stripped too, and a body where it is ``true``
+#: is refused before it gets here (``_refuse_known_of``).
+READ_ONLY_FIELDS: tuple[str, ...] = ("world", "type", "created_at", "updated_at", "change_seq", "known_of")
 
 _TYPE = re.compile(r"^[a-z][a-z0-9_]*$")
 _ID = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_.-]*$")
@@ -87,6 +91,22 @@ def _minted_id(idempotency_key: str | None, index: int) -> str:
 def sanitize_payload(payload: Mapping[str, Any]) -> dict[str, Any]:
     """A copy of ``payload`` without the fields the API rejects on write (see ``READ_ONLY_FIELDS``)."""
     return {k: v for k, v in payload.items() if k not in READ_ONLY_FIELDS}
+
+
+def _refuse_known_of(element: Mapping[str, Any], where: str) -> None:
+    """A known-of stub (``known_of: true``, keel PR 113) is a ValueError before anything is sent.
+
+    Its empty fields are not the element's values: stripping the marker and sending the rest
+    would turn keel's 422 into a write that blanks the element (a PUT replaces it whole, a PATCH
+    clears every field it names) for any key that may write it, such as an owner pushing a
+    copy a player made.
+    """
+    if isinstance(element, Mapping) and element.get("known_of") is True:
+        raise ValueError(
+            f"{where}: this body is a known-of stub (known_of: true), not the element: its empty fields "
+            "are not its values, and writing it would blank them. Write from a whole copy, or send only "
+            "the fields you mean to change."
+        )
 
 
 #: ``GET /world`` keys that ``PATCH /world`` refuses (keel's writable set has neither), dropped
@@ -546,6 +566,7 @@ class Client:
         and ``None`` are accepted and stored as ``""`` (by keel's ruling, nameless Markers exist).
         """
         t = _segment(element_type, _TYPE, "element type")
+        _refuse_known_of(element, "create")
         body = sanitize_payload(element)
         check_kinds(t, body)
         if not body.get("id"):
@@ -569,9 +590,14 @@ class Client:
         return self._element(got.response.json(), "POST", t)
 
     def upsert(self, element_type: str, element_id: str, element: Mapping[str, Any]) -> dict[str, Any]:
-        """``PUT /{type}/{id}``: replace by client id, creating if absent. The local-first write."""
+        """``PUT /{type}/{id}``: replace by client id, creating if absent. The local-first write.
+
+        A known-of stub (``known_of: true``, keel PR 113) is a ValueError before sending, here and
+        on every element write: a PUT of one would blank every field it does not keep.
+        """
         t = _segment(element_type, _TYPE, "element type")
         i = _segment(element_id, _ID, "element id")
+        _refuse_known_of(element, "upsert")
         body = sanitize_payload(element)
         check_kinds(t, body)
         return self._element(self.call("PUT", f"{t}/{i}/", body, self._writing()), "PUT", t)
@@ -587,6 +613,7 @@ class Client:
         """
         t = _segment(element_type, _TYPE, "element type")
         i = _segment(element_id, _ID, "element id")
+        _refuse_known_of(partial, "patch")
         body = sanitize_payload(partial)
         check_kinds(t, body)
         return self._element(self.call("PATCH", f"{t}/{i}/", body, self._writing(_if_match(if_match))), "PATCH", t)
@@ -645,6 +672,7 @@ class Client:
         """
         elements = []
         for index, it in enumerate(items):
+            _refuse_known_of(it["element"], f"bulk: items[{index}]")  # the whole call, never a skipped slot
             element = sanitize_payload(it["element"])
             check_kinds(str(it["type"]), element)
             if not element.get("id"):

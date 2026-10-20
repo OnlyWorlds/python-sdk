@@ -1,6 +1,6 @@
 """OnlyWorlds for Python: the world folder (read, write, push) and a client for the v2 API.
 
-Folder format: v0.3.9 (``FORMAT_VERSION``). Schema: generated from the pinned
+Folder format: v0.3.10 (``FORMAT_VERSION``). Schema: generated from the pinned
 schema distribution (``SCHEMA_DIST_TAG``, ``SCHEMA_VERSION``); the package
 version runs on its own semver.
 """
@@ -12,11 +12,13 @@ from .errors import PreconditionFailed, parse_retry_after
 from .export import export_world
 from .folder import (
     FORMAT_VERSION,
+    KNOWN_OF_KEEPS,
     Folder,
     FolderElement,
     SkippedFile,
     WriteReport,
     element_filename,
+    is_known_of,
     read_folder,
     resolve_filenames,
     slugify,
@@ -43,6 +45,7 @@ __all__ = [
     "ELEMENT_TYPES",
     "FIELD_KINDS",
     "FORMAT_VERSION",
+    "KNOWN_OF_KEEPS",
     "READ_ONLY_FIELDS",
     "SCHEMA_DIST_TAG",
     "SCHEMA_MANIFEST_SHA256",
@@ -67,6 +70,7 @@ __all__ = [
     "check_kinds",
     "element_filename",
     "export_world",
+    "is_known_of",
     "parse_retry_after",
     "plan_push",
     "push",

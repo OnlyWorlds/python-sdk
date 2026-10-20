@@ -25,7 +25,12 @@ schema fields: strip them"); Atlas's local-only extension fields (``ATLAS_LOCAL_
 in Atlas's ``src/core/constants.ts``). Atlas's other ``atlas_*`` fields
 (colour, opacity, label, shape, calendar) travel on purpose and are sent like any extension.
 Atlas-written pins and markers spell their links ``map_id`` / ``zone_id``; the diff reads
-them as the wire's ``map`` / ``zone`` (spec §5).
+them as the wire's ``map`` / ``zone`` (spec §5). ``known_of`` is never sent either.
+
+A stub is never pushed (folder spec v0.3.10 §4.4 rule 3; keel PR 113): an element that is
+``known_of: true`` in the folder OR in the baseline is left out of the diff and listed in
+``PushPlan.known_of`` (and ``PushResult.known_of``), not in the membership lists: its absent
+fields are unknown, not edits, and it is not the folder's to create or delete.
 
 A generic link's two halves (Pin's ``element_type`` / ``element_id``) go together when
 either changed: keel refuses a write that sets one half. The run stops at the first
@@ -75,6 +80,7 @@ NOT_SENT = frozenset(
         "created_by",
         "changed_by",
         "changed_via",
+        "known_of",
         "local_updated_at",
         "server_updated_at",
         "image_media_id",
@@ -166,6 +172,9 @@ class PushPlan:
     only_in_folder: list[str] = field(default_factory=list)
     #: ids whose type differs between baseline and folder — type is not writable
     type_changed: list[str] = field(default_factory=list)
+    #: ids that are a stub (``known_of: true``) in the folder or the baseline — never pushed (§4.4);
+    #: a skip, not a membership difference, so they never make the plan ``unmatched``
+    known_of: list[str] = field(default_factory=list)
 
     @property
     def unmatched(self) -> bool:
@@ -186,10 +195,15 @@ def plan_push(baseline: Folder | str | os.PathLike[str], folder: Folder | str | 
     A field present in the baseline and absent from the folder is sent as its kind's
     empty shape (PATCH has no "remove"): ``""`` for text, ``[]`` for a multi link,
     ``null`` otherwise, extension fields included (keel keeps a null extension key). Patches
-    are sorted by (type, id), fields in the folder's key order.
+    are sorted by (type, id), fields in the folder's key order. A stub on either side
+    (``known_of: true``, §4.4) is left out of every list but ``known_of``.
     """
     base, edited = _elements(baseline), _elements(folder)
+    stubs = {eid for side in (base, edited) for eid, el in side.items() if el.known_of}
+    base = {eid: el for eid, el in base.items() if eid not in stubs}
+    edited = {eid: el for eid, el in edited.items() if eid not in stubs}
     plan = PushPlan(
+        known_of=sorted(stubs),
         patches=[],
         only_in_baseline=sorted(set(base) - set(edited)),
         only_in_folder=sorted(set(edited) - set(base)),
@@ -227,6 +241,8 @@ class PushResult:
     log_path: Path | None = None
     #: why the run stopped early (``stops_run``); patches it never sent are not logged, so a rerun sends them
     aborted: str | None = None
+    #: the stubs left out (``PushPlan.known_of``, §4.4): never pushed
+    known_of: list[str] = field(default_factory=list)
 
 
 def stops_run(error: ApiError) -> bool:
@@ -295,7 +311,9 @@ def push(
     log = Path(log_path)
     prints, legacy_ids = _load_done(log)
     todo = [p for p in plan.patches if p.fingerprint not in prints and p.id not in legacy_ids]
-    result = PushResult(planned=len(plan.patches), already_done=len(plan.patches) - len(todo), log_path=log)
+    result = PushResult(
+        planned=len(plan.patches), already_done=len(plan.patches) - len(todo), log_path=log, known_of=plan.known_of
+    )
     work = todo[:limit] if limit is not None else todo
     if dry_run or not work:
         return result

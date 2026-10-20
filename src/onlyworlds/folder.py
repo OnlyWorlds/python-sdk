@@ -1,6 +1,6 @@
 """The OnlyWorlds world folder: filenames, the writer, the reader.
 
-Spec: OnlyWorlds Folder Format v0.3.9.
+Spec: OnlyWorlds Folder Format v0.3.10.
 Section numbers below are that document's.
 
 ::
@@ -33,6 +33,8 @@ __all__ = [
     "ELEMENTS_DIR",
     "FORMAT_VERSION",
     "ID_TAIL_LEN",
+    "KNOWN_OF",
+    "KNOWN_OF_KEEPS",
     "LEGACY_SPATIAL_DIR",
     "LEGACY_SPATIAL_TYPES",
     "SLUG_ID_SEP",
@@ -47,6 +49,8 @@ __all__ = [
     "element_filename",
     "element_filename_full_id",
     "id_tail",
+    "is_known_of",
+    "known_of_for_disk",
     "read_folder",
     "resolve_filenames",
     "slugify",
@@ -55,7 +59,36 @@ __all__ = [
 ]
 
 #: The spec version this module writes and reads against (§4.2 ``format_version``).
-FORMAT_VERSION = "0.3.9"
+FORMAT_VERSION = "0.3.10"
+
+#: §4.4 (v0.3.10; keel PR 113): the stub marker. keel hands a guest an element it reaches only
+#: through its own Character's sheet as a stub, ``known_of: true``, every field but these unset.
+KNOWN_OF = "known_of"
+#: The keys a stub keeps (§4.4, keel's ``KNOWN_OF_KEEPS``); a writer writes these and ``known_of`` only.
+KNOWN_OF_KEEPS: frozenset[str] = frozenset(
+    {"id", "type", "name", "description", "supertype", "subtype", "image_url", "created_at", "updated_at", "change_seq"}
+)
+
+
+def is_known_of(body: Mapping[str, Any]) -> bool:
+    """True for a stub (``known_of: true``, §4.4): an element known of, never a whole one.
+
+    Its absent fields are unknown, not empty: never read them as values or as a deletion,
+    never merge them over a whole copy, never push it. Absent, ``false`` or anything else: whole.
+    """
+    return body.get(KNOWN_OF) is True
+
+
+def known_of_for_disk(body: Mapping[str, Any]) -> dict[str, Any]:
+    """A stub as §4.4 writes it: the kept keys in received order, then ``known_of: true``.
+
+    The unset fields keel serves (``""``, ``null``, ``[]``) are left out, never written:
+    on disk they would read as a whole element with nothing filled in.
+    """
+    out = {k: v for k, v in body.items() if k in KNOWN_OF_KEEPS}
+    out[KNOWN_OF] = True
+    return out
+
 
 ELEMENTS_DIR = "elements"
 WORLD_FILE = "world.json"
@@ -206,9 +239,12 @@ def write_folder(
 
     Bodies are written whole and untouched: no field stripped, added or reordered
     (§3.3 binds foreign values byte-for-byte, §4.2 keeps server-managed fields).
+    The one exception is a stub (``known_of: true``, §4.4): it is written as it is,
+    its kept keys and ``known_of`` only, never its unset fields (``known_of_for_disk``).
     Within a type, a repeated id keeps its LAST body (id-keyed overwrite, the
-    spec's answer to a keyset walk that met a mid-walk write). The same id under
-    two types is an error.
+    spec's answer to a keyset walk that met a mid-walk write), so a stub that later
+    arrives whole is written whole, without ``known_of`` (§4.4 rule 4). The same id
+    under two types is an error.
 
     ``root`` must not exist, or be an empty directory: this writes a folder's
     birth, never over another folder (stale files from renamed or deleted
@@ -251,7 +287,7 @@ def write_folder(
                 filename = names[eid]
                 if filename != element_filename(eid, _name_of(body)):
                     collisions.append(eid)
-                (tdir / filename).write_bytes(encode(body))
+                (tdir / filename).write_bytes(encode(known_of_for_disk(body) if is_known_of(body) else body))
             counts[etype] = len(bodies_by_id)
         (tmp / WORLD_FILE).write_bytes(encode(world_for_disk(world, counts)))
         if root.exists():
@@ -280,6 +316,12 @@ class FolderElement:
     body: dict[str, Any]
     path: Path
     layout: Literal["elements", "spatial"]
+
+    @property
+    def known_of(self) -> bool:
+        """True for a stub (``known_of: true``, §4.4): known of, never whole. Its absent fields are
+        unknown, not empty, and it is never pushed."""
+        return is_known_of(self.body)
 
 
 @dataclass(frozen=True)
@@ -318,6 +360,12 @@ class Folder:
         (§4, v0.3.8, one id one file), so each is a folder some writer got wrong: a reader serves the
         ``elements/`` copy (``all_elements``) and SHOULD log these."""
         return sorted(self.elements.keys() & self.legacy.keys())
+
+    @property
+    def known_of(self) -> list[str]:
+        """Ids of the stubs among ``all_elements`` (§4.4, ``known_of: true``), sorted: elements this
+        folder knows of but does not hold whole."""
+        return sorted(eid for eid, el in self.all_elements().items() if el.known_of)
 
     @property
     def server_world_id(self) -> str | None:
@@ -365,6 +413,8 @@ def read_folder(root: str | os.PathLike[str], *, legacy: bool = True) -> Folder:
     - ``spatial/{map,pin,zone,marker}/`` (Atlas through v1.0) is read into ``legacy``
       unless ``legacy=False``. A missing type directory is "none of that type".
     - A repeated id keeps the first file in sorted path order; the rest land in ``duplicates``.
+    - A ``known_of: true`` file is a stub (§4.4): read as it is, flagged ``FolderElement.known_of``
+      and listed in ``Folder.known_of``; nothing is filled in for the fields it lacks.
     """
     root = Path(root)
     world_path = root / WORLD_FILE

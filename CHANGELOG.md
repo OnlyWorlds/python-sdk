@@ -4,6 +4,13 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+Known-of stubs (keel PR 113, B16; keel #421 §7g), staged, not live: keel PR 113 is not merged.
+
+- **Folder format v0.3.10, known-of elements (§4.4).** keel hands a guest or player an element it reaches only through its own Character's sheet as a stub, `known_of: true`, keeping `id`, `type`, `name`, `description`, `supertype`, `subtype`, `image_url`, `created_at`, `updated_at` and `change_seq` (`KNOWN_OF_KEEPS`) and every other field unset. `write_folder` (and so `export_world`) writes a stub as it is: its kept keys and `known_of: true`, never the unset `""`, `null` and `[]` (`folder.known_of_for_disk`). Every other body is still written untouched. A stub that later arrives whole is written whole, without `known_of` (a repeated id keeps its last body). `FORMAT_VERSION` is now `"0.3.10"`; folders stamped `"0.3.9"` stay valid.
+- **`is_known_of(body)`**: true only for `known_of: true`. The reader flags a stub (`FolderElement.known_of`) and lists them (`Folder.known_of`), and fills in nothing for the fields it lacks: they are unknown, not empty.
+- **A stub is never pushed**: `plan_push` leaves an element that is `known_of: true` in the folder or in the baseline out of the diff and lists it in `PushPlan.known_of` and `PushResult.known_of`, never in the membership lists, so a stub alone never makes a plan unmatched. `known_of` joins `push.NOT_SENT`.
+- **A stub is never written back**: `create`, `upsert`, `patch` and `bulk` raise `ValueError` before sending a body with `known_of: true` (`bulk` names the item and sends none of the batch); stripping the marker would turn keel's 422 into a write that blanks the element for any key that may write it. `known_of` joins `READ_ONLY_FIELDS`, so any other value of it is never sent. Equal to `@onlyworlds/sdk`'s staged half.
+
 ## 0.8.1 (2026-10-20)
 
 - **The schema**, repinned to schema-dist `v0.32.1-dist.26` (canonical `00.32.01`, the Captain's word, h55 #8395): one description changed, an Event's `characters` are the Characters who know about it (present, aware or involved). `SCHEMA_VERSION` is `00.32.01`; `ELEMENT_TYPES` and `FIELD_KINDS` are unchanged. Equal to `@onlyworlds/sdk` 4.38.0's pin.
