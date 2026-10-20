@@ -4,6 +4,10 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+## 0.7.1 (2026-10-20)
+
+- **The reset rule says keep.** `ApiError.is_resync_required` and the feed's docstring: on a 409 `resync_required`, walk again from the start and keep what the local copy holds that the new walk does not name; a reset never empties a copy. They said replace. Keel says keep since PR 104 (the Captain's ruling, 2026-10-20: sharing is forward-only). Nothing in the package acted on it, so no behaviour changes.
+
 ## 0.7.0 (2026-10-19)
 
 - **Folder format v0.3.9, the provenance lines (§4.2).** `export_world` writes two keys into `world.json`: `source`, `{server, world, at}` (the client's API origin, the world's id, and when the export began, as an ISO timestamp in UTC), and `exported_as`, `{kind, role, character}`, which slice the key reads. `exported_as` comes from `GET /me` through one function, `onlyworlds.export.exported_as`: an owner key gives `{"kind": "owner", "role": "owner", "character": null}`, a co-builder or contributor `{"kind": "member", "role": <its role>, "character": null}`, a guest of any kind (person, agent seat, player) `{"kind": "character", "role": "guest", "character": {"id", "name"}}` with the name read from `GET /character/{id}`. When `/me` is refused or missing, a guest has no Character, or its Character cannot be read, the key is left out: absent, never guessed. `FORMAT_VERSION` is now `"0.3.9"`; folders stamped `"0.3.8"` stay valid.

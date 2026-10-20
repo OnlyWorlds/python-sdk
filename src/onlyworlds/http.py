@@ -261,8 +261,8 @@ class ChangeWalk:
 
     A stored cursor can be refused: ``ApiError.is_resync_required`` (409), when a guest's view
     of the world changed or the key's role did. Then drop the cursor, walk again from the
-    start, and replace the local copy rather than merging into it. A guest never receives
-    delete ops, so only the replace removes what it no longer sees.
+    start, and keep what the local copy holds that the new walk does not name: a reset never
+    empties a copy (keel PR 104; sharing is forward-only).
     """
 
     def __init__(self, client: Client, since: str | None = None, *, limit: int | None = None):

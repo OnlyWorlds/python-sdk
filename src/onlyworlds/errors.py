@@ -130,7 +130,8 @@ class ApiError(Exception):
     def is_resync_required(self) -> bool:
         """``/changes`` refused the cursor (409 ``resync_required``): a guest's view of the world
         changed, or the key's role did (a guest's cursor has another shape). Drop the cursor,
-        walk again from the start, and REPLACE the local copy: what the key no longer sees must go."""
+        walk again from the start, and keep what the local copy holds that the new walk does not
+        name: a reset never empties a copy (keel PR 104; sharing is forward-only)."""
         return self.status == 409 and self.code == "resync_required"
 
     @property
