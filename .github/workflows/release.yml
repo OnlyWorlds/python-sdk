@@ -40,6 +40,14 @@ jobs:
             echo "$v is already on PyPI"; exit 1
           fi
 
+      # Every release is written up where its users look (the changelog question, OW Infra h37 #8286)
+      - name: The changelog has this version's entry
+        run: |
+          v="${GITHUB_REF_NAME#v}"
+          if ! awk -v v="$v" '$1=="##" && $2==v {f=1} END {exit !f}' CHANGELOG.md; then
+            echo "CHANGELOG.md has no '## $v' entry: write it, then tag"; exit 1
+          fi
+
       - run: uv sync
       - run: uv run pytest -q
       - run: uv run ruff check .
