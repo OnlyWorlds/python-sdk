@@ -103,6 +103,7 @@ def known_of_for_disk(body: Mapping[str, Any]) -> dict[str, Any]:
 ELEMENTS_DIR = "elements"
 WORLD_FILE = "world.json"
 LEGACY_SPATIAL_DIR = "spatial"
+RECORDS_DIR = "records"  # §4.5: world data that is not elements; this reader never opens it
 LEGACY_SPATIAL_TYPES: tuple[str, ...] = ("map", "pin", "zone", "marker")
 
 #: §5 (v0.3.5): ``world.json`` keys follow the CANONICAL SCHEMA, not the wire. One rename today.

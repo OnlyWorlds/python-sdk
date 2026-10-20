@@ -75,8 +75,13 @@ not an element, as the folder spec clarifies), a directory that is not a
 type directory, an id in both `elements/` and the legacy `spatial/` (the
 `elements/` copy is served, folder format v0.3.8), a key that is not a field
 of its type, a field kind this exporter does not know, and a link left out
-(not an id, a null in a multi link, or an element of the wrong type). A link
-to an id the folder does not hold is listed in ``OkfReport.unresolved``.
+(not an id, a null in a multi link, or an element of the wrong type), and
+anything at the folder's root beside `world.json`, `elements/` and `spatial/`:
+`records/` (world data that is not elements, folder format §4.5; a bundle is a
+translation, not an archive in the folder's format, so it may leave records
+out and says so), `media/` and any other entry. A dot-prefixed entry there is a
+tool's private store (folder format §4.3), not the world's, and is passed over.
+A link to an id the folder does not hold is listed in ``OkfReport.unresolved``.
 
 The folder is read by ``onlyworlds.folder.read_folder``, the package's one
 reader; the schema comes from the package's generated tables (``_schema``),
@@ -120,7 +125,15 @@ from ._schema import (
     WORLD_FIELDS,
 )
 from ._version import __version__
-from .folder import WIRE_TO_DISK_WORLD_KEYS, WORLD_FILE, Folder, read_folder
+from .folder import (
+    ELEMENTS_DIR,
+    LEGACY_SPATIAL_DIR,
+    RECORDS_DIR,
+    WIRE_TO_DISK_WORLD_KEYS,
+    WORLD_FILE,
+    Folder,
+    read_folder,
+)
 from .push import NOT_SENT
 
 __all__ = ["EXPORTER", "OKF_COMMIT", "OKF_VERSION", "FolderError", "OkfReport", "build_bundle", "export_okf", "main"]
@@ -510,6 +523,14 @@ def build_bundle(folder: Folder | str | os.PathLike[str], note: Note | None = No
     if folder.world is None:
         why = [s.reason for s in folder.skipped if s.path.parent == folder.root and s.path.name == WORLD_FILE]
         raise FolderError(why[0] if why else f"{folder.root}: no {WORLD_FILE}")
+    for entry in sorted(folder.root.iterdir(), key=lambda p: p.name):
+        if entry.name.startswith(".") or entry.name in (WORLD_FILE, ELEMENTS_DIR, LEGACY_SPATIAL_DIR):
+            continue
+        shown = f"{entry.name}/" if entry.is_dir() else entry.name
+        if entry.name == RECORDS_DIR and entry.is_dir():
+            noted(f"{shown} left out: world data that is not elements (folder format §4.5)")
+        else:
+            noted(f"{shown} left out: not the World or an element")
     elements = _elements(folder, noted)
     paths = assign_paths(elements)
     names = {body["id"]: str(body.get("name") or "") for _, body in elements}

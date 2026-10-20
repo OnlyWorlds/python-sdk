@@ -4,6 +4,8 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+- **The OKF exporter names what it leaves at the folder's root.** A folder's `records/` (world data that is not elements, folder format §4.5) stays out of the bundle, which is a translation and not an archive in the folder's format, and the export now says so in a note. So does `media/` or any other entry beside `world.json`, `elements/` and `spatial/`; a dot-prefixed one is a tool's private store (§4.3) and is passed over. Before, all of them were left out with no note, against the module's "nothing is dropped in silence". `RECORDS_DIR` joins the folder module's layout constants.
+
 ## 0.10.1 (2026-10-20)
 
 Folder format v0.3.11 (§3.3: a re-key never rewrites `x_identity_key`, the cross-world identity convention's key, Council #451). Nothing here re-keys, so the writer's behaviour is unchanged; `FORMAT_VERSION` and the `format_version` a written folder declares move to `0.3.11`.

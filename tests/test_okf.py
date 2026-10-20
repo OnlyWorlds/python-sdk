@@ -536,6 +536,22 @@ def test_nit_hyperion_run_is_quiet(world: World) -> None:
     assert run(HYPERION, world.out) == (0, "")
 
 
+def test_root_entries_left_out_are_noted(world: World) -> None:
+    """§4.5: a bundle is a translation, so records/ may stay behind, but never in silence."""
+    (world.src / "records" / "ledger").mkdir(parents=True)
+    (world.src / "records" / "RECORDS.json").write_text('{"producer": "ledger"}', encoding="utf-8")
+    (world.src / "media").mkdir()
+    (world.src / "notes.txt").write_text("x", encoding="utf-8")
+    (world.src / ".atlas").mkdir()
+    code, err = world.run()
+    assert code == 0, err
+    assert "records/ left out: world data that is not elements (folder format §4.5)" in err
+    assert "media/ left out" in err
+    assert "notes.txt left out" in err
+    assert ".atlas" not in err  # a tool's private store (§4.3), not the world's
+    assert not any("records" in p.parts or "media" in p.parts for p in world.out.rglob("*"))
+
+
 def test_nit_only_stderr_redirected(world: World) -> None:
     out = io.TextIOWrapper(io.BytesIO(), encoding="utf-8")
     with redirect_stdout(out), redirect_stderr(io.StringIO()):
