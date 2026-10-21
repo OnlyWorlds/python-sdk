@@ -5,8 +5,8 @@ and it never writes: no file, no API write, no fix. Two doors, one walk:
 
 ::
 
-    python -m onlyworlds.doctor PATH/TO/WORLD-FOLDER [--json] [--days N] [--changes N]
-    python -m onlyworlds.doctor --api [--json] [--days N] [--changes N]
+    python -m onlyworlds.doctor PATH/TO/WORLD-FOLDER [--json | --packet] [--days N] [--changes N]
+    python -m onlyworlds.doctor --api [--json | --packet] [--days N] [--changes N]
 
 The API door reads its key from ``OW_API_KEY`` (else the toolkit's ``ONLYWORLDS_API_KEY``) and
 its PIN from ``OW_API_PIN`` (else ``ONLYWORLDS_API_PIN``), lists every type in pages of 1,000 and
@@ -48,6 +48,17 @@ is present at its latest change_seq"), so a walk carries current bodies only and
 reports ``not_run`` unless the walk holds two versions of one element. No read mark exists
 in the folder format, the API or this package, so flag 7 never runs.
 
+``--packet`` prints the findings as work packets (``packets``): the ``packet`` extension
+profile (schema-dist ``profiles/packet.md``, dist.36), a Relation with supertype ``Work item``
+holding ``x_packet_elements`` (one entry per element, ``{type, id, reason}``, in flag order),
+``x_packet_source`` (``{server, world}``; ``server`` null for a folder) and
+``x_packet_producer`` (this tool and version), the same elements on the Relation's typed link
+fields, no ``id`` (the tool that lands it mints one). A JSON array: empty on a clean run,
+several packets past the extension cap (``PACKET_CAP``, each named ``(i of n)``). Findings on
+messages and room things, and findings with no element (no charter), stay in the report and
+out of the packet. The doctor still writes nothing: a packet is output, landing it is the
+reader's act.
+
 From the command line: exit 0 clean, 1 findings, 2 nothing could be read.
 """
 
@@ -68,7 +79,8 @@ from itertools import pairwise
 from pathlib import Path
 from typing import Any, Protocol
 
-from ._schema import ELEMENT_TYPES, FIELD_KINDS, GENERIC_PAIRS
+from ._schema import ELEMENT_TYPES, FIELD_KINDS, GENERIC_PAIRS, LINK_TARGETS
+from ._version import __version__
 from .errors import ApiError
 from .folder import FORMAT_VERSION, WORLD_FILE, Folder, is_known_of, read_folder
 from .http import API_BASE, Client
@@ -76,12 +88,15 @@ from .http import API_BASE, Client
 __all__ = [
     "FLAGS",
     "MESSAGE_SUPERTYPES",
+    "PACKET_CAP",
+    "PACKET_TOOL",
     "Reader",
     "Report",
     "doctor_api",
     "doctor_folder",
     "fold_name",
     "main",
+    "packets",
     "render_prose",
 ]
 
@@ -138,6 +153,15 @@ _LEGACY_LINK_SPELLINGS: dict[str, dict[str, str]] = {
 _HOLDING_SUPERTYPES = frozenset({"tenure", "membership"})
 _PAGE = 1000
 _GIT_TIMEOUT = 30.0
+#: The bytes of a packet's three ``x_packet_*`` keys (ASCII JSON) one work item may carry: keel
+#: caps extensions at 64 KB per element; the margin is for how keel measures.
+PACKET_CAP = 60_000
+#: The tool name a packet's producer line carries (decision 8 of the doctor's sheet).
+PACKET_TOOL = "onlyworlds doctor"
+#: Element type -> the Relation's multi-link field that holds it (the typed view of a packet).
+_RELATION_FIELD: dict[str, str] = {
+    target: f for f, target in LINK_TARGETS["relation"].items() if FIELD_KINDS["relation"][f] == "multi_link"
+}
 
 
 class Reader(Protocol):
@@ -728,6 +752,75 @@ def render_prose(report: Report) -> str:
     return "\n".join(_lines(report)) + "\n"
 
 
+# ---------------------------------------------------------------------------
+# The packet: the findings as work items (the ``packet`` extension profile, dist.36)
+# ---------------------------------------------------------------------------
+
+
+def _sentence(text: str) -> str:
+    text = text.strip()
+    return text if not text or text[-1] in ".!?" else text + "."
+
+
+def _packet_bytes(entries: list[dict[str, str]], source: dict[str, Any], producer: dict[str, str]) -> int:
+    ext = {"x_packet_elements": entries, "x_packet_source": source, "x_packet_producer": producer}
+    return len(json.dumps(ext, ensure_ascii=True, separators=(",", ":")))
+
+
+def packets(
+    report: Report, *, server: str | None = None, now: _dt.datetime | None = None, cap: int = PACKET_CAP
+) -> list[dict[str, Any]]:
+    """The report's findings as work packets: a list of Relations (``type: relation``, supertype
+    ``Work item``, subtype ``open``, no ``id``) in the ``packet`` profile's shape. One entry per
+    element in ``x_packet_elements`` (``{type, id, reason}``, first in flag order; an element with
+    several findings has their reasons joined), the same ids on the Relation's typed link fields
+    where it has one for the type, ``x_packet_source`` ``{server, world}`` (``server`` is the API
+    base the world was read from, ``None`` for a folder) and ``x_packet_producer``. Only the
+    findings that are facts about the world with an element go in (not ``kind: "message"``, not
+    a finding on the world itself). Empty on a clean run; split past ``cap`` bytes of the three
+    ``x_packet_*`` keys, each part complete and named ``(i of n)``."""
+    reasons: dict[tuple[str, str], list[str]] = {}
+    for f in report.to_look_at:
+        el = f.get("element")
+        if not el or not isinstance(el.get("id"), str) or not isinstance(el.get("type"), str):
+            continue
+        reasons.setdefault((el["type"], el["id"]), []).append(_sentence(f["reason"]))
+    if not reasons:
+        return []
+    entries = [{"type": t, "id": i, "reason": " ".join(rs)} for (t, i), rs in reasons.items()]
+    source: dict[str, Any] = {"server": server, "world": report.world.get("id")}
+    producer = {"tool": PACKET_TOOL, "version": __version__}
+    parts: list[list[dict[str, str]]] = [[]]
+    for e in entries:
+        if parts[-1] and _packet_bytes([*parts[-1], e], source, producer) > cap:
+            parts.append([])
+        parts[-1].append(e)
+    day = (now or _dt.datetime.now(_dt.UTC)).date().isoformat()
+    world_name = report.world.get("name") or "this world"
+    out: list[dict[str, Any]] = []
+    for i, part in enumerate(parts, 1):
+        suffix = f" ({i} of {len(parts)})" if len(parts) > 1 else ""
+        body: dict[str, Any] = {
+            "type": "relation",
+            "supertype": "Work item",
+            "subtype": "open",
+            "name": f"Doctor's findings, {day}{suffix}",
+            "description": (
+                f"{len(part)} of {len(entries)} elements to look at in {world_name}, from the doctor's run on {day}"
+                f" ({len(report.ran)} flags ran, {len(report.not_run)} could not)."
+            ),
+        }
+        for e in part:
+            field_name = _RELATION_FIELD.get(e["type"])
+            if field_name:
+                body.setdefault(field_name, []).append(e["id"])
+        body["x_packet_elements"] = part
+        body["x_packet_source"] = dict(source)
+        body["x_packet_producer"] = dict(producer)
+        out.append(body)
+    return out
+
+
 def main(argv: list[str] | None = None) -> int:
     for stream in (sys.stdout, sys.stderr):
         if isinstance(stream, io.TextIOWrapper):
@@ -741,11 +834,19 @@ def main(argv: list[str] | None = None) -> int:
     )
     ap.add_argument("--base-url", default=API_BASE, help=f"the API to read (default {API_BASE})")
     ap.add_argument("--json", action="store_true", help="print the JSON report instead of the prose one")
+    ap.add_argument(
+        "--packet",
+        action="store_true",
+        help="print the findings as work packets (the packet extension profile), a JSON array",
+    )
     ap.add_argument("--days", type=int, default=14, help="flag 6a: a stub older than this many days (default 14)")
     ap.add_argument("--changes", type=int, default=50, help="flag 8: more changes than this (default 50)")
     args = ap.parse_args(argv)
     if (args.folder is None) == (not args.api):
         print("give a world folder or --api, one of the two", file=sys.stderr)
+        return 2
+    if args.json and args.packet:
+        print("--json or --packet, one of the two", file=sys.stderr)
         return 2
 
     if args.api:
@@ -776,6 +877,9 @@ def main(argv: list[str] | None = None) -> int:
 
     if args.json:
         print(json.dumps(report.as_dict(), ensure_ascii=True, indent=2))
+    elif args.packet:
+        server = args.base_url.rstrip("/") if args.api else None
+        print(json.dumps(packets(report, server=server), ensure_ascii=True, indent=2))
     else:
         sys.stdout.write(render_prose(report))
     return report.exit_code

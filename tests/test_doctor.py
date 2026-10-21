@@ -660,3 +660,109 @@ def test_the_api_command_line_when_nothing_can_be_read(monkeypatch: pytest.Monke
     monkeypatch.setenv("OW_API_KEY", "ow_r_bad")
     code, _, err = run_main(["--api"])
     assert code == 2 and "nothing could be read" in err
+
+
+# --- the packet: the findings as work items (the packet profile, dist.36) ----------
+
+
+def test_packets_on_the_clean_world(tmp_path: Path) -> None:
+    assert doctor.packets(folder_report(tmp_path, clean()), now=NOW) == []
+    root = tmp_path / "clean"
+    write_folder(root, WORLD, clean())
+    code, out, _ = run_main([str(root), "--packet"])
+    assert code == 0 and json.loads(out) == []
+
+
+def test_packets_one_entry_per_element_in_the_profiles_shape(tmp_path: Path) -> None:
+    # C2: no links and no text (flags 4 and 6b on one element); a Message with the same faults is a
+    # room thing and stays out; the packet is one Relation in the profile's shape, with no id
+    msg = {"id": N1[:-1] + "9", "name": "Re: Plans", "supertype": "Message", "description": ""}
+    world = with_(with_(clean(), "character", {"id": C2, "name": "Bo", "description": ""}), "narrative", msg)
+    report = folder_report(tmp_path, world)
+    assert {f["flag"] for f in report.findings if f["element"]["id"] == C2} == {"4", "6b"}
+    assert any(f.get("kind") == "message" for f in report.findings)
+    (packet,) = doctor.packets(report, now=NOW)
+    assert list(packet) == [
+        "type",
+        "supertype",
+        "subtype",
+        "name",
+        "description",
+        "characters",
+        "x_packet_elements",
+        "x_packet_source",
+        "x_packet_producer",
+    ]
+    assert packet["type"] == "relation" and packet["supertype"] == "Work item" and packet["subtype"] == "open"
+    assert packet["name"] == "Doctor's findings, 2026-10-21"
+    assert packet["description"].startswith(
+        "1 of 1 elements to look at in Harbor World, from the doctor's run on 2026-10-21"
+    )
+    assert packet["characters"] == [C2]
+    r4, r6b = (f["reason"] for f in report.to_look_at if f["element"]["id"] == C2)
+    assert packet["x_packet_elements"] == [{"type": "character", "id": C2, "reason": f"{r4}. {r6b}."}]
+    assert packet["x_packet_source"] == {"server": None, "world": WORLD["id"]}
+    assert packet["x_packet_producer"] == {"tool": "onlyworlds doctor", "version": doctor.__version__}
+    assert msg["id"] not in json.dumps(packet)
+    # a reader needs no lookup: every entry's three keys are strings
+    for e in packet["x_packet_elements"]:
+        assert set(e) == {"type", "id", "reason"} and all(isinstance(v, str) for v in e.values())
+
+
+def test_packets_leave_out_a_finding_on_the_world_itself() -> None:
+    # flag 8's "no charter" names no element; a packet entry needs a type and an id
+    report = Report(world={"id": WORLD["id"], "name": "W", "door": "api"}, ran=["8"])
+    report.findings = [{"flag": "8", "element": None, "reason": "no Law with supertype Charter", "evidence": {}}]
+    assert doctor.packets(report, server="https://www.onlyworlds.com", now=NOW) == []
+
+
+def test_packets_split_past_the_cap() -> None:
+    report = Report(world={"id": WORLD["id"], "name": "W", "door": "api"}, ran=["4"])
+    ids = [f"c0000000-0000-7000-8000-{i:012d}" for i in range(300)]
+    report.findings = [
+        {
+            "flag": "4",
+            "element": {"type": "character", "id": i, "name": "x", "reason": ""},
+            "reason": "no links",
+            "evidence": {},
+        }
+        for i in ids
+    ]
+    parts = doctor.packets(report, server="https://www.onlyworlds.com", now=NOW, cap=4000)
+    assert len(parts) > 1
+    assert [p["name"] for p in parts] == [
+        f"Doctor's findings, 2026-10-21 ({i} of {len(parts)})" for i in range(1, len(parts) + 1)
+    ]
+    assert [e["id"] for p in parts for e in p["x_packet_elements"]] == ids
+    for p in parts:
+        assert p["characters"] == [e["id"] for e in p["x_packet_elements"]]
+        assert doctor._packet_bytes(p["x_packet_elements"], p["x_packet_source"], p["x_packet_producer"]) <= 4000
+        assert p["x_packet_source"] == {"server": "https://www.onlyworlds.com", "world": WORLD["id"]}
+    (whole,) = doctor.packets(report, now=NOW)
+    assert len(whole["x_packet_elements"]) == 300 and "(1 of" not in whole["name"]
+
+
+def test_the_packet_command_line(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    root = tmp_path / "w"
+    write_folder(root, WORLD, with_(clean(), "character", {"id": C2, "name": "Bo", "description": "Alone."}))
+    code, out, _ = run_main([str(root), "--packet"])
+    (packet,) = json.loads(out)
+    assert code == 1 and packet["x_packet_source"] == {"server": None, "world": WORLD["id"]}
+    assert packet["x_packet_elements"] == [
+        {"type": "character", "id": C2, "reason": "no link field is set on it and no element links to it."}
+    ]
+    code, _, err = run_main([str(root), "--packet", "--json"])
+    assert code == 2 and "one of the two" in err
+    # through the API door the source names the server the world was read from
+    transport = FakeTransport(
+        handler=route(on_the_wire(with_(clean(), "character", {"id": C2, "name": "Bo", "description": "Alone."})))
+    )
+    monkeypatch.setattr(doctor, "Client", lambda key, pin=None, **kw: Client(key, pin, transport=transport, **kw))
+    monkeypatch.setenv("OW_API_KEY", "ow_r_testkey")
+    monkeypatch.setenv("OW_API_PIN", "")
+    code, out, _ = run_main(["--api", "--packet", "--base-url", "https://keel-staging.onrender.com/api/v2/"])
+    (packet,) = json.loads(out)
+    assert code == 1 and packet["x_packet_source"] == {
+        "server": "https://keel-staging.onrender.com/api/v2",
+        "world": WORLD["id"],
+    }
