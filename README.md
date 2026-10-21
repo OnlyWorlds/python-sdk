@@ -91,6 +91,26 @@ print(report.elements, "elements,", len(report.notes), "notes")
 
 The output directory must not exist yet. Anything the export leaves out (a file that isn't an element, a key that isn't a field, a link to the wrong type) is listed in `report.notes`; the command prints these on stderr. The same folder always gives the same bytes. What a bundle never carries: the server's bookkeeping (`change_seq`, `created_at`, who wrote what) and the world's key, so a bundle is a copy to read elsewhere, not a folder to sync.
 
+## The doctor
+
+The doctor checks a world and reports what its keeper should look at, each finding with the element and the reason. It only reads: it never changes a file or sends a write.
+
+```bash
+python -m onlyworlds.doctor moppetopia            # a world folder
+OW_API_KEY=ow_r_… python -m onlyworlds.doctor --api   # the key's world (OW_API_PIN when the key needs one)
+```
+
+```python
+from onlyworlds import read_folder
+from onlyworlds.doctor import doctor_folder
+
+report = doctor_folder(read_folder("moppetopia"))
+for finding in report.findings:
+    print(finding["flag"], finding["element"], finding["reason"])
+```
+
+It looks for links to elements that are not there, Events that end before they start, elements with no links in or out, names that collide once case, character width, spacing and punctuation are folded, stubs never filled (a known-of element older than `--days`, or an element with no text in any of its type's text fields), and a charter Law untouched after `--changes` changes in the feed. On a folder it also checks `world.json`: a `format_version` older than this package's, and an `api_key` in a `world.json` that git tracks. Each check says how much it could compare, and one it cannot run (a folder has no change feed; nothing records whether a message was read) is listed with the reason, never counted as clean. `--json` prints the same report for a tool. The exit code is 0 when there is nothing to look at, 1 when there is, 2 when nothing could be read.
+
 ## Errors
 
 A failed call raises `ApiError` with the API's `code`, `param` (the field that failed) and `doc_url`, and flags for the cases you handle differently: `is_validation_error`, `is_auth_error`, `is_not_author`, `is_owner_only`, `is_id_conflict`, `is_resync_required`, `is_busy`, `is_precondition_failed`.
