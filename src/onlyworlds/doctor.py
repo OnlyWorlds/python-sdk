@@ -8,8 +8,9 @@ and it never writes: no file, no API write, no fix. Two doors, one walk:
     python -m onlyworlds.doctor PATH/TO/WORLD-FOLDER [--json] [--days N] [--changes N]
     python -m onlyworlds.doctor --api [--json] [--days N] [--changes N]
 
-The API door reads its key and PIN from ``OW_API_KEY`` and ``OW_API_PIN``, lists every
-type in pages of 1,000 and walks the change feed from the start.
+The API door reads its key from ``OW_API_KEY`` (else the toolkit's ``ONLYWORLDS_API_KEY``) and
+its PIN from ``OW_API_PIN`` (else ``ONLYWORLDS_API_PIN``), lists every type in pages of 1,000 and
+walks the change feed from the start.
 
 The flags (the first list):
 
@@ -17,10 +18,13 @@ The flags (the first list):
 2. a Title whose holders changed with no dated Relation;
 3. an Event ending before it starts;
 4. an element with no links in or out;
-5. two elements whose names collide after folding (NFKC, case-folded, whitespace and
-   punctuation collapsed), within one type and across types, reported apart;
+5. two elements of one type whose names collide after folding (NFKC, case-folded,
+   whitespace and punctuation collapsed); a name shared across types is not one (a Location
+   and its Pin or Zone share a name by the format's own convention);
 6. a stub never filled, two readings: (6a) a known-of stub (``known_of: true``) older
-   than N days, and (6b) an element with no text in any of its type's text fields;
+   than N days, and (6b) an element with no text in any of its type's text fields, on the
+   types with at least two prose fields beside ``description`` (not map, marker, pin and
+   relation: their text is their links or their place);
 7. a message unread by its addressee after N days;
 8. a charter (a Law with supertype Charter) untouched after N changes;
 
@@ -32,6 +36,11 @@ A flag the walk cannot evaluate is reported in ``not_run`` with its reason, neve
 and every flag that ran says how much it could compare (``compared: {n, of}``): a clean
 count over nothing compared is not a pass. A known-of stub's absent fields are unknown,
 not empty (folder spec §4.4), so a stub is never counted as linkless or textless.
+
+A finding on a parlor- or message-shaped element (supertype Message, Board, Work item, Spec,
+Heart, Vote or Sitting) carries ``"kind": "message"``: it is about a room, not a fact about
+the world. The prose groups those last and leaves them out of the "things to look at" count;
+they still make the exit code 1.
 
 What the feed can show was measured, not assumed: keel serves each element's upsert from
 its row at its latest ``change_seq`` (keel ``core/changes.py``, spec §8: "every live element
@@ -64,7 +73,17 @@ from .errors import ApiError
 from .folder import FORMAT_VERSION, WORLD_FILE, Folder, is_known_of, read_folder
 from .http import API_BASE, Client
 
-__all__ = ["FLAGS", "Reader", "Report", "doctor_api", "doctor_folder", "fold_name", "main", "render_prose"]
+__all__ = [
+    "FLAGS",
+    "MESSAGE_SUPERTYPES",
+    "Reader",
+    "Report",
+    "doctor_api",
+    "doctor_folder",
+    "fold_name",
+    "main",
+    "render_prose",
+]
 
 #: Flag id -> what it looks for. The ids are strings because flag 6 has two readings.
 FLAGS: dict[str, str] = {
@@ -81,13 +100,17 @@ FLAGS: dict[str, str] = {
     "10": "An api_key in a tracked world.json",
 }
 
+#: A finding on an element of these supertypes (compared case-folded) is ``kind: "message"``
+#: (TC's rule, h66 #9660): a world's own parlor, messages and room things, not facts about the world.
+MESSAGE_SUPERTYPES: frozenset[str] = frozenset({"message", "board", "work item", "spec", "heart", "vote", "sitting"})
+
 #: What each flag's ``compared`` counts, for the prose report.
 _UNITS: dict[str, str] = {
     "1": "link values",
     "2": "Titles with two versions in the feed",
     "3": "Events with both dates",
     "4": "elements",
-    "5": "named elements",
+    "5": "named elements (names shared across types are not counted)",
     "6a": "known-of stubs with an updated_at",
     "6b": "whole elements",
     "8": "charters found in the feed",
@@ -99,6 +122,13 @@ _UNITS: dict[str, str] = {
 _NOT_PROSE = frozenset({"name", "supertype", "subtype", "image_url"}) | {
     type_key for pairs in GENERIC_PAIRS.values() for type_key, _ in pairs
 }
+#: Flag 6b leaves out the types with fewer than two prose fields beside ``description``
+#: (measured from the schema: map, marker, pin, relation). A Relation's text is its links.
+_SPARSE_TYPES: tuple[str, ...] = tuple(
+    t
+    for t in ELEMENT_TYPES
+    if len([f for f, k in FIELD_KINDS[t].items() if k == "text" and f not in _NOT_PROSE and f != "description"]) < 2
+)
 #: Atlas-written pins and markers spell two links ``map_id`` / ``zone_id`` (spec §5; ``push``).
 _LEGACY_LINK_SPELLINGS: dict[str, dict[str, str]] = {
     "pin": {"map_id": "map", "zone_id": "zone"},
@@ -132,7 +162,8 @@ class Report:
     ran: list[str] = field(default_factory=list)
     not_run: list[dict[str, str]] = field(default_factory=list)
     findings: list[dict[str, Any]] = field(default_factory=list)
-    compared: dict[str, dict[str, int]] = field(default_factory=dict)
+    #: flag -> ``{n, of}``; 6b adds ``skipped_types``
+    compared: dict[str, dict[str, Any]] = field(default_factory=dict)
     #: always 0: the doctor never writes
     written: int = 0
 
@@ -148,7 +179,18 @@ class Report:
 
     @property
     def exit_code(self) -> int:
+        """1 for any finding, a message-shaped one too; 0 for none."""
         return 1 if self.findings else 0
+
+    @property
+    def to_look_at(self) -> list[dict[str, Any]]:
+        """The findings that are facts about the world: all but ``kind: "message"``."""
+        return [f for f in self.findings if f.get("kind") != "message"]
+
+    @property
+    def messages(self) -> list[dict[str, Any]]:
+        """The findings on messages and room things (``kind: "message"``)."""
+        return [f for f in self.findings if f.get("kind") == "message"]
 
 
 @dataclass(frozen=True)
@@ -179,18 +221,24 @@ class _Run:
         self._not_run: dict[str, str] = {}
         self._findings: dict[str, list[dict[str, Any]]] = defaultdict(list)
 
-    def ran(self, flag: str, n: int | None = None, of: int | None = None) -> None:
+    def ran(self, flag: str, n: int | None = None, of: int | None = None, **extra: Any) -> None:
         self._ran.add(flag)
         if n is not None and of is not None:
-            self.report.compared[flag] = {"n": n, "of": of}
+            self.report.compared[flag] = {"n": n, "of": of, **extra}
 
     def skip(self, flag: str, why: str) -> None:
         self._not_run[flag] = why
 
     def find(self, flag: str, element: _El | None, reason: str, evidence: Mapping[str, Any]) -> None:
-        self._findings[flag].append(
-            {"flag": flag, "element": element.ref() if element else None, "reason": reason, "evidence": dict(evidence)}
-        )
+        finding: dict[str, Any] = {
+            "flag": flag,
+            "element": element.ref() if element else None,
+            "reason": reason,
+            "evidence": dict(evidence),
+        }
+        if element is not None and _folded(element.body.get("supertype")) in MESSAGE_SUPERTYPES:
+            finding["kind"] = "message"  # additive: a finding on anything else has no `kind`
+        self._findings[flag].append(finding)
 
     def done(self) -> Report:
         r = self.report
@@ -256,6 +304,10 @@ def _time(value: Any) -> _dt.datetime | None:
     except ValueError:
         return None
     return t if t.tzinfo else t.replace(tzinfo=_dt.UTC)
+
+
+def _type_order(element_type: str) -> int:
+    return ELEMENT_TYPES.index(element_type) if element_type in ELEMENT_TYPES else len(ELEMENT_TYPES)
 
 
 def _folded(value: Any) -> str:
@@ -339,36 +391,24 @@ def _walk(run: _Run, els: list[_El], *, days: int, now: _dt.datetime, whole_view
         run.find("4", el, "no link field is set on it and no element links to it", {})
     run.ran("4", known, len(els))
 
-    # 5. Two elements whose names collide after folding.
-    groups: dict[str, list[_El]] = defaultdict(list)
+    # 5. Two elements of one type whose names collide after folding. Across types is no
+    # collision: a Location and its Pin or Zone share a name by the format's own convention.
+    groups: dict[tuple[str, str], list[_El]] = defaultdict(list)
     for el in els:
         key = fold_name(el.name)
         if key:
-            groups[key].append(el)
+            groups[(el.type, key)].append(el)
     named = sum(len(g) for g in groups.values())
-    for key, group in groups.items():
+    for (_, key), group in sorted(groups.items(), key=lambda kv: (_type_order(kv[0][0]), kv[0][1])):
         if len(group) < 2:
             continue
-        by_type: dict[str, list[_El]] = defaultdict(list)
-        for el in sorted(group, key=lambda e: (ELEMENT_TYPES.index(e.type) if e.type in ELEMENT_TYPES else 99, e.id)):
-            by_type[el.type].append(el)
-        for same in by_type.values():
-            if len(same) > 1:
-                run.find(
-                    "5",
-                    same[0],
-                    f"{len(same)} elements of one type share this name once folded",
-                    {"scope": "same type", "folded": key, "with": [e.ref() for e in same[1:]]},
-                )
-        if len(by_type) > 1:
-            firsts = [g[0] for g in by_type.values()]
-            others = [e.ref() for g in by_type.values() for e in g if e is not firsts[0]]
-            run.find(
-                "5",
-                firsts[0],
-                f"elements of {len(by_type)} types share this name once folded",
-                {"scope": "across types", "folded": key, "with": others},
-            )
+        same = sorted(group, key=lambda e: e.id)
+        run.find(
+            "5",
+            same[0],
+            f"{len(same)} elements of one type share this name once folded",
+            {"folded": key, "with": [e.ref() for e in same[1:]]},
+        )
     run.ran("5", named, len(els))
 
     # 6a. A known-of stub older than `days`.
@@ -389,16 +429,19 @@ def _walk(run: _Run, els: list[_El], *, days: int, now: _dt.datetime, whole_view
             )
     run.ran("6a", timed, len(stubs))
 
-    # 6b. No text in any of the type's text fields.
+    # 6b. No text in any of the type's text fields, on the types with prose beside description.
     whole = 0
     for el in els:
         if el.known_of:
             continue  # its absent fields are unknown, not empty: 6a's reading
+        if el.type in _SPARSE_TYPES:
+            continue
         whole += 1
         fields = _text_fields(el.type)
         if fields and not any(isinstance(el.body.get(f), str) and el.body[f].strip() for f in fields):
             run.find("6b", el, f"no text in any of its {len(fields)} text fields", {"fields": fields})
-    run.ran("6b", whole, len(els))
+    of = sum(1 for el in els if el.type not in _SPARSE_TYPES)
+    run.ran("6b", whole, of, skipped_types=list(_SPARSE_TYPES))
 
 
 # ---------------------------------------------------------------------------
@@ -636,12 +679,38 @@ def _lines(report: Report) -> Iterable[str]:
     w = report.world
     yield f"The doctor on {w.get('name') or '(no name)'} ({w.get('id') or 'no id'}), {w.get('door')} door"
     yield ""
+    messages = report.messages
     yield (
-        f"{len(report.findings)} things to look at, {len(report.ran)} flags ran, "
+        f"{len(report.to_look_at)} things to look at, {len(report.ran)} flags ran, "
         f"{len(report.not_run)} could not run, {report.written} things written"
+        + (f" ({len(messages)} on messages and room things, listed last)" if messages else "")
     )
+    yield from _by_flag(report.to_look_at)
+    yield ""
+    yield "What was checked"
+    for flag in report.ran:
+        c = report.compared.get(flag)
+        counted = f": {c['n']} of {c['of']} {_UNITS.get(flag, '')}".rstrip() if c else ""
+        if c and c.get("skipped_types"):
+            skipped = ", ".join(c["skipped_types"])
+            counted += f" (not compared: {skipped}, types with under two text fields beside description)"
+        yield f"  {flag}. {FLAGS[flag]}{counted}"
+    if report.not_run:
+        yield ""
+        yield "What could not be checked, and why"
+        for item in report.not_run:
+            yield f"  {item['flag']}. {FLAGS[item['flag']]}: {item['why']}"
+    if messages:
+        yield ""
+        yield "Messages and room things (not facts about the world)"
+        yield f"  {len(messages)} findings on elements whose supertype marks a message or a room thing;"
+        yield "  they are not counted above, but they still make the exit code 1."
+        yield from _by_flag(messages)
+
+
+def _by_flag(findings: list[dict[str, Any]]) -> Iterable[str]:
     for flag in FLAGS:
-        found = [x for x in report.findings if x["flag"] == flag]
+        found = [x for x in findings if x["flag"] == flag]
         if not found:
             continue
         yield ""
@@ -652,17 +721,6 @@ def _lines(report: Report) -> Iterable[str]:
             yield f"  - {who}: {x['reason']}"
             if x["evidence"]:
                 yield "    " + "; ".join(f"{k}: {_say(v)}" for k, v in x["evidence"].items())
-    yield ""
-    yield "What was checked"
-    for flag in report.ran:
-        c = report.compared.get(flag)
-        counted = f": {c['n']} of {c['of']} {_UNITS.get(flag, '')}".rstrip() if c else ""
-        yield f"  {flag}. {FLAGS[flag]}{counted}"
-    if report.not_run:
-        yield ""
-        yield "What could not be checked, and why"
-        for item in report.not_run:
-            yield f"  {item['flag']}. {FLAGS[item['flag']]}: {item['why']}"
 
 
 def render_prose(report: Report) -> str:
@@ -676,7 +734,11 @@ def main(argv: list[str] | None = None) -> int:
             stream.reconfigure(encoding="utf-8")
     ap = argparse.ArgumentParser(prog="python -m onlyworlds.doctor", description=(__doc__ or "").splitlines()[0])
     ap.add_argument("folder", nargs="?", type=Path, help="a world folder (holds world.json and elements/)")
-    ap.add_argument("--api", action="store_true", help="check the world of the key in OW_API_KEY (PIN: OW_API_PIN)")
+    ap.add_argument(
+        "--api",
+        action="store_true",
+        help="check the world of the key in OW_API_KEY or ONLYWORLDS_API_KEY (PIN: OW_API_PIN or ONLYWORLDS_API_PIN)",
+    )
     ap.add_argument("--base-url", default=API_BASE, help=f"the API to read (default {API_BASE})")
     ap.add_argument("--json", action="store_true", help="print the JSON report instead of the prose one")
     ap.add_argument("--days", type=int, default=14, help="flag 6a: a stub older than this many days (default 14)")
@@ -687,14 +749,16 @@ def main(argv: list[str] | None = None) -> int:
         return 2
 
     if args.api:
-        key = os.environ.get("OW_API_KEY")
+        key = os.environ.get("OW_API_KEY") or os.environ.get("ONLYWORLDS_API_KEY")
         if not key:
             print(
-                "--api reads the key from OW_API_KEY (and the PIN from OW_API_PIN); OW_API_KEY is not set",
+                "--api reads the key from OW_API_KEY or ONLYWORLDS_API_KEY (the PIN from OW_API_PIN or "
+                "ONLYWORLDS_API_PIN); neither key variable is set",
                 file=sys.stderr,
             )
             return 2
-        client = Client(key, os.environ.get("OW_API_PIN") or None, base_url=args.base_url)
+        pin = os.environ.get("OW_API_PIN") or os.environ.get("ONLYWORLDS_API_PIN") or None
+        client = Client(key, pin, base_url=args.base_url)
         try:
             report = doctor_api(client, days=args.days, changes=args.changes)
         except (ApiError, ConnectionError, ValueError) as exc:

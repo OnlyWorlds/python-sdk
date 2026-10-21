@@ -210,18 +210,19 @@ def test_5_names_colliding_within_a_type(tmp_path: Path) -> None:
     planted = folder_report(tmp_path, with_(clean(), "character", other))
     twin = folder_report(tmp_path, with_(clean(), "character", {**other, "name": "Anna"}))
     (f,) = found(planted, "5")
-    assert f["evidence"]["scope"] == "same type"
-    assert [w["id"] for w in f["evidence"]["with"]] == [C2]
+    assert f["evidence"] == {"folded": "ann", "with": [{"type": "character", "id": C2, "name": "ANN!"}]}
     assert found(twin, "5") == []
 
 
-def test_5_names_colliding_across_types_are_reported_apart(tmp_path: Path) -> None:
-    place = {"id": L2, "name": "ann", "description": "A cove.", "parent_location": L1}
-    planted = folder_report(tmp_path, with_(clean(), "location", place))
-    twin = folder_report(tmp_path, with_(clean(), "location", {**place, "name": "Ann's Cove"}))
-    (f,) = found(planted, "5")
-    assert f["evidence"]["scope"] == "across types"
-    assert found(twin, "5") == []
+def test_5_a_name_shared_across_types_is_no_collision(tmp_path: Path) -> None:
+    # Moppetopia's Crumblefields is a location, a pin and a zone: the format's own convention
+    zone = {"id": "z0000000-0000-7000-8000-000000000001", "name": "harbor", "role": "The port's waters."}
+    pin = {"id": P1, "name": "Harbor", "description": "", "element_type": "location", "element_id": L1}
+    across = folder_report(tmp_path, with_(with_(clean(), "zone", zone), "pin", pin))
+    within = folder_report(tmp_path, with_(clean(), "location", {**zone, "type": "location", "parent_location": L1}))
+    assert found(across, "5") == []
+    assert [f["element"]["id"] for f in found(within, "5")] == [L1]
+    assert "names shared across types are not counted" in render_prose(across)
 
 
 # --- 6. a stub never filled, both readings --------------------------------------
@@ -261,7 +262,56 @@ def test_6b_leaves_a_stub_to_6a(tmp_path: Path) -> None:
     stub = {"id": C2, "name": "Bo", "description": "", "known_of": True, "updated_at": "2026-10-20T00:00:00Z"}
     r = folder_report(tmp_path, with_(clean(), "character", stub))
     assert found(r, "6b") == []
-    assert r.compared["6b"] == {"n": 7, "of": 8}
+    assert r.compared["6b"]["n"] == 6 and r.compared["6b"]["of"] == 7  # the Relation is skipped, the stub not compared
+
+
+def test_6b_skips_the_types_whose_text_is_description_alone(tmp_path: Path) -> None:
+    # Moppetopia: 148 of 177 findings were 6b on Markers, Pins and a Map
+    assert doctor._SPARSE_TYPES == ("map", "marker", "pin", "relation")  # measured from the schema
+    marker = {"id": "m0000000-0000-7000-8000-000000000001", "name": "Dock", "description": "", "zone": None}
+    zone = {"id": "z0000000-0000-7000-8000-000000000001", "name": "Dock", "description": "", "role": "", "context": ""}
+    skipped = folder_report(tmp_path, with_(clean(), "marker", {**marker, "map": None}))
+    compared = folder_report(tmp_path, with_(clean(), "zone", zone))
+    assert found(skipped, "6b") == []
+    assert [f["element"]["type"] for f in found(compared, "6b")] == ["zone"]
+    assert skipped.compared["6b"] == {"n": 6, "of": 6, "skipped_types": ["map", "marker", "pin", "relation"]}
+    assert "not compared: map, marker, pin, relation" in render_prose(skipped)
+
+
+# --- message-shaped findings ------------------------------------------------------
+
+
+def test_a_finding_on_a_message_is_kind_message(tmp_path: Path) -> None:
+    # BrainBoost: two "Re:" messages collided by name; they are room things, not facts about the world
+    re1 = {"id": "n0000000-0000-7000-8000-000000000002", "name": "Re: Plans", "supertype": "Message", "story": "Yes."}
+    re2 = {**re1, "id": "n0000000-0000-7000-8000-000000000003", "story": "No."}
+    planted = folder_report(tmp_path, with_(clean(), "narrative", {**re1, "narrator": C1}, {**re2, "narrator": C1}))
+    twin = folder_report(
+        tmp_path,
+        with_(clean(), "narrative", {**re1, "narrator": C1, "supertype": "Letter"}, {**re2, "narrator": C1}),
+    )
+    (f,) = found(planted, "5")
+    assert f["kind"] == "message"
+    (g,) = found(twin, "5")
+    assert "kind" not in g  # the element it names is a Letter
+    assert planted.to_look_at == [] and planted.exit_code == 1
+    prose = render_prose(planted)
+    assert prose.splitlines()[2].startswith("0 things to look at,")
+    assert "(1 on messages and room things, listed last)" in prose.splitlines()[2]
+    assert prose.index("What could not be checked") < prose.index(
+        "Messages and room things (not facts about the world)"
+    )
+    assert "they still make the exit code 1" in prose
+    assert "Messages and room things" not in render_prose(twin)
+
+
+def test_every_parlor_supertype_is_a_message(tmp_path: Path) -> None:
+    for supertype in ("Message", "Board", "Work item", "Spec", "Heart", "Vote", "Sitting", "work ITEM"):
+        lone = {"id": N1.replace("1", "9"), "name": "Lone", "supertype": supertype, "story": "Text."}
+        (f,) = found(folder_report(tmp_path, with_(clean(), "narrative", lone)), "4")
+        assert f.get("kind") == "message", supertype
+    (f,) = found(folder_report(tmp_path, with_(clean(), "narrative", {**lone, "supertype": "Chronicle"})), "4")
+    assert "kind" not in f
 
 
 # --- 9 and 10. the file side ----------------------------------------------------
@@ -574,13 +624,34 @@ def test_the_api_command_line(monkeypatch: pytest.MonkeyPatch) -> None:
         return Client(key, pin, transport=transport, **kw)
 
     monkeypatch.setattr(doctor, "Client", make)
-    monkeypatch.delenv("OW_API_KEY", raising=False)
+    for name in ("OW_API_KEY", "OW_API_PIN", "ONLYWORLDS_API_KEY", "ONLYWORLDS_API_PIN"):
+        monkeypatch.delenv(name, raising=False)
     assert run_main(["--api"])[0] == 2
     monkeypatch.setenv("OW_API_KEY", "ow_r_testkey")
     monkeypatch.setenv("OW_API_PIN", "")
     code, out, _ = run_main(["--api", "--json"])
     assert code == 0 and json.loads(out)["world"]["door"] == "api"
     assert seen == {"key": "ow_r_testkey", "pin": None}
+
+
+def test_the_api_command_line_falls_back_to_the_toolkits_names(monkeypatch: pytest.MonkeyPatch) -> None:
+    transport = FakeTransport(handler=route(on_the_wire(clean())))
+    seen: list[tuple[str, str | None]] = []
+
+    def make(key: str, pin: str | None = None, **kw: Any) -> Client:
+        seen.append((key, pin))
+        return Client(key, pin, transport=transport, **kw)
+
+    monkeypatch.setattr(doctor, "Client", make)
+    for name in ("OW_API_KEY", "OW_API_PIN"):
+        monkeypatch.delenv(name, raising=False)
+    monkeypatch.setenv("ONLYWORLDS_API_KEY", "ow_w_toolkit")
+    monkeypatch.setenv("ONLYWORLDS_API_PIN", "4321")
+    assert run_main(["--api"])[0] == 0
+    monkeypatch.setenv("OW_API_KEY", "ow_w_package")
+    monkeypatch.setenv("OW_API_PIN", "1234")
+    assert run_main(["--api"])[0] == 0
+    assert seen == [("ow_w_toolkit", "4321"), ("ow_w_package", "1234")]  # the package's own names win
 
 
 def test_the_api_command_line_when_nothing_can_be_read(monkeypatch: pytest.MonkeyPatch) -> None:
