@@ -2,7 +2,7 @@
 
 The package version runs on its own semver; the schema it is generated from is `SCHEMA_DIST_TAG`.
 
-## 0.12.0 (2026-10-22)
+## 0.12.0 (2026-10-21)
 
 - **The doctor's packet** (`--packet`, `onlyworlds.doctor.packets`): the findings as work packets in the `packet` extension profile (schema-dist `profiles/packet.md`, dist.36; OW Parlor #492, keel PR 148). A JSON array of Relations with supertype `Work item`, subtype `open` and no `id` (the tool that lands one mints it): `x_packet_elements` holds one entry per element, `{type, id, reason}`, in flag order, an element with several findings carrying their reasons joined; the same ids sit on the Relation's typed link fields for the types it has one for (not law, map, marker, pin, relation); `x_packet_source` is `{server, world}`, the API base the world was read from or `null` for a folder; `x_packet_producer` is `{"tool": "onlyworlds doctor", "version": ...}`. Only findings that are facts about the world with an element go in: `kind: "message"` findings and a finding on the world itself (no charter) stay in the report. Empty on a clean run; past `PACKET_CAP` bytes (60,000, under keel's 64 KB extension cap) of the three keys it splits into several packets named `(i of n)`, each complete. `--json` and `--packet` together is exit 2. The doctor still writes nothing: a packet is output, landing it is the reader's act. Measured on Moppetopia's frozen copy: 20 findings, 19 entries, one packet.
 
