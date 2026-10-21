@@ -217,11 +217,13 @@ def test_a_timeout_then_in_flight_retries_to_the_replay(make_client: MakeClient,
     """keel #307: a retry after a timeout can meet the first request still running (409
     idempotency_in_flight, Retry-After 1); the next try, same key and body, gets the replay."""
     in_flight = {"error": {"type": "idempotency_error", "code": "idempotency_in_flight"}}
-    t = FakeTransport(script=[
-        TimeoutError("read timed out"),
-        jresp(409, in_flight, {"Retry-After": "1"}),
-        jresp(201, {"id": ID, "name": "A", "type": "character"}, {"Idempotent-Replay": "true"}),
-    ])
+    t = FakeTransport(
+        script=[
+            TimeoutError("read timed out"),
+            jresp(409, in_flight, {"Retry-After": "1"}),
+            jresp(201, {"id": ID, "name": "A", "type": "character"}, {"Idempotent-Replay": "true"}),
+        ]
+    )
     made = make_client(t).create("character", {"name": "A"}, idempotency_key="k-9")
     assert made["id"] == ID and len(t.calls) == 3 and sleeps[1] == 1.0
     assert len({c.headers["Idempotency-Key"] for c in t.calls}) == 1
@@ -251,6 +253,24 @@ def test_changes_walk_pages_to_the_tail_and_remembers_the_cursor(make_client: Ma
     assert [op["id"] for op in walk] == ["1", "2"]
     assert (walk.cursor, walk.head, walk.done) == ("C2", 9, True)
     assert "since=C0" in t.calls[0].url and "since=C1" in t.calls[1].url and "limit=1" in t.calls[0].url
+
+
+def test_changes_after_is_sent_on_every_page_of_a_walk(make_client: MakeClient) -> None:
+    t = FakeTransport(
+        script=[
+            jresp(200, {"cursor": "C1", "changes": [{"op": "upsert", "id": "1"}], "has_more": True, "head": 9}),
+            jresp(200, {"cursor": "C2", "changes": [], "has_more": False, "head": 9}),
+            jresp(200, {"cursor": "C3", "changes": [], "has_more": False, "head": 9}),
+        ]
+    )
+    client = make_client(t)
+    walk = client.walk_changes("C0", after="2026-10-21T09:00:00Z")
+    assert [op["id"] for op in walk] == ["1"]
+    for call in t.calls[:2]:
+        assert "after=2026-10-21T09%3A00%3A00Z" in call.url
+    assert "since=C1" in t.calls[1].url
+    client.changes(since="C2")
+    assert "after=" not in t.calls[2].url
 
 
 def test_a_feed_that_says_more_without_moving_is_refused(make_client: MakeClient) -> None:
@@ -323,8 +343,16 @@ def test_a_409_without_a_code_is_neither_conflict() -> None:
 def test_resync_reason_reads_the_409_envelope() -> None:
     """keel #421, keel PR 103: with the hidden mark on, the 409 resync_required says why in ``reason``."""
     for reason in ("role", "view"):
-        body = {"error": {"type": "invalid_request", "code": "resync_required", "message": "m", "param": "since",
-                          "doc_url": "https://x/resync_required", "reason": reason}}
+        body = {
+            "error": {
+                "type": "invalid_request",
+                "code": "resync_required",
+                "message": "m",
+                "param": "since",
+                "doc_url": "https://x/resync_required",
+                "reason": reason,
+            }
+        }
         e = ApiError("GET", "changes/", jresp(409, body))
         assert (e.is_resync_required, e.resync_reason) == (True, reason)
     plain = ApiError("GET", "changes/", env(409, "invalid_request", "resync_required"))
@@ -491,7 +519,12 @@ def test_agent_header_on_the_six_element_writes_only(make_client: MakeClient) ->
     agent.bulk([{"type": "character", "element": {"name": "B"}}])
     agent.delete("character", ID)
     assert [(c.method, c.headers.get("X-OW-Agent")) for c in t.calls] == [
-        ("POST", "1"), ("PUT", "1"), ("PATCH", "1"), ("POST", "1"), ("POST", "1"), ("DELETE", "1")
+        ("POST", "1"),
+        ("PUT", "1"),
+        ("PATCH", "1"),
+        ("POST", "1"),
+        ("POST", "1"),
+        ("DELETE", "1"),
     ]
     assert t.calls[2].headers["If-Match"] == '"3"'  # the write's own headers survive
     t.calls.clear()

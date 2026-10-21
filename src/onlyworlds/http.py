@@ -291,16 +291,17 @@ class ChangeWalk:
     copy on your own.
     """
 
-    def __init__(self, client: Client, since: str | None = None, *, limit: int | None = None):
+    def __init__(self, client: Client, since: str | None = None, *, limit: int | None = None, after: str | None = None):
         self._client = client
         self._limit = limit
+        self._after = after
         self.cursor: str | None = since
         self.head: int | None = None
         self.done = False
 
     def __iter__(self) -> Iterator[dict[str, Any]]:
         while True:
-            page = self._client.changes(since=self.cursor, limit=self._limit)
+            page = self._client.changes(since=self.cursor, limit=self._limit, after=self._after)
             yield from page.get("changes", [])
             nxt = page.get("cursor")
             self.head = page.get("head")
@@ -694,7 +695,9 @@ class Client:
         replay = (got.response.header("Idempotent-Replay") or "").lower() == "true"
         return BulkResult(bool(data.get("errors")), data["items"], replay, data)
 
-    def changes(self, *, since: str | None = None, limit: int | None = None) -> dict[str, Any]:
+    def changes(
+        self, *, since: str | None = None, limit: int | None = None, after: str | None = None
+    ) -> dict[str, Any]:
         """``GET /changes``: one page of the ordered change feed,
         ``{cursor, changes, has_more, head, epoch}`` (``epoch``: a guest's or a contributor's
         view epoch, else null). While keel's hidden mark is on, ``epoch_reason`` sits beside
@@ -704,13 +707,25 @@ class Client:
 
         The cursor is opaque and never expires. No ``since`` is a full export. It is the
         heaviest route on the platform: keep ``limit`` polite.
+
+        ``after`` (keel #514): only the changes made at or after an ISO 8601 time (an upsert's
+        ``updated_at``, a delete's ``deleted_at``; no offset means UTC). A filter, not a
+        position: order, cursor, ``has_more`` and ``head`` are as without it, so a window is
+        read by passing the cursor back as ``since`` with the same ``after`` (``walk_changes``
+        does). A kept cursor is still the exact "since my last visit"; ``after`` is "since
+        yesterday" by the clock. A value that is not a date and time is a 422 naming ``after``.
         """
-        query = self._query({"since": since, "limit": limit if limit is not None else self.changes_page_size})
+        query = self._query(
+            {"since": since, "limit": limit if limit is not None else self.changes_page_size, "after": after}
+        )
         page = self.call("GET", f"changes/?{query}")
         if not isinstance(page, dict):
             raise ValueError(f"GET /changes returned no page: {str(page)[:200]}")
         return page
 
-    def walk_changes(self, since: str | None = None, *, limit: int | None = None) -> ChangeWalk:
-        """A ``ChangeWalk`` from ``since`` to the tail; iterate it, then read ``cursor`` and ``head``."""
-        return ChangeWalk(self, since, limit=limit)
+    def walk_changes(
+        self, since: str | None = None, *, limit: int | None = None, after: str | None = None
+    ) -> ChangeWalk:
+        """A ``ChangeWalk`` from ``since`` to the tail (``after``: only changes at or after that
+        time, on every page); iterate it, then read ``cursor`` and ``head``."""
+        return ChangeWalk(self, since, limit=limit, after=after)
