@@ -4,6 +4,10 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+## 0.10.4 (2026-10-21)
+
+Folder format v0.3.12 (§4.5 rule 3: the records manifest, `records/RECORDS.json`, is a bare JSON array of producer entries). Nothing here writes `records/`, so the writer's behaviour is unchanged; `FORMAT_VERSION` and the `format_version` a written folder declares move to `0.3.12`.
+
 ## 0.10.3 (2026-10-20)
 
 - **The schema**, repinned to schema-dist `v0.32.2-dist.29` (canonical `00.32.02`, Skeld, OW Council h58 #8811): two descriptions changed, a Narrative's `start_date` is when it is first told or recorded and its `end_date` when it stops being told (empty while still told); the span it recounts lives on its events. `SCHEMA_VERSION` is `00.32.02`; `ELEMENT_TYPES`, `FIELD_KINDS` and `PUBLIC_FIELDS` are unchanged. Equal to `@onlyworlds/sdk` 4.42.0's pin.
