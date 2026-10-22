@@ -300,6 +300,24 @@ def test_draught_sends_the_seven_policy_keys_and_list_page_the_two_filters(make_
     assert "ids=a,b" in t.calls[2].url and "created_by=owner" in t.calls[2].url
 
 
+def test_a_numeric_cursor_becomes_the_walks_cursor_as_text(make_client: MakeClient) -> None:
+    """keel answers an owner's cursor at the head as a number; the walk keeps it, as a string, to pass back."""
+    t = FakeTransport(
+        script=[
+            jresp(200, {"cursor": 225, "changes": [{"op": "upsert", "id": "1"}], "has_more": True, "head": 226}),
+            jresp(200, {"cursor": 226, "changes": [{"op": "upsert", "id": "2"}], "has_more": False, "head": 226}),
+            jresp(200, {"cursor": 226, "changes": [], "has_more": False, "head": 226}),
+        ]
+    )
+    client = make_client(t)
+    walk = client.walk_changes("C0")
+    assert [op["id"] for op in walk] == ["1", "2"]
+    assert (walk.cursor, walk.head) == ("226", 226)
+    assert "since=225" in t.calls[1].url
+    again = client.walk_changes(walk.cursor)
+    assert list(again) == [] and "since=226" in t.calls[2].url and again.cursor == "226"
+
+
 def test_a_feed_that_says_more_without_moving_is_refused(make_client: MakeClient) -> None:
     stuck = jresp(200, {"cursor": "C0", "changes": [], "has_more": True, "head": 1})
     with pytest.raises(ValueError, match="no new cursor"):

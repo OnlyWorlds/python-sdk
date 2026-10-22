@@ -287,7 +287,8 @@ class ChangeWalk:
     the client of its last write; ``delete`` carries ``deleted_at`` and ``deleted_client``, the
     delete's client name, keel #520: each the client's claim, or null when none was recorded,
     always null on a hidden row). Afterwards ``cursor`` is the opaque position to persist for the next
-    incremental pull (pass back exactly what you got: never parse or build one) and ``head``
+    incremental pull (pass back exactly what you got: never parse or build one; always a string,
+    since keel answers an owner's cursor at the head as a number) and ``head``
     is the world's current ``change_seq``.
 
     A stored cursor can be refused: ``ApiError.is_resync_required`` (409), when what the key
@@ -314,13 +315,15 @@ class ChangeWalk:
         while True:
             page = self._client.changes(since=self.cursor, limit=self._limit, after=self._after)
             yield from page.get("changes", [])
-            nxt = page.get("cursor")
+            raw = page.get("cursor")
+            # keel answers an owner's cursor at the head as a number: kept as text, the position to pass back.
+            nxt = None if raw is None or isinstance(raw, bool) else str(raw)
             self.head = page.get("head")
             if not page.get("has_more"):
-                self.cursor = nxt if isinstance(nxt, str) else self.cursor
+                self.cursor = nxt if nxt is not None else self.cursor
                 self.done = True
                 return
-            if not isinstance(nxt, str) or nxt == self.cursor:
+            if nxt is None or nxt == self.cursor:
                 raise ValueError("/changes said has_more but gave no new cursor")
             self.cursor = nxt
 
