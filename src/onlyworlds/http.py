@@ -477,6 +477,8 @@ class Client:
         fields: Sequence[str] | None = None,
         filter: Mapping[str, str | int | bool] | None = None,
         view_as: str | None = None,
+        ids: Sequence[str] | None = None,
+        created_by: str | None = None,
     ) -> dict[str, Any]:
         """``GET /{type}``: one cursor page, ``{data, has_more, next_cursor}``.
 
@@ -500,6 +502,8 @@ class Client:
                 "expand": ",".join(expand) if expand else None,
                 "fields": ",".join(fields) if fields else None,
                 **(filter or {}),
+                "ids": ",".join(ids) if ids else None,
+                "created_by": created_by,
                 "as": view_as,
             }
         )
@@ -721,6 +725,41 @@ class Client:
         page = self.call("GET", f"changes/?{query}")
         if not isinstance(page, dict):
             raise ValueError(f"GET /changes returned no page: {str(page)[:200]}")
+        return page
+
+    def draught(
+        self,
+        character_id: str,
+        *,
+        components: Sequence[str] | None = None,
+        mode: str | None = None,
+        as_of: int | None = None,
+        undated: str | None = None,
+        since: str | None = None,
+        budget: int | None = None,
+        depth: int | None = None,
+    ) -> dict[str, Any]:
+        """``GET /character/{id}/context``: the draught (keel PR 155), one Character's context in
+        one read as the recorded world holds it: her element, what she holds and sits in, her open
+        work, how she works, her Events, the Narratives she knows, everything else that names her,
+        her sheet, what changed around her (``since``: a feed cursor or an ISO time) and who plays
+        whom, with the world's name and calendar. The seven policy keys as the document names
+        them (``components`` joined by commas); nothing is inferred; a non-empty ``cut`` means the
+        serving is partial. Served ``Cache-Control: private, no-store``: never cache it shared."""
+        query = self._query(
+            {
+                "components": ",".join(components) if components else None,
+                "mode": mode,
+                "as_of": as_of,
+                "undated": undated,
+                "since": since,
+                "budget": budget,
+                "depth": depth,
+            }
+        )
+        page = self.call("GET", f"character/{character_id}/context" + (f"?{query}" if query else ""))
+        if not isinstance(page, dict):
+            raise ValueError(f"GET /character/{character_id}/context returned no packet: {str(page)[:200]}")
         return page
 
     def walk_changes(

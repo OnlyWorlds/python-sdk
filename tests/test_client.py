@@ -273,6 +273,33 @@ def test_changes_after_is_sent_on_every_page_of_a_walk(make_client: MakeClient) 
     assert "after=" not in t.calls[2].url
 
 
+def test_draught_sends_the_seven_policy_keys_and_list_page_the_two_filters(make_client: MakeClient) -> None:
+    t = FakeTransport(
+        script=[jresp(200, {"world": {"id": "w"}, "cut": {}}), jresp(200, {"world": {}}), jresp(200, {"data": []})]
+    )
+    client = make_client(t)
+    packet = client.draught(
+        "c1", components=["self", "events"], mode="act", as_of=453, undated="exclude", since="cur", budget=5, depth=0
+    )
+    assert packet["cut"] == {}
+    url = t.calls[0].url
+    assert "/character/c1/context?" in url
+    for part in (
+        "components=self,events",
+        "mode=act",
+        "as_of=453",
+        "undated=exclude",
+        "since=cur",
+        "budget=5",
+        "depth=0",
+    ):
+        assert part in url, part
+    client.draught("c1")
+    assert t.calls[1].url.endswith("/character/c1/context")
+    client.list_page("character", ids=["a", "b"], created_by="owner")
+    assert "ids=a,b" in t.calls[2].url and "created_by=owner" in t.calls[2].url
+
+
 def test_a_feed_that_says_more_without_moving_is_refused(make_client: MakeClient) -> None:
     stuck = jresp(200, {"cursor": "C0", "changes": [], "has_more": True, "head": 1})
     with pytest.raises(ValueError, match="no new cursor"):

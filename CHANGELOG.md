@@ -2,6 +2,11 @@
 
 The package version runs on its own semver; the schema it is generated from is `SCHEMA_DIST_TAG`.
 
+## 0.14.0 (2026-10-22)
+
+- **The draught** (keel PR 155, D143, live 2026-10-22 02:05): `Client.draught(character_id, components=, mode=, as_of=, undated=, since=, budget=, depth=)` reads `GET /character/{id}/context`, one Character's context in one read; the seven policy keys as the document names them.
+- **`list_page(ids=, created_by=)`**: the same PR's two list filters (`ids` 1 to 200 in the list's own order; `created_by` a membership id or `owner`). Both were reachable through `filter` before.
+
 ## 0.13.0 (2026-10-22)
 
 - **`after` on the feed** (keel #514, PR 152, D142, live 2026-10-22 00:55): `Client.changes(after=...)` and `walk_changes(..., after=...)` send `GET /changes?after=<ISO time>`, only the changes made at or after that time (an upsert's `updated_at`, a delete's `deleted_at`; no offset means UTC). A filter, not a position: order, cursor, `has_more` and `head` are unchanged, and the walk passes the cursor back as `since` with the same `after` on every page. A kept cursor is still the exact "since my last visit"; `after` is "since yesterday" by the clock. A bad value is a 422 naming `after`.
