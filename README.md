@@ -63,6 +63,18 @@ An exported folder's `world.json` says where it came from and which part of the 
 
 `write_folder(root, world, elements)` writes a folder from a world dict and a dict of element lists by type, keeping every key the world dict has. Reading never changes a file, and a file without an id is skipped and left alone.
 
+A whole world also travels as one file, an `.owworld` (a zip by another name, the folder format's §4.7):
+
+```python
+from onlyworlds import read_world_file, write_world_file
+
+write_world_file("moppetopia", "moppetopia.owworld")
+world = read_world_file("moppetopia.owworld")
+world.to_folder("moppetopia-copy")
+```
+
+`write_world_file` carries `world.json` byte for byte (its `producer`, `source` and `format_version` included) and the folder's parts, `elements/`, `spatial/`, `media/` and `records/`, and nothing else: never an `api` block, never a tool's own folder unless you hand it in (`private_dir=".atlas"`, which makes the file a private copy rather than one to send around). The same folder gives the same bytes on one Python. `read_world_file` checks the whole archive before it unpacks anything and refuses a file it cannot open safely with a `WorldFileError`, whose `reason` names one of the spec's twelve causes (`unsafe_path`, `collision`, `too_big`, ...). It gives the same verdict as the TypeScript and Unity SDKs on every case of the format's conformance set.
+
 To send a folder's edits back, keep a copy exported before you edited, then push the difference:
 
 ```python
@@ -141,6 +153,7 @@ uv sync
 uv run pytest -q
 uv run ruff check . && uv run mypy --strict src
 uv run python codegen/generate_schema.py --check
+uv run python codegen/generate_casefold.py --check
 ```
 
 Three groups of tests run only when asked:

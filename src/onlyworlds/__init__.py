@@ -1,4 +1,4 @@
-"""OnlyWorlds for Python: the world folder (read, write, push) and a client for the v2 API.
+"""OnlyWorlds for Python: the world folder (read, write, push), its archive (``.owworld``) and a client for the v2 API.
 
 Folder format: v0.3.14 (``FORMAT_VERSION``). Schema: generated from the pinned
 schema distribution (``SCHEMA_DIST_TAG``, ``SCHEMA_VERSION``); the package
@@ -46,6 +46,14 @@ from .http import (
     sanitize_payload,
 )
 from .push import Patch, PushPlan, PushResult, plan_push, push, verify_level
+from .worldfile import (
+    WORLD_FILE_MEDIA_TYPE,
+    WorldFile,
+    WorldFileError,
+    read_world_file,
+    world_file_bytes,
+    write_world_file,
+)
 
 __all__ = [
     "API_BASE",
@@ -58,6 +66,7 @@ __all__ = [
     "SCHEMA_DIST_TAG",
     "SCHEMA_MANIFEST_SHA256",
     "SCHEMA_VERSION",
+    "WORLD_FILE_MEDIA_TYPE",
     "ApiError",
     "BulkResult",
     "ChangeWalk",
@@ -73,6 +82,8 @@ __all__ = [
     "SkippedFile",
     "Transport",
     "UrllibTransport",
+    "WorldFile",
+    "WorldFileError",
     "WriteReport",
     "__version__",
     "check_kinds",
@@ -83,10 +94,13 @@ __all__ = [
     "plan_push",
     "push",
     "read_folder",
+    "read_world_file",
     "resolve_filenames",
     "sanitize_payload",
     "slugify",
     "uuid7",
     "verify_level",
+    "world_file_bytes",
     "write_folder",
+    "write_world_file",
 ]

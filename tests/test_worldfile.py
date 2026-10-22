@@ -1,0 +1,384 @@
+"""The world file, ``.owworld`` (folder format spec §4.7): the fixture set, the fold, the writer.
+
+The fixture set is the schema distribution's (``codegen/schema-dist/fixtures/owworld/``,
+vendored; ``OW_OWWORLD_FIXTURES`` points at another copy): every zip on disk has a verdict,
+every verdict's zip is on disk, and the package's reader gives each one its verdict and cause.
+"""
+
+from __future__ import annotations
+
+import io
+import json
+import os
+import re
+import shutil
+import sys
+import unicodedata
+import zipfile
+from pathlib import Path
+from typing import Any
+
+import pytest
+
+from onlyworlds import (
+    WORLD_FILE_MEDIA_TYPE,
+    WorldFile,
+    WorldFileError,
+    read_folder,
+    read_world_file,
+    world_file_bytes,
+    write_world_file,
+)
+from onlyworlds._jsonfmt import encode
+from onlyworlds.folder import slugify
+from onlyworlds.worldfile import REASONS, WORLD_FILE_MAX_BYTES, WORLD_FILE_MAX_ENTRIES, simple_case_fold
+
+REPO = Path(__file__).resolve().parent.parent
+SET_ROOT = Path(os.environ.get("OW_OWWORLD_FIXTURES") or REPO / "codegen" / "schema-dist" / "fixtures" / "owworld")
+FIXTURES = SET_ROOT if (SET_ROOT / "verdicts.json").is_file() else SET_ROOT / "fixtures"
+CASE_FOLDING = REPO / "codegen" / "schema-dist" / "fixtures" / "owworld" / "CaseFolding-15.1.0.txt"
+HYPERION = REPO / "codegen" / "schema-dist" / "example" / "hyperion"
+WID = "0192a000-aaaa-7bbb-8ccc-000000000001"
+
+
+def refuses(reason: str, source: Any, **kw: Any) -> WorldFileError:
+    with pytest.raises(WorldFileError) as info:
+        read_world_file(source, **kw)
+    assert info.value.reason == reason, f"expected {reason}, got {info.value.reason}: {info.value}"
+    return info.value
+
+
+def zip_of(entries: dict[str, bytes]) -> bytes:
+    buf = io.BytesIO()
+    with zipfile.ZipFile(buf, "w") as zf:
+        for name, data in entries.items():
+            zf.writestr(name, data)
+    return buf.getvalue()
+
+
+def world_json(**extra: Any) -> bytes:
+    return encode({"id": WID, "name": "W", **extra})
+
+
+def make_folder(root: Path, files: dict[str, bytes]) -> Path:
+    for rel, data in files.items():
+        target = root.joinpath(*rel.split("/"))
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_bytes(data)
+    return root
+
+
+def tree(root: Path) -> dict[str, bytes]:
+    return {p.relative_to(root).as_posix(): p.read_bytes() for p in sorted(root.rglob("*")) if p.is_file()}
+
+
+# --- the fixture set -----------------------------------------------------------------------
+
+
+def test_the_owworld_fixture_set_every_verdict_and_every_cause(tmp_path: Path) -> None:
+    assert (FIXTURES / "verdicts.json").is_file(), f"no verdicts.json at {SET_ROOT} or under its fixtures/"
+    doc = json.loads((FIXTURES / "verdicts.json").read_text(encoding="utf-8"))
+    assert tuple(doc["reasons"]) == REASONS, "the set's causes are the package's, in the spec's order"
+    assert doc["floor"] == {"entries": WORLD_FILE_MAX_ENTRIES, "bytes": WORLD_FILE_MAX_BYTES}
+    assert doc["marker"] == WORLD_FILE_MEDIA_TYPE
+    on_disk = sorted(p.name for p in FIXTURES.iterdir() if p.suffix in (".owworld", ".zip"))
+    listed = sorted(v["file"] for v in doc["fixtures"] if v.get("status") != "not_generated")
+    assert on_disk == listed, "the zips on disk and the verdicts listed"
+    diffs: list[str] = []
+    run = 0
+    for v in doc["fixtures"]:
+        if v.get("status") == "not_generated":
+            continue
+        run += 1
+        got, reason = "accept", ""
+        try:
+            r = read_world_file(FIXTURES / v["file"])
+            if v.get("strips"):
+                key = v["strips"]
+                if key in r.world or key in json.loads(r.entries["world.json"]):
+                    got = "refuse"
+            if v.get("roundtrip"):
+                folder = r.to_folder(tmp_path / v["file"])
+                # A private copy's dot-folder travels only when handed in (OW-7): hand in the one it has.
+                dots = sorted({p.split("/")[0] for p in r.entries if p.startswith(".")})
+                assert len(dots) <= 1, dots
+                again = read_world_file(
+                    world_file_bytes(folder, top_dir="abbey", private_dir=dots[0] if dots else None)
+                )
+                if again.entries != r.entries or list(again.entries) != list(r.entries):
+                    got = "refuse"
+        except WorldFileError as exc:
+            got, reason = "refuse", exc.reason
+        if got != v["reader"]:
+            diffs.append(f"{v['file']}: expected {v['reader']}, got {got} {reason}")
+        elif got == "refuse" and reason != v["reason"]:
+            diffs.append(f"{v['file']}: {v['reason']} -> {reason}")
+    print(f"the .owworld set: {run} fixtures run, {len(diffs)} disagreeing, from {FIXTURES}")
+    for d in diffs:
+        print(f"  disagrees: {d}")
+    assert run == len(on_disk) >= 80, f"the set holds {run} fixtures"
+    assert diffs == []
+
+
+# --- the fold (OW-18) ------------------------------------------------------------------------
+
+
+def test_the_fold_is_casefolding_15_1_c_and_s_rows_for_every_code_point() -> None:
+    table: dict[int, int] = {}
+    for line in CASE_FOLDING.read_text(encoding="utf-8").splitlines():
+        m = re.match(r"^([0-9A-F]+); ([CS]); ([0-9A-F]+);", line)
+        if m:
+            table[int(m.group(1), 16)] = int(m.group(3), 16)
+    assert len(table) == 1457, "the C and S rows of 15.1"
+    wrong = []
+    for c in range(0x110000):
+        if 0xD800 <= c <= 0xDFFF:
+            continue
+        got = ord(simple_case_fold(chr(c)))
+        if got != table.get(c, c):
+            wrong.append(f"U+{c:04X} -> U+{got:04X}")
+    assert wrong[:20] == [], f"{len(wrong)} code points fold otherwise than the table says"
+    # Simple, not full: sharp s stays apart from ss (str.casefold would join them), dotless i from i.
+    assert simple_case_fold(chr(0xDF)) == chr(0xDF)
+    assert simple_case_fold(chr(0x131)) == chr(0x131)
+    assert simple_case_fold("Map" + chr(0x3A3)) == "map" + chr(0x3C3)
+
+
+def test_the_generated_fold_table_is_current() -> None:
+    sys.path.insert(0, str(REPO / "codegen"))
+    try:
+        import generate_casefold
+    finally:
+        sys.path.pop(0)
+    expected = generate_casefold.render(generate_casefold.rows(CASE_FOLDING.read_text(encoding="utf-8")))
+    assert (REPO / "src" / "onlyworlds" / "_casefold.py").read_text(encoding="utf-8") == expected
+
+
+# --- the reader --------------------------------------------------------------------------------
+
+
+def test_reads_a_world_in_one_folder_entries_in_code_point_order() -> None:
+    astral, fullwidth = chr(0x1F600), chr(0xFF21)
+    zf = zip_of(
+        {
+            "w/world.json": world_json(),
+            f"w/media/{astral}.png": b"A",
+            f"w/media/{fullwidth}.png": b"B",
+            "w/elements/character/a.json": b"{}",
+        }
+    )
+    r = read_world_file(zf)
+    assert (r.world_id, r.name, r.top) == (WID, "W", "w")
+    # UTF-16 order would put the astral name first; the spec's order is the code point's (OW-13).
+    assert list(r.entries) == [
+        "elements/character/a.json",
+        f"media/{fullwidth}.png",
+        f"media/{astral}.png",
+        "world.json",
+    ]
+
+
+def test_a_world_at_the_root_and_a_name_it_does_not_have() -> None:
+    r = read_world_file(zip_of({"world.json": encode({"id": WID}), "elements/character/a.json": b"{}"}))
+    assert (r.top, r.name) == (None, "")
+
+
+def test_the_api_block_is_stripped_and_never_returned_otherwise_the_bytes_are_kept() -> None:
+    linked = encode({"id": WID, "name": "L", "api": {"world_id": "srv", "api_key": "ow_w_secret"}, "x": 1})
+    r = read_world_file(zip_of({"l/world.json": linked}))
+    assert r.world == {"id": WID, "name": "L", "x": 1}
+    assert b"ow_w_secret" not in r.entries["world.json"]
+    assert r.entries["world.json"] == encode({"id": WID, "name": "L", "x": 1})
+    odd = ('{"name":"Kept as is","id":"' + WID + '"}').encode()
+    assert read_world_file(zip_of({"w/world.json": odd})).entries["world.json"] == odd
+
+
+def test_the_budget_by_count_and_by_declared_size_and_skip_still_counts() -> None:
+    zf = zip_of({"w/world.json": world_json(), "w/.atlas/a": b"1", "w/.atlas/b": b"2"})
+    refuses("too_many", zf, max_entries=2, skip=lambda p: p.startswith(".atlas/"))
+    refuses("too_big", zf, max_bytes=len(world_json()))
+    r = read_world_file(zf, skip=lambda p: p.startswith(".atlas/"))
+    assert list(r.entries) == ["world.json"]
+
+
+def test_not_a_zip_and_a_cut_short_zip() -> None:
+    refuses("not_openable", b"just some text")
+    refuses("not_openable", b"")
+    whole = zip_of({"w/world.json": world_json()})
+    refuses("not_openable", whole[:-30])
+
+
+def test_to_folder_writes_every_entry_byte_for_byte_and_never_over_a_folder(tmp_path: Path) -> None:
+    r = read_world_file(zip_of({"w/world.json": world_json(), "w/records/lab/.cursor": b"7", "w/media/a.png": b"P"}))
+    out = r.to_folder(tmp_path / "out")
+    assert tree(out) == r.entries
+    with pytest.raises(FileExistsError):
+        r.to_folder(out)
+    assert [p.name for p in tmp_path.iterdir()] == ["out"], "no temp directory left behind"
+    forged = WorldFile(world_id=WID, name="W", world={}, entries={"../evil.json": b"x", "world.json": b"{}"})
+    with pytest.raises(WorldFileError) as info:
+        forged.to_folder(tmp_path / "forged")
+    assert info.value.reason == "unsafe_path"
+    assert not (tmp_path / "evil.json").exists() and not (tmp_path / "forged").exists()
+
+
+# --- the writer --------------------------------------------------------------------------------
+
+
+def central(data: bytes) -> list[zipfile.ZipInfo]:
+    return zipfile.ZipFile(io.BytesIO(data)).infolist()
+
+
+def test_marker_first_and_stored_1980_stamps_utf8_byte_order_json_deflated(tmp_path: Path) -> None:
+    astral, fullwidth = chr(0x1F600), chr(0xFF21)
+    folder = make_folder(
+        tmp_path / "anything",
+        {
+            "world.json": world_json(),
+            f"media/{astral}.png": b"A",
+            "elements/character/b.json": b"{}",
+            f"media/{fullwidth}.png": b"B",
+            "elements/character/a.json": b"{}",
+        },
+    )
+    data = world_file_bytes(folder, top_dir="w")
+    cd = central(data)
+    assert [e.filename for e in cd] == [
+        "mimetype",
+        "w/elements/character/a.json",
+        "w/elements/character/b.json",
+        f"w/media/{fullwidth}.png",
+        f"w/media/{astral}.png",
+        "w/world.json",
+    ]
+    marker = cd[0]
+    assert (marker.header_offset, marker.compress_type, marker.extra) == (0, zipfile.ZIP_STORED, b"")
+    assert data[30 : 30 + 8] == b"mimetype"
+    assert data[38 : 38 + len(WORLD_FILE_MEDIA_TYPE)] == WORLD_FILE_MEDIA_TYPE.encode()
+    assert all(e.date_time == (1980, 1, 1, 0, 0, 0) for e in cd)
+    assert [e.compress_type for e in cd] == [0, 8, 8, 0, 0, 8]
+    assert all(e.flag_bits & 0x0800 for e in cd if not e.filename.isascii()), "non-ASCII names carry the UTF-8 flag"
+    assert all(e.external_attr == 0o100644 << 16 and e.create_system == 3 for e in cd), "a regular file, on any host"
+
+
+def test_the_same_folder_twice_gives_the_same_bytes_wherever_it_sits(tmp_path: Path) -> None:
+    a = shutil.copytree(HYPERION, tmp_path / "a" / "hyperion")
+    b = shutil.copytree(HYPERION, tmp_path / "somewhere-else")
+    first = world_file_bytes(a)
+    assert world_file_bytes(a) == first
+    assert world_file_bytes(b) == first, "the top folder comes from world.json, never from the folder's path"
+    written = write_world_file(a, tmp_path / "h.owworld")
+    assert written.read_bytes() == first
+    assert sorted(p.name for p in tmp_path.iterdir()) == ["a", "h.owworld", "somewhere-else"], "no temp file left"
+
+
+def test_round_trip_folder_to_archive_to_folder_every_file_byte_equal(tmp_path: Path) -> None:
+    src = shutil.copytree(HYPERION, tmp_path / "src")
+    r = read_world_file(write_world_file(src, tmp_path / "h.owworld"))
+    back = r.to_folder(tmp_path / "back")
+    assert tree(back) == tree(src)
+    a, b = read_folder(src), read_folder(back)
+    assert a.world == b.world
+    assert {k: v.body for k, v in a.elements.items()} == {k: v.body for k, v in b.elements.items()}
+    assert r.top == f"{slugify(r.name) or 'world'}-{r.world_id[:8]}", "Atlas and Lantern's <slug>-<id8>"
+
+
+def test_only_world_json_and_the_parts_travel_and_a_handed_dot_folder(tmp_path: Path) -> None:
+    folder = make_folder(
+        tmp_path / "f",
+        {
+            "world.json": world_json(),
+            "elements/character/a.json": b"{}",
+            "spatial/map/m.json": b"{}",
+            "media/a.png": b"P",
+            "records/lab/world.json": encode({"id": "lab"}),
+            "records/lab/.hidden": b"kept",
+            "records/lab/x.meta": b"kept",
+            ".atlas/charts.json": b"[]",
+            ".git/HEAD": b"no",
+            "README.md": b"# no",
+            "notes/todo.txt": b"no",
+            "media/.DS_Store": b"no",
+            "media/a.png.meta": b"no",
+            "elements/.cache/x.json": b"no",
+        },
+    )
+    portable = read_world_file(world_file_bytes(folder))
+    assert list(portable.entries) == [
+        "elements/character/a.json",
+        "media/a.png",
+        "records/lab/.hidden",
+        "records/lab/world.json",
+        "records/lab/x.meta",
+        "spatial/map/m.json",
+        "world.json",
+    ]
+    private = read_world_file(world_file_bytes(folder, private_dir=".atlas"))
+    assert next(iter(private.entries)) == ".atlas/charts.json"
+    assert ".git/HEAD" not in private.entries
+    with pytest.raises(ValueError):
+        world_file_bytes(folder, private_dir="atlas")
+
+
+def test_world_json_travels_verbatim_provenance_included_and_api_never(tmp_path: Path) -> None:
+    raw = encode(
+        {
+            "id": WID,
+            "name": "W",
+            "format_version": "0.3.9",
+            "producer": {"tool": "atlas", "version": "1.0.0", "input": "bare"},
+            "source": {"server": "https://www.onlyworlds.com", "world": WID, "at": "2026-10-01T00:00:00Z"},
+        }
+    )
+    r = read_world_file(world_file_bytes(make_folder(tmp_path / "v", {"world.json": raw})))
+    assert r.entries["world.json"] == raw
+    linked = encode({"id": WID, "name": "L", "producer": {"tool": "x"}, "api": {"world_id": WID, "api_key": "k"}})
+    data = world_file_bytes(make_folder(tmp_path / "l", {"world.json": linked}))
+    assert b'"api_key"' not in zipfile.ZipFile(io.BytesIO(data)).read("l-0192a000/world.json")
+    assert read_world_file(data).world == {"id": WID, "name": "L", "producer": {"tool": "x"}}
+
+
+def test_the_writer_refuses(tmp_path: Path) -> None:
+    def wr(folder: Path, reason: str, **kw: Any) -> None:
+        with pytest.raises(WorldFileError) as info:
+            world_file_bytes(folder, **kw)
+        assert info.value.reason == reason, str(info.value)
+
+    ok = make_folder(tmp_path / "ok", {"world.json": world_json()})
+    wr(make_folder(tmp_path / "none", {"elements/character/a.json": b"{}"}), "not_a_world")
+    wr(make_folder(tmp_path / "broken", {"world.json": b'{ "id": "x", "api": {"api_key": "s"} broken'}), "not_a_world")
+    wr(make_folder(tmp_path / "noid", {"world.json": encode({"name": "no id"})}), "not_a_world")
+    wr(ok, "unsafe_path", top_dir="../w")
+    wr(ok, "unsafe_path", top_dir="a/b")
+    wr(ok, "unsafe_path", top_dir="mimetype")  # the marker's name: a file and a folder
+    wr(ok, "collision", top_dir="MimeType")
+    wr(ok, "name", top_dir="w.")
+    wr(ok, "name", top_dir="aux")
+
+
+@pytest.mark.skipif(sys.platform == "win32", reason="NTFS cannot hold the two names (or the name) to begin with")
+def test_the_writer_refuses_what_a_case_sensitive_disk_can_hold(tmp_path: Path) -> None:
+    for files, reason in (
+        ({"media/A.png": b"1", "media/a.png": b"2"}, "collision"),
+        (
+            {"media/caf" + unicodedata.normalize("NFD", chr(0xE9)) + ".png": b"1", "media/caf\xe9.png": b"2"},
+            "collision",
+        ),
+        ({"media/aux.png": b"1"}, "name"),
+        ({"media/a\\b.png": b"1"}, "unsafe_path"),
+    ):
+        folder = make_folder(tmp_path / reason / str(len(files)), {"world.json": world_json(), **files})
+        with pytest.raises(WorldFileError) as info:
+            world_file_bytes(folder)
+        assert info.value.reason == reason
+
+
+@pytest.mark.skipif(not hasattr(os, "symlink") or sys.platform == "win32", reason="symlinks need privileges on Windows")
+def test_the_writer_refuses_a_link_where_a_carried_file_would_be(tmp_path: Path) -> None:
+    folder = make_folder(tmp_path / "f", {"world.json": world_json()})
+    (tmp_path / "secret").write_bytes(b"s")
+    (folder / "media").mkdir()
+    os.symlink(tmp_path / "secret", folder / "media" / "s.png")
+    with pytest.raises(WorldFileError) as info:
+        world_file_bytes(folder)
+    assert info.value.reason == "link"
