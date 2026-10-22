@@ -39,7 +39,7 @@ def test_each_call_uses_its_verb_path_and_no_world(make_client: MakeClient) -> N
         ("POST", f"character/{ID}/links/friends"),
     ]
     assert t.calls[3].body == {"add": ["a"], "remove": ["b"]}
-    assert t.calls[0].headers["API-Key"] == "ow_w_testkey" and t.calls[0].headers["API-Pin"] == "1234"
+    assert t.calls[0].headers["API-Key"] == "ow_w_testkey" and t.calls[1].headers["API-Pin"] == "1234"
 
 
 def test_delete_is_204_and_returns_none(make_client: MakeClient) -> None:

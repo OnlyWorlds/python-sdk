@@ -2,6 +2,11 @@
 
 The package version runs on its own semver; the schema it is generated from is `SCHEMA_DIST_TAG`.
 
+## [Unreleased]
+
+- **The PIN rides only where keel checks it** (Skeld's rule, OW Keel h29 #10663). `API-Pin` was on every request; keel verifies a PIN wherever one is sent (argon2, 64 MiB each), and a cold cache after a restart OOM-killed staging under scripts reading with the PIN (2026-10-22). `Client.request` now adds it from the request itself, never a list of calls: on every method but GET (every write route, present and future, `push`'s PATCH included), on `GET /me` (keel checks it there when sent: #314, D93), and on every request of a 10-digit legacy key (v1 parity, keel #421: such a key needs it on the reads of a world with a PIN). A GET with an `ow_w_`, `ow_r_` or member key carries no PIN. No call or argument changes: `Client(key, pin)` as before. A minor: a behaviour change, no new API.
+- Tests: every read, write and `me` through a recording transport for three keys (`ow_w_` with a PIN, a 10-digit key with a PIN, `ow_r_` without one), and the rule on arbitrary paths and methods; the PIN put back into every request turned exactly the new tests red.
+
 ## 0.26.1 (2026-10-22)
 
 - **The pack says which kind of key made it.** `00-world.md`'s opening carries one more line: "Made with the owner's key: the whole world", "Made with a member's key (contributor): that member's view", "Made as the Character Ann: that Character's view, not the whole world", or the public view; from `/me` on `--api` (mapped as `export.exported_as` maps it, the Character's name from the Characters read) and from `world.json`'s `exported_as` on a folder; no line when neither says, never a guess, never the key. A label, not a fix: a pack holds only what its key was served (Boss's four-way leak walk, h58 #10628: owner, contributor and guest packs, the hidden element absent from the last two). `pack_world` and `build_pack` take `exported_as=`.

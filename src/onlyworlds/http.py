@@ -3,7 +3,9 @@
 Wire facts this file encodes (keel ``docs/spec/api-v2-spec.md``, and keel's published
 OpenAPI document, which ``tests/test_wire.py`` compares the client with):
 - base ``https://www.onlyworlds.com/api/v2`` (www, not the bare domain);
-- credentials in ``API-Key`` / ``API-Pin`` headers; ``ow_r_`` read keys need no PIN;
+- credentials in ``API-Key`` / ``API-Pin`` headers; the PIN rides only where keel checks it:
+  every request that is not a GET, ``GET /me`` (keel #314, D93), and every request of a
+  10-digit legacy key (keel #421); a GET with any other key carries none;
 - a body never carries ``world`` (the key names the world) or the server-managed
   ``type`` / ``created_at`` / ``updated_at`` / ``change_seq``: the typed calls strip them;
 - a known-of stub (``known_of: true``, keel PR 113) is never written: the typed element
@@ -75,6 +77,8 @@ _TYPE = re.compile(r"^[a-z][a-z0-9_]*$")
 _ID = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_.-]*$")
 #: keel #520's rule for ``X-OW-Client``, matched whole (``fullmatch``: a trailing newline is outside it).
 _CLIENT_NAME = re.compile(r"[a-z0-9-]{1,32}")
+#: A legacy (v1-era) key: ten digits, matched whole. It sends its PIN on every request (keel #421).
+_LEGACY_KEY = re.compile(r"\d{10}")
 #: Namespace for ids derived from a caller's Idempotency-Key (``_minted_id``).
 _KEYED_IDS = uuid.UUID("0199b6a0-6f0e-7c2a-9d1e-3b5c7a8e4f21")
 
@@ -355,6 +359,10 @@ class Client:
 
     ``request`` makes ONE exchange. ``send`` applies the retry policy. ``call`` returns the
     parsed 2xx body or raises ``ApiError``. The typed methods below are what to use.
+
+    ``pin`` is sent as ``API-Pin`` only where keel checks it, derived from the request in
+    ``request`` (``_sends_pin``): every method but GET, ``GET /me``, and every request of a
+    10-digit legacy key. A read with an ``ow_w_``, ``ow_r_`` or member key carries no PIN.
     """
 
     def __init__(
@@ -401,8 +409,9 @@ class Client:
         self.page_size = page_size
         self.changes_page_size = changes_page_size
         self._headers = {"API-Key": api_key, "Accept": "application/json", "User-Agent": user_agent}
-        if pin:
-            self._headers["API-Pin"] = pin
+        # Never in ``_headers``: ``request`` adds it where keel checks it (``_sends_pin``).
+        self._pin = pin or None
+        self._legacy_key = _LEGACY_KEY.fullmatch(api_key) is not None
         self._agent = agent is True
         self._client = client
         # ``head()``'s conditional poll (keel #518): the last ETag as received, and what that 200 said.
@@ -425,10 +434,25 @@ class Client:
     def url(self, path: str) -> str:
         return f"{self.base_url}/{path.lstrip('/')}"
 
+    def _sends_pin(self, method: str, path: str) -> bool:
+        """Whether this request carries ``API-Pin``, from the request alone, never a list of calls.
+
+        keel verifies a PIN wherever one is sent (argon2, 64 MiB each), so a PIN on every read cost
+        memory for nothing: a cold cache after a restart OOM-killed staging under PIN-carrying
+        reads (2026-10-22; Skeld's rule, OW Keel h29 #10663). It rides every method but GET (every
+        write, present and future), ``GET /me`` (keel checks it there when sent: #314, D93), and
+        every request of a 10-digit legacy key (v1 parity, keel #421: such a key needs it on the
+        reads of a world with a PIN)."""
+        if self._legacy_key or method.upper() != "GET":
+            return True
+        return path.split("?", 1)[0].strip("/") == "me"
+
     def request(
         self, method: str, path: str, payload: Any = None, headers: Mapping[str, str] | None = None
     ) -> Response:
         sent = dict(self._headers)
+        if self._pin is not None and self._sends_pin(method, path):
+            sent["API-Pin"] = self._pin
         if headers:
             sent.update(headers)
         body = None

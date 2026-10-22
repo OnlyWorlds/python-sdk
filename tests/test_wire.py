@@ -174,10 +174,18 @@ def test_the_proposal_calls_send_only_declared_headers_and_bodies(doc: dict[str,
     c.decline_proposal("location", ID, ID, reason="r")
     c.withdraw_proposal("location", ID, ID)
     base = set(c._headers) | {"Content-Type"}
+    schemes = doc["components"]["securitySchemes"]
     problems: list[str] = []
     for call in t.calls:
         op = doc["paths"][_norm(call.url)][call.method.lower()]
         declared = {p["name"] for p in op.get("parameters", []) if p["in"] == "header"}
+        # Credentials (API-Pin since the PIN rides only where checked) are the operation's security schemes.
+        declared |= {
+            schemes[name]["name"]
+            for alternative in op.get("security", doc.get("security") or [])
+            for name in alternative
+            if schemes[name].get("in") == "header"
+        }
         problems += [
             f"{call.method} {_norm(call.url)} sends {h}, not declared" for h in set(call.headers) - base - declared
         ]
