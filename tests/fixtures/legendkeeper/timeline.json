@@ -1,0 +1,172 @@
+{
+ "lane": {
+  "id": "r63i4cf2unp6q0prwmk9d0pb",
+  "name": "Wars",
+  "size": "lg",
+  "createdAt": 1792660486336,
+  "updatedAt": 1792660486336,
+  "rank": "a",
+  "pos": "a"
+ },
+ "event_The Siege": {
+  "id": "myaqa6t9c2omcsch90ff4de3",
+  "laneId": "r63i4cf2unp6q0prwmk9d0pb",
+  "type": "event",
+  "start": 1000000,
+  "end": 1005000,
+  "name": "The Siege",
+  "createdAt": 1792660487197,
+  "updatedAt": 1792660487197,
+  "rank": "E",
+  "formattedStart": "November 26th, 2 CE",
+  "formattedEnd": "November 29th, 2 CE",
+  "startDate": {
+   "year": 2,
+   "month": 11,
+   "monthName": "November",
+   "day": 26,
+   "hour": 10,
+   "minute": 40,
+   "era": {
+    "id": "AD",
+    "name": "Common Era",
+    "abbr": "CE"
+   },
+   "iso": "0002-11-26"
+  },
+  "endDate": {
+   "year": 2,
+   "month": 11,
+   "monthName": "November",
+   "day": 29,
+   "hour": 22,
+   "minute": 0,
+   "era": {
+    "id": "AD",
+    "name": "Common Era",
+    "abbr": "CE"
+   },
+   "iso": "0002-11-29"
+  },
+  "pos": "E"
+ },
+ "event_Founding": {
+  "id": "r6q4dpwpyfn5lrazhrglg811",
+  "laneId": "r63i4cf2unp6q0prwmk9d0pb",
+  "type": "event",
+  "start": 500000,
+  "name": "Founding",
+  "createdAt": 1792660488272,
+  "updatedAt": 1792660488272,
+  "rank": "?",
+  "formattedStart": "December 14th, 1 CE",
+  "startDate": {
+   "year": 1,
+   "month": 12,
+   "monthName": "December",
+   "day": 14,
+   "hour": 5,
+   "minute": 20,
+   "era": {
+    "id": "AD",
+    "name": "Common Era",
+    "abbr": "CE"
+   },
+   "iso": "0001-12-14"
+  },
+  "pos": "?"
+ },
+ "events": {
+  "data": [
+   {
+    "id": "r6q4dpwpyfn5lrazhrglg811",
+    "laneId": "r63i4cf2unp6q0prwmk9d0pb",
+    "type": "event",
+    "start": 500000,
+    "name": "Founding",
+    "createdAt": 1792660488272,
+    "updatedAt": 1792660488272,
+    "rank": "?",
+    "formattedStart": "December 14th, 1 CE",
+    "startDate": {
+     "year": 1,
+     "month": 12,
+     "monthName": "December",
+     "day": 14,
+     "hour": 5,
+     "minute": 20,
+     "era": {
+      "id": "AD",
+      "name": "Common Era",
+      "abbr": "CE"
+     },
+     "iso": "0001-12-14"
+    },
+    "pos": "?",
+    "sourceUri": "lk://resources/tgzavfel/docs/ke9g0py4"
+   },
+   {
+    "id": "myaqa6t9c2omcsch90ff4de3",
+    "laneId": "r63i4cf2unp6q0prwmk9d0pb",
+    "type": "event",
+    "start": 1000000,
+    "end": 1005000,
+    "name": "The Siege",
+    "createdAt": 1792660487197,
+    "updatedAt": 1792660487197,
+    "rank": "E",
+    "formattedStart": "November 26th, 2 CE",
+    "formattedEnd": "November 29th, 2 CE",
+    "startDate": {
+     "year": 2,
+     "month": 11,
+     "monthName": "November",
+     "day": 26,
+     "hour": 10,
+     "minute": 40,
+     "era": {
+      "id": "AD",
+      "name": "Common Era",
+      "abbr": "CE"
+     },
+     "iso": "0002-11-26"
+    },
+    "endDate": {
+     "year": 2,
+     "month": 11,
+     "monthName": "November",
+     "day": 29,
+     "hour": 22,
+     "minute": 0,
+     "era": {
+      "id": "AD",
+      "name": "Common Era",
+      "abbr": "CE"
+     },
+     "iso": "0002-11-29"
+    },
+    "pos": "E",
+    "sourceUri": "lk://resources/tgzavfel/docs/ke9g0py4"
+   }
+  ],
+  "hasMore": false,
+  "nextCursor": null
+ },
+ "lanes": {
+  "data": [
+   {
+    "id": "r63i4cf2unp6q0prwmk9d0pb",
+    "name": "Wars",
+    "size": "lg",
+    "createdAt": 1792660486336,
+    "updatedAt": 1792660486336,
+    "rank": "a",
+    "sourceUri": "lk://resources/tgzavfel/docs/ke9g0py4",
+    "isExternal": false,
+    "resourceName": "Order of the Ash",
+    "documentName": "History",
+    "pos": "a"
+   }
+  ]
+ }
+}

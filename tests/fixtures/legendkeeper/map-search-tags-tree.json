@@ -1,0 +1,280 @@
+{
+ "map_doc": {
+  "id": "yrr58xqo",
+  "name": "Region map",
+  "type": "map",
+  "rank": "S",
+  "isHidden": false,
+  "createdAt": "2026-10-22T09:15:04.325Z",
+  "updatedAt": "2026-10-22T09:15:04.325Z",
+  "mapImage": null
+ },
+ "feature_try_1": {
+  "message": "Validation error",
+  "code": "VALIDATION_ERROR",
+  "requestId": "osmhw6bp45t6hy1pl5gkb6mn",
+  "errors": [
+   {
+    "path": "kind",
+    "message": "Unrecognized key: kind"
+   },
+   {
+    "path": "x",
+    "message": "Unrecognized key: x"
+   },
+   {
+    "path": "y",
+    "message": "Unrecognized key: y"
+   },
+   {
+    "path": "resourceId",
+    "message": "Unrecognized key: resourceId"
+   }
+  ]
+ },
+ "feature_try_2": {
+  "message": "Validation error",
+  "code": "VALIDATION_ERROR",
+  "requestId": "jq9gmssmp0isdxz80uty5cji",
+  "errors": [
+   {
+    "path": "x",
+    "message": "Unrecognized key: x"
+   },
+   {
+    "path": "y",
+    "message": "Unrecognized key: y"
+   },
+   {
+    "path": "resourceId",
+    "message": "Unrecognized key: resourceId"
+   }
+  ]
+ },
+ "feature_try_3": {
+  "message": "Validation error",
+  "code": "VALIDATION_ERROR",
+  "requestId": "binfoz1x4f29ghuh8s0qbe4v",
+  "errors": [
+   {
+    "path": "geometry",
+    "message": "Unrecognized key: geometry"
+   }
+  ]
+ },
+ "search": {
+  "data": [
+   {
+    "resource": {
+     "id": "i7xzob1r",
+     "name": "Aldric Veyra",
+     "iconGlyph": "crown",
+     "iconColor": "#C49454",
+     "parentId": "lfyv1ubb",
+     "tags": [
+      "character",
+      "noble"
+     ],
+     "path": [
+      {
+       "id": "lfyv1ubb",
+       "name": "Boss wire test (delete me)"
+      }
+     ],
+     "iconShape": "none"
+    }
+   },
+   {
+    "resource": {
+     "id": "i7xzob1r",
+     "name": "Aldric Veyra",
+     "iconGlyph": "crown",
+     "iconColor": "#C49454",
+     "parentId": "lfyv1ubb",
+     "tags": [
+      "character",
+      "noble"
+     ],
+     "path": [
+      {
+       "id": "lfyv1ubb",
+       "name": "Boss wire test (delete me)"
+      }
+     ],
+     "iconShape": "none"
+    },
+    "document": {
+     "id": "z3kj5ubq",
+     "name": "Main",
+     "highlights": [
+      {
+       "segment": "Aldric Veyra Lord of Castle Veyra, sworn to the Order. He is  feared  and  loved  ( source ). Year Event 430 The siege",
+       "index": 0,
+       "matchStart": 0,
+       "matchEnd": 6
+      }
+     ],
+     "isSolo": false
+    }
+   }
+  ]
+ },
+ "tags": {
+  "data": [
+   {
+    "tag": "character",
+    "count": 1
+   },
+   {
+    "tag": "faction",
+    "count": 1
+   },
+   {
+    "tag": "noble",
+    "count": 1
+   },
+   {
+    "tag": "place",
+    "count": 1
+   }
+  ]
+ },
+ "resources": {
+  "data": [
+   {
+    "id": "i7xzob1r",
+    "name": "Aldric Veyra",
+    "parentId": "lfyv1ubb",
+    "iconGlyph": "crown",
+    "iconColor": "#C49454",
+    "tags": [
+     "character",
+     "noble"
+    ],
+    "aliases": [
+     "Lord Veyra",
+     "the Ash Lord"
+    ],
+    "rank": "O",
+    "isHidden": false,
+    "createdAt": "2026-10-22T08:51:57.153Z",
+    "updatedAt": "2026-10-22T09:14:27.979Z",
+    "iconShape": "none",
+    "documents": [
+     {
+      "id": "z3kj5ubq",
+      "name": "Main",
+      "type": "page"
+     }
+    ],
+    "hasChildren": false
+   },
+   {
+    "id": "imjcfwi6",
+    "name": "Sikelia",
+    "parentId": null,
+    "iconGlyph": "fas fa-book",
+    "iconColor": "#FFFFFF",
+    "tags": [],
+    "aliases": [],
+    "rank": "P",
+    "isHidden": false,
+    "createdAt": null,
+    "updatedAt": "2026-10-22T08:41:57.876Z",
+    "iconShape": "none",
+    "documents": [
+     {
+      "id": "gx4o4cwp",
+      "name": "Main",
+      "type": "blank"
+     }
+    ],
+    "hasChildren": false
+   },
+   {
+    "id": "lfyv1ubb",
+    "name": "Boss wire test (delete me)",
+    "parentId": null,
+    "iconGlyph": "flask",
+    "iconColor": "#C49454",
+    "tags": [],
+    "aliases": [],
+    "rank": "U",
+    "isHidden": false,
+    "createdAt": "2026-10-22T08:51:45.534Z",
+    "updatedAt": "2026-10-22T08:51:45.575Z",
+    "iconShape": "none",
+    "documents": [
+     {
+      "id": "uqqwnnwh",
+      "name": "Main",
+      "type": "blank"
+     }
+    ],
+    "hasChildren": true
+   },
+   {
+    "id": "tgzavfel",
+    "name": "Order of the Ash",
+    "parentId": "lfyv1ubb",
+    "iconGlyph": "fire",
+    "iconColor": "#C49454",
+    "tags": [
+     "faction"
+    ],
+    "aliases": [
+     "the Ashen"
+    ],
+    "rank": "T",
+    "isHidden": false,
+    "createdAt": "2026-10-22T08:51:59.408Z",
+    "updatedAt": "2026-10-22T09:14:29.565Z",
+    "iconShape": "none",
+    "documents": [
+     {
+      "id": "ke9g0py4",
+      "name": "History",
+      "type": "time"
+     },
+     {
+      "id": "u4dyovlx",
+      "name": "Main",
+      "type": "blank"
+     }
+    ],
+    "hasChildren": false
+   },
+   {
+    "id": "zicarhdp",
+    "name": "Castle Veyra",
+    "parentId": "lfyv1ubb",
+    "iconGlyph": "chess-rook",
+    "iconColor": "#C49454",
+    "tags": [
+     "place"
+    ],
+    "aliases": [],
+    "rank": "S",
+    "isHidden": false,
+    "createdAt": "2026-10-22T08:51:58.412Z",
+    "updatedAt": "2026-10-22T09:15:04.325Z",
+    "iconShape": "none",
+    "documents": [
+     {
+      "id": "q8g8qz6w",
+      "name": "Main",
+      "type": "blank"
+     },
+     {
+      "id": "yrr58xqo",
+      "name": "Region map",
+      "type": "map"
+     }
+    ],
+    "hasChildren": false
+   }
+  ],
+  "hasMore": false,
+  "nextCursor": null
+ }
+}

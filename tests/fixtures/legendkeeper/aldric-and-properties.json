@@ -1,0 +1,358 @@
+{
+ "aldric_resource": {
+  "id": "i7xzob1r",
+  "name": "Aldric Veyra",
+  "tags": [
+   "character",
+   "noble"
+  ],
+  "aliases": [
+   "Lord Veyra",
+   "the Ash Lord"
+  ],
+  "iconGlyph": "crown",
+  "iconColor": "#C49454",
+  "parentId": "lfyv1ubb",
+  "rank": "O",
+  "pos": "O",
+  "isHidden": false,
+  "isLocked": false,
+  "showPropertyBar": false,
+  "createdAt": "2026-10-22T08:51:57.153Z",
+  "updatedAt": "2026-10-22T08:51:57.194Z",
+  "iconShape": "none",
+  "documents": [
+   {
+    "id": "z3kj5ubq",
+    "name": "Main",
+    "type": "page",
+    "rank": "R",
+    "isHidden": false,
+    "createdAt": "2026-10-22T08:51:57.194Z",
+    "updatedAt": "2026-10-22T08:51:57.194Z"
+   }
+  ],
+  "properties": [],
+  "ancestors": [
+   {
+    "id": "lfyv1ubb",
+    "name": "Boss wire test (delete me)"
+   }
+  ]
+ },
+ "aldric_doc": {
+  "id": "z3kj5ubq",
+  "name": "Main",
+  "type": "page",
+  "rank": "R",
+  "isHidden": false,
+  "createdAt": "2026-10-22T08:51:57.194Z",
+  "updatedAt": "2026-10-22T08:51:57.194Z"
+ },
+ "aldric_blocks": {
+  "id": "z3kj5ubq",
+  "version": "1aadb1fc24c03ca2",
+  "schema": 1,
+  "text": "Aldric Veyra\nLord of Castle Veyra, sworn to the Order. He is feared and loved (source).\nHe poisoned his brother.\nYear\nEvent\n430\nThe siege",
+  "blocks": [
+   {
+    "id": "cu721d0g",
+    "kind": "heading",
+    "level": 1,
+    "content": [
+     {
+      "text": "Aldric Veyra"
+     }
+    ]
+   },
+   {
+    "id": "c1sdxa4m",
+    "kind": "paragraph",
+    "content": [
+     {
+      "text": "Lord of "
+     },
+     {
+      "mention": {
+       "resourceId": "zicarhdp",
+       "documentId": "q8g8qz6w",
+       "text": "Castle Veyra",
+       "name": "Castle Veyra"
+      }
+     },
+     {
+      "text": ", sworn to "
+     },
+     {
+      "mention": {
+       "resourceId": "tgzavfel",
+       "text": "the Order",
+       "name": "Order of the Ash"
+      }
+     },
+     {
+      "text": ". He is "
+     },
+     {
+      "text": "feared",
+      "bold": true
+     },
+     {
+      "text": " and "
+     },
+     {
+      "text": "loved",
+      "italic": true
+     },
+     {
+      "text": " ("
+     },
+     {
+      "text": "source",
+      "link": "https://example.org/aldric"
+     },
+     {
+      "text": ")."
+     }
+    ]
+   },
+   {
+    "id": "spodrra0",
+    "kind": "infobox",
+    "layout": "wrapRight",
+    "rows": [
+     {
+      "id": "fyemm8u1",
+      "rank": "_",
+      "kind": "keyValue",
+      "rows": [
+       {
+        "key": "Born",
+        "content": [
+         {
+          "text": "Year 412"
+         }
+        ],
+        "text": "Year 412",
+        "id": "ygz2nyf0",
+        "rank": "d"
+       },
+       {
+        "key": "Rank",
+        "content": [
+         {
+          "text": "Lord"
+         }
+        ],
+        "text": "Lord",
+        "id": "k615xv6t",
+        "rank": "i"
+       }
+      ],
+      "display": "list"
+     },
+     {
+      "id": "om38892s",
+      "rank": "d",
+      "title": "Home",
+      "kind": "resourceLink",
+      "items": [
+       {
+        "resourceId": "zicarhdp",
+        "id": "gvy6ezdf",
+        "rank": "7"
+       }
+      ]
+     },
+     {
+      "id": "z50dfm8h",
+      "rank": "f",
+      "title": "Member of",
+      "kind": "resourceLink",
+      "items": [
+       {
+        "resourceId": "tgzavfel",
+        "id": "d2layvcu",
+        "rank": "e"
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "id": "xzjncs0b",
+    "kind": "secret",
+    "children": [
+     {
+      "id": "kv32s3xj",
+      "kind": "paragraph",
+      "content": [
+       {
+        "text": "He poisoned his brother."
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "id": "pm6prrcv",
+    "kind": "table",
+    "children": [
+     {
+      "id": "xozyrc4p",
+      "kind": "tableRow",
+      "children": [
+       {
+        "id": "sfyq6c1z",
+        "kind": "tableCell",
+        "header": true,
+        "children": [
+         {
+          "id": "doctyoye",
+          "kind": "paragraph",
+          "content": [
+           {
+            "text": "Year"
+           }
+          ]
+         }
+        ]
+       },
+       {
+        "id": "hlepsqi8",
+        "kind": "tableCell",
+        "header": true,
+        "children": [
+         {
+          "id": "pep3e410",
+          "kind": "paragraph",
+          "content": [
+           {
+            "text": "Event"
+           }
+          ]
+         }
+        ]
+       }
+      ]
+     },
+     {
+      "id": "tjjxlw2f",
+      "kind": "tableRow",
+      "children": [
+       {
+        "id": "h7tzvxc5",
+        "kind": "tableCell",
+        "children": [
+         {
+          "id": "cakgumvf",
+          "kind": "paragraph",
+          "content": [
+           {
+            "text": "430"
+           }
+          ]
+         }
+        ]
+       },
+       {
+        "id": "x83dsov0",
+        "kind": "tableCell",
+        "children": [
+         {
+          "id": "fynixe17",
+          "kind": "paragraph",
+          "content": [
+           {
+            "text": "The siege"
+           }
+          ]
+         }
+        ]
+       }
+      ]
+     }
+    ]
+   }
+  ]
+ },
+ "prop_create": {
+  "id": "n4nvqiim",
+  "rank": "O",
+  "kind": "keyValue",
+  "rows": [
+   {
+    "key": "Alignment",
+    "content": [
+     {
+      "text": "Lawful"
+     }
+    ],
+    "text": "Lawful",
+    "id": "foo2pyjb",
+    "rank": "@"
+   }
+  ],
+  "display": "list"
+ },
+ "prop_link": {
+  "id": "ln5ucsmr",
+  "rank": "Q",
+  "title": "Allies",
+  "kind": "resourceLink",
+  "items": [
+   {
+    "resourceId": "tgzavfel",
+    "id": "larj1ov5",
+    "rank": "]"
+   }
+  ]
+ },
+ "props": {
+  "data": [
+   {
+    "id": "n4nvqiim",
+    "rank": "O",
+    "kind": "keyValue",
+    "rows": [
+     {
+      "key": "Alignment",
+      "content": [
+       {
+        "text": "Lawful"
+       }
+      ],
+      "text": "Lawful",
+      "id": "foo2pyjb",
+      "rank": "@"
+     }
+    ],
+    "display": "list"
+   },
+   {
+    "id": "ln5ucsmr",
+    "rank": "Q",
+    "title": "Allies",
+    "kind": "resourceLink",
+    "items": [
+     {
+      "resourceId": "tgzavfel",
+      "id": "larj1ov5",
+      "rank": "]"
+     }
+    ]
+   }
+  ]
+ },
+ "timeline_doc": {
+  "id": "ke9g0py4",
+  "name": "History",
+  "type": "time",
+  "rank": "S",
+  "isHidden": false,
+  "calendarId": "gregorian",
+  "createdAt": "2026-10-22T09:14:29.565Z",
+  "updatedAt": "2026-10-22T09:14:29.565Z",
+  "sources": []
+ }
+}

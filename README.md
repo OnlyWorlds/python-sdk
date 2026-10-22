@@ -101,6 +101,23 @@ print(report.render())
 
 A database whose title is one of the 22 types (`Characters`, `Locations`, any case, singular or plural), or that has a `Type` column naming one per row, becomes elements of that type. A column becomes a field when its name matches the field's (`Birth Date` is `birth_date`), and a relation column becomes a link when it matches a link field and its pages are in the export. Every other page becomes a Narrative, and so does each row of a database whose type the door cannot tell (supertype `notion`, the database's name as subtype). Nothing is dropped: a column that doesn't fit is kept as `x_notion_<column>`, and attachments a page links to are copied into `media/notion/`. Ids come from Notion's page ids, so importing the same export twice gives the same folder. The run ends with a report naming every column it could not place and every link it could not resolve, so you can see what to rename in Notion before the next export. No AI, no account. It is built on Notion's documented export shape; no real export has been through it yet.
 
+A world kept in LegendKeeper becomes a folder through LegendKeeper's own API, read-only. It needs your project's API key (Project Settings, Developers, API Keys; LegendKeeper gives the API to projects whose owner is on a paid plan) and the project's id:
+
+```bash
+export LEGENDKEEPER_API_KEY=lk_...                                          # or --key-file PATH
+python -m onlyworlds.legendkeeper --project ID my-world --plan                # what would become what; writes nothing
+python -m onlyworlds.legendkeeper --project ID --map faction=Institution my-world
+```
+
+```python
+from onlyworlds.legendkeeper import ApiSource, import_legendkeeper
+
+report = import_legendkeeper(ApiSource(key), "ID", "my-world", type_map={"faction": "institution"})
+print(report.render())
+```
+
+LegendKeeper has no element types, so a page's type comes from its tags: a tag that is one of the 22 type names (`character`, `Location`) types it, `--map TAG=TYPE` adds your own tags, and every other page becomes a Narrative (supertype `legendkeeper`). The page text becomes the description as Markdown. A sidebar or infobox row becomes a field when its key matches one (`Height` is `height`), and a titled link list (`Allies`) becomes a link field when it matches one and its targets fit; otherwise each link becomes a Relation element named by the list's title. A timeline's events become Events with LegendKeeper's raw minutes and formatted dates kept beside them; their `start_date` is left for you to set against the world's own calendar. Hidden pages and secret blocks are left out unless you pass `--include-hidden` or `--include-secrets`. Nothing else is dropped: whatever has no field is kept as `x_legendkeeper_<key>`, and the report names every key, link, document and omission. Ids come from LegendKeeper's ids, so a second import of the same project gives the same elements. The key is sent to LegendKeeper only, never written or printed. No AI. Map and board documents are not imported yet, and the door has been walked on a test project, not yet on a real world.
+
 ## Export to OKF
 
 A world folder can be exported as a valid [Open Knowledge Format](https://github.com/GoogleCloudPlatform/open-knowledge-format) (OKF) 0.2 bundle, as the spec stands at one pinned commit (`onlyworlds.okf.OKF_COMMIT`): one markdown file per element, with its fields in the frontmatter, its text under headings and its links (in-prose `ow://` references included) as markdown links, plus an index per type. This needs PyYAML, which the rest of the package does not:
