@@ -745,9 +745,17 @@ def _plan(
         _refuse("not_a_world", f"{root} has no world.json.")
     if not include_private_records and RECORDS_MANIFEST in files:
         # OW-8's private clause: each private producer's directory left out whole; the manifest stays as it is.
-        private = _private_producers(files[RECORDS_MANIFEST].read_bytes(), files[RECORDS_MANIFEST])
-        dirs = tuple(f"records/{p}/" for p in private)
-        files = {rel: src for rel, src in files.items() if not rel.startswith(dirs)}
+        # Matched by OW-18's fold, not exactly: on a disk that ignores case, a manifest's `Fold`
+        # names the directory `fold`, and an exact match would let its private records travel.
+        private = {
+            _fold_name(p) for p in _private_producers(files[RECORDS_MANIFEST].read_bytes(), files[RECORDS_MANIFEST])
+        }
+
+        def in_private(rel: str) -> bool:
+            segs = rel.split("/")
+            return len(segs) > 2 and segs[0] == "records" and _fold_name(segs[1]) in private
+
+        files = {rel: src for rel, src in files.items() if not in_private(rel)}
     raw = files[WORLD_FILE].read_bytes()
     world_bytes, world = _without_link(raw, _parse_world(raw))
     top = _default_top(world) if top_dir is None else top_dir

@@ -200,6 +200,17 @@ def test_only_the_json_boolean_true_marks_records_private(tmp_path: Path) -> Non
     assert got["records/RECORDS.json"] == encode(entries)
 
 
+def test_a_private_producer_matches_its_directory_by_the_fold(tmp_path: Path) -> None:
+    # On a disk that ignores case, `Fold` names `fold`: an exact match would let it travel.
+    # A decomposed é in the manifest names the composed directory the same way (NFC first).
+    decomposed, composed = "cafe" + chr(0x301), "caf" + chr(0xE9)
+    entries = [{"producer": "Fold", "private": True}, {"producer": decomposed, "private": True}, {"producer": "lab"}]
+    files = {"records/fold/a.bin": b"x", f"records/{composed}/n.txt": b"y", "records/lab/a.bin": b"z"}
+    folder = make_folder(tmp_path / "f", {"world.json": world_json(), "records/RECORDS.json": encode(entries), **files})
+    got = read_world_file(world_file_bytes(folder)).entries
+    assert sorted(p for p in got if p.startswith("records/")) == ["records/RECORDS.json", "records/lab/a.bin"]
+
+
 # --- the fold (OW-18) ------------------------------------------------------------------------
 
 
