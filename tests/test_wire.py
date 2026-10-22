@@ -16,6 +16,9 @@ from __future__ import annotations
 import gzip
 import json
 import os
+import pathlib
+import tempfile
+import urllib.error
 import urllib.request
 from collections.abc import Mapping
 from typing import Any
@@ -40,13 +43,34 @@ KIND = {"text": "string", "integer": "integer", "multi_link": "array", "single_l
 def _load() -> dict[str, Any]:
     assert SOURCE
     if SOURCE.startswith(("http://", "https://")):
-        # The document is 2 MB plain, 83 KB gzipped: ask for gzip (keel's bandwidth watch, h29 #9808).
-        req = urllib.request.Request(SOURCE, headers={"Accept-Encoding": "gzip"})
-        with urllib.request.urlopen(req, timeout=30) as r:
-            raw = r.read()
-            if r.headers.get("Content-Encoding") == "gzip":
-                raw = gzip.decompress(raw)
-            doc: dict[str, Any] = json.loads(raw)
+        # The document is 2 MB plain, 181 KB gzipped: ask for gzip (keel's bandwidth watch, h29 #9808),
+        # and send the last ETag back as received (keel #538): an unchanged document is a 304 and 0 bytes,
+        # served from a cache file beside the system's temp dir. CI has no cache, so it reads fresh once.
+        cache = pathlib.Path(tempfile.gettempdir()) / "onlyworlds-wire-openapi.json"
+        cached: dict[str, Any] | None = None
+        if cache.exists():
+            try:
+                cached = json.loads(cache.read_text(encoding="utf-8"))
+            except (OSError, ValueError):
+                cached = None
+        headers = {"Accept-Encoding": "gzip"}
+        if cached and cached.get("url") == SOURCE and cached.get("etag"):
+            headers["If-None-Match"] = cached["etag"]
+        req = urllib.request.Request(SOURCE, headers=headers)
+        try:
+            with urllib.request.urlopen(req, timeout=30) as r:
+                raw = r.read()
+                if r.headers.get("Content-Encoding") == "gzip":
+                    raw = gzip.decompress(raw)
+                doc: dict[str, Any] = json.loads(raw)
+                etag = r.headers.get("ETag")
+            if etag:
+                cache.write_text(json.dumps({"url": SOURCE, "etag": etag, "body": doc}), encoding="utf-8")
+        except urllib.error.HTTPError as e:
+            if e.code == 304 and cached and cached.get("body"):
+                doc = cached["body"]
+            else:
+                raise
     else:
         with open(SOURCE, encoding="utf-8") as f:
             doc = json.load(f)
