@@ -474,6 +474,12 @@ def fixtures():
         test="OW-6", reader="refuse", reason="marker",
         rule="The right string with a trailing newline: the bytes are exactly the media type, ASCII, no newline; "
              "other bytes, refused.")
+    add("fail-OW-6-marker-bom.owworld", build_zip([marker(b"\xef\xbb\xbf" + MIMETYPE)] + sorted(base(), key=utf8_key),
+                                                  sort=False),
+        test="OW-6", reader="refuse", reason="marker",
+        rule="The UTF-8 byte order mark before the media type: a reader that decodes the entry as text first "
+             "drops the mark and passes it (the TypeScript reader did, SDK 4.53.2 fixed it, Kael h58 #9992); the "
+             "bytes are compared as bytes, so these are other bytes, refused.")
     # The shape (first, stored, no extra field) is the writer's SHOULD; the reader's MUST is about the bytes only.
     # Ruled (h58 #9817, U2): the bytes decide the reader; a marker with the right bytes in the wrong shape is read.
     add("pass-OW-6-marker-deflated.owworld", build_zip([marker(method=8)] + sorted(base(), key=utf8_key),

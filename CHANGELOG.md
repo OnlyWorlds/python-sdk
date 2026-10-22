@@ -2,6 +2,10 @@
 
 The package version runs on its own semver; the schema it is generated from is `SCHEMA_DIST_TAG`.
 
+## 0.17.1 (2026-10-22)
+
+- **Schema repinned to schema-dist `v0.32.2-dist.42`** (canonical 00.32.02 unchanged: no schema file moved; `SCHEMA_DIST_TAG`, `SCHEMA_DIST_SERIAL` and `SCHEMA_MANIFEST_SHA256` move with it). Serial 42 adds one case to the `.owworld` conformance set, `fail-OW-6-marker-bom`, a `mimetype` marker that starts with a byte order mark (81 cases now), with its row in `verdicts.json` and its generator; nothing else. The reader already refused it as `marker` and needed no change. The same pin as the npm SDK's 4.53.3.
+
 ## 0.17.0 (2026-10-22)
 
 - **The world file, `.owworld`** (folder format §4.7, OW Council #522), for keel's nightly snapshots: `read_world_file(path_or_bytes)`, `write_world_file(folder, path)` and `world_file_bytes(folder)`, in `onlyworlds.worldfile`. The reader parses the zip's central directory itself (zip64 included: `zipfile` would turn a `\` in a name into `/` on Windows and read a name without the UTF-8 flag as cp437) and checks every name, kind, method and size before it inflates anything. A refusal is a `WorldFileError` whose `reason` is one of the spec's twelve causes, named as the TypeScript SDK names them. The collision fold is NFC, then the C and S rows of the vendored CaseFolding 15.1 (`_casefold.py`, made by `codegen/generate_casefold.py`), never `str.casefold()`. The budget is the spec's floor, 500,000 entries and 2 GiB: declared sizes first, then each entry's bytes (more than it declares is `too_big`; fewer, or a failed CRC, `not_openable`). An `api` block is stripped and never returned; without one, `world.json` keeps its bytes. `WorldFile.to_folder(dest)` writes the world as a folder, every entry byte for byte, built beside `dest` and renamed into place as `write_folder` does. 80 of 80 on the vendored conformance set, the verdicts the TypeScript and Unity SDKs give.

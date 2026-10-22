@@ -279,6 +279,17 @@
       "bytes": 2553
     },
     {
+      "file": "fail-OW-6-marker-bom.owworld",
+      "test": "OW-6",
+      "role": "reader",
+      "reader": "refuse",
+      "writer": "refuse",
+      "rule": "The UTF-8 byte order mark before the media type: a reader that decodes the entry as text first drops the mark and passes it (the TypeScript reader did, SDK 4.53.2 fixed it, Kael h58 #9992); the bytes are compared as bytes, so these are other bytes, refused.",
+      "reason": "marker",
+      "sha256": "be68b474abf796d01faceeb5409abec6239ee2702d6dcd9973b30bfa83b41c63",
+      "bytes": 2555
+    },
+    {
       "file": "pass-OW-6-marker-deflated.owworld",
       "test": "OW-6",
       "role": "reader",
