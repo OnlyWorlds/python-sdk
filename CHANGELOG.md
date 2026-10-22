@@ -2,7 +2,7 @@
 
 The package version runs on its own semver; the schema it is generated from is `SCHEMA_DIST_TAG`.
 
-## [Unreleased]
+## 0.27.0 (2026-10-22)
 
 - **The PIN rides only where keel checks it** (Skeld's rule, OW Keel h29 #10663). `API-Pin` was on every request; keel verifies a PIN wherever one is sent (argon2, 64 MiB each), and a cold cache after a restart OOM-killed staging under scripts reading with the PIN (2026-10-22). `Client.request` now adds it from the request itself, never a list of calls: on every method but GET (every write route, present and future, `push`'s PATCH included), on `GET /me` (keel checks it there when sent: #314, D93), and on every request of a 10-digit legacy key (v1 parity, keel #421: such a key needs it on the reads of a world with a PIN). A GET with an `ow_w_`, `ow_r_` or member key carries no PIN. No call or argument changes: `Client(key, pin)` as before. A minor: a behaviour change, no new API.
 - Tests: every read, write and `me` through a recording transport for three keys (`ow_w_` with a PIN, a 10-digit key with a PIN, `ow_r_` without one), and the rule on arbitrary paths and methods; the PIN put back into every request turned exactly the new tests red.

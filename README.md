@@ -153,9 +153,9 @@ A member can propose a change for a keeper to accept instead of writing it (keel
 
 ```python
 row = client.propose("character", cid, {"reputation": "Feared"}, evidence="Chapter 12")
-for p in client.walk_world_proposals(state="open"):   # newest first; keepers see every row, others their own
+for p in client.walk_world_proposals(state="open"):  # newest first; keepers see every row, others their own
     ...
-client.accept_proposal("character", cid, row["id"])    # the keeper's own write; StaleProposal when a proposed field moved
+client.accept_proposal("character", cid, row["id"])  # the keeper's own write; StaleProposal when a proposed field moved
 client.decline_proposal("character", cid, row["id"], reason="not yet")
 client.withdraw_proposal("character", cid, row["id"])  # the proposer's
 ```
