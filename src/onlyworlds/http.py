@@ -728,11 +728,16 @@ class Client:
         headers = self._writing(_if_match(if_match))
         return self._element(self._element_write("PATCH", f"{t}/{i}/", body, headers), "PATCH", t)
 
-    def delete(self, element_type: str, element_id: str) -> None:
-        """``DELETE /{type}/{id}``: 204, also when it is already gone. The server scrubs the id from every link."""
+    def delete(self, element_type: str, element_id: str, *, if_match: int | None = None) -> None:
+        """``DELETE /{type}/{id}``: 204, also when it is already gone. The server scrubs the id from every link.
+
+        ``if_match`` (keel #563, as on ``patch``): the element's ``change_seq`` as you read it. The delete
+        lands only if nothing changed since; otherwise ``PreconditionFailed`` (412), whose ``current`` is
+        the element as it is now, and nothing is deleted. Under a world's proposals switch a
+        delete is never a proposal."""
         t = _segment(element_type, _TYPE, "element type")
         i = _segment(element_id, _ID, "element id")
-        self.call("DELETE", f"{t}/{i}/", None, self._writing())
+        self.call("DELETE", f"{t}/{i}/", None, self._writing(_if_match(if_match)))
 
     def edit_links(
         self,

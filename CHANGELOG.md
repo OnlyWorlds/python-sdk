@@ -2,6 +2,10 @@
 
 The package version runs on its own semver; the schema it is generated from is `SCHEMA_DIST_TAG`.
 
+## 0.29.0 (2026-10-22)
+
+- **`delete(..., if_match=)`** (keel #563, PR 183, live 2026-10-22 21:3x): `DELETE` reads `If-Match` exactly as `PATCH` does. With the element's `change_seq` as you read it, a delete of an element someone changed since raises `PreconditionFailed` (412) with `current`, nothing deleted; on an element already gone it is the idempotent 204. Under a world's proposals switch a delete is never a proposal. A test sends it and leaves it out, watched failing with the header dropped. The wire test holds no header parameter yet; the npm SDK's wire gate reads keel's document for every operation that takes `If-Match`.
+
 ## 0.28.0 (2026-10-22)
 
 - **The doctor applies the world's Charter only** (keel #558, D152; Skeld's ruling, OW Council h58 #10789). Flag 11 read `x_checks_rules` from every Law with supertype Charter, whoever made it, so a contributor or an agent seat could write the rules it is judged by, and two Charters both applied. Now the Charter is D152's one definition, the newest Law with supertype Charter (trimmed, any case) made by the owner or a co-builder: through `--api` it is `front_door.charter` from `GET /me`, keel's own answer; on a folder the owner's newest (`created_by` null or absent), and when a member's Charter is newer the doctor says it cannot tell (a folder carries no roster) and applies no rule rather than guess. Every other Law with supertype Charter is a finding, naming how many of its rules are not applied. `compared` gains `charter` and `charter_from` (`front_door` or `maker`). Flag 8 is unchanged.

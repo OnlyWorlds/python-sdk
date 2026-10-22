@@ -636,6 +636,15 @@ def test_if_match_sends_a_quoted_change_seq_on_patch_and_links_and_nothing_witho
     assert "If-Match" not in t.calls[2].headers
 
 
+def test_if_match_on_delete_keel_563(make_client: MakeClient) -> None:
+    t = FakeTransport(handler=lambda *a: Response(204, b"", {}))
+    c = make_client(t)
+    c.delete("character", ID, if_match=44)
+    c.delete("character", ID)
+    assert t.calls[0].method == "DELETE" and t.calls[0].headers["If-Match"] == '"44"'
+    assert "If-Match" not in t.calls[1].headers
+
+
 @pytest.mark.parametrize("bad", [4.5, -1, "44", True, None.__class__])
 def test_an_if_match_that_is_not_a_whole_number_raises_before_sending(make_client: MakeClient, bad: Any) -> None:
     t = FakeTransport(handler=lambda *a: jresp(200, {}))
