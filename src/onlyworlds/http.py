@@ -66,7 +66,9 @@ USER_AGENT = f"onlyworlds-py/{__version__}"
 #: a write (spec §4; keel #299), so a read body round-trips as it is. ``known_of`` (keel PR 113)
 #: is an unknown field to keel's writes (a 422): stripped too, and a body where it is ``true``
 #: is refused before it gets here (``_refuse_known_of``).
-READ_ONLY_FIELDS: tuple[str, ...] = ("world", "type", "created_at", "updated_at", "change_seq", "known_of")
+#: ``hidden`` (keel PR 160, #537) rides a body only for a reader who still sees a hidden element and is
+#: ignored in a write: stripped here so a read body round-trips as it is.
+READ_ONLY_FIELDS: tuple[str, ...] = ("world", "type", "created_at", "updated_at", "change_seq", "known_of", "hidden")
 
 _TYPE = re.compile(r"^[a-z][a-z0-9_]*$")
 _ID = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_.-]*$")

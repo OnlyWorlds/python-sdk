@@ -81,6 +81,7 @@ NOT_SENT = frozenset(
         "changed_by",
         "changed_via",
         "known_of",
+        "hidden",
         "local_updated_at",
         "server_updated_at",
         "image_media_id",

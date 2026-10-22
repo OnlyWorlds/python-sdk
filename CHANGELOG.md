@@ -2,6 +2,10 @@
 
 The package version runs on its own semver; the schema it is generated from is `SCHEMA_DIST_TAG`.
 
+## 0.14.3 (2026-10-22)
+
+- **`hidden` is a read-only field** (keel PR 160, #537: `hidden: true` rides an element body only for a reader who still sees a hidden element). It joins `READ_ONLY_FIELDS` and the push loop's never-sent list, so a read body round-trips and a push never carries it. CI's wire test found it the hour keel shipped it.
+
 ## 0.14.2 (2026-10-22)
 
 - **The doctor's flag 8 finds a charter on any type.** A world that files its charter as a Construct with supertype Charter (BrainBoost; TC's audit run, OW Industry #9814) read as "no charter". Now any element with supertype Charter is the charter for the staleness check, and one that is not a Law gets its own finding, since keel's world page and the parlor read a Law with supertype Charter. The "no charter" finding's words name the guidance.
