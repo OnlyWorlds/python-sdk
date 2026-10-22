@@ -16,6 +16,7 @@ from ._schema import (
     SCHEMA_VERSION,
 )
 from ._version import __version__
+from .checks import CHECKS_FIELD, CheckRow, apply_checks
 from .errors import PreconditionFailed, parse_retry_after
 from .export import export_world
 from .folder import (
@@ -59,6 +60,7 @@ from .worldfile import (
 
 __all__ = [
     "API_BASE",
+    "CHECKS_FIELD",
     "ELEMENT_TYPES",
     "FIELD_KINDS",
     "FORMAT_VERSION",
@@ -73,6 +75,7 @@ __all__ = [
     "ApiError",
     "BulkResult",
     "ChangeWalk",
+    "CheckRow",
     "Client",
     "Folder",
     "FolderElement",
@@ -89,6 +92,7 @@ __all__ = [
     "WorldFileError",
     "WriteReport",
     "__version__",
+    "apply_checks",
     "check_kinds",
     "element_filename",
     "export_world",

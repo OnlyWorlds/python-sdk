@@ -20,8 +20,11 @@ from urllib.parse import parse_qs, urlsplit
 import pytest
 from conftest import FakeTransport, jresp
 
-from onlyworlds import FORMAT_VERSION, Client, Response, doctor, read_folder, write_folder
+from onlyworlds import FORMAT_VERSION, CheckRow, Client, Response, apply_checks, doctor, read_folder, write_folder
 from onlyworlds.doctor import FLAGS, Report, doctor_api, doctor_folder, fold_name, render_prose
+
+REPO = Path(__file__).resolve().parent.parent
+CHECKS_FIXTURE = REPO / "codegen" / "schema-dist" / "profiles" / "checks.fixture.json"
 
 NOW = dt.datetime(2026, 10, 21, 12, 0, tzinfo=dt.UTC)
 WORLD = {"id": "w0000000-0000-7000-8000-000000000000", "name": "Harbor World", "format_version": FORMAT_VERSION}
@@ -114,7 +117,7 @@ def snapshot(root: Path) -> dict[str, str]:
 def test_the_clean_world_has_nothing_to_look_at(tmp_path: Path) -> None:
     r = folder_report(tmp_path, clean())
     assert r.findings == []
-    assert r.ran == ["1", "3", "4", "5", "6a", "6b", "9", "10"]
+    assert r.ran == ["1", "3", "4", "5", "6a", "6b", "9", "10", "11"]
     assert [x["flag"] for x in r.not_run] == ["2", "7", "8"]
     assert r.world == {"id": WORLD["id"], "name": WORLD["name"], "door": "folder"}
     assert r.written == 0
@@ -385,7 +388,7 @@ def test_the_prose_report_reads_counts_first(tmp_path: Path) -> None:
     write_folder(root, WORLD, edit(clean(), "event", E1, end_date=1))
     _, out, _ = run_main([str(root)])
     lines = out.splitlines()
-    assert lines[2] == "1 things to look at, 8 flags ran, 3 could not run, 0 things written"
+    assert lines[2] == "1 things to look at, 9 flags ran, 3 could not run, 0 things written"
     assert lines.index("What was checked") < lines.index("What could not be checked, and why")
     assert "  - event Storm (" + E1 + "): it ends before it starts" in lines
     assert (
@@ -488,7 +491,7 @@ def test_the_api_door_on_the_clean_world() -> None:
     r = api_report(reader)
     assert r.findings == []
     assert r.world["door"] == "api"
-    assert r.ran == ["1", "3", "4", "5", "6a", "6b", "8"]
+    assert r.ran == ["1", "3", "4", "5", "6a", "6b", "8", "11"]
     assert {x["flag"]: x["why"] for x in r.not_run} == {
         "2": "the feed carries current bodies only; a holders change cannot be seen (measured: 7 upserts for 7 ids)",
         "7": "read marks are not readable through the API",
@@ -777,3 +780,359 @@ def test_the_packet_command_line(tmp_path: Path, monkeypatch: pytest.MonkeyPatch
         "server": "https://keel-staging.onrender.com/api/v2",
         "world": WORLD["id"],
     }
+
+
+# --- 11. house rules (the checks profile, schema-dist profiles/checks.md, dist.47) ----------
+
+HR = doctor.CHECKS_FLAG
+C3 = "c0000000-0000-7000-8000-000000000003"
+R2 = "r0000000-0000-7000-8000-000000000002"
+R3 = "r0000000-0000-7000-8000-000000000003"
+R4 = "r0000000-0000-7000-8000-000000000004"
+CON1 = "d0000000-0000-7000-8000-000000000001"
+
+
+def checks_fixture() -> dict[str, Any]:
+    assert CHECKS_FIXTURE.is_file(), f"no checks fixture at {CHECKS_FIXTURE}"
+    doc: dict[str, Any] = json.loads(CHECKS_FIXTURE.read_text(encoding="utf-8"))
+    assert doc["profile"] == "checks"
+    return doc
+
+
+def verdict(row: CheckRow) -> str:
+    assert row.not_checked is None, row
+    return "out" if row.scoped == 0 else ("short" if row.short else "ok")
+
+
+def test_11_the_fixture_cases_replayed() -> None:
+    # every case's verdict per rule index, read from the vendored dist (never a copy)
+    fx = checks_fixture()
+    rules = fx["rules"]
+    misses: list[str] = []
+    expectations = 0
+    for case in fx["cases"]:
+        rows = apply_checks(rules, [case["element"]])
+        assert [r.index for r in rows] == list(range(len(rules)))
+        for idx, want in case["expect"].items():
+            expectations += 1
+            got = verdict(rows[int(idx)])
+            if got != want:
+                misses.append(f"{case['name']}: rule {idx} wants {want}, got {got}")
+    assert misses == []
+    assert len(fx["cases"]) >= 13 and expectations >= 32  # dist.47's counts; a later serial adds cases
+
+
+def test_11_the_fixture_not_checked_rows_replayed() -> None:
+    fx = checks_fixture()
+    misses = [
+        f"{nc['rule']!r}: the reader says {row.not_checked!r}, the fixture {nc['reason']!r}"
+        for nc in fx["not_checked"]
+        if ((row := apply_checks([nc["rule"]], [])[0]).not_checked is None) != (nc["reason"] is None)
+    ]
+    assert misses == []
+    assert len(fx["not_checked"]) >= 8
+
+
+def test_11_a_short_element_is_named_by_type_id_and_name() -> None:
+    rules = checks_fixture()["rules"][:1]
+    els = [
+        {"type": "character", "id": C1, "name": "Ann"},
+        {"type": "character", "id": C2, "name": "Bo", "reputation": 0},
+        {"type": "location", "id": L1, "name": "Harbor"},
+    ]
+    (row,) = apply_checks(rules, els)
+    assert (row.index, row.rule, row.field, row.scoped) == (0, "every Character carries a reputation", "reputation", 2)
+    assert row.short == [{"type": "character", "id": C1, "name": "Ann"}]  # 0 is present
+    assert row.as_dict() == {
+        "index": 0,
+        "rule": "every Character carries a reputation",
+        "field": "reputation",
+        "scoped": 2,
+        "short": [{"type": "character", "id": C1, "name": "Ann"}],
+        "not_checked": None,
+    }
+
+
+def test_11_present_reads_null_blank_and_empty_list_as_absent() -> None:
+    rule = {"rule": "r", "where": {"type": "character"}, "require": {"field": "x_bb_notes", "present": True}}
+    values: list[Any] = [None, "", " \t\n", [], "x", 0, False, ["a"], {}]
+    els = [{"type": "character", "id": str(i), "name": "", "x_bb_notes": v} for i, v in enumerate(values)]
+    (row,) = apply_checks([rule], els)
+    assert [s["id"] for s in row.short] == ["0", "1", "2", "3"]
+
+
+def test_11_where_type_as_a_list_and_the_fold() -> None:
+    rule = {
+        "rule": "every Character and Creature has a description",
+        "where": {"type": ["character", " Creature "], "supertype": ["PERSON", ""]},
+        "require": {"field": "description", "present": True},
+    }
+    els = [
+        {"type": "character", "id": "1", "name": "a", "supertype": "person"},
+        {"type": "creature", "id": "2", "name": "b"},  # absent supertype matches ""
+        {"type": "creature", "id": "3", "name": "c", "supertype": "Beast"},  # out
+        {"type": "location", "id": "4", "name": "d", "supertype": "Person"},  # out
+    ]
+    (row,) = apply_checks([rule], els)
+    assert row.scoped == 2 and [s["id"] for s in row.short] == ["1", "2"]
+
+
+def test_11_a_field_must_be_one_every_scoped_type_has() -> None:
+    rule = {
+        "rule": "r",
+        "where": {"type": ["character", "location"]},
+        "require": {"field": "reputation", "present": True},
+    }
+    (row,) = apply_checks([rule], [])
+    assert row.not_checked is not None and "reputation" in row.not_checked
+
+
+def test_11_links_min_counts_ids() -> None:
+    rule = {"rule": "r", "where": {"type": "relation"}, "require": {"field": "institutions", "links_min": 2}}
+    els = [
+        {"type": "relation", "id": "1", "name": "", "institutions": ["a", "b"]},
+        {"type": "relation", "id": "2", "name": "", "institutions": ["a"]},
+        {"type": "relation", "id": "3", "name": "", "institutions": "a"},
+        {"type": "relation", "id": "4", "name": ""},
+    ]
+    (row,) = apply_checks([rule], els)
+    assert [s["id"] for s in row.short] == ["2", "3", "4"]
+    text_field = {"rule": "r", "where": {"type": "relation"}, "require": {"field": "description", "links_min": 1}}
+    assert apply_checks([text_field], [])[0].not_checked is not None
+
+
+@pytest.mark.parametrize(
+    ("require", "why"),
+    [
+        ({"field": "reputation", "present": False}, "present"),
+        ({"field": "reputation", "links_min": -1}, "links_min"),
+        ({"field": "reputation", "links_min": True}, "links_min"),
+        ({"field": "reputation", "one_of": []}, "one_of"),
+        ({"field": "reputation", "one_of": ["a", 3]}, "one_of"),
+        ({"field": "reputation", "matches": ""}, "pattern"),
+        ({"field": "reputation", "matches": "a" * 401}, "pattern"),
+        ({"field": "reputation", "matches": "(?<=a)b"}, "pattern"),
+        ({"field": "reputation", "matches": "(?<!a)b"}, "pattern"),
+        ({"field": "reputation", "matches": "(?P<x>a)"}, "pattern"),
+        ({"field": "reputation", "matches": "(?<x>a)"}, "pattern"),
+        ({"field": "reputation", "matches": "(?s)a.b"}, "pattern"),
+        ({"field": "reputation", "matches": "a(?i)b"}, "pattern"),
+        ({"field": "reputation", "matches": "(?i:a)b"}, "pattern"),
+        ({"field": "reputation", "present": True, "note": "x"}, "note"),
+    ],
+)
+def test_11_a_rule_it_cannot_apply_is_not_checked(require: dict[str, Any], why: str) -> None:
+    rule = {"rule": "r", "where": {"type": "character"}, "require": require}
+    (row,) = apply_checks([rule], [{"type": "character", "id": "1", "name": "", "reputation": "ab"}])
+    assert row.not_checked is not None and why in row.not_checked
+    assert row.scoped == 0 and row.short == []
+
+
+@pytest.mark.parametrize(
+    "where",
+    [{"type": []}, {"type": 3}, {"type": "character", "subtype": [1]}, {"type": "character", "name": "Ann"}, []],
+)
+def test_11_a_malformed_where_is_not_checked(where: Any) -> None:
+    rule = {"rule": "r", "where": where, "require": {"field": "name", "present": True}}
+    assert apply_checks([rule], [])[0].not_checked is not None
+
+
+def test_11_the_shared_regex_subset_runs() -> None:
+    # the two allowed leading flags, escaped parens, a class holding "(?", a lookahead, a non-capturing group
+    patterns = [r"(?im)^next\b", r"(?mi)^NEXT", r"\(?next", r"[(?]x|next", r"ne(?=xt)", r"(?:ne)xt"]
+    for p in patterns:
+        rule = {"rule": "r", "where": {"type": "relation"}, "require": {"field": "description", "matches": p}}
+        (row,) = apply_checks([rule], [{"type": "relation", "id": "1", "name": "", "description": "a\nNext: b"}])
+        assert row.not_checked is None, p
+
+
+def test_11_apply_checks_never_changes_the_rules() -> None:
+    fx = checks_fixture()
+    rules = [*fx["rules"], *(nc["rule"] for nc in fx["not_checked"])]
+    before = copy.deepcopy(rules)
+    apply_checks(rules, [c["element"] for c in fx["cases"]])
+    assert rules == before
+
+
+def bb_world(rules: Any = None, *, key: bool = True) -> Elements:
+    """The clean world, its Charter carrying BrainBoost's three rules (the fixture's first three), one
+    Character without a reputation, a Funding line short of Next and roles, and two lines that hold."""
+    base = with_(
+        clean(),
+        "character",
+        {"id": C2, "name": "Bo", "description": "B.", "location": L1, "reputation": "steady"},
+    )
+    base = with_(
+        base,
+        "relation",
+        {
+            "id": R2,
+            "name": "Fund A",
+            "supertype": "Funding",
+            "subtype": "in talks",
+            "description": "Roles: Jasper leads.\nNext: the call.",
+            "actor": C1,
+        },
+        {
+            "id": R3,
+            "name": "Fund B",
+            "supertype": "Funding",
+            "subtype": "running",
+            "description": "Going.",
+            "actor": C1,
+        },
+        {
+            "id": R4,
+            "name": "Pilot C",
+            "supertype": "Pilot",
+            "subtype": "paused",
+            "description": "Next: wait",
+            "actor": C1,
+        },
+    )
+    if key:
+        base = edit(base, "law", LAW1, x_checks_rules=checks_fixture()["rules"][:3] if rules is None else rules)
+    return base
+
+
+def test_11_brainboosts_three_rules_on_a_folder(tmp_path: Path) -> None:
+    r = folder_report(tmp_path, bb_world())
+    assert HR in r.ran
+    got = sorted((f["element"]["id"], f["evidence"]["rule"]) for f in found(r, HR))
+    assert got == sorted([(C1, 0), (R3, 1), (R3, 2)])
+    (ann,) = [f for f in found(r, HR) if f["element"]["id"] == C1]
+    assert ann == {
+        "flag": HR,
+        "element": {"type": "character", "id": C1, "name": "Ann"},
+        "reason": "every Character carries a reputation",
+        "evidence": {"charter": LAW1, "rule": 0, "field": "reputation"},
+    }
+    c = r.compared[HR]
+    assert (c["n"], c["of"], c["view"], c["stubs_not_judged"]) == (3, 3, "folder", 0)
+    assert [(x["charter"], x["index"], x["scoped"], x["short"], x["not_checked"]) for x in c["rules"]] == [
+        (LAW1, 0, 2, 1, None),
+        (LAW1, 1, 3, 1, None),
+        (LAW1, 2, 2, 1, None),
+    ]
+    assert c["rules"][1]["rule"] == "a live line carries its Next"
+
+
+def test_11_brainboosts_three_rules_in_prose_and_json(tmp_path: Path) -> None:
+    root = tmp_path / "w"
+    write_folder(root, WORLD, bb_world())
+    code, out, _ = run_main([str(root)])
+    lines = out.splitlines()
+    assert code == 1
+    assert lines[2].startswith("3 things to look at, 9 flags ran")
+    assert f"{HR}. House rules (the checks profile) (3)" in lines
+    assert f"  - character Ann ({C1}): every Character carries a reputation" in lines
+    assert f"  {HR}. House rules (the checks profile): 3 of 3 house rules applied (view: folder)" in lines
+    assert '      rule 1, "a live line carries its Next": 3 scoped, 1 short' in lines
+    code, out, _ = run_main([str(root), "--json"])
+    report = json.loads(out)
+    assert code == 1 and HR in report["ran"]
+    assert [x["short"] for x in report["compared"][HR]["rules"]] == [1, 1, 1]
+    assert sorted(f["element"]["id"] for f in report["findings"] if f["flag"] == HR) == sorted([C1, R3, R3])
+
+
+def test_11_the_key_is_read_from_the_charters_file(tmp_path: Path) -> None:
+    root = tmp_path / "w"
+    write_folder(root, WORLD, bb_world())
+    (path,) = [p for p in (root / "elements" / "law").glob("*.json")]
+    assert json.loads(path.read_text(encoding="utf-8"))["x_checks_rules"] == checks_fixture()["rules"][:3]
+    before = snapshot(root)
+    r = doctor_folder(read_folder(root), now=NOW)
+    assert r.compared[HR]["n"] == 3 and len(found(r, HR)) == 3
+    assert snapshot(root) == before  # never written, reordered or repaired
+
+
+def test_11_brainboosts_three_rules_through_the_api() -> None:
+    r = api_report(FakeReader(on_the_wire(bb_world())))
+    assert sorted((f["element"]["id"], f["evidence"]["rule"]) for f in found(r, HR)) == sorted(
+        [(C1, 0), (R3, 1), (R3, 2)]
+    )
+    assert r.compared[HR]["view"] == "owner"
+    assert api_report(FakeReader(on_the_wire(bb_world()), role="guest")).compared[HR]["view"] == "guest"
+
+
+def test_11_the_packet_takes_the_short_elements(tmp_path: Path) -> None:
+    root = tmp_path / "w"
+    write_folder(root, WORLD, bb_world())
+    code, out, _ = run_main([str(root), "--packet"])
+    (packet,) = json.loads(out)
+    entries = {e["id"]: e["reason"] for e in packet["x_packet_elements"]}
+    assert code == 1 and entries == {
+        C1: "every Character carries a reputation.",
+        R3: "a live line carries its Next. a Funding line names the roles.",
+    }
+
+
+def test_11_a_charter_without_the_key_runs_and_checks_nothing(tmp_path: Path) -> None:
+    r = folder_report(tmp_path, bb_world(key=False))
+    assert HR in r.ran and found(r, HR) == []
+    assert r.compared[HR] == {
+        "n": 0,
+        "of": 0,
+        "view": "folder",
+        "charters": 1,
+        "carrying": 0,
+        "stubs_not_judged": 0,
+        "rules": [],
+    }
+    prose = render_prose(r).splitlines()
+    assert (
+        f"  {HR}. House rules (the checks profile): 0 of 0 house rules applied (view: folder; "
+        "no charter carries x_checks_rules)" in prose
+    )
+
+
+def test_11_an_empty_list_checks_nothing_and_finds_nothing(tmp_path: Path) -> None:
+    r = folder_report(tmp_path, bb_world([]))
+    assert found(r, HR) == [] and r.compared[HR]["of"] == 0
+
+
+def test_11_a_key_that_is_not_a_list_is_one_finding_on_the_charter(tmp_path: Path) -> None:
+    r = folder_report(tmp_path, bb_world({"rule": "every Character carries a reputation"}))
+    (f,) = found(r, HR)
+    assert f["element"]["id"] == LAW1
+    assert f["reason"] == "x_checks_rules is not a list (an object), so no house rule on it is checked"
+    assert f["evidence"] == {"charter": LAW1, "got": "object"}
+    assert r.compared[HR]["of"] == 0
+
+
+def test_11_a_fifth_predicate_is_not_checked_and_said(tmp_path: Path) -> None:
+    fifth = checks_fixture()["not_checked"][0]["rule"]
+    assert "longer_than" in fifth["require"]
+    r = folder_report(tmp_path, bb_world([*checks_fixture()["rules"][:1], fifth]))
+    nc = [f for f in found(r, HR) if f["element"]["id"] == LAW1]
+    (f,) = nc
+    assert f["reason"].startswith('house rule 1, "a fifth predicate", is not checked: ')
+    assert "longer_than" in f["reason"]
+    assert f["evidence"]["rule"] == 1 and f["evidence"]["sentence"] == "a fifth predicate"
+    c = r.compared[HR]
+    assert (c["n"], c["of"]) == (1, 2)
+    assert c["rules"][1]["not_checked"] is not None and c["rules"][1]["scoped"] == 0
+    assert any(
+        line.startswith('      rule 1, "a fifth predicate": not checked (') for line in render_prose(r).splitlines()
+    )
+
+
+def test_11_a_known_of_stub_is_not_judged(tmp_path: Path) -> None:
+    stub = {"id": C3, "name": "Cy", "known_of": True}
+    r = folder_report(tmp_path, with_(bb_world(), "character", stub))
+    assert C3 not in {f["element"]["id"] for f in found(r, HR)}
+    assert r.compared[HR]["stubs_not_judged"] == 1
+    assert r.compared[HR]["rules"][0]["scoped"] == 2
+
+
+def test_11_rules_on_a_charter_that_is_not_a_law_are_not_read(tmp_path: Path) -> None:
+    rules = checks_fixture()["rules"][:1]
+    base = edit(clean(), "law", LAW1, supertype="Decree")
+    base["construct"] = [
+        {"id": CON1, "name": "Charter", "supertype": "Charter", "description": "Rules.", "x_checks_rules": rules}
+    ]
+    r = folder_report(tmp_path, base)
+    (f,) = found(r, HR)
+    assert f["element"]["id"] == CON1 and f["evidence"] == {"filed_as": "construct"}
+    assert "a Law with supertype Charter" in f["reason"]
+    assert r.compared[HR]["of"] == 0

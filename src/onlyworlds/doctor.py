@@ -32,6 +32,17 @@ and two from the file side, on the folder door only: (9) a ``format_version`` ol
 this package's ``FORMAT_VERSION``; (10) an ``api_key`` in ``world.json``'s ``api`` block
 when ``world.json`` is tracked by git.
 
+And on both doors, (11) the world's own house rules: the checks profile (schema-dist
+``profiles/checks.md``, dist.47), ``x_checks_rules`` on a Law with supertype Charter, read
+by ``onlyworlds.checks.apply_checks``. Each element a rule finds short is a finding (the
+rule's sentence as the reason; the charter, the rule's index and its field as evidence); a
+rule the reader cannot apply is a finding on the charter, naming the rule and why; a key
+that is not a list is one finding on the charter; a charter without the key checks nothing
+and says so. ``compared`` carries every rule's ``scoped`` and ``short`` counts and the view
+read (``folder``, or the key's role). A known-of stub is not judged (its absent fields are
+unknown), and the rules are on a Law only: a charter of another type that carries them is a
+finding, its rules not read.
+
 A flag the walk cannot evaluate is reported in ``not_run`` with its reason, never as clean,
 and every flag that ran says how much it could compare (``compared: {n, of}``): a clean
 count over nothing compared is not a pass. A known-of stub's absent fields are unknown,
@@ -81,11 +92,13 @@ from typing import Any, Protocol
 
 from ._schema import ELEMENT_TYPES, FIELD_KINDS, GENERIC_PAIRS, LINK_TARGETS
 from ._version import __version__
+from .checks import CHECKS_FIELD, apply_checks
 from .errors import ApiError
 from .folder import FORMAT_VERSION, WORLD_FILE, Folder, is_known_of, read_folder
 from .http import API_BASE, Client
 
 __all__ = [
+    "CHECKS_FLAG",
     "FLAGS",
     "MESSAGE_SUPERTYPES",
     "PACKET_CAP",
@@ -100,6 +113,9 @@ __all__ = [
     "render_prose",
 ]
 
+#: The house-rules flag (the checks profile): read from every Charter on both doors.
+CHECKS_FLAG = "11"
+
 #: Flag id -> what it looks for. The ids are strings because flag 6 has two readings.
 FLAGS: dict[str, str] = {
     "1": "A link to an element that is not there",
@@ -113,6 +129,7 @@ FLAGS: dict[str, str] = {
     "8": "A charter untouched after N changes",
     "9": "A format_version older than this package's",
     "10": "An api_key in a tracked world.json",
+    CHECKS_FLAG: "House rules (the checks profile)",
 }
 
 #: A finding on an element of these supertypes (compared case-folded) is ``kind: "message"``
@@ -131,6 +148,7 @@ _UNITS: dict[str, str] = {
     "8": "charters found in the feed",
     "9": "world.json format_version",
     "10": "world.json",
+    CHECKS_FLAG: "house rules applied",
 }
 
 #: Fields that hold no prose even when the schema types them text.
@@ -468,6 +486,83 @@ def _walk(run: _Run, els: list[_El], *, days: int, now: _dt.datetime, whole_view
     run.ran("6b", whole, of, skipped_types=list(_SPARSE_TYPES))
 
 
+def _json_kind(value: Any) -> str:
+    if value is None:
+        return "null"
+    if isinstance(value, bool):
+        return "a boolean"
+    if isinstance(value, int | float):
+        return "a number"
+    if isinstance(value, str):
+        return "a string"
+    return "an object" if isinstance(value, Mapping) else type(value).__name__
+
+
+def _house_rules(run: _Run, els: list[_El], *, view: str) -> None:
+    """Flag 11: every charter's ``x_checks_rules`` (the checks profile) applied to the elements the
+    door could read. Never writes, reorders or repairs a list."""
+    flag = CHECKS_FLAG
+    charters = [el for el in els if _folded(el.body.get("supertype")) == "charter"]
+    for el in charters:
+        if el.type != "law" and CHECKS_FIELD in el.body:
+            run.find(
+                flag,
+                el,
+                f"{CHECKS_FIELD} rides on a Law with supertype Charter; on this {el.type.capitalize()} its house "
+                "rules are not read",
+                {"filed_as": el.type},
+            )
+    laws = [el for el in charters if el.type == "law"]
+    judged = [el for el in els if not el.known_of]  # a stub's absent fields are unknown, not short
+    bodies = [{**el.body, "type": el.type, "id": el.id} for el in judged]
+    by_ref = {(el.type, el.id): el for el in judged}
+    rows: list[dict[str, Any]] = []
+    applied = carrying = 0
+    for charter in laws:
+        if CHECKS_FIELD not in charter.body:
+            continue
+        carrying += 1
+        rules = charter.body[CHECKS_FIELD]
+        if not isinstance(rules, list):
+            got = _json_kind(rules)
+            run.find(
+                flag,
+                charter,
+                f"{CHECKS_FIELD} is not a list ({got}), so no house rule on it is checked",
+                {"charter": charter.id, "got": got.removeprefix("a ").removeprefix("an ")},
+            )
+            continue
+        for row in apply_checks(rules, bodies):
+            rows.append({"charter": charter.id, **row.as_dict(), "short": len(row.short)})
+            if row.not_checked is not None:
+                named = f', "{row.rule}",' if row.rule is not None else ""
+                run.find(
+                    flag,
+                    charter,
+                    f"house rule {row.index}{named} is not checked: {row.not_checked}",
+                    {"charter": charter.id, "rule": row.index, "sentence": row.rule, "why": row.not_checked},
+                )
+                continue
+            applied += 1
+            for ref in row.short:
+                run.find(
+                    flag,
+                    by_ref[(ref["type"], ref["id"])],
+                    row.rule or "",
+                    {"charter": charter.id, "rule": row.index, "field": row.field},
+                )
+    run.ran(
+        flag,
+        applied,
+        len(rows),
+        view=view,
+        charters=len(laws),
+        carrying=carrying,
+        stubs_not_judged=len(els) - len(judged),
+        rules=rows,
+    )
+
+
 # ---------------------------------------------------------------------------
 # The folder door
 # ---------------------------------------------------------------------------
@@ -546,6 +641,7 @@ def doctor_folder(folder: Folder, *, days: int = 14, changes: int = 50, now: _dt
     run = _Run({"id": world.get("id"), "name": world.get("name"), "door": "folder"})
     els = [_El(fe.type, eid, fe.body) for eid, fe in folder.all_elements().items()]
     _walk(run, els, days=days, now=now or _dt.datetime.now(_dt.UTC))
+    _house_rules(run, els, view="folder")
     run.skip("2", "needs the feed's history of Title.holders")
     run.skip("7", "read marks are not in the folder")
     run.skip("8", "no feed in a folder")
@@ -684,6 +780,7 @@ def doctor_api(client: Reader, *, days: int = 14, changes: int = 50, now: _dt.da
     for t in ELEMENT_TYPES:
         els.extend(_El(t, b["id"], b) for b in _list_all(client, t) if isinstance(b.get("id"), str))
     _walk(run, els, days=days, now=now or _dt.datetime.now(_dt.UTC), whole_view=role != "guest")
+    _house_rules(run, els, view=role if isinstance(role, str) and role else "unknown")
     try:
         rows, head = _feed(client)
     except (ApiError, ConnectionError, ValueError) as exc:
@@ -729,7 +826,11 @@ def _lines(report: Report) -> Iterable[str]:
         if c and c.get("skipped_types"):
             skipped = ", ".join(c["skipped_types"])
             counted += f" (not compared: {skipped}, types with under two text fields beside description)"
+        if c and flag == CHECKS_FLAG:
+            counted += f" ({_rules_note(c)})"
         yield f"  {flag}. {FLAGS[flag]}{counted}"
+        if c and flag == CHECKS_FLAG:
+            yield from _rule_lines(c)
     if report.not_run:
         yield ""
         yield "What could not be checked, and why"
@@ -741,6 +842,30 @@ def _lines(report: Report) -> Iterable[str]:
         yield f"  {len(messages)} findings on elements whose supertype marks a message or a room thing;"
         yield "  they are not counted above, but they still make the exit code 1."
         yield from _by_flag(messages)
+
+
+def _rules_note(c: Mapping[str, Any]) -> str:
+    """The house-rules line's parenthesis: the view read, and why nothing was checked when nothing was."""
+    note = f"view: {c.get('view')}"
+    if not c.get("charters"):
+        note += "; no Law with supertype Charter"
+    elif not c.get("carrying"):
+        note += f"; no charter carries {CHECKS_FIELD}"
+    if c.get("stubs_not_judged"):
+        note += f"; {c['stubs_not_judged']} known-of stubs not judged"
+    return note
+
+
+def _rule_lines(c: Mapping[str, Any]) -> Iterable[str]:
+    """One line per house rule: scoped and short, or not checked and why."""
+    several = c.get("carrying", 0) > 1
+    for row in c.get("rules", []):
+        named = f', "{row["rule"]}"' if row["rule"] is not None else ""
+        where = f" (charter {row['charter']})" if several else ""
+        if row["not_checked"] is not None:
+            yield f"      rule {row['index']}{named}{where}: not checked ({row['not_checked']})"
+        else:
+            yield f"      rule {row['index']}{named}{where}: {row['scoped']} scoped, {row['short']} short"
 
 
 def _by_flag(findings: list[dict[str, Any]]) -> Iterable[str]:
