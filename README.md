@@ -147,6 +147,21 @@ OW_API_KEY=ow_r_… python -m onlyworlds.pack --api moppetopia-pack   # the key'
 
 `00-world.md` holds the world's own fields and an index of every element; then one file per element type, each element a `## Name` section with its fields in schema order and every link written as the name and type of what it points to. Room elements and extension fields are left out unless asked (`--rooms`, `--extensions`); a file past a cap splits into parts, and small files merge when the parts would pass the source cap (`--words`, `--bytes`, `--files`). Nothing is invented and nothing is cut: an unresolved link stays as its id, an oversize element gets a file of its own. The output directory must not exist yet; the same world gives the same bytes. Beside it: the OKF bundle (above) is one file per element with frontmatter and links as paths, for knowledge tools that follow links; the pack is merged prose for a notebook that reads it whole.
 
+## Proposed changes
+
+A member can propose a change for a keeper to accept instead of writing it (keel #519), and a world's owner can make every AI seat work that way:
+
+```python
+row = client.propose("character", cid, {"reputation": "Feared"}, evidence="Chapter 12")
+for p in client.walk_world_proposals(state="open"):   # newest first; keepers see every row, others their own
+    ...
+client.accept_proposal("character", cid, row["id"])    # the keeper's own write; StaleProposal when a proposed field moved
+client.decline_proposal("character", cid, row["id"], reason="not yet")
+client.withdraw_proposal("character", cid, row["id"])  # the proposer's
+```
+
+With **AI seats propose, a person accepts** on for the world (`agent_writes_proposed` on `get_world()`, read-only), a seat's `patch`, `upsert` or link edit raises `ProposedError` (`.proposal`) instead of returning a body that is not the element; `push` counts those as `proposed` and never resends one. The doctor's flag 12 reports the queue's open and lapsed rows.
+
 ## The doctor
 
 The doctor checks a world and reports what its keeper should look at, each finding with the element and the reason. It only reads: it never changes a file or sends a write.
