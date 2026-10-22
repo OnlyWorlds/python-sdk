@@ -1,6 +1,6 @@
 """OnlyWorlds for Python: the world folder (read, write, push), its archive (``.owworld``) and a client for the v2 API.
 
-Folder format: v0.3.14 (``FORMAT_VERSION``). Schema: generated from the pinned
+Folder format: v0.3.15 (``FORMAT_VERSION``). Schema: generated from the pinned
 schema distribution (``SCHEMA_DIST_TAG``, ``SCHEMA_VERSION``); the package
 version runs on its own semver.
 """

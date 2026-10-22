@@ -44,7 +44,9 @@ stamped 1980-01-01 00:00, in the UTF-8 byte order of its name, ``.json`` deflate
 everything else stored (the TypeScript writer's choice, so the two directories agree
 method for method). Every other file in the folder is left out. A tool's dot-folder
 travels only when handed in (``private_dir``), and makes the file a private copy, not a
-portable ``.owworld`` (§4.1).
+portable ``.owworld`` (§4.1). A producer's records marked ``"private": true`` in
+``records/RECORDS.json`` are left out whole unless asked (``include_private_records``;
+OW-8, §4.5 rule 11), the manifest carried byte-exact either way.
 """
 
 from __future__ import annotations
@@ -690,6 +692,38 @@ def _collect(root: Path, private_dir: str | None) -> dict[str, Path]:
     return out
 
 
+#: The records manifest (§4.5 rule 3): a JSON array of one entry per producer.
+RECORDS_MANIFEST = "records/RECORDS.json"
+
+
+def _private_producers(raw: bytes, where: Path) -> set[str]:
+    """The producers ``RECORDS.json`` marks ``"private": true`` (§4.5 rule 11; only the JSON
+    boolean ``true`` marks one). A manifest the writer cannot read raises ``ValueError``: it
+    leaves nothing out by guess (OW-8), so the caller fixes the file or asks for every record."""
+
+    def unreadable(why: str) -> NoReturn:
+        raise ValueError(
+            f"{where} {why}, so the writer cannot tell which records are private and leaves nothing "
+            "out by guess (OW-8). Fix the manifest, or pass include_private_records=True to carry "
+            "every producer's records."
+        )
+
+    try:
+        doc = json.loads(raw.decode("utf-8").removeprefix(_BOM), parse_constant=_reject_constant)
+    except ValueError:  # not UTF-8, or not JSON
+        unreadable("is not JSON")
+    if not isinstance(doc, list) or not all(isinstance(e, dict) for e in doc):
+        unreadable("is not a JSON array of objects")
+    private: set[str] = set()
+    for e in doc:
+        if e.get("private") is True:
+            producer = e.get("producer")
+            if not isinstance(producer, str) or "/" in producer or _path_fault(producer):
+                unreadable(f"marks private an entry whose producer {producer!r} is not one directory name")
+            private.add(producer)
+    return private
+
+
 def _default_top(world: Mapping[str, Any]) -> str:
     """Atlas and Lantern's name for the top folder: ``<slug>-<id8>``, ``world`` for an unsluggable
     name. Presentation only (§3.1), and taken from ``world.json``, so the bytes never depend on
@@ -699,7 +733,7 @@ def _default_top(world: Mapping[str, Any]) -> str:
 
 
 def _plan(
-    folder: str | os.PathLike[str], top_dir: str | None, private_dir: str | None
+    folder: str | os.PathLike[str], top_dir: str | None, private_dir: str | None, include_private_records: bool
 ) -> tuple[str, list[tuple[str, Path | bytes]]]:
     root = Path(folder)
     if not root.is_dir():
@@ -709,6 +743,11 @@ def _plan(
     files = _collect(root, private_dir)
     if WORLD_FILE not in files:
         _refuse("not_a_world", f"{root} has no world.json.")
+    if not include_private_records and RECORDS_MANIFEST in files:
+        # OW-8's private clause: each private producer's directory left out whole; the manifest stays as it is.
+        private = _private_producers(files[RECORDS_MANIFEST].read_bytes(), files[RECORDS_MANIFEST])
+        dirs = tuple(f"records/{p}/" for p in private)
+        files = {rel: src for rel, src in files.items() if not rel.startswith(dirs)}
     raw = files[WORLD_FILE].read_bytes()
     world_bytes, world = _without_link(raw, _parse_world(raw))
     top = _default_top(world) if top_dir is None else top_dir
@@ -759,10 +798,16 @@ def _write(out: IO[bytes], top: str, plan: list[tuple[str, Path | bytes]]) -> No
 
 
 def world_file_bytes(
-    folder: str | os.PathLike[str], *, top_dir: str | None = None, private_dir: str | None = None
+    folder: str | os.PathLike[str],
+    *,
+    top_dir: str | None = None,
+    private_dir: str | None = None,
+    include_private_records: bool = False,
 ) -> bytes:
-    """The world file for the folder at ``folder``, as bytes. See ``write_world_file``."""
-    top, plan = _plan(folder, top_dir, private_dir)
+    """The world file for the folder at ``folder``, as bytes. See ``write_world_file``: the
+    same keywords, the same refusals, private records left out unless
+    ``include_private_records=True``."""
+    top, plan = _plan(folder, top_dir, private_dir, include_private_records)
     buf = io.BytesIO()
     _write(buf, top, plan)
     return buf.getvalue()
@@ -774,6 +819,7 @@ def write_world_file(
     *,
     top_dir: str | None = None,
     private_dir: str | None = None,
+    include_private_records: bool = False,
 ) -> Path:
     """Write the folder at ``folder`` as one world file at ``path``; returns ``path``.
 
@@ -785,8 +831,16 @@ def write_world_file(
       stored. The same folder gives the same bytes on one Python and zlib build.
     - Only ``world.json``, ``elements/``, ``spatial/``, ``media/`` and ``records/`` travel
       (OW-7); inside the parts no dot-file and no ``.meta``, except ``records/``, which
-      travels whole (OW-8). ``private_dir`` (one name, such as ``".atlas"``) carries that
-      tool's dot-folder too, and makes the file a private copy, not a portable ``.owworld``.
+      travels whole and byte-exact (OW-8). ``private_dir`` (one name, such as ``".atlas"``)
+      carries that tool's dot-folder too, and makes the file a private copy, not a portable
+      ``.owworld``.
+    - Private records are left out (OW-8, §4.5 rule 11): every file under
+      ``records/<producer>/`` for each producer whose entry in ``records/RECORDS.json`` has
+      ``"private": true`` (the JSON boolean only; ``"true"`` or ``1`` marks nothing), the
+      directory whole. ``RECORDS.json`` itself travels byte-exact, its private entries kept,
+      so a reader learns a producer was left out. No manifest, nothing is private.
+      ``include_private_records=True`` (the caller asks) carries every producer's records
+      whole, and the manifest is not read.
     - ``world.json`` is carried byte for byte, ``producer``, ``source`` and
       ``format_version`` included: a writer that copies never rewrites a folder's
       provenance. The one change is an ``api`` block, which is never written (OW-10).
@@ -795,10 +849,14 @@ def write_world_file(
     Refuses (``WorldFileError``) a folder without a readable ``world.json`` with an id
     (``not_a_world``), a path no disk can hold (``name``), two names that fold to one
     (``collision``), a path that is a file and a folder or an unsafe ``top_dir``
-    (``unsafe_path``), and a link where a carried file would be (``link``). The archive is
-    written beside ``path`` and renamed into place, so a crash never leaves half a file.
+    (``unsafe_path``), and a link where a carried file would be (``link``). A
+    ``RECORDS.json`` it cannot read (not UTF-8 JSON, not an array of objects, or a private
+    entry whose ``producer`` is not one directory name) raises a plain ``ValueError`` naming
+    the file, unless ``include_private_records=True``: the writer never guesses which
+    records are private. The archive is written beside ``path`` and renamed into place, so
+    a crash never leaves half a file.
     """
-    top, plan = _plan(folder, top_dir, private_dir)
+    top, plan = _plan(folder, top_dir, private_dir, include_private_records)
     target = Path(path)
     tmp = target.parent / f".{target.name}.tmp-{uuid.uuid4().hex[:8]}"
     try:

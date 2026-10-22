@@ -7,6 +7,7 @@ every verdict's zip is on disk, and the package's reader gives each one its verd
 
 from __future__ import annotations
 
+import hashlib
 import io
 import json
 import os
@@ -116,8 +117,87 @@ def test_the_owworld_fixture_set_every_verdict_and_every_cause(tmp_path: Path) -
     print(f"the .owworld set: {run} fixtures run, {len(diffs)} disagreeing, from {FIXTURES}")
     for d in diffs:
         print(f"  disagrees: {d}")
-    assert run == len(on_disk) >= 80, f"the set holds {run} fixtures"
+    assert run == len(on_disk) == 85, f"the set holds {run} fixtures"
     assert diffs == []
+
+
+def test_the_private_case_both_sides_of_the_writer(tmp_path: Path) -> None:
+    """OW-8's private clause (§4.5 rule 11), the set's two-sided case: the source world rebuilt from
+    the asked side (it carries every source file, each checked against ``sources.private``), written
+    with the default and when asked, each equal entry for entry to its side's fixture and to neither
+    of the two a conforming writer never emits. Entries, not zip bytes (one zlib build's)."""
+    doc = json.loads((FIXTURES / "verdicts.json").read_text(encoding="utf-8"))
+    source = doc["sources"]["private"]
+    cases = {v["file"]: v for v in doc["fixtures"] if v.get("source") == "private"}
+    assert sorted(cases) == [
+        "fail-OW-8-private-manifest-rewritten.owworld",
+        "fail-OW-8-private-partial.owworld",
+        "pass-OW-8-private-asked.owworld",
+        "pass-OW-8-private-left-out.owworld",
+    ]
+    assert all(v["role"] == "writer" for v in cases.values())
+    side = {v.get("side"): read_world_file(FIXTURES / f).entries for f, v in cases.items() if v["writer"] == "accept"}
+    never = [read_world_file(FIXTURES / f).entries for f, v in cases.items() if v["writer"] == "refuse"]
+    assert set(side) == {"default", "asked"} and len(never) == 2
+
+    asked = read_world_file(FIXTURES / "pass-OW-8-private-asked.owworld")
+    assert {p: hashlib.sha256(b).hexdigest() for p, b in asked.entries.items()} == source["files"]
+    src = asked.to_folder(tmp_path / "abbey")
+    assert source["private"] == ["fold"] and any(p.startswith("records/fold/") for p in asked.entries)
+
+    default = read_world_file(world_file_bytes(src, top_dir=source["top"])).entries
+    carried = read_world_file(write_world_file(src, tmp_path / "a.owworld", include_private_records=True)).entries
+    assert default == side["default"] and list(default) == list(side["default"])
+    assert carried == side["asked"] and list(carried) == list(side["asked"])
+    assert not any(p.startswith("records/fold/") for p in default), "the private directory left out whole"
+    assert default["records/RECORDS.json"] == asked.entries["records/RECORDS.json"], "the manifest byte-exact"
+    for bad in never:
+        assert default != bad and carried != bad
+
+
+def test_a_records_manifest_the_writer_cannot_read_refuses_unless_asked(tmp_path: Path) -> None:
+    base = {"world.json": world_json(), "records/fold/spine.jsonl": b"{}\n", "records/lab/ledger.bin": b"L"}
+    for name, manifest in (
+        ("object", encode({"producer": "fold", "private": True})),
+        ("array-of-strings", encode(["fold"])),
+        ("not-json", b"[{"),
+        ("nan", b'[{"producer": "fold", "x": NaN}]'),
+        ("not-utf8", b'[{"producer": "f\xffold"}]'),
+        ("bad-producer", encode([{"producer": "../lab", "private": True}])),
+        ("no-producer", encode([{"private": True}])),
+    ):
+        folder = make_folder(tmp_path / name, {**base, "records/RECORDS.json": manifest})
+        with pytest.raises(ValueError) as info:
+            world_file_bytes(folder)
+        assert not isinstance(info.value, WorldFileError), "a plain ValueError, not a thirteenth reader cause"
+        assert "RECORDS.json" in str(info.value) and "include_private_records" in str(info.value), str(info.value)
+        with pytest.raises(ValueError):
+            write_world_file(folder, tmp_path / f"{name}.owworld")
+        assert not (tmp_path / f"{name}.owworld").exists()
+        entries = read_world_file(world_file_bytes(folder, include_private_records=True)).entries
+        assert entries["records/RECORDS.json"] == manifest
+        assert "records/fold/spine.jsonl" in entries and "records/lab/ledger.bin" in entries
+
+
+def test_only_the_json_boolean_true_marks_records_private(tmp_path: Path) -> None:
+    entries = [
+        {"producer": "fold", "private": True},
+        {"producer": "text", "private": "true"},
+        {"producer": "one", "private": 1},
+        {"producer": "no", "private": False},
+        {"producer": "lab"},
+    ]
+    files = {f"records/{e['producer']}/a.bin": b"x" for e in entries}
+    folder = make_folder(tmp_path / "f", {"world.json": world_json(), "records/RECORDS.json": encode(entries), **files})
+    got = read_world_file(world_file_bytes(folder)).entries
+    assert sorted(p for p in got if p.startswith("records/")) == [
+        "records/RECORDS.json",
+        "records/lab/a.bin",
+        "records/no/a.bin",
+        "records/one/a.bin",
+        "records/text/a.bin",
+    ]
+    assert got["records/RECORDS.json"] == encode(entries)
 
 
 # --- the fold (OW-18) ------------------------------------------------------------------------
