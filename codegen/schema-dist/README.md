@@ -13,6 +13,7 @@ The files here are generated. The OnlyWorlds platform rebuilds and publishes the
 | `example/hyperion/` | Hyperion, the public example world, as a world folder. Every file in it passes the decoded schema |
 | `example/world-export.json` | the world-export envelope (`format: onlyworlds-world-export`, the portal's one-file download) for one small fixed world: a single link, a multi-link, an extension field. It is the emitter's own output, pinned by a keel test, so a reader of the envelope tests against the real shape |
 | `presentation.json` | default family and icon per type, and the four family colours as light/dark pairs. Defaults: tools may override them. The colours were checked for colour-vision deficiency, so re-run that check before changing one. Each type also lists its `public` fields: what the platform shows of an element a reader knows of but does not see whole, beside its name and description |
+| `profiles/*.md` | extension profiles: one page per named extension field that tools agree to read the same way (`x_identity_key`, one being in several worlds; `atlas_calendar`, a world's own calendar; `x_packet_*`, a work item's elements with a reason each; `x_review_*`, proposed and checked marks). What it holds, how a reader reads it, what a writer must keep. A profile with a `<name>.fixture.json` beside it has a conformance fixture: cases a reader must pass |
 | `walk/schema_walk.py` | the reference decoder, in Python: reads the YAML and returns each type's fields. `schema.json` is its output. One module; its only dependency is PyYAML |
 | `walk/rulings.yaml` | rulings the YAML cannot carry (nullability, empty strings, extension fields). Code in any language should follow these rows |
 | `walk/lint_folder.py` | the folder check: run it on a world folder and it names every key that is not a field of its type, every link that does not resolve or points at the wrong type, every value of the wrong shape. The example world passes it at every publish |
@@ -34,7 +35,7 @@ Each field has a `kind`, explained in `kinds` at the top of the file:
 - `generic`: a link to an element of any type. Only `pin.element` has it. In data it is two keys, `element_type` (the type's slug, such as `"character"`) and `element_id` (the UUID), both set or both null; `type_key` and `id_key` name them.
 - `list`: an array (World fields only); `items` gives the kind of each entry.
 
-Only `id` and `name` are required. Element bodies read from the API also carry keys the schema does not declare: `type`, `created_at`, `updated_at`, `change_seq`, `created_by`, `changed_by` and `changed_via`, all set by the server. Fields starting `x_` (and the tool prefixes `atlas_`, `shadow_`) are extensions, which a tool keeps and writes back unchanged. `walk/rulings.yaml` has the rest.
+Only `id` and `name` are required. Element bodies read from the API also carry keys the schema does not declare: `type`, `created_at`, `updated_at`, `change_seq`, `created_by`, `changed_by` and `changed_via`, all set by the server. Fields starting `x_` (and the tool prefixes `atlas_`, `shadow_`) are extensions, which a tool keeps and writes back unchanged. A few have a published meaning, one page each in `profiles/`. `walk/rulings.yaml` has the rest.
 
 ## The example world
 

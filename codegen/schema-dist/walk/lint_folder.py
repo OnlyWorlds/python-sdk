@@ -12,7 +12,9 @@ Server-managed keys (`type`, `created_at`, `updated_at`, `change_seq`,
 `created_by`), the folder format's own keys (`local_updated_at`,
 `server_updated_at`, `image_media_id`) and extension prefixes (`x_`, `atlas_`,
 `shadow_`) pass; nothing else undeclared does. A string field may be null on
-disk (read as "", the unset string). The last line is the count it checked, so an empty
+disk (read as "", the unset string). A known-of stub (`known_of: true`, folder
+spec 4.4) passes with only the keys it keeps; one that writes an unset field
+is reported. `records/` (spec 4.5) is not elements and is not read. The last line is the count it checked, so an empty
 report is a result and not a silence. Exit 0 clean, 1 with problems, 2 when
 the folder is not a world folder.
 
@@ -43,8 +45,14 @@ BODY_EXTRA_KEYS = {"type", "created_at", "updated_at", "change_seq", "created_by
 # the linked-folder guidance): Atlas's two sync stamps and the media id. A
 # linked folder carries them on every edited element; Kael's first run on the
 # Captain's Atlas folders flagged all 1,669 of one world's elements (2026-10-12).
-FOLDER_KEYS = {"local_updated_at", "server_updated_at", "image_media_id"}
+FOLDER_KEYS = {"local_updated_at", "server_updated_at", "image_media_id", "known_of"}
 EXTENSION_PREFIXES = ("x_", "atlas_", "shadow_")
+# A known-of stub (folder spec 4.4) keeps these and leaves every unset field out
+# (rule 1); a field keel marks public (Keel #448) may also be there, set. The
+# lint cannot tell public from not without keel's wrapper, so it flags only
+# what rule 1 forbids outright: an unset value written into a stub.
+STUB_KEEPS = {"id", "type", "name", "description", "supertype", "subtype", "image_url",
+              "created_at", "updated_at", "change_seq"}
 
 
 class Report:
@@ -126,6 +134,13 @@ def lint_folder(src: Path, decoded: dict) -> Report:
                 fields[f["name"]] = f
         if body.get("type", slug) != slug:
             report.add(f"{rel}: `type` is {body['type']!r}, folder says {slug!r}")
+        if "known_of" in body:
+            if body["known_of"] is not True:
+                report.add(f"{rel}: `known_of` is {body['known_of']!r}; a stub says true, a whole element leaves it out")
+            else:
+                for key, value in body.items():
+                    if key not in STUB_KEEPS and key != "known_of" and value in ("", None, []):
+                        report.add(f"{rel}: known-of stub writes unset `{key}`; a stub leaves unset fields out")
         for key, value in body.items():
             if key in BODY_EXTRA_KEYS or key in FOLDER_KEYS \
                     or key.startswith(EXTENSION_PREFIXES):

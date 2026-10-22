@@ -2,6 +2,10 @@
 
 The package version runs on its own semver; the schema it is generated from is `SCHEMA_DIST_TAG`.
 
+## 0.14.1 (2026-10-22)
+
+- **Schema repinned to schema-dist `v0.32.2-dist.37`** (canonical 00.32.02 unchanged: no type, field or link moved; `SCHEMA_DIST_TAG`, `SCHEMA_DIST_SERIAL` and `SCHEMA_MANIFEST_SHA256` move with it). The dist added `profiles/` (identity, calendar with its fixture, packet, review), its folder lint reads known-of stubs and never `records/`, and its export example carries `source` and `exported_as`. Equal to the npm SDK's pin (4.48.1).
+
 ## 0.14.0 (2026-10-22)
 
 - **The draught** (keel PR 155, D143, live 2026-10-22 02:05): `Client.draught(character_id, components=, mode=, as_of=, undated=, since=, budget=, depth=)` reads `GET /character/{id}/context`, one Character's context in one read; the seven policy keys as the document names them.

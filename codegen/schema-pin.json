@@ -2,12 +2,19 @@
   "_what": "The recorded pin for the vendored OnlyWorlds schema distribution (codegen/schema-dist/, copied byte-exact). Do not edit by hand; re-vendor from the pinned tag and review the diff. Kept equal to the npm SDK's pin (github.com/OnlyWorlds/sdk, codegen/schema-pin.json) on purpose: two clients, one schema.",
   "_why_manifest_sha256": "Verifying the tree against its own MANIFEST.json only proves internal consistency. If the tag moved, the manifest moved with it. The hash recorded here is the one first accepted, which is what makes a moved tag visible.",
   "repo": "https://github.com/OnlyWorlds/schema-dist",
-  "tag": "v0.32.2-dist.29",
-  "commit": "106b5791249c4f4a3e13ac1640b9f5f82d9356ae",
-  "manifest_sha256": "d8fc5d942ab2ab64f1a0a88970fa3d4ba920c7144ee929b8fbb48c8f61fa715d",
+  "tag": "v0.32.2-dist.37",
+  "commit": "ad6e7f7b5385dd52962973ba5cb77414f7917b75",
+  "manifest_sha256": "1467dc6a12d77f65e5ec255299912d16c3e824563a15d563010a006641119cc2",
   "canonical_version": "00.32.02",
-  "dist_serial": 29,
-  "published": "2026-10-20",
-  "pinned_at": "2026-10-20",
-  "pinned_by": "The maintainer: tree from `git archive` of the tag in a schema-dist checkout; files re-hashed against MANIFEST.json by generate_schema.py; MANIFEST self-hash matched against the raw file GitHub serves at the tag, whose ref resolves to the commit above. Same tag and hash as the npm SDK's pin (4.42.0)."
+  "dist_serial": 37,
+  "published": "2026-10-21",
+  "pinned_at": "2026-10-22",
+  "pinned_by": "The maintainer: tree from `git archive` of the tag in a schema-dist checkout; files re-hashed against MANIFEST.json by generate_schema.py; MANIFEST self-hash matched against the raw file GitHub serves at the tag, whose ref resolves to the commit above. Same tag and hash as the npm SDK's pin (4.48.1).",
+  "previous_pins": [
+    {
+      "tag": "v0.32.2-dist.29",
+      "manifest_sha256": "d8fc5d942ab2ab64f1a0a88970fa3d4ba920c7144ee929b8fbb48c8f61fa715d",
+      "note": "superseded by v0.32.2-dist.37 (same canonical 00.32.02; profiles/ added (identity, calendar with its fixture, packet, review), the folder lint reads known-of stubs and never records/, the export example carries source and exported_as; no schema file moved)"
+    }
+  ]
 }

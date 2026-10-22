@@ -1,0 +1,2869 @@
+{
+  "profile": "atlas_calendar",
+  "source": {
+    "package": "@onlyworlds/sdk",
+    "version": "4.42.2",
+    "profile_tag": "v0.32.2-dist.33",
+    "profile_page": "profiles/calendar.md"
+  },
+  "generated_by": "generate.mjs",
+  "notes": [
+    "value: the raw atlas_calendar field value (an object, or a JSON string). valid: the SDK reader (readCalendarValue) returns a calendar; false means not a calendar, the reader shows bare numbers.",
+    "words: exactly what formatStep prints. breakdown: breakdownStep with its keys, except era, which is the era's name (or null) in place of the era object."
+  ],
+  "cases": [
+    {
+      "name": "refuse-version",
+      "why": "version is not 1",
+      "value": {
+        "version": 2,
+        "grain": "day",
+        "bundles": {
+          "months": {
+            "names": [
+              "Frost",
+              "Thaw"
+            ],
+            "lengths": [
+              10,
+              10
+            ]
+          }
+        }
+      },
+      "valid": false
+    },
+    {
+      "name": "refuse-grain-missing",
+      "why": "grain absent: required",
+      "value": {
+        "version": 1,
+        "bundles": {
+          "months": {
+            "names": [
+              "Frost",
+              "Thaw"
+            ],
+            "lengths": [
+              10,
+              10
+            ]
+          }
+        }
+      },
+      "valid": false
+    },
+    {
+      "name": "refuse-grain-not-string",
+      "why": "grain is not a string",
+      "value": {
+        "version": 1,
+        "grain": 1
+      },
+      "valid": false
+    },
+    {
+      "name": "refuse-months-unequal",
+      "why": "months names and lengths not the same length",
+      "value": {
+        "version": 1,
+        "grain": "day",
+        "bundles": {
+          "months": {
+            "names": [
+              "Frost",
+              "Thaw"
+            ],
+            "lengths": [
+              10
+            ]
+          }
+        }
+      },
+      "valid": false
+    },
+    {
+      "name": "refuse-months-empty",
+      "why": "months names and lengths of zero length",
+      "value": {
+        "version": 1,
+        "grain": "day",
+        "bundles": {
+          "months": {
+            "names": [],
+            "lengths": []
+          }
+        }
+      },
+      "valid": false
+    },
+    {
+      "name": "refuse-month-length-zero",
+      "why": "a month length is not a whole number from 1 (0)",
+      "value": {
+        "version": 1,
+        "grain": "day",
+        "bundles": {
+          "months": {
+            "names": [
+              "Frost",
+              "Thaw"
+            ],
+            "lengths": [
+              10,
+              0
+            ]
+          }
+        }
+      },
+      "valid": false
+    },
+    {
+      "name": "refuse-month-length-fraction",
+      "why": "a month length is not a whole number (2.5)",
+      "value": {
+        "version": 1,
+        "grain": "day",
+        "bundles": {
+          "months": {
+            "names": [
+              "Frost",
+              "Thaw"
+            ],
+            "lengths": [
+              10,
+              2.5
+            ]
+          }
+        }
+      },
+      "valid": false
+    },
+    {
+      "name": "refuse-year-steps-zero",
+      "why": "bundles.year.steps is not a whole number from 1",
+      "value": {
+        "version": 1,
+        "grain": "day",
+        "bundles": {
+          "year": {
+            "steps": 0
+          }
+        }
+      },
+      "valid": false
+    },
+    {
+      "name": "refuse-week-length-zero",
+      "why": "bundles.week.length is not a whole number from 1",
+      "value": {
+        "version": 1,
+        "grain": "day",
+        "bundles": {
+          "months": {
+            "names": [
+              "Frost",
+              "Thaw"
+            ],
+            "lengths": [
+              10,
+              10
+            ]
+          },
+          "week": {
+            "length": 0,
+            "names": []
+          }
+        }
+      },
+      "valid": false
+    },
+    {
+      "name": "refuse-week-names-not-list",
+      "why": "bundles.week.names is not a list",
+      "value": {
+        "version": 1,
+        "grain": "day",
+        "bundles": {
+          "months": {
+            "names": [
+              "Frost",
+              "Thaw"
+            ],
+            "lengths": [
+              10,
+              10
+            ]
+          },
+          "week": {
+            "length": 1,
+            "names": "Mon"
+          }
+        }
+      },
+      "valid": false
+    },
+    {
+      "name": "refuse-every-years-zero",
+      "why": "an intercalary every_years is not a whole number from 1",
+      "value": {
+        "version": 1,
+        "grain": "day",
+        "bundles": {
+          "months": {
+            "names": [
+              "Frost",
+              "Thaw"
+            ],
+            "lengths": [
+              10,
+              10
+            ]
+          }
+        },
+        "intercalary": [
+          {
+            "name": "Leap",
+            "after_month": 1,
+            "every_years": 0
+          }
+        ]
+      },
+      "valid": false
+    },
+    {
+      "name": "refuse-eras-not-list",
+      "why": "eras is not a list (an object)",
+      "value": {
+        "version": 1,
+        "grain": "day",
+        "bundles": {
+          "months": {
+            "names": [
+              "Frost",
+              "Thaw"
+            ],
+            "lengths": [
+              10,
+              10
+            ]
+          }
+        },
+        "eras": {
+          "name": "Age",
+          "start": 0
+        }
+      },
+      "valid": false
+    },
+    {
+      "name": "refuse-eras-falsy",
+      "why": "eras present but not a list (0; false and \"\" alike)",
+      "value": {
+        "version": 1,
+        "grain": "day",
+        "bundles": {
+          "months": {
+            "names": [
+              "Frost",
+              "Thaw"
+            ],
+            "lengths": [
+              10,
+              10
+            ]
+          }
+        },
+        "eras": 0
+      },
+      "valid": false
+    },
+    {
+      "name": "refuse-era-name",
+      "why": "an era lacks a string name",
+      "value": {
+        "version": 1,
+        "grain": "day",
+        "bundles": {
+          "months": {
+            "names": [
+              "Frost",
+              "Thaw"
+            ],
+            "lengths": [
+              10,
+              10
+            ]
+          }
+        },
+        "eras": [
+          {
+            "abbrev": "A",
+            "start": 0
+          }
+        ]
+      },
+      "valid": false
+    },
+    {
+      "name": "refuse-era-start",
+      "why": "an era lacks a numeric start (a string \"0\")",
+      "value": {
+        "version": 1,
+        "grain": "day",
+        "bundles": {
+          "months": {
+            "names": [
+              "Frost",
+              "Thaw"
+            ],
+            "lengths": [
+              10,
+              10
+            ]
+          }
+        },
+        "eras": [
+          {
+            "name": "Age",
+            "start": "0"
+          }
+        ]
+      },
+      "valid": false
+    },
+    {
+      "name": "refuse-intercalary-not-list",
+      "why": "intercalary is not a list (an object)",
+      "value": {
+        "version": 1,
+        "grain": "day",
+        "bundles": {
+          "months": {
+            "names": [
+              "Frost",
+              "Thaw"
+            ],
+            "lengths": [
+              10,
+              10
+            ]
+          }
+        },
+        "intercalary": {
+          "name": "Gap",
+          "after_month": 1
+        }
+      },
+      "valid": false
+    },
+    {
+      "name": "refuse-intercalary-falsy",
+      "why": "intercalary present but not a list (\"\"; false and 0 alike)",
+      "value": {
+        "version": 1,
+        "grain": "day",
+        "bundles": {
+          "months": {
+            "names": [
+              "Frost",
+              "Thaw"
+            ],
+            "lengths": [
+              10,
+              10
+            ]
+          }
+        },
+        "intercalary": ""
+      },
+      "valid": false
+    },
+    {
+      "name": "refuse-intercalary-name",
+      "why": "an intercalary entry lacks a string name",
+      "value": {
+        "version": 1,
+        "grain": "day",
+        "bundles": {
+          "months": {
+            "names": [
+              "Frost",
+              "Thaw"
+            ],
+            "lengths": [
+              10,
+              10
+            ]
+          }
+        },
+        "intercalary": [
+          {
+            "after_month": 1
+          }
+        ]
+      },
+      "valid": false
+    },
+    {
+      "name": "refuse-intercalary-after-month",
+      "why": "an intercalary entry lacks a whole after_month (1.5)",
+      "value": {
+        "version": 1,
+        "grain": "day",
+        "bundles": {
+          "months": {
+            "names": [
+              "Frost",
+              "Thaw"
+            ],
+            "lengths": [
+              10,
+              10
+            ]
+          }
+        },
+        "intercalary": [
+          {
+            "name": "Gap",
+            "after_month": 1.5
+          }
+        ]
+      },
+      "valid": false
+    },
+    {
+      "name": "refuse-json-string-broken",
+      "why": "a JSON-string value that does not parse",
+      "value": "{\"version\":1,\"grain\":\"day\",",
+      "valid": false
+    },
+    {
+      "name": "refuse-json-string-loose",
+      "why": "a JSON string that is not strict JSON (single quotes)",
+      "value": "{'version':1,'grain':'day'}",
+      "valid": false
+    },
+    {
+      "name": "refuse-eras-false",
+      "why": "eras present but not a list (false)",
+      "value": {
+        "version": 1,
+        "grain": "day",
+        "bundles": {
+          "months": {
+            "names": [
+              "Frost",
+              "Thaw"
+            ],
+            "lengths": [
+              10,
+              10
+            ]
+          }
+        },
+        "eras": false
+      },
+      "valid": false
+    },
+    {
+      "name": "refuse-era-start-fraction",
+      "why": "an era start that is not a whole number (0.5)",
+      "value": {
+        "version": 1,
+        "grain": "year",
+        "eras": [
+          {
+            "name": "Half",
+            "start": 0.5
+          }
+        ]
+      },
+      "valid": false
+    },
+    {
+      "name": "refuse-era-end-fraction",
+      "why": "an era end that is not a whole number (10.5)",
+      "value": {
+        "version": 1,
+        "grain": "year",
+        "eras": [
+          {
+            "name": "Age",
+            "start": 0,
+            "end": 10.5
+          }
+        ]
+      },
+      "valid": false
+    },
+    {
+      "name": "refuse-year-base-string",
+      "why": "a year_base that is not 0 or 1 (the string \"1\")",
+      "value": {
+        "version": 1,
+        "grain": "year",
+        "eras": [
+          {
+            "name": "Age",
+            "start": 0,
+            "year_base": "1"
+          }
+        ]
+      },
+      "valid": false
+    },
+    {
+      "name": "refuse-month-name-not-string",
+      "why": "a month name that is not a string",
+      "value": {
+        "version": 1,
+        "grain": "day",
+        "bundles": {
+          "months": {
+            "names": [
+              "Frost",
+              2
+            ],
+            "lengths": [
+              10,
+              10
+            ]
+          }
+        }
+      },
+      "valid": false
+    },
+    {
+      "name": "refuse-weekday-name-not-string",
+      "why": "a weekday name that is not a string",
+      "value": {
+        "version": 1,
+        "grain": "day",
+        "bundles": {
+          "months": {
+            "names": [
+              "Frost",
+              "Thaw"
+            ],
+            "lengths": [
+              10,
+              10
+            ]
+          },
+          "week": {
+            "length": 2,
+            "names": [
+              "Mon",
+              null
+            ]
+          }
+        }
+      },
+      "valid": false
+    },
+    {
+      "name": "json-string-valid",
+      "why": "the same object as a JSON string reads like the object",
+      "value": "{\"version\":1,\"grain\":\"day\",\"bundles\":{\"months\":{\"names\":[\"Frost\",\"Thaw\"],\"lengths\":[10,10]}}}",
+      "valid": true,
+      "steps": [
+        {
+          "step": 0,
+          "words": "1 Frost, 0",
+          "breakdown": {
+            "absYear": 0,
+            "year": 0,
+            "era": null,
+            "month": 1,
+            "monthName": "Frost",
+            "day": 1,
+            "intercalary": null,
+            "weekday": null
+          }
+        },
+        {
+          "step": 10,
+          "words": "1 Thaw, 0",
+          "breakdown": {
+            "absYear": 0,
+            "year": 0,
+            "era": null,
+            "month": 2,
+            "monthName": "Thaw",
+            "day": 1,
+            "intercalary": null,
+            "weekday": null
+          }
+        },
+        {
+          "step": 19,
+          "words": "10 Thaw, 0",
+          "breakdown": {
+            "absYear": 0,
+            "year": 0,
+            "era": null,
+            "month": 2,
+            "monthName": "Thaw",
+            "day": 10,
+            "intercalary": null,
+            "weekday": null
+          }
+        },
+        {
+          "step": 20,
+          "words": "1 Frost, 1",
+          "breakdown": {
+            "absYear": 1,
+            "year": 1,
+            "era": null,
+            "month": 1,
+            "monthName": "Frost",
+            "day": 1,
+            "intercalary": null,
+            "weekday": null
+          }
+        },
+        {
+          "step": -1,
+          "words": "10 Thaw, -1",
+          "breakdown": {
+            "absYear": -1,
+            "year": -1,
+            "era": null,
+            "month": 2,
+            "monthName": "Thaw",
+            "day": 10,
+            "intercalary": null,
+            "weekday": null
+          }
+        }
+      ]
+    },
+    {
+      "name": "months-plain-free-week",
+      "why": "default months template; Euclidean floor for negative steps (step -1 ends year -1); free week anchored at step 0; unknown keys ignored",
+      "value": {
+        "version": 1,
+        "grain": "day",
+        "x_note": "unknown keys are ignored",
+        "bundles": {
+          "months": {
+            "names": [
+              "Frost",
+              "Thaw",
+              "Sun"
+            ],
+            "lengths": [
+              10,
+              10,
+              10
+            ]
+          },
+          "week": {
+            "length": 7,
+            "names": [
+              "Mo",
+              "Tu",
+              "We",
+              "Th",
+              "Fr",
+              "Sa",
+              "Su"
+            ]
+          },
+          "extra": {
+            "kept": true
+          }
+        }
+      },
+      "valid": true,
+      "steps": [
+        {
+          "step": 0,
+          "words": "1 Frost, 0",
+          "breakdown": {
+            "absYear": 0,
+            "year": 0,
+            "era": null,
+            "month": 1,
+            "monthName": "Frost",
+            "day": 1,
+            "intercalary": null,
+            "weekday": "Mo"
+          }
+        },
+        {
+          "step": 6,
+          "words": "7 Frost, 0",
+          "breakdown": {
+            "absYear": 0,
+            "year": 0,
+            "era": null,
+            "month": 1,
+            "monthName": "Frost",
+            "day": 7,
+            "intercalary": null,
+            "weekday": "Su"
+          }
+        },
+        {
+          "step": 7,
+          "words": "8 Frost, 0",
+          "breakdown": {
+            "absYear": 0,
+            "year": 0,
+            "era": null,
+            "month": 1,
+            "monthName": "Frost",
+            "day": 8,
+            "intercalary": null,
+            "weekday": "Mo"
+          }
+        },
+        {
+          "step": 9,
+          "words": "10 Frost, 0",
+          "breakdown": {
+            "absYear": 0,
+            "year": 0,
+            "era": null,
+            "month": 1,
+            "monthName": "Frost",
+            "day": 10,
+            "intercalary": null,
+            "weekday": "We"
+          }
+        },
+        {
+          "step": 10,
+          "words": "1 Thaw, 0",
+          "breakdown": {
+            "absYear": 0,
+            "year": 0,
+            "era": null,
+            "month": 2,
+            "monthName": "Thaw",
+            "day": 1,
+            "intercalary": null,
+            "weekday": "Th"
+          }
+        },
+        {
+          "step": 29,
+          "words": "10 Sun, 0",
+          "breakdown": {
+            "absYear": 0,
+            "year": 0,
+            "era": null,
+            "month": 3,
+            "monthName": "Sun",
+            "day": 10,
+            "intercalary": null,
+            "weekday": "Tu"
+          }
+        },
+        {
+          "step": 30,
+          "words": "1 Frost, 1",
+          "breakdown": {
+            "absYear": 1,
+            "year": 1,
+            "era": null,
+            "month": 1,
+            "monthName": "Frost",
+            "day": 1,
+            "intercalary": null,
+            "weekday": "We"
+          }
+        },
+        {
+          "step": -1,
+          "words": "10 Sun, -1",
+          "breakdown": {
+            "absYear": -1,
+            "year": -1,
+            "era": null,
+            "month": 3,
+            "monthName": "Sun",
+            "day": 10,
+            "intercalary": null,
+            "weekday": "Su"
+          }
+        },
+        {
+          "step": -7,
+          "words": "4 Sun, -1",
+          "breakdown": {
+            "absYear": -1,
+            "year": -1,
+            "era": null,
+            "month": 3,
+            "monthName": "Sun",
+            "day": 4,
+            "intercalary": null,
+            "weekday": "Mo"
+          }
+        },
+        {
+          "step": -8,
+          "words": "3 Sun, -1",
+          "breakdown": {
+            "absYear": -1,
+            "year": -1,
+            "era": null,
+            "month": 3,
+            "monthName": "Sun",
+            "day": 3,
+            "intercalary": null,
+            "weekday": "Su"
+          }
+        },
+        {
+          "step": -30,
+          "words": "1 Frost, -1",
+          "breakdown": {
+            "absYear": -1,
+            "year": -1,
+            "era": null,
+            "month": 1,
+            "monthName": "Frost",
+            "day": 1,
+            "intercalary": null,
+            "weekday": "Sa"
+          }
+        },
+        {
+          "step": -31,
+          "words": "10 Sun, -2",
+          "breakdown": {
+            "absYear": -2,
+            "year": -2,
+            "era": null,
+            "month": 3,
+            "monthName": "Sun",
+            "day": 10,
+            "intercalary": null,
+            "weekday": "Fr"
+          }
+        }
+      ]
+    },
+    {
+      "name": "intercalary-before-month-1",
+      "why": "intercalary after_month 0 opens every year; default intercalary template",
+      "value": {
+        "version": 1,
+        "grain": "day",
+        "bundles": {
+          "months": {
+            "names": [
+              "Frost",
+              "Thaw"
+            ],
+            "lengths": [
+              10,
+              10
+            ]
+          }
+        },
+        "intercalary": [
+          {
+            "name": "Yearsgate",
+            "after_month": 0
+          }
+        ]
+      },
+      "valid": true,
+      "steps": [
+        {
+          "step": 0,
+          "words": "Yearsgate, 0",
+          "breakdown": {
+            "absYear": 0,
+            "year": 0,
+            "era": null,
+            "month": null,
+            "monthName": null,
+            "day": null,
+            "intercalary": "Yearsgate",
+            "weekday": null
+          }
+        },
+        {
+          "step": 1,
+          "words": "1 Frost, 0",
+          "breakdown": {
+            "absYear": 0,
+            "year": 0,
+            "era": null,
+            "month": 1,
+            "monthName": "Frost",
+            "day": 1,
+            "intercalary": null,
+            "weekday": null
+          }
+        },
+        {
+          "step": 20,
+          "words": "10 Thaw, 0",
+          "breakdown": {
+            "absYear": 0,
+            "year": 0,
+            "era": null,
+            "month": 2,
+            "monthName": "Thaw",
+            "day": 10,
+            "intercalary": null,
+            "weekday": null
+          }
+        },
+        {
+          "step": 21,
+          "words": "Yearsgate, 1",
+          "breakdown": {
+            "absYear": 1,
+            "year": 1,
+            "era": null,
+            "month": null,
+            "monthName": null,
+            "day": null,
+            "intercalary": "Yearsgate",
+            "weekday": null
+          }
+        },
+        {
+          "step": -1,
+          "words": "10 Thaw, -1",
+          "breakdown": {
+            "absYear": -1,
+            "year": -1,
+            "era": null,
+            "month": 2,
+            "monthName": "Thaw",
+            "day": 10,
+            "intercalary": null,
+            "weekday": null
+          }
+        },
+        {
+          "step": -21,
+          "words": "Yearsgate, -1",
+          "breakdown": {
+            "absYear": -1,
+            "year": -1,
+            "era": null,
+            "month": null,
+            "monthName": null,
+            "day": null,
+            "intercalary": "Yearsgate",
+            "weekday": null
+          }
+        }
+      ]
+    },
+    {
+      "name": "intercalary-leap-every-4",
+      "why": "every_years 4 by floored modulo: year 0 and year -4 are leap years (21 steps), others 20",
+      "value": {
+        "version": 1,
+        "grain": "day",
+        "bundles": {
+          "months": {
+            "names": [
+              "Frost",
+              "Thaw"
+            ],
+            "lengths": [
+              10,
+              10
+            ]
+          }
+        },
+        "intercalary": [
+          {
+            "name": "Leapday",
+            "after_month": 1,
+            "every_years": 4
+          }
+        ]
+      },
+      "valid": true,
+      "steps": [
+        {
+          "step": 10,
+          "words": "Leapday, 0",
+          "breakdown": {
+            "absYear": 0,
+            "year": 0,
+            "era": null,
+            "month": null,
+            "monthName": null,
+            "day": null,
+            "intercalary": "Leapday",
+            "weekday": null
+          }
+        },
+        {
+          "step": 11,
+          "words": "1 Thaw, 0",
+          "breakdown": {
+            "absYear": 0,
+            "year": 0,
+            "era": null,
+            "month": 2,
+            "monthName": "Thaw",
+            "day": 1,
+            "intercalary": null,
+            "weekday": null
+          }
+        },
+        {
+          "step": 20,
+          "words": "10 Thaw, 0",
+          "breakdown": {
+            "absYear": 0,
+            "year": 0,
+            "era": null,
+            "month": 2,
+            "monthName": "Thaw",
+            "day": 10,
+            "intercalary": null,
+            "weekday": null
+          }
+        },
+        {
+          "step": 21,
+          "words": "1 Frost, 1",
+          "breakdown": {
+            "absYear": 1,
+            "year": 1,
+            "era": null,
+            "month": 1,
+            "monthName": "Frost",
+            "day": 1,
+            "intercalary": null,
+            "weekday": null
+          }
+        },
+        {
+          "step": 81,
+          "words": "1 Frost, 4",
+          "breakdown": {
+            "absYear": 4,
+            "year": 4,
+            "era": null,
+            "month": 1,
+            "monthName": "Frost",
+            "day": 1,
+            "intercalary": null,
+            "weekday": null
+          }
+        },
+        {
+          "step": 91,
+          "words": "Leapday, 4",
+          "breakdown": {
+            "absYear": 4,
+            "year": 4,
+            "era": null,
+            "month": null,
+            "monthName": null,
+            "day": null,
+            "intercalary": "Leapday",
+            "weekday": null
+          }
+        },
+        {
+          "step": -1,
+          "words": "10 Thaw, -1",
+          "breakdown": {
+            "absYear": -1,
+            "year": -1,
+            "era": null,
+            "month": 2,
+            "monthName": "Thaw",
+            "day": 10,
+            "intercalary": null,
+            "weekday": null
+          }
+        },
+        {
+          "step": -60,
+          "words": "1 Frost, -3",
+          "breakdown": {
+            "absYear": -3,
+            "year": -3,
+            "era": null,
+            "month": 1,
+            "monthName": "Frost",
+            "day": 1,
+            "intercalary": null,
+            "weekday": null
+          }
+        },
+        {
+          "step": -61,
+          "words": "10 Thaw, -4",
+          "breakdown": {
+            "absYear": -4,
+            "year": -4,
+            "era": null,
+            "month": 2,
+            "monthName": "Thaw",
+            "day": 10,
+            "intercalary": null,
+            "weekday": null
+          }
+        },
+        {
+          "step": -71,
+          "words": "Leapday, -4",
+          "breakdown": {
+            "absYear": -4,
+            "year": -4,
+            "era": null,
+            "month": null,
+            "monthName": null,
+            "day": null,
+            "intercalary": "Leapday",
+            "weekday": null
+          }
+        },
+        {
+          "step": -81,
+          "words": "1 Frost, -4",
+          "breakdown": {
+            "absYear": -4,
+            "year": -4,
+            "era": null,
+            "month": 1,
+            "monthName": "Frost",
+            "day": 1,
+            "intercalary": null,
+            "weekday": null
+          }
+        },
+        {
+          "step": 1000000,
+          "words": "5 Thaw, 49382",
+          "breakdown": {
+            "absYear": 49382,
+            "year": 49382,
+            "era": null,
+            "month": 2,
+            "monthName": "Thaw",
+            "day": 5,
+            "intercalary": null,
+            "weekday": null
+          }
+        }
+      ]
+    },
+    {
+      "name": "intercalary-not-in-week",
+      "why": "in_week false: the day has no weekday and the free week does not advance over it",
+      "value": {
+        "version": 1,
+        "grain": "day",
+        "bundles": {
+          "months": {
+            "names": [
+              "Early",
+              "Late"
+            ],
+            "lengths": [
+              7,
+              7
+            ]
+          },
+          "week": {
+            "length": 7,
+            "names": [
+              "Mo",
+              "Tu",
+              "We",
+              "Th",
+              "Fr",
+              "Sa",
+              "Su"
+            ],
+            "mode": "free"
+          }
+        },
+        "intercalary": [
+          {
+            "name": "Midday",
+            "after_month": 1,
+            "in_week": false
+          }
+        ],
+        "format": "{weekday} {day} {month}, {year}"
+      },
+      "valid": true,
+      "steps": [
+        {
+          "step": 0,
+          "words": "Mo 1 Early, 0",
+          "breakdown": {
+            "absYear": 0,
+            "year": 0,
+            "era": null,
+            "month": 1,
+            "monthName": "Early",
+            "day": 1,
+            "intercalary": null,
+            "weekday": "Mo"
+          }
+        },
+        {
+          "step": 6,
+          "words": "Su 7 Early, 0",
+          "breakdown": {
+            "absYear": 0,
+            "year": 0,
+            "era": null,
+            "month": 1,
+            "monthName": "Early",
+            "day": 7,
+            "intercalary": null,
+            "weekday": "Su"
+          }
+        },
+        {
+          "step": 7,
+          "words": "Midday, 0",
+          "breakdown": {
+            "absYear": 0,
+            "year": 0,
+            "era": null,
+            "month": null,
+            "monthName": null,
+            "day": null,
+            "intercalary": "Midday",
+            "weekday": null
+          }
+        },
+        {
+          "step": 8,
+          "words": "Mo 1 Late, 0",
+          "breakdown": {
+            "absYear": 0,
+            "year": 0,
+            "era": null,
+            "month": 2,
+            "monthName": "Late",
+            "day": 1,
+            "intercalary": null,
+            "weekday": "Mo"
+          }
+        },
+        {
+          "step": 14,
+          "words": "Su 7 Late, 0",
+          "breakdown": {
+            "absYear": 0,
+            "year": 0,
+            "era": null,
+            "month": 2,
+            "monthName": "Late",
+            "day": 7,
+            "intercalary": null,
+            "weekday": "Su"
+          }
+        },
+        {
+          "step": 15,
+          "words": "Mo 1 Early, 1",
+          "breakdown": {
+            "absYear": 1,
+            "year": 1,
+            "era": null,
+            "month": 1,
+            "monthName": "Early",
+            "day": 1,
+            "intercalary": null,
+            "weekday": "Mo"
+          }
+        },
+        {
+          "step": -1,
+          "words": "Su 7 Late, -1",
+          "breakdown": {
+            "absYear": -1,
+            "year": -1,
+            "era": null,
+            "month": 2,
+            "monthName": "Late",
+            "day": 7,
+            "intercalary": null,
+            "weekday": "Su"
+          }
+        },
+        {
+          "step": -8,
+          "words": "Midday, -1",
+          "breakdown": {
+            "absYear": -1,
+            "year": -1,
+            "era": null,
+            "month": null,
+            "monthName": null,
+            "day": null,
+            "intercalary": "Midday",
+            "weekday": null
+          }
+        }
+      ]
+    },
+    {
+      "name": "week-nested",
+      "why": "nested week restarts each month; an intercalary day (in_week default) has no weekday in nested mode",
+      "value": {
+        "version": 1,
+        "grain": "day",
+        "bundles": {
+          "months": {
+            "names": [
+              "Frost",
+              "Thaw"
+            ],
+            "lengths": [
+              10,
+              10
+            ]
+          },
+          "week": {
+            "length": 4,
+            "names": [
+              "One",
+              "Two",
+              "Three",
+              "Four"
+            ],
+            "mode": "nested"
+          }
+        },
+        "intercalary": [
+          {
+            "name": "Gap",
+            "after_month": 1
+          }
+        ],
+        "format": "{weekday} {day} {month} {year}"
+      },
+      "valid": true,
+      "steps": [
+        {
+          "step": 0,
+          "words": "One 1 Frost 0",
+          "breakdown": {
+            "absYear": 0,
+            "year": 0,
+            "era": null,
+            "month": 1,
+            "monthName": "Frost",
+            "day": 1,
+            "intercalary": null,
+            "weekday": "One"
+          }
+        },
+        {
+          "step": 3,
+          "words": "Four 4 Frost 0",
+          "breakdown": {
+            "absYear": 0,
+            "year": 0,
+            "era": null,
+            "month": 1,
+            "monthName": "Frost",
+            "day": 4,
+            "intercalary": null,
+            "weekday": "Four"
+          }
+        },
+        {
+          "step": 4,
+          "words": "One 5 Frost 0",
+          "breakdown": {
+            "absYear": 0,
+            "year": 0,
+            "era": null,
+            "month": 1,
+            "monthName": "Frost",
+            "day": 5,
+            "intercalary": null,
+            "weekday": "One"
+          }
+        },
+        {
+          "step": 9,
+          "words": "Two 10 Frost 0",
+          "breakdown": {
+            "absYear": 0,
+            "year": 0,
+            "era": null,
+            "month": 1,
+            "monthName": "Frost",
+            "day": 10,
+            "intercalary": null,
+            "weekday": "Two"
+          }
+        },
+        {
+          "step": 10,
+          "words": "Gap, 0",
+          "breakdown": {
+            "absYear": 0,
+            "year": 0,
+            "era": null,
+            "month": null,
+            "monthName": null,
+            "day": null,
+            "intercalary": "Gap",
+            "weekday": null
+          }
+        },
+        {
+          "step": 11,
+          "words": "One 1 Thaw 0",
+          "breakdown": {
+            "absYear": 0,
+            "year": 0,
+            "era": null,
+            "month": 2,
+            "monthName": "Thaw",
+            "day": 1,
+            "intercalary": null,
+            "weekday": "One"
+          }
+        },
+        {
+          "step": -1,
+          "words": "Two 10 Thaw -1",
+          "breakdown": {
+            "absYear": -1,
+            "year": -1,
+            "era": null,
+            "month": 2,
+            "monthName": "Thaw",
+            "day": 10,
+            "intercalary": null,
+            "weekday": "Two"
+          }
+        }
+      ]
+    },
+    {
+      "name": "eras-restart-base-1",
+      "why": "restart era counts from the year its start falls in, from year_base 1 (default); abbrev is printed; a step before any era prints no era",
+      "value": {
+        "version": 1,
+        "grain": "day",
+        "bundles": {
+          "months": {
+            "names": [
+              "Frost",
+              "Thaw"
+            ],
+            "lengths": [
+              10,
+              10
+            ]
+          }
+        },
+        "eras": [
+          {
+            "name": "First Age",
+            "abbrev": "FA",
+            "start": 0
+          },
+          {
+            "name": "Second Age",
+            "abbrev": "SA",
+            "start": 45
+          }
+        ]
+      },
+      "valid": true,
+      "steps": [
+        {
+          "step": -1,
+          "words": "10 Thaw, -1",
+          "breakdown": {
+            "absYear": -1,
+            "year": -1,
+            "era": null,
+            "month": 2,
+            "monthName": "Thaw",
+            "day": 10,
+            "intercalary": null,
+            "weekday": null
+          }
+        },
+        {
+          "step": 0,
+          "words": "1 Frost, 1 FA",
+          "breakdown": {
+            "absYear": 0,
+            "year": 1,
+            "era": "First Age",
+            "month": 1,
+            "monthName": "Frost",
+            "day": 1,
+            "intercalary": null,
+            "weekday": null
+          }
+        },
+        {
+          "step": 44,
+          "words": "5 Frost, 3 FA",
+          "breakdown": {
+            "absYear": 2,
+            "year": 3,
+            "era": "First Age",
+            "month": 1,
+            "monthName": "Frost",
+            "day": 5,
+            "intercalary": null,
+            "weekday": null
+          }
+        },
+        {
+          "step": 45,
+          "words": "6 Frost, 1 SA",
+          "breakdown": {
+            "absYear": 2,
+            "year": 1,
+            "era": "Second Age",
+            "month": 1,
+            "monthName": "Frost",
+            "day": 6,
+            "intercalary": null,
+            "weekday": null
+          }
+        },
+        {
+          "step": 60,
+          "words": "1 Frost, 2 SA",
+          "breakdown": {
+            "absYear": 3,
+            "year": 2,
+            "era": "Second Age",
+            "month": 1,
+            "monthName": "Frost",
+            "day": 1,
+            "intercalary": null,
+            "weekday": null
+          }
+        }
+      ]
+    },
+    {
+      "name": "eras-no-restart-and-base-0",
+      "why": "restart false shows the year index; year_base 0 counts from 0; an era without abbrev prints its name",
+      "value": {
+        "version": 1,
+        "grain": "day",
+        "bundles": {
+          "months": {
+            "names": [
+              "Frost",
+              "Thaw"
+            ],
+            "lengths": [
+              10,
+              10
+            ]
+          }
+        },
+        "eras": [
+          {
+            "name": "Reckoning",
+            "abbrev": "R",
+            "start": 20,
+            "restart": false
+          },
+          {
+            "name": "Count",
+            "start": 100,
+            "year_base": 0
+          }
+        ]
+      },
+      "valid": true,
+      "steps": [
+        {
+          "step": 19,
+          "words": "10 Thaw, 0",
+          "breakdown": {
+            "absYear": 0,
+            "year": 0,
+            "era": null,
+            "month": 2,
+            "monthName": "Thaw",
+            "day": 10,
+            "intercalary": null,
+            "weekday": null
+          }
+        },
+        {
+          "step": 20,
+          "words": "1 Frost, 1 R",
+          "breakdown": {
+            "absYear": 1,
+            "year": 1,
+            "era": "Reckoning",
+            "month": 1,
+            "monthName": "Frost",
+            "day": 1,
+            "intercalary": null,
+            "weekday": null
+          }
+        },
+        {
+          "step": 99,
+          "words": "10 Thaw, 4 R",
+          "breakdown": {
+            "absYear": 4,
+            "year": 4,
+            "era": "Reckoning",
+            "month": 2,
+            "monthName": "Thaw",
+            "day": 10,
+            "intercalary": null,
+            "weekday": null
+          }
+        },
+        {
+          "step": 100,
+          "words": "1 Frost, 0 Count",
+          "breakdown": {
+            "absYear": 5,
+            "year": 0,
+            "era": "Count",
+            "month": 1,
+            "monthName": "Frost",
+            "day": 1,
+            "intercalary": null,
+            "weekday": null
+          }
+        },
+        {
+          "step": 120,
+          "words": "1 Frost, 1 Count",
+          "breakdown": {
+            "absYear": 6,
+            "year": 1,
+            "era": "Count",
+            "month": 1,
+            "monthName": "Frost",
+            "day": 1,
+            "intercalary": null,
+            "weekday": null
+          }
+        }
+      ]
+    },
+    {
+      "name": "era-down-pivot-0",
+      "why": "a down era counts toward its pivot (BC); the pivot step belongs to the up era",
+      "value": {
+        "version": 1,
+        "grain": "day",
+        "bundles": {
+          "months": {
+            "names": [
+              "Frost",
+              "Thaw"
+            ],
+            "lengths": [
+              10,
+              10
+            ]
+          }
+        },
+        "eras": [
+          {
+            "name": "Before",
+            "abbrev": "BC",
+            "start": 0,
+            "direction": "down"
+          },
+          {
+            "name": "After",
+            "abbrev": "AD",
+            "start": 0
+          }
+        ]
+      },
+      "valid": true,
+      "steps": [
+        {
+          "step": -21,
+          "words": "10 Thaw, 2 BC",
+          "breakdown": {
+            "absYear": -2,
+            "year": 2,
+            "era": "Before",
+            "month": 2,
+            "monthName": "Thaw",
+            "day": 10,
+            "intercalary": null,
+            "weekday": null
+          }
+        },
+        {
+          "step": -20,
+          "words": "1 Frost, 1 BC",
+          "breakdown": {
+            "absYear": -1,
+            "year": 1,
+            "era": "Before",
+            "month": 1,
+            "monthName": "Frost",
+            "day": 1,
+            "intercalary": null,
+            "weekday": null
+          }
+        },
+        {
+          "step": -1,
+          "words": "10 Thaw, 1 BC",
+          "breakdown": {
+            "absYear": -1,
+            "year": 1,
+            "era": "Before",
+            "month": 2,
+            "monthName": "Thaw",
+            "day": 10,
+            "intercalary": null,
+            "weekday": null
+          }
+        },
+        {
+          "step": 0,
+          "words": "1 Frost, 1 AD",
+          "breakdown": {
+            "absYear": 0,
+            "year": 1,
+            "era": "After",
+            "month": 1,
+            "monthName": "Frost",
+            "day": 1,
+            "intercalary": null,
+            "weekday": null
+          }
+        },
+        {
+          "step": 19,
+          "words": "10 Thaw, 1 AD",
+          "breakdown": {
+            "absYear": 0,
+            "year": 1,
+            "era": "After",
+            "month": 2,
+            "monthName": "Thaw",
+            "day": 10,
+            "intercalary": null,
+            "weekday": null
+          }
+        }
+      ]
+    },
+    {
+      "name": "era-down-mid-year-pivot",
+      "why": "a down era whose pivot falls mid-year: counted from the year holding the step before the pivot, which reads year_base (1); no year zero (SDK 4.42.2)",
+      "value": {
+        "version": 1,
+        "grain": "day",
+        "bundles": {
+          "months": {
+            "names": [
+              "Frost",
+              "Thaw"
+            ],
+            "lengths": [
+              10,
+              10
+            ]
+          }
+        },
+        "eras": [
+          {
+            "name": "Before Gate",
+            "abbrev": "BG",
+            "start": 30,
+            "direction": "down"
+          },
+          {
+            "name": "After Gate",
+            "abbrev": "AG",
+            "start": 30
+          }
+        ]
+      },
+      "valid": true,
+      "steps": [
+        {
+          "step": 0,
+          "words": "1 Frost, 2 BG",
+          "breakdown": {
+            "absYear": 0,
+            "year": 2,
+            "era": "Before Gate",
+            "month": 1,
+            "monthName": "Frost",
+            "day": 1,
+            "intercalary": null,
+            "weekday": null
+          }
+        },
+        {
+          "step": 19,
+          "words": "10 Thaw, 2 BG",
+          "breakdown": {
+            "absYear": 0,
+            "year": 2,
+            "era": "Before Gate",
+            "month": 2,
+            "monthName": "Thaw",
+            "day": 10,
+            "intercalary": null,
+            "weekday": null
+          }
+        },
+        {
+          "step": 20,
+          "words": "1 Frost, 1 BG",
+          "breakdown": {
+            "absYear": 1,
+            "year": 1,
+            "era": "Before Gate",
+            "month": 1,
+            "monthName": "Frost",
+            "day": 1,
+            "intercalary": null,
+            "weekday": null
+          }
+        },
+        {
+          "step": 29,
+          "words": "10 Frost, 1 BG",
+          "breakdown": {
+            "absYear": 1,
+            "year": 1,
+            "era": "Before Gate",
+            "month": 1,
+            "monthName": "Frost",
+            "day": 10,
+            "intercalary": null,
+            "weekday": null
+          }
+        },
+        {
+          "step": 30,
+          "words": "1 Thaw, 1 AG",
+          "breakdown": {
+            "absYear": 1,
+            "year": 1,
+            "era": "After Gate",
+            "month": 2,
+            "monthName": "Thaw",
+            "day": 1,
+            "intercalary": null,
+            "weekday": null
+          }
+        }
+      ]
+    },
+    {
+      "name": "era-overlap-latest-start",
+      "why": "overlapping eras: the latest start wins; no months: default template is {year} {era}",
+      "value": {
+        "version": 1,
+        "grain": "month",
+        "bundles": {
+          "year": {
+            "steps": 10
+          }
+        },
+        "eras": [
+          {
+            "name": "Old",
+            "start": 0,
+            "end": 100
+          },
+          {
+            "name": "New",
+            "start": 50
+          }
+        ]
+      },
+      "valid": true,
+      "steps": [
+        {
+          "step": -1,
+          "words": "-1",
+          "breakdown": {
+            "absYear": -1,
+            "year": -1,
+            "era": null,
+            "month": null,
+            "monthName": null,
+            "day": null,
+            "intercalary": null,
+            "weekday": null
+          }
+        },
+        {
+          "step": 0,
+          "words": "1 Old",
+          "breakdown": {
+            "absYear": 0,
+            "year": 1,
+            "era": "Old",
+            "month": null,
+            "monthName": null,
+            "day": null,
+            "intercalary": null,
+            "weekday": null
+          }
+        },
+        {
+          "step": 49,
+          "words": "5 Old",
+          "breakdown": {
+            "absYear": 4,
+            "year": 5,
+            "era": "Old",
+            "month": null,
+            "monthName": null,
+            "day": null,
+            "intercalary": null,
+            "weekday": null
+          }
+        },
+        {
+          "step": 50,
+          "words": "1 New",
+          "breakdown": {
+            "absYear": 5,
+            "year": 1,
+            "era": "New",
+            "month": null,
+            "monthName": null,
+            "day": null,
+            "intercalary": null,
+            "weekday": null
+          }
+        },
+        {
+          "step": 99,
+          "words": "5 New",
+          "breakdown": {
+            "absYear": 9,
+            "year": 5,
+            "era": "New",
+            "month": null,
+            "monthName": null,
+            "day": null,
+            "intercalary": null,
+            "weekday": null
+          }
+        },
+        {
+          "step": 100,
+          "words": "6 New",
+          "breakdown": {
+            "absYear": 10,
+            "year": 6,
+            "era": "New",
+            "month": null,
+            "monthName": null,
+            "day": null,
+            "intercalary": null,
+            "weekday": null
+          }
+        }
+      ]
+    },
+    {
+      "name": "era-overlap-down-later-start",
+      "why": "a down era (pivot 100, no end) overlaps an up era from 0: the later start (the down era) wins; and an up era without end ends at the next era's start even when that era counts down, so from step 100 no era holds",
+      "value": {
+        "version": 1,
+        "grain": "month",
+        "bundles": {
+          "year": {
+            "steps": 10
+          }
+        },
+        "eras": [
+          {
+            "name": "Rise",
+            "start": 0
+          },
+          {
+            "name": "Toward",
+            "abbrev": "TW",
+            "start": 100,
+            "direction": "down"
+          }
+        ]
+      },
+      "valid": true,
+      "steps": [
+        {
+          "step": -1,
+          "words": "11 TW",
+          "breakdown": {
+            "absYear": -1,
+            "year": 11,
+            "era": "Toward",
+            "month": null,
+            "monthName": null,
+            "day": null,
+            "intercalary": null,
+            "weekday": null
+          }
+        },
+        {
+          "step": 0,
+          "words": "10 TW",
+          "breakdown": {
+            "absYear": 0,
+            "year": 10,
+            "era": "Toward",
+            "month": null,
+            "monthName": null,
+            "day": null,
+            "intercalary": null,
+            "weekday": null
+          }
+        },
+        {
+          "step": 50,
+          "words": "5 TW",
+          "breakdown": {
+            "absYear": 5,
+            "year": 5,
+            "era": "Toward",
+            "month": null,
+            "monthName": null,
+            "day": null,
+            "intercalary": null,
+            "weekday": null
+          }
+        },
+        {
+          "step": 99,
+          "words": "1 TW",
+          "breakdown": {
+            "absYear": 9,
+            "year": 1,
+            "era": "Toward",
+            "month": null,
+            "monthName": null,
+            "day": null,
+            "intercalary": null,
+            "weekday": null
+          }
+        },
+        {
+          "step": 100,
+          "words": "10",
+          "breakdown": {
+            "absYear": 10,
+            "year": 10,
+            "era": null,
+            "month": null,
+            "monthName": null,
+            "day": null,
+            "intercalary": null,
+            "weekday": null
+          }
+        }
+      ]
+    },
+    {
+      "name": "era-tie-up-wins-listed-second",
+      "why": "equal starts: the up era wins the tie over a non-up spelling listed first",
+      "value": {
+        "version": 1,
+        "grain": "month",
+        "bundles": {
+          "year": {
+            "steps": 10
+          }
+        },
+        "eras": [
+          {
+            "name": "Sideways",
+            "start": 0,
+            "end": 100,
+            "direction": "sideways"
+          },
+          {
+            "name": "Upward",
+            "start": 0
+          }
+        ]
+      },
+      "valid": true,
+      "steps": [
+        {
+          "step": 10,
+          "words": "2 Upward",
+          "breakdown": {
+            "absYear": 1,
+            "year": 2,
+            "era": "Upward",
+            "month": null,
+            "monthName": null,
+            "day": null,
+            "intercalary": null,
+            "weekday": null
+          }
+        },
+        {
+          "step": 150,
+          "words": "16 Upward",
+          "breakdown": {
+            "absYear": 15,
+            "year": 16,
+            "era": "Upward",
+            "month": null,
+            "monthName": null,
+            "day": null,
+            "intercalary": null,
+            "weekday": null
+          }
+        }
+      ]
+    },
+    {
+      "name": "era-tie-up-wins-listed-first",
+      "why": "equal starts: the up era wins the tie whatever the listing order",
+      "value": {
+        "version": 1,
+        "grain": "month",
+        "bundles": {
+          "year": {
+            "steps": 10
+          }
+        },
+        "eras": [
+          {
+            "name": "Upward",
+            "start": 0,
+            "end": 100
+          },
+          {
+            "name": "Sideways",
+            "start": 0,
+            "direction": "sideways"
+          }
+        ]
+      },
+      "valid": true,
+      "steps": [
+        {
+          "step": 10,
+          "words": "2 Sideways",
+          "breakdown": {
+            "absYear": 1,
+            "year": 2,
+            "era": "Sideways",
+            "month": null,
+            "monthName": null,
+            "day": null,
+            "intercalary": null,
+            "weekday": null
+          }
+        },
+        {
+          "step": 150,
+          "words": "16 Sideways",
+          "breakdown": {
+            "absYear": 15,
+            "year": 16,
+            "era": "Sideways",
+            "month": null,
+            "monthName": null,
+            "day": null,
+            "intercalary": null,
+            "weekday": null
+          }
+        }
+      ]
+    },
+    {
+      "name": "era-tie-direction-null",
+      "why": "equal starts: a null direction is absent, so up; any direction but \"down\" counts up, and of two up eras the later in the list wins",
+      "value": {
+        "version": 1,
+        "grain": "month",
+        "bundles": {
+          "year": {
+            "steps": 10
+          }
+        },
+        "eras": [
+          {
+            "name": "Sideways",
+            "start": 0,
+            "end": 100,
+            "direction": "sideways"
+          },
+          {
+            "name": "Nulled",
+            "start": 0,
+            "direction": null
+          }
+        ]
+      },
+      "valid": true,
+      "steps": [
+        {
+          "step": 10,
+          "words": "2 Nulled",
+          "breakdown": {
+            "absYear": 1,
+            "year": 2,
+            "era": "Nulled",
+            "month": null,
+            "monthName": null,
+            "day": null,
+            "intercalary": null,
+            "weekday": null
+          }
+        },
+        {
+          "step": 150,
+          "words": "16 Nulled",
+          "breakdown": {
+            "absYear": 15,
+            "year": 16,
+            "era": "Nulled",
+            "month": null,
+            "monthName": null,
+            "day": null,
+            "intercalary": null,
+            "weekday": null
+          }
+        }
+      ]
+    },
+    {
+      "name": "era-tie-two-up",
+      "why": "two up eras on one start: the later in the list wins",
+      "value": {
+        "version": 1,
+        "grain": "month",
+        "bundles": {
+          "year": {
+            "steps": 10
+          }
+        },
+        "eras": [
+          {
+            "name": "Alpha",
+            "start": 0,
+            "end": 100
+          },
+          {
+            "name": "Beta",
+            "start": 0
+          }
+        ]
+      },
+      "valid": true,
+      "steps": [
+        {
+          "step": 10,
+          "words": "2 Beta",
+          "breakdown": {
+            "absYear": 1,
+            "year": 2,
+            "era": "Beta",
+            "month": null,
+            "monthName": null,
+            "day": null,
+            "intercalary": null,
+            "weekday": null
+          }
+        },
+        {
+          "step": 150,
+          "words": "16 Beta",
+          "breakdown": {
+            "absYear": 15,
+            "year": 16,
+            "era": "Beta",
+            "month": null,
+            "monthName": null,
+            "day": null,
+            "intercalary": null,
+            "weekday": null
+          }
+        }
+      ]
+    },
+    {
+      "name": "no-months-year-steps",
+      "why": "a calendar without months (bundles.year.steps 12); free week with no months; default template without months",
+      "value": {
+        "version": 1,
+        "grain": "month",
+        "bundles": {
+          "year": {
+            "steps": 12
+          },
+          "week": {
+            "length": 5,
+            "names": [
+              "A",
+              "B",
+              "C",
+              "D",
+              "E"
+            ]
+          }
+        }
+      },
+      "valid": true,
+      "steps": [
+        {
+          "step": 0,
+          "words": "0",
+          "breakdown": {
+            "absYear": 0,
+            "year": 0,
+            "era": null,
+            "month": null,
+            "monthName": null,
+            "day": null,
+            "intercalary": null,
+            "weekday": "A"
+          }
+        },
+        {
+          "step": 11,
+          "words": "0",
+          "breakdown": {
+            "absYear": 0,
+            "year": 0,
+            "era": null,
+            "month": null,
+            "monthName": null,
+            "day": null,
+            "intercalary": null,
+            "weekday": "B"
+          }
+        },
+        {
+          "step": 12,
+          "words": "1",
+          "breakdown": {
+            "absYear": 1,
+            "year": 1,
+            "era": null,
+            "month": null,
+            "monthName": null,
+            "day": null,
+            "intercalary": null,
+            "weekday": "C"
+          }
+        },
+        {
+          "step": -1,
+          "words": "-1",
+          "breakdown": {
+            "absYear": -1,
+            "year": -1,
+            "era": null,
+            "month": null,
+            "monthName": null,
+            "day": null,
+            "intercalary": null,
+            "weekday": "E"
+          }
+        },
+        {
+          "step": -12,
+          "words": "-1",
+          "breakdown": {
+            "absYear": -1,
+            "year": -1,
+            "era": null,
+            "month": null,
+            "monthName": null,
+            "day": null,
+            "intercalary": null,
+            "weekday": "D"
+          }
+        },
+        {
+          "step": -13,
+          "words": "-2",
+          "breakdown": {
+            "absYear": -2,
+            "year": -2,
+            "era": null,
+            "month": null,
+            "monthName": null,
+            "day": null,
+            "intercalary": null,
+            "weekday": "C"
+          }
+        }
+      ]
+    },
+    {
+      "name": "no-year-structure",
+      "why": "no months and no year: every step is one year",
+      "value": {
+        "version": 1,
+        "grain": "year"
+      },
+      "valid": true,
+      "steps": [
+        {
+          "step": -5,
+          "words": "-5",
+          "breakdown": {
+            "absYear": -5,
+            "year": -5,
+            "era": null,
+            "month": null,
+            "monthName": null,
+            "day": null,
+            "intercalary": null,
+            "weekday": null
+          }
+        },
+        {
+          "step": 0,
+          "words": "0",
+          "breakdown": {
+            "absYear": 0,
+            "year": 0,
+            "era": null,
+            "month": null,
+            "monthName": null,
+            "day": null,
+            "intercalary": null,
+            "weekday": null
+          }
+        },
+        {
+          "step": 7,
+          "words": "7",
+          "breakdown": {
+            "absYear": 7,
+            "year": 7,
+            "era": null,
+            "month": null,
+            "monthName": null,
+            "day": null,
+            "intercalary": null,
+            "weekday": null
+          }
+        }
+      ]
+    },
+    {
+      "name": "absent-likes",
+      "why": "eras null, intercalary null, week null and months false read as absent, not as \"not a list\"",
+      "value": {
+        "version": 1,
+        "grain": "year",
+        "bundles": {
+          "months": false,
+          "week": null
+        },
+        "eras": null,
+        "intercalary": null
+      },
+      "valid": true,
+      "steps": [
+        {
+          "step": 0,
+          "words": "0",
+          "breakdown": {
+            "absYear": 0,
+            "year": 0,
+            "era": null,
+            "month": null,
+            "monthName": null,
+            "day": null,
+            "intercalary": null,
+            "weekday": null
+          }
+        },
+        {
+          "step": 3,
+          "words": "3",
+          "breakdown": {
+            "absYear": 3,
+            "year": 3,
+            "era": null,
+            "month": null,
+            "monthName": null,
+            "day": null,
+            "intercalary": null,
+            "weekday": null
+          }
+        }
+      ]
+    },
+    {
+      "name": "format-unknown-token",
+      "why": "an unknown token prints as written; {step} prints the raw step; a custom format_intercalary",
+      "value": {
+        "version": 1,
+        "grain": "day",
+        "bundles": {
+          "months": {
+            "names": [
+              "Frost",
+              "Thaw"
+            ],
+            "lengths": [
+              10,
+              10
+            ]
+          }
+        },
+        "intercalary": [
+          {
+            "name": "Gap",
+            "after_month": 1
+          }
+        ],
+        "format": "{day} {month} {year} {season} [{step}]",
+        "format_intercalary": "{intercalary} of {year} ({moon})"
+      },
+      "valid": true,
+      "steps": [
+        {
+          "step": 0,
+          "words": "1 Frost 0 {season} [0]",
+          "breakdown": {
+            "absYear": 0,
+            "year": 0,
+            "era": null,
+            "month": 1,
+            "monthName": "Frost",
+            "day": 1,
+            "intercalary": null,
+            "weekday": null
+          }
+        },
+        {
+          "step": 10,
+          "words": "Gap of 0 ({moon})",
+          "breakdown": {
+            "absYear": 0,
+            "year": 0,
+            "era": null,
+            "month": null,
+            "monthName": null,
+            "day": null,
+            "intercalary": "Gap",
+            "weekday": null
+          }
+        },
+        {
+          "step": -1,
+          "words": "10 Thaw -1 {season} [-1]",
+          "breakdown": {
+            "absYear": -1,
+            "year": -1,
+            "era": null,
+            "month": 2,
+            "monthName": "Thaw",
+            "day": 10,
+            "intercalary": null,
+            "weekday": null
+          }
+        }
+      ]
+    },
+    {
+      "name": "format-empty-known-token",
+      "why": "known tokens with no value (no week, no era) print empty and the comma separators around them close up",
+      "value": {
+        "version": 1,
+        "grain": "day",
+        "bundles": {
+          "months": {
+            "names": [
+              "Frost",
+              "Thaw"
+            ],
+            "lengths": [
+              10,
+              10
+            ]
+          }
+        },
+        "format": "{weekday}, {day} {month}, {weekday}, {year} {era}"
+      },
+      "valid": true,
+      "steps": [
+        {
+          "step": 0,
+          "words": "1 Frost 0",
+          "breakdown": {
+            "absYear": 0,
+            "year": 0,
+            "era": null,
+            "month": 1,
+            "monthName": "Frost",
+            "day": 1,
+            "intercalary": null,
+            "weekday": null
+          }
+        },
+        {
+          "step": 25,
+          "words": "6 Frost 1",
+          "breakdown": {
+            "absYear": 1,
+            "year": 1,
+            "era": null,
+            "month": 1,
+            "monthName": "Frost",
+            "day": 6,
+            "intercalary": null,
+            "weekday": null
+          }
+        }
+      ]
+    },
+    {
+      "name": "format-empty-known-dash",
+      "why": "only , ; and the middle dot (and spaces) close up around an empty token; a dash stays",
+      "value": {
+        "version": 1,
+        "grain": "day",
+        "bundles": {
+          "months": {
+            "names": [
+              "Frost",
+              "Thaw"
+            ],
+            "lengths": [
+              10,
+              10
+            ]
+          }
+        },
+        "format": "{year}-{weekday}-{day}"
+      },
+      "valid": true,
+      "steps": [
+        {
+          "step": 0,
+          "words": "0- -1",
+          "breakdown": {
+            "absYear": 0,
+            "year": 0,
+            "era": null,
+            "month": 1,
+            "monthName": "Frost",
+            "day": 1,
+            "intercalary": null,
+            "weekday": null
+          }
+        }
+      ]
+    },
+    {
+      "name": "week-names-short",
+      "why": "week names fewer than its length: the SDK reads the calendar but gives no weekday",
+      "value": {
+        "version": 1,
+        "grain": "day",
+        "bundles": {
+          "months": {
+            "names": [
+              "Frost",
+              "Thaw"
+            ],
+            "lengths": [
+              10,
+              10
+            ]
+          },
+          "week": {
+            "length": 3,
+            "names": [
+              "X",
+              "Y"
+            ]
+          }
+        },
+        "format": "{weekday} {day} {month} {year}"
+      },
+      "valid": true,
+      "steps": [
+        {
+          "step": 0,
+          "words": "1 Frost 0",
+          "breakdown": {
+            "absYear": 0,
+            "year": 0,
+            "era": null,
+            "month": 1,
+            "monthName": "Frost",
+            "day": 1,
+            "intercalary": null,
+            "weekday": null
+          }
+        },
+        {
+          "step": 1,
+          "words": "2 Frost 0",
+          "breakdown": {
+            "absYear": 0,
+            "year": 0,
+            "era": null,
+            "month": 1,
+            "monthName": "Frost",
+            "day": 2,
+            "intercalary": null,
+            "weekday": null
+          }
+        }
+      ]
+    },
+    {
+      "name": "months-and-year-steps",
+      "why": "months and bundles.year both present: the SDK reads it and the months set the year length",
+      "value": {
+        "version": 1,
+        "grain": "day",
+        "bundles": {
+          "months": {
+            "names": [
+              "Frost",
+              "Thaw"
+            ],
+            "lengths": [
+              10,
+              10
+            ]
+          },
+          "year": {
+            "steps": 365
+          }
+        }
+      },
+      "valid": true,
+      "steps": [
+        {
+          "step": 19,
+          "words": "10 Thaw, 0",
+          "breakdown": {
+            "absYear": 0,
+            "year": 0,
+            "era": null,
+            "month": 2,
+            "monthName": "Thaw",
+            "day": 10,
+            "intercalary": null,
+            "weekday": null
+          }
+        },
+        {
+          "step": 20,
+          "words": "1 Frost, 1",
+          "breakdown": {
+            "absYear": 1,
+            "year": 1,
+            "era": null,
+            "month": 1,
+            "monthName": "Frost",
+            "day": 1,
+            "intercalary": null,
+            "weekday": null
+          }
+        }
+      ]
+    },
+    {
+      "name": "intercalary-after-month-out-of-range",
+      "why": "after_month beyond the month count: the SDK reads it, the day counts in the year length but is placed nowhere, so its step has no month, day or intercalary name",
+      "value": {
+        "version": 1,
+        "grain": "day",
+        "bundles": {
+          "months": {
+            "names": [
+              "A",
+              "B"
+            ],
+            "lengths": [
+              2,
+              2
+            ]
+          }
+        },
+        "intercalary": [
+          {
+            "name": "Lost",
+            "after_month": 5
+          }
+        ]
+      },
+      "valid": true,
+      "steps": [
+        {
+          "step": 3,
+          "words": "2 B, 0",
+          "breakdown": {
+            "absYear": 0,
+            "year": 0,
+            "era": null,
+            "month": 2,
+            "monthName": "B",
+            "day": 2,
+            "intercalary": null,
+            "weekday": null
+          }
+        },
+        {
+          "step": 4,
+          "words": "0",
+          "breakdown": {
+            "absYear": 0,
+            "year": 0,
+            "era": null,
+            "month": null,
+            "monthName": null,
+            "day": null,
+            "intercalary": null,
+            "weekday": null
+          }
+        },
+        {
+          "step": 5,
+          "words": "1 A, 1",
+          "breakdown": {
+            "absYear": 1,
+            "year": 1,
+            "era": null,
+            "month": 1,
+            "monthName": "A",
+            "day": 1,
+            "intercalary": null,
+            "weekday": null
+          }
+        }
+      ]
+    }
+  ]
+}
