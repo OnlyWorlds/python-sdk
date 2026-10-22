@@ -85,6 +85,22 @@ result = push("moppetopia-before", "moppetopia", api_key="ow_w_â€¦", pin="ow_s_â
 
 `push` sends only the fields that changed, retries what the server asks it to retry, checks that what came back is what it sent, and logs every write, so running it again skips what already landed. `dry_run=True` shows the plan without sending it.
 
+A world kept in Notion becomes a folder without retyping it. Export the workspace or page from Notion as "Markdown & CSV", then:
+
+```bash
+python -m onlyworlds.notion Export.zip my-world --plan   # what would become what; writes nothing
+python -m onlyworlds.notion Export.zip my-world
+```
+
+```python
+from onlyworlds.notion import import_notion
+
+report = import_notion("Export.zip", "my-world")
+print(report.render())
+```
+
+A database whose title is one of the 22 types (`Characters`, `Locations`, any case, singular or plural), or that has a `Type` column naming one per row, becomes elements of that type. A column becomes a field when its name matches the field's (`Birth Date` is `birth_date`), and a relation column becomes a link when it matches a link field and its pages are in the export. Every other page becomes a Narrative, and so does each row of a database whose type the door cannot tell (supertype `notion`, the database's name as subtype). Nothing is dropped: a column that doesn't fit is kept as `x_notion_<column>`, and attachments a page links to are copied into `media/notion/`. Ids come from Notion's page ids, so importing the same export twice gives the same folder. The run ends with a report naming every column it could not place and every link it could not resolve, so you can see what to rename in Notion before the next export. No AI, no account. It is built on Notion's documented export shape; no real export has been through it yet.
+
 ## Export to OKF
 
 A world folder can be exported as a valid [Open Knowledge Format](https://github.com/GoogleCloudPlatform/open-knowledge-format) (OKF) 0.2 bundle, as the spec stands at one pinned commit (`onlyworlds.okf.OKF_COMMIT`): one markdown file per element, with its fields in the frontmatter, its text under headings and its links (in-prose `ow://` references included) as markdown links, plus an index per type. This needs PyYAML, which the rest of the package does not:
