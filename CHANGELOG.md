@@ -2,6 +2,12 @@
 
 The package version runs on its own semver; the schema it is generated from is `SCHEMA_DIST_TAG`.
 
+## 0.30.0 (2026-10-22)
+
+- **A world's own words for the types** (the names profile, schema-dist `profiles/names.md`, dist.48; OW Council #567). `onlyworlds.type_word(world, element_type, supertype=None, many=False)` reads `x_names` from a World body (`GET /world`, or a folder's `world.json`) and answers the word to print for a type, or None for the standard's name: in a work world Character is *Employee*. The order is the profile's: the supertype's entry under `supertypes[type]`, matched trimmed and without regard to case (the room profile's one definition, shared with `is_room_element`), then the type's entry under `types`, then None. `many=True` prints the pair's `many`, or its `one` when `many` is absent, not a string or blank. A map that is not a names map (not an object, `version` not the number 1, a JSON `true` included, `types` or `supertypes` not objects, a `supertypes` value not an object) is None everywhere; a bad entry or a slug outside the 22 is ignored, never an error. The word is printed as written, never re-cased. A display lookup only: the API, the folder, the schema and every id keep the standard's names. The same lookup as the npm SDK's `typeWord`.
+- **Schema repinned to schema-dist `v0.33.0-dist.48`** (same canonical 00.33.00; no schema file moved, `_schema.py` changes only its provenance lines). The distribution gains `profiles/names.md` and `profiles/names.fixture.json`; `profiles/checks.md` names the one Charter (D152), as the doctor has applied it since 0.28.0. The npm SDK is still pinned at dist.47.
+- Tests: the dist's `names.fixture.json` replayed from the vendored file, all 23 cases (a missing fixture fails, never skips), and no world, no map, a map that is a string, and `version: true` each answering None.
+
 ## 0.29.1 (2026-10-22)
 
 - **`health()` sends no credential.** keel's document gives `GET /health` no security, and the client sent its `API-Key` there (and a 10-digit key's PIN) on every pulse; it now sends neither, as the npm SDK does. Found by the new wire test below.

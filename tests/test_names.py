@@ -1,7 +1,7 @@
 """The names profile (schema-dist ``profiles/names.md``): ``type_word`` on every conformance case in
-``codegen/schema-dist/profiles/names.fixture.json``, vendored with the distribution. Until the serial
-carries it, the draft beside Skeld's profile (Orrery ``product/schema/names.fixture.json``) is read; on
-the serial the vendored copy wins and the draft path goes. The npm SDK's ``typeWord`` runs the same cases."""
+``codegen/schema-dist/profiles/names.fixture.json``, vendored with the distribution from
+``v0.33.0-dist.48``. The vendored copy is the only source: a missing fixture fails, never skips. The npm
+SDK's ``typeWord`` runs the same cases."""
 
 from __future__ import annotations
 
@@ -9,27 +9,22 @@ import json
 from pathlib import Path
 from typing import Any
 
-import pytest
-
 from onlyworlds import type_word
 
 REPO = Path(__file__).resolve().parents[1]
 VENDORED = REPO / "codegen" / "schema-dist" / "profiles" / "names.fixture.json"
-DRAFT = Path("C:/Users/Titus/Carrier/Orrery/product/schema/names.fixture.json")
 
 
 def load_fixture() -> dict[str, Any]:
-    path = VENDORED if VENDORED.is_file() else DRAFT
-    if not path.is_file():
-        pytest.skip(f"no names fixture at {VENDORED} or {DRAFT}")
-    doc: dict[str, Any] = json.loads(path.read_text(encoding="utf-8"))
+    assert VENDORED.is_file(), f"no names fixture at {VENDORED}"
+    doc: dict[str, Any] = json.loads(VENDORED.read_text(encoding="utf-8"))
     assert doc["profile"] == "x_names"
     return doc
 
 
 def test_every_case_of_the_names_fixture() -> None:
     cases = load_fixture()["cases"]
-    assert len(cases) >= 22
+    assert len(cases) >= 23
     for c in cases:
         got = type_word({"x_names": c["map"]}, c["type"], supertype=c.get("supertype"), many=c["many"])
         assert got == c["word"], c["name"]
