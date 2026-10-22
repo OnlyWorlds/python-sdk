@@ -9,7 +9,7 @@
   "dist_serial": 46,
   "published": "2026-10-22",
   "pinned_at": "2026-10-22",
-  "pinned_by": "The maintainer: tree from `git archive` of the tag in a schema-dist checkout; files re-hashed against MANIFEST.json by generate_schema.py; MANIFEST self-hash matched against the raw file GitHub serves at the tag, whose ref resolves to the commit above. The same tag and hash as the npm SDK's pin for keel #520.",
+  "pinned_by": "The maintainer: tree from `git archive` of the tag in a schema-dist checkout; files re-hashed against MANIFEST.json by generate_schema.py; MANIFEST self-hash matched against the raw file GitHub serves at the tag, whose ref resolves to the commit above. The same tag and hash as the npm SDK's 4.56.0.",
   "previous_pins": [
     {
       "tag": "v0.33.0-dist.45",

@@ -306,6 +306,128 @@ def test_a_feed_that_says_more_without_moving_is_refused(make_client: MakeClient
         list(make_client(FakeTransport(script=[stuck])).walk_changes("C0"))
 
 
+# --- the conditional head poll (keel #518) ----------------------------------------
+
+
+def head_body(head: int, epoch: int | None = None, cursor: Any = None) -> dict[str, Any]:
+    return {
+        "cursor": head if cursor is None else cursor,
+        "changes": [],
+        "has_more": False,
+        "head": head,
+        "epoch": epoch,
+    }
+
+
+def not_modified(etag: str) -> Response:
+    return Response(304, b"", {"ETag": etag, "Cache-Control": "no-store"})
+
+
+RESYNC = jresp(409, {"error": {"type": "invalid_request", "code": "resync_required", "reason": "view"}})
+
+
+def test_head_sends_no_tag_first_and_keeps_the_one_it_got_verbatim(make_client: MakeClient) -> None:
+    t = FakeTransport(script=[jresp(200, head_body(821), {"etag": 'W/"821:-"'}), not_modified('"821:-"')])
+    client = make_client(t)
+    first = client.head()
+    assert first == {"head": 821, "cursor": "821", "epoch": None, "unchanged": False}
+    assert t.calls[0].method == "GET" and t.calls[0].url.endswith("/changes/?head=true")
+    assert "If-None-Match" not in t.calls[0].headers
+    second = client.head()
+    assert t.calls[1].headers["If-None-Match"] == 'W/"821:-"'  # as received: the weak prefix and the quotes
+    assert second == {"head": 821, "cursor": "821", "epoch": None, "unchanged": True}
+
+
+def test_a_304_answers_what_the_last_200_said_and_a_later_200_replaces_the_tag(make_client: MakeClient) -> None:
+    t = FakeTransport(
+        script=[
+            jresp(200, {**head_body(7, epoch=3, cursor="g:3:7"), "epoch_reason": "view"}, {"ETag": '"7:3"'}),
+            not_modified('"7:3"'),
+            jresp(200, head_body(9, epoch=3, cursor="g:3:9"), {"ETag": '"9:3"'}),
+            not_modified('"9:3"'),
+        ]
+    )
+    client = make_client(t)
+    assert client.head() == {"head": 7, "cursor": "g:3:7", "epoch": 3, "epoch_reason": "view", "unchanged": False}
+    assert client.head() == {"head": 7, "cursor": "g:3:7", "epoch": 3, "epoch_reason": "view", "unchanged": True}
+    assert t.calls[1].body is None  # a 304 has no body, and the poll sends none
+    assert client.head() == {"head": 9, "cursor": "g:3:9", "epoch": 3, "unchanged": False}
+    assert t.calls[2].headers["If-None-Match"] == '"7:3"'
+    assert client.head()["unchanged"] is True
+    assert t.calls[3].headers["If-None-Match"] == '"9:3"'
+
+
+def test_a_200_without_a_tag_leaves_none_to_send(make_client: MakeClient) -> None:
+    t = FakeTransport(
+        script=[jresp(200, head_body(1), {"ETag": '"1:-"'}), jresp(200, head_body(2)), jresp(200, head_body(2))]
+    )
+    client = make_client(t)
+    client.head()
+    assert client.head()["unchanged"] is False
+    client.head()
+    assert "If-None-Match" not in t.calls[2].headers
+
+
+def test_a_resync_409_from_any_feed_read_clears_the_tag(make_client: MakeClient) -> None:
+    tagged = jresp(200, head_body(5), {"ETag": '"5:-"'})
+    walk_page = jresp(200, {"cursor": "C1", "changes": [], "has_more": False, "head": 5})
+    t = FakeTransport(
+        script=[tagged, RESYNC, tagged, tagged, RESYNC, tagged, tagged, RESYNC, tagged, tagged, walk_page]
+    )
+    client = make_client(t)
+    client.head()
+    with pytest.raises(ApiError) as caught:
+        client.head()
+    assert caught.value.resync_reason == "view"
+    client.head()
+    assert "If-None-Match" not in t.calls[2].headers  # the poll after a 409 carries no tag
+
+    client.head()
+    with pytest.raises(ApiError):
+        client.changes(since="C0")
+    client.head()
+    assert "If-None-Match" not in t.calls[5].headers
+
+    client.head()
+    with pytest.raises(ApiError):
+        list(client.walk_changes("C0"))
+    client.head()
+    assert "If-None-Match" not in t.calls[8].headers
+    client.head()
+    assert t.calls[9].headers["If-None-Match"] == '"5:-"'  # held again after a 200
+    assert [op for op in client.walk_changes("C0")] == []
+
+
+def test_another_error_keeps_the_tag(make_client: MakeClient) -> None:
+    t = FakeTransport(
+        script=[
+            jresp(200, head_body(5), {"ETag": '"5:-"'}),
+            env(403, "permission_error", "permission_error"),
+            not_modified('"5:-"'),
+        ]
+    )
+    client = make_client(t)
+    client.head()
+    with pytest.raises(ApiError):
+        client.head()
+    assert client.head()["unchanged"] is True
+    assert t.calls[2].headers["If-None-Match"] == '"5:-"'
+
+
+def test_a_304_with_nothing_held_is_refused(make_client: MakeClient) -> None:
+    client = make_client(FakeTransport(script=[not_modified('"5:-"')]))
+    with pytest.raises(ValueError, match="304"):
+        client.head()
+
+
+def test_the_tag_is_per_client(make_client: MakeClient) -> None:
+    t = FakeTransport(handler=lambda *a: jresp(200, head_body(4), {"ETag": '"4:-"'}))
+    one, two = make_client(t), make_client(t)
+    one.head()
+    two.head()
+    assert "If-None-Match" not in t.calls[1].headers
+
+
 # --- errors ----------------------------------------
 
 

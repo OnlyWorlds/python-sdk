@@ -6,8 +6,9 @@ what it sends and knows is compared with what the document describes: routes, qu
 each type's fields and their kinds, what a write must not carry, the list envelope's names and
 the error envelope.
 
-Blind spots, because the document gives no schema for them: ``/changes`` (parameters and
-response), ``/bulk`` (request and response) and the world-meta body. Those are covered by the
+Blind spots, because the document gives no schema for them: the ``/changes`` response (its
+parameters, the head poll's ``If-None-Match`` and its 304 are declared and checked here),
+``/bulk`` (request and response) and the world-meta body. Those are covered by the
 scripted tests in ``test_client.py``, not here.
 """
 
@@ -108,7 +109,16 @@ def _json_type(schema: Mapping[str, Any]) -> str:
 
 
 def _recorder() -> tuple[Client, FakeTransport]:
-    everything = {"id": ID, "name": "x", "data": [], "has_more": False, "next_cursor": None, "items": [], "changes": []}
+    everything = {
+        "id": ID,
+        "name": "x",
+        "data": [],
+        "has_more": False,
+        "next_cursor": None,
+        "items": [],
+        "changes": [],
+        "head": 0,
+    }
     t = FakeTransport(handler=lambda *a: jresp(200, everything))
     return Client("ow_w_testkey", "1234", transport=t), t
 
@@ -120,7 +130,8 @@ def test_every_route_and_query_parameter_the_client_sends_exists(doc: dict[str, 
     c.get_world()
     c.patch_world({"name": "x"})
     c.bulk([{"type": "character", "element": {"name": "x"}}])
-    c.changes(since="c", limit=1)
+    c.changes(since="c", limit=1, after="2026-10-22T00:00:00Z")
+    c.head()
     for ty in ELEMENT_TYPES:
         c.list_page(
             ty, limit=1, cursor="c", expand=["a"], fields=["name"], filter={"name__icontains": "a", "supertype": "b"}
@@ -137,11 +148,26 @@ def test_every_route_and_query_parameter_the_client_sends_exists(doc: dict[str, 
         if op is None:
             problems.append(f"{call.method} {_norm(call.url)} is not in the document")
             continue
-        if call.method == "GET" and "/changes" not in call.url:
+        if call.method == "GET":
             listed = {p["name"] for p in op.get("parameters", []) if p["in"] == "query"}
             sent = {q.split("=")[0] for q in call.url.split("?", 1)[1].split("&")} if "?" in call.url else set()
             problems += [f"{call.method} {_norm(call.url)} sends ?{q}, not listed" for q in sorted(sent - listed)]
     assert not problems, "\n".join(problems[:20])
+
+
+def test_the_head_poll_header_and_its_304_are_declared(doc: dict[str, Any]) -> None:
+    """keel #518: ``head()`` sends ``If-None-Match`` and reads a 304 with an ``ETag`` on GET /changes."""
+    t = FakeTransport(
+        script=[jresp(200, {"head": 3, "cursor": 3, "epoch": None}, {"ETag": '"3:-"'}), _http.Response(304, b"", {})]
+    )
+    c = Client("ow_w_testkey", "1234", transport=t)
+    c.head()
+    c.head()
+    sent = set(t.calls[1].headers) - set(t.calls[0].headers)
+    op = doc["paths"][_norm(t.calls[1].url)]["get"]
+    declared = {p["name"] for p in op.get("parameters", []) if p["in"] == "header"}
+    assert sent == {"If-None-Match"} and sent <= declared
+    assert "ETag" in op["responses"]["304"].get("headers", {})
 
 
 def test_fields_and_kinds_equal_the_read_schemas_both_ways(doc: dict[str, Any]) -> None:

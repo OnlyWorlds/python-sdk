@@ -40,3 +40,12 @@ def test_the_change_feed_pages_and_has_a_head(client: Client) -> None:
     walk = client.walk_changes(page["cursor"])  # the default page size: two requests, not a crawl
     list(walk)
     assert walk.done and walk.head is not None
+
+
+def test_the_head_poll_answers_unchanged_on_the_second_call() -> None:
+    """keel #518: the second head read sends the first one's ETag and gets a 304 (the demo world is read-only)."""
+    poller = Client("0000000000")
+    first = poller.head()
+    assert first["unchanged"] is False and isinstance(first["head"], int) and first["cursor"]
+    second = poller.head()
+    assert second == {**first, "unchanged": True}

@@ -380,6 +380,9 @@ class Client:
             self._headers["API-Pin"] = pin
         self._agent = agent is True
         self._client = client
+        # ``head()``'s conditional poll (keel #518): the last ETag as received, and what that 200 said.
+        self._head_etag: str | None = None
+        self._head_held: dict[str, Any] | None = None
 
     def _writing(self, headers: Mapping[str, str] | None = None) -> dict[str, str]:
         """An element write's headers: ``X-OW-Client`` always (keel #520), and ``X-OW-Agent`` when this
@@ -753,10 +756,81 @@ class Client:
         query = self._query(
             {"since": since, "limit": limit if limit is not None else self.changes_page_size, "after": after}
         )
-        page = self.call("GET", f"changes/?{query}")
+        try:
+            page = self.call("GET", f"changes/?{query}")
+        except ApiError as e:
+            self._forget_head_on_resync(e)
+            raise
         if not isinstance(page, dict):
             raise ValueError(f"GET /changes returned no page: {str(page)[:200]}")
         return page
+
+    def _forget_head_on_resync(self, error: ApiError) -> None:
+        """A 409 ``resync_required`` from any feed read drops ``head()``'s held tag: the poll after it carries none."""
+        if error.is_resync_required:
+            self._head_etag = None
+            self._head_held = None
+
+    def head(self) -> dict[str, Any]:
+        """``GET /changes?head=true``: where the feed is now, without a page (no element is read),
+        ``{head, cursor, epoch, unchanged}``, with ``epoch_reason`` when keel sends it (keel #421).
+
+        ``head`` is the world's ``change_seq``; ``cursor`` is a position to pass as ``since`` that
+        re-sends nothing at the head (a string: keel answers an owner's as a number, handed back as
+        text like the npm SDK's ``changesHead``); ``epoch`` is a guest's or a contributor's view epoch,
+        else null, and it can move with ``head`` unchanged.
+
+        The poll is conditional (keel #518): this client keeps the ``ETag`` of the last 200 and sends
+        it as ``If-None-Match`` on the next call, exactly as received (``W/`` and quotes included);
+        the package compares nothing. keel answers 304 when neither ``head`` nor ``epoch`` moved (the
+        tag covers both), and then this returns what the last 200 said with ``unchanged=True``; a
+        200 returns the new values with ``unchanged=False`` and keeps its tag. keel refunds a 304
+        against the request budget (within a floor of 120 a minute per credential). The tag is per
+        client instance. A 409 ``resync_required`` from ``head()``, ``changes()`` or ``walk_changes()``
+        drops it, so the poll after it carries none. A 304 when no tag was sent is the server
+        contradicting itself: a ``ValueError``, never an invented head.
+
+        The poll recipe (the package never sleeps for you)::
+
+            cursor, applied = saved_cursor, None  # applied: (head, epoch) of the last walk you finished
+            while True:
+                now = client.head()  # a 304 costs nothing against the budget
+                if (now["head"], now["epoch"]) != applied:
+                    walk = client.walk_changes(cursor)
+                    for op in walk:
+                        ...
+                    cursor, applied = walk.cursor, (walk.head, now["epoch"])
+                time.sleep(2)
+
+        ``unchanged`` says nothing moved since this client's last poll, not since your last walk:
+        compare with what you applied, so a walk that failed after a 200 is walked again on the
+        next tick (its poll answers ``unchanged=True`` with the moved head). On a 409
+        ``resync_required`` walk again from the start (``ApiError.resync_reason`` says what to keep)."""
+        headers = {"If-None-Match": self._head_etag} if self._head_etag is not None else None
+        got = self.send("GET", "changes/?head=true", headers=headers)
+        if got.response is None:
+            raise ConnectionError(f"GET changes/?head=true: {got.error}")
+        if got.response.status == 304:
+            if headers is None or self._head_held is None:
+                raise ValueError("GET /changes?head=true answered 304 Not Modified, but no tag was sent")
+            return {**self._head_held, "unchanged": True}
+        if not 200 <= got.response.status < 300:
+            error = api_error("GET", "changes/?head=true", got.response)
+            self._forget_head_on_resync(error)
+            raise error
+        page = got.response.json()
+        if not isinstance(page, dict) or "head" not in page:
+            raise ValueError(f"GET /changes?head=true returned no head: {str(page)[:200]}")
+        held: dict[str, Any] = {
+            "head": page["head"],
+            "cursor": None if page.get("cursor") is None else str(page["cursor"]),
+            "epoch": page.get("epoch"),
+        }
+        if "epoch_reason" in page:
+            held["epoch_reason"] = page["epoch_reason"]
+        self._head_etag = got.response.header("ETag")
+        self._head_held = held
+        return {**held, "unchanged": False}
 
     def draught(
         self,
