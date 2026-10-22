@@ -39,7 +39,7 @@ testpaths = ["tests"]
 [tool.ruff]
 line-length = 120
 target-version = "py312"
-extend-exclude = ["codegen/schema-dist"]
+extend-exclude = ["codegen/schema-dist", "src/onlyworlds/_schema.py"]  # the vendored dist and the generated module keep their own shape
 
 [tool.ruff.lint]
 select = ["E", "F", "W", "I", "B", "UP", "SIM", "RUF"]

@@ -27,11 +27,7 @@ def test_manifest_matches_pin_and_every_file_matches_manifest() -> None:
     manifest = DIST / "MANIFEST.json"
     assert hashlib.sha256(manifest.read_bytes()).hexdigest() == pin["manifest_sha256"]
     files = json.loads(manifest.read_text(encoding="utf-8"))["files"]
-    on_disk = {
-        p.relative_to(DIST).as_posix()
-        for p in DIST.rglob("*")
-        if p.is_file() and "__pycache__" not in p.parts
-    }
+    on_disk = {p.relative_to(DIST).as_posix() for p in DIST.rglob("*") if p.is_file() and "__pycache__" not in p.parts}
     assert on_disk == set(files) | {"MANIFEST.json"}
     for rel, digest in files.items():
         assert hashlib.sha256((DIST / rel).read_bytes()).hexdigest() == digest, rel
