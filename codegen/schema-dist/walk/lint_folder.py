@@ -29,6 +29,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import subprocess
 import sys
 import uuid
 from pathlib import Path
@@ -82,6 +83,17 @@ def is_uuid(value) -> bool:
     return True
 
 
+def git_tracks(path: Path) -> bool:
+    """True when a git repository tracks `path` (folder spec 4.6 d: a world.json
+    that carries an `api` block is a linked folder and is never committed)."""
+    try:
+        r = subprocess.run(["git", "-C", str(path.parent), "ls-files", "--error-unmatch",
+                            path.name], capture_output=True, text=True, timeout=10)
+    except (OSError, subprocess.SubprocessError):
+        return False
+    return r.returncode == 0
+
+
 def lint_folder(src: Path, decoded: dict) -> Report:
     """Check the folder at `src` against `decoded` (decode_schema's output)."""
     report = Report()
@@ -96,6 +108,10 @@ def lint_folder(src: Path, decoded: dict) -> Report:
             report.add(f"world.json: not JSON ({e})")
         if not isinstance(world, dict) or not world.get("id") or "name" not in world:
             report.add("world.json: needs `id` and `name`")
+        if isinstance(world, dict) and world.get("api") and git_tracks(world_path):
+            report.add("world.json: carries an `api` block and git tracks it; a linked "
+                       "folder is never committed (folder spec 4.6 d), keep the key "
+                       "outside the repository")
 
     base = {f["name"]: f for f in decoded["base"] if f["name"] != "world"}
     bodies: dict[str, tuple[str, dict, str]] = {}

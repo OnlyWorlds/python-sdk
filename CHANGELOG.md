@@ -2,6 +2,11 @@
 
 The package version runs on its own semver; the schema it is generated from is `SCHEMA_DIST_TAG`.
 
+## 0.15.0 (2026-10-22)
+
+- **Folder format v0.3.13**: §4.7, the `.owworld` archive, is RULED. `FORMAT_VERSION` moves to `0.3.13`, so a folder this package writes is stamped 0.3.13 at its birth (a stamp a folder already carries is kept, as before). Older stamps read as before; the doctor's flag 9 still names a folder stamped older than the package. This package reads and writes folders, not archives, so nothing else moved.
+- **Schema repinned to schema-dist `v0.32.2-dist.39`** (canonical 00.32.02 unchanged: no schema file moved; `SCHEMA_DIST_TAG`, `SCHEMA_DIST_SERIAL` and `SCHEMA_MANIFEST_SHA256` move with it). The dist now carries the archive's 78-case conformance set at `fixtures/owworld/`, vendored in `codegen/` with the rest of the tree and not shipped in the wheel. Ahead of the npm SDK, whose main still pins dist.37.
+
 ## 0.14.3 (2026-10-22)
 
 - **`hidden` is a read-only field** (keel PR 160, #537: `hidden: true` rides an element body only for a reader who still sees a hidden element). It joins `READ_ONLY_FIELDS` and the push loop's never-sent list, so a read body round-trips and a push never carries it. CI's wire test found it the hour keel shipped it.
