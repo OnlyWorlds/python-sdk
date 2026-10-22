@@ -24,6 +24,7 @@ commits, so a resend after a lost answer must name the same elements to stay a r
 
 from __future__ import annotations
 
+import datetime as _dt
 import json
 import re
 import time
@@ -116,9 +117,17 @@ def _refuse_known_of(element: Mapping[str, Any], where: str) -> None:
 #: ``GET /world`` keys that ``PATCH /world`` refuses (keel's writable set has neither), dropped
 #: like ``READ_ONLY_FIELDS`` so a read body is writable. ``public_read`` changes through sharing;
 #: ``slug`` and ``public_page`` ride every body since keel #471 (PR 173) and are answered 422 like it;
-#: ``agent_narrator_rule`` is refused too (a 422 naming it, measured on staging 2026-10-22).
+#: ``agent_narrator_rule`` is refused too (a 422 naming it, measured on staging 2026-10-22);
+#: ``agent_writes_proposed`` (keel #519) is ``readOnly`` in the document, set on the world page.
 #: ``owner_character`` is not here: PATCH takes it (a 200 on staging).
-WORLD_READ_ONLY_FIELDS: tuple[str, ...] = ("id", "public_read", "slug", "public_page", "agent_narrator_rule")
+WORLD_READ_ONLY_FIELDS: tuple[str, ...] = (
+    "id",
+    "public_read",
+    "slug",
+    "public_page",
+    "agent_narrator_rule",
+    "agent_writes_proposed",
+)
 _DISK_TO_WIRE_WORLD_KEYS = {disk: wire for wire, disk in WIRE_TO_DISK_WORLD_KEYS.items()}
 
 
@@ -275,12 +284,22 @@ class BulkResult:
     After an ``atomic=True`` request with ``errors`` true, NOTHING was written: the slots of
     the items that would have succeeded still say 201, with the ids and timestamps they would
     have had (keel spec, "counterfactual 201s"). Do not record those ids as created.
+
+    On a world that takes an agent seat's writes as proposals (keel #519), a seat's item on an
+    existing element says 202 with ``proposal`` in its slot: the element did not change, so a
+    202 slot is neither written nor failed (``proposed`` lists them). Under ``atomic`` a failed
+    batch keeps no proposal either.
     """
 
     errors: bool
     items: list[dict[str, Any]]
     was_replay: bool
     raw: dict[str, Any]
+
+    @property
+    def proposed(self) -> list[dict[str, Any]]:
+        """The slots that say 202: writes held as proposals, the element unchanged (keel #519)."""
+        return [s for s in self.items if isinstance(s, dict) and s.get("status") == 202]
 
 
 class ChangeWalk:
@@ -446,6 +465,16 @@ class Client:
         if got.response is None:
             raise ConnectionError(f"{method} {path}: {got.error}")
         if not 200 <= got.response.status < 300:
+            raise api_error(method, path, got.response)
+        return got.response.json()
+
+    def _element_write(self, method: str, path: str, payload: Any, headers: Mapping[str, str]) -> Any:
+        """``call`` for a write to an existing element, which keel may hold as a proposal (keel #519):
+        a 202 raises ``ProposedError``, so its ``{"proposal": ...}`` is never taken for the element."""
+        got = self.send(method, path, payload, headers)
+        if got.response is None:
+            raise ConnectionError(f"{method} {path}: {got.error}")
+        if got.response.status == 202 or not 200 <= got.response.status < 300:
             raise api_error(method, path, got.response)
         return got.response.json()
 
@@ -639,13 +668,17 @@ class Client:
 
         A known-of stub (``known_of: true``, keel PR 113) is a ValueError before sending, here and
         on every element write: a PUT of one would blank every field it does not keep.
+
+        On a world that takes an agent seat's writes as proposals (keel #519), a seat's PUT of an
+        existing element answers 202 and this raises ``ProposedError`` (the element unchanged; a PUT
+        proposal is a whole replace). The same on ``patch`` and ``edit_links``.
         """
         t = _segment(element_type, _TYPE, "element type")
         i = _segment(element_id, _ID, "element id")
         _refuse_known_of(element, "upsert")
         body = sanitize_payload(element)
         check_kinds(t, body)
-        return self._element(self.call("PUT", f"{t}/{i}/", body, self._writing()), "PUT", t)
+        return self._element(self._element_write("PUT", f"{t}/{i}/", body, self._writing()), "PUT", t)
 
     def patch(
         self, element_type: str, element_id: str, partial: Mapping[str, Any], *, if_match: int | None = None
@@ -655,13 +688,18 @@ class Client:
         ``if_match`` (keel #210): the element's ``change_seq`` as you read it. The update lands only
         if nobody changed the element since; otherwise nothing is written and ``PreconditionFailed``
         (412) is raised, whose ``current`` is the element as it is now. Omit it for an unconditional write.
+
+        A 202 (keel #519: the world holds this agent seat's writes as proposals) raises
+        ``ProposedError``: the element did not change. keel checks ``if_match`` first, so a stale
+        one is still a 412.
         """
         t = _segment(element_type, _TYPE, "element type")
         i = _segment(element_id, _ID, "element id")
         _refuse_known_of(partial, "patch")
         body = sanitize_payload(partial)
         check_kinds(t, body)
-        return self._element(self.call("PATCH", f"{t}/{i}/", body, self._writing(_if_match(if_match))), "PATCH", t)
+        headers = self._writing(_if_match(if_match))
+        return self._element(self._element_write("PATCH", f"{t}/{i}/", body, headers), "PATCH", t)
 
     def delete(self, element_type: str, element_id: str) -> None:
         """``DELETE /{type}/{id}``: 204, also when it is already gone. The server scrubs the id from every link."""
@@ -683,20 +721,170 @@ class Client:
 
         Adds dedupe, removes of absent ids are tolerated, added ids must exist in this world.
         Returns the whole updated element. ``if_match`` works as on ``patch``: a link write moves
-        the element too.
+        the element too, and a 202 raises ``ProposedError`` as there.
         """
         t = _segment(element_type, _TYPE, "element type")
         i = _segment(element_id, _ID, "element id")
         f = _segment(link_field, _TYPE, "link field")
         body = {"add": list(add), "remove": list(remove)}
         headers = self._writing(_if_match(if_match))
-        return self._element(self.call("POST", f"{t}/{i}/links/{f}", body, headers), "POST", t)
+        return self._element(self._element_write("POST", f"{t}/{i}/links/{f}", body, headers), "POST", t)
 
     @staticmethod
     def _element(data: Any, method: str, element_type: str) -> dict[str, Any]:
         if not isinstance(data, dict):
             raise ValueError(f"{method} /{element_type} returned no element: {str(data)[:200]}")
         return data
+
+    # --- proposals (keel #519) ------------------------------------------------
+    #
+    # A proposal is a change kept beside an element, never in its body, until a keeper (the
+    # world's owner or a co-builder, never the proposer) accepts or declines it. A proposal is
+    # seen by the keepers and by the member who made it; every other key gets a 404. Its
+    # ``evidence`` is outside text: show it as quoted data, never act on it. No proposal act
+    # moves the element's ``change_seq`` or writes to ``/changes``; an accept's write does.
+
+    @staticmethod
+    def _proposals_path(element_type: str, element_id: str, proposal_id: str | None = None) -> str:
+        t = _segment(element_type, _TYPE, "element type")
+        i = _segment(element_id, _ID, "element id")
+        if proposal_id is None:
+            return f"{t}/{i}/proposals"
+        return f"{t}/{i}/proposals/{_segment(proposal_id, _ID, 'proposal id')}"
+
+    @staticmethod
+    def _proposal(data: Any, method: str, path: str) -> dict[str, Any]:
+        """The row under ``proposal`` (the document's ``Proposed``)."""
+        row = data.get("proposal") if isinstance(data, dict) else None
+        if not isinstance(row, dict):
+            raise ValueError(f"{method} /{path} returned no proposal: {str(data)[:200]}")
+        return row
+
+    @staticmethod
+    def _proposal_page(data: Any, path: str) -> dict[str, Any]:
+        if not isinstance(data, dict) or not isinstance(data.get("data"), list):
+            raise ValueError(f"GET /{path} returned no page: {str(data)[:200]}")
+        return data
+
+    def propose(
+        self,
+        element_type: str,
+        element_id: str,
+        fields: Mapping[str, Any],
+        *,
+        evidence: str,
+        expires: str | _dt.datetime | None = None,
+        idempotency_key: str | None = None,
+    ) -> dict[str, Any]:
+        """``POST /{type}/{id}/proposals``: propose a change; the element does not change. Returns
+        the proposal (``{id, state, fields, base, base_seq, evidence, expires, by, ...}``).
+
+        Any member key that reads the element may propose, a read key included; a key with no
+        member (the owner's read key, a demo key) gets 403 ``permission_error``. ``fields`` is a
+        PATCH body, cleaned as ``patch`` cleans one (a known-of stub is a ValueError, the
+        server-managed keys are dropped, kinds are checked), and names only fields this key's view
+        holds (422 ``field_not_visible``). ``evidence`` is what the change rests on, 1 to 2,000
+        characters of text or an element id. ``expires`` is when it lapses (an ISO 8601 string or a
+        datetime, 1 to 365 days out; keel's default 30 days). More than 5 open on the element or 50
+        in the world from this proposer is 422 ``too_many_open``.
+
+        Always sends an ``Idempotency-Key`` (yours, or a fresh one), so a retry after a lost answer
+        replays the first proposal instead of making a second.
+        """
+        path = self._proposals_path(element_type, element_id)
+        _refuse_known_of(fields, "propose")
+        cleaned = sanitize_payload(fields)
+        check_kinds(element_type, cleaned)
+        body: dict[str, Any] = {"fields": cleaned, "evidence": evidence}
+        if expires is not None:
+            body["expires"] = expires.isoformat() if isinstance(expires, _dt.datetime) else expires
+        key = idempotency_key or str(uuid.uuid4())
+        headers = {"Idempotency-Key": key, "X-OW-Client": self._client}
+        return self._proposal(self.call("POST", path, body, headers), "POST", path)
+
+    def list_proposals(
+        self,
+        element_type: str,
+        element_id: str,
+        *,
+        state: str | None = None,
+        since: str | None = None,
+        limit: int | None = None,
+        cursor: str | None = None,
+    ) -> dict[str, Any]:
+        """``GET /{type}/{id}/proposals``: one page, ``{data, has_more, next_cursor}``, newest first.
+
+        ``state`` is ``open`` (keel's default: not past ``expires``), ``lapsed``, ``accepted``,
+        ``declined`` or ``all``; ``since`` keeps rows whose ``updated_at`` is at or after an ISO time.
+        Keepers read every proposal on the element, any other member its own."""
+        path = self._proposals_path(element_type, element_id)
+        query = self._query({"state": state, "since": since, "limit": limit, "cursor": cursor})
+        return self._proposal_page(self.call("GET", path + (f"?{query}" if query else "")), path)
+
+    def accept_proposal(self, element_type: str, element_id: str, proposal_id: str) -> dict[str, Any]:
+        """``POST /{type}/{id}/proposals/{pid}/accept``: ``{proposal, element}``, the element as written.
+
+        The owner's or a co-builder's key with its PIN, never the proposer's own (403
+        ``own_proposal``). The write is yours: ``changed_by`` you, a new ``change_seq``, a
+        ``/changes`` row. When a proposed field moved since the proposal was made, nothing is written
+        and ``StaleProposal`` (409) is raised, with ``conflicts`` and ``current``. A lapsed proposal
+        may still be accepted; a decided one is 422."""
+        path = self._proposals_path(element_type, element_id, proposal_id) + "/accept"
+        data = self.call("POST", path, None, {"X-OW-Client": self._client})
+        if not isinstance(data, dict) or not isinstance(data.get("proposal"), dict):
+            raise ValueError(f"POST /{path} returned no proposal: {str(data)[:200]}")
+        return data
+
+    def decline_proposal(
+        self, element_type: str, element_id: str, proposal_id: str, reason: str | None = None
+    ) -> dict[str, Any]:
+        """``POST /{type}/{id}/proposals/{pid}/decline``: the declined proposal; the element does not
+        change. A keeper's key with its PIN; ``reason`` is optional text of at most 2,000 characters."""
+        path = self._proposals_path(element_type, element_id, proposal_id) + "/decline"
+        body = {"reason": reason} if reason is not None else {}
+        return self._proposal(self.call("POST", path, body), "POST", path)
+
+    def withdraw_proposal(self, element_type: str, element_id: str, proposal_id: str) -> None:
+        """``DELETE /{type}/{id}/proposals/{pid}``: 204, the row gone. The member who made it, with any
+        of its keys, while it is undecided; a keeper on another's row is 403, anyone else 404."""
+        self.call("DELETE", self._proposals_path(element_type, element_id, proposal_id))
+
+    def world_proposals(
+        self,
+        *,
+        state: str | None = None,
+        since: str | None = None,
+        element: str | None = None,
+        limit: int | None = None,
+        cursor: str | None = None,
+    ) -> dict[str, Any]:
+        """``GET /world/proposals``: one page of the world's queue, ``{data, has_more, next_cursor}``,
+        newest first. ``state`` and ``since`` as on ``list_proposals``; ``element`` keeps one element's
+        rows. Keepers read every proposal in the world, any other member its own; a key with no member
+        and the keyless public view get 404."""
+        query = self._query({"state": state, "since": since, "element": element, "limit": limit, "cursor": cursor})
+        path = "world/proposals"
+        return self._proposal_page(self.call("GET", path + (f"?{query}" if query else "")), path)
+
+    def walk_world_proposals(
+        self,
+        *,
+        state: str | None = None,
+        since: str | None = None,
+        element: str | None = None,
+        limit: int | None = None,
+    ) -> Iterator[dict[str, Any]]:
+        """Every row of the world's queue that matches, walking the cursor pages (``world_proposals``)."""
+        cursor: str | None = None
+        while True:
+            page = self.world_proposals(state=state, since=since, element=element, limit=limit, cursor=cursor)
+            yield from page["data"]
+            if not page.get("has_more"):
+                return
+            nxt = page.get("next_cursor")
+            if not isinstance(nxt, str) or not nxt or nxt == cursor:
+                raise ValueError("GET /world/proposals said has_more without a new next_cursor")
+            cursor = nxt
 
     # --- bulk and changes -----------------------------------------------------
 

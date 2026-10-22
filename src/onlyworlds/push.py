@@ -36,6 +36,12 @@ A generic link's two halves (Pin's ``element_type`` / ``element_id``) go togethe
 either changed: keel refuses a write that sets one half. The run stops at the first
 answer that refuses the key itself (``stops_run``): a wrong PIN repeated across a push
 locks the key for every tool that uses it.
+
+A 202 is a patch held as a proposal (keel #519: the world takes this agent seat's writes as
+proposals): the element did not change, so it is neither pushed nor failed. It is counted in
+``PushResult.proposed``, logged with ``code: 202`` and its ``proposal`` id, never retried, and a
+rerun never sends that same patch again (``PushResult.already_proposed``): it would only file a
+second proposal. Whether a keeper accepted it shows in a fresh export (``verify_level``).
 """
 
 from __future__ import annotations
@@ -245,6 +251,10 @@ class PushResult:
     aborted: str | None = None
     #: the stubs left out (``PushPlan.known_of``, §4.4): never pushed
     known_of: list[str] = field(default_factory=list)
+    #: patches answered 202 this run (keel #519): held as proposals, the element unchanged; not in ``ok``
+    proposed: int = 0
+    #: patches a previous run's log shows proposed (202), not sent again: a resend would file a second proposal
+    already_proposed: int = 0
 
 
 def stops_run(error: ApiError) -> bool:
@@ -258,27 +268,32 @@ def stops_run(error: ApiError) -> bool:
     return error.status == 403 and not error.is_not_author
 
 
-def _load_done(log_path: Path) -> tuple[set[str], set[str]]:
-    """(fingerprints that landed, ids that landed under a log line with no fingerprint).
+def _load_done(log_path: Path) -> tuple[set[str], set[str], set[str]]:
+    """(fingerprints that landed, ids that landed under a log line with no fingerprint,
+    fingerprints that were proposed: a 202, keel #519).
 
     The second set reads logs written by the original script, which keyed on id alone.
     """
     prints: set[str] = set()
     legacy_ids: set[str] = set()
+    proposed: set[str] = set()
     if not log_path.is_file():
-        return prints, legacy_ids
+        return prints, legacy_ids, proposed
     with log_path.open(encoding="utf-8") as fh:
         for line in fh:
             if not line.strip():
                 continue
             rec = json.loads(line)
+            if rec.get("code") == 202 and "patch_sha256" in rec:
+                proposed.add(rec["patch_sha256"])
+                continue
             if rec.get("code") != 200 or rec.get("mismatch"):
                 continue
             if "patch_sha256" in rec:
                 prints.add(rec["patch_sha256"])
             else:
                 legacy_ids.add(rec["id"])
-    return prints, legacy_ids
+    return prints, legacy_ids, proposed
 
 
 def push(
@@ -311,10 +326,17 @@ def push(
             "(pass allow_unmatched=True to push the rest anyway)"
         )
     log = Path(log_path)
-    prints, legacy_ids = _load_done(log)
+    prints, legacy_ids, proposed = _load_done(log)
+    landed = sum(1 for p in plan.patches if p.fingerprint in prints or p.id in legacy_ids)
     todo = [p for p in plan.patches if p.fingerprint not in prints and p.id not in legacy_ids]
+    held = sum(1 for p in todo if p.fingerprint in proposed)
+    todo = [p for p in todo if p.fingerprint not in proposed]
     result = PushResult(
-        planned=len(plan.patches), already_done=len(plan.patches) - len(todo), log_path=log, known_of=plan.known_of
+        planned=len(plan.patches),
+        already_done=landed,
+        already_proposed=held,
+        log_path=log,
+        known_of=plan.known_of,
     )
     work = todo[:limit] if limit is not None else todo
     if dry_run or not work:
@@ -366,7 +388,15 @@ def push(
                 "fields": sorted(p.fields),
                 "patch_sha256": p.fingerprint,
             }
-            if code != 200:
+            if code == 202 and got.response is not None:
+                # keel #519: held as a proposal, the element unchanged. Not a failure, not pushed.
+                try:
+                    held_as = got.response.json()
+                except ValueError:
+                    held_as = None
+                row = held_as.get("proposal") if isinstance(held_as, dict) else None
+                rec["proposal"] = row.get("id") if isinstance(row, dict) else None
+            elif code != 200:
                 body = got.response.body[:300].decode("utf-8", "replace") if got.response is not None else ""
                 rec["error"] = got.error or body
                 if got.response is not None and stops_run(ApiError("PATCH", f"{p.type}/{p.id}/", got.response)):
@@ -379,7 +409,9 @@ def push(
                 fh.flush()
                 result.attempted += 1
                 result.retries += got.retries
-                if code == 200 and not mismatch_fields:
+                if code == 202:
+                    result.proposed += 1
+                elif code == 200 and not mismatch_fields:
                     result.ok += 1
                 else:
                     result.failed.append(rec)

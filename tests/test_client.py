@@ -671,7 +671,8 @@ def test_patch_world_takes_back_a_get_world_body_and_a_folder_spelling(make_clie
 
 def test_patch_world_drops_the_read_only_keys_keel_refuses(make_client: MakeClient) -> None:
     # keel #471 (PR 173): slug and public_page ride every GET /world and PATCH answers them 422;
-    # agent_narrator_rule is refused the same way (measured on staging); owner_character is accepted, so it is sent
+    # agent_narrator_rule is refused the same way (measured on staging), and agent_writes_proposed is readOnly in the
+    # document (keel #519); owner_character is accepted, so it is sent
     t = FakeTransport(handler=lambda *_: jresp(200, {"id": "w"}))
     body = {
         "id": "w",
@@ -679,6 +680,7 @@ def test_patch_world_drops_the_read_only_keys_keel_refuses(make_client: MakeClie
         "slug": "w-world",
         "public_page": {"on": True, "palette": "ink", "hero": None, "sections": [], "pin": None, "index": True},
         "agent_narrator_rule": False,
+        "agent_writes_proposed": False,  # keel #519: read-only on GET /world, set on the world page
         "owner_character": None,
     }
     make_client(t).patch_world(body)

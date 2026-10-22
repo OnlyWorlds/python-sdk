@@ -329,3 +329,51 @@ def test_a_value_keel_would_store_as_another_is_not_pushed(tmp_path: Path, make_
     res = push(base, edit, client=make_client(t), log_path=tmp_path / "log.jsonl", workers=1)
     assert res.ok == 1 and len(res.failed) == 1 and "birth_date" in res.failed[0]["error"]
     assert [c.url.rsplit("/", 2)[-2] for c in t.calls] == [C1]
+
+
+PROPOSAL_ID = "019a0000-0000-7000-8000-0000000000aa"
+
+
+def held(*ids: str) -> Callable[..., Response]:
+    """keel #519: a world that takes an agent seat's writes as proposals answers these ids 202."""
+    stored = echo()
+
+    def handler(method: str, url: str, headers: Mapping[str, str], body: bytes | None) -> Response:
+        eid = url.rstrip("/").rsplit("/", 1)[-1]
+        if eid in ids:
+            return jresp(202, {"proposal": {"id": PROPOSAL_ID, "element_id": eid, "state": "open"}})
+        return stored(method, url, headers, body)
+
+    return handler
+
+
+def test_a_202_is_proposed_counted_apart_and_never_pushed(tmp_path: Path, make_client: MakeClient) -> None:
+    base, edit = folders(
+        tmp_path, {"character": [wire_char(C1, "A"), wire_char(C2, "A")]},
+        {"character": [wire_char(C1, "B"), wire_char(C2, "B")]},
+    )  # fmt: skip
+    log = tmp_path / "log.jsonl"
+    failures: list[dict[str, Any]] = []
+    t = FakeTransport(handler=held(C1))
+    res = push(base, edit, client=make_client(t), log_path=log, workers=1, on_failure=failures.append)
+    assert (res.attempted, res.ok, res.proposed, res.failed, res.aborted) == (2, 1, 1, [], None)
+    assert failures == [] and len(t.calls) == 2  # one PATCH each: a 202 is never retried
+    recs = {r["id"]: r for r in map(json.loads, log.read_text(encoding="utf-8").splitlines())}
+    assert (recs[C1]["code"], recs[C1]["proposal"], recs[C1]["mismatch"]) == (202, PROPOSAL_ID, False)
+    assert "proposal" not in recs[C2]
+
+
+def test_a_rerun_never_proposes_the_same_patch_twice(tmp_path: Path, make_client: MakeClient) -> None:
+    base, edit = folders(tmp_path, {"character": [wire_char(C1, "A")]}, {"character": [wire_char(C1, "B")]})
+    log = tmp_path / "log.jsonl"
+    assert push(base, edit, client=make_client(FakeTransport(handler=held(C1))), log_path=log).proposed == 1
+    t2 = FakeTransport(handler=echo())
+    res2 = push(base, edit, client=make_client(t2), log_path=log)
+    assert (res2.already_proposed, res2.already_done, res2.attempted, res2.proposed) == (1, 0, 0, 0)
+    assert t2.calls == []
+    # an edited patch is a new one, so it is sent
+    edit2 = tmp_path / "edit2"
+    write_folder(edit2, WORLD, {"character": [wire_char(C1, "C")]})
+    t3 = FakeTransport(handler=echo())
+    res3 = push(base, edit2, client=make_client(t3), log_path=log)
+    assert (res3.already_proposed, res3.ok) == (0, 1)

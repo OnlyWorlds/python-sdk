@@ -177,6 +177,45 @@ class ApiError(Exception):
         ``PreconditionFailed``, whose ``current`` is the element as it is now."""
         return self.status == 412 and self.code == "precondition_failed"
 
+    @property
+    def is_proposed(self) -> bool:
+        """The write was held as a proposal (202, keel #519): the world takes this agent seat's writes
+        as proposals, and the element did not change. The error is a ``ProposedError``, whose
+        ``proposal`` is the row a keeper (the owner or a co-builder) accepts or declines."""
+        return self.status == 202
+
+    @property
+    def is_field_not_visible(self) -> bool:
+        """A proposal named a field this key's view of the element does not hold: it reads the element
+        as a known-of stub (422 ``field_not_visible``, keel #519; ``param`` names the field)."""
+        return self.status == 422 and self.code == "field_not_visible"
+
+    @property
+    def is_too_many_open(self) -> bool:
+        """This proposer already has 5 open proposals on the element, or 50 in the world (422
+        ``too_many_open``, keel #519): wait for a keeper, or withdraw one. A lapsed one no longer counts."""
+        return self.status == 422 and self.code == "too_many_open"
+
+    @property
+    def is_stale_proposal(self) -> bool:
+        """An accept found a proposed field moved since the proposal was made (409 ``stale_proposal``,
+        keel #519): nothing written, the row stays open. The error is a ``StaleProposal``, whose
+        ``conflicts`` and ``current`` say what moved."""
+        return self.status == 409 and self.code == "stale_proposal"
+
+    @property
+    def is_proposed_only(self) -> bool:
+        """The world takes this agent seat's writes as proposals, and the act has no proposal form (403
+        ``proposed_only``, keel #519): deleting an element the seat did not create, or accepting or
+        declining a proposal. Propose instead, or ask a keeper."""
+        return self.status == 403 and self.code == "proposed_only"
+
+    @property
+    def is_own_proposal(self) -> bool:
+        """A keeper tried to accept or decline their own proposal (403 ``own_proposal``, keel #519):
+        another keeper decides it."""
+        return self.status == 403 and self.code == "own_proposal"
+
 
 class PreconditionFailed(ApiError):
     """412 ``precondition_failed`` (keel #210): the element changed since the ``change_seq`` sent as
@@ -191,8 +230,49 @@ class PreconditionFailed(ApiError):
         self.current: dict[str, Any] | None = cur if isinstance(cur, dict) else None
 
 
+class StaleProposal(ApiError):
+    """409 ``stale_proposal`` (keel #519): an accept found that a field the proposal names has moved
+    since it was made. Nothing was written and the proposal stays open. ``conflicts`` holds one
+    ``{field, base, current}`` per moved field (empty if a response ever lacks it); ``current`` is the
+    element as it is now (None if missing). A change to a field the proposal does not name never
+    counts. The proposer proposes again on the current text."""
+
+    def __init__(self, method: str, path: str, response: Response):
+        super().__init__(method, path, response)
+        env = _envelope(response.body)
+        raw = env.get("conflicts")
+        self.conflicts: list[dict[str, Any]] = [c for c in raw if isinstance(c, dict)] if isinstance(raw, list) else []
+        cur = env.get("current")
+        self.current: dict[str, Any] | None = cur if isinstance(cur, dict) else None
+
+
+class ProposedError(ApiError):
+    """A write answered 202 (keel #519): the world takes this agent seat's writes as proposals (its
+    owner's setting, ``agent_writes_proposed`` on ``GET /world``), so the element did NOT change.
+    ``proposal`` is the row the write became (None if a response ever lacks it); a keeper accepts or
+    declines it. Raised, not returned, so that no caller takes the answer for the element: a PATCH,
+    PUT or link edit that returned normally changed the element; this one did not. ``status`` is 202
+    and ``code`` None. A ``/bulk`` slot that says 202 is not raised: it stays in the result."""
+
+    def __init__(self, method: str, path: str, response: Response):
+        super().__init__(method, path, response)
+        raw = _envelope(response.body).get("proposal")
+        self.proposal: dict[str, Any] | None = raw if isinstance(raw, dict) else None
+        pid = self.proposal.get("id") if self.proposal else None
+        self.args = (
+            f"{method} {path} -> 202: proposed, not applied (proposal {pid}): this world takes this "
+            "agent seat's writes as proposals, and a keeper accepts or declines them",
+        )
+
+
 def api_error(method: str, path: str, response: Response) -> ApiError:
-    """The right ``ApiError`` for a non-2xx answer: ``PreconditionFailed`` for a 412 ``precondition_failed``."""
-    if response.status == 412 and error_code(response.body) == "precondition_failed":
+    """The right ``ApiError`` for an answer that is not the element: ``ProposedError`` for a 202,
+    ``PreconditionFailed`` for a 412 ``precondition_failed``, ``StaleProposal`` for a 409 ``stale_proposal``."""
+    if response.status == 202:
+        return ProposedError(method, path, response)
+    code = error_code(response.body)
+    if response.status == 412 and code == "precondition_failed":
         return PreconditionFailed(method, path, response)
+    if response.status == 409 and code == "stale_proposal":
+        return StaleProposal(method, path, response)
     return ApiError(method, path, response)

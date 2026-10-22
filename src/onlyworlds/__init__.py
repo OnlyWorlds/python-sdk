@@ -17,7 +17,7 @@ from ._schema import (
 )
 from ._version import __version__
 from .checks import CHECKS_FIELD, CheckRow, apply_checks
-from .errors import PreconditionFailed, parse_retry_after
+from .errors import PreconditionFailed, ProposedError, StaleProposal, parse_retry_after
 from .export import export_world
 from .folder import (
     FORMAT_VERSION,
@@ -81,11 +81,13 @@ __all__ = [
     "FolderElement",
     "Patch",
     "PreconditionFailed",
+    "ProposedError",
     "PushPlan",
     "PushResult",
     "Response",
     "RetryPolicy",
     "SkippedFile",
+    "StaleProposal",
     "Transport",
     "UrllibTransport",
     "WorldFile",

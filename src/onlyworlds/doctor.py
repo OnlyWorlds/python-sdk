@@ -43,6 +43,13 @@ read (``folder``, or the key's role). A known-of stub is not judged (its absent 
 unknown), and the rules are on a Law only: a charter of another type that carries them is a
 finding, its rules not read.
 
+On the API door only, (12) proposals waiting (keel #519): the open and the lapsed proposals in
+the world's queue (``GET /world/proposals``, paged through), one finding on the world when any
+wait, with both counts and the oldest open one's age in days. ``compared`` carries both counts and
+the view read (a keeper reads every proposal, any other member its own). A key with no member
+reads no queue (403 or 404): the flag does not run, and says why. A proposal's ``evidence`` is
+outside text and is never read into a finding.
+
 A flag the walk cannot evaluate is reported in ``not_run`` with its reason, never as clean,
 and every flag that ran says how much it could compare (``compared: {n, of}``): a clean
 count over nothing compared is not a pass. A known-of stub's absent fields are unknown,
@@ -103,6 +110,7 @@ __all__ = [
     "MESSAGE_SUPERTYPES",
     "PACKET_CAP",
     "PACKET_TOOL",
+    "PROPOSALS_FLAG",
     "Reader",
     "Report",
     "doctor_api",
@@ -115,6 +123,8 @@ __all__ = [
 
 #: The house-rules flag (the checks profile): read from every Charter on both doors.
 CHECKS_FLAG = "11"
+#: The proposals flag (keel #519): the world's queue, on the API door only.
+PROPOSALS_FLAG = "12"
 
 #: Flag id -> what it looks for. The ids are strings because flag 6 has two readings.
 FLAGS: dict[str, str] = {
@@ -130,6 +140,7 @@ FLAGS: dict[str, str] = {
     "9": "A format_version older than this package's",
     "10": "An api_key in a tracked world.json",
     CHECKS_FLAG: "House rules (the checks profile)",
+    PROPOSALS_FLAG: "Proposals waiting",
 }
 
 #: A finding on an element of these supertypes (compared case-folded) is ``kind: "message"``
@@ -149,6 +160,7 @@ _UNITS: dict[str, str] = {
     "9": "world.json format_version",
     "10": "world.json",
     CHECKS_FLAG: "house rules applied",
+    PROPOSALS_FLAG: "open and lapsed proposals read",
 }
 
 #: Fields that hold no prose even when the schema types them text.
@@ -183,7 +195,8 @@ _RELATION_FIELD: dict[str, str] = {
 
 
 class Reader(Protocol):
-    """The four reads the API door makes; ``Client`` is one. Nothing here writes."""
+    """The reads the API door makes; ``Client`` is one. Nothing here writes. A reader without
+    ``world_proposals`` (one written before keel #519) still works: flag 12 does not run."""
 
     def me(self) -> dict[str, Any]: ...
 
@@ -194,6 +207,16 @@ class Reader(Protocol):
     ) -> dict[str, Any]: ...
 
     def changes(self, *, since: str | None = None, limit: int | None = None) -> dict[str, Any]: ...
+
+    def world_proposals(
+        self,
+        *,
+        state: str | None = None,
+        since: str | None = None,
+        element: str | None = None,
+        limit: int | None = None,
+        cursor: str | None = None,
+    ) -> dict[str, Any]: ...
 
 
 @dataclass
@@ -645,6 +668,7 @@ def doctor_folder(folder: Folder, *, days: int = 14, changes: int = 50, now: _dt
     run.skip("2", "needs the feed's history of Title.holders")
     run.skip("7", "read marks are not in the folder")
     run.skip("8", "no feed in a folder")
+    run.skip(PROPOSALS_FLAG, "proposals are kept on the server, not in a folder")
     _file_side(run, folder)
     return run.done()
 
@@ -766,21 +790,77 @@ def _charters(run: _Run, els: list[_El], rows: list[dict[str, Any]], head: Any, 
     run.ran("8", found, len(charters))
 
 
+def _queue(client: Reader, state: str) -> list[dict[str, Any]]:
+    """Every row of the world's proposal queue in one state, paged through."""
+    rows: list[dict[str, Any]] = []
+    cursor: str | None = None
+    while True:
+        page = client.world_proposals(state=state, limit=_PAGE, cursor=cursor)
+        rows.extend(r for r in page.get("data", []) if isinstance(r, dict))
+        if not page.get("has_more"):
+            return rows
+        nxt = page.get("next_cursor")
+        if not isinstance(nxt, str) or not nxt or nxt == cursor:
+            raise ValueError("/world/proposals said has_more without a new next_cursor")
+        cursor = nxt
+
+
+def _proposals(run: _Run, client: Reader, *, view: str, now: _dt.datetime) -> None:
+    """Flag 12: the open and the lapsed proposals waiting for a keeper, one finding on the world."""
+    flag = PROPOSALS_FLAG
+    if getattr(client, "world_proposals", None) is None:
+        run.skip(flag, "this reader has no proposal queue read")
+        return
+    try:
+        waiting = {state: _queue(client, state) for state in ("open", "lapsed")}
+    except ApiError as exc:
+        if exc.status in (403, 404):
+            run.skip(
+                flag,
+                f"the proposal queue answered {exc.status}: a key with no member (the owner's read key, a "
+                "demo key) reads no queue, and a server before keel #519 has none",
+            )
+        else:
+            run.skip(flag, f"the proposal queue could not be read ({exc})")
+        return
+    except (ConnectionError, ValueError) as exc:
+        run.skip(flag, f"the proposal queue could not be read ({exc})")
+        return
+    opened, lapsed = len(waiting["open"]), len(waiting["lapsed"])
+    run.ran(flag, opened + lapsed, opened + lapsed, open=opened, lapsed=lapsed, view=view)
+    if not opened and not lapsed:
+        return
+    dated = [(t, r) for r in waiting["open"] if (t := _time(r.get("created_at"))) is not None]
+    oldest = min(dated, key=lambda tr: tr[0]) if dated else None
+    reason = f"{opened} proposals open and {lapsed} lapsed, waiting for a keeper"
+    evidence: dict[str, Any] = {"open": opened, "lapsed": lapsed, "oldest_open_days": None, "oldest_open": None}
+    if oldest is not None:
+        days = (now - oldest[0]).days
+        reason += f"; the oldest open one is {days} days old"
+        row = oldest[1]
+        evidence["oldest_open_days"] = days
+        evidence["oldest_open"] = {k: row.get(k) for k in ("id", "element_type", "element_id")}
+    run.find(flag, None, reason, evidence)
+
+
 def doctor_api(client: Reader, *, days: int = 14, changes: int = 50, now: _dt.datetime | None = None) -> Report:
-    """Check the key's world through the API: ``me``, ``get_world``, every type's list and the
-    feed. Reads only. A failure to read the world or a list raises (``ApiError``,
-    ``ConnectionError``, ``ValueError``); a feed that cannot be read makes flags 2 and 8 ``not_run``."""
+    """Check the key's world through the API: ``me``, ``get_world``, every type's list, the feed
+    and the proposal queue. Reads only. A failure to read the world or a list raises (``ApiError``,
+    ``ConnectionError``, ``ValueError``); a feed that cannot be read makes flags 2 and 8 ``not_run``,
+    a queue that cannot be read flag 12."""
     world = client.get_world()
     try:
         role = client.me().get("role")
     except (ApiError, ValueError):
         role = None
+    view = role if isinstance(role, str) and role else "unknown"
+    at = now or _dt.datetime.now(_dt.UTC)
     run = _Run({"id": world.get("id"), "name": world.get("name"), "door": "api"})
     els: list[_El] = []
     for t in ELEMENT_TYPES:
         els.extend(_El(t, b["id"], b) for b in _list_all(client, t) if isinstance(b.get("id"), str))
-    _walk(run, els, days=days, now=now or _dt.datetime.now(_dt.UTC), whole_view=role != "guest")
-    _house_rules(run, els, view=role if isinstance(role, str) and role else "unknown")
+    _walk(run, els, days=days, now=at, whole_view=role != "guest")
+    _house_rules(run, els, view=view)
     try:
         rows, head = _feed(client)
     except (ApiError, ConnectionError, ValueError) as exc:
@@ -790,6 +870,7 @@ def doctor_api(client: Reader, *, days: int = 14, changes: int = 50, now: _dt.da
     else:
         _title_history(run, els, rows)
         _charters(run, els, rows, head, changes=changes)
+    _proposals(run, client, view=view, now=at)
     run.skip("7", "read marks are not readable through the API")
     run.skip("9", "a file-side check: the API door reads no world.json")
     run.skip("10", "a file-side check: the API door reads no world.json")
@@ -828,6 +909,8 @@ def _lines(report: Report) -> Iterable[str]:
             counted += f" (not compared: {skipped}, types with under two text fields beside description)"
         if c and flag == CHECKS_FLAG:
             counted += f" ({_rules_note(c)})"
+        if c and flag == PROPOSALS_FLAG:
+            counted += f" (open: {c['open']}, lapsed: {c['lapsed']}; view: {c['view']})"
         yield f"  {flag}. {FLAGS[flag]}{counted}"
         if c and flag == CHECKS_FLAG:
             yield from _rule_lines(c)
