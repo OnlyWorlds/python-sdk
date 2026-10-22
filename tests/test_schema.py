@@ -43,7 +43,8 @@ def test_twenty_two_types_agree_with_the_dist_files() -> None:
 
 def test_field_kinds() -> None:
     assert set(FIELD_KINDS) == set(ELEMENT_TYPES)
-    assert sum(len(v) for v in FIELD_KINDS.values()) == 466  # 355 walked + 22 x 5 base + the generic pair's extra half
+    assert sum(len(v) for v in FIELD_KINDS.values()) == 467  # 356 walked + 22 x 5 base + the generic pair's extra half
+    assert FIELD_KINDS["zone"]["shape"] == "text"
     assert FIELD_KINDS["pin"]["map"] == "single_link"
     assert FIELD_KINDS["pin"]["element_id"] == "single_link"
     assert FIELD_KINDS["character"]["name"] == "text"

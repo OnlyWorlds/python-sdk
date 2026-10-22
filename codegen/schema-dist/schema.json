@@ -2737,6 +2737,13 @@
         "required": false
       },
       {
+        "name": "shape",
+        "kind": "scalar_str",
+        "desc": "How the zone's markers are joined: polygon (a closed area: the last marker joins the first) or line (an open path, drawn in marker order). Lowercase. Empty, absent, or any other value means the shape is not stated, and a reader draws a polygon",
+        "section": "Scope",
+        "required": false
+      },
+      {
         "name": "start_date",
         "kind": "scalar_int",
         "desc": "Date when the zone becomes extant or relevant, defined in world TIME units",

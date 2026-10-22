@@ -2,6 +2,11 @@
 
 The package version runs on its own semver; the schema it is generated from is `SCHEMA_DIST_TAG`.
 
+## 0.18.0 (2026-10-22)
+
+- **Added: `Zone.shape`** (canonical 00.33.00, a minor step of the standard): a string in Zone's Scope section beside `role`, saying how the zone's markers are joined. `"polygon"` is a closed area (the last marker joins the first), `"line"` an open path drawn in marker order; lowercase. Empty, absent or any other value means not stated, and a reader draws a polygon. Generated into `FIELD_KINDS["zone"]` as `"shape": "text"` and into Zone's `Scope` entry of `SECTIONS`; `SCHEMA_VERSION` is `"00.33.00"`.
+- **Schema repinned to schema-dist `v0.33.0-dist.43`** (`SCHEMA_DIST_TAG`, `SCHEMA_DIST_SERIAL` and `SCHEMA_MANIFEST_SHA256` move with it). Only `schema/zone.yaml` and `schema.json` moved, by the one field; `VERSION`, `README.md`, `example/world-export.json` and `MANIFEST.json` carry the new version; nothing else. The same pin as the npm SDK's 4.54.0.
+
 ## 0.17.1 (2026-10-22)
 
 - **Schema repinned to schema-dist `v0.32.2-dist.42`** (canonical 00.32.02 unchanged: no schema file moved; `SCHEMA_DIST_TAG`, `SCHEMA_DIST_SERIAL` and `SCHEMA_MANIFEST_SHA256` move with it). Serial 42 adds one case to the `.owworld` conformance set, `fail-OW-6-marker-bom`, a `mimetype` marker that starts with a byte order mark (81 cases now), with its row in `verdicts.json` and its generator; nothing else. The reader already refused it as `marker` and needed no change. The same pin as the npm SDK's 4.53.3.
