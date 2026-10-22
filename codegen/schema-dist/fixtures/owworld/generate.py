@@ -576,6 +576,11 @@ def fixtures():
         test="OW-14", reader="refuse", reason="too_big",
         rule="A stored entry declares 64 bytes and holds %d (Kael, h58 #9829): the same lie as a deflated one, the "
              "same cause." % len(PNG))
+    add("fail-OW-14-stored-short.owworld",
+        build_zip(base() + [Entry(TOP + "media/short.png", PNG, method=0, declared_size=len(PNG) + 64)]),
+        test="OW-14", reader="refuse", reason="not_openable",
+        rule="A stored entry declares %d bytes and holds %d: fewer than it declares is a broken entry, not_openable "
+             "(only more is too_big; Skeld h58 #9944)." % (len(PNG) + 64, len(PNG)))
     crc_body = element(0xc1, "Crc")
     add("fail-OW-14-crc.owworld",
         build_zip(base() + [Entry(TOP + "elements/character/crc--0000abc1.json", crc_body,

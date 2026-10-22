@@ -2,6 +2,10 @@
 
 The package version runs on its own semver; the schema it is generated from is `SCHEMA_DIST_TAG`.
 
+## 0.16.1 (2026-10-22)
+
+- **Schema repinned to schema-dist `v0.32.2-dist.41`** (canonical 00.32.02 unchanged: no schema file moved; `SCHEMA_DIST_TAG`, `SCHEMA_DIST_SERIAL` and `SCHEMA_MANIFEST_SHA256` move with it). Serial 41 adds one case to the `.owworld` conformance set, `fail-OW-14-stored-short` (80 cases now), with its row in `verdicts.json` and its generator; nothing else. The same pin as the npm SDK's 4.53.1.
+
 ## 0.16.0 (2026-10-22)
 
 - **The producer line** (folder format v0.3.14, §4.2, Keel #477): `export_world` writes `producer` beside `source`, `{"tool": "onlyworlds", "version": <this package's version>, "input": "server"}` (`EXPORT_PRODUCER`). An export is always a folder's birth (the writer never writes over a folder), so the line is always the export's own, also when a `GET /world` body carries another folder's. A folder written from a read one (a branch, a copy) keeps its maker's `producer` verbatim, and one with none gets none: a later writer never invents it. An `input` word the package does not know reads like any other. A tool that runs the export in its own name passes `producer=` (keel's nightly snapshots: `{"tool": "keel", "version": ..., "input": "server"}`), written in place of the package's line on the folder it makes; only the shape is checked (exactly `tool`, `version`, `input`, each a non-empty string, `input` any word), a ValueError before anything is read, and it never replaces a line a folder already carries. The OKF export carries `producer` into `world.md` beside `source` and `exported_as`.

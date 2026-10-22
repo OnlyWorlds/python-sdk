@@ -500,6 +500,17 @@
       "bytes": 2613
     },
     {
+      "file": "fail-OW-14-stored-short.owworld",
+      "test": "OW-14",
+      "role": "reader",
+      "reader": "refuse",
+      "writer": "refuse",
+      "rule": "A stored entry declares 137 bytes and holds 73: fewer than it declares is a broken entry, not_openable (only more is too_big; Skeld h58 #9944).",
+      "reason": "not_openable",
+      "sha256": "c260c8122affc5d37ec0d86f308b15d7e4985e0d1771d61d487a189544849a07",
+      "bytes": 2615
+    },
+    {
       "file": "fail-OW-14-crc.owworld",
       "test": "OW-14",
       "role": "reader",
