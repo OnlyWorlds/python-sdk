@@ -136,6 +136,17 @@ print(report.elements, "elements,", len(report.notes), "notes")
 
 The output directory must not exist yet. Anything the export leaves out (a file that isn't an element, a key that isn't a field, a link to the wrong type) is listed in `report.notes`; the command prints these on stderr. The same folder always gives the same bytes. What a bundle never carries: the server's bookkeeping (`change_seq`, `created_at`, who wrote what) and the world's key, so a bundle is a copy to read elsewhere, not a folder to sync.
 
+## The Markdown pack
+
+A world as a few merged Markdown files, sized for an AI notebook with source caps (NotebookLM: 50 sources a notebook, 500,000 words a source; Claude Projects: 30 MB a file). No extra needed:
+
+```bash
+python -m onlyworlds.pack moppetopia moppetopia-pack          # a world folder
+OW_API_KEY=ow_r_… python -m onlyworlds.pack --api moppetopia-pack   # the key's world
+```
+
+`00-world.md` holds the world's own fields and an index of every element; then one file per element type, each element a `## Name` section with its fields in schema order and every link written as the name and type of what it points to. Room elements and extension fields are left out unless asked (`--rooms`, `--extensions`); a file past a cap splits into parts, and small files merge when the parts would pass the source cap (`--words`, `--bytes`, `--files`). Nothing is invented and nothing is cut: an unresolved link stays as its id, an oversize element gets a file of its own. The output directory must not exist yet; the same world gives the same bytes. Beside it: the OKF bundle (above) is one file per element with frontmatter and links as paths, for knowledge tools that follow links; the pack is merged prose for a notebook that reads it whole.
+
 ## The doctor
 
 The doctor checks a world and reports what its keeper should look at, each finding with the element and the reason. It only reads: it never changes a file or sends a write.
