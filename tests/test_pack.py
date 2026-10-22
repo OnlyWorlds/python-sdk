@@ -470,3 +470,58 @@ def test_the_api_command_line_when_nothing_can_be_read(tmp_path: Path, monkeypat
     code, _, err = run_main(["--api", str(tmp_path / "out")])
     assert code == 2 and "nothing could be read: no answer" in err
     assert not (tmp_path / "out").exists()
+
+
+# --- the label line: which kind of key made the pack (h58 #10628, #10631)
+
+
+def test_the_world_file_says_which_kind_of_key_made_the_pack() -> None:
+    owner = {"kind": "owner", "role": "owner", "character": None}
+    member = {"kind": "member", "role": "co_builder", "character": None}
+    named = {"kind": "character", "role": "guest", "character": {"id": C1, "name": "Ann"}}
+    unnamed = {"kind": "character", "role": "guest", "character": None}
+    assert pack.made_by_line(owner) == "*Made with the owner's key: the whole world.*"
+    assert pack.made_by_line(member) == "*Made with a member's key (co-builder): that member's view of the world.*"
+    assert pack.made_by_line(named) == "*Made as the Character Ann: that Character's view, not the whole world.*"
+    assert pack.made_by_line(unnamed) == "*Made as a Character: that Character's view, not the whole world.*"
+    assert pack.made_by_line(None) is None and pack.made_by_line({"kind": "elsewhere"}) is None
+    files, _ = built(exported_as=owner)
+    text = files["00-world.md"]
+    assert "*Made with the owner's key: the whole world.*\n\n**Id:**" in text
+    assert "**Description:**" in text  # the fields follow it
+    plain, _ = built()
+    assert "Made with" not in plain["00-world.md"]  # no slice known: no line, never a guess
+    assert "ow_" not in text  # a kind, never a key
+
+
+def test_a_folder_with_an_exported_as_line_packs_it_and_the_api_asks_me(tmp_path: Path) -> None:
+    meta = {k: v for k, v in WORLD.items() if k != "api"} | {
+        "exported_as": {"kind": "member", "role": "contributor", "character": None}
+    }
+    root = tmp_path / "w"
+    by_type: dict[str, list[dict[str, Any]]] = {}
+    for t, b in world():
+        by_type.setdefault(t, []).append(dict(b))
+    write_folder(root, meta, by_type)
+    out = tmp_path / "pack"
+    pack_folder(root, out)
+    assert "*Made with a member's key (contributor): that member's view of the world.*" in (
+        out / "00-world.md"
+    ).read_text(encoding="utf-8")
+
+    class Reader:
+        def me(self) -> dict[str, Any]:
+            return {"kind": "person", "role": "guest", "membership": "m1", "character": C1}
+
+        def get_world(self) -> dict[str, Any]:
+            return dict(WORLD)
+
+        def list_page(self, element_type: str, **kw: Any) -> dict[str, Any]:
+            data = [dict(b) for t, b in world() if t == element_type]
+            return {"data": data, "has_more": False, "next_cursor": None}
+
+    out2 = tmp_path / "pack-api"
+    pack_api(Reader(), out2)
+    assert "*Made as the Character Ann: that Character's view, not the whole world.*" in (
+        out2 / "00-world.md"
+    ).read_text(encoding="utf-8")

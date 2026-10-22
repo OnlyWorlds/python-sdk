@@ -2,6 +2,10 @@
 
 The package version runs on its own semver; the schema it is generated from is `SCHEMA_DIST_TAG`.
 
+## 0.26.1 (2026-10-22)
+
+- **The pack says which kind of key made it.** `00-world.md`'s opening carries one more line: "Made with the owner's key: the whole world", "Made with a member's key (contributor): that member's view", "Made as the Character Ann: that Character's view, not the whole world", or the public view; from `/me` on `--api` (mapped as `export.exported_as` maps it, the Character's name from the Characters read) and from `world.json`'s `exported_as` on a folder; no line when neither says, never a guess, never the key. A label, not a fix: a pack holds only what its key was served (Boss's four-way leak walk, h58 #10628: owner, contributor and guest packs, the hidden element absent from the last two). `pack_world` and `build_pack` take `exported_as=`.
+
 ## 0.26.0 (2026-10-22)
 
 - **The proposed change** (keel #519, PR 180, live 2026-10-22 16:25). `propose(type, id, fields, *, evidence, expires=None, idempotency_key=None)` (any member key that reads the element; `fields` cleaned as `patch` cleans a body, a known-of stub refused; an `Idempotency-Key` always sent, yours or a fresh one, as `create` does; `expires` an ISO string or a datetime), `list_proposals(type, id, ...)`, `world_proposals(state=None, since=None, element=None, limit=None, cursor=None)` and `walk_world_proposals(...)` (the queue, newest first; keepers see every row, others their own), `accept_proposal(type, id, pid)` (`{proposal, element}`: the keeper's own write, one feed row; no `Idempotency-Key`, the document declares none, so a retry after a lost answer can meet a 422 on a decided row), `decline_proposal(type, id, pid, reason=None)` and `withdraw_proposal(type, id, pid)` (204). `X-OW-Client` on propose and accept, where the document lists it; `X-OW-Agent` on none.

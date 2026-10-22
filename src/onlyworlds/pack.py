@@ -76,6 +76,7 @@ from ._schema import (
 )
 from .doctor import _LEGACY_LINK_SPELLINGS, Reader, _list_all
 from .errors import ApiError
+from .export import exported_as as _exported_as
 from .folder import KNOWN_OF, WORLD_FILE, Folder, is_known_of, read_folder
 from .http import API_BASE, Client
 from .push import NOT_SENT
@@ -107,6 +108,29 @@ INTRO_LINE = (
     "the other files hold the elements, by type. A link between elements is written as the name and type "
     "of the element it points to.*"
 )
+
+
+def made_by_line(exported_as: Mapping[str, Any] | None) -> str | None:
+    """The one line saying which kind of key made the pack (a label, never a fix: a pack holds only
+    what its key was served; Boss's four-way walk, h58 #10628). From the folder's ``exported_as``
+    (spec 4.2) or ``/me`` on the API; None, and no line, when the slice is not known. Never the key."""
+    if not isinstance(exported_as, Mapping):
+        return None
+    kind, role = exported_as.get("kind"), exported_as.get("role")
+    if kind == "owner":
+        return "*Made with the owner's key: the whole world.*"
+    if kind == "member" and isinstance(role, str) and role:
+        return f"*Made with a member's key ({role.replace('_', '-')}): that member's view of the world.*"
+    if kind == "character":
+        ch = exported_as.get("character")
+        name = ch.get("name") if isinstance(ch, Mapping) else None
+        who = f"the Character {name}" if isinstance(name, str) and name else "a Character"
+        return f"*Made as {who}: that Character's view, not the whole world.*"
+    if kind == "public":
+        return "*Made from the public view: only what the world shows everyone.*"
+    return None
+
+
 #: A merged file past this many types is named by its first and last type.
 _NAME_TYPES = 4
 #: An index line's first sentence is cut at this many characters.
@@ -372,16 +396,19 @@ def world_parts(
     extensions: bool,
     words: int,
     bytes_: int,
+    exported_as: Mapping[str, Any] | None = None,
 ) -> list[_Part]:
     """00-world.md: the world's fields, then the index, one line per element by type. Past a cap,
     parts at index-line boundaries: the fields in the first, each later part headed
     ``## Index (continued)``, a type's heading repeated ``(continued)`` where it runs on."""
     fields = _world_fields(world, w, extensions=extensions)
+    made = made_by_line(exported_as)
+    intro = f"{INTRO_LINE}\n\n{made}" if made else INTRO_LINE
     items = [(slug, _name(b), _index_line(b, w) + "\n") for slug in ELEMENT_TYPES for b in index.get(slug, [])]
 
     def head(k: int, n: int) -> str:
         top = f"# {title}" + (f" (part {k} of {n})" if n > 1 else "")
-        return f"{top}\n\n{INTRO_LINE}\n\n{fields}## Index\n" if k == 1 else f"{top}\n\n## Index (continued)\n"
+        return f"{top}\n\n{intro}\n\n{fields}## Index\n" if k == 1 else f"{top}\n\n## Index (continued)\n"
 
     def type_head(slug: str, continued: bool) -> str:
         return f"\n### {PLURALS.get(slug, slug.capitalize())}{' (continued)' if continued else ''}\n\n"
@@ -407,7 +434,7 @@ def world_parts(
         return whole
     digits = "9" * len(str(len(items) + 1))
     probe = f"{title} (part {digits} of {digits})"
-    first_head = _count(f"# {probe}\n\n{INTRO_LINE}\n\n{fields}## Index\n")
+    first_head = _count(f"# {probe}\n\n{intro}\n\n{fields}## Index\n")
     later_head = _count(f"# {probe}\n\n## Index (continued)\n")
     groups: list[list[int]] = []
     cur: list[int] = []
@@ -520,11 +547,13 @@ def build_pack(
     rooms: bool = False,
     extensions: bool = False,
     note: Note | None = None,
+    exported_as: Mapping[str, Any] | None = None,
 ) -> tuple[dict[str, str], PackReport]:
     """Every file as {name: text}, in order, and the report. Writes nothing.
 
     ``elements`` are (type slug, body). ``note`` is called with each note as it is made (they are
-    also in ``report.notes``). Raises ValueError when a cap is below 1.
+    also in ``report.notes``). ``exported_as`` (spec 4.2's line, or None) puts one line in the world
+    file saying which kind of key made the pack. Raises ValueError when a cap is below 1.
     """
     for flag, cap in (("words", words), ("bytes", bytes_), ("files", files)):
         if not isinstance(cap, int) or cap < 1:
@@ -569,7 +598,9 @@ def build_pack(
     report.elements = sum(len(b) for b in kept.values())
     report.types = len(kept)
 
-    head = world_parts(world, world_title, kept, w, extensions=extensions, words=words, bytes_=bytes_)
+    head = world_parts(
+        world, world_title, kept, w, extensions=extensions, words=words, bytes_=bytes_, exported_as=exported_as
+    )
     report.files_over = not _merge(units, files - len(head) + 1, words, bytes_)
 
     named: list[tuple[str, _Part, bool]] = []  # (file name, part, a world part)
@@ -612,6 +643,7 @@ def pack_world(
     rooms: bool = False,
     extensions: bool = False,
     note: Note | None = None,
+    exported_as: Mapping[str, Any] | None = None,
 ) -> PackReport:
     """Pack a world (its ``GET /world`` body or ``world.json``, and its elements as (type slug,
     body)) into ``out``, which must not exist (``FileExistsError``). Nothing is written unless the
@@ -620,7 +652,15 @@ def pack_world(
     if path.exists():
         raise FileExistsError(f"{path}: already exists; give a new directory")
     texts, report = build_pack(
-        world, elements, words=words, bytes_=bytes_, files=files, rooms=rooms, extensions=extensions, note=note
+        world,
+        elements,
+        words=words,
+        bytes_=bytes_,
+        files=files,
+        rooms=rooms,
+        extensions=extensions,
+        note=note,
+        exported_as=exported_as,
     )
     path.mkdir(parents=True, exist_ok=False)
     for name, text in texts.items():
@@ -676,7 +716,7 @@ def pack_folder(
     elements = _folder_elements(folder, noted)
     report = pack_world(
         folder.world, elements, out, words=words, bytes_=bytes_, files=files, rooms=rooms, extensions=extensions,
-        note=note,
+        note=note, exported_as=folder.world.get("exported_as"),
     )  # fmt: skip
     report.notes[:0] = early
     return report
@@ -701,8 +741,27 @@ def pack_api(
         raise FileExistsError(f"{path}: already exists; give a new directory")
     world = client.get_world()
     elements = [(t, b) for t in ELEMENT_TYPES for b in _list_all(client, t)]
+    # Which kind of key made the pack (the label line): /me, mapped as export.exported_as maps it,
+    # a Character's name from the Characters read; no /me, no line.
+    try:
+        me: Mapping[str, Any] | None = client.me()
+    except (ApiError, ConnectionError, ValueError, AttributeError):
+        me = None
+    names = {
+        str(b.get("id")): str(b.get("name")) for t, b in elements if t == "character" and isinstance(b.get("name"), str)
+    }
+    slice_ = _exported_as(me, names.get)
     return pack_world(
-        world, elements, path, words=words, bytes_=bytes_, files=files, rooms=rooms, extensions=extensions, note=note
+        world,
+        elements,
+        path,
+        words=words,
+        bytes_=bytes_,
+        files=files,
+        rooms=rooms,
+        extensions=extensions,
+        note=note,
+        exported_as=slice_,
     )
 
 
