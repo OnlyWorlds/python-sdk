@@ -451,7 +451,10 @@ class Client:
         self, method: str, path: str, payload: Any = None, headers: Mapping[str, str] | None = None
     ) -> Response:
         sent = dict(self._headers)
-        if self._pin is not None and self._sends_pin(method, path):
+        if path.split("?", 1)[0].strip("/") == "health":
+            # The one route keel answers without a key (no security in its document): no credential rides.
+            del sent["API-Key"]
+        elif self._pin is not None and self._sends_pin(method, path):
             sent["API-Pin"] = self._pin
         if headers:
             sent.update(headers)

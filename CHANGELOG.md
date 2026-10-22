@@ -2,6 +2,11 @@
 
 The package version runs on its own semver; the schema it is generated from is `SCHEMA_DIST_TAG`.
 
+## 0.29.1 (2026-10-22)
+
+- **`health()` sends no credential.** keel's document gives `GET /health` no security, and the client sent its `API-Key` there (and a 10-digit key's PIN) on every pulse; it now sends neither, as the npm SDK does. Found by the new wire test below.
+- **The wire test reads every header from keel's document.** Every call, as an agent too, sends only headers its operation declares (a header parameter or a credential of its security schemes), and every operation the document says takes `If-Match` is one a call sends it on: today `PATCH`, `DELETE` and the links route on all 22 types. The list is the document's own, never one kept in the test (a hand list of two missed `DELETE` in the npm gate the hour keel #563 gave it the header). Each clause watched failing on its own mutant: `if_match` dropped from `delete`, from `edit_links`, and the key put back on `health`.
+
 ## 0.29.0 (2026-10-22)
 
 - **`delete(..., if_match=)`** (keel #563, PR 183, live 2026-10-22 21:3x): `DELETE` reads `If-Match` exactly as `PATCH` does. With the element's `change_seq` as you read it, a delete of an element someone changed since raises `PreconditionFailed` (412) with `current`, nothing deleted; on an element already gone it is the idempotent 204. Under a world's proposals switch a delete is never a proposal. A test sends it and leaves it out, watched failing with the header dropped. The wire test holds no header parameter yet; the npm SDK's wire gate reads keel's document for every operation that takes `If-Match`.

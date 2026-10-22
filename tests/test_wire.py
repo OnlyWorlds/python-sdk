@@ -110,7 +110,7 @@ def _json_type(schema: Mapping[str, Any]) -> str:
     return "|".join(str(k) for k in kinds)
 
 
-def _recorder() -> tuple[Client, FakeTransport]:
+def _recorder(*, agent: bool = False) -> tuple[Client, FakeTransport]:
     everything = {
         "id": ID,
         "name": "x",
@@ -124,11 +124,11 @@ def _recorder() -> tuple[Client, FakeTransport]:
         "element": {"id": ID},
     }
     t = FakeTransport(handler=lambda *a: jresp(200, everything))
-    return Client("ow_w_testkey", "1234", transport=t), t
+    return Client("ow_w_testkey", "1234", transport=t, agent=agent), t
 
 
-def test_every_route_and_query_parameter_the_client_sends_exists(doc: dict[str, Any]) -> None:
-    c, t = _recorder()
+def _every_call(c: Client) -> None:
+    """Every call the client makes, each optional header it can add switched on once."""
     c.health()
     c.me()
     c.get_world()
@@ -144,14 +144,31 @@ def test_every_route_and_query_parameter_the_client_sends_exists(doc: dict[str, 
         c.get(ty, ID, expand=["a"], fields=["name"])
         c.create(ty, {"name": "x"})
         c.upsert(ty, ID, {"name": "x"})
-        c.patch(ty, ID, {"name": "x"})
-        c.delete(ty, ID)
-        c.edit_links(ty, ID, "friends", add=[ID])
+        c.patch(ty, ID, {"name": "x"}, if_match=3)
+        c.delete(ty, ID, if_match=3)
+        c.edit_links(ty, ID, "friends", add=[ID], if_match=3)
         c.propose(ty, ID, {"name": "x"}, evidence="e", expires="2026-12-01T00:00:00Z")
         c.list_proposals(ty, ID, state="all", since="2026-10-22T00:00:00Z", limit=1, cursor="c")
         c.accept_proposal(ty, ID, ID)
         c.decline_proposal(ty, ID, ID, reason="r")
         c.withdraw_proposal(ty, ID, ID)
+
+
+def _declared_headers(doc: dict[str, Any], op: Mapping[str, Any]) -> set[str]:
+    """An operation's header parameters, and the headers of its security schemes (the credentials)."""
+    schemes = doc["components"]["securitySchemes"]
+    declared = {p["name"] for p in op.get("parameters", []) if p["in"] == "header"}
+    return declared | {
+        schemes[name]["name"]
+        for alternative in op.get("security", doc.get("security") or [])
+        for name in alternative
+        if schemes[name].get("in") == "header"
+    }
+
+
+def test_every_route_and_query_parameter_the_client_sends_exists(doc: dict[str, Any]) -> None:
+    c, t = _recorder()
+    _every_call(c)
     problems: list[str] = []
     for call in t.calls:
         op = doc["paths"].get(_norm(call.url), {}).get(call.method.lower())
@@ -165,6 +182,43 @@ def test_every_route_and_query_parameter_the_client_sends_exists(doc: dict[str, 
     assert not problems, "\n".join(problems[:20])
 
 
+#: HTTP's own headers, which no operation declares.
+HTTP_OWN = {"Accept", "User-Agent", "Content-Type"}
+
+
+def test_every_header_the_client_sends_is_declared_on_its_operation(doc: dict[str, Any]) -> None:
+    """Every call, as an agent too, sends only headers its operation declares: a header parameter or a
+    credential of its security schemes. A header keel reads but the document does not declare shows here."""
+    problems: list[str] = []
+    for agent in (False, True):
+        c, t = _recorder(agent=agent)
+        _every_call(c)
+        for call in t.calls:
+            op = doc["paths"][_norm(call.url)][call.method.lower()]
+            extra = set(call.headers) - HTTP_OWN - _declared_headers(doc, op)
+            problems += [f"{call.method} {_norm(call.url)} sends {h}, not declared" for h in sorted(extra)]
+    assert not problems, "\n".join(sorted(set(problems))[:20])
+
+
+def test_every_operation_that_takes_if_match_is_one_the_client_sends_it_on(doc: dict[str, Any]) -> None:
+    """keel #210, #563: the operations that read ``If-Match`` are the document's own list, never one kept
+    here (a hand list of two missed DELETE the hour keel gave it the header). Each must be reached by a
+    call that sends it, and the client sends it nowhere else (the test above)."""
+    takes = {
+        (route, method.upper())
+        for route, ops in doc["paths"].items()
+        for method, op in ops.items()
+        if isinstance(op, Mapping)
+        and any(p["in"] == "header" and p["name"] == "If-Match" for p in op.get("parameters", []))
+    }
+    assert takes, "the document declares If-Match nowhere: the reference moved, not the client"
+    c, t = _recorder()
+    _every_call(c)
+    sends = {(_norm(call.url), call.method) for call in t.calls if "If-Match" in call.headers}
+    missing = sorted(f"{m} {r}" for r, m in takes - sends)
+    assert not missing, "the document takes If-Match where the client cannot send it:\n" + "\n".join(missing[:20])
+
+
 def test_the_proposal_calls_send_only_declared_headers_and_bodies(doc: dict[str, Any]) -> None:
     """keel #519: each proposal call's extra headers are parameters of its operation, and each body's
     keys are properties of its request schema (which allow no others)."""
@@ -174,18 +228,11 @@ def test_the_proposal_calls_send_only_declared_headers_and_bodies(doc: dict[str,
     c.decline_proposal("location", ID, ID, reason="r")
     c.withdraw_proposal("location", ID, ID)
     base = set(c._headers) | {"Content-Type"}
-    schemes = doc["components"]["securitySchemes"]
     problems: list[str] = []
     for call in t.calls:
         op = doc["paths"][_norm(call.url)][call.method.lower()]
-        declared = {p["name"] for p in op.get("parameters", []) if p["in"] == "header"}
         # Credentials (API-Pin since the PIN rides only where checked) are the operation's security schemes.
-        declared |= {
-            schemes[name]["name"]
-            for alternative in op.get("security", doc.get("security") or [])
-            for name in alternative
-            if schemes[name].get("in") == "header"
-        }
+        declared = _declared_headers(doc, op)
         problems += [
             f"{call.method} {_norm(call.url)} sends {h}, not declared" for h in set(call.headers) - base - declared
         ]

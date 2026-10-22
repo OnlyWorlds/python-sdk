@@ -110,6 +110,14 @@ def test_the_rule_is_derived_from_the_request(key: str, method: str, path: str, 
     assert ("API-Pin" in t.calls[0].headers) is pinned
 
 
+@pytest.mark.parametrize("key", ["ow_w_testkey", "0123456789"])
+def test_health_carries_no_credential(key: str) -> None:
+    """keel's document gives ``GET /health`` no security: neither the key nor the PIN rides there."""
+    t = FakeTransport(handler=lambda *a: jresp(200, {"status": "ok"}))
+    Client(key, "1234", transport=t).health()
+    assert not {"API-Key", "API-Pin"} & set(t.calls[0].headers)
+
+
 def test_repr_never_prints_credentials() -> None:
     shown = repr(Client("ow_w_secretkey", "9876"))
     assert "secretkey" not in shown and "9876" not in shown
