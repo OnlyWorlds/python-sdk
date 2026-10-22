@@ -342,6 +342,25 @@ def base_files():
     return {rel: data for rel, data in files.items() if rel not in DIAGNOSTIC_DROP}
 
 
+PRIVATE_PRODUCER = "fold"
+
+
+def private_files():
+    """The base world plus a second producer marked private (section 4.5 rule 11): the private case's source. Its
+    manifest names both producers; its directory holds a history spine keyed to an element id (rule 12) and a
+    dot-file. The base world itself never changes, so no other fixture's bytes move."""
+    files = base_files()
+    files["records/RECORDS.json"] = jbytes([
+        {"producer": "lab", "format": "binary ledger rows", "version": "1", "deltas": False},
+        {"producer": PRIVATE_PRODUCER, "format": "a history spine, JSON Lines keyed to element ids", "version": "1",
+         "deltas": False, "private": True},
+    ])
+    files["records/fold/spine.jsonl"] = (b'{"element": "0695db83-0000-7000-8000-00000000ab02", '
+                                         b'"note": "the abbot keeps the keys"}\n')
+    files["records/fold/.head"] = b"1\n"
+    return files
+
+
 def world_entries(files, top=TOP, **kw):
     return [Entry(top + rel, data, **kw) for rel, data in files.items()]
 
@@ -375,10 +394,14 @@ def fixtures():
     F = []
 
     def add(file, content, *, test, rule, reader="accept", writer=None, role="reader", reason=None, open_=None,
-            lean=None, covers=None, roundtrip=False, strips=None, should=None, budget=None):
+            lean=None, covers=None, roundtrip=False, strips=None, should=None, budget=None, source=None, side=None):
         if writer is None:
             writer = "accept" if reader == "accept" else "refuse"
         v = {"file": file, "test": test, "role": role, "reader": reader, "writer": writer, "rule": rule}
+        if source:
+            v["source"] = source
+        if side:
+            v["side"] = side
         if reason:
             v["reason"] = reason
         if strips:
@@ -515,6 +538,37 @@ def fixtures():
     add("fail-OW-8-producer-meta-dropped.owworld", build_zip(base(drop=["records/lab/ledger.bin.meta"])),
         test="OW-8", role="writer", writer="refuse",
         rule="Writer: the producer's own ledger.bin.meta dropped as if it were Unity's litter.")
+
+    # -- OW-8: private records (section 4.5 rule 11): left out unless asked, whole either way (writer, two-sided) ---
+    # One source (private_files: the base plus the private producer fold), two sides a writer may emit, and the two
+    # ways to get it wrong. The manifest travels byte-exact on both sides: the entry stays, only the directory goes.
+    priv = private_files()
+    fold = "records/%s/" % PRIVATE_PRODUCER
+
+    def private_world(drop=(), replace=None):
+        files = {rel: data for rel, data in priv.items() if rel not in drop}
+        files.update(replace or {})
+        return build_zip(world_entries(files))
+
+    add("pass-OW-8-private-left-out.owworld",
+        private_world(drop=[rel for rel in priv if rel.startswith(fold)]), test="OW-8", role="writer",
+        source="private", side="default",
+        rule="Writer, the default side: records/fold/ is marked private in RECORDS.json, so an export, share or "
+             "snapshot leaves the whole directory out; RECORDS.json travels byte-exact, its fold entry kept.")
+    add("pass-OW-8-private-asked.owworld", private_world(), test="OW-8", role="writer", source="private",
+        side="asked",
+        rule="Writer, the asked side: the caller asked for private records, so records/fold/ travels whole and "
+             "byte-exact, its dot-file included, like any producer's.")
+    add("fail-OW-8-private-partial.owworld", private_world(drop=[fold + "spine.jsonl"]), test="OW-8",
+        role="writer", writer="refuse", source="private",
+        rule="Writer: records/fold/ half carried (.head in, spine.jsonl out); a private directory goes whole or not "
+             "at all.")
+    add("fail-OW-8-private-manifest-rewritten.owworld",
+        private_world(drop=[rel for rel in priv if rel.startswith(fold)],
+                      replace={"records/RECORDS.json": base_files()["records/RECORDS.json"]}),
+        test="OW-8", role="writer", writer="refuse", source="private",
+        rule="Writer: records/fold/ left out and its entry cut from RECORDS.json; the manifest travels byte-exact, "
+             "so a reader learns a private producer was left out rather than never there.")
 
     # -- OW-9: what a reader does not understand comes through a rewrite (round trip) --------------------------------
     add("pass-OW-9-unknown.owworld",
@@ -782,12 +836,22 @@ def verdicts_doc(entries):
             "budget: reader verdicts hold for a reader whose budget is the floor (`floor`: 500,000 entries, 2 GiB). "
             "A reader whose budget is larger reads the fixtures marked `budget: floor` with the floor's budget; one "
             "whose budget is smaller fails the floor cases (pass-OW-15-floor, pass-OW-15-floor-bytes).",
+            "source: a fixture's writer verdict is checked against `source` unless it names one of `sources` (the "
+            "private case's world, OW-8). A source's `private` lists producers marked private in its RECORDS.json "
+            "(section 4.5 rule 11): each one's directory is present whole and byte-exact, or absent whole; the "
+            "manifest itself travels byte-exact either way.",
+            "side: on the private case, which side of the export the file is: `default` (private records left out) "
+            "or `asked` (the caller asked for them). Both are files a conforming writer emits; which one depends on "
+            "the call, not the bytes.",
         ],
         "reasons": READER_REASONS,
         "floor": {"entries": FLOOR_ENTRIES, "bytes": FLOOR_BYTES},
         "marker": MIMETYPE.decode("ascii"),
         "source": {"world_id": WORLD_ID, "top": TOP.rstrip("/"),
                    "files": {rel: hashlib.sha256(data).hexdigest() for rel, data in sorted(src.items())}},
+        "sources": {"private": {"world_id": WORLD_ID, "top": TOP.rstrip("/"), "private": [PRIVATE_PRODUCER],
+                                "files": {rel: hashlib.sha256(data).hexdigest()
+                                          for rel, data in sorted(private_files().items())}}},
         "fixtures": entries,
     }
 

@@ -9,7 +9,9 @@
     "strips: a key a reader removes from world.json and never returns (OW-10: `api`), the file still read.",
     "open: what section 4.7 still leaves open on this fixture (the question, with the spec's line); the verdict follows `lean` and moves when the spec says otherwise. Every other verdict is the spec's.",
     "reason: one of `reasons` (section 4.7: the TypeScript reader's six plus duplicate, collision, link, method, name, marker). A reader that refuses for another cause fails the case.",
-    "budget: reader verdicts hold for a reader whose budget is the floor (`floor`: 500,000 entries, 2 GiB). A reader whose budget is larger reads the fixtures marked `budget: floor` with the floor's budget; one whose budget is smaller fails the floor cases (pass-OW-15-floor, pass-OW-15-floor-bytes)."
+    "budget: reader verdicts hold for a reader whose budget is the floor (`floor`: 500,000 entries, 2 GiB). A reader whose budget is larger reads the fixtures marked `budget: floor` with the floor's budget; one whose budget is smaller fails the floor cases (pass-OW-15-floor, pass-OW-15-floor-bytes).",
+    "source: a fixture's writer verdict is checked against `source` unless it names one of `sources` (the private case's world, OW-8). A source's `private` lists producers marked private in its RECORDS.json (section 4.5 rule 11): each one's directory is present whole and byte-exact, or absent whole; the manifest itself travels byte-exact either way.",
+    "side: on the private case, which side of the export the file is: `default` (private records left out) or `asked` (the caller asked for them). Both are files a conforming writer emits; which one depends on the call, not the bytes."
   ],
   "reasons": [
     "unsafe_path",
@@ -44,6 +46,29 @@
       "records/lab/ledger.bin.meta": "f5a67c172404428fbd1057b1f8e35af69a6174bacca421080f407ae07b1b48b1",
       "records/lab/world.json": "a7b085e5ac3d34de33024c40db1e38f0526a2b03711ac492340d138b85871447",
       "world.json": "bf6ff0507a982839e2dbbdd98995dc3da22926fd9b9291c21ac1cdb55b824f60"
+    }
+  },
+  "sources": {
+    "private": {
+      "world_id": "0695db52-0000-7000-8000-00000000abbe",
+      "top": "abbey",
+      "private": [
+        "fold"
+      ],
+      "files": {
+        "elements/character/ana--0000ab01.json": "1fb89188a024f91cf4ce2ef88c04fcd62ac7bd6a3162f7706f1387e718a4d1bf",
+        "elements/character/brother-tomas--0000ab02.json": "581efb60de6430fbc29c57a11bc02dc3f4e58d98c4e6465cbc55b0241d6ea295",
+        "elements/location/abbey--0000ab03.json": "51551b550b02851005b9e9ea2d573cf9c8a059ccabbc806b943816c131ddb556",
+        "media/a.png": "68aa60a5f1ac10e88f44f6e4a462540949808b813c736db8201d2590f3fc30e0",
+        "records/RECORDS.json": "c08c1860b1a5d9deea0a8a9562bec7af6bbf65196477a10b58034a159e341ad8",
+        "records/fold/.head": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+        "records/fold/spine.jsonl": "e8c67cbf6866f7d3273a0b247c4296d73d470dd77489c1fd556050afcce95e6b",
+        "records/lab/.cursor": "084c799cd551dd1d8d5c5f9a5d593b2e931f5e36122ee5c793c1d08a19839cc0",
+        "records/lab/ledger.bin": "0334a98f4f7a57273b73b6854df3d72960f8e20f08d64d141918c6f8df4932b2",
+        "records/lab/ledger.bin.meta": "f5a67c172404428fbd1057b1f8e35af69a6174bacca421080f407ae07b1b48b1",
+        "records/lab/world.json": "a7b085e5ac3d34de33024c40db1e38f0526a2b03711ac492340d138b85871447",
+        "world.json": "bf6ff0507a982839e2dbbdd98995dc3da22926fd9b9291c21ac1cdb55b824f60"
+      }
     }
   },
   "fixtures": [
@@ -378,6 +403,52 @@
       "rule": "Writer: the producer's own ledger.bin.meta dropped as if it were Unity's litter.",
       "sha256": "4fa8e3a1f0ba92f38db1e29223ae1bd3c6df5346c34bb6b6eb1e4cf1a8d20259",
       "bytes": 2240
+    },
+    {
+      "file": "pass-OW-8-private-left-out.owworld",
+      "test": "OW-8",
+      "role": "writer",
+      "reader": "accept",
+      "writer": "accept",
+      "rule": "Writer, the default side: records/fold/ is marked private in RECORDS.json, so an export, share or snapshot leaves the whole directory out; RECORDS.json travels byte-exact, its fold entry kept.",
+      "source": "private",
+      "side": "default",
+      "sha256": "a30e471f677b0c48ca033ca1f46b09d50d9bbcee58e5dea9c5b1cc56984b29d6",
+      "bytes": 2584
+    },
+    {
+      "file": "pass-OW-8-private-asked.owworld",
+      "test": "OW-8",
+      "role": "writer",
+      "reader": "accept",
+      "writer": "accept",
+      "rule": "Writer, the asked side: the caller asked for private records, so records/fold/ travels whole and byte-exact, its dot-file included, like any producer's.",
+      "source": "private",
+      "side": "asked",
+      "sha256": "cebf95db8bda796b74b14ec229935106ff7a3b49d80bfd404150bbe70357b854",
+      "bytes": 2934
+    },
+    {
+      "file": "fail-OW-8-private-partial.owworld",
+      "test": "OW-8",
+      "role": "writer",
+      "reader": "accept",
+      "writer": "refuse",
+      "rule": "Writer: records/fold/ half carried (.head in, spine.jsonl out); a private directory goes whole or not at all.",
+      "source": "private",
+      "sha256": "ddc227599f9a91e001691a110eb545a2a2279620e4f1d506e58ed14e7b41b929",
+      "bytes": 2710
+    },
+    {
+      "file": "fail-OW-8-private-manifest-rewritten.owworld",
+      "test": "OW-8",
+      "role": "writer",
+      "reader": "accept",
+      "writer": "refuse",
+      "rule": "Writer: records/fold/ left out and its entry cut from RECORDS.json; the manifest travels byte-exact, so a reader learns a private producer was left out rather than never there.",
+      "source": "private",
+      "sha256": "11a577b054b87cc8e7d66f8070d791d413f3ab7527d4de82a9d19abbf5d1e856",
+      "bytes": 2424
     },
     {
       "file": "pass-OW-9-unknown.owworld",
