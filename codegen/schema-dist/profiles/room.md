@@ -4,6 +4,8 @@
 
 **The pairs and the mark.** Profile `room`, one extension field: `x_room_of`, the id of the world the room belongs to (a world's parlor) or of the sitting it belongs to (a workshop), written by the parlor on every element it makes. An element is a room element when **both** hold: its type and its supertype, each trimmed and compared without regard to case, match one of the pairs below, **and** it carries `x_room_of`. A lore element may use any of these words (a novel's letters are Narratives with supertype Message, the Manifest's Wire among them): without the mark it is lore and stays in view. The grammar is `x_<profile>_<field>`; the prefix `x_room_` is reserved.
 
+**Trimmed and without regard to case, defined once** (other profiles say "trimmed and folded like the room profile's pairs" and mean this): trimmed is the value with leading and trailing whitespace removed, nothing inside it touched; without regard to case is the trimmed value compared after simple case folding (Python's `casefold()`, JavaScript's `toLowerCase()`; the two agree on every word a pair can hold). The match is the whole folded word against the whole folded pair; a type is folded like a supertype (`Narrative` and `narrative` are one type).
+
 | Type | Supertype | What it is |
 |---|---|---|
 | `narrative` | `Message` | a line in the room (the Manifest's Wire and BrainBoost use it already) |

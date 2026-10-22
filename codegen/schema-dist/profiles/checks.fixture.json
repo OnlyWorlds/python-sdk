@@ -1,0 +1,55 @@
+{
+  "profile": "checks",
+  "profile_page": "profiles/checks.md",
+  "notes": [
+    "rules: BrainBoost's house rules as a Charter would carry them in x_checks_rules (draft 1, 2026-10-22).",
+    "cases: element gives a body as a reader might hold it; expect gives, per rule index, 'ok', 'short' or 'out' (not scoped); a rule index absent from expect is not applied to that case.",
+    "not_checked: rules a reader must report by name, never apply and never pass silently; reason is prose, a reader's words may differ.",
+    "measured: the counts the reference reader printed on BrainBoost's live world on 2026-10-22 (37 Characters, 24 Relations), the specimen's receipt, not a verdict a reader must reproduce."
+  ],
+  "rules": [
+    {"rule": "every Character carries a reputation", "where": {"type": "character"}, "require": {"field": "reputation", "present": true}},
+    {"rule": "a live line carries its Next", "where": {"type": "relation", "subtype": ["in talks", "agreed", "running", "paused"]}, "require": {"field": "description", "matches": "(?im)^next\\b"}},
+    {"rule": "a Funding line names the roles", "where": {"type": "relation", "supertype": "Funding"}, "require": {"field": "description", "matches": "(?i)\\broles?\\b"}},
+    {"rule": "the first line of a description is Source: ... · as of YYYY-MM-DD", "where": {"type": "relation"}, "require": {"field": "description", "matches": "^Source: .+ · as of \\d{4}-\\d{2}-\\d{2}"}},
+    {"rule": "a line's status is one the Charter names", "where": {"type": "relation", "supertype": ["Pilot", "Partnership", "Customer", "Certification", "Integration", "Funding", "Channel"]}, "require": {"field": "subtype", "one_of": ["idea", "in talks", "agreed", "running", "paused", "stalled", "ended"]}},
+    {"rule": "a line names every side", "where": {"type": "relation", "supertype": "Funding"}, "require": {"field": "institutions", "links_min": 1}}
+  ],
+  "cases": [
+    {"name": "a Character with a reputation", "element": {"type": "character", "supertype": "Person", "reputation": "keeps the world"}, "expect": {"0": "ok", "1": "out", "2": "out", "3": "out", "4": "out", "5": "out"}},
+    {"name": "a Character with an empty reputation", "element": {"type": "character", "supertype": "Contact", "reputation": "  "}, "expect": {"0": "short"}},
+    {"name": "a Character with a null reputation", "element": {"type": "character", "reputation": null}, "expect": {"0": "short"}},
+    {"name": "the type compared folded", "element": {"type": "Character", "reputation": "x"}, "expect": {"0": "ok"}},
+    {"name": "a live Funding line with Next and roles and a Source line", "element": {"type": "relation", "supertype": "Funding", "subtype": "in talks", "description": "Source: mail from Bram · as of 2026-05-26\nRoles: Jasper leads.\nNext: the meeting on 11-02.", "institutions": ["0199"]}, "expect": {"1": "ok", "2": "ok", "3": "ok", "4": "ok", "5": "ok"}},
+    {"name": "a live line without Next", "element": {"type": "relation", "supertype": "Pilot", "subtype": "running", "description": "Source: x · as of 2026-01-01\nGoing well."}, "expect": {"1": "short", "2": "out", "3": "ok", "4": "ok"}},
+    {"name": "an ended line is not scoped by the Next rule", "element": {"type": "relation", "supertype": "Pilot", "subtype": "ended", "description": "closed"}, "expect": {"1": "out", "3": "short", "4": "ok"}},
+    {"name": "the subtype compared folded and trimmed", "element": {"type": "relation", "supertype": "funding", "subtype": " In Talks ", "description": "Next: call", "institutions": []}, "expect": {"1": "ok", "2": "short", "5": "short"}},
+    {"name": "Next in the middle of a line is not the form", "element": {"type": "relation", "supertype": "Funding", "subtype": "agreed", "description": "the next step is unclear"}, "expect": {"1": "short"}},
+    {"name": "a status the Charter does not name", "element": {"type": "relation", "supertype": "Pilot", "subtype": "maybe"}, "expect": {"4": "short", "1": "out"}},
+    {"name": "a Read relation is outside the status rule", "element": {"type": "relation", "supertype": "Read", "subtype": ""}, "expect": {"4": "out"}},
+    {"name": "a single link counts as one", "element": {"type": "relation", "supertype": "Funding", "subtype": "idea", "institutions": "0199"}, "expect": {"5": "ok"}},
+    {"name": "a description that is not a string never matches", "element": {"type": "relation", "supertype": "Funding", "subtype": "agreed", "description": 7}, "expect": {"1": "short", "2": "short", "3": "short"}}
+  ],
+  "not_checked": [
+    {"rule": {"rule": "a fifth predicate", "where": {"type": "character"}, "require": {"field": "reputation", "longer_than": 3}}, "reason": "a predicate outside the four"},
+    {"rule": {"rule": "a type the schema does not name", "where": {"type": "person"}, "require": {"field": "name", "present": true}}, "reason": "unknown type"},
+    {"rule": {"rule": "a field the type does not have", "where": {"type": "character"}, "require": {"field": "budget", "present": true}}, "reason": "not a field of character and not an extension key"},
+    {"rule": {"rule": "an extension key is always a field", "where": {"type": "character"}, "require": {"field": "x_bb_keeper", "present": true}}, "reason": null},
+    {"rule": {"rule": "two predicates", "where": {"type": "character"}, "require": {"field": "reputation", "present": true, "matches": "x"}}, "reason": "exactly one predicate"},
+    {"rule": {"rule": "a pattern the engine refuses", "where": {"type": "character"}, "require": {"field": "reputation", "matches": "("}}, "reason": "pattern refused"},
+    {"rule": "not an object", "reason": "a rule must be an object"},
+    {"rule": {"where": {"type": "character"}, "require": {"field": "reputation", "present": true}}, "reason": "missing rule"}
+  ],
+  "measured": {
+    "world": "BrainBoost, read through Kael's agent seat (guest view of the roster, every element the seat sees), 2026-10-22 14:3x",
+    "rows": [
+      {"rule": 0, "scoped": 37, "short": 4},
+      {"rule": 1, "scoped": 16, "short": 11},
+      {"rule": 2, "scoped": 8, "short": 7},
+      {"rule": 3, "scoped": 24, "short": 3},
+      {"rule": 4, "scoped": 21, "short": 0},
+      {"rule": 5, "scoped": 8, "short": 1}
+    ],
+    "note": "BB's keeper found 21 gaps on its three rules (h35 #10436); rules 0 to 2 here find 22 on the same world a few hours later."
+  }
+}

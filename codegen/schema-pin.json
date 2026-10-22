@@ -2,15 +2,20 @@
   "_what": "The recorded pin for the vendored OnlyWorlds schema distribution (codegen/schema-dist/, copied byte-exact). Do not edit by hand; re-vendor from the pinned tag and review the diff. Kept equal to the npm SDK's pin (github.com/OnlyWorlds/sdk, codegen/schema-pin.json) on purpose: two clients, one schema.",
   "_why_manifest_sha256": "Verifying the tree against its own MANIFEST.json only proves internal consistency. If the tag moved, the manifest moved with it. The hash recorded here is the one first accepted, which is what makes a moved tag visible.",
   "repo": "https://github.com/OnlyWorlds/schema-dist",
-  "tag": "v0.33.0-dist.46",
-  "commit": "de56aea3863822b0048c9e09e9a1c154be95a942",
-  "manifest_sha256": "da7e9cee801a529f509f8a2084ed352e433886e0ca76e272fc5c87ce9595530e",
+  "tag": "v0.33.0-dist.47",
+  "commit": "fb38f65f2abeb1e80a9b39cda0a9616529bd8f8b",
+  "manifest_sha256": "e46297fd9f17a1f8bc4c9c9f8d614d99c1674759caa64441dd6e2e90b1bccad0",
   "canonical_version": "00.33.00",
-  "dist_serial": 46,
+  "dist_serial": 47,
   "published": "2026-10-22",
   "pinned_at": "2026-10-22",
-  "pinned_by": "The maintainer: tree from `git archive` of the tag in a schema-dist checkout; files re-hashed against MANIFEST.json by generate_schema.py; MANIFEST self-hash matched against the raw file GitHub serves at the tag, whose ref resolves to the commit above. The same tag and hash as the npm SDK's 4.56.0.",
+  "pinned_by": "The maintainer: tree from `git archive` of the tag in a schema-dist checkout; files re-hashed against MANIFEST.json by generate_schema.py; MANIFEST self-hash matched against the raw file GitHub serves at the tag, whose ref resolves to the commit above. The same tag and hash as the npm SDK's 4.57.2.",
   "previous_pins": [
+    {
+      "tag": "v0.33.0-dist.46",
+      "manifest_sha256": "da7e9cee801a529f509f8a2084ed352e433886e0ca76e272fc5c87ce9595530e",
+      "note": "superseded by v0.33.0-dist.47 (same canonical 00.33.00; profiles/ gains checks.md and checks.fixture.json, the checks profile: a Charter's house rules as x_checks_rules (OW Council #559); profiles/room.md defines trimmed and without regard to case once; no schema file moved)"
+    },
     {
       "tag": "v0.33.0-dist.45",
       "manifest_sha256": "ed5fcab2d2e768d06282073993a4abac5c99f94753c8fd9c5f52596a636b4566",

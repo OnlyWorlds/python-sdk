@@ -55,6 +55,45 @@ def test_the_fold_is_unicode_simple_case_folding_as_the_npm_sdk() -> None:
     assert is_room_element({"type": "Relation", "supertype": "\tWORK ITEM\n", "x_room_of": WORLD}) is True
 
 
+# Unicode's White_Space property, the 25 code points (PropList.txt), typed here apart from the module's
+# constant so the sweep below checks one against the other.
+WHITE_SPACE = {
+    *range(0x09, 0x0E),
+    0x20,
+    0x85,
+    0xA0,
+    0x1680,
+    *range(0x2000, 0x200B),
+    0x2028,
+    0x2029,
+    0x202F,
+    0x205F,
+    0x3000,
+}
+
+
+def test_trimmed_is_unicode_white_space_at_both_ends_and_nothing_else() -> None:
+    """room.md (dist.47), "Trimmed and without regard to case, defined once"; Skeld's ruling, OW Parlor h66
+    #10415: White_Space is stripped at both ends, a byte order mark stays, nothing inside is touched."""
+    assert is_room_element({"type": "narrative", "supertype": " Message\u3000", "x_room_of": WORLD}) is True
+    assert is_room_element({"type": "\xa0narrative\u2029", "supertype": "Message", "x_room_of": WORLD}) is True
+    assert is_room_element({"type": "narrative", "supertype": "\ufeffMessage", "x_room_of": WORLD}) is False
+    # U+001C is stripped by str.strip() (str.isspace) but is not White_Space.
+    assert is_room_element({"type": "narrative", "supertype": "\x1cMessage", "x_room_of": WORLD}) is False
+    assert is_room_element({"type": "narrative", "supertype": "\u200bMessage", "x_room_of": WORLD}) is False
+    assert is_room_element({"type": "relation", "supertype": "Work\u3000item", "x_room_of": WORLD}) is False
+
+
+def test_the_trim_strips_exactly_white_space_over_the_whole_bmp() -> None:
+    assert len(WHITE_SPACE) == 25
+    stripped = {
+        cp
+        for cp in range(0x10000)
+        if is_room_element({"type": "narrative", "supertype": f"{chr(cp)}Message{chr(cp)}", "x_room_of": WORLD})
+    }
+    assert stripped == WHITE_SPACE
+
+
 def test_a_folder_element_is_matched_by_its_type_even_when_the_body_has_none() -> None:
     body = {"id": "0192a000-aaaa-7bbb-8ccc-000000000001", "name": "a line", "supertype": "Message"}
     marked = {**body, "x_room_of": WORLD}

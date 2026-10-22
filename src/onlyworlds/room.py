@@ -22,13 +22,42 @@ from .worldfile import simple_case_fold
 __all__ = ["ROOM_PAIRS", "is_room_element"]
 
 
+_WHITE_SPACE: str = "".join(
+    map(
+        chr,
+        (
+            *range(0x0009, 0x000E),
+            0x0020,
+            0x0085,
+            0x00A0,
+            0x1680,
+            *range(0x2000, 0x200B),
+            0x2028,
+            0x2029,
+            0x202F,
+            0x205F,
+            0x3000,
+        ),
+    )
+)
+"""The 25 code points of Unicode's White_Space property (PropList.txt): U+0009 to U+000D, U+0020, U+0085,
+U+00A0, U+1680, U+2000 to U+200A, U+2028, U+2029, U+202F, U+205F, U+3000.
+
+The profiles' "trimmed" (schema-dist ``profiles/room.md``, dist.47, "Trimmed and without regard to case,
+defined once") is leading and trailing whitespace removed, nothing inside touched, and whitespace is
+White_Space exactly (Skeld's ruling, OW Parlor h66 #10415): a byte order mark (U+FEFF) and a zero width
+space (U+200B) stay. Bare ``str.strip()`` is not used: it strips by ``str.isspace()``, which also takes
+U+001C to U+001F. The npm SDK's ``isRoomElement`` trims by the same 25."""
+
+
 def _fold(text: str) -> str:
-    return simple_case_fold(text.strip())
+    return simple_case_fold(text.strip(_WHITE_SPACE))
 
 
 def is_room_element(element: Mapping[str, Any] | FolderElement) -> bool:
-    """True when the element's type and supertype, each trimmed and compared without regard to case
-    (Unicode simple case folding, the ``.owworld`` reader's table), match one of ``ROOM_PAIRS``, AND it
+    """True when the element's type and supertype, each trimmed (Unicode White_Space at both ends, so a
+    leading byte order mark is no match) and compared without regard to case (Unicode simple case
+    folding, the ``.owworld`` reader's table), match one of ``ROOM_PAIRS``, AND it
     carries the mark ``x_room_of`` as a non-empty string.
 
     Both, always: a pair without the mark is lore (a novel's letters are Narratives with supertype
