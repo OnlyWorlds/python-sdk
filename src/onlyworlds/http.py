@@ -114,8 +114,11 @@ def _refuse_known_of(element: Mapping[str, Any], where: str) -> None:
 
 
 #: ``GET /world`` keys that ``PATCH /world`` refuses (keel's writable set has neither), dropped
-#: like ``READ_ONLY_FIELDS`` so a read body is writable. ``public_read`` changes through sharing.
-WORLD_READ_ONLY_FIELDS: tuple[str, ...] = ("id", "public_read")
+#: like ``READ_ONLY_FIELDS`` so a read body is writable. ``public_read`` changes through sharing;
+#: ``slug`` and ``public_page`` ride every body since keel #471 (PR 173) and are answered 422 like it;
+#: ``agent_narrator_rule`` is refused too (a 422 naming it, measured on staging 2026-10-22).
+#: ``owner_character`` is not here: PATCH takes it (a 200 on staging).
+WORLD_READ_ONLY_FIELDS: tuple[str, ...] = ("id", "public_read", "slug", "public_page", "agent_narrator_rule")
 _DISK_TO_WIRE_WORLD_KEYS = {disk: wire for wire, disk in WIRE_TO_DISK_WORLD_KEYS.items()}
 
 
@@ -475,12 +478,12 @@ class Client:
         """``PATCH /world``: a partial meta update (owner key only). World-meta edits do NOT appear
         in ``/changes``.
 
-        Takes back a ``get_world()`` body: ``id``, ``public_read`` and the timestamps are dropped
-        (``public_read`` is not writable here). A folder ``world.json``'s ``time_current`` is sent
-        as the wire's ``time_range_current``, and the keys only a folder carries are left out: the
-        folder format's own (``WORLD_FOLDER_KEYS``: ``format_version``, ``writable``, ``source``,
-        ``exported_as``, ``producer``), ``api`` and the ``snapshot_*`` keys. keel refuses any
-        other key it does not write (422).
+        Takes back a ``get_world()`` body: ``id``, ``public_read``, ``slug``, ``public_page``,
+        ``agent_narrator_rule`` and the timestamps are dropped (none is writable here). A folder
+        ``world.json``'s ``time_current`` is sent as the wire's ``time_range_current``, and the keys
+        only a folder carries are left out: the folder format's own (``WORLD_FOLDER_KEYS``:
+        ``format_version``, ``writable``, ``source``, ``exported_as``, ``producer``), ``api`` and
+        the ``snapshot_*`` keys. keel refuses any other key it does not write (422).
         """
         body = {
             _DISK_TO_WIRE_WORLD_KEYS.get(k, k): v

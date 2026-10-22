@@ -669,6 +669,22 @@ def test_patch_world_takes_back_a_get_world_body_and_a_folder_spelling(make_clie
     assert t.calls[0].body == {"name": "W", "time_range_current": 5}
 
 
+def test_patch_world_drops_the_read_only_keys_keel_refuses(make_client: MakeClient) -> None:
+    # keel #471 (PR 173): slug and public_page ride every GET /world and PATCH answers them 422;
+    # agent_narrator_rule is refused the same way (measured on staging); owner_character is accepted, so it is sent
+    t = FakeTransport(handler=lambda *_: jresp(200, {"id": "w"}))
+    body = {
+        "id": "w",
+        "name": "W",
+        "slug": "w-world",
+        "public_page": {"on": True, "palette": "ink", "hero": None, "sections": [], "pin": None, "index": True},
+        "agent_narrator_rule": False,
+        "owner_character": None,
+    }
+    make_client(t).patch_world(body)
+    assert t.calls[0].body == {"name": "W", "owner_character": None}
+
+
 def test_patch_world_never_sends_what_only_a_folder_carries(make_client: MakeClient) -> None:
     # a folder's world.json handed back whole: its own keys (§4.1, §4.2) say what the folder is
     t = FakeTransport(handler=lambda *_: jresp(200, {"id": "w"}))
