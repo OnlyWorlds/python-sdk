@@ -455,8 +455,10 @@ class FakeReader:
         feed_fails: bool = False,
         proposals: Mapping[str, list[dict[str, Any]]] | None = None,
         queue_error: Exception | None = None,
+        front_door: Mapping[str, Any] | None = None,
     ):
         self.elements = elements
+        self.front_door = front_door
         self.rows = feed_of(elements) if rows is None else rows
         self.role = role
         self.page = page
@@ -467,7 +469,10 @@ class FakeReader:
 
     def me(self) -> dict[str, Any]:
         self.calls.append("me")
-        return {"world": WORLD["id"], "role": self.role, "kind": "owner"}
+        me: dict[str, Any] = {"world": WORLD["id"], "role": self.role, "kind": "owner"}
+        if self.front_door is not None:
+            me["front_door"] = dict(self.front_door)
+        return me
 
     def get_world(self) -> dict[str, Any]:
         self.calls.append("get_world")
@@ -1179,6 +1184,95 @@ def test_11_brainboosts_three_rules_through_the_api() -> None:
     assert api_report(FakeReader(on_the_wire(bb_world()), role="guest")).compared[HR]["view"] == "guest"
 
 
+# D152 (keel #558): the Charter is the newest Law with supertype Charter made by the owner or a
+# co-builder; its rules are the house rules, and every other such Law is a finding.
+SEAT = "seat-membership"
+LAW2 = "a0000000-0000-7000-8000-000000000002"
+ONE_RULE = [{"rule": "Every Location says where it is.", "where": {"type": "location"}, "present": "parent_location"}]
+
+
+def two_charters(*, maker: str | None, newer: bool, rules_on_second: bool = True) -> Elements:
+    """bb_world's Charter (the owner's, created 2026-01-02) and a second Law with supertype Charter,
+    made by ``maker`` (None: the owner), created before or after it, carrying ONE_RULE."""
+    base = edit(bb_world(), "law", LAW1, created_at="2026-01-02T00:00:00Z")
+    second: dict[str, Any] = {
+        "id": LAW2,
+        "name": "Seat's Charter",
+        "supertype": " charter ",
+        "description": "",
+        "declaration": "My rules.",
+        "locations": [L1],
+        "created_at": "2026-03-01T00:00:00Z" if newer else "2025-12-01T00:00:00Z",
+        "created_by": maker,
+    }
+    if rules_on_second:
+        second["x_checks_rules"] = ONE_RULE
+    return with_(base, "law", second)
+
+
+def second_charter_finding(r: Report) -> dict[str, Any]:
+    (f,) = [f for f in found(r, HR) if f["element"] is not None and f["element"]["id"] == LAW2]
+    return f
+
+
+def test_11_a_folder_applies_the_owners_newest_charter_only(tmp_path: Path) -> None:
+    r = folder_report(tmp_path, two_charters(maker=None, newer=False))
+    assert r.compared[HR]["charter"] == LAW1 and r.compared[HR]["charter_from"] == "maker"
+    assert sorted(
+        (f["element"]["id"], f["evidence"].get("rule")) for f in found(r, HR) if f["element"]["id"] != LAW2
+    ) == sorted([(C1, 0), (R3, 1), (R3, 2)])
+    f = second_charter_finding(r)
+    assert "not the world's Charter" in f["reason"] and "1 house rule(s) are not applied" in f["reason"]
+    assert f["evidence"] == {"charter": LAW1, "source": "maker", "carries_rules": True}
+
+
+def test_11_a_folder_cannot_tell_when_a_members_charter_is_newer(tmp_path: Path) -> None:
+    r = folder_report(tmp_path, two_charters(maker=SEAT, newer=True))
+    assert r.compared[HR]["charter"] is None and r.compared[HR]["n"] == 0 and r.compared[HR]["rules"] == []
+    (world,) = [f for f in found(r, HR) if f["element"] is None]
+    assert world["reason"].startswith("no house rule is checked: 1 Law(s) with supertype Charter made by a member")
+    assert "a folder carries none" in world["reason"]
+    assert {f["element"]["id"] for f in found(r, HR) if f["element"] is not None} == {LAW1, LAW2}
+
+
+def test_11_a_folder_takes_the_owners_when_the_members_is_older(tmp_path: Path) -> None:
+    r = folder_report(tmp_path, two_charters(maker=SEAT, newer=False))
+    assert r.compared[HR]["charter"] == LAW1
+    assert second_charter_finding(r)["evidence"]["carries_rules"] is True
+
+
+def test_11_the_api_takes_front_door_charter_even_a_co_builders() -> None:
+    """keel says which Law is the Charter: a co-builder's newer one is applied, the owner's older one is
+    a finding, though the doctor cannot see roles."""
+    reader = FakeReader(on_the_wire(two_charters(maker=SEAT, newer=True)), front_door={"charter": LAW2})
+    r = api_report(reader)
+    assert r.compared[HR]["charter"] == LAW2 and r.compared[HR]["charter_from"] == "front_door"
+    assert [row["rule"] for row in r.compared[HR]["rules"]] == [ONE_RULE[0]["rule"]]
+    (owners,) = [f for f in found(r, HR) if f["element"] is not None and f["element"]["id"] == LAW1]
+    assert "3 house rule(s) are not applied" in owners["reason"]
+
+
+def test_11_a_seats_charter_is_never_applied_through_the_api() -> None:
+    """front_door.charter null: keel found no keeper's Charter; a seat's Law with supertype Charter and
+    rules is a finding, and no rule is checked."""
+    reader = FakeReader(on_the_wire(two_charters(maker=SEAT, newer=True)), front_door={"charter": None})
+    reader.elements["law"] = [b for b in reader.elements["law"] if b["id"] == LAW2]
+    r = api_report(reader)
+    assert r.compared[HR]["charter"] is None and r.compared[HR]["rules"] == []
+    f = second_charter_finding(r)
+    assert f["evidence"] == {"charter": None, "source": "front_door", "carries_rules": True}
+
+
+def test_11_the_api_says_so_when_front_door_names_a_law_it_did_not_list() -> None:
+    reader = FakeReader(on_the_wire(bb_world()), front_door={"charter": LAW2})
+    r = api_report(reader)
+    (world,) = [f for f in found(r, HR) if f["element"] is None]
+    assert (
+        world["reason"]
+        == f"no house rule is checked: GET /me names {LAW2} as the Charter, and no Law this key listed has that id"
+    )
+
+
 def test_11_the_packet_takes_the_short_elements(tmp_path: Path) -> None:
     root = tmp_path / "w"
     write_folder(root, WORLD, bb_world())
@@ -1199,6 +1293,8 @@ def test_11_a_charter_without_the_key_runs_and_checks_nothing(tmp_path: Path) ->
         "of": 0,
         "view": "folder",
         "charters": 1,
+        "charter": LAW1,
+        "charter_from": "maker",
         "carrying": 0,
         "stubs_not_judged": 0,
         "rules": [],

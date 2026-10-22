@@ -33,15 +33,19 @@ this package's ``FORMAT_VERSION``; (10) an ``api_key`` in ``world.json``'s ``api
 when ``world.json`` is tracked by git.
 
 And on both doors, (11) the world's own house rules: the checks profile (schema-dist
-``profiles/checks.md``, dist.47), ``x_checks_rules`` on a Law with supertype Charter, read
-by ``onlyworlds.checks.apply_checks``. Each element a rule finds short is a finding (the
-rule's sentence as the reason; the charter, the rule's index and its field as evidence); a
-rule the reader cannot apply is a finding on the charter, naming the rule and why; a key
-that is not a list is one finding on the charter; a charter without the key checks nothing
-and says so. ``compared`` carries every rule's ``scoped`` and ``short`` counts and the view
-read (``folder``, or the key's role). A known-of stub is not judged (its absent fields are
-unknown), and the rules are on a Law only: a charter of another type that carries them is a
-finding, its rules not read.
+``profiles/checks.md``, dist.47), ``x_checks_rules`` on the world's Charter, read by
+``onlyworlds.checks.apply_checks``. The Charter is D152's one (keel #558): the newest Law with
+supertype Charter made by the owner or a co-builder; through the API it is
+``front_door.charter`` from ``GET /me``, on a folder the owner's newest (a folder carries no
+roster, so when a member's Charter is newer the doctor says it cannot tell and applies none).
+Every other Law with supertype Charter is a finding, its rules not applied: a seat cannot write
+the rules it is judged by. Each element a rule finds short is a finding (the rule's sentence as
+the reason; the charter, the rule's index and its field as evidence); a rule the reader cannot
+apply is a finding on the charter, naming the rule and why; a key that is not a list is one
+finding on the charter; a charter without the key checks nothing and says so. ``compared``
+carries every rule's ``scoped`` and ``short`` counts and the view read (``folder``, or the
+key's role). A known-of stub is not judged (its absent fields are unknown), and the rules are
+on a Law only: a charter of another type that carries them is a finding, its rules not read.
 
 On the API door only, (12) proposals waiting (keel #519): the open and the lapsed proposals in
 the world's queue (``GET /world/proposals``, paged through), one finding on the world when any
@@ -521,9 +525,52 @@ def _json_kind(value: Any) -> str:
     return "an object" if isinstance(value, Mapping) else type(value).__name__
 
 
-def _house_rules(run: _Run, els: list[_El], *, view: str) -> None:
-    """Flag 11: every charter's ``x_checks_rules`` (the checks profile) applied to the elements the
-    door could read. Never writes, reorders or repairs a list."""
+#: ``named`` when the door could not ask keel which Law is the Charter (a folder, or a /me with no
+#: ``front_door``): the doctor applies D152's rule to what it holds instead.
+_NOT_ASKED = object()
+
+
+def _newest(laws: list[_El]) -> _El | None:
+    """Keel's order (``accounts/front_door.py``): the newest by ``created_at``, then by id."""
+    return max(laws, key=lambda el: (str(el.body.get("created_at") or ""), el.id), default=None)
+
+
+def _the_charter(laws: list[_El], named: Any) -> tuple[_El | None, str, str | None]:
+    """The world's Charter among ``laws`` (each a Law with supertype Charter), by D152's one
+    definition (keel #558; the checks profile from the serial after 47): the newest such Law made by
+    the owner or a co-builder. Returns the Charter or None, where the answer came from, and a reason
+    when it could not be told.
+
+    Through the API keel answers it: ``front_door.charter`` from ``GET /me`` (``named``, an id or
+    None). Otherwise only the owner's are known to be a keeper's (``created_by`` null or absent): a
+    folder carries no roster, so a Law made by a member may be a co-builder's or not, and when one is
+    newer than the owner's newest the Charter cannot be told; the doctor says so and applies none."""
+    if named is not _NOT_ASKED:
+        if named is None:
+            return None, "front_door", None
+        hit = next((el for el in laws if el.id == named), None)
+        if hit is None:
+            return None, "front_door", f"GET /me names {named} as the Charter, and no Law this key listed has that id"
+        return hit, "front_door", None
+    owners = [el for el in laws if el.body.get("created_by") is None]
+    members = [el for el in laws if el.body.get("created_by") is not None]
+    owner = _newest(owners)
+    newer = [m for m in members if owner is None or _newest([owner, m]) is m]
+    if newer:
+        return (
+            None,
+            "maker",
+            f"{len(newer)} Law(s) with supertype Charter made by a member are newer than the owner's "
+            "newest, and only the roster says whether that member is a co-builder (a folder carries "
+            "none), so which Law is the Charter cannot be told here",
+        )
+    return owner, "maker", None
+
+
+def _house_rules(run: _Run, els: list[_El], *, view: str, named: Any = _NOT_ASKED) -> None:
+    """Flag 11: the Charter's ``x_checks_rules`` (the checks profile) applied to the elements the
+    door could read; the Charter is the one D152 names (``_the_charter``), and every other Law with
+    supertype Charter is a finding, its rules not applied. Never writes, reorders or repairs a list."""
     flag = CHECKS_FLAG
     charters = [el for el in els if _folded(el.body.get("supertype")) == "charter"]
     for el in charters:
@@ -536,12 +583,31 @@ def _house_rules(run: _Run, els: list[_El], *, view: str) -> None:
                 {"filed_as": el.type},
             )
     laws = [el for el in charters if el.type == "law"]
+    the, source, unknown = _the_charter(laws, named)
+    if unknown is not None:
+        run.find(flag, None, f"no house rule is checked: {unknown}", {"source": source})
+    for el in laws:
+        if el is the:
+            continue
+        rules = el.body.get(CHECKS_FIELD)
+        held = f"; its {len(rules)} house rule(s) are not applied" if isinstance(rules, list) and rules else ""
+        run.find(
+            flag,
+            el,
+            "a Law with supertype Charter that is not the world's Charter (the newest one made by the owner "
+            f"or a co-builder){held}",
+            {
+                "charter": the.id if the is not None else None,
+                "source": source,
+                "carries_rules": CHECKS_FIELD in el.body,
+            },
+        )
     judged = [el for el in els if not el.known_of]  # a stub's absent fields are unknown, not short
     bodies = [{**el.body, "type": el.type, "id": el.id} for el in judged]
     by_ref = {(el.type, el.id): el for el in judged}
     rows: list[dict[str, Any]] = []
     applied = carrying = 0
-    for charter in laws:
+    for charter in [the] if the is not None else []:
         if CHECKS_FIELD not in charter.body:
             continue
         carrying += 1
@@ -580,6 +646,8 @@ def _house_rules(run: _Run, els: list[_El], *, view: str) -> None:
         len(rows),
         view=view,
         charters=len(laws),
+        charter=the.id if the is not None else None,
+        charter_from=source,
         carrying=carrying,
         stubs_not_judged=len(els) - len(judged),
         rules=rows,
@@ -850,17 +918,20 @@ def doctor_api(client: Reader, *, days: int = 14, changes: int = 50, now: _dt.da
     a queue that cannot be read flag 12."""
     world = client.get_world()
     try:
-        role = client.me().get("role")
+        me = client.me()
     except (ApiError, ValueError):
-        role = None
+        me = {}
+    role = me.get("role")
     view = role if isinstance(role, str) and role else "unknown"
+    door = me.get("front_door")
+    named = door.get("charter") if isinstance(door, dict) and "charter" in door else _NOT_ASKED
     at = now or _dt.datetime.now(_dt.UTC)
     run = _Run({"id": world.get("id"), "name": world.get("name"), "door": "api"})
     els: list[_El] = []
     for t in ELEMENT_TYPES:
         els.extend(_El(t, b["id"], b) for b in _list_all(client, t) if isinstance(b.get("id"), str))
     _walk(run, els, days=days, now=at, whole_view=role != "guest")
-    _house_rules(run, els, view=view)
+    _house_rules(run, els, view=view, named=named)
     try:
         rows, head = _feed(client)
     except (ApiError, ConnectionError, ValueError) as exc:

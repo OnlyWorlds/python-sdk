@@ -2,8 +2,10 @@
 
 The package version runs on its own semver; the schema it is generated from is `SCHEMA_DIST_TAG`.
 
-## Unreleased
+## 0.28.0 (2026-10-22)
 
+- **The doctor applies the world's Charter only** (keel #558, D152; Skeld's ruling, OW Council h58 #10789). Flag 11 read `x_checks_rules` from every Law with supertype Charter, whoever made it, so a contributor or an agent seat could write the rules it is judged by, and two Charters both applied. Now the Charter is D152's one definition, the newest Law with supertype Charter (trimmed, any case) made by the owner or a co-builder: through `--api` it is `front_door.charter` from `GET /me`, keel's own answer; on a folder the owner's newest (`created_by` null or absent), and when a member's Charter is newer the doctor says it cannot tell (a folder carries no roster) and applies no rule rather than guess. Every other Law with supertype Charter is a finding, naming how many of its rules are not applied. `compared` gains `charter` and `charter_from` (`front_door` or `maker`). Flag 8 is unchanged.
+- Tests: six, a folder's owner-newest, a member's newer Charter (cannot tell), a member's older one, the API's `front_door.charter` (a co-builder's applied, the owner's older one a finding), a null `front_door.charter` with a seat's Charter carrying rules (none applied), and a named id the key did not list; each clause watched failing on its own mutant. Read live: Moppetopia (no Charter) and BrainBoost (its Charter through the front door).
 - `me()`'s docstring names `front_door` (keel #558): the sponsor, the Characters, the Charter and its skill Objects. The client already returned the whole body; nothing else moved.
 
 ## 0.27.0 (2026-10-22)
