@@ -525,3 +525,77 @@ def test_a_folder_with_an_exported_as_line_packs_it_and_the_api_asks_me(tmp_path
     assert "*Made as the Character Ann: that Character's view, not the whole world.*" in (
         out2 / "00-world.md"
     ).read_text(encoding="utf-8")
+
+
+# --- a world's own words for the types (the names profile, schema-dist profiles/names.md, dist.48)
+
+NAMES: dict[str, Any] = {
+    "version": 1,
+    "types": {
+        "character": {"one": "Employee", "many": "Employees"},
+        "location": {"one": "Office", "many": "Offices"},
+    },
+    "supertypes": {"character": {"human": {"one": "Crew member", "many": "Crew"}}},
+}
+
+
+def digest(files: dict[str, str]) -> str:
+    import hashlib
+
+    h = hashlib.sha256()
+    for name, text in files.items():
+        h.update(name.encode() + b"\0" + text.encode("utf-8") + b"\0")
+    return h.hexdigest()
+
+
+def test_without_a_names_map_the_pack_is_byte_for_byte_as_before() -> None:
+    # Digests of this test world's pack as 0.30.0 wrote it, before the pack read names maps.
+    named = {"kind": "character", "role": "guest", "character": {"id": C1, "name": "Ann"}}
+    assert digest(built()[0]) == "294c32a58994d3784071b07ca317fcda1bf9bec9c2f92aa7390f393c93754256"
+    everything = built(rooms=True, extensions=True, exported_as=named)[0]
+    assert digest(everything) == "d1bd968860a0249d2fed4342abcb884b3a7dccb5ee0e539258e626c8de8d8c41"
+    refused = {**WORLD, "x_names": {**NAMES, "version": 2}}  # not a names map: the standard's names
+    assert build_pack(refused, world())[0] == built()[0]
+
+
+def test_a_names_map_prints_the_worlds_word_first_and_the_standards_in_brackets(tmp_path: Path) -> None:
+    by_type: dict[str, list[dict[str, Any]]] = {}
+    for slug, body in world():
+        by_type.setdefault(slug, []).append(body)
+    root = tmp_path / "world"
+    write_folder(root, {k: v for k, v in WORLD.items() if k != "api"} | {"x_names": NAMES}, by_type)
+    report = pack_folder(root, tmp_path / "out")
+    assert report.files == built()[1].files  # file names keep the standard's slugs
+    read = {n: (tmp_path / "out" / n).read_text(encoding="utf-8") for n in report.files}
+
+    index = read["00-world.md"].split("## Index\n", 1)[1]
+    assert "\n### Employees (Character)\n" in index and "\n### Offices (Location)\n" in index
+    assert "\n### Species\n" in index  # no entry: the standard's name, as ever
+    assert read["01-character.md"].startswith("# Employees (Character) of Harbor World\n")
+    assert read["02-location.md"].startswith("# Offices (Location) of Harbor World\n")
+    # an element's own line knows its supertype: Ann's (Human, matched without regard to case) has a word
+    assert section(read["01-character.md"], "Ann").splitlines()[1] == (
+        f"*Crew member (Character, Human) · id {C1} · Human / Sailor*"
+    )
+    assert section(read["01-character.md"], "Bo").splitlines()[1] == f"*Employee (Character) · id {C2}*"
+    assert section(read["02-location.md"], "Harbor").splitlines()[1] == f"*Office (Location) · id {L1}*"
+    assert "*Species · id " in read["06-species.md"]
+
+    assert "x_names" not in read["00-world.md"] and report.extensions_left_out == 2  # the map is no field
+    pack_folder(root, tmp_path / "out-x", extensions=True)
+    with_x = (tmp_path / "out-x" / "00-world.md").read_text(encoding="utf-8")
+    assert "\n**x_theme:** sea\n" in with_x  # other extension keys still print when asked
+    assert "x_names" not in with_x and "Crew member" not in with_x
+
+
+def test_the_label_line_says_a_characters_view_in_the_worlds_word() -> None:
+    mapped = {**WORLD, "x_names": NAMES}
+    named = {"kind": "character", "role": "guest", "character": {"id": C1, "name": "Ann"}}
+    unnamed = {"kind": "character", "role": "guest", "character": None}
+    assert pack.made_by_line(named, mapped) == (
+        "*Made as the Employee (Character) Ann: that Employee's view, not the whole world.*"
+    )
+    assert pack.made_by_line(unnamed, mapped) == (
+        "*Made as one Employee (Character): that Employee's view, not the whole world.*"
+    )
+    assert "*Made as the Employee (Character) Ann:" in build_pack(mapped, world(), exported_as=named)[0]["00-world.md"]

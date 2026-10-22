@@ -30,6 +30,12 @@ after it in brackets when the two differ. A known-of stub (folder format §4.4) 
 id line: its missing fields are unknown, not empty. Nothing is invented and an unset field is
 left out.
 
+A world's own words for the types (the names profile, ``x_names`` on the World, read by
+``type_word``) print the word first and the standard's type in brackets, for the person who knows
+the word and the AI that needs the type: ``### Employees (Character)``, ``*AI agent (Character,
+Agent) · id ...*`` when the element's supertype has its own word. File names keep the standard's
+slugs, a link keeps the target's slug, and ``x_names`` is never printed among the world's fields.
+
 Left out unless asked: room elements (the room profile, ``room.is_room_element``; ``--rooms``
 keeps them) and extension keys (``x_``, ``atlas_``, ``shadow_``; ``--extensions`` keeps them),
 each counted in the report. Server keys (``push.NOT_SENT``) are never written; a key that is not
@@ -79,6 +85,7 @@ from .errors import ApiError
 from .export import exported_as as _exported_as
 from .folder import KNOWN_OF, WORLD_FILE, Folder, is_known_of, read_folder
 from .http import API_BASE, Client
+from .names import type_word
 from .push import NOT_SENT
 from .room import is_room_element
 
@@ -110,10 +117,11 @@ INTRO_LINE = (
 )
 
 
-def made_by_line(exported_as: Mapping[str, Any] | None) -> str | None:
+def made_by_line(exported_as: Mapping[str, Any] | None, world: Mapping[str, Any] | None = None) -> str | None:
     """The one line saying which kind of key made the pack (a label, never a fix: a pack holds only
     what its key was served; Boss's four-way walk, h58 #10628). From the folder's ``exported_as``
-    (spec 4.2) or ``/me`` on the API; None, and no line, when the slice is not known. Never the key."""
+    (spec 4.2) or ``/me`` on the API; None, and no line, when the slice is not known. Never the key.
+    A ``world`` with a names map says the Character in its own word: "the Employee (Character) Ann"."""
     if not isinstance(exported_as, Mapping):
         return None
     kind, role = exported_as.get("kind"), exported_as.get("role")
@@ -124,8 +132,11 @@ def made_by_line(exported_as: Mapping[str, Any] | None) -> str | None:
     if kind == "character":
         ch = exported_as.get("character")
         name = ch.get("name") if isinstance(ch, Mapping) else None
-        who = f"the Character {name}" if isinstance(name, str) and name else "a Character"
-        return f"*Made as {who}: that Character's view, not the whole world.*"
+        word = type_word(world, "character")
+        seat = f"{word} (Character)" if word else "Character"
+        # "one", not "a": the article of a world's word is not ours to guess ("a Employee")
+        who = f"the {seat} {name}" if isinstance(name, str) and name else f"{'one' if word else 'a'} {seat}"
+        return f"*Made as {who}: that {word or 'Character'}'s view, not the whole world.*"
     if kind == "public":
         return "*Made from the public view: only what the world shows everyone.*"
     return None
@@ -209,14 +220,34 @@ _SENTENCE_END = re.compile(r"(?<=[.!?])\s")
 
 
 class _World:
-    """The names every link resolves to (the whole world read, room elements too), and the report."""
+    """The names every link resolves to (the whole world read, room elements too), the world's own
+    words for the types (its names map), and the report."""
 
-    def __init__(self, everything: Iterable[tuple[str, Mapping[str, Any]]], report: PackReport, note: Note):
+    def __init__(
+        self,
+        everything: Iterable[tuple[str, Mapping[str, Any]]],
+        report: PackReport,
+        note: Note,
+        world: Mapping[str, Any] | None = None,
+    ):
         self.names: dict[str, tuple[str, str]] = {}
         for slug, body in everything:
             self.names[body["id"]] = (_name(body), slug)
-        self.report, self.note = report, note
+        self.report, self.note, self.world = report, note, world
         self.unknown: Counter[tuple[str, str]] = Counter()
+
+    def type_label(self, slug: str, *, many: bool = False, supertype: Any = None) -> str:
+        """A type's name as the pack prints it: the standard's (``Characters``, ``Character``), or with
+        a names map the world's word first and the standard's in brackets, ``Employees (Character)``;
+        ``AI agent (Character, Agent)`` when the supertype's own entry gave the word."""
+        standard = slug.capitalize()
+        st = one_line(supertype) if isinstance(supertype, str) else ""
+        word = type_word(self.world, slug, supertype=st or None, many=many)
+        if word is None:
+            return PLURALS.get(slug, standard) if many else standard
+        if st and word != type_word(self.world, slug, many=many):
+            return f"{word} ({standard}, {st})"
+        return f"{word} ({standard})"
 
     def link(self, here: str, name: str, eid: Any, target: str | None) -> str | None:
         if not isinstance(eid, str) or not eid:
@@ -263,7 +294,7 @@ def element_block(slug: str, body: Mapping[str, Any], w: _World, *, extensions: 
     eid = body["id"]
     title = _name(body)
     here = f"{slug} {title} ({eid})"
-    meta = [slug.capitalize(), f"id {eid}"]
+    meta = [w.type_label(slug, supertype=body.get("supertype")), f"id {eid}"]
     if _kind(body):
         meta.append(_kind(body))
     head = [f"## {title}", "*" + " · ".join(meta) + "*"]
@@ -367,6 +398,8 @@ def _world_fields(world: Mapping[str, Any], w: _World, *, extensions: bool) -> s
         else:
             fields.append(f"**{heading(name)}:** {_scalar(value)}")
     for key, value in world.items():
+        if key == "x_names":  # the names profile: the words print on the types, never as a field
+            continue
         if key.startswith(EXTENSION_PREFIXES) and _set(value):
             if extensions:
                 fields.append(_extension(key, value))
@@ -402,7 +435,7 @@ def world_parts(
     parts at index-line boundaries: the fields in the first, each later part headed
     ``## Index (continued)``, a type's heading repeated ``(continued)`` where it runs on."""
     fields = _world_fields(world, w, extensions=extensions)
-    made = made_by_line(exported_as)
+    made = made_by_line(exported_as, world)
     intro = f"{INTRO_LINE}\n\n{made}" if made else INTRO_LINE
     items = [(slug, _name(b), _index_line(b, w) + "\n") for slug in ELEMENT_TYPES for b in index.get(slug, [])]
 
@@ -411,7 +444,7 @@ def world_parts(
         return f"{top}\n\n{intro}\n\n{fields}## Index\n" if k == 1 else f"{top}\n\n## Index (continued)\n"
 
     def type_head(slug: str, continued: bool) -> str:
-        return f"\n### {PLURALS.get(slug, slug.capitalize())}{' (continued)' if continued else ''}\n\n"
+        return f"\n### {w.type_label(slug, many=True)}{' (continued)' if continued else ''}\n\n"
 
     def render(groups: list[list[int]]) -> list[_Part]:
         parts, started = [], set()
@@ -574,7 +607,7 @@ def build_pack(
             noted(f"a {slug} named {_name(body)!r} has no id; left out")
         else:
             valid.append((slug, body))
-    w = _World(valid, report, noted)
+    w = _World(valid, report, noted, world)
 
     kept: dict[str, list[Mapping[str, Any]]] = {}
     for slug, body in valid:
@@ -591,7 +624,7 @@ def build_pack(
         if slug not in kept:
             continue
         blocks = [(_name(b), element_block(slug, b, w, extensions=extensions)) for b in kept[slug]]
-        title = f"{PLURALS.get(slug, slug.capitalize())} of {world_title}"
+        title = f"{w.type_label(slug, many=True)} of {world_title}"
         units.append(_Unit([slug], _split(title, blocks, words, bytes_)))
     for (slug, key), n in sorted(w.unknown.items()):
         noted(f"{slug}: `{key}` is not a field of {slug}; left out ({n} element{'s' if n != 1 else ''})")
