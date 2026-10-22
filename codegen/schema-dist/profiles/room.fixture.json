@@ -1,0 +1,246 @@
+{
+  "profile": "room",
+  "profile_page": "profiles/room.md",
+  "notes": [
+    "pairs: the eight type-and-supertype pairs a reader matches, each trimmed and compared without regard to case.",
+    "mark: x_room_of, the id of the world or the sitting the room belongs to; a room element carries it, a lore element never does.",
+    "cases: element gives type, supertype and x_room_of as a body might carry them; in_room is what isRoomElement must answer: the pair AND the mark."
+  ],
+  "pairs": [
+    {
+      "type": "narrative",
+      "supertype": "Message"
+    },
+    {
+      "type": "narrative",
+      "supertype": "Board"
+    },
+    {
+      "type": "relation",
+      "supertype": "Work item"
+    },
+    {
+      "type": "construct",
+      "supertype": "Spec"
+    },
+    {
+      "type": "relation",
+      "supertype": "Heart"
+    },
+    {
+      "type": "relation",
+      "supertype": "Vote"
+    },
+    {
+      "type": "event",
+      "supertype": "Sitting"
+    },
+    {
+      "type": "character",
+      "supertype": "Member"
+    }
+  ],
+  "cases": [
+    {
+      "name": "message",
+      "element": {
+        "type": "narrative",
+        "supertype": "Message",
+        "x_room_of": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f"
+      },
+      "in_room": true
+    },
+    {
+      "name": "board",
+      "element": {
+        "type": "narrative",
+        "supertype": "Board",
+        "x_room_of": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f"
+      },
+      "in_room": true
+    },
+    {
+      "name": "work-item",
+      "element": {
+        "type": "relation",
+        "supertype": "Work item",
+        "x_room_of": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f"
+      },
+      "in_room": true
+    },
+    {
+      "name": "spec",
+      "element": {
+        "type": "construct",
+        "supertype": "Spec",
+        "x_room_of": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f"
+      },
+      "in_room": true
+    },
+    {
+      "name": "heart",
+      "element": {
+        "type": "relation",
+        "supertype": "Heart",
+        "x_room_of": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f"
+      },
+      "in_room": true
+    },
+    {
+      "name": "vote",
+      "element": {
+        "type": "relation",
+        "supertype": "Vote",
+        "x_room_of": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f"
+      },
+      "in_room": true
+    },
+    {
+      "name": "sitting",
+      "element": {
+        "type": "event",
+        "supertype": "Sitting",
+        "x_room_of": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f"
+      },
+      "in_room": true
+    },
+    {
+      "name": "member",
+      "element": {
+        "type": "character",
+        "supertype": "Member",
+        "x_room_of": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f"
+      },
+      "in_room": true
+    },
+    {
+      "name": "case-blind",
+      "element": {
+        "type": "Narrative",
+        "supertype": "message",
+        "x_room_of": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f"
+      },
+      "in_room": true
+    },
+    {
+      "name": "trimmed",
+      "element": {
+        "type": "relation",
+        "supertype": " Work item ",
+        "x_room_of": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f"
+      },
+      "in_room": true
+    },
+    {
+      "name": "charter-stays-lore",
+      "element": {
+        "type": "law",
+        "supertype": "Charter"
+      },
+      "in_room": false
+    },
+    {
+      "name": "wrong-type-same-word",
+      "element": {
+        "type": "character",
+        "supertype": "Message"
+      },
+      "in_room": false
+    },
+    {
+      "name": "resembles-not-whole-word",
+      "element": {
+        "type": "narrative",
+        "supertype": "Messages"
+      },
+      "in_room": false
+    },
+    {
+      "name": "prefix-not-whole-word",
+      "element": {
+        "type": "relation",
+        "supertype": "Work"
+      },
+      "in_room": false
+    },
+    {
+      "name": "no-supertype",
+      "element": {
+        "type": "narrative",
+        "supertype": null
+      },
+      "in_room": false
+    },
+    {
+      "name": "empty-supertype",
+      "element": {
+        "type": "event",
+        "supertype": ""
+      },
+      "in_room": false
+    },
+    {
+      "name": "lore-narrative",
+      "element": {
+        "type": "narrative",
+        "supertype": "Legend"
+      },
+      "in_room": false
+    },
+    {
+      "name": "lore-letter-no-mark",
+      "element": {
+        "type": "narrative",
+        "supertype": "Message"
+      },
+      "in_room": false
+    },
+    {
+      "name": "lore-vote-no-mark",
+      "element": {
+        "type": "relation",
+        "supertype": "Vote"
+      },
+      "in_room": false
+    },
+    {
+      "name": "lore-sitting-no-mark",
+      "element": {
+        "type": "event",
+        "supertype": "Sitting"
+      },
+      "in_room": false
+    },
+    {
+      "name": "mark-without-pair",
+      "element": {
+        "type": "location",
+        "supertype": "Harbour",
+        "x_room_of": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f"
+      },
+      "in_room": false
+    },
+    {
+      "name": "mark-empty",
+      "element": {
+        "type": "narrative",
+        "supertype": "Message",
+        "x_room_of": ""
+      },
+      "in_room": false
+    },
+    {
+      "name": "mark-null",
+      "element": {
+        "type": "narrative",
+        "supertype": "Message",
+        "x_room_of": null
+      },
+      "in_room": false
+    }
+  ],
+  "mark": {
+    "field": "x_room_of",
+    "value": "the world id (a world's parlor) or the sitting's id (a workshop)"
+  }
+}

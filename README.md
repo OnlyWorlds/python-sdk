@@ -160,6 +160,19 @@ saved_cursor = walk.cursor  # opaque: keep it, don't parse it
 
 The 22 element types and each field's kind are generated from the published [schema distribution](https://github.com/OnlyWorlds/schema-dist); `onlyworlds.SCHEMA_VERSION` and `onlyworlds.SCHEMA_DIST_TAG` say which one. `onlyworlds.PUBLIC_FIELDS` names, per type, the fields OnlyWorlds shows on a known-of element (one a guest sees only one step out) beside its name and description. The package's own version doesn't track the schema's.
 
+### The room
+
+A parlor (a chat room on a world) keeps its lines, board entries, work items, specs, hearts, votes, sittings and member cards in the world as ordinary elements, told apart by type and supertype and marked with `x_room_of` (the id of the world or sitting the room belongs to). `onlyworlds.ROOM_PAIRS` is the room profile's list of those `(type, supertype)` pairs, and `onlyworlds.is_room_element(element)` is true when a body or a `FolderElement` matches one (trimmed, case-blind, the whole word) and carries the mark. A pair without the mark is lore: a novel's letters are Narratives with supertype Message.
+
+```python
+from onlyworlds import is_room_element
+
+# a lore view, unless the person asks for the room
+lore = [el for el in folder.all_elements().values() if not is_room_element(el)]
+```
+
+A lore view (a list, a count, search, a graph, a story's context, a survey) leaves room elements out unless the person asks; the room's own views show them whole, and a writer writes them like any element. A Law with supertype `Charter` is lore on purpose. The profile: [`profiles/room.md`](https://github.com/OnlyWorlds/schema-dist/blob/main/profiles/room.md) in the schema distribution.
+
 Not yet: typed element models, the account routes, a snapshot writer.
 
 ## Develop

@@ -26,6 +26,7 @@ import argparse
 import hashlib
 import importlib.util
 import json
+import re
 import sys
 from pathlib import Path
 from typing import Any
@@ -211,6 +212,49 @@ def public_fields(types: list[str], layout: dict[str, Any]) -> dict[str, list[st
     return out
 
 
+ROOM_ROW = re.compile(r"^\|\s*`([^`]+)`\s*\|\s*`([^`]+)`\s*\|")
+
+
+def room_pairs(types: list[str]) -> list[tuple[str, str]]:
+    """The room profile's (type, supertype) pairs (dist serial 44 on, profiles/room.md), the npm SDK's
+    ROOM_PAIRS. Emitted from the fixture's ``pairs``, the machine-readable copy, and checked against the
+    page's own table: the two must name the same pairs in the same order, or generation fails instead of
+    picking one."""
+    fixture_path, page_path = DIST / "profiles" / "room.fixture.json", DIST / "profiles" / "room.md"
+    fixture: dict[str, Any] = json.loads(fixture_path.read_text(encoding="utf-8"))
+    raw = fixture.get("pairs")
+    if not isinstance(raw, list) or not raw:
+        raise SystemExit(f"{fixture_path}: `pairs` is {raw!r}, expected a list of {{type, supertype}}")
+    pairs: list[tuple[str, str]] = []
+    for p in raw:
+        if not isinstance(p, dict) or set(p) != {"type", "supertype"}:
+            raise SystemExit(f"{fixture_path}: a pair is {p!r}, expected {{type, supertype}}")
+        t, s = p["type"], p["supertype"]
+        if t not in types or not isinstance(s, str) or not s or s != s.strip() or '"' in s or "\\" in s:
+            raise SystemExit(f"{fixture_path}: pair {p!r}: not an element type, or a supertype this emitter refuses")
+        pairs.append((t, s))
+    if len({(t.lower(), s.lower()) for t, s in pairs}) != len(pairs):
+        raise SystemExit(f"{fixture_path}: pairs repeat one another without regard to case: {pairs!r}")
+    lines = page_path.read_text(encoding="utf-8").splitlines()
+    table = [(m[1], m[2]) for m in map(ROOM_ROW.match, lines) if m]
+    if table != pairs:
+        raise SystemExit(f"the room profile's two copies disagree: room.md's table {table}, the fixture's {pairs}")
+    return pairs
+
+
+def room_mark() -> str:
+    """The room profile's mark (dist serial 45 on): the extension field the parlor writes on every room element
+    beside the pair. From the fixture's ``mark.field``; it must sit under the profile's reserved prefix ``x_room_``
+    and be named in room.md, or generation fails."""
+    fixture: dict[str, Any] = json.loads((DIST / "profiles" / "room.fixture.json").read_text(encoding="utf-8"))
+    mark = (fixture.get("mark") or {}).get("field")
+    if not isinstance(mark, str) or not re.fullmatch(r"x_room_[a-z0-9_]+", mark):
+        raise SystemExit(f"room.fixture.json: mark.field is {mark!r}, expected an extension key under x_room_")
+    if f"`{mark}`" not in (DIST / "profiles" / "room.md").read_text(encoding="utf-8"):
+        raise SystemExit(f"room.md does not name the fixture's mark `{mark}`")
+    return mark
+
+
 def element_types(walk: Any) -> list[str]:
     from_walk: list[str] = list(walk.ELEMENT_TYPES)
     from_files = sorted(p.stem for p in (DIST / "schema").glob("*.yaml") if p.stem not in NON_ELEMENT_SCHEMA_FILES)
@@ -227,6 +271,8 @@ def render(
     layout: dict[str, Any],
     prefixes: tuple[str, ...],
     public: dict[str, list[str]],
+    room: list[tuple[str, str]],
+    mark: str,
 ) -> str:
     def strs(names: list[str]) -> str:
         return "(" + ", ".join(f'"{n}"' for n in names) + ("," if len(names) == 1 else "") + ")"
@@ -326,6 +372,17 @@ def render(
         "# Prefixes of the extension keys a tool may add to any element (dist walk/lint_folder.py).",
         f"EXTENSION_PREFIXES: tuple[str, ...] = {strs(list(prefixes))}",
         "",
+        "# The room profile (profiles/room.md): the (type, supertype) pairs a parlor puts in a world, each",
+        "# matched trimmed and without regard to case, together with the mark ROOM_MARK (room.is_room_element).",
+        "# From room.fixture.json's pairs, checked against the page's table. A convention on the 22 types.",
+        "ROOM_PAIRS: tuple[tuple[str, str], ...] = (",
+        *[f'    ("{t}", "{s}"),' for t, s in room],
+        ")",
+        "",
+        "# The room profile's mark: the extension field the parlor writes on every room element, the id of the",
+        "# world or sitting the room belongs to (room.fixture.json's mark.field, checked against room.md).",
+        f'ROOM_MARK = "{mark}"',
+        "",
     ]
     return "\n".join(lines)
 
@@ -339,7 +396,17 @@ def main() -> int:
     types = element_types(walk)
     kinds, pairs = field_kinds(walk, types), generic_pairs(walk, types)
     layout = layout_tables(decoded_schema(walk), types, kinds, pairs)
-    text = render(pin, types, kinds, pairs, layout, extension_prefixes(), public_fields(types, layout))
+    text = render(
+        pin,
+        types,
+        kinds,
+        pairs,
+        layout,
+        extension_prefixes(),
+        public_fields(types, layout),
+        room_pairs(types),
+        room_mark(),
+    )
     if args.check:
         current = OUT.read_bytes().decode("utf-8") if OUT.is_file() else ""
         if current != text:

@@ -2,15 +2,20 @@
   "_what": "The recorded pin for the vendored OnlyWorlds schema distribution (codegen/schema-dist/, copied byte-exact). Do not edit by hand; re-vendor from the pinned tag and review the diff. Kept equal to the npm SDK's pin (github.com/OnlyWorlds/sdk, codegen/schema-pin.json) on purpose: two clients, one schema.",
   "_why_manifest_sha256": "Verifying the tree against its own MANIFEST.json only proves internal consistency. If the tag moved, the manifest moved with it. The hash recorded here is the one first accepted, which is what makes a moved tag visible.",
   "repo": "https://github.com/OnlyWorlds/schema-dist",
-  "tag": "v0.33.0-dist.43",
-  "commit": "1bd7e3571519f425856a3177c748c98806d2e961",
-  "manifest_sha256": "a9bbe8171e2e815cdec05a7ddd2a3d07beb4212fcbd6dc80e9cae81935e4cf7f",
+  "tag": "v0.33.0-dist.45",
+  "commit": "f2a23f3a7d7b2fa04bb5d8197931020a74f5946e",
+  "manifest_sha256": "ed5fcab2d2e768d06282073993a4abac5c99f94753c8fd9c5f52596a636b4566",
   "canonical_version": "00.33.00",
-  "dist_serial": 43,
+  "dist_serial": 45,
   "published": "2026-10-22",
   "pinned_at": "2026-10-22",
-  "pinned_by": "The maintainer: tree from `git archive` of the tag in a schema-dist checkout; files re-hashed against MANIFEST.json by generate_schema.py; MANIFEST self-hash matched against the raw file GitHub serves at the tag, whose ref resolves to the commit above. The same tag and hash as the npm SDK's 4.54.0 pin.",
+  "pinned_by": "The maintainer: tree from `git archive` of the tag in a schema-dist checkout; files re-hashed against MANIFEST.json by generate_schema.py; MANIFEST self-hash matched against the raw file GitHub serves at the tag, whose ref resolves to the commit above. The same tag and hash as the npm SDK's 4.55.0 pin.",
   "previous_pins": [
+    {
+      "tag": "v0.33.0-dist.43",
+      "manifest_sha256": "a9bbe8171e2e815cdec05a7ddd2a3d07beb4212fcbd6dc80e9cae81935e4cf7f",
+      "note": "superseded by v0.33.0-dist.45 (same canonical 00.33.00; profiles/ gains room.md and room.fixture.json, the room profile: eight type-and-supertype pairs and the mark x_room_of, 23 conformance cases; no schema file moved. Serial 44, the pairs without the mark, was superseded the same hour and pinned in no release)"
+    },
     {
       "tag": "v0.32.2-dist.42",
       "manifest_sha256": "a0fff6799f44d04dbece127229576ac6e4e137b488727ebecc0a5f87f83481e0",

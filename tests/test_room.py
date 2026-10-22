@@ -1,0 +1,68 @@
+"""The room profile (schema-dist ``profiles/room.md``, serial 45): ``ROOM_PAIRS`` against the fixture's
+pairs, and ``is_room_element`` (the pair AND the mark ``x_room_of``) on every conformance case in
+``codegen/schema-dist/profiles/room.fixture.json``, vendored with the distribution. The npm SDK's
+``isRoomElement`` runs the same cases."""
+
+from __future__ import annotations
+
+import json
+from pathlib import Path
+from typing import Any
+
+from onlyworlds import ROOM_PAIRS, FolderElement, is_room_element
+
+REPO = Path(__file__).resolve().parent.parent
+FIXTURE = REPO / "codegen" / "schema-dist" / "profiles" / "room.fixture.json"
+WORLD = "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f"
+
+
+def load_fixture() -> dict[str, Any]:
+    assert FIXTURE.is_file(), f"no room fixture at {FIXTURE}"
+    doc: dict[str, Any] = json.loads(FIXTURE.read_text(encoding="utf-8"))
+    assert doc["profile"] == "room"
+    return doc
+
+
+def test_room_pairs_are_the_fixtures_in_order_and_the_mark_is_x_room_of() -> None:
+    doc = load_fixture()
+    assert [{"type": t, "supertype": s} for t, s in ROOM_PAIRS] == doc["pairs"]
+    assert len(ROOM_PAIRS) == 8
+    assert doc["mark"]["field"] == "x_room_of"
+
+
+def test_is_room_element_answers_every_fixture_case() -> None:
+    cases = load_fixture()["cases"]
+    wrong = [
+        f"{c['name']}: {c['element']} gave {got}, the fixture says {c['in_room']}"
+        for c in cases
+        if (got := is_room_element(c["element"])) is not c["in_room"]
+    ]
+    assert wrong == []
+    assert len(cases) >= 23, f"the fixture holds {len(cases)} cases"
+
+
+def test_without_a_string_type_supertype_or_mark_it_is_not_in_the_room() -> None:
+    assert is_room_element({}) is False
+    assert is_room_element({"type": "narrative", "x_room_of": WORLD}) is False
+    assert is_room_element({"supertype": "Message", "x_room_of": WORLD}) is False
+    assert is_room_element({"type": "narrative", "supertype": "   ", "x_room_of": WORLD}) is False
+    assert is_room_element({"type": "narrative", "supertype": "Message", "x_room_of": 7}) is False
+
+
+def test_the_fold_is_unicode_simple_case_folding_as_the_npm_sdk() -> None:
+    long_s = chr(0x17F)  # LATIN SMALL LETTER LONG S simple-folds to "s"; str.lower() leaves it
+    assert is_room_element({"type": "NARRATIVE", "supertype": f"Me{long_s}{long_s}age", "x_room_of": WORLD}) is True
+    assert is_room_element({"type": "Relation", "supertype": "\tWORK ITEM\n", "x_room_of": WORLD}) is True
+
+
+def test_a_folder_element_is_matched_by_its_type_even_when_the_body_has_none() -> None:
+    body = {"id": "0192a000-aaaa-7bbb-8ccc-000000000001", "name": "a line", "supertype": "Message"}
+    marked = {**body, "x_room_of": WORLD}
+
+    def element(b: dict[str, Any]) -> FolderElement:
+        path = Path("elements/narrative/a-line.json")
+        return FolderElement(id=b["id"], type="narrative", type_inferred=True, body=b, path=path, layout="elements")
+
+    assert is_room_element(element(marked)) is True
+    assert is_room_element(marked) is False  # the body alone has no type
+    assert is_room_element(element(body)) is False  # a letter without the mark is lore

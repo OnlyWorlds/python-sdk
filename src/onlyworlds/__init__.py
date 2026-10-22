@@ -10,6 +10,7 @@ from ._schema import (
     ELEMENT_TYPES,
     FIELD_KINDS,
     PUBLIC_FIELDS,
+    ROOM_PAIRS,
     SCHEMA_DIST_TAG,
     SCHEMA_MANIFEST_SHA256,
     SCHEMA_VERSION,
@@ -46,6 +47,7 @@ from .http import (
     sanitize_payload,
 )
 from .push import Patch, PushPlan, PushResult, plan_push, push, verify_level
+from .room import is_room_element
 from .worldfile import (
     WORLD_FILE_MEDIA_TYPE,
     WorldFile,
@@ -63,6 +65,7 @@ __all__ = [
     "KNOWN_OF_KEEPS",
     "PUBLIC_FIELDS",
     "READ_ONLY_FIELDS",
+    "ROOM_PAIRS",
     "SCHEMA_DIST_TAG",
     "SCHEMA_MANIFEST_SHA256",
     "SCHEMA_VERSION",
@@ -90,6 +93,7 @@ __all__ = [
     "element_filename",
     "export_world",
     "is_known_of",
+    "is_room_element",
     "parse_retry_after",
     "plan_push",
     "push",
