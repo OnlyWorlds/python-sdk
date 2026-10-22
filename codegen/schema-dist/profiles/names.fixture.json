@@ -1,0 +1,1120 @@
+{
+  "profile": "x_names",
+  "profile_page": "profiles/names.md",
+  "notes": [
+    "map: the World's x_names value as a body carries it (an object, or something that is not).",
+    "type: the element's type slug; supertype: the element's supertype when the case has one; many: whether the reader prints a plural.",
+    "word: what a conforming reader prints, or null: the standard's name for the type."
+  ],
+  "cases": [
+    {
+      "name": "type-one",
+      "map": {
+        "version": 1,
+        "types": {
+          "character": {
+            "one": "Employee",
+            "many": "Employees"
+          },
+          "institution": {
+            "one": "Team"
+          },
+          "construct": {
+            "one": " Procedure ",
+            "many": " Procedures "
+          },
+          "employee": {
+            "one": "Nope",
+            "many": "Nopes"
+          },
+          "event": {
+            "one": 3
+          },
+          "law": {
+            "one": "   "
+          },
+          "object": {
+            "one": "Asset",
+            "many": [
+              "Assets"
+            ]
+          },
+          "title": {
+            "one": "Role",
+            "many": "   "
+          }
+        },
+        "supertypes": {
+          "character": {
+            "Agent": {
+              "one": "AI agent",
+              "many": "AI agents"
+            },
+            "Contractor": {
+              "one": "  "
+            }
+          },
+          "relation": {
+            "Work item": {
+              "one": "Ticket",
+              "many": "Tickets"
+            }
+          }
+        },
+        "note": "an unknown key, kept and ignored"
+      },
+      "type": "character",
+      "many": false,
+      "word": "Employee"
+    },
+    {
+      "name": "type-many",
+      "map": {
+        "version": 1,
+        "types": {
+          "character": {
+            "one": "Employee",
+            "many": "Employees"
+          },
+          "institution": {
+            "one": "Team"
+          },
+          "construct": {
+            "one": " Procedure ",
+            "many": " Procedures "
+          },
+          "employee": {
+            "one": "Nope",
+            "many": "Nopes"
+          },
+          "event": {
+            "one": 3
+          },
+          "law": {
+            "one": "   "
+          },
+          "object": {
+            "one": "Asset",
+            "many": [
+              "Assets"
+            ]
+          },
+          "title": {
+            "one": "Role",
+            "many": "   "
+          }
+        },
+        "supertypes": {
+          "character": {
+            "Agent": {
+              "one": "AI agent",
+              "many": "AI agents"
+            },
+            "Contractor": {
+              "one": "  "
+            }
+          },
+          "relation": {
+            "Work item": {
+              "one": "Ticket",
+              "many": "Tickets"
+            }
+          }
+        },
+        "note": "an unknown key, kept and ignored"
+      },
+      "type": "character",
+      "many": true,
+      "word": "Employees"
+    },
+    {
+      "name": "many-absent-prints-one",
+      "map": {
+        "version": 1,
+        "types": {
+          "character": {
+            "one": "Employee",
+            "many": "Employees"
+          },
+          "institution": {
+            "one": "Team"
+          },
+          "construct": {
+            "one": " Procedure ",
+            "many": " Procedures "
+          },
+          "employee": {
+            "one": "Nope",
+            "many": "Nopes"
+          },
+          "event": {
+            "one": 3
+          },
+          "law": {
+            "one": "   "
+          },
+          "object": {
+            "one": "Asset",
+            "many": [
+              "Assets"
+            ]
+          },
+          "title": {
+            "one": "Role",
+            "many": "   "
+          }
+        },
+        "supertypes": {
+          "character": {
+            "Agent": {
+              "one": "AI agent",
+              "many": "AI agents"
+            },
+            "Contractor": {
+              "one": "  "
+            }
+          },
+          "relation": {
+            "Work item": {
+              "one": "Ticket",
+              "many": "Tickets"
+            }
+          }
+        },
+        "note": "an unknown key, kept and ignored"
+      },
+      "type": "institution",
+      "many": true,
+      "word": "Team"
+    },
+    {
+      "name": "supertype-one",
+      "map": {
+        "version": 1,
+        "types": {
+          "character": {
+            "one": "Employee",
+            "many": "Employees"
+          },
+          "institution": {
+            "one": "Team"
+          },
+          "construct": {
+            "one": " Procedure ",
+            "many": " Procedures "
+          },
+          "employee": {
+            "one": "Nope",
+            "many": "Nopes"
+          },
+          "event": {
+            "one": 3
+          },
+          "law": {
+            "one": "   "
+          },
+          "object": {
+            "one": "Asset",
+            "many": [
+              "Assets"
+            ]
+          },
+          "title": {
+            "one": "Role",
+            "many": "   "
+          }
+        },
+        "supertypes": {
+          "character": {
+            "Agent": {
+              "one": "AI agent",
+              "many": "AI agents"
+            },
+            "Contractor": {
+              "one": "  "
+            }
+          },
+          "relation": {
+            "Work item": {
+              "one": "Ticket",
+              "many": "Tickets"
+            }
+          }
+        },
+        "note": "an unknown key, kept and ignored"
+      },
+      "type": "character",
+      "many": false,
+      "word": "AI agent",
+      "supertype": "Agent"
+    },
+    {
+      "name": "supertype-many",
+      "map": {
+        "version": 1,
+        "types": {
+          "character": {
+            "one": "Employee",
+            "many": "Employees"
+          },
+          "institution": {
+            "one": "Team"
+          },
+          "construct": {
+            "one": " Procedure ",
+            "many": " Procedures "
+          },
+          "employee": {
+            "one": "Nope",
+            "many": "Nopes"
+          },
+          "event": {
+            "one": 3
+          },
+          "law": {
+            "one": "   "
+          },
+          "object": {
+            "one": "Asset",
+            "many": [
+              "Assets"
+            ]
+          },
+          "title": {
+            "one": "Role",
+            "many": "   "
+          }
+        },
+        "supertypes": {
+          "character": {
+            "Agent": {
+              "one": "AI agent",
+              "many": "AI agents"
+            },
+            "Contractor": {
+              "one": "  "
+            }
+          },
+          "relation": {
+            "Work item": {
+              "one": "Ticket",
+              "many": "Tickets"
+            }
+          }
+        },
+        "note": "an unknown key, kept and ignored"
+      },
+      "type": "character",
+      "many": true,
+      "word": "AI agents",
+      "supertype": "Agent"
+    },
+    {
+      "name": "supertype-trimmed-case",
+      "map": {
+        "version": 1,
+        "types": {
+          "character": {
+            "one": "Employee",
+            "many": "Employees"
+          },
+          "institution": {
+            "one": "Team"
+          },
+          "construct": {
+            "one": " Procedure ",
+            "many": " Procedures "
+          },
+          "employee": {
+            "one": "Nope",
+            "many": "Nopes"
+          },
+          "event": {
+            "one": 3
+          },
+          "law": {
+            "one": "   "
+          },
+          "object": {
+            "one": "Asset",
+            "many": [
+              "Assets"
+            ]
+          },
+          "title": {
+            "one": "Role",
+            "many": "   "
+          }
+        },
+        "supertypes": {
+          "character": {
+            "Agent": {
+              "one": "AI agent",
+              "many": "AI agents"
+            },
+            "Contractor": {
+              "one": "  "
+            }
+          },
+          "relation": {
+            "Work item": {
+              "one": "Ticket",
+              "many": "Tickets"
+            }
+          }
+        },
+        "note": "an unknown key, kept and ignored"
+      },
+      "type": "character",
+      "many": false,
+      "word": "AI agent",
+      "supertype": "  agent "
+    },
+    {
+      "name": "supertype-unmapped-falls-to-type",
+      "map": {
+        "version": 1,
+        "types": {
+          "character": {
+            "one": "Employee",
+            "many": "Employees"
+          },
+          "institution": {
+            "one": "Team"
+          },
+          "construct": {
+            "one": " Procedure ",
+            "many": " Procedures "
+          },
+          "employee": {
+            "one": "Nope",
+            "many": "Nopes"
+          },
+          "event": {
+            "one": 3
+          },
+          "law": {
+            "one": "   "
+          },
+          "object": {
+            "one": "Asset",
+            "many": [
+              "Assets"
+            ]
+          },
+          "title": {
+            "one": "Role",
+            "many": "   "
+          }
+        },
+        "supertypes": {
+          "character": {
+            "Agent": {
+              "one": "AI agent",
+              "many": "AI agents"
+            },
+            "Contractor": {
+              "one": "  "
+            }
+          },
+          "relation": {
+            "Work item": {
+              "one": "Ticket",
+              "many": "Tickets"
+            }
+          }
+        },
+        "note": "an unknown key, kept and ignored"
+      },
+      "type": "character",
+      "many": false,
+      "word": "Employee",
+      "supertype": "Founder"
+    },
+    {
+      "name": "supertype-only-no-type-word",
+      "map": {
+        "version": 1,
+        "types": {
+          "character": {
+            "one": "Employee",
+            "many": "Employees"
+          },
+          "institution": {
+            "one": "Team"
+          },
+          "construct": {
+            "one": " Procedure ",
+            "many": " Procedures "
+          },
+          "employee": {
+            "one": "Nope",
+            "many": "Nopes"
+          },
+          "event": {
+            "one": 3
+          },
+          "law": {
+            "one": "   "
+          },
+          "object": {
+            "one": "Asset",
+            "many": [
+              "Assets"
+            ]
+          },
+          "title": {
+            "one": "Role",
+            "many": "   "
+          }
+        },
+        "supertypes": {
+          "character": {
+            "Agent": {
+              "one": "AI agent",
+              "many": "AI agents"
+            },
+            "Contractor": {
+              "one": "  "
+            }
+          },
+          "relation": {
+            "Work item": {
+              "one": "Ticket",
+              "many": "Tickets"
+            }
+          }
+        },
+        "note": "an unknown key, kept and ignored"
+      },
+      "type": "relation",
+      "many": true,
+      "word": "Tickets",
+      "supertype": "Work item"
+    },
+    {
+      "name": "supertype-only-other-supertype",
+      "map": {
+        "version": 1,
+        "types": {
+          "character": {
+            "one": "Employee",
+            "many": "Employees"
+          },
+          "institution": {
+            "one": "Team"
+          },
+          "construct": {
+            "one": " Procedure ",
+            "many": " Procedures "
+          },
+          "employee": {
+            "one": "Nope",
+            "many": "Nopes"
+          },
+          "event": {
+            "one": 3
+          },
+          "law": {
+            "one": "   "
+          },
+          "object": {
+            "one": "Asset",
+            "many": [
+              "Assets"
+            ]
+          },
+          "title": {
+            "one": "Role",
+            "many": "   "
+          }
+        },
+        "supertypes": {
+          "character": {
+            "Agent": {
+              "one": "AI agent",
+              "many": "AI agents"
+            },
+            "Contractor": {
+              "one": "  "
+            }
+          },
+          "relation": {
+            "Work item": {
+              "one": "Ticket",
+              "many": "Tickets"
+            }
+          }
+        },
+        "note": "an unknown key, kept and ignored"
+      },
+      "type": "relation",
+      "many": false,
+      "word": null,
+      "supertype": "Heart"
+    },
+    {
+      "name": "type-unmapped",
+      "map": {
+        "version": 1,
+        "types": {
+          "character": {
+            "one": "Employee",
+            "many": "Employees"
+          },
+          "institution": {
+            "one": "Team"
+          },
+          "construct": {
+            "one": " Procedure ",
+            "many": " Procedures "
+          },
+          "employee": {
+            "one": "Nope",
+            "many": "Nopes"
+          },
+          "event": {
+            "one": 3
+          },
+          "law": {
+            "one": "   "
+          },
+          "object": {
+            "one": "Asset",
+            "many": [
+              "Assets"
+            ]
+          },
+          "title": {
+            "one": "Role",
+            "many": "   "
+          }
+        },
+        "supertypes": {
+          "character": {
+            "Agent": {
+              "one": "AI agent",
+              "many": "AI agents"
+            },
+            "Contractor": {
+              "one": "  "
+            }
+          },
+          "relation": {
+            "Work item": {
+              "one": "Ticket",
+              "many": "Tickets"
+            }
+          }
+        },
+        "note": "an unknown key, kept and ignored"
+      },
+      "type": "location",
+      "many": false,
+      "word": null
+    },
+    {
+      "name": "unknown-slug-ignored",
+      "map": {
+        "version": 1,
+        "types": {
+          "character": {
+            "one": "Employee",
+            "many": "Employees"
+          },
+          "institution": {
+            "one": "Team"
+          },
+          "construct": {
+            "one": " Procedure ",
+            "many": " Procedures "
+          },
+          "employee": {
+            "one": "Nope",
+            "many": "Nopes"
+          },
+          "event": {
+            "one": 3
+          },
+          "law": {
+            "one": "   "
+          },
+          "object": {
+            "one": "Asset",
+            "many": [
+              "Assets"
+            ]
+          },
+          "title": {
+            "one": "Role",
+            "many": "   "
+          }
+        },
+        "supertypes": {
+          "character": {
+            "Agent": {
+              "one": "AI agent",
+              "many": "AI agents"
+            },
+            "Contractor": {
+              "one": "  "
+            }
+          },
+          "relation": {
+            "Work item": {
+              "one": "Ticket",
+              "many": "Tickets"
+            }
+          }
+        },
+        "note": "an unknown key, kept and ignored"
+      },
+      "type": "species",
+      "many": false,
+      "word": null
+    },
+    {
+      "name": "entry-one-not-string-ignored",
+      "map": {
+        "version": 1,
+        "types": {
+          "character": {
+            "one": "Employee",
+            "many": "Employees"
+          },
+          "institution": {
+            "one": "Team"
+          },
+          "construct": {
+            "one": " Procedure ",
+            "many": " Procedures "
+          },
+          "employee": {
+            "one": "Nope",
+            "many": "Nopes"
+          },
+          "event": {
+            "one": 3
+          },
+          "law": {
+            "one": "   "
+          },
+          "object": {
+            "one": "Asset",
+            "many": [
+              "Assets"
+            ]
+          },
+          "title": {
+            "one": "Role",
+            "many": "   "
+          }
+        },
+        "supertypes": {
+          "character": {
+            "Agent": {
+              "one": "AI agent",
+              "many": "AI agents"
+            },
+            "Contractor": {
+              "one": "  "
+            }
+          },
+          "relation": {
+            "Work item": {
+              "one": "Ticket",
+              "many": "Tickets"
+            }
+          }
+        },
+        "note": "an unknown key, kept and ignored"
+      },
+      "type": "event",
+      "many": false,
+      "word": null
+    },
+    {
+      "name": "entry-one-blank-ignored",
+      "map": {
+        "version": 1,
+        "types": {
+          "character": {
+            "one": "Employee",
+            "many": "Employees"
+          },
+          "institution": {
+            "one": "Team"
+          },
+          "construct": {
+            "one": " Procedure ",
+            "many": " Procedures "
+          },
+          "employee": {
+            "one": "Nope",
+            "many": "Nopes"
+          },
+          "event": {
+            "one": 3
+          },
+          "law": {
+            "one": "   "
+          },
+          "object": {
+            "one": "Asset",
+            "many": [
+              "Assets"
+            ]
+          },
+          "title": {
+            "one": "Role",
+            "many": "   "
+          }
+        },
+        "supertypes": {
+          "character": {
+            "Agent": {
+              "one": "AI agent",
+              "many": "AI agents"
+            },
+            "Contractor": {
+              "one": "  "
+            }
+          },
+          "relation": {
+            "Work item": {
+              "one": "Ticket",
+              "many": "Tickets"
+            }
+          }
+        },
+        "note": "an unknown key, kept and ignored"
+      },
+      "type": "law",
+      "many": false,
+      "word": null,
+      "supertype": ""
+    },
+    {
+      "name": "many-not-string-prints-one",
+      "map": {
+        "version": 1,
+        "types": {
+          "character": {
+            "one": "Employee",
+            "many": "Employees"
+          },
+          "institution": {
+            "one": "Team"
+          },
+          "construct": {
+            "one": " Procedure ",
+            "many": " Procedures "
+          },
+          "employee": {
+            "one": "Nope",
+            "many": "Nopes"
+          },
+          "event": {
+            "one": 3
+          },
+          "law": {
+            "one": "   "
+          },
+          "object": {
+            "one": "Asset",
+            "many": [
+              "Assets"
+            ]
+          },
+          "title": {
+            "one": "Role",
+            "many": "   "
+          }
+        },
+        "supertypes": {
+          "character": {
+            "Agent": {
+              "one": "AI agent",
+              "many": "AI agents"
+            },
+            "Contractor": {
+              "one": "  "
+            }
+          },
+          "relation": {
+            "Work item": {
+              "one": "Ticket",
+              "many": "Tickets"
+            }
+          }
+        },
+        "note": "an unknown key, kept and ignored"
+      },
+      "type": "object",
+      "many": true,
+      "word": "Asset"
+    },
+    {
+      "name": "values-trimmed",
+      "map": {
+        "version": 1,
+        "types": {
+          "character": {
+            "one": "Employee",
+            "many": "Employees"
+          },
+          "institution": {
+            "one": "Team"
+          },
+          "construct": {
+            "one": " Procedure ",
+            "many": " Procedures "
+          },
+          "employee": {
+            "one": "Nope",
+            "many": "Nopes"
+          },
+          "event": {
+            "one": 3
+          },
+          "law": {
+            "one": "   "
+          },
+          "object": {
+            "one": "Asset",
+            "many": [
+              "Assets"
+            ]
+          },
+          "title": {
+            "one": "Role",
+            "many": "   "
+          }
+        },
+        "supertypes": {
+          "character": {
+            "Agent": {
+              "one": "AI agent",
+              "many": "AI agents"
+            },
+            "Contractor": {
+              "one": "  "
+            }
+          },
+          "relation": {
+            "Work item": {
+              "one": "Ticket",
+              "many": "Tickets"
+            }
+          }
+        },
+        "note": "an unknown key, kept and ignored"
+      },
+      "type": "construct",
+      "many": true,
+      "word": "Procedures"
+    },
+    {
+      "name": "many-blank-prints-one",
+      "map": {
+        "version": 1,
+        "types": {
+          "character": {
+            "one": "Employee",
+            "many": "Employees"
+          },
+          "institution": {
+            "one": "Team"
+          },
+          "construct": {
+            "one": " Procedure ",
+            "many": " Procedures "
+          },
+          "employee": {
+            "one": "Nope",
+            "many": "Nopes"
+          },
+          "event": {
+            "one": 3
+          },
+          "law": {
+            "one": "   "
+          },
+          "object": {
+            "one": "Asset",
+            "many": [
+              "Assets"
+            ]
+          },
+          "title": {
+            "one": "Role",
+            "many": "   "
+          }
+        },
+        "supertypes": {
+          "character": {
+            "Agent": {
+              "one": "AI agent",
+              "many": "AI agents"
+            },
+            "Contractor": {
+              "one": "  "
+            }
+          },
+          "relation": {
+            "Work item": {
+              "one": "Ticket",
+              "many": "Tickets"
+            }
+          }
+        },
+        "note": "an unknown key, kept and ignored"
+      },
+      "type": "title",
+      "many": true,
+      "word": "Role"
+    },
+    {
+      "name": "supertype-entry-ignored-falls-to-type",
+      "map": {
+        "version": 1,
+        "types": {
+          "character": {
+            "one": "Employee",
+            "many": "Employees"
+          },
+          "institution": {
+            "one": "Team"
+          },
+          "construct": {
+            "one": " Procedure ",
+            "many": " Procedures "
+          },
+          "employee": {
+            "one": "Nope",
+            "many": "Nopes"
+          },
+          "event": {
+            "one": 3
+          },
+          "law": {
+            "one": "   "
+          },
+          "object": {
+            "one": "Asset",
+            "many": [
+              "Assets"
+            ]
+          },
+          "title": {
+            "one": "Role",
+            "many": "   "
+          }
+        },
+        "supertypes": {
+          "character": {
+            "Agent": {
+              "one": "AI agent",
+              "many": "AI agents"
+            },
+            "Contractor": {
+              "one": "  "
+            }
+          },
+          "relation": {
+            "Work item": {
+              "one": "Ticket",
+              "many": "Tickets"
+            }
+          }
+        },
+        "note": "an unknown key, kept and ignored"
+      },
+      "type": "character",
+      "many": false,
+      "word": "Employee",
+      "supertype": "Contractor"
+    },
+    {
+      "name": "refuse-version",
+      "map": {
+        "version": 2,
+        "types": {
+          "character": {
+            "one": "Employee"
+          }
+        }
+      },
+      "type": "character",
+      "many": false,
+      "word": null
+    },
+    {
+      "name": "refuse-not-object",
+      "map": "{\"version\":1}",
+      "type": "character",
+      "many": false,
+      "word": null
+    },
+    {
+      "name": "refuse-version-true",
+      "map": {
+        "version": true,
+        "types": {
+          "character": {
+            "one": "Employee"
+          }
+        }
+      },
+      "type": "character",
+      "many": false,
+      "word": null
+    },
+    {
+      "name": "refuse-types-not-object",
+      "map": {
+        "version": 1,
+        "types": [
+          "character"
+        ]
+      },
+      "type": "character",
+      "many": false,
+      "word": null
+    },
+    {
+      "name": "refuse-supertypes-value-not-object",
+      "map": {
+        "version": 1,
+        "types": {
+          "character": {
+            "one": "Employee"
+          }
+        },
+        "supertypes": {
+          "character": "Agent"
+        }
+      },
+      "type": "character",
+      "many": false,
+      "word": null
+    },
+    {
+      "name": "supertypes-alone",
+      "map": {
+        "version": 1,
+        "supertypes": {
+          "character": {
+            "agent": {
+              "one": "AI agent"
+            }
+          }
+        }
+      },
+      "type": "character",
+      "many": false,
+      "word": "AI agent",
+      "supertype": "AGENT"
+    }
+  ]
+}

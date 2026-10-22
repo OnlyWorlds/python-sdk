@@ -2,15 +2,20 @@
   "_what": "The recorded pin for the vendored OnlyWorlds schema distribution (codegen/schema-dist/, copied byte-exact). Do not edit by hand; re-vendor from the pinned tag and review the diff. Kept equal to the npm SDK's pin (github.com/OnlyWorlds/sdk, codegen/schema-pin.json) on purpose: two clients, one schema.",
   "_why_manifest_sha256": "Verifying the tree against its own MANIFEST.json only proves internal consistency. If the tag moved, the manifest moved with it. The hash recorded here is the one first accepted, which is what makes a moved tag visible.",
   "repo": "https://github.com/OnlyWorlds/schema-dist",
-  "tag": "v0.33.0-dist.47",
-  "commit": "fb38f65f2abeb1e80a9b39cda0a9616529bd8f8b",
-  "manifest_sha256": "e46297fd9f17a1f8bc4c9c9f8d614d99c1674759caa64441dd6e2e90b1bccad0",
+  "tag": "v0.33.0-dist.48",
+  "commit": "5b0caeeb4e3eaeb71392eaab7e7e74e60f6c6419",
+  "manifest_sha256": "62c33f211b472075b27c053a400871b98e44129d56bcaa4de66e33f282bc5acd",
   "canonical_version": "00.33.00",
-  "dist_serial": 47,
+  "dist_serial": 48,
   "published": "2026-10-22",
   "pinned_at": "2026-10-22",
-  "pinned_by": "The maintainer: tree from `git archive` of the tag in a schema-dist checkout; files re-hashed against MANIFEST.json by generate_schema.py; MANIFEST self-hash matched against the raw file GitHub serves at the tag, whose ref resolves to the commit above. The same tag and hash as the npm SDK's 4.57.2.",
+  "pinned_by": "The maintainer: tree from `git archive` of the tag in a schema-dist checkout; files re-hashed against MANIFEST.json by generate_schema.py; MANIFEST self-hash matched against the raw file GitHub serves at the tag, whose ref resolves to the commit above. Ahead of the npm SDK, which is at v0.33.0-dist.47 (4.61.0) when this is pinned.",
   "previous_pins": [
+    {
+      "tag": "v0.33.0-dist.47",
+      "manifest_sha256": "e46297fd9f17a1f8bc4c9c9f8d614d99c1674759caa64441dd6e2e90b1bccad0",
+      "note": "superseded by v0.33.0-dist.48 (same canonical 00.33.00; profiles/ gains names.md and names.fixture.json, the names profile: x_names on the World, a world's own words for the 22 types, 23 conformance cases; profiles/checks.md names the one Charter (D152); README's profiles row; no schema file moved)"
+    },
     {
       "tag": "v0.33.0-dist.46",
       "manifest_sha256": "da7e9cee801a529f509f8a2084ed352e433886e0ca76e272fc5c87ce9595530e",
