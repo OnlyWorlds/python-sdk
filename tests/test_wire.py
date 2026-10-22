@@ -36,7 +36,13 @@ ID = "018f0000-0000-7000-8000-000000000001"
 # The fields keel keeps that the schema does not carry, read from the package itself, never a list kept
 # here: the read-only fields it strips before a write (a hand list missed `known_of`, keel PR 113, the
 # hour it went live), plus the ones keel ignores on write and the id.
-SERVER_MANAGED = (set(_http.READ_ONLY_FIELDS) - {"world"}) | {"id", "created_by", "changed_by", "changed_via"}
+SERVER_MANAGED = (set(_http.READ_ONLY_FIELDS) - {"world"}) | {
+    "id",
+    "created_by",
+    "changed_by",
+    "changed_via",
+    "changed_client",
+}
 KIND = {"text": "string", "integer": "integer", "multi_link": "array", "single_link": "string"}
 
 

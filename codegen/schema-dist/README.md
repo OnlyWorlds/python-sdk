@@ -36,7 +36,7 @@ Each field has a `kind`, explained in `kinds` at the top of the file:
 - `generic`: a link to an element of any type. Only `pin.element` has it. In data it is two keys, `element_type` (the type's slug, such as `"character"`) and `element_id` (the UUID), both set or both null; `type_key` and `id_key` name them.
 - `list`: an array (World fields only); `items` gives the kind of each entry.
 
-Only `id` and `name` are required. Element bodies read from the API also carry keys the schema does not declare: `type`, `created_at`, `updated_at`, `change_seq`, `created_by`, `changed_by` and `changed_via`, all set by the server. Fields starting `x_` (and the tool prefixes `atlas_`, `shadow_`) are extensions, which a tool keeps and writes back unchanged. A few have a published meaning, one page each in `profiles/`. `walk/rulings.yaml` has the rest.
+Only `id` and `name` are required. Element bodies read from the API also carry keys the schema does not declare: `type`, `created_at`, `updated_at`, `change_seq`, `created_by`, `changed_by`, `changed_via` and `changed_client`, all set by the server. Fields starting `x_` (and the tool prefixes `atlas_`, `shadow_`) are extensions, which a tool keeps and writes back unchanged. A few have a published meaning, one page each in `profiles/`. `walk/rulings.yaml` has the rest.
 
 ## The example world
 

@@ -132,6 +132,29 @@ def test_changed_by_and_changed_via_are_never_sent(tmp_path: Path) -> None:
     assert [(p.id, p.fields) for p in plan.patches] == [(C2, {"name": "B2"})]
 
 
+def test_changed_client_is_never_sent(tmp_path: Path) -> None:
+    """keel #520: the last write's client name is read-only like changed_via, and every push restamps it."""
+    base, edit = folders(
+        tmp_path,
+        {"character": [wire_char(C1, "A", changed_client="atlas"), wire_char(C2, "B", changed_client=None)]},
+        {"character": [wire_char(C1, "A", changed_client="python"), wire_char(C2, "B2", changed_client="lantern")]},
+    )
+    plan = plan_push(base, edit)
+    assert [(p.id, p.fields) for p in plan.patches] == [(C2, {"name": "B2"})]
+
+
+def test_push_patch_carries_the_write_headers(tmp_path: Path) -> None:
+    """The push's PATCH is an element write: it names the client (keel #520) and, for an agent, declares it."""
+    base, edit = folders(tmp_path, {"character": [wire_char(C1, "A")]}, {"character": [wire_char(C1, "B")]})
+    t = FakeTransport(handler=echo())
+    push(base, edit, client=Client("ow_w_testkey", "1234", transport=t), log_path=tmp_path / "a.jsonl", workers=1)
+    assert (t.calls[-1].headers.get("X-OW-Client"), t.calls[-1].headers.get("X-OW-Agent")) == ("python", None)
+    t.calls.clear()
+    agent = Client("ow_w_testkey", "1234", transport=t, client="toolkit", agent=True)
+    push(base, edit, client=agent, log_path=tmp_path / "b.jsonl", workers=1)
+    assert (t.calls[-1].headers.get("X-OW-Client"), t.calls[-1].headers.get("X-OW-Agent")) == ("toolkit", "1")
+
+
 def test_atlas_local_only_fields_stay_home(tmp_path: Path) -> None:
     """Atlas's ATLAS_LOCAL_ONLY_FIELDS never reach the wire; its wire extensions (atlas_color...) do."""
     base, edit = folders(

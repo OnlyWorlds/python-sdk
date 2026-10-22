@@ -68,7 +68,8 @@
         "change_seq": 4,
         "created_by": null,
         "changed_by": null,
-        "changed_via": "server"
+        "changed_via": "server",
+        "changed_client": null
       },
       {
         "type": "character",
@@ -117,6 +118,7 @@
         "created_by": null,
         "changed_by": null,
         "changed_via": "server",
+        "changed_client": null,
         "atlas_color": "#8b0000"
       }
     ],
@@ -165,7 +167,8 @@
         "change_seq": 1,
         "created_by": null,
         "changed_by": null,
-        "changed_via": "server"
+        "changed_via": "server",
+        "changed_client": null
       },
       {
         "type": "location",
@@ -211,7 +214,8 @@
         "change_seq": 2,
         "created_by": null,
         "changed_by": null,
-        "changed_via": "server"
+        "changed_via": "server",
+        "changed_client": null
       }
     ],
     "trait": [
@@ -242,7 +246,8 @@
         "change_seq": 3,
         "created_by": null,
         "changed_by": null,
-        "changed_via": "server"
+        "changed_via": "server",
+        "changed_client": null
       }
     ]
   }

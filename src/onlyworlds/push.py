@@ -17,7 +17,7 @@ never by the diff that was sent.
 Never sent, whatever the diff says: ``id``; the wire's server-managed fields
 (``world``, ``type``, ``created_at``, ``updated_at``, ``change_seq``: the npm SDK's
 ``sanitizePayload`` list; keel ignores ``world`` and 422s the rest); ``created_by`` (and since keel
-#299 ``changed_by`` and ``changed_via``), which keel drops
+#299 ``changed_by`` and ``changed_via``, since #520 ``changed_client``), which keel drops
 from a write but still answers with a fresh ``change_seq`` (a folder without the key
 would otherwise rewrite every member-made element on every run); Atlas's in-file sync stamps
 ``local_updated_at`` / ``server_updated_at`` and ``image_media_id`` (spec §5, "not
@@ -80,6 +80,7 @@ NOT_SENT = frozenset(
         "created_by",
         "changed_by",
         "changed_via",
+        "changed_client",
         "known_of",
         "hidden",
         "local_updated_at",
@@ -340,7 +341,8 @@ def push(
                     if on_failure:
                         on_failure(refused)
                 return
-            got = client.send("PATCH", f"{p.type}/{p.id}/", p.fields)
+            # An element write: the client's name and any agent declaration ride it (keel #520, #299).
+            got = client.send("PATCH", f"{p.type}/{p.id}/", p.fields, client._writing())
             code = got.response.status if got.response is not None else 0
             mismatch_fields: list[str] = []
             if code == 200 and got.response is not None:

@@ -2,15 +2,20 @@
   "_what": "The recorded pin for the vendored OnlyWorlds schema distribution (codegen/schema-dist/, copied byte-exact). Do not edit by hand; re-vendor from the pinned tag and review the diff. Kept equal to the npm SDK's pin (github.com/OnlyWorlds/sdk, codegen/schema-pin.json) on purpose: two clients, one schema.",
   "_why_manifest_sha256": "Verifying the tree against its own MANIFEST.json only proves internal consistency. If the tag moved, the manifest moved with it. The hash recorded here is the one first accepted, which is what makes a moved tag visible.",
   "repo": "https://github.com/OnlyWorlds/schema-dist",
-  "tag": "v0.33.0-dist.45",
-  "commit": "f2a23f3a7d7b2fa04bb5d8197931020a74f5946e",
-  "manifest_sha256": "ed5fcab2d2e768d06282073993a4abac5c99f94753c8fd9c5f52596a636b4566",
+  "tag": "v0.33.0-dist.46",
+  "commit": "de56aea3863822b0048c9e09e9a1c154be95a942",
+  "manifest_sha256": "da7e9cee801a529f509f8a2084ed352e433886e0ca76e272fc5c87ce9595530e",
   "canonical_version": "00.33.00",
-  "dist_serial": 45,
+  "dist_serial": 46,
   "published": "2026-10-22",
   "pinned_at": "2026-10-22",
-  "pinned_by": "The maintainer: tree from `git archive` of the tag in a schema-dist checkout; files re-hashed against MANIFEST.json by generate_schema.py; MANIFEST self-hash matched against the raw file GitHub serves at the tag, whose ref resolves to the commit above. The same tag and hash as the npm SDK's 4.55.0 pin.",
+  "pinned_by": "The maintainer: tree from `git archive` of the tag in a schema-dist checkout; files re-hashed against MANIFEST.json by generate_schema.py; MANIFEST self-hash matched against the raw file GitHub serves at the tag, whose ref resolves to the commit above. The same tag and hash as the npm SDK's pin for keel #520.",
   "previous_pins": [
+    {
+      "tag": "v0.33.0-dist.45",
+      "manifest_sha256": "ed5fcab2d2e768d06282073993a4abac5c99f94753c8fd9c5f52596a636b4566",
+      "note": "superseded by v0.33.0-dist.46 (same canonical 00.33.00; keel #520's changed_client: example/world-export.json's bodies gain changed_client: null, walk/lint_folder.py's server-key set names it, one README sentence; no schema file moved)"
+    },
     {
       "tag": "v0.33.0-dist.43",
       "manifest_sha256": "a9bbe8171e2e815cdec05a7ddd2a3d07beb4212fcbd6dc80e9cae81935e4cf7f",

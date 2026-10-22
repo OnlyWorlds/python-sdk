@@ -41,7 +41,7 @@ from schema_walk import decode_schema  # noqa: E402
 # slug and the server-managed fields (elements/serialize.py READONLY_FIELDS
 # minus `world`, which bodies never carry). Extension prefixes as served.
 BODY_EXTRA_KEYS = {"type", "created_at", "updated_at", "change_seq", "created_by",
-                   "changed_by", "changed_via"}
+                   "changed_by", "changed_via", "changed_client"}
 # Keys the folder format itself puts in an element file (folder spec section 5,
 # the linked-folder guidance): Atlas's two sync stamps and the media id. A
 # linked folder carries them on every edited element; Kael's first run on the

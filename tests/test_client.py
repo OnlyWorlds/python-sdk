@@ -580,3 +580,61 @@ def test_agent_header_on_the_six_element_writes_only(make_client: MakeClient) ->
     agent.get_world()
     agent.patch_world({"name": "W"})
     assert [c.headers.get("X-OW-Agent") for c in t.calls] == [None, None, None, None]
+
+
+# --- keel #520: the client's name ------------------------------------------
+
+
+def _six_writes(c: Client) -> None:
+    c.create("character", {"name": "A"})
+    c.upsert("character", ID, {"name": "K"})
+    c.patch("character", ID, {"name": "K2"}, if_match=3)
+    c.edit_links("character", ID, "friends", add=["a"])
+    c.bulk([{"type": "character", "element": {"name": "B"}}])
+    c.delete("character", ID)
+
+
+def test_client_name_on_the_six_element_writes_only(make_client: MakeClient) -> None:
+    body = {"id": ID, "name": "K", "type": "character", "items": [], "data": [], "has_more": False}
+    t = FakeTransport(handler=lambda *a: jresp(200, body))
+    _six_writes(make_client(t))
+    assert [(c.method, c.headers.get("X-OW-Client")) for c in t.calls] == [
+        ("POST", "python"),
+        ("PUT", "python"),
+        ("PATCH", "python"),
+        ("POST", "python"),
+        ("POST", "python"),
+        ("DELETE", "python"),
+    ]
+    assert t.calls[2].headers["If-Match"] == '"3"'  # the write's own headers survive
+    assert "X-OW-Agent" not in t.calls[0].headers  # the name is not the agent declaration
+    t.calls.clear()
+    c = make_client(t)
+    c.get("character", ID)
+    c.list_page("character")
+    c.get_world()
+    c.patch_world({"name": "W"})
+    assert [c.headers.get("X-OW-Client") for c in t.calls] == [None, None, None, None]
+
+
+def test_client_name_is_the_callers_and_rides_beside_the_agent_header() -> None:
+    body = {"id": ID, "name": "K", "type": "character", "items": [], "data": [], "has_more": False}
+    t = FakeTransport(handler=lambda *a: jresp(200, body))
+    _six_writes(Client("ow_w_testkey", "1234", transport=t, client="atlas", agent=True))
+    assert {(c.headers.get("X-OW-Client"), c.headers.get("X-OW-Agent")) for c in t.calls} == {("atlas", "1")}
+    t.calls.clear()
+    longest = "a-9" + "z" * 29
+    Client("ow_w_testkey", "1234", transport=t, client=longest).delete("character", ID)
+    assert t.calls[0].headers["X-OW-Client"] == longest
+
+
+@pytest.mark.parametrize("bad", ["Atlas", "", "a" * 33, "a b", " atlas", "atlas\n", "atlas_1", "atlás"])
+def test_client_name_outside_the_rule_is_refused_at_construction(bad: str) -> None:
+    with pytest.raises(ValueError, match=r"client.*\[a-z0-9-\]\{1,32\}"):
+        Client("ow_w_testkey", "1234", client=bad)
+
+
+@pytest.mark.parametrize("bad", [None, 1, b"atlas", ["atlas"]])
+def test_client_name_not_a_string_is_a_type_error(bad: Any) -> None:
+    with pytest.raises(TypeError, match=r"client.*\[a-z0-9-\]\{1,32\}"):
+        Client("ow_w_testkey", "1234", client=bad)

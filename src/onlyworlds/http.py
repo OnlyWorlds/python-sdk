@@ -62,8 +62,8 @@ USER_AGENT = f"onlyworlds-py/{__version__}"
 #: Fields the API must never receive on a write. A BLACKLIST, never a whitelist:
 #: namespaced extension fields (``atlas_*`` / ``shadow_*`` / ``x_*``) must pass through
 #: untouched, because tools round-trip their own state through other tools' writes.
-#: ``created_by``, ``changed_by`` and ``changed_via`` are not here: keel drops them silently on
-#: a write (spec §4; keel #299), so a read body round-trips as it is. ``known_of`` (keel PR 113)
+#: ``created_by``, ``changed_by``, ``changed_via`` and ``changed_client`` are not here: keel drops
+#: them silently on a write (spec §4; keel #299, #520), so a read body round-trips as it is. ``known_of`` (keel PR 113)
 #: is an unknown field to keel's writes (a 422): stripped too, and a body where it is ``true``
 #: is refused before it gets here (``_refuse_known_of``).
 #: ``hidden`` (keel PR 160, #537) rides a body only for a reader who still sees a hidden element and is
@@ -72,6 +72,8 @@ READ_ONLY_FIELDS: tuple[str, ...] = ("world", "type", "created_at", "updated_at"
 
 _TYPE = re.compile(r"^[a-z][a-z0-9_]*$")
 _ID = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_.-]*$")
+#: keel #520's rule for ``X-OW-Client``, matched whole (``fullmatch``: a trailing newline is outside it).
+_CLIENT_NAME = re.compile(r"[a-z0-9-]{1,32}")
 #: Namespace for ids derived from a caller's Idempotency-Key (``_minted_id``).
 _KEYED_IDS = uuid.UUID("0199b6a0-6f0e-7c2a-9d1e-3b5c7a8e4f21")
 
@@ -281,8 +283,10 @@ class BulkResult:
 class ChangeWalk:
     """Walk the world's change feed from ``since`` (or from the start) to the current tail, in order.
 
-    ``for op in walk`` yields each op (``upsert`` carries ``element``, ``delete`` carries
-    ``deleted_at``). Afterwards ``cursor`` is the opaque position to persist for the next
+    ``for op in walk`` yields each op (``upsert`` carries ``element``, whose ``changed_client`` names
+    the client of its last write; ``delete`` carries ``deleted_at`` and ``deleted_client``, the
+    delete's client name, keel #520: each the client's claim, or null when none was recorded,
+    always null on a hidden row). Afterwards ``cursor`` is the opaque position to persist for the next
     incremental pull (pass back exactly what you got: never parse or build one) and ``head``
     is the world's current ``change_seq``.
 
@@ -342,14 +346,28 @@ class Client:
         page_size: int = 100,
         changes_page_size: int = 100,
         agent: bool = False,
+        client: str = "python",
     ):
         """``agent=True`` declares the caller an AI agent: every element write (create, upsert,
         patch, delete, edit_links, bulk: the operations keel's document declares it on) carries
         ``X-OW-Agent``, and keel records those writes as agent-made (``changed_via: "declared"``, keel #299; keel
         stores that the header was there, never its value). Off by default, and off in any tool
-        a person uses: it describes the caller. An agent seat's key counts as an agent without it."""
+        a person uses: it describes the caller. An agent seat's key counts as an agent without it.
+
+        ``client`` is the software's own name, sent as ``X-OW-Client`` on the same element writes
+        (keel #520) and never on a read. keel stores it on the element as ``changed_client``, and on
+        a delete as the change feed's ``deleted_client``. The default ``python`` says which library
+        wrote; a tool passes its own (``client="atlas"``). The rule is lower case letters, digits and
+        hyphens, 1 to 32 characters (``[a-z0-9-]{1,32}``), with no version in it: a value outside it
+        is refused here (``ValueError``; ``TypeError`` for a non-string), never trimmed. It is the
+        client's claim, never proof of who wrote, and it changes no door and no permission: an agent
+        sends both headers."""
         if not api_key:
             raise ValueError("api_key is required")
+        if not isinstance(client, str):
+            raise TypeError(f"client must be a string matching [a-z0-9-]{{1,32}}, got {type(client).__name__}")
+        if not _CLIENT_NAME.fullmatch(client):
+            raise ValueError(f"client must match [a-z0-9-]{{1,32}} (lower case, digits, hyphens), got {client!r}")
         self.base_url = base_url.rstrip("/")
         self.transport: Transport = transport or UrllibTransport()
         self.retry = retry or RetryPolicy()
@@ -361,14 +379,17 @@ class Client:
         if pin:
             self._headers["API-Pin"] = pin
         self._agent = agent is True
+        self._client = client
 
-    def _writing(self, headers: Mapping[str, str] | None = None) -> dict[str, str] | None:
-        """An element write's headers: with ``X-OW-Agent`` when this client is an agent (presence is
-        the declaration, D104; keel declares it on the element writes only)."""
+    def _writing(self, headers: Mapping[str, str] | None = None) -> dict[str, str]:
+        """An element write's headers: ``X-OW-Client`` always (keel #520), and ``X-OW-Agent`` when this
+        client is an agent (presence is the declaration, D104). keel reads both on the element writes
+        only, so nothing else sends them."""
         out = dict(headers or {})
+        out["X-OW-Client"] = self._client
         if self._agent:
             out["X-OW-Agent"] = "1"
-        return out or None
+        return out
 
     def __repr__(self) -> str:  # never print credentials
         return f"Client(base_url={self.base_url!r})"
