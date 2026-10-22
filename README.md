@@ -218,6 +218,18 @@ lore = [el for el in folder.all_elements().values() if not is_room_element(el)]
 
 A lore view (a list, a count, search, a graph, a story's context, a survey) leaves room elements out unless the person asks; the room's own views show them whole, and a writer writes them like any element. A Law with supertype `Charter` is lore on purpose. The profile: [`profiles/room.md`](https://github.com/OnlyWorlds/schema-dist/blob/main/profiles/room.md) in the schema distribution.
 
+### A world's own words
+
+A world may name its types in its own words: in a work world a Character is an *Employee*. The map is `x_names` on the World (`world.json` in a folder), and only what a person reads changes; the API, the folder and every id keep the standard's names. `onlyworlds.type_word(world, element_type, supertype=None, many=False)` gives the word to print, or `None` for the standard's name:
+
+```python
+from onlyworlds import type_word
+
+word = type_word(folder.world, "character", many=True) or "Characters"
+```
+
+The profile: [`profiles/names.md`](https://github.com/OnlyWorlds/schema-dist/blob/main/profiles/names.md).
+
 Not yet: typed element models, the account routes, a snapshot writer.
 
 ## Develop
