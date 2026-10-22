@@ -636,11 +636,22 @@ def _title_history(run: _Run, els: list[_El], rows: list[dict[str, Any]]) -> Non
 
 def _charters(run: _Run, els: list[_El], rows: list[dict[str, Any]], head: Any, *, changes: int) -> None:
     """Flag 8: a charter with more than ``changes`` feed rows after its own."""
-    charters = [el for el in els if el.type == "law" and _folded(el.body.get("supertype")) == "charter"]
+    charters = [el for el in els if _folded(el.body.get("supertype")) == "charter"]
     if not charters:
         run.ran("8", 0, 0)
-        run.find("8", None, "no charter: no Law with supertype Charter", {})
+        run.find("8", None, "no charter: no element with supertype Charter (the guidance names a Law)", {})
         return
+    for el in charters:
+        if el.type != "law":
+            # BrainBoost files its charter as a Construct (TC, h67 #9814): still a charter to this flag,
+            # but keel's world page and the parlor read a Law with supertype Charter, so say so.
+            run.find(
+                "8",
+                el,
+                f"the charter is filed as a {el.type.capitalize()}: keel's world page and the parlor read a Law "
+                "with supertype Charter",
+                {"filed_as": el.type},
+            )
     position = {r["id"]: i for i, r in enumerate(rows) if r.get("op") == "upsert" and isinstance(r.get("id"), str)}
     found = 0
     for el in charters:

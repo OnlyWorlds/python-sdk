@@ -2,6 +2,10 @@
 
 The package version runs on its own semver; the schema it is generated from is `SCHEMA_DIST_TAG`.
 
+## 0.14.2 (2026-10-22)
+
+- **The doctor's flag 8 finds a charter on any type.** A world that files its charter as a Construct with supertype Charter (BrainBoost; TC's audit run, OW Industry #9814) read as "no charter". Now any element with supertype Charter is the charter for the staleness check, and one that is not a Law gets its own finding, since keel's world page and the parlor read a Law with supertype Charter. The "no charter" finding's words name the guidance.
+
 ## 0.14.1 (2026-10-22)
 
 - **Schema repinned to schema-dist `v0.32.2-dist.37`** (canonical 00.32.02 unchanged: no type, field or link moved; `SCHEMA_DIST_TAG`, `SCHEMA_DIST_SERIAL` and `SCHEMA_MANIFEST_SHA256` move with it). The dist added `profiles/` (identity, calendar with its fixture, packet, review), its folder lint reads known-of stubs and never `records/`, and its export example carries `source` and `exported_as`. Equal to the npm SDK's pin (4.48.1).

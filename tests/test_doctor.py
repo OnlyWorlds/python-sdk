@@ -564,6 +564,17 @@ def test_8_a_charter_untouched_after_n_changes() -> None:
     assert planted.compared["8"] == {"n": 1, "of": 1}
 
 
+def test_8_a_charter_filed_as_a_construct_is_found_and_named() -> None:
+    # BrainBoost's case (TC, h67 #9814): the charter is a Construct with supertype Charter, no Law.
+    con1 = "d0000000-0000-7000-8000-000000000001"
+    base = edit(clean(), "law", LAW1, supertype="Decree")
+    base["construct"] = [{"id": con1, "name": "Charter", "supertype": "Charter", "description": "Our rules."}]
+    elements = on_the_wire(base)
+    (f,) = found(api_report(FakeReader(elements, feed_of(elements))), "8")
+    assert f["element"]["id"] == con1 and f["reason"].startswith("the charter is filed as a Construct")
+    assert f["evidence"]["filed_as"] == "construct"
+
+
 def test_8_no_charter_is_a_finding_of_its_own() -> None:
     (f,) = found(api_report(charter_feed(0, charter=False)), "8")
     assert f["element"] is None and f["reason"].startswith("no charter")
