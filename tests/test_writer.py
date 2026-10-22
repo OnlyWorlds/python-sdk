@@ -87,6 +87,46 @@ def test_world_for_disk_rules() -> None:
         world_for_disk({"id": "w"})
 
 
+# --- v0.3.14 the producer line (§4.2): a folder made from a folder keeps its maker's ---------
+
+
+def _rewrite(tmp_path: Path, world: dict[str, Any]) -> tuple[bytes, bytes]:
+    """Write a folder, read it, write the read one again (a branch, a copy): both world.json bytes."""
+    els = {"character": [el("00000000-0000-7000-8000-000000000001", "Gelon")]}
+    write_folder(tmp_path / "a", world, els)
+    a = read_folder(tmp_path / "a")
+    assert a.world is not None and not a.skipped
+    write_folder(tmp_path / "b", a.world, {"character": [e.body for e in a.elements.values()]})
+    return (tmp_path / "a" / "world.json").read_bytes(), (tmp_path / "b" / "world.json").read_bytes()
+
+
+def test_a_folder_from_a_folder_keeps_its_producer_and_unknown_keys_verbatim(tmp_path: Path) -> None:
+    producer = {"tool": "azgaar-converter", "version": "0.4.0", "input": "azgaar-map"}
+    world = {**WORLD, "producer": producer, "future_key": {"z": 1, "a": [2, "Σ"]}, "x_tool": True}
+    a, b = _rewrite(tmp_path, world)
+    assert a == b  # byte-exact: nothing dropped, reordered or re-stamped
+    got = json.loads(b.decode("utf-8"))
+    assert got["producer"] == producer and got["future_key"] == {"z": 1, "a": [2, "Σ"]} and got["x_tool"] is True
+
+
+def test_a_folder_with_no_producer_gets_none(tmp_path: Path) -> None:
+    a, b = _rewrite(tmp_path, dict(WORLD))
+    assert a == b
+    assert "producer" not in json.loads(b.decode("utf-8"))  # absent is the honest value; never invented
+
+
+def test_an_input_word_the_package_does_not_know_reads_fine(tmp_path: Path) -> None:
+    from onlyworlds.doctor import doctor_folder
+
+    producer = {"tool": "papyrus", "version": "9", "input": "papyrus-scroll"}
+    a, b = _rewrite(tmp_path, {**WORLD, "producer": producer})
+    assert a == b
+    folder = read_folder(tmp_path / "b")
+    assert folder.world is not None and folder.world["producer"] == producer and not folder.skipped
+    report = doctor_folder(folder)
+    assert not [f for f in report.findings if f["element"] is None]  # nothing said about the world file
+
+
 def test_collision_writes_both(tmp_path: Path) -> None:
     a = "aaaaaaaa-0000-7000-8000-000011112222"
     b = "bbbbbbbb-0000-7000-8000-000011112222"

@@ -1,6 +1,6 @@
 """The OnlyWorlds world folder: filenames, the writer, the reader.
 
-Spec: OnlyWorlds Folder Format v0.3.13.
+Spec: OnlyWorlds Folder Format v0.3.14.
 Section numbers below are that document's.
 
 ::
@@ -41,6 +41,7 @@ __all__ = [
     "SLUG_MAX_LEN",
     "WIRE_TO_DISK_WORLD_KEYS",
     "WORLD_FILE",
+    "WORLD_FOLDER_KEYS",
     "DuplicateId",
     "Folder",
     "FolderElement",
@@ -59,7 +60,7 @@ __all__ = [
 ]
 
 #: The spec version this module writes and reads against (§4.2 ``format_version``).
-FORMAT_VERSION = "0.3.13"
+FORMAT_VERSION = "0.3.14"
 
 #: §4.4 (v0.3.10; keel PR 113): the stub marker. keel hands a guest an element it reaches only
 #: through its own Character's sheet as a stub, ``known_of: true``: these keys, its type's public
@@ -107,6 +108,11 @@ LEGACY_SPATIAL_TYPES: tuple[str, ...] = ("map", "pin", "zone", "marker")
 
 #: §5 (v0.3.5): ``world.json`` keys follow the CANONICAL SCHEMA, not the wire. One rename today.
 WIRE_TO_DISK_WORLD_KEYS: Mapping[str, str] = {"time_range_current": "time_current"}
+
+#: §4.2: the ``world.json`` keys this spec defines beside the World's schema fields (besides
+#: ``api`` and the ``snapshot_*`` keys). They say what the folder is, never what the world is,
+#: so the wire neither serves nor takes them: ``Client.patch_world`` leaves them out.
+WORLD_FOLDER_KEYS: tuple[str, ...] = ("format_version", "writable", "source", "exported_as", "producer")
 
 # ---------------------------------------------------------------------------
 # Filenames (§3.2) — behaviour ported from Atlas `src/store/fs-utils.ts`, the
@@ -218,9 +224,10 @@ def world_for_disk(world: Mapping[str, Any], counts: Mapping[str, int] | None = 
       removed otherwise.
     - ``format_version`` is written at a folder's birth; a value already carried
       is kept, never rewritten.
-    - ``source`` and ``exported_as`` (§4.2, v0.3.9) are carried like any key, so a
-      folder rewritten from a read one keeps its parent's verbatim; ``export_world``
-      is what writes them fresh.
+    - ``source`` and ``exported_as`` (§4.2, v0.3.9) and ``producer`` (v0.3.14) are
+      carried like any key, so a folder rewritten from a read one keeps its parent's
+      verbatim, and one that has none gets none; ``export_world`` is what writes them
+      fresh.
     """
     wid = world.get("id")
     if not isinstance(wid, str) or not wid:

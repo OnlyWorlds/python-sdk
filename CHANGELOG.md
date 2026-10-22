@@ -2,6 +2,13 @@
 
 The package version runs on its own semver; the schema it is generated from is `SCHEMA_DIST_TAG`.
 
+## 0.16.0 (2026-10-22)
+
+- **The producer line** (folder format v0.3.14, §4.2, Keel #477): `export_world` writes `producer` beside `source`, `{"tool": "onlyworlds", "version": <this package's version>, "input": "server"}` (`EXPORT_PRODUCER`). An export is always a folder's birth (the writer never writes over a folder), so the line is always the export's own, also when a `GET /world` body carries another folder's. A folder written from a read one (a branch, a copy) keeps its maker's `producer` verbatim, and one with none gets none: a later writer never invents it. An `input` word the package does not know reads like any other. A tool that runs the export in its own name passes `producer=` (keel's nightly snapshots: `{"tool": "keel", "version": ..., "input": "server"}`), written in place of the package's line on the folder it makes; only the shape is checked (exactly `tool`, `version`, `input`, each a non-empty string, `input` any word), a ValueError before anything is read, and it never replaces a line a folder already carries. The OKF export carries `producer` into `world.md` beside `source` and `exported_as`.
+- **`patch_world` never sends what only a folder carries**: handed a folder's `world.json`, it leaves out `format_version`, `writable`, `source`, `exported_as`, `producer`, `api` and the `snapshot_*` keys (`WORLD_FOLDER_KEYS`), where keel answered a 422 before. The push loop sends element writes only, never a world PATCH, as before.
+- **Folder format v0.3.14**: `FORMAT_VERSION` moves to `0.3.14`, so a folder this package writes is stamped 0.3.14 at its birth (a carried stamp is kept, as before).
+- **Schema repinned to schema-dist `v0.32.2-dist.40`** (canonical 00.32.02 unchanged: no schema file moved; `SCHEMA_DIST_TAG`, `SCHEMA_DIST_SERIAL` and `SCHEMA_MANIFEST_SHA256` move with it). Serial 40 adds one case to the `.owworld` conformance set, `fail-OW-14-crc` (an entry whose bytes fail its CRC is refused, 79 cases now), with its row in `verdicts.json` and its generator; nothing else. The same pin as the npm SDK's repin.
+
 ## 0.15.0 (2026-10-22)
 
 - **Folder format v0.3.13**: §4.7, the `.owworld` archive, is RULED. `FORMAT_VERSION` moves to `0.3.13`, so a folder this package writes is stamped 0.3.13 at its birth (a stamp a folder already carries is kept, as before). Older stamps read as before; the doctor's flag 9 still names a folder stamped older than the package. This package reads and writes folders, not archives, so nothing else moved.

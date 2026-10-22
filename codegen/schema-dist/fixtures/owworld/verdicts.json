@@ -500,6 +500,17 @@
       "bytes": 2613
     },
     {
+      "file": "fail-OW-14-crc.owworld",
+      "test": "OW-14",
+      "role": "reader",
+      "reader": "refuse",
+      "writer": "refuse",
+      "rule": "An element whose bytes fail the CRC its headers declare (one bit off; Skeld h58 #9903, spec 4.7's size bullet): refused, never read as written.",
+      "reason": "not_openable",
+      "sha256": "d062a3a2b78312235296d41bcbc1f801a9a205dd03b1e4e7ae9605f6f99aa984",
+      "bytes": 2656
+    },
+    {
       "file": "pass-OW-15-zip64.owworld",
       "test": "OW-15",
       "role": "reader",

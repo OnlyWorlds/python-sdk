@@ -529,6 +529,26 @@ def test_patch_world_takes_back_a_get_world_body_and_a_folder_spelling(make_clie
     assert t.calls[0].body == {"name": "W", "time_range_current": 5}
 
 
+def test_patch_world_never_sends_what_only_a_folder_carries(make_client: MakeClient) -> None:
+    # a folder's world.json handed back whole: its own keys (§4.1, §4.2) say what the folder is
+    t = FakeTransport(handler=lambda *_: jresp(200, {"id": "w"}))
+    folder_world = {
+        "id": "w",
+        "name": "W",
+        "format_version": "0.3.14",
+        "writable": False,
+        "source": {"server": "https://www.onlyworlds.com", "world": "w", "at": "2026-10-22T10:00:00.000Z"},
+        "exported_as": {"kind": "owner", "role": "owner", "character": None},
+        "producer": {"tool": "onlyworlds", "version": "0.16.0", "input": "server"},
+        "api": {"world_id": "w"},
+        "snapshot_of": "w0",
+        "snapshot_counts": {"character": 1},
+        "x_calendar": {"months": 12},
+    }
+    make_client(t).patch_world(folder_world)
+    assert t.calls[0].body == {"name": "W", "x_calendar": {"months": 12}}
+
+
 # --- keel #299: the agent declaration -------------------------------------
 
 

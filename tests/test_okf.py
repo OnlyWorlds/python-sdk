@@ -434,6 +434,7 @@ def test_2_4_world_keys_carried(world: World) -> None:
         writable=False,
         source={"server": "https://www.onlyworlds.com", "world": "w", "at": "2026-10-19T10:00:00.000Z"},
         exported_as={"kind": "character", "role": "guest", "character": {"id": consul_id, "name": "The Consul"}},
+        producer={"tool": "azgaar-converter", "version": "0.4.0", "input": "azgaar-map"},
         api={"world_id": "w", "api_key": "secret"},
     )
     world_path.write_text(json.dumps(data), encoding="utf-8")
@@ -444,7 +445,7 @@ def test_2_4_world_keys_carried(world: World) -> None:
     assert "time_range_current" not in fm
     for key in (
         "x_calendar", "atlas_style", "snapshot_label", "snapshot_counts", "writable", "format_version", "source",
-        "exported_as",
+        "exported_as", "producer",
     ):  # fmt: skip
         assert fm[key] == data[key], key
     assert fm["owner_character"] == "/character/" + consul.stem + ".md"

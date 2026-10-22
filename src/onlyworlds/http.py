@@ -39,7 +39,7 @@ from ._ids import uuid7
 from ._schema import FIELD_KINDS
 from ._version import __version__
 from .errors import ApiError, api_error, error_code, parse_retry_after
-from .folder import WIRE_TO_DISK_WORLD_KEYS
+from .folder import WIRE_TO_DISK_WORLD_KEYS, WORLD_FOLDER_KEYS
 
 __all__ = [
     "API_BASE",
@@ -115,6 +115,11 @@ def _refuse_known_of(element: Mapping[str, Any], where: str) -> None:
 #: like ``READ_ONLY_FIELDS`` so a read body is writable. ``public_read`` changes through sharing.
 WORLD_READ_ONLY_FIELDS: tuple[str, ...] = ("id", "public_read")
 _DISK_TO_WIRE_WORLD_KEYS = {disk: wire for wire, disk in WIRE_TO_DISK_WORLD_KEYS.items()}
+
+
+def _folder_only_world_key(key: str) -> bool:
+    """A ``world.json`` key that says what the folder is (§4.1, §4.2), never sent to ``PATCH /world``."""
+    return key in WORLD_FOLDER_KEYS or key == "api" or key.startswith("snapshot_")
 
 
 def check_kinds(element_type: str, element: Mapping[str, Any]) -> None:
@@ -445,12 +450,15 @@ class Client:
 
         Takes back a ``get_world()`` body: ``id``, ``public_read`` and the timestamps are dropped
         (``public_read`` is not writable here). A folder ``world.json``'s ``time_current`` is sent
-        as the wire's ``time_range_current``. keel refuses any other key it does not write (422).
+        as the wire's ``time_range_current``, and the keys only a folder carries are left out: the
+        folder format's own (``WORLD_FOLDER_KEYS``: ``format_version``, ``writable``, ``source``,
+        ``exported_as``, ``producer``), ``api`` and the ``snapshot_*`` keys. keel refuses any
+        other key it does not write (422).
         """
         body = {
             _DISK_TO_WIRE_WORLD_KEYS.get(k, k): v
             for k, v in sanitize_payload(partial).items()
-            if k not in WORLD_READ_ONLY_FIELDS
+            if k not in WORLD_READ_ONLY_FIELDS and not _folder_only_world_key(k)
         }
         data = self.call("PATCH", "world/", body)
         if not isinstance(data, dict):

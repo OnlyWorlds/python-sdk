@@ -31,7 +31,6 @@ import json
 import os
 import struct
 import sys
-import unicodedata
 import zipfile
 import zlib
 
@@ -577,6 +576,13 @@ def fixtures():
         test="OW-14", reader="refuse", reason="too_big",
         rule="A stored entry declares 64 bytes and holds %d (Kael, h58 #9829): the same lie as a deflated one, the "
              "same cause." % len(PNG))
+    crc_body = element(0xc1, "Crc")
+    add("fail-OW-14-crc.owworld",
+        build_zip(base() + [Entry(TOP + "elements/character/crc--0000abc1.json", crc_body,
+                                          crc=zlib.crc32(crc_body) ^ 1)]),
+        test="OW-14", reader="refuse", reason="not_openable",
+        rule="An element whose bytes fail the CRC its headers declare (one bit off; Skeld h58 #9903, spec 4.7's size "
+             "bullet): refused, never read as written.")
 
     # -- OW-15: the floor (ruled: 500,000 entries and 2 GiB, so zip64 on read) --------------------------------------
     add("pass-OW-15-zip64.owworld", build_zip(base(), zip64_end=True), test="OW-15",

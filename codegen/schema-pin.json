@@ -2,15 +2,20 @@
   "_what": "The recorded pin for the vendored OnlyWorlds schema distribution (codegen/schema-dist/, copied byte-exact). Do not edit by hand; re-vendor from the pinned tag and review the diff. Kept equal to the npm SDK's pin (github.com/OnlyWorlds/sdk, codegen/schema-pin.json) on purpose: two clients, one schema.",
   "_why_manifest_sha256": "Verifying the tree against its own MANIFEST.json only proves internal consistency. If the tag moved, the manifest moved with it. The hash recorded here is the one first accepted, which is what makes a moved tag visible.",
   "repo": "https://github.com/OnlyWorlds/schema-dist",
-  "tag": "v0.32.2-dist.39",
-  "commit": "cef8a323c7ffda6d732701fbb0efe169a461f46f",
-  "manifest_sha256": "efc94e3318d5b4bff11ef535f932be6a49db6c9b774dfdcbabddaebb4a9a4426",
+  "tag": "v0.32.2-dist.40",
+  "commit": "26ffb69c6aa3cde8fbe37eb75bd2ed827efeb746",
+  "manifest_sha256": "b73fe08d76c57f3dcef2013919cd21723ff0f90dcfc03200455de5e379dc1a44",
   "canonical_version": "00.32.02",
-  "dist_serial": 39,
+  "dist_serial": 40,
   "published": "2026-10-22",
   "pinned_at": "2026-10-22",
-  "pinned_by": "The maintainer: tree from `git archive` of the tag in a schema-dist checkout; files re-hashed against MANIFEST.json by generate_schema.py; MANIFEST self-hash matched against the raw file GitHub serves at the tag, whose ref resolves to the commit above. Ahead of the npm SDK at this pin: its main (4.53.0) still pins v0.32.2-dist.37; the two meet again at its repin.",
+  "pinned_by": "The maintainer: tree from `git archive` of the tag in a schema-dist checkout; files re-hashed against MANIFEST.json by generate_schema.py; MANIFEST self-hash matched against the raw file GitHub serves at the tag, whose ref resolves to the commit above. The same tag and hash as the npm SDK's repin made beside it; its published main (4.53.1) pins v0.32.2-dist.39 until that repin ships.",
   "previous_pins": [
+    {
+      "tag": "v0.32.2-dist.39",
+      "manifest_sha256": "efc94e3318d5b4bff11ef535f932be6a49db6c9b774dfdcbabddaebb4a9a4426",
+      "note": "superseded by v0.32.2-dist.40 (same canonical; fixtures/owworld gains fail-OW-14-crc; nothing else)"
+    },
     {
       "tag": "v0.32.2-dist.37",
       "manifest_sha256": "1467dc6a12d77f65e5ec255299912d16c3e824563a15d563010a006641119cc2",

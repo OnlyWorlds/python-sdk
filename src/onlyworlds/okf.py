@@ -66,7 +66,8 @@ world.md carries the World's schema fields (`time_current` read from
 its extension keys, `owner_character` (as a link), `format_version`,
 `writable`, the provenance lines `source` and `exported_as` (folder format
 v0.3.9: where the folder came from and which slice it is, so a bundle made
-from one Character's slice still says so) and every `snapshot_*` key, each
+from one Character's slice still says so), the producer line `producer`
+(v0.3.14: which tool made the folder, and from what) and every `snapshot_*` key, each
 as the folder holds it. The `api` block is dropped: it is a
 credential and a sync switch, not world content (folder format §4.1, the
 portable copy).
@@ -123,7 +124,15 @@ from ._schema import (
     WORLD_FIELDS,
 )
 from ._version import __version__
-from .folder import KNOWN_OF, WIRE_TO_DISK_WORLD_KEYS, WORLD_FILE, Folder, is_known_of, read_folder
+from .folder import (
+    KNOWN_OF,
+    WIRE_TO_DISK_WORLD_KEYS,
+    WORLD_FILE,
+    WORLD_FOLDER_KEYS,
+    Folder,
+    is_known_of,
+    read_folder,
+)
 from .push import NOT_SENT
 
 __all__ = ["EXPORTER", "OKF_COMMIT", "OKF_VERSION", "FolderError", "OkfReport", "build_bundle", "export_okf", "main"]
@@ -141,8 +150,6 @@ OKF_KEYS = frozenset(
         "status", "stale_after", "runtime", "parameters", "computation", "executor", "attester", "okf_version",
     }
 )  # fmt: skip
-# world.json keys the folder format defines beside the schema's (§4.2, §5).
-WORLD_FOLDER_KEYS = ("format_version", "writable", "source", "exported_as")
 WORLD_DROPPED = ("api", *WIRE_TO_DISK_WORLD_KEYS)
 # Every break str.splitlines() honours: the reference parser splits the
 # frontmatter on these, so a string holding one is written double-quoted.
