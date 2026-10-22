@@ -509,11 +509,14 @@ class Client:
         return self.call("GET", "health/")
 
     def me(self) -> dict[str, Any]:
-        """``GET /me``: who this key is, ``{world, scope, kind, role, membership, character, name?}``.
+        """``GET /me``: who this key is, ``{world, scope, kind, role, membership, character, name?, front_door}``.
 
         ``kind`` is ``owner`` for an owner-minted or classic key, else the membership's (``person``,
         ``agent``, ``player``); ``role`` is ``owner``, ``co_builder``, ``contributor`` or ``guest``;
-        ``character`` is the member's Character id, or None.
+        ``character`` is the member's Character id, or None. ``front_door`` (keel #558) is
+        ``{sponsor, sponsor_character, my_character, charter, charter_skill}``: who answers for a
+        seat, its Character, and the world's Charter (every member's to read; an agent reads it
+        first) with up to five Objects it names; anything hidden from the key is None or left out.
         """
         data = self.call("GET", "me/")
         if not isinstance(data, dict):
