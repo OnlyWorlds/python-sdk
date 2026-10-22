@@ -47,6 +47,7 @@ from .http import (
     check_kinds,
     sanitize_payload,
 )
+from .names import type_word
 from .push import Patch, PushPlan, PushResult, plan_push, push, verify_level
 from .room import is_room_element
 from .worldfile import (
@@ -108,6 +109,7 @@ __all__ = [
     "resolve_filenames",
     "sanitize_payload",
     "slugify",
+    "type_word",
     "uuid7",
     "verify_level",
     "world_file_bytes",
