@@ -13,6 +13,7 @@ scripted tests in ``test_client.py``, not here.
 
 from __future__ import annotations
 
+import gzip
 import json
 import os
 import urllib.request
@@ -39,8 +40,13 @@ KIND = {"text": "string", "integer": "integer", "multi_link": "array", "single_l
 def _load() -> dict[str, Any]:
     assert SOURCE
     if SOURCE.startswith(("http://", "https://")):
-        with urllib.request.urlopen(SOURCE, timeout=30) as r:
-            doc: dict[str, Any] = json.load(r)
+        # The document is 2 MB plain, 83 KB gzipped: ask for gzip (keel's bandwidth watch, h29 #9808).
+        req = urllib.request.Request(SOURCE, headers={"Accept-Encoding": "gzip"})
+        with urllib.request.urlopen(req, timeout=30) as r:
+            raw = r.read()
+            if r.headers.get("Content-Encoding") == "gzip":
+                raw = gzip.decompress(raw)
+            doc: dict[str, Any] = json.loads(raw)
     else:
         with open(SOURCE, encoding="utf-8") as f:
             doc = json.load(f)
