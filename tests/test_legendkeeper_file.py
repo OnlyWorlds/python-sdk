@@ -244,9 +244,9 @@ def test_plan_writes_nothing(tmp_path: Path) -> None:
     assert "Plan only: nothing written." in report.render()
 
 
-def test_folder_lint_passes_but_for_the_hidden_mark(tmp_path: Path) -> None:
-    """The dist's lint: no problem but the ``hidden`` key, one line per hidden element (the lint
-    before schema-dist serial 53 does not know the mark), and its count line the output's count."""
+def test_folder_lint_passes_with_the_hidden_mark(tmp_path: Path) -> None:
+    """The dist's lint: no problem at all, the 16 hidden marks included (``hidden`` a folder key
+    since schema-dist serial 53), and its count line the output's count."""
     pytest.importorskip("yaml", reason="the dist's lint decodes the schema YAML")
     out, report = run(tmp_path)
     r = subprocess.run([sys.executable, str(LINT), str(out)], capture_output=True, text=True)
@@ -255,9 +255,8 @@ def test_folder_lint_passes_but_for_the_hidden_mark(tmp_path: Path) -> None:
     problems = [line for line in lines[:-1] if not line.startswith("walk note:")]
     hidden = sum(1 for b in bodies(out).values() if b.get("hidden") is True)
     assert hidden == 16
-    assert all("`hidden` is not a field of" in p for p in problems), r.stdout + r.stderr
-    assert len(problems) in (0, hidden), r.stdout  # 0 once the lint knows the mark
-    assert r.returncode == (1 if problems else 0)
+    assert problems == [], r.stdout + r.stderr
+    assert r.returncode == 0, r.stdout + r.stderr
 
 
 def test_templates_are_marked_and_tutorial_pages_imported(tmp_path: Path) -> None:
@@ -442,14 +441,13 @@ def of_type(out: Path, etype: str) -> dict[str, dict[str, Any]]:
 
 
 def lint_ok(out: Path, total: int) -> None:
-    """The dist's lint: no problem but the hidden mark (as test_folder_lint_passes_but_for_the_hidden_mark)."""
+    """The dist's lint: no problem at all (as test_folder_lint_passes_with_the_hidden_mark)."""
     r = subprocess.run([sys.executable, str(LINT), str(out)], capture_output=True, text=True)
     lines = r.stdout.strip().splitlines()
     assert str(total) in lines[-1], r.stdout + r.stderr
     problems = [line for line in lines[:-1] if not line.startswith("walk note:")]
-    assert all("`hidden` is not a field of" in p for p in problems), r.stdout + r.stderr
-    hidden = sum(1 for b in bodies(out).values() if b.get("hidden") is True)
-    assert len(problems) in (0, hidden), r.stdout
+    assert problems == [], r.stdout + r.stderr
+    assert r.returncode == 0, r.stdout + r.stderr
 
 
 def asset_uuids(text: str) -> set[str]:

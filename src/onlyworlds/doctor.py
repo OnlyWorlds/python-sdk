@@ -33,7 +33,8 @@ this package's ``FORMAT_VERSION``; (10) an ``api_key`` in ``world.json``'s ``api
 when ``world.json`` is tracked by git.
 
 And on both doors, (11) the world's own house rules: the checks profile (schema-dist
-``profiles/checks.md``, dist.47), ``x_checks_rules`` on the world's Charter, read by
+``profiles/checks.md``, dist.47; the list case and reader rules 6 to 8 from dist.54),
+``x_checks_rules`` on the world's Charter, read by
 ``onlyworlds.checks.apply_checks``. The Charter is D152's one (keel #558): the newest Law with
 supertype Charter made by the owner or a co-builder; through the API it is
 ``front_door.charter`` from ``GET /me``, on a folder the owner's newest (a folder carries no
@@ -44,7 +45,8 @@ the reason; the charter, the rule's index and its field as evidence); a rule the
 apply is a finding on the charter, naming the rule and why; a key that is not a list is one
 finding on the charter; a charter without the key checks nothing and says so. ``compared``
 carries every rule's ``scoped`` and ``short`` counts and the view read (``folder``, or the
-key's role). A known-of stub is not judged (its absent fields are unknown), and the rules are
+key's role). A known-of stub is not judged (its absent fields are unknown; the profile's rule
+6), and the rules are
 on a Law only: a charter of another type that carries them is a finding, its rules not read.
 
 On the API door only, (12) proposals waiting (keel #519): the open and the lapsed rows of the

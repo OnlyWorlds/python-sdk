@@ -1,4 +1,5 @@
-"""The checks profile (schema-dist ``profiles/checks.md``, serial 47): a world's house rules, read by machine.
+"""The checks profile (schema-dist ``profiles/checks.md``, serial 47; serial 54 adds the list case
+and reader rules 6 to 8): a world's house rules, read by machine.
 
 A work world's Charter (a Law with supertype Charter) may carry ``x_checks_rules``, a list of rules,
 each the Charter's sentence beside an object a reader applies::

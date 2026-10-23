@@ -425,19 +425,17 @@ def test_world_json(tmp_path: Path) -> None:
 
 
 def lint(out: Path, total: int) -> None:
-    """The dist's lint on a folder: no problem but the ``hidden`` key, one line per hidden element
-    (the lint before schema-dist serial 53 does not know the mark), and its count line the total."""
+    """The dist's lint on a folder: no problem at all, the ``hidden`` mark included (a folder key
+    since schema-dist serial 53), and its count line the total."""
     r = subprocess.run([sys.executable, str(LINT), str(out)], capture_output=True, text=True)
     lines = r.stdout.strip().splitlines()
     assert str(total) in lines[-1], r.stdout + r.stderr
     problems = [line for line in lines[:-1] if not line.startswith("walk note:")]
-    hidden = sum(1 for b in bodies(out).values() if b.get("hidden") is True)
-    assert all("`hidden` is not a field of" in p for p in problems), r.stdout + r.stderr
-    assert len(problems) in (0, hidden), r.stdout  # 0 once the lint knows the mark
-    assert r.returncode == (1 if problems else 0)
+    assert problems == [], r.stdout + r.stderr
+    assert r.returncode == 0, r.stdout + r.stderr
 
 
-def test_folder_lint_passes_but_for_the_hidden_mark(tmp_path: Path) -> None:
+def test_folder_lint_passes_with_the_hidden_mark(tmp_path: Path) -> None:
     pytest.importorskip("yaml", reason="the dist's lint decodes the schema YAML")
     cases: list[tuple[str, dict[str, Any], dict[str, Any]]] = [
         ("plain", answers(), {}),
@@ -446,6 +444,8 @@ def test_folder_lint_passes_but_for_the_hidden_mark(tmp_path: Path) -> None:
     ]
     for name, ans, kw in cases:
         out, report = run(tmp_path, ans, name=name, **kw)
+        if name == "hidden":
+            assert any(b.get("hidden") is True for b in bodies(out).values())
         lint(out, report.total)
     # with nothing hidden, the lint is green outright
     ans = answers()

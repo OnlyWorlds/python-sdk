@@ -14,10 +14,12 @@
 | `x_review_checked` | `{"by": "<membership or seat id>", "at": "YYYY-MM-DD", "against": "<an id, a path or a sentence>"}`: who last confirmed the element still true, when, and against what (a source element, a file, a sentence naming the check). Overwritten by each later check; a world keeps no history of checks in this key. |
 
 **How a reader uses it.**
-1. An element whose `x_review_proposed` is an object is proposed: shown apart from settled elements (a mark, a word before the colour; never hidden, never merged into counts of what the world holds as true), and never fed to a reader as a fact without the mark. An element without the key, or with `null`, is settled.
+1. **A marked element is not canon until a keeper settles it.** An element whose `x_review_proposed` is an object is proposed; an element without the key, or with `null`, is settled. Readers come in two kinds, and the rule binds both:
+   - **A reader that hands a world on** (a Markdown or context pack, a draught of what a Character knows, an MCP server's lists and searches, a context packet for an AI) **leaves proposed elements out unless asked for**, says in its opening line or its reply how many it left out, and labels each one it keeps **"proposed, not yet reviewed"**, with the mark still on it. It never hands a proposed element on as a fact without the label. The reason is a planted instruction: a seat whose write lands for review must not reach the next AI as canon before a keeper has read it.
+   - **A reader that shows a world to its people** (an editor, a viewer, the world page, a review queue) **shows proposed elements with the mark visible**, apart from settled ones (a word before the colour, never merged into counts of what the world holds as true), since the keeper has to see them to settle them. An element asked for by its own id is served whole, mark on, to any reader.
 2. `expires` past: the proposal lapsed; a reader shows it as lapsed and a doctor reports it; nothing deletes it on its own.
 3. `x_review_checked.at` is the element's freshness date where it exists; last checked outranks last edited. A reader that shows age shows the check's date first and the edit's beside it.
-4. A value that is not an object with the keys above is ignored, never repaired, and reported by a lint.
+4. A value that is not an object with the keys above is never repaired and is reported by a lint. A reader that hands a world on treats it as a doubt: left out unless asked for and counted with the proposed, so a doubt never reaches an AI as canon. A reader that shows a world to its people ignores it, showing the element as settled with the lint's finding beside it. The queue and the review route read an object only.
 
 **What a writer must do.**
 - Write a proposal only where the world's charter says writes of this kind land as proposed; a settled world's writer never adds the key.
@@ -35,4 +37,4 @@
 { "name": "Harbourmaster",   "x_review_checked":  {"by": "2ba21540-…", "at": "2026-10-22", "against": "019a2c7e-5b31-…"} }
 ```
 
-Readers today: none shipped; the parlor's review queue (OW Parlor), the world doctor (Kael), Atlas's ink (Temper) and keel's checked-against card (Keel #517) are the first, each named here as it ships. Ruled in the folder format spec §4.6 (f) and (g), draft 2 of 2026-10-22, from Kael's and Temper's reads (h58 #9637, #9643).
+Readers today: keel writes the mark on an agent seat's new element under the world's switch, lists marked elements in the review queue and settles them through the review route (Keel #519, #565); keel's draught and MCP reads leave them out unless asked (Keel #580); the world doctor counts them apart (Kael's `onlyworlds` package, flag 12), and its Markdown pack leaves them out unless asked (`--proposed`). Still to come, each named here as it ships: the parlor's review queue (OW Parlor), Atlas's ink (Temper), keel's checked-against card (Keel #517). Ruled in the folder format spec §4.6 (f) and (g), draft 2 of 2026-10-22, from Kael's and Temper's reads (h58 #9637, #9643); the reader rule from Kael's question (h29 #11115) and the lead's ruling (#11116), 2026-10-23.

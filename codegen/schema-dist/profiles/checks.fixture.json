@@ -13,7 +13,8 @@
     {"rule": "a Funding line names the roles", "where": {"type": "relation", "supertype": "Funding"}, "require": {"field": "description", "matches": "(?i)\\broles?\\b"}},
     {"rule": "the first line of a description is Source: ... · as of YYYY-MM-DD", "where": {"type": "relation"}, "require": {"field": "description", "matches": "^Source: .+ · as of \\d{4}-\\d{2}-\\d{2}"}},
     {"rule": "a line's status is one the Charter names", "where": {"type": "relation", "supertype": ["Pilot", "Partnership", "Customer", "Certification", "Integration", "Funding", "Channel"]}, "require": {"field": "subtype", "one_of": ["idea", "in talks", "agreed", "running", "paused", "stalled", "ended"]}},
-    {"rule": "a line names every side", "where": {"type": "relation", "supertype": "Funding"}, "require": {"field": "institutions", "links_min": 1}}
+    {"rule": "a line names every side", "where": {"type": "relation", "supertype": "Funding"}, "require": {"field": "institutions", "links_min": 1}},
+    {"rule": "a person or an organisation says where it stands", "where": {"type": ["character", "institution"]}, "require": {"field": "description", "present": true}}
   ],
   "cases": [
     {"name": "a Character with a reputation", "element": {"type": "character", "supertype": "Person", "reputation": "keeps the world"}, "expect": {"0": "ok", "1": "out", "2": "out", "3": "out", "4": "out", "5": "out"}},
@@ -28,7 +29,11 @@
     {"name": "a status the Charter does not name", "element": {"type": "relation", "supertype": "Pilot", "subtype": "maybe"}, "expect": {"4": "short", "1": "out"}},
     {"name": "a Read relation is outside the status rule", "element": {"type": "relation", "supertype": "Read", "subtype": ""}, "expect": {"4": "out"}},
     {"name": "a single link counts as one", "element": {"type": "relation", "supertype": "Funding", "subtype": "idea", "institutions": "0199"}, "expect": {"5": "ok"}},
-    {"name": "a description that is not a string never matches", "element": {"type": "relation", "supertype": "Funding", "subtype": "agreed", "description": 7}, "expect": {"1": "short", "2": "short", "3": "short"}}
+    {"name": "a description that is not a string never matches", "element": {"type": "relation", "supertype": "Funding", "subtype": "agreed", "description": 7}, "expect": {"1": "short", "2": "short", "3": "short", "6": "out"}},
+    {"name": "where.type as a list: an institution is scoped", "element": {"type": "institution", "supertype": "Company", "description": ""}, "expect": {"6": "short", "0": "out"}},
+    {"name": "where.type as a list: a character is scoped too", "element": {"type": "character", "supertype": "Contact", "description": "Source: x · as of 2026-01-01", "reputation": "y"}, "expect": {"6": "ok", "0": "ok"}},
+    {"name": "where.type as a list: an object is not", "element": {"type": "object", "supertype": "Product", "description": ""}, "expect": {"6": "out"}},
+    {"name": "where.type as a list: each listed type compared folded", "element": {"type": "INSTITUTION", "description": "x"}, "expect": {"6": "ok"}}
   ],
   "not_checked": [
     {"rule": {"rule": "a fifth predicate", "where": {"type": "character"}, "require": {"field": "reputation", "longer_than": 3}}, "reason": "a predicate outside the four"},
@@ -38,7 +43,10 @@
     {"rule": {"rule": "two predicates", "where": {"type": "character"}, "require": {"field": "reputation", "present": true, "matches": "x"}}, "reason": "exactly one predicate"},
     {"rule": {"rule": "a pattern the engine refuses", "where": {"type": "character"}, "require": {"field": "reputation", "matches": "("}}, "reason": "pattern refused"},
     {"rule": "not an object", "reason": "a rule must be an object"},
-    {"rule": {"where": {"type": "character"}, "require": {"field": "reputation", "present": true}}, "reason": "missing rule"}
+    {"rule": {"where": {"type": "character"}, "require": {"field": "reputation", "present": true}}, "reason": "missing rule"},
+    {"rule": {"rule": "a type list with one name the schema does not name", "where": {"type": ["character", "person"]}, "require": {"field": "description", "present": true}}, "reason": "unknown type: one unknown name leaves the whole rule not checked"},
+    {"rule": {"rule": "an empty type list", "where": {"type": []}, "require": {"field": "description", "present": true}}, "reason": "where.type is a string or a non-empty list of strings"},
+    {"rule": {"rule": "a field one listed type does not have", "where": {"type": ["character", "institution"]}, "require": {"field": "reputation", "present": true}}, "reason": "the field must be a field of every listed type, or an extension key"}
   ],
   "measured": {
     "world": "BrainBoost, read through Kael's agent seat (guest view of the roster, every element the seat sees), 2026-10-22 14:3x",

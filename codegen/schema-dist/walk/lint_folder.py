@@ -46,7 +46,11 @@ BODY_EXTRA_KEYS = {"type", "created_at", "updated_at", "change_seq", "created_by
 # the linked-folder guidance): Atlas's two sync stamps and the media id. A
 # linked folder carries them on every edited element; Kael's first run on the
 # Captain's Atlas folders flagged all 1,669 of one world's elements (2026-10-12).
-FOLDER_KEYS = {"local_updated_at", "server_updated_at", "image_media_id", "known_of"}
+# `hidden` (folder spec 4.8, 2026-10-23): what the source hid stays hidden in the
+# folder; a converter door writes it, a push withholds the element until keel
+# takes the mark on a create. Must be a boolean (checked below).
+FOLDER_KEYS = {"local_updated_at", "server_updated_at", "image_media_id", "known_of",
+               "hidden"}
 EXTENSION_PREFIXES = ("x_", "atlas_", "shadow_")
 # A known-of stub (folder spec 4.4) keeps these and leaves every unset field out
 # (rule 1); a field keel marks public (Keel #448) may also be there, set. The
@@ -158,6 +162,9 @@ def lint_folder(src: Path, decoded: dict) -> Report:
                     if key not in STUB_KEEPS and key != "known_of" and value in ("", None, []):
                         report.add(f"{rel}: known-of stub writes unset `{key}`; a stub leaves unset fields out")
         for key, value in body.items():
+            if key == "hidden" and not isinstance(value, bool):
+                report.add(f"{rel}: `hidden` must be true or false, not {value!r}")
+                continue
             if key in BODY_EXTRA_KEYS or key in FOLDER_KEYS \
                     or key.startswith(EXTENSION_PREFIXES):
                 continue

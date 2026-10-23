@@ -284,9 +284,9 @@ def test_a_private_post_is_its_own_hidden_narrative(tmp_path: Path) -> None:
     assert "1 post not visible to all, its own Narrative (visibility_id)" in report.render()
 
 
-def test_folder_lint_passes_but_for_the_hidden_mark(tmp_path: Path) -> None:
-    """The dist's lint on the output: no problem but the ``hidden`` key, one line per hidden element
-    (the lint does not know the mark yet), and its count line the output's count."""
+def test_folder_lint_passes_with_the_hidden_mark(tmp_path: Path) -> None:
+    """The dist's lint on the output: no problem at all, the ``hidden`` mark included (a folder key
+    since schema-dist serial 53), and its count line the output's count."""
     pytest.importorskip("yaml", reason="the dist's lint decodes the schema YAML")
 
     def private(doc: dict[str, Any]) -> None:
@@ -299,9 +299,9 @@ def test_folder_lint_passes_but_for_the_hidden_mark(tmp_path: Path) -> None:
         assert str(report.total) in lines[-1]
         problems = [line for line in lines[:-1] if not line.startswith("walk note:")]
         hidden = sum(1 for b in bodies(out).values() if b.get("hidden") is True)
-        assert hidden and all("`hidden` is not a field of" in p for p in problems), r.stdout + r.stderr
-        assert len(problems) in (0, hidden), r.stdout  # 0 once the lint knows the mark
-        assert r.returncode == (1 if problems else 0)
+        assert hidden, r.stdout
+        assert problems == [], r.stdout + r.stderr
+        assert r.returncode == 0, r.stdout + r.stderr
     # with nothing hidden, the lint is green outright
     data = files()
     for rel in ("characters/your-character-name_10074596.json", "characters/allied-character-name_10074597.json"):

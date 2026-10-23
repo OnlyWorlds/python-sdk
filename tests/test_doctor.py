@@ -981,7 +981,7 @@ def test_the_packet_command_line(tmp_path: Path, monkeypatch: pytest.MonkeyPatch
     }
 
 
-# --- 11. house rules (the checks profile, schema-dist profiles/checks.md, dist.47) ----------
+# --- 11. house rules (the checks profile, schema-dist profiles/checks.md, dist.47; dist.54) ---
 
 HR = doctor.CHECKS_FLAG
 C3 = "c0000000-0000-7000-8000-000000000003"
@@ -1018,7 +1018,7 @@ def test_11_the_fixture_cases_replayed() -> None:
             if got != want:
                 misses.append(f"{case['name']}: rule {idx} wants {want}, got {got}")
     assert misses == []
-    assert len(fx["cases"]) >= 13 and expectations >= 32  # dist.47's counts; a later serial adds cases
+    assert len(fx["rules"]) >= 7 and len(fx["cases"]) >= 17 and expectations >= 39  # dist.54's counts
 
 
 def test_11_the_fixture_not_checked_rows_replayed() -> None:
@@ -1029,7 +1029,10 @@ def test_11_the_fixture_not_checked_rows_replayed() -> None:
         if ((row := apply_checks([nc["rule"]], [])[0]).not_checked is None) != (nc["reason"] is None)
     ]
     assert misses == []
-    assert len(fx["not_checked"]) >= 8
+    # dist.54's count; a row whose reason is null is a control the reader must check, so the
+    # comparison above runs both ways only while the fixture keeps one
+    assert len(fx["not_checked"]) >= 11
+    assert any(nc["reason"] is None for nc in fx["not_checked"])
 
 
 def test_11_a_short_element_is_named_by_type_id_and_name() -> None:
