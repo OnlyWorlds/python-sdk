@@ -32,11 +32,12 @@ What becomes what:
 
 - **An article becomes an element** of its template's type (``TEMPLATE_TYPES``, keyed on the
   template as the Metadata tab names it, ``Character``, or as a link's ``data-template-type``
-  names it, ``person``). A template not in the table, or an article with none, becomes a
-  Narrative with supertype ``worldanvil`` and the template's name as subtype; the report names
-  it. The ``h1`` is the name (the Codex's name when the ``h1`` is empty); the template's name is
-  kept as ``x_worldanvil_template``, a link's slug for it as ``x_worldanvil_template_type``, and
-  the article's uuid as ``x_worldanvil_id``.
+  names it, ``person``; the schema owner's table, Skeld, OW Market h40 #11360). A template not in
+  the table, or an article with none, becomes a Narrative with supertype ``Article`` (what it is,
+  never where it came from) and the template's name as World Anvil spells it as subtype; the
+  report names each such template and its count. The ``h1`` is the name (the Codex's name when
+  the ``h1`` is empty); the template's name is kept as ``x_worldanvil_template``, a link's slug
+  for it as ``x_worldanvil_template_type``, and the article's uuid as ``x_worldanvil_id``.
 - **Text**: the body, HTML to Markdown (the Kanka door's converter), is the ``description``. A
   link to another article becomes its text, and its target joins ``x_worldanvil_mentions``
   (element ids, in order, once each), as a Kanka mention does; the editor anchor after it is
@@ -56,8 +57,13 @@ What becomes what:
 - **The Metadata tab**: Visibility is read for the hidden mark below and kept as
   ``x_worldanvil_visibility`` when it is not Public; the Work In Progress badge as
   ``x_worldanvil_work_in_progress: true``; World is checked against the world's name. A row this
-  door does not know is kept as ``x_worldanvil_<label>`` and named in the report. Not kept, named
-  in the report: Author, the three dates and the counters (Views, Favorites, Comments).
+  door does not know is kept as ``x_worldanvil_<label>`` and named in the report. The three dates
+  are kept under the owner's three names (``DATE_KEYS``: ``x_worldanvil_created``,
+  ``_updated``, ``_published``) as ISO 8601 (``23 Oct, 2026`` is ``2026-10-23``);
+  a date not parsed exactly is kept as printed and named in the report, never guessed. The Author
+  is one platform username for the whole export, not a fact about an element: named in the
+  report, never on an element (Skeld, OW Market h40 #11360). The counters (Views, Favorites,
+  Comments) are not kept, and the report says so.
 - **A cover image** of the article's own becomes ``image_url``; World Anvil's inherited default
   (``img-inherited``) is counted and not kept.
 - **Nothing read past in silence**: text anywhere in an article outside the parts above and the
@@ -97,6 +103,7 @@ file, an OUT-DIR that is not empty, a file that is not a World Anvil export).
 from __future__ import annotations
 
 import argparse
+import datetime
 import io
 import itertools
 import os
@@ -114,6 +121,7 @@ from .folder import FORMAT_VERSION, write_folder
 from .kanka import _blocks, _clean, _inline, _Node, _norm, _Tree
 
 __all__ = [
+    "DATE_KEYS",
     "EXT_PREFIX",
     "PRODUCER_INPUT",
     "PROVEN_TEMPLATES",
@@ -139,16 +147,18 @@ WORLDANVIL_NAMESPACE = uuid.uuid5(uuid.NAMESPACE_URL, "https://onlyworlds.com/ns
 #: Every extension key this door writes starts with this.
 EXT_PREFIX = "x_worldanvil_"
 
-#: The supertype of a Narrative made from an article whose template has no OnlyWorlds type.
-UNTYPED_SUPERTYPE = "worldanvil"
+#: The supertype of a Narrative made from an article whose template has no OnlyWorlds type: what
+#: the thing is, never where it came from (the producer line says that; Skeld, OW Market h40 #11360).
+UNTYPED_SUPERTYPE = "Article"
 
 #: The most an export may hold, in bytes: a file past it is refused, not read.
 MAX_EXPORT_BYTES = 256 * 1024 * 1024
 
-#: World Anvil's article template -> element type: the one table, for the schema owner's ruling.
-#: Keyed lowercased on the template as the Metadata tab names it (``Geographic Location``) or as a
-#: link's ``data-template-type`` names it (``person``). The keys in ``PROVEN_TEMPLATES`` were read
-#: on a real export; the rest are believed.
+#: World Anvil's article template -> element type: the one table, as the schema owner ruled it
+#: against the definitions page (Skeld, OW Market h40 #11360: every row below holds, the last four
+#: added on his reading; anything else stays unknown). Keyed lowercased on the template as the
+#: Metadata tab names it (``Geographic Location``) or as a link's ``data-template-type`` names it
+#: (``person``). The keys in ``PROVEN_TEMPLATES`` were read on a real export; the rest are believed.
 TEMPLATE_TYPES: dict[str, str] = {
     "character": "character",
     "person": "character",
@@ -167,6 +177,10 @@ TEMPLATE_TYPES: dict[str, str] = {
     "conflict": "event",
     "rank / title": "title",
     "rank": "title",
+    "ethnicity": "species",
+    "myth / legend": "narrative",
+    "vehicle": "object",
+    "profession": "title",
 }
 PROVEN_TEMPLATES = frozenset({"character", "person", "species", "geographic location"})
 
@@ -185,16 +199,46 @@ _OWN = (
     "parent",
     "unread",
 )
-_RESERVED = frozenset(f"{EXT_PREFIX}{k}" for k in _OWN)
 
-#: Metadata rows not kept (one report line); the rest are read or kept.
-_META_NOT_KEPT = frozenset(
-    {"author", "publication date", "creation date", "last update date", "views", "favorites", "comments"}
-)
+#: The Metadata tab's dates, kept on the element under the owner's three names (Skeld, OW Market h40
+#: #11360: ``created``, ``updated``, ``published``, "or the template's own words"), as ISO 8601.
+DATE_KEYS: dict[str, str] = {
+    "creation date": f"{EXT_PREFIX}created",
+    "last update date": f"{EXT_PREFIX}updated",
+    "publication date": f"{EXT_PREFIX}published",
+}
+_RESERVED = frozenset(f"{EXT_PREFIX}{k}" for k in _OWN) | frozenset(DATE_KEYS.values())
+
+#: A date as the Metadata tab prints it: ``23 Oct, 2026``. Any other shape is kept as printed.
+_PRINTED_DATE = re.compile(r"(?P<day>\d{1,2}) (?P<month>[A-Za-z]+),? (?P<year>\d{4})")
+_MONTHS = {
+    m: i
+    for i, names in enumerate(
+        (
+            ("jan", "january"),
+            ("feb", "february"),
+            ("mar", "march"),
+            ("apr", "april"),
+            ("may",),
+            ("jun", "june"),
+            ("jul", "july"),
+            ("aug", "august"),
+            ("sep", "september"),
+            ("oct", "october"),
+            ("nov", "november"),
+            ("dec", "december"),
+        ),
+        1,
+    )
+    for m in names
+}
+
+#: Metadata rows not kept (one report line; the author's name is in the report); the rest are read or kept.
+_META_NOT_KEPT = frozenset({"author", "views", "favorites", "comments"})
 _NOT_KEPT = (
     "the page's chrome and layout (the title icons, World Anvil's inherited cover image, share, report and"
-    " block-link buttons, the comment form, navigation, the Codex's layout ids), who wrote an article and when"
-    " (Author, Publication Date, Creation Date, Last Update Date, the world's 'Created by' line), the counters"
+    " block-link buttons, the comment form, navigation, the Codex's layout ids), who wrote an article (Author,"
+    " the world's 'Created by' line: named above, never on an element), the counters"
     " (Views, Favorites, Comments), a link's page address, tooltip and editor anchor once its target is kept by"
     " id, and the template fields' visibility-toggle ids (a hash each; what they toggle is not in the file)"
 )
@@ -288,6 +332,18 @@ def _public(value: str) -> bool:
     return value.strip().casefold() == "public"
 
 
+def _iso_date(printed: str) -> str | None:
+    """``23 Oct, 2026`` as ``2026-10-23``; None for anything not exactly a day, a month and a year."""
+    m = _PRINTED_DATE.fullmatch(printed.strip())
+    month = _MONTHS.get(m["month"].casefold()) if m is not None else None
+    if m is None or month is None:
+        return None
+    try:
+        return datetime.date(int(m["year"]), month, int(m["day"])).isoformat()
+    except ValueError:
+        return None
+
+
 # ---------------------------------------------------------------------------
 # The report
 # ---------------------------------------------------------------------------
@@ -365,6 +421,12 @@ class ImportReport:
     secret_blocks: int = 0
     #: Secret blocks inside a hidden article, kept in place
     secrets_inside: int = 0
+    #: the Metadata tab's Author -> articles naming it: in this report, never on an element
+    authors: dict[str, int] = field(default_factory=dict)
+    #: dates kept on the elements as ISO 8601
+    dates: int = 0
+    #: (element, label, the text as printed): a date not parsed exactly, kept as printed
+    dates_unparsed: list[tuple[str, str, str]] = field(default_factory=list)
     notes: list[str] = field(default_factory=list)
     #: where the folder was written; None for a plan
     out: Path | None = None
@@ -416,6 +478,15 @@ class ImportReport:
         if self.codex_only:
             lines.append(f"In the World Codex with no article in the export ({len(self.codex_only)}): not made")
             lines += [f"  - {a}: {repr(n) if n else 'no title'}" for a, n in self.codex_only]
+        if self.dates or self.dates_unparsed:
+            keys = ", ".join(DATE_KEYS.values())
+            lines.append(f"Dates kept on the elements ({keys}): {self.dates} as ISO 8601")
+            if self.dates_unparsed:
+                lines.append(f"Dates not parsed exactly, kept as printed ({len(self.dates_unparsed)}):")
+                lines += [f"  - {e!r} / {k!r}: {t!r}" for e, k, t in self.dates_unparsed]
+        if self.authors:
+            who = ", ".join(f"{a!r} ({n} article{'' if n == 1 else 's'})" for a, n in self.authors.items())
+            lines.append(f"Author, named here and never on an element: {who}")
         if self.notes:
             lines.append(f"Notes ({len(self.notes)}):")
             lines += [f"  - {n}" for n in self.notes]
@@ -893,9 +964,19 @@ class _Importer:
             item.consumed |= {id(lnode), id(vnode)}
             low = label.casefold()
             value = _plain(vnode)
+            if low == "author" and value:
+                self.report.authors[value] = self.report.authors.get(value, 0) + 1
             if low in ("article template",) or low in _META_NOT_KEPT:
                 continue
-            if low == "world":
+            if low in DATE_KEYS:
+                if value:
+                    iso = _iso_date(value)
+                    item.ext[DATE_KEYS[low]] = value if iso is None else iso
+                    if iso is None:
+                        self.report.dates_unparsed.append((item.name, label, value))
+                    else:
+                        self.report.dates += 1
+            elif low == "world":
                 if value != self.report.world.get("name", value):
                     self.report.notes.append(f"article {item.name!r} names its world {value!r}")
             elif low == "visibility":

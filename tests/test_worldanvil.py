@@ -31,9 +31,11 @@ import pytest
 from onlyworlds import read_folder, write_folder
 from onlyworlds.folder import FORMAT_VERSION
 from onlyworlds.worldanvil import (
+    DATE_KEYS,
     PRODUCER_INPUT,
     PROVEN_TEMPLATES,
     TEMPLATE_TYPES,
+    UNTYPED_SUPERTYPE,
     WORLDANVIL_NAMESPACE,
     ImportReport,
     import_worldanvil,
@@ -59,10 +61,20 @@ DRAFT = "516196cd-dc42-4482-b670-858883651a33"  # the Codex's untitled Species d
 TYPES = {"Ada Quay": "character", "Riverfolk": "species", "The ferry crossing": "location"}
 RIVERFOLK_LINK = f'data-article-privacy="public" data-article-id="{RIVERFOLK}"'
 
-#: What must never be in a fixture: the comment form's CSRF token, the account's handle, analytics ids.
+#: The export account's handle, by hash (sha256 of the lowercased name), so the name stays out of
+#: the package: no word-ish token of a fixture may hash to it (Boss's find, OW Market h40 #11375).
+HANDLE_SHA256 = "115bc6ac1c0836fbd92dda1b8a74d16a2d36f56ad66b75c55f43aaa9068a094c"
+
+
+def tokens_hashing_to(text: str, digest: str) -> list[str]:
+    """The word-ish tokens of ``text``, lowercased, whose sha256 is ``digest``."""
+    words = {w.lower() for w in re.findall(r"[A-Za-z0-9_]+", text)}
+    return sorted(w for w in words if hashlib.sha256(w.encode("utf-8")).hexdigest() == digest)
+
+
+#: What must never be in a fixture: the comment form's CSRF token, analytics ids (the handle: above).
 FORBIDDEN = {
     "the comment form's CSRF token": re.compile(r"appbundle_comment(\[_token\])?"),
-    "the account's handle": re.compile(r"SeetheOwExport", re.IGNORECASE),
     "a Google Analytics 4 id": re.compile(r"G-[A-Za-z0-9]+"),
     "a Universal Analytics id": re.compile(r"UA-\d+"),
     "a gtag call": re.compile(r"gtag\("),
@@ -124,12 +136,20 @@ def test_no_fixture_carries_a_token_a_handle_or_an_analytics_id(path: Path) -> N
     text = path.read_text(encoding="utf-8")
     found = {what: pat.findall(text) for what, pat in FORBIDDEN.items() if pat.search(text)}
     assert not found, f"{path.name}: {found}"
+    assert not tokens_hashing_to(text, HANDLE_SHA256), f"{path.name}: the account's handle"
+
+
+@pytest.mark.parametrize("planted", ["plantedhandle", "PlantedHandle"])
+def test_the_handle_check_flags_a_planted_token(planted: str) -> None:
+    """The check, run over the digest of a stand-in name: it finds the token, any case, in prose."""
+    digest = hashlib.sha256(b"plantedhandle").hexdigest()
+    assert tokens_hashing_to(f'<a href="/~{planted}">by {planted}</a>', digest) == ["plantedhandle"]
+    assert tokens_hashing_to("by someone-else plantedhandles", digest) == []
 
 
 def test_the_forbidden_patterns_catch_what_they_name() -> None:
     samples = [
         'name="appbundle_comment[_token]"',
-        "by SeetheOwExport",
         "gtag('config', 'G-ABC123XYZ')",
         "UA-12345-1",
         "https://www.googletagmanager.com/gtm.js",
@@ -145,6 +165,34 @@ def test_namespace_and_producer_word_are_pinned() -> None:
     assert PRODUCER_INPUT == "worldanvil-export"  # folder spec §4.2's list
     assert set(TEMPLATE_TYPES) >= PROVEN_TEMPLATES
     assert {TEMPLATE_TYPES[k] for k in PROVEN_TEMPLATES} == {"character", "species", "location"}
+    assert UNTYPED_SUPERTYPE == "Article"  # what it is, never where it came from (h40 #11360)
+
+
+def test_the_template_table_is_the_owners_ruling() -> None:
+    """Skeld, OW Market h40 #11360: every row of 0.39.0 holds, four added, anything else unknown."""
+    assert TEMPLATE_TYPES == {
+        "character": "character",
+        "person": "character",
+        "species": "species",
+        "geographic location": "location",
+        "location": "location",
+        "settlement": "location",
+        "building / landmark": "location",
+        "landmark": "location",
+        "organization": "institution",
+        "item": "object",
+        "language": "language",
+        "law": "law",
+        "spell": "ability",
+        "military conflict": "event",
+        "conflict": "event",
+        "rank / title": "title",
+        "rank": "title",
+        "ethnicity": "species",
+        "myth / legend": "narrative",
+        "vehicle": "object",
+        "profession": "title",
+    }
 
 
 # --- the real files ----------------------------------------------------------
@@ -169,6 +217,9 @@ def test_the_first_export(tmp_path: Path) -> None:
         ("Species", "species", "proven"),
     }
     assert report.codex_only == [(DRAFT, "")]  # listed, never printed: not made
+    for b in els.values():  # the three dates, kept under the export's words, as ISO 8601
+        assert {k: b[k] for k in DATE_KEYS.values()} == dict.fromkeys(DATE_KEYS.values(), "2026-10-23")
+    assert report.dates == 9 and report.dates_unparsed == []
     world = json.loads((out / "world.json").read_text(encoding="utf-8"))
     assert world == {
         "id": str(uuid.uuid5(WORLDANVIL_NAMESPACE, f"worldanvil:{WORLD}")),
@@ -254,11 +305,14 @@ def test_the_report_names_every_unplaced_item(tmp_path: Path) -> None:
         "'Ada Quay: Children'",  # the empty template field
         "3 cover images inherited",
         "2 editor anchor(s)",
-        "Author, Publication Date, Creation Date, Last Update Date",
+        "Dates kept on the elements (x_worldanvil_created, x_worldanvil_updated,"
+        " x_worldanvil_published): 9 as ISO 8601",
+        "Author, named here and never on an element: '[author]' (3 articles)",
         "Views, Favorites, Comments",
         "Wrote ",
     ):
         assert needle in text, needle
+    assert "not parsed exactly" not in text
     assert not any(u.key == "unread" for u in report.unplaced)  # nothing in an article read past
     assert not any("outside the articles" in n for n in report.notes)  # nor on the page
 
@@ -404,18 +458,71 @@ def test_a_template_field_named_like_a_field_fills_it(tmp_path: Path) -> None:
     assert why["Weight"] == "the value is not a whole number (weight is an integer)"
 
 
-def test_an_unknown_template_is_a_narrative_and_named(tmp_path: Path) -> None:
+def retemplated(tmp: Path, template: str) -> Path:
+    """The first export with Riverfolk's Article template renamed."""
     text = ONE.read_text(encoding="utf-8")
-    new, n = re.subn(r"(Article template</div>\s*<div[^>]*>\s*)Species", r"\1Vehicle", text)
+    new, n = re.subn(r"(Article template</div>\s*<div[^>]*>\s*)Species", rf"\g<1>{template}", text)
     assert n == 1
-    src = tmp_path / "vehicle.html"
+    src = tmp / f"{re.sub(r'\W+', '-', template)}.html"
     src.write_text(new, encoding="utf-8", newline="")
-    out, report = run(tmp_path, src)
+    return src
+
+
+def test_an_unknown_template_is_an_article_narrative_and_named(tmp_path: Path) -> None:
+    """Skeld, h40 #11360: supertype Article, the template as World Anvil spells it the subtype."""
+    out, report = run(tmp_path, retemplated(tmp_path, "Technology"))
     riverfolk = by_name(out)["Riverfolk"]
     assert riverfolk["type"] == "narrative"
-    assert (riverfolk["supertype"], riverfolk["subtype"]) == ("worldanvil", "Vehicle")
-    assert ("Vehicle", "narrative", "untyped") in {(t.template, t.type, t.status) for t in report.templates}
-    assert "template 'Vehicle' (1): narrative; no OnlyWorlds type" in report.render()
+    assert (riverfolk["supertype"], riverfolk["subtype"]) == ("Article", "Technology")
+    assert riverfolk["x_worldanvil_template"] == "Technology"
+    assert ("Technology", "narrative", "untyped") in {(t.template, t.type, t.status) for t in report.templates}
+    assert "template 'Technology' (1): narrative; no OnlyWorlds type: Narratives, supertype Article" in report.render()
+    assert "worldanvil" not in {b.get("supertype") for b in bodies(out).values()}
+
+
+@pytest.mark.parametrize(
+    ("template", "etype"),
+    [("Ethnicity", "species"), ("Myth / Legend", "narrative"), ("Vehicle", "object"), ("Profession", "title")],
+)
+def test_the_four_added_templates_type(tmp_path: Path, template: str, etype: str) -> None:
+    out, report = run(tmp_path, retemplated(tmp_path, template))
+    riverfolk = by_name(out)["Riverfolk"]
+    assert riverfolk["type"] == etype and riverfolk["x_worldanvil_template"] == template
+    assert "supertype" not in riverfolk  # typed, not an Article
+    assert (template, etype, "believed") in {(t.template, t.type, t.status) for t in report.templates}
+
+
+def test_a_date_not_parsed_exactly_is_kept_as_printed_and_named(tmp_path: Path) -> None:
+    text = ONE.read_text(encoding="utf-8")
+    ferry = text.index(f'id="article-{FERRY}"')
+    at = text.index("23 Oct, 2026", text.index("Creation Date</div>", ferry))
+    src = tmp_path / "date.html"
+    src.write_text(text[:at] + "Spring, 2026" + text[at + len("23 Oct, 2026") :], encoding="utf-8", newline="")
+    out, report = run(tmp_path, src)
+    ferry_el = by_name(out)["The ferry crossing"]
+    assert ferry_el["x_worldanvil_created"] == "Spring, 2026"  # never guessed
+    assert ferry_el["x_worldanvil_published"] == "2026-10-23"
+    assert report.dates_unparsed == [("The ferry crossing", "Creation Date", "Spring, 2026")]
+    assert report.dates == 8
+    assert "'The ferry crossing' / 'Creation Date': 'Spring, 2026'" in report.render()
+
+
+@pytest.mark.parametrize(
+    ("printed", "iso"),
+    [("23 Oct, 2026", "2026-10-23"), ("3 March, 2025", "2025-03-03"), ("31 Feb, 2026", None), ("Oct 23, 2026", None)],
+)
+def test_the_date_parse_is_exact(printed: str, iso: str | None) -> None:
+    from onlyworlds.worldanvil import _iso_date
+
+    assert _iso_date(printed) == iso
+
+
+def test_the_author_stays_out_of_the_elements(tmp_path: Path) -> None:
+    """Skeld, h40 #11360: one username for the whole export, named in the report only."""
+    out, report = run(tmp_path)
+    assert report.authors == {"[author]": 3}
+    assert "[author]" not in json.dumps(bodies(out))
+    assert not any("author" in k for b in bodies(out).values() for k in b)
 
 
 def test_text_no_part_reads_is_kept_and_named(tmp_path: Path) -> None:
