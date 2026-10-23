@@ -1,20 +1,70 @@
-"""Read a LegendKeeper project into a world folder through LegendKeeper's own API: read-only, no AI.
+"""Read a LegendKeeper project into a world folder, through LegendKeeper's own API or from its own
+export file: read-only, no AI.
 
     LEGENDKEEPER_API_KEY=lk_... python -m onlyworlds.legendkeeper --project ID OUT-DIR [--plan]
-        [--key-file PATH] [--map TAG=TYPE ...] [--include-hidden] [--include-secrets]
+        [--key-file PATH] [--map TAG=TYPE ...]
+    python -m onlyworlds.legendkeeper --file EXPORT.lk OUT-DIR [--plan] [--project ID] [--map TAG=TYPE ...]
 
-or ``import_legendkeeper(ApiSource(key), project_id, out_dir, ...)``. The key is the person's own
-(Project Settings, Developers, API Keys; LegendKeeper requires the project owner to be on a paid
-plan), read from ``LEGENDKEEPER_API_KEY`` or the file ``--key-file`` names. It is sent as
-``Authorization: Bearer`` and nowhere else: never stored, never printed, never written into the
-folder or the report. ``--plan`` reads the project and prints what would become what, and writes
-nothing. OUT-DIR must not exist yet (or be empty): a folder is written whole, once.
+or ``import_legendkeeper(ApiSource(key), project_id, out_dir, ...)`` and
+``import_legendkeeper("EXPORT.lk", out_dir=...)``. The key is the person's own (Project Settings,
+Developers, API Keys; LegendKeeper requires the project owner to be on a paid plan), read from
+``LEGENDKEEPER_API_KEY`` or the file ``--key-file`` names. It is sent as ``Authorization: Bearer``
+and nowhere else: never stored, never printed, never written into the folder or the report. The
+export file needs no key. ``--plan`` reads the project and prints what would become what, and
+writes nothing. OUT-DIR must not exist yet (or be empty): a folder is written whole, once.
 
 Reading and converting are apart. A ``Source`` answers ``get(path, params)`` with the decoded JSON
 of one GET below ``https://www.legendkeeper.com/api/v3``: ``ApiSource`` asks the live API (GET only,
 paced on ``x-ratelimit-remaining`` and ``x-ratelimit-reset``, a 429's ``Retry-After`` honoured),
-``RecordedSource`` answers from recorded replies (the tests). ``read_project`` walks a source into
-a ``Snapshot``; the converter reads only the snapshot.
+``RecordedSource`` answers from recorded replies (the tests), and ``FileSource`` answers from
+LegendKeeper's own export file, each answer in the API's shape. ``read_project`` walks a source
+into a ``Snapshot``; the converter reads only the snapshot, so both roads give the same elements.
+
+**The export file** (Project Settings, Export; ``.lk`` is the JSON gzipped, the JSON type the same
+data plain; read either, by its first bytes, never by its name) holds the whole project in one
+object, ``{version, exportId, exportedAt, resources, calendars, resourceCount, hash}``. **Proven on
+one real export** (version 1, 2026-10-23, Seethe's project on a crew trial account,
+``tests/fixtures/legendkeeper/the-quay-world.lk``). ``FileSource`` adapts where its shape is not
+the API's:
+
+- no project: the export names neither the project's id nor its name. Ids are keyed on the id of
+  the first top-level resource in LegendKeeper's own sibling order (``pos``; the project home in
+  a new project), the world named by that resource, unless ``project_id`` (``--project``) names
+  the project, when ids are those the API road gives. Reordering the top level, or deleting that
+  resource, moves the key: give ``--project`` for ids that hold.
+- the tree is one list, not pages; a top-level resource has no ``parentId`` key (the API's is
+  null); each document carries its ``content`` inline (the API serves it per document).
+- **a page's content is the editor's own document** (``{type: doc, content: [...]}``, Atlassian
+  ADF style nodes: ``type``, ``attrs``, text nodes with ``marks``), not the API's blocks (``kind``,
+  ``children``, runs with flags). It is translated node for node: paragraph, heading, the three
+  lists and their items (a task's ``state`` DONE as checked), blockquote as a quote, panel as a
+  callout (``panelType`` its tone), codeBlock, rule, mediaSingle and media as images, layoutSection
+  and layoutColumn, expand, tables; a ``bodiedExtension`` ``block-secret`` is the API's ``secret``
+  block, an ``extension`` ``block-youtube`` an embed; marks strong, em, strike, code, underline,
+  link (``href``), textColor, subsup; hardBreak a break; a mention's ``attrs.id`` its
+  ``resourceId``. An inline icon (``inline-icon``) is counted, not kept; another node or extension
+  goes on under its own name, which the report counts as a kind not known here.
+- sidebar properties are ``{id, title, type, data, pos}``: ``IMAGE``, ``TEXT_FIELD`` (its
+  ``fragment`` an editor document), ``RESOURCE_COLLECTION``, ``METER`` and ``SPOTIFY_SINGLE`` (an
+  embed) become the API's kinds; ``TAGS`` and ``ALIAS`` only show the resource's tags and aliases
+  (which are kept) and are counted; any other goes on under its own type, kept whole.
+- a timeline's ``content`` holds its lanes and events; an event carries no formatted dates and
+  no ``sourceUri`` (the server computes those), so ``x_legendkeeper_start`` holds the minutes only.
+- not kept, named in the report: ``exportId``, ``exportedAt`` and ``hash`` (the report names the
+  export; two exports of one project give one folder), ``createdBy`` (an account id),
+  ``schemaVersion``, ``showPropertyBar``, ``isFullWidth``, document locators, ``transforms`` and
+  ``sources``, and ``calendars`` (the export of 2026-10-23 holds none, though its timeline names a
+  calendar).
+
+LegendKeeper's starter pages (the tutorial a new project is seeded with: Wiki City, Temple of
+Time, ...) travel like the rest: nothing in the file marks them, so they are imported. On the one
+real export their ``createdBy`` is another account than the person's, which is a tell, not a rule.
+The templates (Character, Location, ...) are marked: they sit in LegendKeeper's templates folder,
+``parentId`` ``templates`` (no resource has that id), and each is imported carrying
+``x_legendkeeper_template: true``, the report naming them.
+
+The Markdown zip LegendKeeper also exports is not a source: it loses the tags, the properties,
+the hidden marks and the ids.
 
 **Observed** (Boss, 2026-10-22, live on a real project; the recorded answers are this package's
 test fixtures): the tree as one flat list of resources (``id``, ``name``, ``parentId``, ``tags``,
@@ -71,42 +121,67 @@ What becomes what:
   ``x_legendkeeper_parent`` the resource it belongs to. ``start_date`` and ``end_date`` are left
   unset: the unit is the world's own time system, and converting minutes into it is a later step
   that needs the world's time settings named. Placeholders are layout and are counted.
-- **Hidden** resources (and what sits under them), documents, properties and events, and
-  ``secret`` blocks, are omitted by default and counted: the safe side for a player-facing world.
-  ``--include-hidden`` and ``--include-secrets`` take them in (a secret as ``> [!secret]``).
-  Hidden content is never fetched unless asked for.
 - **Not imported**, named in the report with their resource: ``map`` documents (features are not
   read yet) and ``board`` documents. ``blank`` documents are empty and counted. Not kept, named in
   the report: icons, sibling order, timestamps, lock state, permissions, banners, event colours
   and icons, and the server's computed event dates (they follow from the minutes and calendar).
 
+**What the source hides, the folder hides: never dropped, never public** (Skeld's rule, OW Market
+h40 #11228). Each hidden thing is an element carrying ``hidden: true`` at the top of its body
+(OnlyWorlds' hidden mark), counted in the report, from either road:
+
+- a resource whose ``isHidden`` is true, and every resource under it (LegendKeeper hides a
+  hidden page's subtree from a reader below admin): its element, whole; its hidden pages and
+  secret blocks stay in its own text (a page under its heading, a secret as ``> [!secret]``);
+- a hidden ``page`` document on a visible resource: its own Narrative, named
+  ``<resource>: <document>``, the page's text its ``story``, linked to the resource's element
+  (Narrative's field for the element's type, ``parent_narrative`` for a Narrative) and
+  ``x_legendkeeper_parent``; ``x_legendkeeper_document`` the document's id;
+- a ``secret`` block in a visible page: its own Narrative, ``<resource>: Secret`` (the block's
+  title when it has one; numbered when a resource has more than one), the block's text its
+  ``story``, linked the same way; the page keeps only its visible text;
+- a hidden property on a visible resource: into one Narrative per resource,
+  ``<resource>: hidden properties``, linked the same way, its keys kept as extensions;
+- a timeline event whose ``isHidden`` is true, or on a hidden document or resource: its Event;
+- a Relation either end of which is hidden.
+
+A visible text that mentions a hidden element by name is named in the report. A hidden map, board
+or blank document is named or counted as a visible one is.
+
 **Ids are UUIDv5** in ``LEGENDKEEPER_NAMESPACE``: of ``legendkeeper:<project id>:<resource id>`` for
-a resource, ``legendkeeper:<project id>:event:<event id>`` for an event, and
+a resource, ``legendkeeper:<project id>:event:<event id>`` for an event,
 ``legendkeeper:<project id>:link:<resource id>:<list id>:<item id>`` for a Relation (a kind word,
-since LegendKeeper lets a client choose 8- or 24-character ids for resources and events alike). A
-second import of the same project finds the same elements. ``world.json``: ``id`` UUIDv5 of
+since LegendKeeper lets a client choose 8- or 24-character ids for resources and events alike),
+``legendkeeper:<project id>:document:<resource id>:<document id>`` for a hidden document's
+Narrative, ``legendkeeper:<project id>:secret:<resource id>:<document id>:<n>`` for the n-th secret
+block of a page (the export gives a block no id, so both roads count them) and
+``legendkeeper:<project id>:properties:<resource id>`` for a resource's hidden properties. A second
+import of the same project finds the same elements. ``world.json``: ``id`` UUIDv5 of
 ``legendkeeper:<project id>``, ``name`` the project's name, ``producer`` ``{"tool": "onlyworlds",
-"version": ..., "input": "legendkeeper-api"}`` (``PRODUCER_INPUT``; the word awaits the folder
-spec's list of inputs, and a reader never refuses an unknown word), ``format_version`` this
-package's.
+"version": ..., "input": ...}`` with ``legendkeeper-api`` (``PRODUCER_INPUT``) from the API and
+``legendkeeper-export`` (``PRODUCER_INPUT_FILE``) from the file (both on the folder spec's list,
+§4.2, v0.3.17), ``format_version`` this package's.
 
 The report (``ImportReport``, printed at the end of a run and by ``--plan``) names what became what
 with counts and how each type was decided, every key not placed (element, key, why, the extension
 it was kept as), every titled link kept as Relations (by title, with counts), every link or mention
-whose target is not in the folder, what was omitted and why, the documents not imported, every
-answer that could not be read, and anything else read past. Nothing from the source is dropped
-without a line in it.
+whose target is not in the folder, what is hidden and how, the documents not imported, every answer
+that could not be read, and anything else read past. Nothing from the source is dropped without a
+line in it.
 
 From the command line: exit 0 written (or planned), 2 on bad arguments (no key, a ``--map`` that
-names no type, an OUT-DIR that is not empty) or a project that cannot be read (the key refused, the
-plan gate, no such project); the error names the call and LegendKeeper's error code, never the key.
+names no type, an OUT-DIR that is not empty, a file that is not a LegendKeeper export) or a project
+that cannot be read (the key refused, the plan gate, no such project); the error names the call and
+LegendKeeper's error code, never the key.
 """
 
 from __future__ import annotations
 
 import argparse
 import copy
+import gzip
 import io
+import json
 import os
 import re
 import sys
@@ -130,10 +205,12 @@ __all__ = [
     "KEY_ENV",
     "LEGENDKEEPER_NAMESPACE",
     "PRODUCER_INPUT",
+    "PRODUCER_INPUT_FILE",
     "ApiSource",
+    "FileSource",
+    "Hidden",
     "ImportReport",
     "NotImported",
-    "Omitted",
     "RecordedSource",
     "Snapshot",
     "Source",
@@ -146,8 +223,18 @@ __all__ = [
     "read_project",
 ]
 
-#: The ``producer.input`` word for this door; new to the folder spec's list.
+#: The ``producer.input`` word for a folder read through the API (folder spec §4.2, v0.3.17).
 PRODUCER_INPUT = "legendkeeper-api"
+
+#: The ``producer.input`` word for a folder read from LegendKeeper's export file (§4.2, v0.3.17).
+PRODUCER_INPUT_FILE = "legendkeeper-export"
+
+#: The ``parentId`` of a resource in LegendKeeper's templates folder (seen in the export; no
+#: resource of the tree carries this id).
+TEMPLATES_PARENT = "templates"
+
+#: The most an export may hold once unzipped, in bytes: a file past it is refused, not read.
+MAX_EXPORT_BYTES = 256 * 1024 * 1024
 
 #: The namespace every id this door mints is UUIDv5 in. Fixed for good: changing it would give
 #: every element of every re-imported project a new id.
@@ -189,6 +276,8 @@ _OWN = (
     "uri",
     "source",
     "target",
+    "document",
+    "template",
 )
 #: The door's own extension keys; a property's key never takes one of them.
 _RESERVED = frozenset(f"{EXT_PREFIX}{k}" for k in _OWN)
@@ -208,6 +297,12 @@ _RELATION_FIELD_FOR: dict[str, str] = {}
 for _f, _kind in FIELD_KINDS["relation"].items():
     if _kind == "multi_link":
         _RELATION_FIELD_FOR.setdefault(LINK_TARGETS["relation"][_f], _f)
+
+#: target type -> Narrative's multi-link field for it: how a hidden Narrative links its resource.
+_NARRATIVE_FIELD_FOR: dict[str, str] = {}
+for _f, _kind in FIELD_KINDS["narrative"].items():
+    if _kind == "multi_link":
+        _NARRATIVE_FIELD_FOR.setdefault(LINK_TARGETS["narrative"][_f], _f)
 
 #: An element type whose own parent field takes a parent of the same type.
 _PARENT_FIELD: dict[str, str] = {"location": "parent_location", "institution": "parent_institution"}
@@ -373,6 +468,303 @@ class ApiSource:
         return SourceError(path, r.status, code, self._scrub(message))
 
 
+#: Editor marks -> the API run's flag (a link and a colour carry their value).
+_PM_MARKS = {"strong": "bold", "em": "italic", "strike": "strike", "code": "code", "underline": "underline"}
+
+#: Editor block nodes whose children are blocks, -> the API block kind.
+_PM_CONTAINERS = {
+    "listItem": "listItem",
+    "blockquote": "quote",
+    "layoutSection": "layout",
+    "layoutColumn": "layoutColumn",
+    "tableRow": "tableRow",
+}
+
+#: Sidebar property types that only show the resource's own tags or aliases (kept from the row).
+_SHOWS_ROW = ("TAGS", "ALIAS")
+
+
+def _obj(value: Any) -> dict[str, Any]:
+    """``value`` when it is an object, else an empty one."""
+    return value if isinstance(value, dict) else {}
+
+
+def _export_bytes(path: Path) -> bytes:
+    """The export's JSON bytes: ``.lk`` is gzip (told by its first two bytes), the JSON type plain."""
+    try:
+        with path.open("rb") as fh:
+            head = fh.read(2)
+            fh.seek(0)
+            if head == b"\x1f\x8b":
+                with gzip.GzipFile(fileobj=fh) as gz:
+                    data = gz.read(MAX_EXPORT_BYTES + 1)
+            else:
+                data = fh.read(MAX_EXPORT_BYTES + 1)
+    except (OSError, EOFError, gzip.BadGzipFile) as exc:
+        raise ValueError(f"{path}: cannot read the export ({type(exc).__name__}: {exc})") from None
+    if len(data) > MAX_EXPORT_BYTES:
+        raise ValueError(f"{path}: the export holds more than {MAX_EXPORT_BYTES} bytes; refused")
+    return data
+
+
+class FileSource:
+    """LegendKeeper's own export file (``.lk``, gzipped, or the JSON type), answering the API's
+    paths in the API's shapes, so ``read_project`` walks it as it walks the API. What it adapts,
+    and why, is in the module docstring; ``notes`` names what it read past.
+
+    ``project_id`` is the id the folder's ids are keyed on: the project's own when given (the API
+    road's ids), else the id of the export's first top-level resource in ``pos`` order. ``name``
+    is that resource's name. Raises ``FileNotFoundError`` for a missing file and ``ValueError``
+    for one that is not a LegendKeeper export.
+    """
+
+    producer_input = PRODUCER_INPUT_FILE
+
+    def __init__(self, path: str | os.PathLike[str], project_id: str | None = None) -> None:
+        self.path = Path(path)
+        if not self.path.is_file():
+            raise FileNotFoundError(f"{self.path}: no such export file")
+        raw = _export_bytes(self.path)
+        try:
+            data = json.loads(raw.decode("utf-8-sig"))
+        except ValueError:  # UnicodeDecodeError and JSONDecodeError both
+            raise ValueError(f"{self.path}: not a LegendKeeper export (not UTF-8 JSON)") from None
+        if not isinstance(data, dict) or not isinstance(data.get("resources"), list):
+            raise ValueError(f"{self.path}: not a LegendKeeper export (no resources list)")
+        self.export: dict[str, Any] = data
+        self.notes: list[str] = []
+        self._icons = 0
+        self._shows_row = 0
+        self._marks: dict[str, int] = {}
+        rows = [r for r in data["resources"] if isinstance(r, dict) and isinstance(r.get("id"), str)]
+        self._rows = {r["id"]: r for r in rows}
+        tops = sorted(
+            (r for r in rows if not isinstance(r.get("parentId"), str) or r["parentId"] not in self._rows),
+            key=lambda r: (str(r.get("pos") or ""), r["id"]),
+        )
+        if project_id is not None and not str(project_id).strip():
+            raise ValueError("give the LegendKeeper project id, or leave it out")
+        first = tops[0] if tops else None
+        self.project_id = str(project_id).strip() if project_id else (first["id"] if first else "export")
+        self.name = str(first.get("name") or "").strip() if first else ""
+        self._answers = self._build(rows)
+        self._note(first, project_id)
+
+    def __repr__(self) -> str:
+        return f"FileSource({str(self.path)!r})"
+
+    def get(self, path: str, params: Mapping[str, str] | None = None) -> Any:
+        parts = path.strip("/").split("/")
+        if len(parts) < 2 or parts[0] != "projects":
+            raise SourceError(path, 404, "NOT_IN_EXPORT", "not a path the export answers")
+        key = "/".join(urllib.parse.unquote(p) for p in parts[2:])
+        if key not in self._answers:
+            raise SourceError(path, 404, "NOT_IN_EXPORT", "the export holds no such thing")
+        return copy.deepcopy(self._answers[key])
+
+    # -- the answers, built once --------------------------------------------
+
+    def _build(self, rows: list[dict[str, Any]]) -> dict[str, Any]:
+        out: dict[str, Any] = {"": {"id": self.project_id, "name": self.name}}
+        listed: list[dict[str, Any]] = []
+        for r in rows:
+            docs = [d for d in r.get("documents") or [] if isinstance(d, dict) and isinstance(d.get("id"), str)]
+            heads = [{k: v for k, v in d.items() if k != "content"} for d in docs]
+            row = {k: v for k, v in r.items() if k not in ("documents", "properties")}
+            row["parentId"] = r.get("parentId") if isinstance(r.get("parentId"), str) else None
+            listed.append(
+                {**row, "documents": [{"id": d["id"], "name": d.get("name"), "type": d.get("type")} for d in docs]}
+            )
+            props = [p for p in (self._property(p) for p in r.get("properties") or [] if isinstance(p, dict)) if p]
+            rpath = f"resources/{r['id']}"
+            out[rpath] = {**row, "documents": heads, "properties": props}
+            for d in docs:
+                content = _obj(d.get("content"))
+                if d.get("type") == "page":
+                    out[f"{rpath}/docs/{d['id']}/blocks"] = {
+                        "id": d["id"],
+                        "blocks": self._blocks(content.get("content")),
+                    }
+                elif d.get("type") == "time":
+                    lanes = [x for x in content.get("lanes") or [] if isinstance(x, dict)]
+                    events = [x for x in content.get("events") or [] if isinstance(x, dict)]
+                    out[f"{rpath}/docs/{d['id']}/lanes"] = {"data": lanes, "hasMore": False}
+                    out[f"{rpath}/docs/{d['id']}/events"] = {"data": events, "hasMore": False}
+        out["resources"] = {"data": listed, "hasMore": False, "nextCursor": None}
+        return out
+
+    def _note(self, first: dict[str, Any] | None, project_id: str | None) -> None:
+        e = self.export
+        self.notes.append(
+            f"read from LegendKeeper's export file (version {e.get('version')}, export {e.get('exportId')}, made"
+            f" {e.get('exportedAt')}); exportId, exportedAt and hash are not kept, so two exports give one folder"
+        )
+        if project_id:
+            self.notes.append(f"ids keyed on the project id given, {self.project_id}: the API road's ids")
+        elif first is not None:
+            self.notes.append(
+                f"the export names no project: ids keyed on the first top-level resource, {first.get('name')!r}"
+                f" ({self.project_id}), the world named by it; --project ID keys them on the project's own id"
+            )
+        count = e.get("resourceCount")
+        if isinstance(count, int) and count != len(self._rows):
+            self.notes.append(f"the export says it holds {count} resources and lists {len(self._rows)}")
+        calendars = e.get("calendars")
+        if isinstance(calendars, list) and calendars:
+            self.notes.append(f"{len(calendars)} calendar{'' if len(calendars) == 1 else 's'} in the export: not read")
+        if self._icons:
+            self.notes.append(f"{self._icons} inline icon{'' if self._icons == 1 else 's'}: not kept")
+        if self._shows_row:
+            n = self._shows_row
+            self.notes.append(
+                f"{n} sidebar propert{'y' if n == 1 else 'ies'} showing the resource's tags or aliases (TAGS, ALIAS):"
+                " the tags and aliases are kept from the resource"
+            )
+        if self._marks:
+            listed = ", ".join(f"{m} {c}" for m, c in sorted(self._marks.items()))
+            self.notes.append(f"text marks and inline nodes not known here, read as plain text: {listed}")
+        self.notes.append(
+            "not kept from the export: createdBy (an account id), schemaVersion, showPropertyBar, isFullWidth,"
+            " document locators, transforms and sources"
+        )
+
+    # -- the editor's document into the API's blocks --------------------------
+
+    def _blocks(self, nodes: Any) -> list[dict[str, Any]]:
+        out: list[dict[str, Any]] = []
+        for n in nodes if isinstance(nodes, list) else []:
+            if isinstance(n, dict):
+                out += self._block(n)
+        return out
+
+    def _block(self, n: dict[str, Any]) -> list[dict[str, Any]]:
+        t = str(n.get("type") or "")
+        attrs = _obj(n.get("attrs"))
+        kids = n.get("content")
+        if t == "paragraph":
+            return [{"kind": "paragraph", "content": self._runs(kids)}]
+        if t == "heading":
+            return [{"kind": "heading", "level": attrs.get("level"), "content": self._runs(kids)}]
+        if t in ("bulletList", "orderedList", "taskList"):
+            b: dict[str, Any] = {"kind": t, "children": self._blocks(kids)}
+            if t == "orderedList" and isinstance(attrs.get("order"), int):
+                b["start"] = attrs["order"]
+            return [b]
+        if t == "taskItem":
+            return [{"kind": "taskItem", "checked": attrs.get("state") == "DONE", "content": self._runs(kids)}]
+        if t in _PM_CONTAINERS:
+            return [{"kind": _PM_CONTAINERS[t], "children": self._blocks(kids)}]
+        if t == "panel":
+            return [{"kind": "callout", "tone": attrs.get("panelType") or "note", "children": self._blocks(kids)}]
+        if t == "codeBlock":
+            text = "".join(str(k.get("text") or "") for k in kids or [] if isinstance(k, dict))
+            return [{"kind": "code", "language": attrs.get("language"), "text": text}]
+        if t == "rule":
+            return [{"kind": "rule"}]
+        if t in ("mediaSingle", "mediaGroup"):
+            return self._blocks(kids)
+        if t == "media":
+            return [{"kind": "image", "url": attrs.get("url"), "alt": attrs.get("alt")}]
+        if t in ("expand", "nestedExpand"):
+            return [{"kind": "expand", "title": attrs.get("title"), "children": self._blocks(kids)}]
+        if t == "table":
+            return [{"kind": "table", "children": self._blocks(kids)}]
+        if t in ("tableCell", "tableHeader"):
+            return [{"kind": "tableCell", "header": t == "tableHeader", "children": self._blocks(kids)}]
+        if t in ("blockCard", "embedCard"):
+            return [{"kind": "embed", "url": attrs.get("url")}]
+        if t in ("bodiedExtension", "extension"):
+            key = str(attrs.get("extensionKey") or t)
+            params = _obj(attrs.get("parameters"))
+            if key == "block-secret":
+                return [{"kind": "secret", "title": params.get("extensionTitle"), "children": self._blocks(kids)}]
+            if key == "block-youtube":
+                return [{"kind": "embed", "provider": "youtube", "url": params.get("embedUrl")}]
+            return [{"kind": key, "children": self._blocks(kids)}]
+        # a node not known here goes on under its own name: the converter counts it and reads its text
+        inline = any(isinstance(k, dict) and k.get("type") in ("text", "mention", "hardBreak") for k in kids or [])
+        return [
+            {"kind": t or "unknown", **({"content": self._runs(kids)} if inline else {"children": self._blocks(kids)})}
+        ]
+
+    def _runs(self, nodes: Any) -> list[dict[str, Any]]:
+        out: list[dict[str, Any]] = []
+        for n in nodes if isinstance(nodes, list) else []:
+            if not isinstance(n, dict):
+                continue
+            t = n.get("type")
+            attrs = _obj(n.get("attrs"))
+            if t == "text":
+                out.append(self._text(n))
+            elif t == "hardBreak":
+                out.append({"break": True})
+            elif t == "mention":
+                out.append(
+                    {
+                        "mention": {
+                            "resourceId": attrs.get("id"),
+                            "documentId": attrs.get("documentId") or None,
+                            "text": attrs.get("text"),
+                        }
+                    }
+                )
+            elif t == "inlineExtension" and attrs.get("extensionKey") == "inline-icon":
+                self._icons += 1
+            elif t == "emoji":
+                out.append({"text": attrs.get("text") or attrs.get("shortName") or ""})
+            elif t == "inlineCard" and isinstance(attrs.get("url"), str):
+                out.append({"text": attrs["url"], "link": attrs["url"]})
+            else:
+                text = attrs.get("text")
+                out.append({"text": text if isinstance(text, str) else ""})
+                self._marks[f"node {t}"] = self._marks.get(f"node {t}", 0) + 1
+        return out
+
+    def _text(self, n: dict[str, Any]) -> dict[str, Any]:
+        run: dict[str, Any] = {"text": str(n.get("text") or "")}
+        for m in n.get("marks") or []:
+            if not isinstance(m, dict):
+                continue
+            mt = m.get("type")
+            attrs = _obj(m.get("attrs"))
+            if mt in _PM_MARKS:
+                run[_PM_MARKS[str(mt)]] = True
+            elif mt == "link":
+                run["link"] = attrs.get("href")
+            elif mt == "textColor":
+                run["color"] = attrs.get("color") or True
+            elif mt == "subsup" and attrs.get("type") in ("sub", "sup"):
+                run[str(attrs["type"])] = True
+            else:
+                self._marks[str(mt)] = self._marks.get(str(mt), 0) + 1
+        return run
+
+    def _property(self, p: dict[str, Any]) -> dict[str, Any] | None:
+        ptype = str(p.get("type") or "")
+        data = _obj(p.get("data"))
+        head = {"id": p.get("id"), "title": p.get("title")}
+        if ptype == "IMAGE":
+            return {**head, "kind": "image", "url": data.get("url")}
+        if ptype == "TEXT_FIELD":
+            fragment = _obj(data.get("fragment"))
+            return {**head, "kind": "textField", "children": self._blocks(fragment.get("content"))}
+        if ptype == "RESOURCE_COLLECTION":
+            items = [
+                {"id": x.get("id"), "resourceId": x.get("resourceId") or x.get("id")}
+                for x in data.get("items") or []
+                if isinstance(x, dict)
+            ]
+            return {**head, "kind": "resourceCollection", "items": items, "filter": data.get("filter")}
+        if ptype == "METER":
+            return {**head, "kind": "meter", "items": data.get("items") or []}
+        if ptype == "SPOTIFY_SINGLE":
+            return {**head, "kind": "embed", "provider": "spotify", "url": data.get("url")}
+        if ptype in _SHOWS_ROW:
+            self._shows_row += 1
+            return None
+        return {**head, "kind": ptype or "property", **data}
+
+
 # ---------------------------------------------------------------------------
 # Reading: a source walked into a snapshot
 # ---------------------------------------------------------------------------
@@ -395,6 +787,10 @@ class Snapshot:
     events: dict[str, list[dict[str, Any]]] = field(default_factory=dict)
     #: every answer that could not be read, one line each
     unread: list[str] = field(default_factory=list)
+    #: what the source read past (the export file's adaptations), one line each
+    notes: list[str] = field(default_factory=list)
+    #: the folder's ``producer.input``: the source's word
+    producer_input: str = PRODUCER_INPUT
 
 
 def _paged(source: Source, path: str, *, sized: bool) -> list[dict[str, Any]]:
@@ -419,17 +815,15 @@ def _paged(source: Source, path: str, *, sized: bool) -> list[dict[str, Any]]:
         cursor = nxt
 
 
-def _split_hidden(resources: Iterable[dict[str, Any]], include_hidden: bool) -> dict[str, str]:
-    """resource id -> ``kept``, ``hidden`` (its own mark) or ``under`` (a hidden ancestor)."""
+def _split_hidden(resources: Iterable[dict[str, Any]]) -> dict[str, str]:
+    """resource id -> ``shown``, ``hidden`` (its own mark) or ``under`` (a hidden ancestor)."""
     rows = {r["id"]: r for r in resources}
-    if include_hidden:
-        return dict.fromkeys(rows, "kept")
     state: dict[str, str] = {}
     for rid, row in rows.items():
         if row.get("isHidden"):
             state[rid] = "hidden"
             continue
-        verdict, seen, cur = "kept", {rid}, row.get("parentId")
+        verdict, seen, cur = "shown", {rid}, row.get("parentId")
         while isinstance(cur, str) and cur in rows and cur not in seen:
             if rows[cur].get("isHidden"):
                 verdict = "under"
@@ -440,9 +834,9 @@ def _split_hidden(resources: Iterable[dict[str, Any]], include_hidden: bool) -> 
     return state
 
 
-def read_project(source: Source, project_id: str, *, include_hidden: bool = False) -> Snapshot:
-    """Walk a project: the project, its whole tree, then each kept resource, its page blocks and
-    its timelines. Hidden content is not fetched unless ``include_hidden``.
+def read_project(source: Source, project_id: str) -> Snapshot:
+    """Walk a project: the project, its whole tree, then each resource, its page blocks and its
+    timelines, hidden ones too (the converter marks them hidden; nothing is left out).
 
     The project and the tree must answer (a ``SourceError`` otherwise); a resource, a page or a
     timeline that does not is listed in ``unread`` and the walk goes on.
@@ -453,11 +847,9 @@ def read_project(source: Source, project_id: str, *, include_hidden: bool = Fals
         raise SourceError(root, None, None, "the answer is not a project")
     resources = [r for r in _paged(source, f"{root}/resources", sized=True) if isinstance(r.get("id"), str)]
     snap = Snapshot(project_id, project, resources)
-    state = _split_hidden(resources, include_hidden)
+    snap.producer_input = str(getattr(source, "producer_input", PRODUCER_INPUT))
     for row in resources:
         rid = row["id"]
-        if state[rid] != "kept":
-            continue
         rpath = f"{root}/resources/{_seg(rid)}"
         try:
             full = source.get(rpath)
@@ -470,8 +862,6 @@ def read_project(source: Source, project_id: str, *, include_hidden: bool = Fals
         snap.full[rid] = full
         for doc in full.get("documents") or []:
             if not isinstance(doc, dict) or not isinstance(doc.get("id"), str):
-                continue
-            if doc.get("isHidden") and not include_hidden:
                 continue
             did, dtype = doc["id"], doc.get("type")
             dpath = f"{rpath}/docs/{_seg(did)}"
@@ -488,6 +878,7 @@ def read_project(source: Source, project_id: str, *, include_hidden: bool = Fals
                     snap.events[did] = _paged(source, f"{dpath}/events", sized=True)
             except SourceError as exc:
                 snap.unread.append(f"{where}: {exc}")
+    snap.notes = list(getattr(source, "notes", None) or [])
     return snap
 
 
@@ -536,18 +927,32 @@ class NotImported:
     kind: str
     resource: str
     document: str
+    #: the document is hidden in LegendKeeper
+    hidden: bool = False
 
 
 @dataclass
-class Omitted:
-    """What was left out on the safe side, each opt-in by a flag."""
+class Hidden:
+    """What the source hides, imported with ``hidden: true``: never dropped, never public."""
 
-    hidden_resources: int = 0
+    #: resources marked hidden: elements carrying the mark
+    resources: int = 0
+    #: resources under a hidden one: elements carrying the mark
     under_hidden: int = 0
-    hidden_documents: int = 0
-    hidden_properties: int = 0
-    hidden_events: int = 0
+    #: hidden pages on a visible resource: each its own hidden Narrative
+    documents: int = 0
+    #: secret blocks in visible pages: each its own hidden Narrative
     secret_blocks: int = 0
+    #: secret blocks inside text already hidden (a hidden resource or page): kept in place
+    secrets_inside: int = 0
+    #: hidden properties on a visible resource, held in its hidden-properties Narrative
+    properties: int = 0
+    #: hidden-properties Narratives made (one per visible resource with any)
+    property_narratives: int = 0
+    #: events hidden, on a hidden timeline or of a hidden resource: hidden Events
+    events: int = 0
+    #: Relations with a hidden end: hidden Relations
+    relations: int = 0
 
 
 @dataclass
@@ -560,7 +965,7 @@ class ImportReport:
     #: titled link -> Relation elements made for it
     relations: dict[str, int] = field(default_factory=dict)
     unresolved: list[Unresolved] = field(default_factory=list)
-    omitted: Omitted = field(default_factory=Omitted)
+    hidden: Hidden = field(default_factory=Hidden)
     not_imported: list[NotImported] = field(default_factory=list)
     unread: list[str] = field(default_factory=list)
     notes: list[str] = field(default_factory=list)
@@ -607,21 +1012,42 @@ class ImportReport:
         if self.unresolved:
             lines.append(f"Links and mentions whose target is not in the folder ({len(self.unresolved)}):")
             lines += [f"  - {u.element!r}, {u.where}: {u.target}: {u.why}" for u in self.unresolved]
-        o = self.omitted
-        omitted = [
-            (o.hidden_resources, "hidden resource", "--include-hidden"),
-            (o.under_hidden, "resource under a hidden one", "--include-hidden"),
-            (o.hidden_documents, "hidden document", "--include-hidden"),
-            (o.hidden_properties, "hidden property", "--include-hidden"),
-            (o.hidden_events, "hidden timeline event", "--include-hidden"),
-            (o.secret_blocks, "secret block", "--include-secrets"),
+        h = self.hidden
+        kinds = [
+            (h.resources, "hidden resource (isHidden)", "hidden resources (isHidden)"),
+            (h.under_hidden, "resource under a hidden one", "resources under a hidden one"),
+            (
+                h.documents,
+                "hidden page on a visible resource, its own Narrative",
+                "hidden pages on a visible resource, each its own Narrative",
+            ),
+            (
+                h.secret_blocks,
+                "secret block in a visible page, its own Narrative",
+                "secret blocks in a visible page, each its own Narrative",
+            ),
+            (
+                h.secrets_inside,
+                "secret block inside hidden text, kept in place",
+                "secret blocks inside hidden text, kept in place",
+            ),
+            (h.events, "hidden timeline event", "hidden timeline events"),
+            (h.relations, "Relation with a hidden end", "Relations with a hidden end"),
         ]
-        said = [f"{n} {what}{'' if n == 1 else 's'} ({flag})" for n, what, flag in omitted if n]
+        said = [f"{n} {one if n == 1 else many}" for n, one, many in kinds if n]
+        if h.properties:
+            said.append(
+                f"{h.property_narratives} hidden-properties Narrative{'' if h.property_narratives == 1 else 's'}"
+                f" holding {h.properties} hidden propert{'y' if h.properties == 1 else 'ies'}"
+            )
         if said:
-            lines.append("Omitted, on the safe side: " + "; ".join(said) + ".")
+            lines.append("Hidden as the source hides it (elements carrying hidden: true): " + "; ".join(said) + ".")
         if self.not_imported:
             lines.append(f"Documents not imported ({len(self.not_imported)}):")
-            lines += [f"  - {n.kind} {n.document!r} on {n.resource!r}" for n in self.not_imported]
+            lines += [
+                f"  - {n.kind} {n.document!r} on {n.resource!r}{' (hidden)' if n.hidden else ''}"
+                for n in self.not_imported
+            ]
         if self.unread:
             lines.append(f"Could not read ({len(self.unread)}):")
             lines += [f"  - {u}" for u in self.unread]
@@ -639,7 +1065,7 @@ class ImportReport:
 
 @dataclass
 class _Item:
-    """One resource's element being built."""
+    """One resource's element being built, or a hidden Narrative beside one (``owner`` set)."""
 
     etype: str
     eid: str
@@ -651,6 +1077,10 @@ class _Item:
     ext: dict[str, Any] = field(default_factory=dict)
     taken: set[str] = field(default_factory=set)
     mentions: list[str] = field(default_factory=list)
+    #: the element carries ``hidden: true``
+    hidden: bool = False
+    #: for a hidden Narrative made from a resource's hidden page, secret or properties: that resource
+    owner: _Item | None = None
 
 
 def _plain(runs: Any) -> str:
@@ -668,17 +1098,20 @@ def _quote(text: str, marker: str = "> ") -> str:
 
 
 class _Converter:
-    def __init__(
-        self, snap: Snapshot, type_map: Mapping[str, str], *, include_hidden: bool, include_secrets: bool
-    ) -> None:
+    def __init__(self, snap: Snapshot, type_map: Mapping[str, str]) -> None:
         self.snap = snap
         self.type_map = dict(type_map)
-        self.include_hidden = include_hidden
-        self.include_secrets = include_secrets
-        self.report = ImportReport(project=snap.project_id, world={}, unread=list(snap.unread))
+        self.report = ImportReport(project=snap.project_id, world={}, unread=list(snap.unread), notes=list(snap.notes))
         self.rows = {r["id"]: r for r in snap.resources}
-        self.state = _split_hidden(snap.resources, include_hidden)
+        self.state = _split_hidden(snap.resources)
         self.items: dict[str, _Item] = {}
+        #: hidden Narratives made beside resources (hidden pages, secrets, hidden properties)
+        self.extra: list[_Item] = []
+        self._secrets: dict[str, list[_Item]] = {}
+        self._secret_n: dict[str, int] = {}
+        self._hidden_props: dict[str, _Item] = {}
+        #: the document whose blocks are being read (keys a secret block's id)
+        self._doc = ""
         self.relations: list[dict[str, Any]] = []
         self.events: list[dict[str, Any]] = []
         self.event_ids: set[str] = set()
@@ -687,6 +1120,9 @@ class _Converter:
         self.unknown: dict[str, int] = {}
         self.map_blocks = 0
         self.blank = 0
+        self.empty_props = 0
+        #: names of the resources in LegendKeeper's templates folder
+        self.templates: list[str] = []
         self.placeholders = 0
         self._unplaced_seen: set[Unplaced] = set()
 
@@ -701,16 +1137,20 @@ class _Converter:
             rid = row["id"]
             st = self.state[rid]
             if st == "hidden":
-                self.report.omitted.hidden_resources += 1
-                continue
-            if st == "under":
-                self.report.omitted.under_hidden += 1
-                continue
+                self.report.hidden.resources += 1
+            elif st == "under":
+                self.report.hidden.under_hidden += 1
             tags = [t for t in row.get("tags") or [] if isinstance(t, str)]
             etype, by = self._type_of(tags)
             name = str(row.get("name") or "").strip() or f"Untitled ({rid})"
             item = _Item(
-                etype, self._id(rid), name, rid, typed=by != "untyped" and not by.startswith("ambiguous"), row=row
+                etype,
+                self._id(rid),
+                name,
+                rid,
+                typed=by != "untyped" and not by.startswith("ambiguous"),
+                row=row,
+                hidden=st != "shown",
             )
             if not item.typed:
                 item.fields["supertype"] = UNTYPED_SUPERTYPE
@@ -754,6 +1194,9 @@ class _Converter:
                 pfield = _PARENT_FIELD.get(item.etype)
                 if pfield and parent.etype == item.etype:
                     item.fields[pfield] = parent.eid
+            elif parent_id == TEMPLATES_PARENT:
+                item.ext[f"{EXT_PREFIX}template"] = True
+                self.templates.append(item.name)
             else:
                 self.report.notes.append(f"{item.name!r}: its parent {parent_id} is not in the project's tree")
         for key in ("tags", "aliases"):
@@ -767,20 +1210,22 @@ class _Converter:
             item.fields["image_url"] = image
 
         docs = [d for d in full.get("documents") or [] if isinstance(d, dict)]
-        pages = [d for d in docs if d.get("type") == "page" and (self.include_hidden or not d.get("isHidden"))]
+        # a hidden page on a visible resource is its own Narrative, so it does not count here
+        pages = [d for d in docs if d.get("type") == "page" and (item.hidden or not d.get("isHidden"))]
         parts: list[str] = []
         for doc in docs:
             dtype, dname = doc.get("type"), str(doc.get("name") or "")
-            if doc.get("isHidden") and not self.include_hidden:
-                self.report.omitted.hidden_documents += 1
-                continue
             if dtype == "page":
                 answer = self.snap.blocks.get(doc.get("id", ""))
                 if answer is None:
                     continue  # listed in unread
+                self._doc = str(doc.get("id"))
                 blocks = [b for b in answer.get("blocks") or [] if isinstance(b, dict)]
                 if blocks and blocks[0].get("kind") == "heading" and _plain(blocks[0].get("content")) == item.name:
                     blocks = blocks[1:]
+                if doc.get("isHidden") and not item.hidden:
+                    self._hidden_page(item, doc, dname, blocks)
+                    continue
                 md = "\n\n".join(self._blocks(item, blocks))
                 if md:
                     parts.append(f"## {dname}\n\n{md}" if len(pages) > 1 else md)
@@ -789,7 +1234,10 @@ class _Converter:
             elif dtype == "time":
                 self._timeline(item, doc)
             else:
-                self.report.not_imported.append(NotImported(str(dtype or "unknown"), item.name, dname))
+                self.report.not_imported.append(
+                    NotImported(str(dtype or "unknown"), item.name, dname, hidden=bool(doc.get("isHidden")))
+                )
+        self._doc = "properties"
         for prop in full.get("properties") or []:
             if isinstance(prop, dict):
                 self._property(item, prop)
@@ -799,6 +1247,47 @@ class _Converter:
                 item.ext[f"{EXT_PREFIX}body"] = text
             else:
                 item.fields["description"] = text
+
+    # -- what the source hides on a visible resource ---------------------------
+
+    def _narrative(self, owner: _Item, key: str, name: str) -> _Item:
+        """A hidden Narrative beside ``owner``, linked back to it when its body is made."""
+        narr = _Item(
+            "narrative", self._id(key), name, owner.lk_id, typed=False, row=owner.row, hidden=True, owner=owner
+        )
+        narr.taken |= _RESERVED
+        self.extra.append(narr)
+        return narr
+
+    def _hidden_page(self, item: _Item, doc: dict[str, Any], dname: str, blocks: list[dict[str, Any]]) -> None:
+        narr = self._narrative(item, f"document:{item.lk_id}:{doc.get('id')}", f"{item.name}: {dname or 'Page'}")
+        narr.ext[f"{EXT_PREFIX}document"] = doc.get("id")
+        story = "\n\n".join(self._blocks(narr, blocks))
+        if story:
+            narr.fields["story"] = story
+        self.report.hidden.documents += 1
+
+    def _secret(self, item: _Item, b: dict[str, Any]) -> None:
+        """A secret block in a visible page: its own hidden Narrative; the page keeps the rest."""
+        where = f"{item.lk_id}:{self._doc}"
+        n = self._secret_n[where] = self._secret_n.get(where, 0) + 1
+        title = str(b.get("title") or "").strip() or "Secret"
+        narr = self._narrative(item, f"secret:{where}:{n}", f"{item.name}: {title}")
+        if self._doc != "properties":
+            narr.ext[f"{EXT_PREFIX}document"] = self._doc
+        story = self._children(narr, b)
+        if story:
+            narr.fields["story"] = story
+        self._secrets.setdefault(item.lk_id, []).append(narr)
+        self.report.hidden.secret_blocks += 1
+
+    def _props_narrative(self, item: _Item) -> _Item:
+        narr = self._hidden_props.get(item.lk_id)
+        if narr is None:
+            narr = self._narrative(item, f"properties:{item.lk_id}", f"{item.name}: hidden properties")
+            self._hidden_props[item.lk_id] = narr
+            self.report.hidden.property_narratives += 1
+        return narr
 
     # -- blocks ----------------------------------------------------------------
 
@@ -831,9 +1320,10 @@ class _Converter:
             head = f"> [!{b.get('tone') or 'note'}]"
             return head + ("\n" + _quote(inner) if inner else "")
         if kind == "secret":
-            if not self.include_secrets:
-                self.report.omitted.secret_blocks += 1
+            if not item.hidden:
+                self._secret(item, b)
                 return None
+            self.report.hidden.secrets_inside += 1  # the text around it is hidden already
             inner = self._children(item, b)
             return "> [!secret]" + ("\n" + _quote(inner) if inner else "")
         if kind == "code":
@@ -973,21 +1463,19 @@ class _Converter:
             core = f"[{core}]({link})"
         return lead + core + trail
 
-    def _why_missing(self, rid: str) -> str:
-        st = self.state.get(rid)
-        if st == "hidden":
-            return "the resource is hidden (omitted; --include-hidden takes it in)"
-        if st == "under":
-            return "the resource sits under a hidden one (omitted; --include-hidden takes it in)"
-        return "no such resource in the project's tree"
+    _MISSING = "no such resource in the project's tree"
 
     def _mention(self, item: _Item, mention: dict[str, Any], text: str) -> None:
         rid = str(mention.get("resourceId") or "")
         target = self.items.get(rid)
         if target is None:
-            self.report.unresolved.append(Unresolved(item.name, f"mention {text!r}", rid, self._why_missing(rid)))
-        elif target is not item and target.eid not in item.mentions:
+            self.report.unresolved.append(Unresolved(item.name, f"mention {text!r}", rid, self._MISSING))
+            return
+        if target is not item and target.eid not in item.mentions:
             item.mentions.append(target.eid)
+        note = f"{item.name!r}: visible text mentions the hidden {target.name!r} by name"
+        if target.hidden and not item.hidden and note not in self.report.notes:
+            self.report.notes.append(note)
 
     # -- properties ----------------------------------------------------------
 
@@ -1008,9 +1496,9 @@ class _Converter:
         self._unplaced(item, key, why, ext)
 
     def _property(self, item: _Item, prop: dict[str, Any]) -> None:
-        if prop.get("isHidden") and not self.include_hidden:
-            self.report.omitted.hidden_properties += 1
-            return
+        if prop.get("isHidden") and not item.hidden:
+            item = self._props_narrative(item)  # the hidden-properties Narrative takes it, whole
+            self.report.hidden.properties += 1
         kind = prop.get("kind")
         title = str(prop.get("title") or "").strip()
         if kind == "keyValue":
@@ -1019,8 +1507,10 @@ class _Converter:
                     self._key_value(item, row)
         elif kind == "resourceLink" or (kind == "resourceCollection" and prop.get("items")):
             self._link(item, prop, title or ("Links" if kind == "resourceLink" else "Collection"))
-        elif kind == "resourceCollection":
+        elif kind == "resourceCollection" and prop.get("filter") is not None:
             self._keep(item, title or "collection", prop.get("filter"), "a collection chosen by a filter: not expanded")
+        elif kind in ("resourceCollection", "meter", "embed") and not (prop.get("items") or prop.get("url")):
+            self.empty_props += 1  # an empty collection, meter or embed (a template's sidebar) carries nothing
         elif kind == "textField":
             self._text_field(item, title or "Text", "\n\n".join(self._blocks(item, prop.get("children") or [])))
         elif kind == "image":
@@ -1133,7 +1623,7 @@ class _Converter:
             rid = str(x["resourceId"])
             target = self.items.get(rid)
             if target is None:
-                self.report.unresolved.append(Unresolved(item.name, f"link {title!r}", rid, self._why_missing(rid)))
+                self.report.unresolved.append(Unresolved(item.name, f"link {title!r}", rid, self._MISSING))
             else:
                 hits.append((x, target))
         if not hits:
@@ -1180,6 +1670,9 @@ class _Converter:
             "id": self._id("link", item.lk_id, list_id, str(x.get("id") or target.lk_id)),
             "name": title,
         }
+        if item.hidden or target.hidden:
+            body["hidden"] = True
+            self.report.hidden.relations += 1
         for fname in FIELD_KINDS["relation"]:
             if fname in fields:
                 body[fname] = fields[fname]
@@ -1208,9 +1701,6 @@ class _Converter:
                 chained = self.items.get(uri["rid"])
                 if chained is not None:
                     owner = chained
-                elif self.state.get(uri["rid"]) in ("hidden", "under"):
-                    self.report.omitted.hidden_events += 1  # an event of a hidden resource's timeline
-                    continue
                 else:
                     self.report.notes.append(
                         f"event {ev.get('name')!r} on {item.name!r} comes from {uri['rid']}, not in the tree;"
@@ -1220,9 +1710,8 @@ class _Converter:
             if etype in ("placeholder", "invisible-placeholder"):
                 self.placeholders += 1
                 continue
-            if ev.get("isHidden") and not self.include_hidden:
-                self.report.omitted.hidden_events += 1
-                continue
+            # hidden itself, of a hidden resource, or on this hidden timeline (a chained one's own mark is its own)
+            hidden = bool(ev.get("isHidden")) or owner.hidden or (owner is item and bool(doc.get("isHidden")))
             self.event_ids.add(ev_id)
             lane = lanes.get(str(ev.get("laneId")))
             name = str(ev.get("name") or "").strip()
@@ -1261,12 +1750,13 @@ class _Converter:
                     None,
                 )
                 if target is None:
-                    self.report.unresolved.append(
-                        Unresolved(name, "event uri", link["rid"], self._why_missing(link["rid"]))
-                    )
+                    self.report.unresolved.append(Unresolved(name, "event uri", link["rid"], self._MISSING))
                 elif fname is not None and FIELD_KINDS["event"][fname] == "multi_link":
                     fields.setdefault(fname, []).append(target.eid)
             body: dict[str, Any] = {"type": "event", "id": self._id("event", ev_id), "name": name}
+            if hidden:
+                body["hidden"] = True
+                self.report.hidden.events += 1
             for fname in FIELD_KINDS["event"]:
                 if fname in fields:
                     body[fname] = fields[fname]
@@ -1274,16 +1764,25 @@ class _Converter:
             self.events.append(body)
             made += 1
         self.report.notes.append(
-            f"timeline {doc.get('name')!r} on {item.name!r}: {made} event{'' if made == 1 else 's'}"
-            " (start and end kept as minutes and the formatted date; start_date and end_date unset)"
+            f"timeline {doc.get('name')!r} on {item.name!r}: {made} event{'' if made == 1 else 's'} (start and end"
+            " kept as minutes, with the formatted date when the source gives one; start_date and end_date unset)"
         )
 
     # -- the bodies ----------------------------------------------------------
 
     def bodies(self) -> dict[str, list[dict[str, Any]]]:
         out: dict[str, list[dict[str, Any]]] = {}
-        for item in self.items.values():
+        for narrs in self._secrets.values():
+            if len(narrs) > 1:  # several secrets on one resource: numbered in the order they were read
+                for n, narr in enumerate(narrs, 1):
+                    narr.name = f"{narr.name} {n}"
+        for item in [*self.items.values(), *self.extra]:
             body: dict[str, Any] = {"type": item.etype, "id": item.eid, "name": item.name}
+            if item.hidden:
+                body["hidden"] = True
+            if item.owner is not None:
+                self._link_back(item, item.owner)
+                item.ext[f"{EXT_PREFIX}parent"] = item.owner.eid
             for fname in FIELD_KINDS[item.etype]:
                 if fname in item.fields and fname != "name":
                     body[fname] = item.fields[fname]
@@ -1297,10 +1796,30 @@ class _Converter:
         self._notes()
         return out
 
+    @staticmethod
+    def _link_back(narr: _Item, owner: _Item) -> None:
+        """A hidden Narrative's link to its resource: Narrative's field for the resource's type."""
+        if owner.etype == "narrative":
+            narr.fields["parent_narrative"] = owner.eid
+        elif owner.etype in _NARRATIVE_FIELD_FOR:
+            narr.fields[_NARRATIVE_FIELD_FOR[owner.etype]] = [owner.eid]
+
     def _notes(self) -> None:
         n = self.report.notes
+        if self.templates:
+            listed = ", ".join(repr(t) for t in self.templates)
+            n.append(
+                f"{len(self.templates)} resource{'' if len(self.templates) == 1 else 's'} in LegendKeeper's templates"
+                f" folder (parentId {TEMPLATES_PARENT!r}), imported with x_legendkeeper_template true: {listed}"
+            )
         if self.blank:
             n.append(f"{self.blank} blank document{'' if self.blank == 1 else 's'}: empty by LegendKeeper's definition")
+        if self.empty_props:
+            e = self.empty_props
+            n.append(
+                f"{e} empty collection, meter or embed propert{'y' if e == 1 else 'ies'} (no items, no URL): nothing"
+                " to keep"
+            )
         if self.placeholders:
             n.append(f"{self.placeholders} timeline placeholder{'' if self.placeholders == 1 else 's'}: layout only")
         if self.map_blocks:
@@ -1326,7 +1845,7 @@ class _Converter:
             "id": _uuid(f"legendkeeper:{pid}"),
             "name": name,
             "format_version": FORMAT_VERSION,
-            "producer": {"tool": "onlyworlds", "version": __version__, "input": PRODUCER_INPUT},
+            "producer": {"tool": "onlyworlds", "version": __version__, "input": self.snap.producer_input},
         }
 
 
@@ -1343,26 +1862,27 @@ def _type_map(pairs: Mapping[str, str] | None) -> dict[str, str]:
 
 
 def import_legendkeeper(
-    source: Source,
-    project_id: str,
-    out_dir: str | os.PathLike[str] | None,
+    source: Source | str | os.PathLike[str],
+    project_id: str | None = None,
+    out_dir: str | os.PathLike[str] | None = None,
     *,
     plan_only: bool = False,
     type_map: Mapping[str, str] | None = None,
-    include_hidden: bool = False,
-    include_secrets: bool = False,
 ) -> ImportReport:
-    """Read the LegendKeeper project ``project_id`` from ``source`` into a world folder at
-    ``out_dir``, which must not exist or be empty.
+    """Read a LegendKeeper project from ``source`` into a world folder at ``out_dir``, which must
+    not exist or be empty.
 
-    ``type_map`` maps a tag to one of the 22 types (``{"faction": "institution"}``), besides the
-    tags that are type names. With ``plan_only`` nothing is written (``out_dir`` may be None) and
-    the report says what would be. Raises ``FileExistsError`` for an ``out_dir`` that is not
-    empty, ``ValueError`` for a ``type_map`` that names no type, ``SourceError`` when the project
-    or its tree cannot be read.
+    ``source`` is a ``Source`` (``ApiSource(key)``, with the project's id as ``project_id``), or
+    the path of LegendKeeper's export file (``.lk`` or the JSON type), read through ``FileSource``;
+    for a file, ``project_id`` is optional and keys the ids on the project's own id (the module
+    docstring says what keys them without it). What LegendKeeper hides is imported carrying
+    ``hidden: true`` and counted in the report. ``type_map`` maps a tag to one of the 22 types
+    (``{"faction": "institution"}``), besides the tags that are type names. With ``plan_only``
+    nothing is written (``out_dir`` may be None) and the report says what would be. Raises
+    ``FileExistsError`` for an ``out_dir`` that is not empty, ``FileNotFoundError`` for a missing
+    export file, ``ValueError`` for a ``type_map`` that names no type or a file that is not an
+    export, ``SourceError`` when the project or its tree cannot be read.
     """
-    if not isinstance(project_id, str) or not project_id.strip():
-        raise ValueError("give the LegendKeeper project id")
     mapping = _type_map(type_map)
     out = Path(out_dir) if out_dir is not None else None
     if not plan_only:
@@ -1370,8 +1890,16 @@ def import_legendkeeper(
             raise ValueError("give an out_dir, or plan_only=True")
         if out.exists() and (not out.is_dir() or any(out.iterdir())):
             raise FileExistsError(f"{out} exists and is not an empty directory; a folder is written whole, once")
-    snap = read_project(source, project_id.strip(), include_hidden=include_hidden)
-    conv = _Converter(snap, mapping, include_hidden=include_hidden, include_secrets=include_secrets)
+    if isinstance(source, (str, os.PathLike)):
+        source = FileSource(source, project_id)
+    if isinstance(source, FileSource):
+        if project_id is not None and project_id.strip() != source.project_id:
+            raise ValueError("give the project id to FileSource(path, project_id), which keys the ids on it")
+        project_id = source.project_id
+    if not isinstance(project_id, str) or not project_id.strip():
+        raise ValueError("give the LegendKeeper project id")
+    snap = read_project(source, project_id.strip())
+    conv = _Converter(snap, mapping)
     conv.collect()
     conv.fill()
     elements = conv.bodies()
@@ -1407,15 +1935,22 @@ def main(argv: list[str] | None = None, *, source: Source | None = None, transpo
             stream.reconfigure(encoding="utf-8")
     ap = argparse.ArgumentParser(prog="python -m onlyworlds.legendkeeper", description=(__doc__ or "").splitlines()[0])
     ap.add_argument("out", type=Path, nargs="?", help="the world folder to create; must not exist or be empty")
-    ap.add_argument("--project", required=True, help="the LegendKeeper project id (the key is bound to it)")
+    ap.add_argument(
+        "--project", help="the LegendKeeper project id (the API key is bound to it; with --file, it keys the ids)"
+    )
+    ap.add_argument("--file", type=Path, help="LegendKeeper's export file (.lk, or the JSON type): no key, no API")
     ap.add_argument("--plan", action="store_true", help="read the project, print what would become what, write nothing")
     ap.add_argument("--key-file", type=Path, help=f"a file holding the API key (else ${KEY_ENV})")
     ap.add_argument("--map", action="append", default=[], metavar="TAG=TYPE", help="type the resources with this tag")
-    ap.add_argument("--include-hidden", action="store_true", help="take in hidden resources, documents and events")
-    ap.add_argument("--include-secrets", action="store_true", help="take in secret blocks")
     args = ap.parse_args(argv)
     if args.out is None and not args.plan:
         print("give OUT-DIR, or --plan", file=sys.stderr)
+        return 2
+    if args.file is None and not args.project:
+        print("give --project ID (the API), or --file EXPORT (LegendKeeper's export file)", file=sys.stderr)
+        return 2
+    if args.file is not None and args.key_file is not None:
+        print("--key-file is for the API; an export file needs no key", file=sys.stderr)
         return 2
     pairs: dict[str, str] = {}
     for item in args.map:
@@ -1425,17 +1960,13 @@ def main(argv: list[str] | None = None, *, source: Source | None = None, transpo
             return 2
         pairs[tag] = etype
     try:
-        src = source if source is not None else ApiSource(_read_key(args.key_file), transport=transport)
-        report = import_legendkeeper(
-            src,
-            args.project,
-            args.out,
-            plan_only=args.plan,
-            type_map=pairs,
-            include_hidden=args.include_hidden,
-            include_secrets=args.include_secrets,
-        )
-    except (FileExistsError, ValueError, SourceError) as exc:
+        src: Source | Path
+        if args.file is not None:
+            src = args.file
+        else:
+            src = source if source is not None else ApiSource(_read_key(args.key_file), transport=transport)
+        report = import_legendkeeper(src, args.project, args.out, plan_only=args.plan, type_map=pairs)
+    except (FileExistsError, FileNotFoundError, ValueError, SourceError) as exc:
         print(f"{exc}", file=sys.stderr)
         return 2
     sys.stdout.write(report.render())

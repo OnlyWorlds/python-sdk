@@ -143,7 +143,7 @@ def test_namespace_is_pinned() -> None:
 
 def test_the_tree_converts_to_the_element_set(tmp_path: Path) -> None:
     out, report = run(tmp_path)
-    assert report.counts == {"character": 1, "event": 2, "narrative": 4, "relation": 3}
+    assert report.counts == {"character": 1, "event": 2, "narrative": 5, "relation": 3}
     els = by_name(out)
     aldric = els["Aldric Veyra"]
     assert aldric["id"] == eid(ALDRIC) and aldric["type"] == "character"
@@ -163,7 +163,7 @@ def test_the_tree_converts_to_the_element_set(tmp_path: Path) -> None:
 
 def test_map_adds_tag_types(tmp_path: Path) -> None:
     out, report = run(tmp_path, type_map=MAP)
-    assert report.counts == {"character": 1, "event": 2, "institution": 1, "location": 1, "narrative": 2, "relation": 3}
+    assert report.counts == {"character": 1, "event": 2, "institution": 1, "location": 1, "narrative": 3, "relation": 3}
     els = by_name(out)
     assert els["Castle Veyra"]["type"] == "location" and "supertype" not in els["Castle Veyra"]
     assert "parent_location" not in els["Castle Veyra"]  # its parent is a Narrative
@@ -281,39 +281,98 @@ def test_the_timeline_becomes_events_with_raw_minutes(tmp_path: Path) -> None:
     assert any("History" in n and "2 events" in n for n in report.notes)
 
 
-def test_a_secret_block_is_omitted_and_counted(tmp_path: Path) -> None:
+def secret_id(rid: str, did: str, n: int) -> str:
+    return str(uuid.uuid5(LEGENDKEEPER_NAMESPACE, f"legendkeeper:{PID}:secret:{rid}:{did}:{n}"))
+
+
+def visible(out: Path) -> str:
+    """Every element a reader who may not see hidden ones is served, as one JSON text."""
+    return json.dumps([b for b in bodies(out).values() if b.get("hidden") is not True])
+
+
+def test_a_secret_block_becomes_its_own_hidden_narrative(tmp_path: Path) -> None:
+    """Skeld's rule (OW Market h40 #11228): what the source hides, we hide, never drop and never publish."""
     out, report = run(tmp_path)
-    assert not any("poisoned" in json.dumps(b) for b in bodies(out).values())
-    assert report.omitted.secret_blocks == 1
-    assert "secret" in report.render().lower()
-    out2, report2 = run(tmp_path, include_secrets=True, name="secrets")
-    assert "> [!secret]\n> He poisoned his brother." in by_name(out2)["Aldric Veyra"]["description"]
-    assert report2.omitted.secret_blocks == 0
+    els = by_name(out)
+    secret = els["Aldric Veyra: Secret"]
+    assert secret["id"] == secret_id(ALDRIC, "z3kj5ubq", 1)
+    assert secret["hidden"] is True and secret["type"] == "narrative"
+    assert secret["story"] == "He poisoned his brother."
+    assert secret["characters"] == [eid(ALDRIC)] and secret["x_legendkeeper_parent"] == eid(ALDRIC)
+    assert secret["x_legendkeeper_document"] == "z3kj5ubq"
+    assert "poisoned" not in visible(out)  # the page keeps only its visible text
+    assert "Lord of Castle Veyra" in els["Aldric Veyra"]["description"]
+    assert report.hidden.secret_blocks == 1
+    assert "1 secret block in a visible page, its own Narrative" in report.render()
 
 
-def test_hidden_is_skipped_counted_and_never_read(tmp_path: Path) -> None:
+def test_a_hidden_resource_is_an_element_carrying_the_mark(tmp_path: Path) -> None:
     src = RecordedSource(hide(answers(), ORDER))
     out = tmp_path / "hidden"
     report = import_legendkeeper(src, PID, out)
-    assert not any(ORDER in path for path in src.calls)  # its content is never fetched
-    assert report.omitted.hidden_resources == 1
-    assert report.counts == {"character": 1, "narrative": 3, "relation": 1}
-    assert "Order of the Ash" not in by_name(out)
-    unresolved = {(u.where, u.target) for u in report.unresolved}
-    assert ("link 'Member of'", ORDER) in unresolved and ("link 'Allies'", ORDER) in unresolved
-    assert ("mention 'the Order'", ORDER) in unresolved
-    assert by_name(out)["Aldric Veyra"]["x_legendkeeper_mentions"] == [eid(CASTLE)]
-    # opted in, it is all there
-    _, again = run(tmp_path, hide(answers(), ORDER), include_hidden=True, name="opted")
-    assert again.counts == {"character": 1, "event": 2, "narrative": 4, "relation": 3}
-    assert again.omitted.hidden_resources == 0
+    assert any(ORDER in path for path in src.calls)  # read like any other: nothing is dropped
+    assert report.hidden.resources == 1
+    assert report.counts == {"character": 1, "event": 2, "narrative": 5, "relation": 3}
+    els = by_name(out)
+    order = els["Order of the Ash"]
+    assert order["hidden"] is True and list(order)[:4] == ["type", "id", "name", "hidden"]
+    assert "Order of the Ash" not in visible(out)
+    for ev in ("The Siege", "Founding"):  # its timeline's events are its own
+        assert els[ev]["hidden"] is True
+    rels = {r["name"]: r for r in relations(out)}
+    assert rels["Member of"]["hidden"] is True and rels["Allies"]["hidden"] is True  # a hidden end
+    assert "hidden" not in rels["Home"]
+    assert (report.hidden.events, report.hidden.relations) == (2, 2)
+    assert report.unresolved == []
+    assert els["Aldric Veyra"]["x_legendkeeper_mentions"] == [eid(CASTLE), eid(ORDER)]
+    assert "'Aldric Veyra': visible text mentions the hidden 'Order of the Ash' by name" in report.notes
 
 
 def test_a_hidden_parent_hides_its_subtree(tmp_path: Path) -> None:
     out, report = run(tmp_path, hide(answers(), BOSS))
-    assert report.counts == {"narrative": 1}
-    assert (report.omitted.hidden_resources, report.omitted.under_hidden) == (1, 3)
-    assert [b["name"] for b in bodies(out).values()] == ["Sikelia"]
+    assert report.counts == {"character": 1, "event": 2, "narrative": 4, "relation": 3}  # no secret Narrative
+    assert (report.hidden.resources, report.hidden.under_hidden) == (1, 3)
+    shown = [b["name"] for b in bodies(out).values() if not b.get("hidden")]
+    assert shown == ["Sikelia"]
+    # inside text already hidden, a secret stays in place, marked
+    assert "> [!secret]\n> He poisoned his brother." in by_name(out)["Aldric Veyra"]["description"]
+    assert (report.hidden.secret_blocks, report.hidden.secrets_inside) == (0, 1)
+
+
+def test_a_hidden_page_becomes_its_own_hidden_narrative(tmp_path: Path) -> None:
+    ans = answers()
+    for doc in ans[f"{P}/resources/{ALDRIC}"]["documents"]:
+        doc["isHidden"] = True
+    out, report = run(tmp_path, ans)
+    els = by_name(out)
+    page = els["Aldric Veyra: Main"]
+    assert page["hidden"] is True and page["characters"] == [eid(ALDRIC)]
+    assert page["id"] == str(uuid.uuid5(LEGENDKEEPER_NAMESPACE, f"legendkeeper:{PID}:document:{ALDRIC}:z3kj5ubq"))
+    assert page["story"].startswith("Lord of Castle Veyra")
+    assert "> [!secret]\n> He poisoned his brother." in page["story"]  # inside a hidden page: in place
+    assert page["x_legendkeeper_mentions"] == [eid(CASTLE), eid(ORDER)]
+    assert "description" not in els["Aldric Veyra"] and "x_legendkeeper_mentions" not in els["Aldric Veyra"]
+    assert "Lord of Castle" not in visible(out)
+    assert (report.hidden.documents, report.hidden.secrets_inside) == (1, 1)
+
+
+def test_hidden_properties_and_events_are_hidden(tmp_path: Path) -> None:
+    ans = answers()
+    for prop in ans[f"{P}/resources/{ALDRIC}"]["properties"]:
+        prop["isHidden"] = True  # Alignment, and the Allies link
+    ans[f"{P}/resources/{ORDER}/docs/ke9g0py4/events"]["data"][0]["isHidden"] = True
+    out, report = run(tmp_path, ans)
+    els = by_name(out)
+    held = els["Aldric Veyra: hidden properties"]
+    assert held["hidden"] is True and held["characters"] == [eid(ALDRIC)]
+    assert held["x_legendkeeper_alignment"] == "Lawful"
+    assert "x_legendkeeper_alignment" not in els["Aldric Veyra"]
+    allies = {r["name"]: r for r in relations(out)}["Allies"]
+    assert allies["hidden"] is True and allies["x_legendkeeper_source"] == held["id"]
+    assert els["Founding"]["hidden"] is True and "hidden" not in els["The Siege"]
+    h = report.hidden
+    assert (h.properties, h.property_narratives, h.events, h.relations) == (2, 1, 1, 1)
+    assert "1 hidden-properties Narrative holding 2 hidden properties" in report.render()
 
 
 def test_ids_are_stable_across_two_runs(tmp_path: Path) -> None:
@@ -326,7 +385,7 @@ def test_plan_writes_nothing(tmp_path: Path) -> None:
     out = tmp_path / "planned"
     report = import_legendkeeper(RecordedSource(answers()), PID, out, plan_only=True)
     assert not out.exists() and report.out is None
-    assert report.counts == {"character": 1, "event": 2, "narrative": 4, "relation": 3}
+    assert report.counts == {"character": 1, "event": 2, "narrative": 5, "relation": 3}
     text = report.render()
     assert "Plan only: nothing written." in text
     assert "'faction'" in text and "'place'" in text  # the tags --map could type
@@ -351,14 +410,36 @@ def test_world_json(tmp_path: Path) -> None:
     assert world["format_version"] == FORMAT_VERSION
 
 
-def test_folder_lint_is_green(tmp_path: Path) -> None:
+def lint(out: Path, total: int) -> None:
+    """The dist's lint on a folder: no problem but the ``hidden`` key, one line per hidden element
+    (the lint before schema-dist serial 53 does not know the mark), and its count line the total."""
+    r = subprocess.run([sys.executable, str(LINT), str(out)], capture_output=True, text=True)
+    lines = r.stdout.strip().splitlines()
+    assert str(total) in lines[-1], r.stdout + r.stderr
+    problems = [line for line in lines[:-1] if not line.startswith("walk note:")]
+    hidden = sum(1 for b in bodies(out).values() if b.get("hidden") is True)
+    assert all("`hidden` is not a field of" in p for p in problems), r.stdout + r.stderr
+    assert len(problems) in (0, hidden), r.stdout  # 0 once the lint knows the mark
+    assert r.returncode == (1 if problems else 0)
+
+
+def test_folder_lint_passes_but_for_the_hidden_mark(tmp_path: Path) -> None:
     pytest.importorskip("yaml", reason="the dist's lint decodes the schema YAML")
-    cases: list[tuple[str, dict[str, Any]]] = [("plain", {}), ("mapped", {"type_map": MAP, "include_secrets": True})]
-    for name, kw in cases:
-        out, report = run(tmp_path, name=name, **kw)
-        r = subprocess.run([sys.executable, str(LINT), str(out)], capture_output=True, text=True)
-        assert r.returncode == 0, r.stdout + r.stderr
-        assert str(report.total) in r.stdout.strip().splitlines()[-1]
+    cases: list[tuple[str, dict[str, Any], dict[str, Any]]] = [
+        ("plain", answers(), {}),
+        ("mapped", answers(), {"type_map": MAP}),
+        ("hidden", hide(answers(), BOSS), {}),
+    ]
+    for name, ans, kw in cases:
+        out, report = run(tmp_path, ans, name=name, **kw)
+        lint(out, report.total)
+    # with nothing hidden, the lint is green outright
+    ans = answers()
+    blocks = ans[f"{P}/resources/{ALDRIC}/docs/z3kj5ubq/blocks"]["blocks"]
+    blocks[:] = [b for b in blocks if b["kind"] != "secret"]
+    out, report = run(tmp_path, ans, name="shown")
+    r = subprocess.run([sys.executable, str(LINT), str(out)], capture_output=True, text=True)
+    assert r.returncode == 0, r.stdout + r.stderr
 
 
 def test_round_trip_is_byte_equal(tmp_path: Path) -> None:
@@ -522,6 +603,11 @@ def test_cli(tmp_path: Path) -> None:
         assert main(["--project", PID, str(out)], source=src) == 2  # not empty
         assert main(["--project", PID, "--map", "place=Town", "--plan"], source=src) == 2  # not a type
         assert main(["--project", PID, "--map", "place", "--plan"], source=src) == 2
+        assert main(["--plan"], source=src) == 2  # neither --project nor --file
+        for gone in ("--include-hidden", "--include-secrets"):  # 0.38.0: what LegendKeeper hides comes in hidden
+            with pytest.raises(SystemExit) as stop:
+                main(["--project", PID, "--plan", gone], source=src)
+            assert stop.value.code == 2
 
 
 def test_cli_reads_the_key_and_never_prints_it(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:

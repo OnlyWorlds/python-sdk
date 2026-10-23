@@ -103,22 +103,32 @@ print(report.render())
 
 A database whose title is one of the 22 types (`Characters`, `Locations`, any case, singular or plural), or that has a `Type` column naming one per row, becomes elements of that type. A column becomes a field when its name matches the field's (`Birth Date` is `birth_date`), and a relation column becomes a link when it matches a link field and its pages are in the export. Every other page becomes a Narrative, and so does each row of a database whose type the door cannot tell (supertype `notion`, the database's name as subtype). Nothing is dropped: a column that doesn't fit is kept as `x_notion_<column>`, and attachments a page links to are copied into `media/notion/`. Ids come from Notion's page ids, so importing the same export twice gives the same folder. The run ends with a report naming every column it could not place and every link it could not resolve, so you can see what to rename in Notion before the next export. No AI, no account. It is built on Notion's documented export shape; no real export has been through it yet.
 
-A world kept in LegendKeeper becomes a folder through LegendKeeper's own API, read-only. It needs your project's API key (Project Settings, Developers, API Keys; LegendKeeper gives the API to projects whose owner is on a paid plan) and the project's id:
+A world kept in LegendKeeper becomes a folder from LegendKeeper's own export file (Project Settings, Export; the `.lk` file or the JSON one), with no key and no account:
+
+```bash
+python -m onlyworlds.legendkeeper --file my-world.lk my-world --plan   # what would become what; writes nothing
+python -m onlyworlds.legendkeeper --file my-world.lk --map faction=Institution my-world
+```
+
+or through LegendKeeper's own API, read-only, with your project's API key (Project Settings, Developers, API Keys; LegendKeeper gives the API to projects whose owner is on a paid plan) and the project's id:
 
 ```bash
 export LEGENDKEEPER_API_KEY=lk_...                                          # or --key-file PATH
-python -m onlyworlds.legendkeeper --project ID my-world --plan                # what would become what; writes nothing
+python -m onlyworlds.legendkeeper --project ID my-world --plan
 python -m onlyworlds.legendkeeper --project ID --map faction=Institution my-world
 ```
 
 ```python
 from onlyworlds.legendkeeper import ApiSource, import_legendkeeper
 
+report = import_legendkeeper("my-world.lk", out_dir="my-world")  # the export file
 report = import_legendkeeper(ApiSource(key), "ID", "my-world", type_map={"faction": "institution"})
 print(report.render())
 ```
 
-LegendKeeper has no element types, so a page's type comes from its tags: a tag that is one of the 22 type names (`character`, `Location`) types it, `--map TAG=TYPE` adds your own tags, and every other page becomes a Narrative (supertype `legendkeeper`). The page text becomes the description as Markdown. A sidebar or infobox row becomes a field when its key matches one (`Height` is `height`), and a titled link list (`Allies`) becomes a link field when it matches one and its targets fit; otherwise each link becomes a Relation element named by the list's title. A timeline's events become Events with LegendKeeper's raw minutes and formatted dates kept beside them; their `start_date` is left for you to set against the world's own calendar. Hidden pages and secret blocks are left out unless you pass `--include-hidden` or `--include-secrets`. Nothing else is dropped: whatever has no field is kept as `x_legendkeeper_<key>`, and the report names every key, link, document and omission. Ids come from LegendKeeper's ids, so a second import of the same project gives the same elements. The key is sent to LegendKeeper only, never written or printed. No AI. Map and board documents are not imported yet, and the door has been walked on a test project, not yet on a real world.
+Both roads give the same elements. The export file names no project, so its ids are keyed on the project's first top-level page; pass `--project ID` with `--file` to key them on the project's own id, the same ids the API road gives. LegendKeeper's Markdown export is not read: it loses the tags, the properties and the hidden marks.
+
+LegendKeeper has no element types, so a page's type comes from its tags: a tag that is one of the 22 type names (`character`, `Location`) types it, `--map TAG=TYPE` adds your own tags, and every other page becomes a Narrative (supertype `legendkeeper`). The page text becomes the description as Markdown. A sidebar or infobox row becomes a field when its key matches one (`Height` is `height`), and a titled link list (`Allies`) becomes a link field when it matches one and its targets fit; otherwise each link becomes a Relation element named by the list's title. A timeline's events become Events with LegendKeeper's raw minutes and formatted dates kept beside them; their `start_date` is left for you to set against the world's own calendar. What LegendKeeper hides stays hidden: a hidden page is imported with `hidden: true` (and every page under it), a hidden tab on a visible page becomes its own hidden Narrative, and so does each Secret block, the page keeping only its visible text, so nothing is dropped and nothing secret turns public. Templates are imported marked `x_legendkeeper_template`, and the tutorial pages a new project starts with are imported like the rest, since nothing marks them. Whatever has no field is kept as `x_legendkeeper_<key>`, and the report names every key, link, document and hidden thing. Ids come from LegendKeeper's ids, so a second import of the same project gives the same elements. The key is sent to LegendKeeper only, never written or printed. No AI. Map and board documents are not imported yet. Read on one real export file (a tutorial project with six pages typed by hand); the API road has been walked on a test project.
 
 A campaign kept in Kanka becomes a folder from Kanka's own JSON export (Campaign, Settings, Data, Export, JSON; free campaigns get it):
 
