@@ -2,6 +2,10 @@
 
 The package version runs on its own semver; the schema it is generated from is `SCHEMA_DIST_TAG`.
 
+## Unreleased
+
+- The PyPI page links the docs, the source, the issues and this changelog (`[project.urls]`; until now it linked nothing, so a person with a bug had no door from it).
+
 ## 0.43.1 (2026-10-23)
 
 - **Schema repinned to schema-dist `v0.33.0-dist.54`** (from dist.49; same canonical 00.33.00, no schema file moved, so `_schema.py` moves its provenance lines only: `SCHEMA_DIST_TAG`, `SCHEMA_DIST_SERIAL` 54, `SCHEMA_MANIFEST_SHA256`). Five serials in the vendored tree: 50 and 51, `example/world-export.json`'s world block is the World whole, with `origin` and `x_names` (keel #516, #571); 52, `profiles/review.md`'s reader rule (a reader that hands a world on leaves proposed elements out unless asked); 53, the folder lint (`walk/lint_folder.py`) takes `hidden` as a folder key, true or false (folder spec §4.8), and review.md's rule 4 on a malformed mark; 54, `profiles/checks.md`'s `where.type` as a list and reader rules 6 to 8 (a known-of stub judged by no rule, a pattern outside the shared subset not checked by name, the size cap no step limit), and `checks.fixture.json`'s rule 6 with four cases and three not-checked rows. The doctor already reads all of it: the fixture replays clean (7 rules, 17 cases, 39 expectations, 11 not-checked rows). Tree from `git archive` of the tag (commit 6153745); MANIFEST sha256 82ba25c1... matched against the raw file GitHub serves at the tag. `FORMAT_VERSION` stays `0.3.18`: the dist carries no folder-format stamp, and the package's moved by hand in 0.42.0. No API change.

@@ -11,6 +11,12 @@ classifiers = [
     "Typing :: Typed",
 ]
 
+[project.urls]
+Homepage = "https://onlyworlds.github.io/docs/development/python"
+Source = "https://github.com/OnlyWorlds/python-sdk"
+Issues = "https://github.com/OnlyWorlds/python-sdk/issues"
+Changelog = "https://github.com/OnlyWorlds/python-sdk/blob/main/CHANGELOG.md"
+
 [project.optional-dependencies]
 okf = ["PyYAML>=6"]       # onlyworlds.okf, the OKF bundle export; the core imports no YAML
 
