@@ -1,8 +1,8 @@
 """Export a world folder to an Open Knowledge Format bundle.
 
-    python -m onlyworlds.okf PATH/TO/WORLD-FOLDER OUT-DIR
+    python -m onlyworlds.okf PATH/TO/WORLD-FOLDER OUT-DIR [--hidden]
 
-or ``export_okf(folder, out_dir)``. Needs PyYAML: ``pip install "onlyworlds[okf]"``.
+or ``export_okf(folder, out_dir, hidden=False)``. Needs PyYAML: ``pip install "onlyworlds[okf]"``.
 
 Writes OUT-DIR (which must not exist yet) as a bundle in Google Cloud's Open
 Knowledge Format (OKF) v0.2, as specified at one pinned commit:
@@ -60,6 +60,16 @@ Each element concept:
     element's concept, so a markdown viewer can follow it; one to an id the
     folder does not hold stays as written and is listed in
     ``OkfReport.unresolved``.
+
+Hidden elements (``folder.is_hidden``: ``hidden: true`` at the top level, folder format §4.8) are
+hidden from whoever the world is handed to, never from its holder (Skeld's ruling, OW Council h58
+#11461), and a bundle is handed on: left out unless ``--hidden`` (``hidden=True``), counted in
+``OkfReport.hidden_left_out`` and in world.md's ``onlyworlds_export`` block (``hidden_left_out``).
+Left out, nothing of it is written, its name included: no concept file, no index line, a link to it
+left out of the frontmatter and the body (``OkfReport.hidden_links_left_out``), an in-prose
+reference to it reduced to its own label, never the `urn:uuid:` of an unresolved link. Kept, its
+frontmatter carries ``hidden: true`` (the one NOT_SENT key kept besides ``known_of``), its index line
+and every body link to it say ``(hidden)``, and ``OkfReport.hidden_kept`` counts it.
 
 world.md carries the World's schema fields (`time_current` read from
 `time_range_current` when only that spelling is present, folder format §5),
@@ -128,11 +138,13 @@ from ._schema import (
 )
 from ._version import __version__
 from .folder import (
+    HIDDEN,
     KNOWN_OF,
     WIRE_TO_DISK_WORLD_KEYS,
     WORLD_FILE,
     WORLD_FOLDER_KEYS,
     Folder,
+    is_hidden,
     is_known_of,
     read_folder,
 )
@@ -179,6 +191,11 @@ class OkfReport:
     files: int = 0
     #: elements written as known-of stubs (``known_of: true`` in their frontmatter, §4.4)
     known_of: int = 0
+    #: elements carrying ``hidden: true`` (§4.8) not written (no ``hidden``), and written (``hidden``)
+    hidden_left_out: int = 0
+    hidden_kept: int = 0
+    #: links and in-prose references to a hidden element left out with it (its name unwritten)
+    hidden_links_left_out: int = 0
     links: int = 0
     #: ``<file>: `<field>` -> <id>`` for each link to an id the folder does not hold
     unresolved: list[str] = field(default_factory=list)
@@ -289,19 +306,35 @@ def _fm_key(name: str) -> str:
 
 # An in-prose reference as a markdown link target (atlas `src/core/ow-links.ts`, OW_LINK_HREF_RE).
 _OW_LINK = re.compile(r"\]\(ow://([A-Za-z_]+)/([\w-]+)\)")
+# The whole reference, label and target, for one to a hidden element left out (only the label stays).
+_OW_REF = re.compile(r"\[([^\]\n]*)\]\(ow://([A-Za-z_]+)/([\w-]+)\)")
+HIDDEN_LABEL = " (hidden)"
 
 
 class _Links:
     """Resolves one file's links: a bundle path and a body link per id, or a note and nothing for
     an id that cannot be exported."""
 
-    def __init__(self, here: str, paths: Mapping[str, str], names: Mapping[str, str], report: OkfReport, note: Note):
+    def __init__(
+        self,
+        here: str,
+        paths: Mapping[str, str],
+        names: Mapping[str, str],
+        report: OkfReport,
+        note: Note,
+        hidden: frozenset[str] = frozenset(),
+    ):
         self.here, self.paths, self.names = here, paths, names
         self.report, self.note = report, note
+        #: every hidden id: one in ``paths`` was kept (labelled), one not in it was left out (never named)
+        self.hidden = hidden
 
     def one(self, name: str, eid: Any, target: str | None) -> tuple[str, str] | None:
         if not isinstance(eid, str) or not eid:
             self.note(f"{self.here}: `{name}` holds {eid!r}, not an id; left out")
+            return None
+        if eid in self.hidden and eid not in self.paths:
+            self.report.hidden_links_left_out += 1
             return None
         if eid not in self.paths:
             self.report.unresolved.append(f"{self.here}: `{name}` -> {eid}")
@@ -311,7 +344,8 @@ class _Links:
             self.note(f"{self.here}: `{name}` -> a {actual}, expected {target}; left out")
             return None
         self.report.links += 1
-        return "/" + self.paths[eid], f"[{_link_text(self.names[eid])}]({self._rel(eid)})"
+        label = HIDDEN_LABEL if eid in self.hidden else ""
+        return "/" + self.paths[eid], f"[{_link_text(self.names[eid])}]({self._rel(eid)}){label}"
 
     def _rel(self, eid: str) -> str:
         return "../" + self.paths[eid] if "/" in self.here else self.paths[eid]
@@ -320,14 +354,20 @@ class _Links:
         """A text field's `](ow://<type>/<id>)` link targets as relative bundle paths; one to an
         id the folder does not hold stays as written and is listed as unresolved."""
 
+        def drop(m: re.Match[str]) -> str:
+            if m.group(3) in self.hidden and m.group(3) not in self.paths:
+                self.report.hidden_links_left_out += 1
+                return m.group(1)
+            return m.group(0)
+
         def swap(m: re.Match[str]) -> str:
             eid = m.group(2)
             if eid not in self.paths:
                 self.report.unresolved.append(f"{self.here}: `{name}` (prose) -> {eid}")
                 return m.group(0)
-            return f"]({self._rel(eid)})"
+            return f"]({self._rel(eid)})" + (HIDDEN_LABEL if eid in self.hidden else "")
 
-        return _OW_LINK.sub(swap, text)
+        return _OW_LINK.sub(swap, _OW_REF.sub(drop, text))
 
 
 # --- one element
@@ -343,10 +383,12 @@ def element_doc(
     *,
     kinds: Mapping[str, Mapping[str, str]] = FIELD_KINDS,
     sections: Mapping[str, tuple[tuple[str, tuple[str, ...]], ...]] = SECTIONS,
+    hidden: frozenset[str] = frozenset(),
 ) -> str:
-    """One element as an OKF concept. ``kinds`` and ``sections`` default to the generated schema."""
+    """One element as an OKF concept. ``kinds`` and ``sections`` default to the generated schema;
+    ``hidden`` is every hidden id of the world (one not in ``paths`` was left out)."""
     here = paths[body["id"]]
-    links = _Links(here, paths, names, report, note)
+    links = _Links(here, paths, names, report, note, hidden)
     fm: dict[str, Any] = {"type": _type_name(slug)}
     if not _unset(body.get("name")):
         fm["title"] = str(body["name"])
@@ -362,6 +404,9 @@ def element_doc(
     if is_known_of(body):  # §4.4: known of, never whole; NOT_SENT would drop the mark in silence
         fm[_fm_key(KNOWN_OF)] = True
         report.known_of += 1
+    if is_hidden(body):  # §4.8: kept only when asked; NOT_SENT would drop the mark in silence
+        fm[_fm_key(HIDDEN)] = True
+        report.hidden_kept += 1
 
     blocks: list[tuple[str, str]] = []  # (kind, text): kind "text" or "link"
     current: str | None = None
@@ -442,9 +487,10 @@ def world_doc(
     names: Mapping[str, str],
     report: OkfReport,
     note: Note,
+    hidden: frozenset[str] = frozenset(),
 ) -> str:
     """world.md. ``time_current`` is the folder's (``Folder.time_current``: either spelling, §5)."""
-    links = _Links("world.md", paths, names, report, note)
+    links = _Links("world.md", paths, names, report, note, hidden)
     world = dict(world)
     if time_current is not None:
         world["time_current"] = time_current
@@ -477,18 +523,23 @@ def world_doc(
         "okf_spec": f"{OKF_REPO}/blob/{OKF_COMMIT}/SPEC.md",
         "elements": count,
     }
+    if report.hidden_left_out:  # what was left out, counted (§4.8); absent when nothing was
+        fm["onlyworlds_export"]["hidden_left_out"] = report.hidden_left_out
     return f"---\n{_frontmatter(fm)}---\n"
 
 
-def index_entry(title: str, link: str, desc: str) -> str:
+def index_entry(title: str, link: str, desc: str, *, hidden: bool = False) -> str:
     suffix = f" - {_one_line(desc)}" if _one_line(desc) else ""
-    return f"* [{_link_text(title)}]({link}){suffix}"
+    return f"* [{_link_text(title)}]({link}){HIDDEN_LABEL if hidden else ''}{suffix}"
 
 
-def build_bundle(folder: Folder | str | os.PathLike[str], note: Note | None = None) -> tuple[dict[str, str], OkfReport]:
+def build_bundle(
+    folder: Folder | str | os.PathLike[str], note: Note | None = None, *, hidden: bool = False
+) -> tuple[dict[str, str], OkfReport]:
     """Every bundle file as {bundle path: text}, and the report. Writes nothing.
 
-    ``note`` is called with each note as it is made (they are also in ``report.notes``).
+    ``note`` is called with each note as it is made (they are also in ``report.notes``). ``hidden``
+    keeps hidden elements, labelled; left out by default (the module docstring).
     Raises ``FolderError`` when world.json cannot be read or one id is in two files of one layout.
     """
     report = OkfReport()
@@ -504,19 +555,25 @@ def build_bundle(folder: Folder | str | os.PathLike[str], note: Note | None = No
         why = [s.reason for s in folder.skipped if s.path.parent == folder.root and s.path.name == WORLD_FILE]
         raise FolderError(why[0] if why else f"{folder.root}: no {WORLD_FILE}")
     elements = _elements(folder, noted)
+    hidden_ids = frozenset(body["id"] for _, body in elements if is_hidden(body))
+    if not hidden:
+        report.hidden_left_out = len(hidden_ids)
+        elements = [(slug, body) for slug, body in elements if body["id"] not in hidden_ids]
     paths = assign_paths(elements)
     names = {body["id"]: str(body.get("name") or "") for _, body in elements}
     report.elements = len(elements)
     files: dict[str, str] = {}
-    by_type: dict[str, list[tuple[str, str, str]]] = {}
+    by_type: dict[str, list[tuple[str, str, str, bool]]] = {}
     for slug, body in elements:
         path = paths[body["id"]]
-        files[path] = element_doc(slug, body, paths, names, report, noted)
+        files[path] = element_doc(slug, body, paths, names, report, noted, hidden=hidden_ids)
         by_type.setdefault(slug, []).append(
-            (names[body["id"]], path.split("/", 1)[1], str(body.get("description") or ""))
+            (names[body["id"]], path.split("/", 1)[1], str(body.get("description") or ""), body["id"] in hidden_ids)
         )
 
-    files["world.md"] = world_doc(folder.world, folder.time_current, len(elements), paths, names, report, noted)
+    files["world.md"] = world_doc(
+        folder.world, folder.time_current, len(elements), paths, names, report, noted, hidden_ids
+    )
     root = [
         f'---\nokf_version: "{OKF_VERSION}"\n---\n',
         "# World\n",
@@ -535,7 +592,7 @@ def build_bundle(folder: Folder | str | os.PathLike[str], note: Note | None = No
         n = len(entries)
         root.append(index_entry(_type_name(slug), f"{slug}/index.md", f"{n} element{'s' if n != 1 else ''}"))
         lines = [f"# {_type_name(slug)}", ""]
-        lines += [index_entry(t, link, d) for t, link, d in entries]
+        lines += [index_entry(t, link, d, hidden=h) for t, link, d, h in entries]
         files[f"{slug}/index.md"] = "\n".join(lines) + "\n"
     files["index.md"] = "\n".join(root) + "\n"
     report.types = len(by_type)
@@ -554,18 +611,19 @@ def write_bundle(files: Mapping[str, str], out: str | os.PathLike[str]) -> None:
 
 
 def export_okf(
-    folder: str | os.PathLike[str], out_dir: str | os.PathLike[str], *, note: Note | None = None
+    folder: str | os.PathLike[str], out_dir: str | os.PathLike[str], *, note: Note | None = None, hidden: bool = False
 ) -> OkfReport:
     """Export the world folder at ``folder`` as an OKF bundle at ``out_dir`` (which must not exist).
 
     Returns the report: counts, the unresolved links and the notes (``note`` is also called with
     each as it is made). Raises ``FileExistsError`` if ``out_dir`` exists, ``FolderError`` if the
-    folder cannot be exported. Nothing is written unless the whole bundle was built.
+    folder cannot be exported. Nothing is written unless the whole bundle was built. ``hidden``
+    keeps hidden elements, labelled; left out by default and counted (``report.hidden_left_out``).
     """
     out = Path(out_dir)
     if out.exists():
         raise FileExistsError(f"{out}: already exists; give a new directory")
-    files, report = build_bundle(folder, note)
+    files, report = build_bundle(folder, note, hidden=hidden)
     write_bundle(files, out)
     report.out = out
     return report
@@ -578,6 +636,11 @@ def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(prog="python -m onlyworlds.okf", description=(__doc__ or "").splitlines()[0])
     ap.add_argument("folder", type=Path, help="a world folder (holds world.json and elements/)")
     ap.add_argument("out", type=Path, help="the bundle directory to create; must not exist")
+    ap.add_argument(
+        "--hidden",
+        action="store_true",
+        help="keep hidden elements (hidden: true), each labelled; left out by default, since a bundle is handed on",
+    )
     args = ap.parse_args(argv)
     if not (args.folder / WORLD_FILE).is_file():
         print(f"{args.folder}: not a world folder (no world.json)", file=sys.stderr)
@@ -590,7 +653,7 @@ def main(argv: list[str] | None = None) -> int:
         print(f"note: {msg}", file=sys.stderr)
 
     try:
-        report = export_okf(args.folder, args.out, note=note)
+        report = export_okf(args.folder, args.out, note=note, hidden=args.hidden)
     except FolderError as e:
         print(f"{e}", file=sys.stderr)
         return 1
@@ -600,6 +663,8 @@ def main(argv: list[str] | None = None) -> int:
         f"exported {report.elements} elements in {report.types} types to {args.out}: "
         f"{report.files} files, {report.links} links, {len(report.unresolved)} unresolved"
         + (f", {report.known_of} known of" if report.known_of else "")
+        + (f", {report.hidden_left_out} hidden left out" if report.hidden_left_out else "")
+        + (f", {report.hidden_kept} hidden kept, labelled" if report.hidden_kept else "")
     )
     return 0
 

@@ -46,6 +46,7 @@ from .folder import WIRE_TO_DISK_WORLD_KEYS, WORLD_FOLDER_KEYS
 
 __all__ = [
     "API_BASE",
+    "CREATE_FIELDS",
     "READ_ONLY_FIELDS",
     "ApiError",
     "BulkResult",
@@ -70,8 +71,16 @@ USER_AGENT = f"onlyworlds-py/{__version__}"
 #: is an unknown field to keel's writes (a 422): stripped too, and a body where it is ``true``
 #: is refused before it gets here (``_refuse_known_of``).
 #: ``hidden`` (keel PR 160, #537) rides a body only for a reader who still sees a hidden element and is
-#: ignored in a write: stripped here so a read body round-trips as it is.
+#: ignored in an update: stripped from a PATCH so a read body round-trips as it is. A create takes it
+#: (keel #587, ``CREATE_FIELDS``).
 READ_ONLY_FIELDS: tuple[str, ...] = ("world", "type", "created_at", "updated_at", "change_seq", "known_of", "hidden")
+#: Read-only on an update, taken on a create (``sanitize_payload(..., create=True)``): ``hidden``
+#: (keel #587). ``create``, ``upsert`` (a PUT whose id is new creates; one that replaces ignores it)
+#: and ``bulk`` send it as the body has it, so an element hidden in a folder is created hidden, never
+#: visible for a moment. Only the owner's keys and a co-builder's may send ``true``: any other key is a
+#: 403 ``hidden_not_allowed`` (``ApiError.is_hidden_not_allowed``, a bulk slot's 403) and nothing is
+#: created; a server with the hidden mark off answers 422, ``param`` hidden. ``patch`` never sends it.
+CREATE_FIELDS: tuple[str, ...] = ("hidden",)
 
 _TYPE = re.compile(r"^[a-z][a-z0-9_]*$")
 _ID = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_.-]*$")
@@ -97,9 +106,12 @@ def _minted_id(idempotency_key: str | None, index: int) -> str:
     return uuid7()
 
 
-def sanitize_payload(payload: Mapping[str, Any]) -> dict[str, Any]:
-    """A copy of ``payload`` without the fields the API rejects on write (see ``READ_ONLY_FIELDS``)."""
-    return {k: v for k, v in payload.items() if k not in READ_ONLY_FIELDS}
+def sanitize_payload(payload: Mapping[str, Any], *, create: bool = False) -> dict[str, Any]:
+    """A copy of ``payload`` without the fields the API rejects on write (see ``READ_ONLY_FIELDS``).
+
+    ``create=True`` keeps the fields a create takes (``CREATE_FIELDS``: ``hidden``, keel #587)."""
+    keep = CREATE_FIELDS if create else ()
+    return {k: v for k, v in payload.items() if k not in READ_ONLY_FIELDS or k in keep}
 
 
 def _refuse_known_of(element: Mapping[str, Any], where: str) -> None:
@@ -691,10 +703,14 @@ class Client:
 
         ``name`` is the one required field, and "required" means the key must be present: ``""``
         and ``None`` are accepted and stored as ``""`` (by keel's ruling, nameless Markers exist).
+
+        ``hidden: true`` in the element creates it hidden from its first moment (keel #587,
+        ``CREATE_FIELDS``): the owner's keys and a co-builder's only; any other key gets
+        ``ApiError`` 403 ``hidden_not_allowed`` (``is_hidden_not_allowed``) and nothing is created.
         """
         t = _segment(element_type, _TYPE, "element type")
         _refuse_known_of(element, "create")
-        body = sanitize_payload(element)
+        body = sanitize_payload(element, create=True)
         check_kinds(t, body)
         if not body.get("id"):
             body["id"] = _minted_id(idempotency_key, 0)
@@ -709,7 +725,10 @@ class Client:
                 stored = self.get(t, str(body["id"]))
             except ApiError:
                 stored = None
-            if stored is not None and all(_same_stored(stored.get(k), v) for k, v in body.items()):
+            if stored is not None and all(
+                (stored.get(k) is True) == (v is True) if k in CREATE_FIELDS else _same_stored(stored.get(k), v)
+                for k, v in body.items()
+            ):
                 return stored
             raise ApiError("POST", f"{t}/", got.response)
         if not 200 <= got.response.status < 300:
@@ -727,11 +746,16 @@ class Client:
         row holds only what differs, and the fields this PUT left out that were not empty are named in
         its ``omitted``: an accept empties them). A seat's write that changes nothing makes no row and
         answers 200 with the element (keel #565). The same on ``patch`` and ``edit_links``.
+
+        ``hidden`` is sent as the element has it (keel #587): a PUT whose id is new creates the
+        element hidden, as ``create`` does, with the same 403 ``hidden_not_allowed`` for a key that
+        may not hide; a PUT that replaces an existing element ignores it (hide and unhide through
+        ``PUT|DELETE /{type}/{id}/hidden``).
         """
         t = _segment(element_type, _TYPE, "element type")
         i = _segment(element_id, _ID, "element id")
         _refuse_known_of(element, "upsert")
-        body = sanitize_payload(element)
+        body = sanitize_payload(element, create=True)
         check_kinds(t, body)
         return self._element(self._element_write("PUT", f"{t}/{i}/", body, self._writing()), "PUT", t)
 
@@ -1010,11 +1034,15 @@ class Client:
         send items in any order, cycles included. Always sends an ``Idempotency-Key``, and
         gives every element without an ``id`` one (``create``'s rule, per position), so a
         resend after a lost answer rewrites the same elements instead of creating them twice.
+
+        ``hidden`` is sent as each element has it (keel #587): an item that creates with
+        ``hidden: true`` is created hidden; from a key that may not hide, that slot is a 403
+        ``hidden_not_allowed`` and its element is not created, the other slots as ever.
         """
         elements = []
         for index, it in enumerate(items):
             _refuse_known_of(it["element"], f"bulk: items[{index}]")  # the whole call, never a skipped slot
-            element = sanitize_payload(it["element"])
+            element = sanitize_payload(it["element"], create=True)
             check_kinds(str(it["type"]), element)
             if not element.get("id"):
                 element["id"] = _minted_id(idempotency_key, index)
@@ -1145,14 +1173,23 @@ class Client:
         since: str | None = None,
         budget: int | None = None,
         depth: int | None = None,
+        compact: bool | None = None,
     ) -> dict[str, Any]:
         """``GET /character/{id}/context``: the draught (keel PR 155), one Character's context in
         one read as the recorded world holds it: her element, what she holds and sits in, her open
         work, how she works, her Events, the Narratives she knows, everything else that names her,
         her sheet, what changed around her (``since``: a feed cursor or an ISO time) and who plays
-        whom, with the world's name and calendar. The seven policy keys as the document names
+        whom, with the world's name and calendar. The eight policy keys as the document names
         them (``components`` joined by commas); nothing is inferred; a non-empty ``cut`` means the
-        serving is partial. Served ``Cache-Control: private, no-store``: never cache it shared."""
+        serving is partial. Served ``Cache-Control: private, no-store``: never cache it shared.
+
+        ``compact`` (keel #585): ``True`` leaves out every section that is an empty list or object,
+        and ``cut`` when it is empty; the frame (``world``, ``calendar``, ``as_of``, ``now``,
+        ``mode``, ``policy``) and every null stay, since a null is an answer. Sent as ``true`` or
+        ``false``; ``None`` sends nothing (keel's default, false). Anything but a bool is a
+        TypeError before anything is sent."""
+        if compact is not None and not isinstance(compact, bool):
+            raise TypeError(f"draught: compact is True or False, not {compact!r}. Nothing was sent.")
         query = self._query(
             {
                 "components": ",".join(components) if components else None,
@@ -1162,6 +1199,7 @@ class Client:
                 "since": since,
                 "budget": budget,
                 "depth": depth,
+                "compact": compact,
             }
         )
         page = self.call("GET", f"character/{character_id}/context" + (f"?{query}" if query else ""))

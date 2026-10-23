@@ -687,3 +687,66 @@ def test_the_command_line_leaves_proposed_elements_out_unless_asked(tmp_path: Pa
     code, out, _ = run_main([str(root), str(tmp_path / "out-p"), "--proposed"])
     assert code == 0 and "; 1 proposed element kept, labelled; " in out
     assert pack.PROPOSED_LINE in (tmp_path / "out-p" / "01-character.md").read_text(encoding="utf-8")
+
+
+# --- hidden elements: hidden from whoever the world is handed to (folder format §4.8; Skeld, h58 #11461)
+
+
+def with_hidden() -> Elements:
+    """The test world, plus Cy (hidden) and Dee (visible, linking to Cy and naming her in prose)."""
+    return [
+        *world(),
+        ("character", {"id": C3, "name": "Cy", "description": "The spy in the harbor.", "hidden": True}),
+        ("character", {"id": C4, "name": "Dee", "friends": [C3], "background": f"Met [her](ow://character/{C3})."}),
+    ]
+
+
+def test_hidden_elements_are_left_out_counted_and_never_named() -> None:
+    files, report = built(with_hidden())
+    assert (report.hidden_left_out, report.hidden_kept, report.elements) == (1, 0, 8)
+    assert report.hidden_links_left_out == 2  # the friends link and the prose reference
+    assert not any("Cy" in text or "spy in the harbor" in text for text in files.values())
+    opening = "*1 hidden element is left out of this pack.*"
+    assert files["00-world.md"].startswith(f"# Harbor World\n\n{pack.INTRO_LINE}\n\n{opening}\n\n**Id:**")
+    dee = section(files["01-character.md"], "Dee")
+    assert "**Friends:**" not in dee and "Met her.\n" in dee
+    assert report.unresolved == [f"character Ann ({C1}): `friends` -> {GHOST}"]
+    hidden_and_proposed = [(t, {**b, "x_review_proposed": MARK} if b["id"] == C3 else b) for t, b in with_hidden()]
+    _, report = built(hidden_and_proposed)
+    assert (report.hidden_left_out, report.proposed_left_out) == (1, 0)  # counted once, as hidden
+    _, report = built(hidden_and_proposed, proposed=True)
+    assert (report.hidden_left_out, report.proposed_kept) == (1, 0)  # asked for proposed, still hidden
+    for value in (False, None):
+        _, report = built([(t, {**b, "hidden": value} if b["id"] == C3 else b) for t, b in with_hidden()])
+        assert (report.hidden_left_out, report.elements) == (0, 9)
+    assert pack.is_hidden({"hidden": "yes"}) and not pack.is_hidden({"hidden": False})  # a doubt leaves it out
+
+
+def test_a_kept_hidden_element_is_labelled_and_so_is_every_link_to_it() -> None:
+    files, report = built(with_hidden(), hidden=True)
+    assert (report.hidden_kept, report.hidden_left_out, report.hidden_links_left_out) == (1, 0, 0)
+    cy = section(files["01-character.md"], "Cy")
+    assert cy.splitlines()[:3] == ["## Cy", f"*Character · id {C3}*", pack.HIDDEN_LINE]
+    assert "**Hidden" not in cy  # the mark itself is a server key, never a field line
+    assert "- **Cy** *(hidden)*: The spy in the harbor.\n" in files["00-world.md"]
+    assert (
+        '*1 element here is hidden in the world; each is labelled "hidden" and is not for whoever the world is '
+        "handed to.*\n\n**Id:**"
+    ) in files["00-world.md"]
+    dee = section(files["01-character.md"], "Dee")
+    assert "**Friends:** Cy (character, hidden)\n" in dee and "Met her (Cy, hidden).\n" in dee
+    assert "- **Dee**\n" in files["00-world.md"]
+
+
+def test_the_command_line_leaves_hidden_elements_out_unless_asked(tmp_path: Path) -> None:
+    by_type: dict[str, list[dict[str, Any]]] = {}
+    for slug, body in with_hidden():
+        by_type.setdefault(slug, []).append(body)
+    root = tmp_path / "world"
+    write_folder(root, {k: v for k, v in WORLD.items() if k != "api"}, by_type)
+    code, out, _ = run_main([str(root), str(tmp_path / "out")])
+    assert code == 0 and "; 1 hidden element left out; " in out
+    assert "## Cy\n" not in (tmp_path / "out" / "01-character.md").read_text(encoding="utf-8")
+    code, out, _ = run_main([str(root), str(tmp_path / "out-h"), "--hidden"])
+    assert code == 0 and "; 1 hidden element kept, labelled; " in out
+    assert pack.HIDDEN_LINE in (tmp_path / "out-h" / "01-character.md").read_text(encoding="utf-8")

@@ -637,3 +637,52 @@ def test_known_keys_cover_the_dist_lint() -> None:
     spec.loader.exec_module(lint)
     assert set(lint.BODY_EXTRA_KEYS) | set(lint.FOLDER_KEYS) <= NOT_SENT
     assert tuple(lint.EXTENSION_PREFIXES) == EXTENSION_PREFIXES
+
+
+# --- hidden elements: hidden from whoever the world is handed to (folder format §4.8; Skeld, h58 #11461)
+
+CONSUL = "068e2ddb-83c6-71a7-8000-a45b8b711e25"
+
+
+def test_a_hidden_element_is_left_out_counted_and_never_named(world: World) -> None:
+    world.edit("elements/character/the-consul--*.json", lambda b: b.update(hidden=True))
+    code, err = world.run()
+    assert code == 0, err
+    report = okf.export_okf(world.src, world.out.with_name("again"))
+    assert (report.hidden_left_out, report.hidden_kept, report.elements) == (1, 0, 34)
+    # event and narrative `characters`, title `holders`, the pin's `element`, one in-prose reference
+    assert report.hidden_links_left_out == 5 and report.unresolved == []
+    files = tree(world.out)
+    assert not [p for p in files if "the-consul--" in p]
+    assert not [p for p, b in files.items() if CONSUL in b.decode("utf-8") and not p.startswith("narrative/")]
+    pin, _ = world.doc("pin/*--*.md")
+    assert "element" not in pin and "urn:uuid" not in json.dumps(pin)
+    _, body = world.doc("narrative/a-world-in-a-sentence--*.md")
+    assert "(ow://character/" not in body and "](../character/the-consul" not in body
+    meta, _ = world.doc("world.md")
+    assert meta["onlyworlds_export"]["hidden_left_out"] == 1
+
+
+def test_a_kept_hidden_element_carries_its_mark_and_every_link_to_it_says_hidden(world: World) -> None:
+    world.edit("elements/character/the-consul--*.json", lambda b: b.update(hidden=True))
+    report = okf.export_okf(world.src, world.out, hidden=True)
+    assert (report.hidden_left_out, report.hidden_kept, report.hidden_links_left_out) == (0, 1, 0)
+    fm, _ = world.doc("character/the-consul--*.md")
+    assert fm["hidden"] is True
+    whole, _ = world.doc("character/rachmaninov--*.md")
+    assert "hidden" not in whole
+    index = (world.out / "character" / "index.md").read_text(encoding="utf-8")
+    assert re.search(r"\* \[The Consul\]\(the-consul--8b711e25\.md\) \(hidden\)", index)
+    _, title = world.doc("title/consul-of-the-hegemony--*.md")
+    assert re.search(r"\[The Consul\]\(\.\./character/the-consul--8b711e25\.md\) \(hidden\)", title)
+    _, body = world.doc("narrative/a-world-in-a-sentence--*.md")
+    assert "](../character/the-consul--8b711e25.md) (hidden)" in body
+    meta, _ = world.doc("world.md")
+    assert "hidden_left_out" not in meta["onlyworlds_export"]
+    err = io.StringIO()
+    with redirect_stdout(out := io.StringIO()), redirect_stderr(err):
+        assert okf.main([str(world.src), str(world.out.with_name("cli")), "--hidden"]) == 0
+    assert "1 hidden kept, labelled" in out.getvalue()
+    with redirect_stdout(out := io.StringIO()), redirect_stderr(err):
+        assert okf.main([str(world.src), str(world.out.with_name("cli2"))]) == 0
+    assert "1 hidden left out" in out.getvalue()

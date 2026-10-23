@@ -32,6 +32,7 @@ from ._schema import ELEMENT_TYPES
 __all__ = [
     "ELEMENTS_DIR",
     "FORMAT_VERSION",
+    "HIDDEN",
     "ID_TAIL_LEN",
     "KNOWN_OF",
     "KNOWN_OF_KEEPS",
@@ -50,6 +51,7 @@ __all__ = [
     "element_filename",
     "element_filename_full_id",
     "id_tail",
+    "is_hidden",
     "is_known_of",
     "known_of_for_disk",
     "read_folder",
@@ -66,6 +68,8 @@ FORMAT_VERSION = "0.3.18"
 #: through its own Character's sheet as a stub, ``known_of: true``: these keys, its type's public
 #: fields with their values (keel PR 117, Keel #448: ``PUBLIC_FIELDS``), every other field unset.
 KNOWN_OF = "known_of"
+#: The hidden mark's key (folder format §4.8, ``is_hidden``).
+HIDDEN = "hidden"
 #: The keys every stub keeps (§4.4, keel's ``KNOWN_OF_BASE``): written even when empty.
 KNOWN_OF_KEEPS: frozenset[str] = frozenset(
     {"id", "type", "name", "description", "supertype", "subtype", "image_url", "created_at", "updated_at", "change_seq"}
@@ -79,6 +83,17 @@ def is_known_of(body: Mapping[str, Any]) -> bool:
     never merge them over a whole copy, never push it. Absent, ``false`` or anything else: whole.
     """
     return body.get(KNOWN_OF) is True
+
+
+def is_hidden(body: Mapping[str, Any]) -> bool:
+    """True when the element carries the hidden mark (``hidden: true`` at the top level, folder format
+    §4.8; keel serves it so to the owner's and co-builders' keys). Hidden from whoever the world is
+    handed to, never from its holder: a reader that hands a world on (the pack, the OKF bundle, a
+    shared ``.owworld``) leaves it out unless asked; a copy keeps it byte for byte. Any value but
+    absent, null and ``false`` counts as marked, so a doubt leaves the element out rather than
+    handing it on."""
+    value = body.get(HIDDEN)
+    return value is not None and value is not False
 
 
 def _is_set(value: Any) -> bool:

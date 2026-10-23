@@ -3,10 +3,10 @@
     python -m onlyworlds.pack PATH/TO/WORLD-FOLDER OUT-DIR [--words N] [--bytes N] [--files N]
     python -m onlyworlds.pack --api OUT-DIR [--base-url URL] [--words N] [--bytes N] [--files N]
 
-with ``--rooms``, ``--proposed`` and ``--extensions`` on either, or ``pack_folder``, ``pack_api`` and ``pack_world``
-from Python. A person uploads the files into a notebook and asks about their world. The caps fit
-NotebookLM (50 sources per notebook, 500,000 words per source: Google's FAQ) and Claude Projects
-(30 MB per file), with a margin: by default 400,000 words, 25,000,000 bytes and 50 files.
+with ``--rooms``, ``--proposed``, ``--hidden`` and ``--extensions`` on either, or ``pack_folder``,
+``pack_api`` and ``pack_world`` from Python. A person uploads the files into a notebook and asks about
+their world. The caps fit NotebookLM (50 sources per notebook, 500,000 words per source: Google's FAQ)
+and Claude Projects (30 MB per file), with a margin: by default 400,000 words, 25,000,000 bytes and 50 files.
 
 The overlap, said once. OKF (``onlyworlds.okf``) writes one concept per element, with frontmatter
 and relative links, for knowledge tools like Obsidian; the pack writes merged prose that names
@@ -45,7 +45,18 @@ where a planted instruction would get through (keel #565; Skeld's ruling, h29 #1
 file's opening lines count the proposed elements left out, and with ``--proposed`` each kept one is
 labelled ``proposed, not yet reviewed`` under its id line, on its index line and on every link to it
 (a link to one left out still resolves to its name, as a link to a room element does, labelled the
-same). Server keys (``push.NOT_SENT``) are never written; a key that is not a field of its type is
+same).
+
+Hidden elements (``folder.is_hidden``: ``hidden: true`` at the top level, as a converter door writes
+what its source hid and as keel serves an owner's or co-builder's read) are hidden from whoever the
+world is handed to, never from its holder (folder format §4.8; Skeld's ruling, OW Council h58
+#11461), and a pack is handed on: left out unless ``--hidden`` (``hidden=True``), counted in the
+world file's opening lines and ``PackReport.hidden_left_out``. Kept, each is labelled ``hidden``
+under its id line, on its index line and on every link to it. Left out, nothing of it is written,
+its name included: a link to it is left out (``PackReport.hidden_links_left_out``) and an in-prose
+reference to it keeps only its own label, as keel leaves a hidden element out of every answer to a
+reader who may not see it. A hidden element counts as hidden, never as proposed or a room element.
+Server keys (``push.NOT_SENT``) are never written; a key that is not a field of its type is
 a note.
 
 Sizing. A type's file past ``--words`` (whitespace-split) or ``--bytes`` (UTF-8) is split at
@@ -90,7 +101,7 @@ from ._schema import (
 from .doctor import _LEGACY_LINK_SPELLINGS, Reader, _list_all
 from .errors import ApiError
 from .export import exported_as as _exported_as
-from .folder import KNOWN_OF, WORLD_FILE, Folder, is_known_of, read_folder
+from .folder import KNOWN_OF, WORLD_FILE, Folder, is_hidden, is_known_of, read_folder
 from .http import API_BASE, Client
 from .names import type_word
 from .push import NOT_SENT
@@ -133,6 +144,28 @@ PROPOSED_LINE = (
     "*Proposed, not yet reviewed: an AI agent wrote this element and a keeper has not accepted it; "
     "it is not canon yet.*"
 )
+
+
+#: The label a kept hidden element carries, wherever it or a link to it is printed (folder format §4.8).
+HIDDEN_LABEL = "hidden"
+HIDDEN_LINE = (
+    "*Hidden: this element is hidden in the world; the pack keeps it only because it was asked to, "
+    "and whoever the world is handed to does not see it.*"
+)
+
+
+def hidden_line(left_out: int, kept: int) -> str | None:
+    """The world file's opening line on hidden elements (h58 #11461), None when there are none."""
+    if left_out:
+        many = left_out != 1
+        return f"*{left_out:,} hidden element{'s' if many else ''} {'are' if many else 'is'} left out of this pack.*"
+    if kept:
+        n = "1 element here is" if kept == 1 else f"{kept:,} elements here are"
+        return (
+            f'*{n} hidden in the world; each is labelled "{HIDDEN_LABEL}" and is not for whoever the world '
+            "is handed to.*"
+        )
+    return None
 
 
 def is_proposed(body: Mapping[str, Any]) -> bool:
@@ -221,6 +254,13 @@ class PackReport:
     proposed_left_out: int = 0
     #: proposed elements written, each labelled (``proposed``)
     proposed_kept: int = 0
+    #: elements carrying ``hidden: true`` (``is_hidden``, §4.8), not written (no ``hidden``); one that is
+    #: proposed or a room element too counts here
+    hidden_left_out: int = 0
+    #: hidden elements written, each labelled (``hidden``)
+    hidden_kept: int = 0
+    #: links and in-prose references to a hidden element left out, left out with it (its name unwritten)
+    hidden_links_left_out: int = 0
     #: extension keys with a value, on elements and the world, not written (no ``--extensions``)
     extensions_left_out: int = 0
     #: elements written as known-of stubs (§4.4)
@@ -277,13 +317,20 @@ class _World:
         report: PackReport,
         note: Note,
         world: Mapping[str, Any] | None = None,
+        *,
+        keep_hidden: bool = False,
     ):
         self.names: dict[str, tuple[str, str]] = {}
         self.proposed: set[str] = set()
+        #: hidden ids: labelled when kept (``keep_hidden``), else never named
+        self.hidden: set[str] = set()
+        self.keep_hidden = keep_hidden
         for slug, body in everything:
             self.names[body["id"]] = (_name(body), slug)
             if is_proposed(body):
                 self.proposed.add(body["id"])
+            if is_hidden(body):
+                self.hidden.add(body["id"])
         self.report, self.note, self.world = report, note, world
         self.unknown: Counter[tuple[str, str]] = Counter()
 
@@ -300,9 +347,15 @@ class _World:
             return f"{word} ({standard}, {st})"
         return f"{word} ({standard})"
 
+    def _labels(self, eid: str) -> list[str]:
+        return ([HIDDEN_LABEL] if eid in self.hidden else []) + ([PROPOSED_LABEL] if eid in self.proposed else [])
+
     def link(self, here: str, name: str, eid: Any, target: str | None) -> str | None:
         if not isinstance(eid, str) or not eid:
             self.note(f"{here}: `{name}` holds {eid!r}, not an id; left out")
+            return None
+        if eid in self.hidden and not self.keep_hidden:
+            self.report.hidden_links_left_out += 1
             return None
         if eid not in self.names:
             self.report.unresolved.append(f"{here}: `{name}` -> {eid}")
@@ -310,25 +363,28 @@ class _World:
         title, actual = self.names[eid]
         if target and actual != target:
             self.note(f"{here}: `{name}` -> a {actual}, where the schema expects a {target}; written as it is")
-        if eid in self.proposed:
-            return f"{title} ({actual}, {PROPOSED_LABEL})"
-        return f"{title} ({actual})"
+        return ", ".join([f"{title} ({actual}", *self._labels(eid)]) + ")"
 
     def prose(self, text: str, here: str | None = None, name: str = "") -> str:
         """In-prose references as words. ``here`` None (the index) reports nothing."""
 
         def swap(m: re.Match[str]) -> str:
             label, eid = one_line(m.group(1)), m.group(3)
+            if eid in self.hidden and not self.keep_hidden:
+                if here is not None:
+                    self.report.hidden_links_left_out += 1
+                return m.group(1)
             if eid not in self.names:
                 if here is None:
                     return label or eid
                 self.report.unresolved.append(f"{here}: `{name}` (prose) -> {eid}")
                 return m.group(0)
             title = self.names[eid][0]
-            if eid in self.proposed:
+            labels = ", ".join(self._labels(eid))
+            if labels:
                 if not label or label.casefold() == title.casefold():
-                    return f"{m.group(1) if label else title} ({PROPOSED_LABEL})"
-                return f"{m.group(1)} ({title}, {PROPOSED_LABEL})"
+                    return f"{m.group(1) if label else title} ({labels})"
+                return f"{m.group(1)} ({title}, {labels})"
             if not label or label.casefold() == title.casefold():
                 return title if not label else m.group(1)
             return f"{m.group(1)} ({title})"
@@ -355,6 +411,9 @@ def element_block(slug: str, body: Mapping[str, Any], w: _World, *, extensions: 
     if _kind(body):
         meta.append(_kind(body))
     head = [f"## {title}", "*" + " · ".join(meta) + "*"]
+    if is_hidden(body):  # only kept when asked (``hidden``)
+        head.append(HIDDEN_LINE)
+        w.report.hidden_kept += 1
     if is_proposed(body):  # only kept when asked (``proposed``); the label shows with or without extensions
         head.append(PROPOSED_LINE)
         w.report.proposed_kept += 1
@@ -472,8 +531,9 @@ def _index_line(body: Mapping[str, Any], w: _World) -> str:
     line = f"- **{_name(body)}**"
     if _kind(body):
         line += f" ({_kind(body)})"
-    if is_proposed(body):
-        line += f" *({PROPOSED_LABEL})*"
+    labels = ([HIDDEN_LABEL] if is_hidden(body) else []) + ([PROPOSED_LABEL] if is_proposed(body) else [])
+    if labels:
+        line += f" *({', '.join(labels)})*"
     first = w.first_sentence(body["description"]) if _set(body.get("description")) else ""
     return f"{line}: {first}" if first else line
 
@@ -493,13 +553,15 @@ def world_parts(
     bytes_: int,
     exported_as: Mapping[str, Any] | None = None,
     proposed: str | None = None,
+    hidden: str | None = None,
 ) -> list[_Part]:
     """00-world.md: the world's fields, then the index, one line per element by type. Past a cap,
     parts at index-line boundaries: the fields in the first, each later part headed
     ``## Index (continued)``, a type's heading repeated ``(continued)`` where it runs on.
-    ``proposed`` (``proposed_line``) follows the made-by line among the opening lines."""
+    ``hidden`` (``hidden_line``) and ``proposed`` (``proposed_line``) follow the made-by line among the
+    opening lines."""
     fields = _world_fields(world, w, extensions=extensions)
-    intro = "\n\n".join(s for s in (INTRO_LINE, made_by_line(exported_as, world), proposed) if s)
+    intro = "\n\n".join(s for s in (INTRO_LINE, made_by_line(exported_as, world), hidden, proposed) if s)
     items = [(slug, _name(b), _index_line(b, w) + "\n") for slug in ELEMENT_TYPES for b in index.get(slug, [])]
 
     def head(k: int, n: int) -> str:
@@ -642,6 +704,7 @@ def build_pack(
     files: int = DEFAULT_FILES,
     rooms: bool = False,
     proposed: bool = False,
+    hidden: bool = False,
     extensions: bool = False,
     note: Note | None = None,
     exported_as: Mapping[str, Any] | None = None,
@@ -650,8 +713,8 @@ def build_pack(
 
     ``elements`` are (type slug, body). ``note`` is called with each note as it is made (they are
     also in ``report.notes``). ``exported_as`` (spec 4.2's line, or None) puts one line in the world
-    file saying which kind of key made the pack. ``rooms`` and ``proposed`` keep room and proposed
-    elements, left out by default. Raises ValueError when a cap is below 1.
+    file saying which kind of key made the pack. ``rooms``, ``proposed`` and ``hidden`` keep room,
+    proposed and hidden elements, left out by default. Raises ValueError when a cap is below 1.
     """
     for flag, cap in (("words", words), ("bytes", bytes_), ("files", files)):
         if not isinstance(cap, int) or cap < 1:
@@ -672,13 +735,16 @@ def build_pack(
             noted(f"a {slug} named {_name(body)!r} has no id; left out")
         else:
             valid.append((slug, body))
-    w = _World(valid, report, noted, world)
+    w = _World(valid, report, noted, world, keep_hidden=hidden)
 
     kept: dict[str, list[Mapping[str, Any]]] = {}
     for slug, body in valid:
         # Proposed first: an element that is both is counted as proposed (the stronger reason: not
         # canon yet), and with ``proposed`` asked a room element is still left out as a room element.
-        if not proposed and is_proposed(body):
+        # Hidden before both (§4.8, h58 #11461): not for whoever the world is handed to at all.
+        if not hidden and is_hidden(body):
+            report.hidden_left_out += 1
+        elif not proposed and is_proposed(body):
             report.proposed_left_out += 1
         elif not rooms and is_room_element({**body, "type": slug}):
             report.rooms_left_out += 1
@@ -703,6 +769,7 @@ def build_pack(
     head = world_parts(
         world, world_title, kept, w, extensions=extensions, words=words, bytes_=bytes_, exported_as=exported_as,
         proposed=proposed_line(report.proposed_left_out, report.proposed_kept),
+        hidden=hidden_line(report.hidden_left_out, report.hidden_kept),
     )  # fmt: skip
     report.files_over = not _merge(units, files - len(head) + 1, words, bytes_)
 
@@ -745,6 +812,7 @@ def pack_world(
     files: int = DEFAULT_FILES,
     rooms: bool = False,
     proposed: bool = False,
+    hidden: bool = False,
     extensions: bool = False,
     note: Note | None = None,
     exported_as: Mapping[str, Any] | None = None,
@@ -763,6 +831,7 @@ def pack_world(
         files=files,
         rooms=rooms,
         proposed=proposed,
+        hidden=hidden,
         extensions=extensions,
         note=note,
         exported_as=exported_as,
@@ -802,6 +871,7 @@ def pack_folder(
     files: int = DEFAULT_FILES,
     rooms: bool = False,
     proposed: bool = False,
+    hidden: bool = False,
     extensions: bool = False,
     note: Note | None = None,
 ) -> PackReport:
@@ -822,7 +892,7 @@ def pack_folder(
     elements = _folder_elements(folder, noted)
     report = pack_world(
         folder.world, elements, out, words=words, bytes_=bytes_, files=files, rooms=rooms, proposed=proposed,
-        extensions=extensions, note=note, exported_as=folder.world.get("exported_as"),
+        hidden=hidden, extensions=extensions, note=note, exported_as=folder.world.get("exported_as"),
     )  # fmt: skip
     report.notes[:0] = early
     return report
@@ -837,6 +907,7 @@ def pack_api(
     files: int = DEFAULT_FILES,
     rooms: bool = False,
     proposed: bool = False,
+    hidden: bool = False,
     extensions: bool = False,
     note: Note | None = None,
 ) -> PackReport:
@@ -867,6 +938,7 @@ def pack_api(
         files=files,
         rooms=rooms,
         proposed=proposed,
+        hidden=hidden,
         extensions=extensions,
         note=note,
         exported_as=slice_,
@@ -889,6 +961,10 @@ def _sentence(report: PackReport, out: object) -> str:
     extra = []
     if report.rooms_left_out:
         extra.append(f"{_plural(report.rooms_left_out, 'room element')} left out")
+    if report.hidden_left_out:
+        extra.append(f"{_plural(report.hidden_left_out, 'hidden element')} left out")
+    if report.hidden_kept:
+        extra.append(f"{_plural(report.hidden_kept, 'hidden element')} kept, labelled")
     if report.proposed_left_out:
         extra.append(f"{_plural(report.proposed_left_out, 'proposed element')} left out")
     if report.proposed_kept:
@@ -939,6 +1015,11 @@ def main(argv: list[str] | None = None) -> int:
         action="store_true",
         help="keep proposed elements (x_review_proposed, not yet reviewed), each labelled; left out by default",
     )
+    ap.add_argument(
+        "--hidden",
+        action="store_true",
+        help="keep hidden elements (hidden: true), each labelled; left out by default, since a pack is handed on",
+    )
     ap.add_argument("--extensions", action="store_true", help="keep x_, atlas_ and shadow_ keys; left out by default")
     try:
         args = ap.parse_args(argv)
@@ -957,6 +1038,7 @@ def main(argv: list[str] | None = None) -> int:
         "files": args.files,
         "rooms": args.rooms,
         "proposed": args.proposed,
+        "hidden": args.hidden,
         "extensions": args.extensions,
     }
 

@@ -27,6 +27,7 @@ from .folder import (
     SkippedFile,
     WriteReport,
     element_filename,
+    is_hidden,
     is_known_of,
     read_folder,
     resolve_filenames,
@@ -35,6 +36,7 @@ from .folder import (
 )
 from .http import (
     API_BASE,
+    CREATE_FIELDS,
     READ_ONLY_FIELDS,
     ApiError,
     BulkResult,
@@ -62,6 +64,7 @@ from .worldfile import (
 __all__ = [
     "API_BASE",
     "CHECKS_FIELD",
+    "CREATE_FIELDS",
     "ELEMENT_TYPES",
     "FIELD_KINDS",
     "FORMAT_VERSION",
@@ -99,6 +102,7 @@ __all__ = [
     "check_kinds",
     "element_filename",
     "export_world",
+    "is_hidden",
     "is_known_of",
     "is_room_element",
     "parse_retry_after",

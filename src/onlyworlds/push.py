@@ -34,11 +34,16 @@ fields are unknown, not edits, and it is not the folder's to create or delete.
 
 An element whose folder copy carries ``hidden: true`` (the hidden mark, keel #421) and whose
 baseline copy does not is left out of the diff and listed in ``PushPlan.hidden`` (and
-``PushResult.hidden``): keel takes the mark only through ``PUT /{type}/{id}/hidden``, never in a
-write body, so a patch would edit an element every reader still sees. Nothing is sent for it; the
-owner hides it on the server first (the site, or a client's hide call), and the next push patches it
-as usual. A folder and a baseline that both carry the mark patch normally (Skeld's ruling, OW Market
-h40 #11232; until keel takes the mark on a create, folder spec §4 DRAFTED).
+``PushResult.hidden``): it is in the baseline, so it exists on the server, visible, and keel drops
+``hidden`` from an update (a PATCH, a PUT that replaces); it moves an existing element's mark only
+through ``PUT /{type}/{id}/hidden``, so a patch would edit an element every reader still sees. Nothing
+is sent for it; the owner hides it on the server first (the site, or a client's hide call), and the
+next push patches it as usual. A folder and a baseline that both carry the mark patch normally
+(Skeld's ruling, OW Market h40 #11232; folder spec §4.8). ``hidden`` is in ``NOT_SENT``: a patch never
+carries it. Since keel #587 a create takes the mark, but a push creates nothing (an element only in
+the folder is ``only_in_folder``): an element new to the server goes through ``Client.create``,
+``upsert`` or ``bulk``, which send ``hidden: true`` as the folder has it, so it is created hidden
+from its first moment, or refused whole (403 ``hidden_not_allowed``) for a key that may not hide.
 
 A generic link's two halves (Pin's ``element_type`` / ``element_id``) go together when
 either changed: keel refuses a write that sets one half. The run stops at the first
@@ -203,7 +208,8 @@ class PushPlan:
     #: a skip, not a membership difference, so they never make the plan ``unmatched``
     known_of: list[str] = field(default_factory=list)
     #: ids whose folder copy carries ``hidden: true`` and whose baseline copy does not: nothing is
-    #: sent for them (keel takes the mark only by its own route, so a patch would edit a visible element)
+    #: sent for them (an existing element's mark moves only by its own route, so a patch would edit a
+    #: visible element)
     hidden: list[str] = field(default_factory=list)
 
     @property

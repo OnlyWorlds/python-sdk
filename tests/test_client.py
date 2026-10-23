@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 import re
 import uuid
 from collections.abc import Callable
@@ -300,6 +301,24 @@ def test_draught_sends_the_seven_policy_keys_and_list_page_the_two_filters(make_
     assert "ids=a,b" in t.calls[2].url and "created_by=owner" in t.calls[2].url
 
 
+def test_draught_compact_is_sent_as_true_or_false_and_absent_sends_nothing(make_client: MakeClient) -> None:
+    """keel #585, as the npm SDK's 'draught: compact' (4.69.0): a refused compact sends nothing."""
+    t = FakeTransport(handler=lambda *a: jresp(200, {"world": {"id": "w"}, "character": None}))
+    client = make_client(t)
+    client.draught("c1", compact=True)
+    assert t.calls[0].url.endswith("/character/c1/context?compact=true")
+    client.draught("c1", compact=False)
+    assert t.calls[1].url.endswith("/character/c1/context?compact=false")
+    client.draught("c1")
+    assert "compact" not in t.calls[2].url
+    client.draught("c1", mode="act", compact=True)
+    assert t.calls[3].url.endswith("?mode=act&compact=true")
+    for wrong in ("yes", "true", 1, 0):
+        with pytest.raises(TypeError, match="compact is True or False"):
+            client.draught("c1", compact=wrong)  # type: ignore[arg-type]
+    assert len(t.calls) == 4, "a refused compact sends nothing"
+
+
 def test_a_numeric_cursor_becomes_the_walks_cursor_as_text(make_client: MakeClient) -> None:
     """keel answers an owner's cursor at the head as a number; the walk keeps it, as a string, to pass back."""
     t = FakeTransport(
@@ -457,6 +476,7 @@ def test_the_tag_is_per_client(make_client: MakeClient) -> None:
         (403, "permission_error", "not_author", "is_not_author"),
         (403, "permission_error", "owner_only", "is_owner_only"),
         (403, "permission_error", "view_as_owner_only", "is_view_as_owner_only"),
+        (403, "permission_error", "hidden_not_allowed", "is_hidden_not_allowed"),
         (503, "api_error", "server_busy", "is_busy"),
         (401, "authentication_error", "key_revoked", "is_auth_error"),
         (422, "invalid_request", "invalid_field", "is_validation_error"),
@@ -471,6 +491,7 @@ def test_each_error_has_its_own_flag_and_no_other(
         "is_not_author",
         "is_owner_only",
         "is_view_as_owner_only",
+        "is_hidden_not_allowed",
         "is_busy",
         "is_auth_error",
         "is_validation_error",
@@ -595,6 +616,71 @@ def test_a_retried_create_that_already_landed_is_read_back(make_client: MakeClie
     with pytest.raises(ApiError):
         make_client(t).create("character", {"id": "c-1", "name": "A"})
     assert len(t.calls) == 1
+
+
+# --- the hidden mark on a create (keel #587) ----------------------------------------
+
+
+def test_a_create_sends_hidden_as_the_element_has_it_and_an_update_never(make_client: MakeClient) -> None:
+    t = FakeTransport(
+        handler=lambda *a: jresp(201, {"id": ID, "name": "K", "hidden": True, "items": [], "proposal": {"id": ID}})
+    )
+    c = make_client(t)
+    c.create("narrative", {"name": "K", "hidden": True, "change_seq": 3})
+    c.upsert("narrative", ID, {"name": "K", "hidden": True})
+    c.bulk([{"type": "event", "element": {"name": "A", "hidden": True}}, {"type": "event", "element": {"name": "B"}}])
+    c.create("narrative", {"name": "V"})
+    c.create("narrative", {"name": "F", "hidden": False})
+    c.patch("narrative", ID, {"description": "d", "hidden": True})
+    c.propose("narrative", ID, {"description": "d", "hidden": True}, evidence="e")
+    create, put, bulk, visible, false, patch, propose = (call.body for call in t.calls)
+    assert create["hidden"] is True and "change_seq" not in create
+    assert put["hidden"] is True
+    assert [i["element"].get("hidden", "absent") for i in bulk["items"]] == [True, "absent"]
+    assert "hidden" not in visible, "a visible element's create sends no hidden key"
+    assert false["hidden"] is False
+    assert patch == {"description": "d"}, "a PATCH never carries hidden"
+    assert "hidden" not in json.dumps(propose)
+    assert sanitize_payload({"name": "n", "hidden": True}) == {"name": "n"}
+    assert sanitize_payload({"name": "n", "hidden": True, "world": 1}, create=True) == {"name": "n", "hidden": True}
+
+
+def test_a_hidden_create_a_key_may_not_make_is_refused_once_and_nothing_is_resent(make_client: MakeClient) -> None:
+    """403 hidden_not_allowed: nothing created, never retried, never resent without the mark."""
+    t = FakeTransport(script=[env(403, "permission_error", "hidden_not_allowed")])
+    with pytest.raises(ApiError) as caught:
+        make_client(t).create("narrative", {"name": "K", "hidden": True})
+    assert caught.value.is_hidden_not_allowed and not caught.value.is_not_author
+    assert len(t.calls) == 1 and t.calls[0].body["hidden"] is True
+    off = jresp(422, {"error": {"type": "invalid_request", "code": "invalid_request", "param": "hidden"}})
+    t = FakeTransport(script=[off])
+    with pytest.raises(ApiError) as caught:
+        make_client(t).create("narrative", {"name": "K", "hidden": True})
+    assert (caught.value.is_validation_error, caught.value.param, caught.value.is_hidden_not_allowed) == (
+        True,
+        "hidden",
+        False,
+    )
+    assert len(t.calls) == 1
+    slots = {"errors": True, "items": [{"status": 403, "error": {"code": "hidden_not_allowed"}}, {"status": 201}]}
+    t = FakeTransport(script=[jresp(200, slots)])
+    r = make_client(t).bulk(
+        [{"type": "event", "element": {"name": "A", "hidden": True}}, {"type": "event", "element": {"name": "B"}}]
+    )
+    assert [s["status"] for s in r.items] == [403, 201] and len(t.calls) == 1
+
+
+def test_a_retried_hidden_create_that_landed_is_read_back_with_its_mark(make_client: MakeClient) -> None:
+    conflict = jresp(409, {"error": {"code": "id_conflict"}})
+    stored = {"id": "c-1", "name": "A", "type": "narrative", "hidden": True}
+    t = FakeTransport(script=[jresp(502, {}), conflict, jresp(200, stored)])
+    assert make_client(t).create("narrative", {"id": "c-1", "name": "A", "hidden": True}) == stored
+    visible = {k: v for k, v in stored.items() if k != "hidden"}  # landed visible: not this create's
+    t = FakeTransport(script=[jresp(502, {}), conflict, jresp(200, visible)])
+    with pytest.raises(ApiError):
+        make_client(t).create("narrative", {"id": "c-1", "name": "A", "hidden": True})
+    t = FakeTransport(script=[jresp(502, {}), conflict, jresp(200, visible)])
+    assert make_client(t).create("narrative", {"id": "c-1", "name": "A", "hidden": False}) == visible
 
 
 @pytest.mark.parametrize(("status", "tries"), [(500, 2), (501, 1), (502, 3), (503, 3), (504, 3), (505, 1)])

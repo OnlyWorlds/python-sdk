@@ -282,3 +282,24 @@ def test_only_if_unchanged_lands_on_a_match_refuses_a_stale_one(owner: Client, m
     linked = owner.edit_links("character", el["id"], "species", add=[sp["id"]], if_match=p1["change_seq"])
     assert linked["species"] == [sp["id"]]
     assert owner.patch("character", el["id"], {"description": "no header"})["description"] == "no header"
+
+
+def test_a_create_takes_hidden_from_the_owner_and_refuses_a_contributor(
+    owner: Client, contrib: Client, made: list[tuple[str, str]]
+) -> None:
+    """keel #587: the owner's create with ``hidden: true`` is hidden from its first moment (the contributor
+    cannot read it); the contributor's is a 403 ``hidden_not_allowed`` and nothing is created. Needs the
+    staging server's HIDDEN_MARK on (off, the owner's create is a 422, param hidden)."""
+    secret = owner.create("narrative", {"name": "Hidden at birth", "hidden": True})
+    made.append(("narrative", secret["id"]))
+    assert secret.get("hidden") is True and owner.get("narrative", secret["id"]).get("hidden") is True
+    with pytest.raises(ApiError) as gone:
+        contrib.get("narrative", secret["id"])
+    assert gone.value.status == 404
+    new_id = uuid7()
+    with pytest.raises(ApiError) as refused:
+        contrib.create("narrative", {"id": new_id, "name": "Not mine to hide", "hidden": True})
+    assert refused.value.is_hidden_not_allowed
+    with pytest.raises(ApiError) as absent:
+        owner.get("narrative", new_id)
+    assert absent.value.status == 404

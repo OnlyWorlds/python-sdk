@@ -46,7 +46,11 @@ method for method). Every other file in the folder is left out. A tool's dot-fol
 travels only when handed in (``private_dir``), and makes the file a private copy, not a
 portable ``.owworld`` (§4.1). A producer's records marked ``"private": true`` in
 ``records/RECORDS.json`` are left out whole unless asked (``include_private_records``;
-OW-8, §4.5 rule 11), the manifest carried byte-exact either way.
+OW-8, §4.5 rule 11), the manifest carried byte-exact either way. An element file carrying
+``hidden: true`` is copied byte for byte unless the file is a share (``include_hidden=False``:
+left out whole, and counted; folder format §4.8, Skeld's ruling, OW Atlas h20 #11469). The two
+defaults differ on purpose: private records stay out unless asked, hidden elements stay in unless
+the write is a share.
 """
 
 from __future__ import annotations
@@ -69,7 +73,7 @@ from typing import IO, Any, Literal, NoReturn
 
 from ._casefold import FOLD_RUNS
 from ._jsonfmt import encode
-from .folder import ELEMENTS_DIR, LEGACY_SPATIAL_DIR, WORLD_FILE, slugify
+from .folder import ELEMENTS_DIR, LEGACY_SPATIAL_DIR, WORLD_FILE, is_hidden, slugify
 
 __all__ = [
     "MARKER_NAME",
@@ -732,8 +736,27 @@ def _default_top(world: Mapping[str, Any]) -> str:
     return f"{slugify(name if isinstance(name, str) else None) or 'world'}-{str(world['id'])[:8]}"
 
 
+def _hidden_element_file(rel: str, src: Path) -> bool:
+    """An element file (``elements/`` or legacy ``spatial/``, ``.json``) whose JSON object carries the
+    hidden mark at the top level (``folder.is_hidden``). A file that is not a JSON object is not an
+    element and is carried as it is, as ever."""
+    segs = rel.split("/")
+    if len(segs) < 2 or segs[0] not in (ELEMENTS_DIR, LEGACY_SPATIAL_DIR) or not rel.lower().endswith(".json"):
+        return False
+    try:
+        body = json.loads(src.read_bytes().decode("utf-8-sig"))
+    except (UnicodeDecodeError, ValueError):
+        return False
+    return isinstance(body, dict) and is_hidden(body)
+
+
 def _plan(
-    folder: str | os.PathLike[str], top_dir: str | None, private_dir: str | None, include_private_records: bool
+    folder: str | os.PathLike[str],
+    top_dir: str | None,
+    private_dir: str | None,
+    include_private_records: bool,
+    include_hidden: bool = True,
+    hidden_left_out: list[str] | None = None,
 ) -> tuple[str, list[tuple[str, Path | bytes]]]:
     root = Path(folder)
     if not root.is_dir():
@@ -756,6 +779,12 @@ def _plan(
             return len(segs) > 2 and segs[0] == "records" and _fold_name(segs[1]) in private
 
         files = {rel: src for rel, src in files.items() if not in_private(rel)}
+    if not include_hidden:
+        # A share (§4.8, h20 #11469): each hidden element's file left out whole; nothing else rewritten.
+        hidden = sorted(rel for rel, src in files.items() if _hidden_element_file(rel, src))
+        files = {rel: src for rel, src in files.items() if rel not in set(hidden)}
+        if hidden_left_out is not None:
+            hidden_left_out.extend(hidden)
     raw = files[WORLD_FILE].read_bytes()
     world_bytes, world = _without_link(raw, _parse_world(raw))
     top = _default_top(world) if top_dir is None else top_dir
@@ -811,11 +840,13 @@ def world_file_bytes(
     top_dir: str | None = None,
     private_dir: str | None = None,
     include_private_records: bool = False,
+    include_hidden: bool = True,
+    hidden_left_out: list[str] | None = None,
 ) -> bytes:
     """The world file for the folder at ``folder``, as bytes. See ``write_world_file``: the
     same keywords, the same refusals, private records left out unless
-    ``include_private_records=True``."""
-    top, plan = _plan(folder, top_dir, private_dir, include_private_records)
+    ``include_private_records=True``, hidden elements kept unless ``include_hidden=False``."""
+    top, plan = _plan(folder, top_dir, private_dir, include_private_records, include_hidden, hidden_left_out)
     buf = io.BytesIO()
     _write(buf, top, plan)
     return buf.getvalue()
@@ -828,6 +859,8 @@ def write_world_file(
     top_dir: str | None = None,
     private_dir: str | None = None,
     include_private_records: bool = False,
+    include_hidden: bool = True,
+    hidden_left_out: list[str] | None = None,
 ) -> Path:
     """Write the folder at ``folder`` as one world file at ``path``; returns ``path``.
 
@@ -849,6 +882,15 @@ def write_world_file(
       so a reader learns a producer was left out. No manifest, nothing is private.
       ``include_private_records=True`` (the caller asks) carries every producer's records
       whole, and the manifest is not read.
+    - Hidden elements are kept (folder format §4.8; Skeld, OW Atlas h20 #11469): a world file is
+      a copy, and an element file carrying ``hidden: true`` at the top level travels byte for
+      byte. ``include_hidden=False``, for a file made to hand to someone else (a share), leaves
+      every such file in ``elements/`` or ``spatial/`` out whole (any value of the mark but null
+      and ``false`` counts, so a doubt leaves it out); ``hidden_left_out``, a list the caller
+      passes, receives each left-out file's path inside the folder (``elements/character/x.json``),
+      sorted, and its length is the count. Nothing else is rewritten: a visible element that links
+      to a hidden one keeps the id, which dangles in the file (a reader meets it as a link to an
+      element the world does not hold).
     - ``world.json`` is carried byte for byte, ``producer``, ``source`` and
       ``format_version`` included: a writer that copies never rewrites a folder's
       provenance. The one change is an ``api`` block, which is never written (OW-10).
@@ -864,7 +906,7 @@ def write_world_file(
     records are private. The archive is written beside ``path`` and renamed into place, so
     a crash never leaves half a file.
     """
-    top, plan = _plan(folder, top_dir, private_dir, include_private_records)
+    top, plan = _plan(folder, top_dir, private_dir, include_private_records, include_hidden, hidden_left_out)
     target = Path(path)
     tmp = target.parent / f".{target.name}.tmp-{uuid.uuid4().hex[:8]}"
     try:

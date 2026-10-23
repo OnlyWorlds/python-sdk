@@ -508,3 +508,33 @@ def test_an_element_hidden_on_both_sides_patches_as_usual(tmp_path: Path) -> Non
     plan = plan_push(base, edit)
     assert plan.hidden == []
     assert [(p.id, p.fields) for p in plan.patches] == [(C1, {"description": "Tyrant of Gela"})]
+    t = FakeTransport(handler=echo())
+    res = push(base, edit, client=Client("ow_w_k", "1", transport=t), log_path=tmp_path / "log.jsonl")
+    assert res.ok == 1 and [c.body for c in t.calls if c.method == "PATCH"] == [{"description": "Tyrant of Gela"}]
+
+
+def test_a_patch_never_carries_the_mark_even_when_the_folder_unhid_it(tmp_path: Path) -> None:
+    """An update's ``hidden`` is dropped by keel (#587 kept it so): the mark moves only by its own route."""
+    base, edit = folders(
+        tmp_path,
+        {"character": [wire_char(C1, "Gelon", hidden=True)]},
+        {"character": [wire_char(C1, "Gelon", description="Tyrant of Gela", hidden=False)]},
+    )
+    t = FakeTransport(handler=echo())
+    push(base, edit, client=Client("ow_w_k", "1", transport=t), log_path=tmp_path / "log.jsonl")
+    assert [c.body for c in t.calls if c.method == "PATCH"] == [{"description": "Tyrant of Gela"}]
+
+
+def test_a_push_creates_nothing_so_a_hidden_element_new_to_the_server_is_never_sent(tmp_path: Path) -> None:
+    """keel #587 takes the mark on a create, but a push is a PATCH loop: an element only in the folder
+    is ``only_in_folder``, never created (``Client.create``/``upsert``/``bulk`` send the mark)."""
+    base, edit = folders(
+        tmp_path,
+        {"character": [wire_char(C2, "Hieron")]},
+        {"character": [wire_char(C1, "Gelon", hidden=True), wire_char(C2, "Hieron", description="Of Syracuse")]},
+    )
+    plan = plan_push(base, edit)
+    assert (plan.only_in_folder, plan.hidden) == ([C1], [])
+    t = FakeTransport(handler=echo())
+    push(base, edit, client=Client("ow_w_k", "1", transport=t), log_path=tmp_path / "log.jsonl", allow_unmatched=True)
+    assert not [c for c in t.calls if C1 in c.url or (c.body and "hidden" in json.dumps(c.body))]

@@ -139,6 +139,9 @@ def _every_call(c: Client) -> None:
     c.changes(since="c", limit=1, after="2026-10-22T00:00:00Z")
     c.head()
     c.world_proposals(state="all", since="2026-10-22T00:00:00Z", element=ID, limit=1, cursor="c")
+    c.draught(
+        ID, components=["self"], mode="act", as_of=1, undated="exclude", since="c", budget=5, depth=0, compact=True
+    )
     for ty in ELEMENT_TYPES:
         c.list_page(
             ty, limit=1, cursor="c", expand=["a"], fields=["name"], filter={"name__icontains": "a", "supertype": "b"}
@@ -373,12 +376,15 @@ def test_a_write_never_carries_what_the_write_schema_refuses(doc: dict[str, Any]
         "updated_at": "b",
         "change_seq": 1,
         "created_by": None,
+        "hidden": True,  # keel #587: a create takes it, so the write schema must name it
     }
     for ty in ELEMENT_TYPES:
         c.upsert(ty, ID, body)
         refused = set(schemas[ty.capitalize()]["properties"]) - set(schemas[ty.capitalize() + "Write"]["properties"])
         leaked = refused & set(t.calls[-1].body)
         assert not leaked, f"{ty}: a write still carries {sorted(leaked)}"
+        assert t.calls[-1].body["hidden"] is True
+        assert "boolean" in schemas[ty.capitalize() + "Write"]["properties"]["hidden"]["type"], ty
 
 
 def test_patch_world_takes_back_every_key_the_world_body_serves(doc: dict[str, Any]) -> None:

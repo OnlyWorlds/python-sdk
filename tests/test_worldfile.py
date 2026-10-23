@@ -473,3 +473,33 @@ def test_the_writer_refuses_a_link_where_a_carried_file_would_be(tmp_path: Path)
     with pytest.raises(WorldFileError) as info:
         world_file_bytes(folder)
     assert info.value.reason == "link"
+
+
+# --- hidden elements: kept in a copy, left out of a share (folder format §4.8; Skeld, OW Atlas h20 #11469)
+
+
+def test_a_hidden_element_travels_byte_for_byte_unless_the_file_is_a_share(tmp_path: Path) -> None:
+    secret = b'{\n  "id": "c-2",\n  "name": "Cy",\n  "hidden": true\n}\n'
+    files = {
+        "world.json": world_json(),
+        "elements/character/ann--c-1.json": encode({"id": "c-1", "name": "Ann", "friends": ["c-2"]}),
+        "elements/character/cy--c-2.json": secret,
+        "elements/character/dee--c-3.json": encode({"id": "c-3", "name": "Dee", "hidden": False}),
+        "spatial/pin/p--p-1.json": encode({"id": "p-1", "name": "P", "hidden": True}),
+        "elements/character/notes.json": b"[1, 2]",  # not an element object: carried as ever
+        "media/hidden.json": encode({"hidden": True}),  # not an element file
+    }
+    src = make_folder(tmp_path / "w", files)
+    kept = read_world_file(world_file_bytes(src)).entries
+    assert kept["elements/character/cy--c-2.json"] == secret and len(kept) == len(files)
+    left: list[str] = []
+    share = world_file_bytes(src, include_hidden=False, hidden_left_out=left)
+    assert left == ["elements/character/cy--c-2.json", "spatial/pin/p--p-1.json"]
+    entries = read_world_file(share).entries
+    assert set(kept) - set(entries) == set(left)
+    assert all(entries[p] == kept[p] for p in entries), "nothing else rewritten"
+    assert b'"c-2"' in entries["elements/character/ann--c-1.json"]  # the link id dangles, as ruled
+    assert world_file_bytes(src, include_hidden=False) == share and world_file_bytes(src) == world_file_bytes(src)
+    again: list[str] = []
+    written = write_world_file(src, tmp_path / "share.owworld", include_hidden=False, hidden_left_out=again)
+    assert written.read_bytes() == share and again == left

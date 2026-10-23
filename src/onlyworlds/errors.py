@@ -135,6 +135,15 @@ class ApiError(Exception):
         return self.status == 422 and self.code == "known_of_not_writable"
 
     @property
+    def is_hidden_not_allowed(self) -> bool:
+        """A create carried ``hidden: true`` from a key that may not hide (403 ``hidden_not_allowed``,
+        keel #587): only the owner's keys and a co-builder's (a person's or a seat's) create an element
+        hidden. Nothing was created. Never retried, never resent without the mark (that would publish
+        it): leave the element out, or ask a keeper. A server with the hidden mark off answers ``true``
+        with a 422 instead (``param`` hidden), nothing created either."""
+        return self.status == 403 and self.code == "hidden_not_allowed"
+
+    @property
     def is_permission_error(self) -> bool:
         """The key is valid but lacks the scope (403 ``permission_error``): a read key on a write
         route, or a member key on a surface that refuses members. Retrying will not help."""
