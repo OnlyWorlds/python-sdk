@@ -23,9 +23,10 @@ into a ``Snapshot``; the converter reads only the snapshot, so both roads give t
 **The export file** (Project Settings, Export; ``.lk`` is the JSON gzipped, the JSON type the same
 data plain; read either, by its first bytes, never by its name) holds the whole project in one
 object, ``{version, exportId, exportedAt, resources, calendars, resourceCount, hash}``. **Proven on
-one real export** (version 1, 2026-10-23, Seethe's project on a crew trial account,
-``tests/fixtures/legendkeeper/the-quay-world.lk``). ``FileSource`` adapts where its shape is not
-the API's:
+two real exports** of one project (version 1, 2026-10-23, Seethe's project on a crew trial account:
+``tests/fixtures/legendkeeper/the-quay-world.lk``, and ``the-quay-world-3.json`` a few hours on,
+with a map of her own and two pins on it; the account's ids and its map image's asset id replaced
+by placeholders). ``FileSource`` adapts where its shape is not the API's:
 
 - no project: the export names neither the project's id nor its name. Ids are keyed on the id of
   the first top-level resource in LegendKeeper's own sibling order (``pos``; the project home in
@@ -50,6 +51,11 @@ the API's:
   (which are kept) and are counted; any other goes on under its own type, kept whole.
 - a timeline's ``content`` holds its lanes and events; an event carries no formatted dates and
   no ``sourceUri`` (the server computes those), so ``x_legendkeeper_start`` holds the minutes only.
+- a map document carries a ``map`` object (``mapId``, ``locatorId``, ``min_x``, ``max_x``,
+  ``min_y``, ``max_y``, ``max_zoom``; none on a map with no image) and ``content.pins``; the pins
+  ride on the document as ``pins``, beside the ``map`` object. The API's map shape is not known
+  (Boss's walk could neither make nor read a pin), so a map read through the API stays not
+  imported, named: only the file makes Maps.
 - not kept, named in the report: ``exportId``, ``exportedAt`` and ``hash`` (the report names the
   export; two exports of one project give one folder), ``createdBy`` (an account id),
   ``schemaVersion``, ``showPropertyBar``, ``isFullWidth``, document locators, ``transforms`` and
@@ -84,7 +90,8 @@ What becomes what:
 
 - **A resource becomes an element.** Its type is a tag equal to one of the 22 type names (any
   case), or a tag ``--map TAG=TYPE`` names; never a guess. A resource whose tags name no type, or
-  name two, becomes a Narrative with supertype ``legendkeeper`` (the report lists the tags
+  name two, becomes a Narrative with supertype ``Article`` (what it is, never where it came from:
+  the producer line and the ``x_legendkeeper_`` keys say that; the report lists the tags
   ``--map`` could use, and the two-type ones). ``name`` is its name; its page documents' blocks,
   as Markdown, its ``description`` (each page under ``## <document name>`` when it has more than
   one; a first heading equal to the name is left out). ``x_legendkeeper_id`` is the resource's
@@ -121,10 +128,44 @@ What becomes what:
   ``x_legendkeeper_parent`` the resource it belongs to. ``start_date`` and ``end_date`` are left
   unset: the unit is the world's own time system, and converting minutes into it is a later step
   that needs the world's time settings named. Placeholders are layout and are counted.
-- **Not imported**, named in the report with their resource: ``map`` documents (features are not
-  read yet) and ``board`` documents. ``blank`` documents are empty and counted. Not kept, named in
-  the report: icons, sibling order, timestamps, lock state, permissions, banners, event colours
-  and icons, and the server's computed event dates (they follow from the minutes and calendar).
+- **A map document** (read from the export file) **becomes a Map** (Skeld's ruling, OW Market h40
+  #11385), named ``<resource>: <document>`` as a hidden page's Narrative is: ``width`` is
+  ``max_x - min_x`` and ``height`` ``max_y - min_y`` from the document's ``map`` bounds (whole
+  numbers), the bounds kept as ``x_legendkeeper_bounds`` and ``max_zoom`` as
+  ``x_legendkeeper_max_zoom``. ``image_url`` is the map's ``mapId`` only when it is an http(s)
+  address, as given and never copied (Skeld #11386): the image lives on LegendKeeper's host and
+  loads only as long as that account's asset does, which the report says; a bare asset id
+  (LegendKeeper's tutorial map's) is kept as ``x_legendkeeper_map_id``, never written as a URL. A
+  ``locatorId`` equal to the ``mapId`` is not kept; any other key of the ``map`` object is kept in
+  ``x_legendkeeper_map``. The Map links its resource as ``location`` when the resource became a
+  Location, else keeps the resource's element id as ``x_legendkeeper_resource``;
+  ``x_legendkeeper_document`` is the document's id. A map document with no ``map`` object is a Map
+  with no width, height or image, named so in the report, never zeros.
+- **Each pin becomes a Pin** on its Map: its ``name``, or, for a pin with none, the name of the
+  element it places (LegendKeeper shows the linked page's name on it), else ``Untitled pin (<id>)``,
+  each named in the report; ``element_type`` and ``element_id`` the element its ``uri``
+  (``lk://resources/<id>``) names. A pin with no uri, or whose uri names no resource of the
+  export, is a Pin with no element, named in the report, never a dangling id. **Its place**:
+  the bounds are image pixels, but LegendKeeper stores ``pos`` as ``[y, x]`` in zoom-0 units, an
+  image pixel divided by ``2^max_zoom``, y counting down from 0 at the map's top to ``min_y``.
+  OnlyWorlds counts image pixels from the bottom left, so ``x`` is ``x * 2^max_zoom - min_x`` and
+  ``y`` is ``y * 2^max_zoom - min_y``, a half rounded up, the exact pair kept as
+  ``x_legendkeeper_pos``; the report names each map's scale (``positions scaled by 2^2 = 4``).
+  Measured on two pins of Seethe's quay map (an 800 by 600 image, bounds x 0..800, y -600..0,
+  ``max_zoom`` 2; OW Market h40 #11426, #11429, Skeld #11428): the first, read at image pixel
+  (127, 110) from the top left, is stored ``[-27.5, 32]`` (times 4, pixel 128, 110): x 128, y 490;
+  the second, read at about (796, 524), is stored ``[-131.118, 199.314]``: x 797, y 76. Both fit
+  the scaled reading and neither the unscaled one. A pin on a map with no bounds has no x, y, and
+  so does a pin on a map with no ``max_zoom`` (the scale is not known, never guessed; named in the
+  report). Its icon and label (``iconGlyph``, ``iconColor``, ``iconShape``, ``labelSize``,
+  ``labelVisibility``, ``isSynced`` and any other key but its id, name, pos, uri, hidden mark, rank
+  and timestamps) are kept together as ``x_legendkeeper_pin``, its id as ``x_legendkeeper_id``,
+  its uri as ``x_legendkeeper_uri``.
+- **Not imported**, named in the report with their resource: ``board`` documents, and ``map``
+  documents read through the API (the report says why). ``blank`` documents are empty and counted.
+  Not kept, named in the report: a resource's and an event's icons, sibling order, timestamps, lock
+  state, permissions, banners, event colours, and the server's computed event dates (they follow
+  from the minutes and calendar).
 
 **What the source hides, the folder hides: never dropped, never public** (Skeld's rule, OW Market
 h40 #11228). Each hidden thing is an element carrying ``hidden: true`` at the top of its body
@@ -143,10 +184,12 @@ h40 #11228). Each hidden thing is an element carrying ``hidden: true`` at the to
 - a hidden property on a visible resource: into one Narrative per resource,
   ``<resource>: hidden properties``, linked the same way, its keys kept as extensions;
 - a timeline event whose ``isHidden`` is true, or on a hidden document or resource: its Event;
-- a Relation either end of which is hidden.
+- a Relation either end of which is hidden;
+- a map document whose ``isHidden`` is true, or on a hidden resource: its Map and every Pin on it;
+- a pin whose ``isHidden`` is true: its Pin (no real file has one yet: the tests plant it).
 
-A visible text that mentions a hidden element by name is named in the report. A hidden map, board
-or blank document is named or counted as a visible one is.
+A visible text that mentions a hidden element by name, or a visible pin that places one, is named
+in the report. A hidden board or blank document is named or counted as a visible one is.
 
 **Ids are UUIDv5** in ``LEGENDKEEPER_NAMESPACE``: of ``legendkeeper:<project id>:<resource id>`` for
 a resource, ``legendkeeper:<project id>:event:<event id>`` for an event,
@@ -155,7 +198,9 @@ since LegendKeeper lets a client choose 8- or 24-character ids for resources and
 ``legendkeeper:<project id>:document:<resource id>:<document id>`` for a hidden document's
 Narrative, ``legendkeeper:<project id>:secret:<resource id>:<document id>:<n>`` for the n-th secret
 block of a page (the export gives a block no id, so both roads count them) and
-``legendkeeper:<project id>:properties:<resource id>`` for a resource's hidden properties. A second
+``legendkeeper:<project id>:properties:<resource id>`` for a resource's hidden properties,
+``legendkeeper:<project id>:map:<resource id>:<document id>`` for a Map and
+``legendkeeper:<project id>:pin:<resource id>:<document id>:<pin id>`` for a Pin. A second
 import of the same project finds the same elements. ``world.json``: ``id`` UUIDv5 of
 ``legendkeeper:<project id>``, ``name`` the project's name, ``producer`` ``{"tool": "onlyworlds",
 "version": ..., "input": ...}`` with ``legendkeeper-api`` (``PRODUCER_INPUT``) from the API and
@@ -165,7 +210,8 @@ import of the same project finds the same elements. ``world.json``: ``id`` UUIDv
 The report (``ImportReport``, printed at the end of a run and by ``--plan``) names what became what
 with counts and how each type was decided, every key not placed (element, key, why, the extension
 it was kept as), every titled link kept as Relations (by title, with counts), every link or mention
-whose target is not in the folder, what is hidden and how, the documents not imported, every answer
+whose target is not in the folder, what is hidden and how, every Map (its size, pins and image) and
+every pin named or left with no element, the documents not imported, every answer
 that could not be read, and anything else read past. Nothing from the source is dropped without a
 line in it.
 
@@ -182,6 +228,7 @@ import copy
 import gzip
 import io
 import json
+import math
 import os
 import re
 import sys
@@ -210,6 +257,7 @@ __all__ = [
     "FileSource",
     "Hidden",
     "ImportReport",
+    "MapMade",
     "NotImported",
     "RecordedSource",
     "Snapshot",
@@ -249,8 +297,9 @@ KEY_ENV = "LEGENDKEEPER_API_KEY"
 #: Every extension key this door writes starts with this.
 EXT_PREFIX = "x_legendkeeper_"
 
-#: The supertype a Narrative made from an untyped resource carries.
-UNTYPED_SUPERTYPE = "legendkeeper"
+#: The supertype a Narrative made from an untyped resource carries: what it is, never where it came
+#: from (the producer line and the x_legendkeeper_ keys say that; Skeld, OW Market h40 #11385).
+UNTYPED_SUPERTYPE = "Article"
 
 #: Resources and events per page (the API's maximum).
 PAGE_SIZE = 100
@@ -278,13 +327,21 @@ _OWN = (
     "target",
     "document",
     "template",
+    "resource",
+    "map_id",
+    "bounds",
+    "max_zoom",
+    "map",
+    "pos",
+    "pin",
 )
 #: The door's own extension keys; a property's key never takes one of them.
 _RESERVED = frozenset(f"{EXT_PREFIX}{k}" for k in _OWN)
 
 #: What a resource or event carries that the folder does not keep (one report line).
 _NOT_KEPT = (
-    "icons (iconGlyph, iconColor, iconShape, iconSize), sibling order (rank), timestamps, lock state, "
+    "a resource's and an event's icons (iconGlyph, iconColor, iconShape, iconSize; a pin's are kept), sibling "
+    "order (rank), timestamps, lock state, "
     "permissions, banners, event colours and icons, and the server's computed event dates "
     "(startDate, endDate: they follow from the minutes and the calendar)"
 )
@@ -310,6 +367,14 @@ _PARENT_FIELD: dict[str, str] = {"location": "parent_location", "institution": "
 _INT = re.compile(r"\s*-?\d+\s*")
 _LK_URI = re.compile(r"^lk://resources/(?P<rid>[^/\s]+)(?:/docs/(?P<did>[^/\s]+))?")
 _SEPARATORS = re.compile(r"[\s,;]*")
+_HTTP = re.compile(r"^https?://", re.IGNORECASE)
+
+#: A map's bounds, as the export's ``map`` object names them.
+_BOUNDS = ("min_x", "max_x", "min_y", "max_y")
+
+#: What a pin carries that is said elsewhere (its own fields, or the report's not-kept line):
+#: everything else on it (icon, label, isSynced, ...) is kept together as ``x_legendkeeper_pin``.
+_PIN_SAID = frozenset({"id", "name", "pos", "uri", "isHidden", "rank", "createdAt", "updatedAt"})
 _PLAIN_MARKS = ("underline", "sub", "sup", "color", "highlight")
 
 
@@ -320,6 +385,16 @@ def _norm(name: str) -> str:
 
 def _uuid(key: str) -> str:
     return str(uuid.uuid5(LEGENDKEEPER_NAMESPACE, key))
+
+
+def _number(value: Any) -> float | None:
+    """``value`` when it is a number (not a bool), else None."""
+    return float(value) if isinstance(value, (int, float)) and not isinstance(value, bool) else None
+
+
+def _whole(value: float) -> int:
+    """A coordinate or a size as a whole number, a half rounded up (572.5 is 573)."""
+    return math.floor(value + 0.5)
 
 
 def _seg(value: str) -> str:
@@ -570,6 +645,10 @@ class FileSource:
         for r in rows:
             docs = [d for d in r.get("documents") or [] if isinstance(d, dict) and isinstance(d.get("id"), str)]
             heads = [{k: v for k, v in d.items() if k != "content"} for d in docs]
+            for head, d in zip(heads, docs, strict=True):
+                if d.get("type") == "map":  # its pins ride on the document, beside its map object
+                    pins = _obj(d.get("content")).get("pins")
+                    head["pins"] = [p for p in pins if isinstance(p, dict)] if isinstance(pins, list) else []
             row = {k: v for k, v in r.items() if k not in ("documents", "properties")}
             row["parentId"] = r.get("parentId") if isinstance(r.get("parentId"), str) else None
             listed.append(
@@ -953,6 +1032,38 @@ class Hidden:
     events: int = 0
     #: Relations with a hidden end: hidden Relations
     relations: int = 0
+    #: map documents hidden, or of a hidden resource: hidden Maps
+    maps: int = 0
+    #: pins hidden, or on a hidden Map: hidden Pins
+    pins: int = 0
+
+
+@dataclass(frozen=True)
+class MapMade:
+    """A map document made a Map (read from the export file; the API road does not read maps)."""
+
+    #: the Map's name, ``<resource>: <document>``
+    name: str
+    resource: str
+    #: max_x - min_x and max_y - min_y; None when the document gives no bounds
+    width: int | None
+    height: int | None
+    pins: int
+    #: ``url`` (image_url, LegendKeeper's address as given), ``id`` (a LegendKeeper asset id, not an
+    #: address: kept as x_legendkeeper_map_id) or ``none``
+    image: str
+    #: the document carries no ``map`` object (no bounds, no image)
+    mapless: bool = False
+    hidden: bool = False
+    #: the map's max_zoom: its pins' positions are scaled by 2^max_zoom; None when it gives none
+    max_zoom: float | None = None
+
+
+def _scale_said(zoom: float) -> str:
+    """``positions scaled by 2^2 = 4`` (whole numbers printed whole)."""
+    z = int(zoom) if zoom.is_integer() else zoom
+    n = 2.0**zoom
+    return f"positions scaled by 2^{z} = {int(n) if n.is_integer() else f'{n:g}'}"
 
 
 @dataclass
@@ -967,6 +1078,12 @@ class ImportReport:
     unresolved: list[Unresolved] = field(default_factory=list)
     hidden: Hidden = field(default_factory=Hidden)
     not_imported: list[NotImported] = field(default_factory=list)
+    #: every map document made a Map
+    maps: list[MapMade] = field(default_factory=list)
+    #: pins with no name of their own, each ``<name given> (pin <id> on <map>)``
+    pins_named: list[str] = field(default_factory=list)
+    #: pins with no element (no uri, or a uri naming no resource of the export), one line each
+    pins_unlinked: list[str] = field(default_factory=list)
     unread: list[str] = field(default_factory=list)
     notes: list[str] = field(default_factory=list)
     #: tags on the resources kept untyped -> how many carry each: what ``--map`` could type
@@ -1033,6 +1150,8 @@ class ImportReport:
             ),
             (h.events, "hidden timeline event", "hidden timeline events"),
             (h.relations, "Relation with a hidden end", "Relations with a hidden end"),
+            (h.maps, "hidden Map (its document or resource hidden)", "hidden Maps (their document or resource hidden)"),
+            (h.pins, "hidden Pin (the pin or its Map hidden)", "hidden Pins (the pin or its Map hidden)"),
         ]
         said = [f"{n} {one if n == 1 else many}" for n, one, many in kinds if n]
         if h.properties:
@@ -1042,6 +1161,40 @@ class ImportReport:
             )
         if said:
             lines.append("Hidden as the source hides it (elements carrying hidden: true): " + "; ".join(said) + ".")
+        if self.maps:
+            lines.append(f"Map documents, each a Map and its pins Pins ({len(self.maps)}):")
+            for m in self.maps:
+                pins = f"{m.pins} pin{'' if m.pins == 1 else 's'}"
+                if m.mapless:
+                    what = f"no map object (no bounds, no image): a Map with no width, height or image_url, {pins}"
+                else:
+                    size = f"{m.width} x {m.height}" if m.width is not None and m.height is not None else "no bounds"
+                    image = {
+                        "url": "image_url LegendKeeper's address",
+                        "id": "its image a LegendKeeper asset id, not an address: kept as x_legendkeeper_map_id,"
+                        " no image_url",
+                        "none": "no image",
+                    }[m.image]
+                    what = f"{size}, {pins}, {image}"
+                    if m.pins and m.width is not None and m.height is not None:
+                        what += (
+                            f", {_scale_said(m.max_zoom)}"
+                            if m.max_zoom is not None
+                            else ", no max_zoom: its pins have no x, y (the scale is not known, never guessed;"
+                            " pos kept as x_legendkeeper_pos)"
+                        )
+                lines.append(f"  - {m.name!r}{' (hidden)' if m.hidden else ''}: {what}")
+            if any(m.image == "url" for m in self.maps):
+                lines.append(
+                    "  A Map's image_url is LegendKeeper's own address, as given, never copied: the image lives on"
+                    " LegendKeeper's host and loads only as long as that account's asset does."
+                )
+        if self.pins_named:
+            lines.append(f"Pins with no name of their own, named as LegendKeeper shows them ({len(self.pins_named)}):")
+            lines += [f"  - {p}" for p in self.pins_named]
+        if self.pins_unlinked:
+            lines.append(f"Pins with no element ({len(self.pins_unlinked)}):")
+            lines += [f"  - {p}" for p in self.pins_unlinked]
         if self.not_imported:
             lines.append(f"Documents not imported ({len(self.not_imported)}):")
             lines += [
@@ -1115,6 +1268,14 @@ class _Converter:
         self.relations: list[dict[str, Any]] = []
         self.events: list[dict[str, Any]] = []
         self.event_ids: set[str] = set()
+        self.maps: list[dict[str, Any]] = []
+        self.pins: list[dict[str, Any]] = []
+        #: map documents read through the API (no bounds or pins in its answers): not imported
+        self.api_maps = 0
+        self.placed_pins = 0
+        self.unplaced_pins = 0
+        #: pins with a pos on a map with bounds but no max_zoom: the scale is not known, so no x, y
+        self.unscaled_pins = 0
         self.marks: dict[str, int] = {}
         self.unsupported = 0
         self.unknown: dict[str, int] = {}
@@ -1233,7 +1394,11 @@ class _Converter:
                 self.blank += 1
             elif dtype == "time":
                 self._timeline(item, doc)
+            elif dtype == "map" and isinstance(doc.get("pins"), list):
+                self._map(item, doc)
             else:
+                if dtype == "map":
+                    self.api_maps += 1
                 self.report.not_imported.append(
                     NotImported(str(dtype or "unknown"), item.name, dname, hidden=bool(doc.get("isHidden")))
                 )
@@ -1768,6 +1933,140 @@ class _Converter:
             " kept as minutes, with the formatted date when the source gives one; start_date and end_date unset)"
         )
 
+    # -- maps ----------------------------------------------------------------
+
+    def _map(self, item: _Item, doc: dict[str, Any]) -> None:
+        """A map document (from the export file) as a Map, each of its pins a Pin on it."""
+        did = str(doc.get("id"))
+        dname = str(doc.get("name") or "").strip()
+        name = f"{item.name}: {dname or 'Map'}"
+        hidden = item.hidden or bool(doc.get("isHidden"))
+        fields: dict[str, Any] = {}
+        ext: dict[str, Any] = {f"{EXT_PREFIX}document": did}
+        if item.etype == "location":
+            fields["location"] = item.eid
+        else:
+            ext[f"{EXT_PREFIX}resource"] = item.eid
+        m = doc.get("map")
+        bounds: dict[str, float] = {}
+        zoom: float | None = None
+        image = "none"
+        if isinstance(m, dict):
+            zoom = _number(m.get("max_zoom"))
+            mid = m.get("mapId")
+            if isinstance(mid, str) and _HTTP.match(mid):
+                fields["image_url"] = mid  # as given: LegendKeeper's host, never copied
+                image = "url"
+            elif isinstance(mid, str) and mid:
+                ext[f"{EXT_PREFIX}map_id"] = mid  # an asset id, not an address
+                image = "id"
+            bounds = {k: v for k in _BOUNDS if (v := _number(m.get(k))) is not None}
+            if len(bounds) == len(_BOUNDS):
+                fields["width"] = _whole(bounds["max_x"] - bounds["min_x"])
+                fields["height"] = _whole(bounds["max_y"] - bounds["min_y"])
+            if bounds:
+                ext[f"{EXT_PREFIX}bounds"] = {k: m[k] for k in _BOUNDS if k in bounds}
+            if "max_zoom" in m:
+                ext[f"{EXT_PREFIX}max_zoom"] = m["max_zoom"]
+            rest = {
+                k: v
+                for k, v in m.items()
+                if k not in ("mapId", "max_zoom", *bounds) and not (k == "locatorId" and v == mid)
+            }
+            if rest:
+                ext[f"{EXT_PREFIX}map"] = rest
+        map_id = self._id("map", item.lk_id, did)
+        body: dict[str, Any] = {"type": "map", "id": map_id, "name": name}
+        if hidden:
+            body["hidden"] = True
+            self.report.hidden.maps += 1
+        for fname in FIELD_KINDS["map"]:
+            if fname in fields:
+                body[fname] = fields[fname]
+        body.update(ext)
+        self.maps.append(body)
+        pins = [p for p in doc.get("pins") or [] if isinstance(p, dict)]
+        for n, pin in enumerate(pins, 1):
+            self._pin(pin, n, item, did, name, map_id, hidden, bounds, zoom)
+        self.report.maps.append(
+            MapMade(
+                name,
+                item.name,
+                fields.get("width"),
+                fields.get("height"),
+                len(pins),
+                image,
+                mapless=not isinstance(m, dict),
+                hidden=hidden,
+                max_zoom=zoom,
+            )
+        )
+
+    def _pin(
+        self,
+        pin: dict[str, Any],
+        n: int,
+        item: _Item,
+        did: str,
+        map_name: str,
+        map_id: str,
+        map_hidden: bool,
+        bounds: dict[str, float],
+        zoom: float | None,
+    ) -> None:
+        pid = str(pin.get("id") or f"#{n}")
+        uri = pin.get("uri")
+        link = _LK_URI.match(uri) if isinstance(uri, str) else None
+        target = self.items.get(link["rid"]) if link is not None else None
+        name = str(pin.get("name") or "").strip()
+        if not name:  # LegendKeeper shows the linked page's name on a pin that has none
+            name = target.name if target is not None else f"Untitled pin ({pid})"
+            self.report.pins_named.append(f"{name!r} (pin {pid} on {map_name!r})")
+        fields: dict[str, Any] = {"map": map_id}
+        if target is not None:
+            fields["element_type"] = target.etype
+            fields["element_id"] = target.eid
+        elif link is not None:
+            self.report.pins_unlinked.append(
+                f"{name!r} on {map_name!r}: its uri names {link['rid']}, {self._MISSING}; a Pin with no element"
+            )
+        else:
+            self.report.pins_unlinked.append(f"{name!r} on {map_name!r}: no uri; a Pin with no element")
+        pos = pin.get("pos")
+        yx = [_number(v) for v in pos] if isinstance(pos, list) and len(pos) == 2 else []
+        if len(yx) == 2 and yx[0] is not None and yx[1] is not None and len(bounds) == len(_BOUNDS):
+            if zoom is None:  # the scale is not known: never guessed
+                self.unscaled_pins += 1
+            else:
+                # LegendKeeper's pos is [y, x] in zoom-0 units (an image pixel / 2^max_zoom), y from 0 at the top
+                # down to min_y; the bounds are image pixels, and OnlyWorlds counts from the bottom left
+                scale = 2.0**zoom
+                fields["x"] = _whole(yx[1] * scale - bounds["min_x"])
+                fields["y"] = _whole(yx[0] * scale - bounds["min_y"])
+                self.placed_pins += 1
+        else:
+            self.unplaced_pins += 1
+        hidden = map_hidden or pin.get("isHidden") is True
+        body: dict[str, Any] = {"type": "pin", "id": self._id("pin", item.lk_id, did, pid), "name": name}
+        if hidden:
+            body["hidden"] = True
+            self.report.hidden.pins += 1
+        for fname in FIELD_KINDS["pin"]:
+            if fname in fields:
+                body[fname] = fields[fname]
+        body[f"{EXT_PREFIX}id"] = pid
+        if pos is not None:
+            body[f"{EXT_PREFIX}pos"] = pos
+        if uri:
+            body[f"{EXT_PREFIX}uri"] = uri
+        rest = {k: v for k, v in pin.items() if k not in _PIN_SAID}
+        if rest:
+            body[f"{EXT_PREFIX}pin"] = rest
+        note = f"{name!r}: a visible pin on {map_name!r} places the hidden {target.name!r}" if target else ""
+        if target is not None and target.hidden and not hidden and note not in self.report.notes:
+            self.report.notes.append(note)
+        self.pins.append(body)
+
     # -- the bodies ----------------------------------------------------------
 
     def bodies(self) -> dict[str, list[dict[str, Any]]]:
@@ -1790,7 +2089,7 @@ class _Converter:
             if item.mentions:
                 body[f"{EXT_PREFIX}mentions"] = item.mentions
             out.setdefault(item.etype, []).append(body)
-        for body in self.relations + self.events:
+        for body in self.relations + self.events + self.maps + self.pins:
             out.setdefault(body["type"], []).append(body)
         self.report.counts = {t: len(b) for t, b in sorted(out.items())}
         self._notes()
@@ -1824,6 +2123,31 @@ class _Converter:
             n.append(f"{self.placeholders} timeline placeholder{'' if self.placeholders == 1 else 's'}: layout only")
         if self.map_blocks:
             n.append(f"{self.map_blocks} map block{'' if self.map_blocks == 1 else 's'}: a line naming the map")
+        if self.placed_pins:
+            n.append(
+                f"{self.placed_pins} pin{'' if self.placed_pins == 1 else 's'} placed: LegendKeeper's pos is [y, x]"
+                " in zoom-0 units (an image pixel divided by 2^max_zoom), y from 0 at the map's top down to min_y,"
+                " and the bounds are image pixels; x is x * 2^max_zoom - min_x and y is y * 2^max_zoom - min_y"
+                " (OnlyWorlds counts from the bottom left), rounded to whole numbers, the exact pair kept as"
+                " x_legendkeeper_pos (measured on two pins of one map, Seethe's, OW Market h40 #11426, #11429)"
+            )
+        if self.unplaced_pins:
+            n.append(
+                f"{self.unplaced_pins} pin{'' if self.unplaced_pins == 1 else 's'} with no x, y: no pos, or a map with"
+                " no bounds (pos kept as x_legendkeeper_pos when given)"
+            )
+        if self.unscaled_pins:
+            n.append(
+                f"{self.unscaled_pins} pin{'' if self.unscaled_pins == 1 else 's'} with no x, y on a map with no"
+                " max_zoom: LegendKeeper's pos is scaled by 2^max_zoom, so with none the place is not guessed (pos"
+                " kept as x_legendkeeper_pos)"
+            )
+        if self.api_maps:
+            n.append(
+                f"{self.api_maps} map document{'' if self.api_maps == 1 else 's'} read through the API, not imported:"
+                " the API's map shape (bounds, pins) is not known here, never read on the wire; LegendKeeper's export"
+                " file (--file) reads them"
+            )
         if self.unsupported:
             n.append(
                 f"{self.unsupported} unsupported block{'' if self.unsupported == 1 else 's'} or propert"

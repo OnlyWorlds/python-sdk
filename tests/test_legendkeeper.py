@@ -21,6 +21,7 @@ No network: the API client is tested on the conftest's fake transport.
 from __future__ import annotations
 
 import copy
+import hashlib
 import io
 import json
 import subprocess
@@ -153,7 +154,7 @@ def test_the_tree_converts_to_the_element_set(tmp_path: Path) -> None:
     assert aldric["x_legendkeeper_parent"] == eid(BOSS)
     assert "supertype" not in aldric
     for name in ("Sikelia", "Boss wire test (delete me)", "Order of the Ash", "Castle Veyra"):
-        assert els[name]["type"] == "narrative" and els[name]["supertype"] == "legendkeeper", name
+        assert els[name]["type"] == "narrative" and els[name]["supertype"] == "Article", name
     assert "x_legendkeeper_parent" not in els["Sikelia"]
     assert els["Order of the Ash"]["x_legendkeeper_tags"] == ["faction"]
     typed = {t.name: (t.type, t.by) for t in report.typed}
@@ -399,6 +400,19 @@ def test_the_report_names_everything_not_placed(tmp_path: Path) -> None:
         assert needle in text, needle
     assert "Wrote" in text
     assert report.unread == []
+    # the API's map shape is not known: the map stays not imported, and the report says why
+    assert report.maps == [] and report.counts.get("map") is None
+    assert any(n.startswith("1 map document read through the API, not imported") for n in report.notes)
+
+
+def test_ids_do_not_move_with_the_supertype(tmp_path: Path) -> None:
+    """Untyped is supertype Article now (no tool name in a supertype, Skeld, OW Market h40 #11385);
+    the ids are those 0.41.0 gave: the sha256 of the sorted ids, one a line."""
+    out, _ = run(tmp_path)
+    ids = sorted(bodies(out))
+    assert hashlib.sha256("\n".join(ids).encode()).hexdigest() == (
+        "d5ffef3b277079ef64e225c9c91ada4d877292aae9ce06c6ff7392863a4a31e1"
+    )
 
 
 def test_world_json(tmp_path: Path) -> None:

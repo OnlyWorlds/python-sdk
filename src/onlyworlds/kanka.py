@@ -38,9 +38,10 @@ What becomes what (the type map follows Skeld's ruled table for his staged conve
   proven); ``families`` Family, ``races`` Species, ``items`` Object, ``creatures`` Creature,
   ``events`` Event, ``abilities`` Ability, ``quests`` and ``journals`` Narrative, ``maps`` Map
   (believed). Any other folder whose files carry an ``entity`` object (``tags``, ``calendars``,
-  ``timelines``, a custom module) becomes a Narrative with supertype ``kanka`` and the folder's
-  name as subtype, its entity ``type`` kept as ``x_kanka_type``. The entity's ``type`` is the
-  element's ``supertype``; its ``name`` the name.
+  ``timelines``, a custom module) becomes a Narrative with supertype ``Article`` (what it is,
+  never where it came from: the producer line says that) and the folder's name as subtype, its
+  entity ``type`` kept as ``x_kanka_type``. The entity's ``type`` is the element's ``supertype``;
+  its ``name`` the name.
 - **Text**: ``entry`` from HTML to Markdown (paragraphs, line breaks, headings, bold, italic,
   strike, code, links, lists, quotes, rules, images, tables; other tags read through to their
   text) is the ``description``, or the ``story`` for a Narrative from ``notes``, ``quests`` or
@@ -181,8 +182,9 @@ KANKA_NAMESPACE = uuid.uuid5(uuid.NAMESPACE_URL, "https://onlyworlds.com/ns/kank
 #: Every extension key this door writes starts with this.
 EXT_PREFIX = "x_kanka_"
 
-#: The supertype of a Narrative made from a module with no OnlyWorlds type.
-UNTYPED_SUPERTYPE = "kanka"
+#: The supertype of a Narrative made from a module with no OnlyWorlds type: what it is, never where
+#: it came from (the producer line and the x_kanka_ keys say that; Skeld, OW Market h40 #11385).
+UNTYPED_SUPERTYPE = "Article"
 
 #: Export folder -> element type (Skeld's table; the four in ``PROVEN_MODULES`` read on a real file).
 MODULE_TYPES: dict[str, str] = {

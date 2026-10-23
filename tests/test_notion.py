@@ -170,10 +170,22 @@ def test_untyped_rows_are_narratives(imported: tuple[Path, ImportReport]) -> Non
     out, report = imported
     quest = bodies(out)[eid(Q)]
     assert quest["type"] == "narrative"
-    assert (quest["supertype"], quest["subtype"]) == ("notion", "Quests")
+    assert (quest["supertype"], quest["subtype"]) == ("Article", "Quests")
     assert quest["x_notion_status"] == "Open" and quest["x_notion_reward"] == "100 gold"
     assert quest["description"] == "Find it."
     assert report.untyped_databases == ["Quests"]
+
+
+def test_ids_do_not_move_with_the_supertype(imported: tuple[Path, ImportReport]) -> None:
+    """No tool name in a supertype (Skeld, OW Market h40 #11385): the fixture's ids are those 0.41.0
+    gave (the sha256 of the sorted ids, one a line). No real Notion export has been through the
+    door, so the fixture is the one built here."""
+    out, _ = imported
+    ids = sorted(bodies(out))
+    assert len(ids) == 6
+    assert hashlib.sha256("\n".join(ids).encode()).hexdigest() == (
+        "a8deaf0550063d1051c74d97f2bed47b925ae47c7d949188e28029bea147672e"
+    )
 
 
 def test_pages_tree_links_and_media(imported: tuple[Path, ImportReport]) -> None:
@@ -286,7 +298,7 @@ def test_type_column(tmp_path: Path) -> None:
     els = {b["name"]: b for b in bodies(tmp_path / "out").values()}
     assert els["Wolf"]["type"] == "creature" and els["Wolf"]["description"] == "Grey"
     assert "x_notion_type" not in els["Wolf"]  # the cell that typed it is its type
-    assert els["Thing"]["supertype"] == "notion" and els["Thing"]["x_notion_type"] == "Gizmo"
+    assert els["Thing"]["supertype"] == "Article" and els["Thing"]["x_notion_type"] == "Gizmo"
     assert len(report.ids_from_path) == 3  # rows with no page take their path's id, listed
 
 

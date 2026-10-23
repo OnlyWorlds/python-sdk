@@ -46,8 +46,9 @@ What becomes what:
   spaces as underscores>`` (``_2`` and on when two columns, or a column and the door's own keys,
   would share a key): nothing is dropped. A row's page text is its ``description``, or
   ``x_notion_body`` when a column filled ``description``.
-- **A row of an untyped database becomes a Narrative**, supertype ``notion``, subtype the
-  database's title, every column under ``x_notion_``, its page text the description.
+- **A row of an untyped database becomes a Narrative**, supertype ``Article`` (what it is, never
+  where it came from: the producer line says that), subtype the database's title, every column
+  under ``x_notion_``, its page text the description.
 - **A page becomes a Narrative**: the title its name, its Markdown its description,
   ``x_notion_id`` the Notion id, ``x_notion_parent`` the element id of the page (or row) it sits
   under. A relative link in its text to another exported page also becomes a link on Narrative's
@@ -131,8 +132,9 @@ _EXT_PARENT = f"{EXT_PREFIX}parent"
 _EXT_BODY = f"{EXT_PREFIX}body"
 _RESERVED = frozenset({_EXT_ID, _EXT_PARENT, _EXT_BODY})
 
-#: The supertype an untyped database's rows carry (decision 1).
-UNTYPED_SUPERTYPE = "notion"
+#: The supertype an untyped database's rows carry: what they are, never where they came from (the
+#: producer line and the x_notion_ keys say that; Skeld, OW Market h40 #11385).
+UNTYPED_SUPERTYPE = "Article"
 
 #: Where attachments land inside the folder (decision 2).
 MEDIA_DIR = "media/notion"

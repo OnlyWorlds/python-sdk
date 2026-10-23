@@ -8,12 +8,24 @@ Voss, The quay, The ferry crossing, The Ferry Guild and The ledger of the first 
 tags, properties or links; she renamed the project home "The quay world", and left three
 "Untitled" pages (two empty strays, one made from the Character template). The rest is the
 tutorial and templates LegendKeeper seeds a new project with: 3 hidden tabs, 13 Secret blocks,
-maps, a board and a timeline. Nothing in the project is a hidden page.
+maps, a board and a timeline. Nothing in the project is a hidden page. Banked as Boss's scrubbed
+copy (OW Market h40 #11420, #11430): the account's ``createdBy`` id a placeholder of the same
+length, every other byte as exported; the door's folder from it is the unscrubbed file's.
 
 The JSON type of the same export (a minute later; Boss found it equal but for ``exportId``,
 ``exportedAt`` and ``hash``, pretty-printed) is not banked, at 576 KB: ``json_twin`` makes it from
 the ``.lk`` the same way. The real twin was checked to give a byte-identical folder when this
 door was built.
+
+``fixtures/legendkeeper/the-quay-world-3.json`` is her third export of the same project, the JSON
+type, a few hours on (Seethe, OW Market h40 #11387, #11426): Ada Okafor now mentions Mara Voss and
+carries a tag, and "The quay map" is a map of her own with two pins: "The quay", on her page The
+quay, and one near the map's right edge with no name and no uri (the name she typed was not kept).
+Five map documents in three cases: her map (an image address and bounds), the tutorial's Realm of
+Tutoria (a bare asset id, bounds, 16 pins with no name of their own) and three templates' maps
+with no ``map`` object at all. Banked as Boss's scrubbed copy (h40 #11434): the account's
+``createdBy`` id and her map image's asset id each a placeholder of the same length; LegendKeeper's
+tutorial asset ids and its authors' ids as exported, and every other byte.
 """
 
 from __future__ import annotations
@@ -22,6 +34,7 @@ import gzip
 import hashlib
 import io
 import json
+import re
 import subprocess
 import sys
 import uuid
@@ -46,7 +59,7 @@ from onlyworlds.legendkeeper import (
 ROOT = Path(__file__).resolve().parents[1]
 LINT = ROOT / "codegen" / "schema-dist" / "walk" / "lint_folder.py"
 EXPORT = Path(__file__).resolve().parent / "fixtures" / "legendkeeper" / "the-quay-world.lk"
-SHA256 = "d484efc1839de13d658f11a942e481aa7be5c99476e5d030f3128306133ea62b"
+SHA256 = "5ee673bd78e4cf542f069be57698af50b6dead90ad11b29852a889a85278ec6f"
 HOME = "ajkxoqw3"  # The quay world: the first top-level resource, which keys the ids
 ADA, CHARACTER, WIKI = "p805c6i9", "nj687ndp", "oqwc8iom"
 TYPED_BY_HAND = {
@@ -62,7 +75,22 @@ SECRET_OWNERS = {
     "Scene", "Technology", "Artifact", "Quest", "Creature", "Country", "Myth",
     "Ethnicity", "Character", "Organization", "Event", "Untitled", "Location",
 }  # fmt: skip
-COUNTS = {"character": 2, "creature": 1, "event": 29, "location": 1, "narrative": 52, "relation": 3}
+COUNTS = {
+    "character": 2,
+    "creature": 1,
+    "event": 29,
+    "location": 1,
+    "map": 4,
+    "narrative": 52,
+    "pin": 16,
+    "relation": 3,
+}
+
+# The first export's folder as 0.41.0 wrote it, before Maps and the Article supertype: the sha256 of
+# every element file (path, NUL, bytes, NUL, in path order; world.json aside, it names the version)
+# and of the element ids, one a line, sorted.
+OLD_FOLDER = "2a16370b97b1c9e1c7fe175a388c7b8362a2a331f92f3cc7fea09acc330610da"
+OLD_IDS = "bb8b8c0ebeafb4b82050351b5b9683bd3ea98c312cb139b8e07f00f4c1ee435c"
 
 
 def eid(lk_id: str, pid: str = HOME) -> str:
@@ -101,7 +129,8 @@ def bodies(out: Path) -> dict[str, dict[str, Any]]:
 def by_name(out: Path) -> dict[str, list[dict[str, Any]]]:
     named: dict[str, list[dict[str, Any]]] = {}
     for b in bodies(out).values():
-        named.setdefault(b["name"], []).append(b)
+        if b["type"] != "pin":  # a pin is named as the element it places: of_type(out, "pin") reads them
+            named.setdefault(b["name"], []).append(b)
     return named
 
 
@@ -148,7 +177,7 @@ def test_the_six_hand_typed_pages_with_their_text(tmp_path: Path) -> None:
     out, _ = run(tmp_path)
     for name, text in TYPED_BY_HAND.items():
         body = one(out, name)
-        assert body["type"] == "narrative" and body["supertype"] == "legendkeeper", name  # no tags: untyped
+        assert body["type"] == "narrative" and body["supertype"] == "Article", name  # no tags: untyped
         assert body["description"] == text, name
         assert "hidden" not in body, name
     assert one(out, "Ada Okafor")["id"] == eid(ADA)
@@ -331,3 +360,311 @@ def test_cli_reads_the_file(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> 
         assert main(["--file", str(tmp_path / "missing.lk"), "--plan"]) == 2
         assert main(["--file", str(EXPORT), "--key-file", str(EXPORT), "--plan"]) == 2
     assert "missing.lk" in err.getvalue()
+
+
+# --- the untyped supertype and the first export's folder ------------------------
+
+
+def element_digests(out: Path) -> tuple[str, str]:
+    """(the folder, the ids) as OLD_FOLDER and OLD_IDS were taken: Maps and Pins aside, Article read
+    back as 0.41.0's supertype, so only the rule's own change is undone."""
+    h = hashlib.sha256()
+    for p in sorted(out.rglob("*")):
+        rel = p.relative_to(out).as_posix()
+        if p.is_file() and p.name != "world.json" and not rel.startswith(("elements/map/", "elements/pin/")):
+            raw = p.read_bytes().replace(b'"supertype": "Article"', b'"supertype": "legendkeeper"')
+            h.update(rel.encode() + b"\0" + raw + b"\0")
+    ids = sorted(b["id"] for b in bodies(out).values() if b["type"] not in ("map", "pin"))
+    return h.hexdigest(), hashlib.sha256("\n".join(ids).encode()).hexdigest()
+
+
+def test_the_first_export_gives_its_old_folder_but_for_the_supertype(tmp_path: Path) -> None:
+    """No tool name in a supertype (Skeld's lane rule, OW Market h40 #11385): untyped is Article now,
+    and nothing else of the first export's folder moved, its ids least of all; its maps are added."""
+    out, report = run(tmp_path)
+    assert element_digests(out) == (OLD_FOLDER, OLD_IDS)
+    untyped = [b for b in bodies(out).values() if b["type"] == "narrative" and "supertype" in b]
+    assert untyped and {b["supertype"] for b in untyped} == {"Article"}
+    assert not any(
+        "legendkeeper" in str(b.get("supertype", "")) + str(b.get("subtype", "")) for b in bodies(out).values()
+    )
+    assert "(supertype Article)" in report.render()
+
+
+# --- the third export: maps and pins -------------------------------------------
+
+EXPORT3 = EXPORT.parent / "the-quay-world-3.json"
+SHA256_3 = "8d80c57e2aac45301a9d6cc1d76019dcf27bfd9ca249af9438463eeb1349ec29"
+COUNTS_3 = {
+    "character": 2, "creature": 1, "event": 29, "location": 1,
+    "map": 5, "narrative": 54, "pin": 18, "relation": 3,
+}  # fmt: skip
+QUAY_MAP, QUAY, TUTORIA, LOCATION = "ha7uu4sb", "sz2hbafh", "cdtsrn5b", "v1cjkvea"
+CORNER = "uhljd0gj"  # the second pin on the quay map: no name, no uri
+ASSET = re.compile(
+    r"https://(?:dev-)?assets\.legendkeeper\.com/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})"
+)
+#: Boss's same-length placeholder for her map image's asset id (h40 #11434)
+MAP_ASSET = "00000000-0000-4000-8000-000000000001"
+#: her map image's real asset id and the account's id, by hash (sha256), so neither is in the package
+MAP_ASSET_SHA256 = "d04851f3065f8a3cc2d7624db15d65a8ca528f0d1978dd5f2af89c3cb21e27fe"
+ACCOUNT_SHA256 = "fceeab8b4d7652711e65241ff1c880b3bbb28fb71e63ca5815b278d7acc74156"
+CREATED_BY = re.compile(r'"createdBy": ?"([^"]*)"')
+MAPLESS = {"Creature: Habitat Map", "Country: Map", "Location: Map"}
+
+
+def map_id(rid: str, did: str) -> str:
+    return str(uuid.uuid5(LEGENDKEEPER_NAMESPACE, f"legendkeeper:{HOME}:map:{rid}:{did}"))
+
+
+def export3() -> dict[str, Any]:
+    data: dict[str, Any] = json.loads(EXPORT3.read_text(encoding="utf-8"))
+    return data
+
+
+def sha(text: str) -> str:
+    return hashlib.sha256(text.encode("utf-8")).hexdigest()
+
+
+def write_json(tmp: Path, data: dict[str, Any], name: str = "variant.json") -> Path:
+    path = tmp / name
+    path.write_text(json.dumps(data, indent=2, ensure_ascii=False), encoding="utf-8")
+    return path
+
+
+def map_doc(data: dict[str, Any], rid: str) -> dict[str, Any]:
+    (doc,) = (d for r in data["resources"] if r["id"] == rid for d in r["documents"] if d["type"] == "map")
+    return doc
+
+
+def of_type(out: Path, etype: str) -> dict[str, dict[str, Any]]:
+    return {b["name"]: b for b in bodies(out).values() if b["type"] == etype}
+
+
+def lint_ok(out: Path, total: int) -> None:
+    """The dist's lint: no problem but the hidden mark (as test_folder_lint_passes_but_for_the_hidden_mark)."""
+    r = subprocess.run([sys.executable, str(LINT), str(out)], capture_output=True, text=True)
+    lines = r.stdout.strip().splitlines()
+    assert str(total) in lines[-1], r.stdout + r.stderr
+    problems = [line for line in lines[:-1] if not line.startswith("walk note:")]
+    assert all("`hidden` is not a field of" in p for p in problems), r.stdout + r.stderr
+    hidden = sum(1 for b in bodies(out).values() if b.get("hidden") is True)
+    assert len(problems) in (0, hidden), r.stdout
+
+
+def asset_uuids(text: str) -> set[str]:
+    return set(ASSET.findall(text))
+
+
+def test_the_third_export_is_banked_with_no_account_asset_or_id() -> None:
+    raw = EXPORT3.read_bytes()
+    assert hashlib.sha256(raw).hexdigest() == SHA256_3 and len(raw) == 581_870  # the size she exported
+    text = raw.decode("utf-8")
+    found = asset_uuids(text)
+    assert MAP_ASSET in found and MAP_ASSET_SHA256 not in {sha(u) for u in found}
+    assert ACCOUNT_SHA256 not in {sha(a) for a in CREATED_BY.findall(text)}
+    # every other uuid on LegendKeeper's asset hosts is LegendKeeper's own tutorial content: in the first export too
+    first = gzip.decompress(EXPORT.read_bytes()).decode("utf-8")
+    assert found - {MAP_ASSET} <= asset_uuids(first) and MAP_ASSET not in first
+    assert ACCOUNT_SHA256 not in {sha(a) for a in CREATED_BY.findall(first)}
+    # the patterns catch what they are for (a made-up uuid and account id, never a real one)
+    planted = '"url": "https://assets.legendkeeper.com/12345678-abcd-4bcd-8bcd-123456789abc.png", "createdBy": "cx"'
+    assert asset_uuids(planted) == {"12345678-abcd-4bcd-8bcd-123456789abc"} and CREATED_BY.findall(planted) == ["cx"]
+    assert not asset_uuids(planted) <= asset_uuids(first)
+    assert len(export3()["resources"]) == export3()["resourceCount"] == 43
+
+
+def test_the_third_export_becomes_the_element_set(tmp_path: Path) -> None:
+    out, report = run(tmp_path, EXPORT3)
+    assert report.counts == COUNTS_3 and report.total == len(bodies(out)) == 113
+    assert [(m.name, m.width, m.height, m.pins, m.image, m.mapless, m.max_zoom) for m in report.maps] == [
+        ("The Realm of Tutoria: Main", 10000, 7000, 16, "id", False, 6),
+        ("Creature: Habitat Map", None, None, 0, "none", True, None),
+        ("The quay map: Main", 800, 600, 2, "url", False, 2),
+        ("Country: Map", None, None, 0, "none", True, None),
+        ("Location: Map", None, None, 0, "none", True, None),
+    ]
+    assert report.pins_unlinked == ["'Untitled pin (uhljd0gj)' on 'The quay map: Main': no uri; a Pin with no element"]
+    assert report.hidden.maps == report.hidden.pins == 0
+    assert not any(n.kind == "map" for n in report.not_imported)
+    ada = one(out, "Ada Okafor")
+    assert ada["x_legendkeeper_mentions"] == [eid("mna7xe5q")] and ada["x_legendkeeper_tags"] == ["keeper"]
+    text = report.render()
+    assert "'The Realm of Tutoria: Main': 10000 x 7000, 16 pins," in text
+    assert "positions scaled by 2^6 = 64" in text and "positions scaled by 2^2 = 4" in text
+    assert any(n.startswith("18 pins placed: LegendKeeper's pos is [y, x] in zoom-0 units") for n in report.notes)
+
+
+def test_the_quay_map_and_its_two_pins(tmp_path: Path) -> None:
+    out, report = run(tmp_path, EXPORT3)
+    quay_map = of_type(out, "map")["The quay map: Main"]
+    assert quay_map["id"] == map_id(QUAY_MAP, "bkxigc0g")
+    assert (quay_map["width"], quay_map["height"]) == (800, 600)
+    assert quay_map["image_url"] == f"https://assets.legendkeeper.com/{MAP_ASSET}.png"  # the address as given
+    assert "location" not in quay_map  # its resource is a Narrative: kept by element id
+    assert quay_map["x_legendkeeper_resource"] == eid(QUAY_MAP)
+    assert quay_map["x_legendkeeper_document"] == "bkxigc0g"
+    assert quay_map["x_legendkeeper_bounds"] == {"min_x": 0, "max_x": 800, "min_y": -600, "max_y": 0}
+    assert quay_map["x_legendkeeper_max_zoom"] == 2 and "x_legendkeeper_map" not in quay_map  # locatorId = mapId
+    pin = of_type(out, "pin")["The quay"]
+    assert pin["map"] == quay_map["id"]
+    assert (pin["element_type"], pin["element_id"]) == ("narrative", eid(QUAY))
+    # [y, x] = [-27.5, 32] in zoom-0 units, max_zoom 2: image pixel (128, 110) from the top left, y from the bottom
+    assert (pin["x"], pin["y"]) == (128, 490)
+    assert pin["x_legendkeeper_pos"] == [-27.5, 32]
+    assert pin["x_legendkeeper_pin"] == {
+        "iconGlyph": "book-open-cover", "iconColor": "#3b82f6", "iconShape": "pin-medium",
+        "labelSize": "medium", "labelVisibility": "hover",
+    }  # fmt: skip
+    assert pin["x_legendkeeper_id"] == "ekns6z68" and pin["x_legendkeeper_uri"] == f"lk://resources/{QUAY}"
+    assert pin["id"] == str(uuid.uuid5(LEGENDKEEPER_NAMESPACE, f"legendkeeper:{HOME}:pin:{QUAY_MAP}:bkxigc0g:ekns6z68"))
+    assert "hidden" not in pin and "description" not in pin
+    corner = of_type(out, "pin")[f"Untitled pin ({CORNER})"]  # no name, no uri: LegendKeeper's fallback
+    assert corner["map"] == quay_map["id"] and "element_id" not in corner and "element_type" not in corner
+    assert corner["x_legendkeeper_pos"] == [-131.11831103678927, 199.31438127090297]
+    assert (corner["x"], corner["y"]) == (797, 76)  # 797.26 and 75.53: near the right edge, low on the map
+    assert "x_legendkeeper_uri" not in corner and corner["x_legendkeeper_id"] == CORNER
+    assert f"'Untitled pin ({CORNER})' (pin {CORNER} on 'The quay map: Main')" in report.pins_named
+    text = report.render()
+    assert "'The quay map: Main': 800 x 600, 2 pins, image_url LegendKeeper's address, positions scaled by 2^2 = 4" in (
+        text
+    )
+    assert "loads only as long as that account's asset does" in text
+
+
+def test_the_bare_id_map_and_its_unnamed_pins(tmp_path: Path) -> None:
+    out, report = run(tmp_path, EXPORT3)
+    realm = of_type(out, "map")["The Realm of Tutoria: Main"]
+    assert "image_url" not in realm  # a bare asset id is never written as a URL
+    assert realm["x_legendkeeper_map_id"] == "ckt3hmegk00023h677l0o5ff9"
+    assert (realm["width"], realm["height"], realm["x_legendkeeper_resource"]) == (10000, 7000, eid(TUTORIA))
+    pins = [b for b in bodies(out).values() if b["type"] == "pin" and b["map"] == realm["id"]]
+    assert len(pins) == 16 and len(report.pins_named) == 17  # and the quay map's corner pin
+    elements = bodies(out)
+    for pin in pins:
+        target = elements[pin["element_id"]]
+        assert pin["name"] == target["name"]  # no name of its own: named as LegendKeeper shows it
+        assert pin["x_legendkeeper_uri"] == f"lk://resources/{target['x_legendkeeper_id']}"
+        assert pin["x_legendkeeper_pin"] == {"isSynced": True}
+        assert 0 <= pin["x"] <= realm["width"] and 0 <= pin["y"] <= realm["height"]
+        assert any(f"{pin['name']!r} (pin {pin['x_legendkeeper_id']} on" in p for p in report.pins_named)
+    wiki = next(p for p in pins if p["name"] == "Wiki City")
+    assert wiki["x_legendkeeper_pos"] == [-24.289565058479525, 55.5190058479532]
+    assert (wiki["x"], wiki["y"]) == (3553, 5445)  # max_zoom 6: 55.519 * 64 = 3553.22, -24.290 * 64 + 7000 = 5445.47
+    assert "its image a LegendKeeper asset id, not an address" in report.render()
+
+
+def test_map_documents_with_no_map_object(tmp_path: Path) -> None:
+    out, report = run(tmp_path, EXPORT3)
+    maps = of_type(out, "map")
+    for name in MAPLESS:
+        m = maps[name]
+        assert not {"width", "height", "image_url", "x_legendkeeper_bounds", "x_legendkeeper_map_id"} & set(m), name
+    assert maps["Location: Map"]["location"] == eid(LOCATION)  # the template became a Location: linked
+    assert "x_legendkeeper_resource" not in maps["Location: Map"]
+    assert maps["Creature: Habitat Map"]["x_legendkeeper_resource"] == eid("fqqy13pb")  # a Creature: kept
+    assert {m.name for m in report.maps if m.mapless} == MAPLESS
+    text = report.render()
+    for name in MAPLESS:
+        assert f"{name!r}: no map object (no bounds, no image)" in text, name
+
+
+def test_the_third_export_lints_and_is_deterministic(tmp_path: Path) -> None:
+    one_, report = run(tmp_path, EXPORT3, name="one")
+    two, _ = run(tmp_path, EXPORT3, name="two")
+    assert tree(one_) == tree(two)
+    pytest.importorskip("yaml", reason="the dist's lint decodes the schema YAML")
+    lint_ok(one_, report.total)
+
+
+def test_bounds_that_do_not_start_at_zero(tmp_path: Path) -> None:
+    """Every real map's bounds start at x 0, y 0: the quay map moved by 100 each way (planted) keeps
+    its size and its pin's place, and a map with half its bounds gives no size and no pin place."""
+    data = export3()
+    doc = map_doc(data, QUAY_MAP)
+    doc["map"].update(min_x=100, max_x=900, min_y=-500, max_y=100)
+    doc["content"]["pins"][0]["pos"] = [-2.5, 57]  # 4 times that, less the moved corner: 128, 490 again
+    out, _ = run(tmp_path, write_json(tmp_path, data), name="moved")
+    moved = of_type(out, "map")["The quay map: Main"]
+    assert (moved["width"], moved["height"]) == (800, 600)
+    assert (of_type(out, "pin")["The quay"]["x"], of_type(out, "pin")["The quay"]["y"]) == (128, 490)
+    del doc["map"]["max_y"], doc["map"]["min_y"]
+    out, report = run(tmp_path, write_json(tmp_path, data, "half.json"), name="half")
+    half = of_type(out, "map")["The quay map: Main"]
+    assert "width" not in half and half["x_legendkeeper_bounds"] == {"min_x": 100, "max_x": 900}
+    pin = of_type(out, "pin")["The quay"]
+    assert "x" not in pin and pin["x_legendkeeper_pos"] == [-2.5, 57]
+    assert any(n.startswith("2 pins with no x, y: no pos, or a map with no bounds") for n in report.notes)
+    assert "'The quay map: Main': no bounds, 2 pins, image_url LegendKeeper's address\n" in report.render()
+
+
+def test_a_map_with_no_max_zoom_places_no_pin(tmp_path: Path) -> None:
+    """The scale is 2^max_zoom: a map with bounds and pins but no max_zoom (planted) gives its pins no
+    x, y, never a guess; each keeps its pos, and the report names the map."""
+    data = export3()
+    del map_doc(data, QUAY_MAP)["map"]["max_zoom"]
+    out, report = run(tmp_path, write_json(tmp_path, data))
+    quay_map = of_type(out, "map")["The quay map: Main"]
+    assert (quay_map["width"], quay_map["height"]) == (800, 600) and "x_legendkeeper_max_zoom" not in quay_map
+    on_it = [b for b in bodies(out).values() if b["type"] == "pin" and b["map"] == quay_map["id"]]
+    assert len(on_it) == 2 and not any("x" in b or "y" in b for b in on_it)
+    assert sorted(b["x_legendkeeper_pos"][1] for b in on_it) == [32, 199.31438127090297]
+    text = report.render()
+    assert "'The quay map: Main': 800 x 600, 2 pins, image_url LegendKeeper's address, no max_zoom: its pins" in text
+    assert "positions scaled by 2^6 = 64" in text  # the tutorial map still places its own
+    assert any(n.startswith("2 pins with no x, y on a map with no max_zoom") for n in report.notes)
+    assert any(n.startswith("16 pins placed") for n in report.notes)
+
+
+def test_a_hidden_pin_and_a_hidden_map(tmp_path: Path) -> None:
+    """No real file has a hidden pin or map yet: planted on copies of the third export."""
+    data = export3()
+    map_doc(data, QUAY_MAP)["content"]["pins"][0]["isHidden"] = True
+    out, report = run(tmp_path, write_json(tmp_path, data), name="pin")
+    assert of_type(out, "pin")["The quay"]["hidden"] is True
+    assert "hidden" not in of_type(out, "map")["The quay map: Main"]
+    assert (report.hidden.maps, report.hidden.pins) == (0, 1)
+    assert "1 hidden Pin (the pin or its Map hidden)" in report.render()
+    data = export3()
+    map_doc(data, TUTORIA)["isHidden"] = True
+    out, report = run(tmp_path, write_json(tmp_path, data, "map.json"), name="map")
+    assert of_type(out, "map")["The Realm of Tutoria: Main"]["hidden"] is True
+    realm = of_type(out, "map")["The Realm of Tutoria: Main"]["id"]
+    on_it = [b for b in bodies(out).values() if b["type"] == "pin" and b["map"] == realm]
+    assert len(on_it) == 16 and all(b["hidden"] is True for b in on_it)
+    assert "hidden" not in of_type(out, "pin")["The quay"]
+    assert "hidden" not in of_type(out, "pin")[f"Untitled pin ({CORNER})"]
+    assert (report.hidden.maps, report.hidden.pins) == (1, 16)
+    pytest.importorskip("yaml", reason="the dist's lint decodes the schema YAML")
+    lint_ok(out, report.total)
+
+
+def test_a_pin_with_no_element(tmp_path: Path) -> None:
+    """A pin whose uri names no resource of the export (planted), beside the real corner pin with no
+    uri and no name: Pins with no element, named in the report, never a dangling id."""
+    data = export3()
+    pins = map_doc(data, QUAY_MAP)["content"]["pins"]
+    pins[0]["uri"] = "lk://resources/gone0000"
+    out, report = run(tmp_path, write_json(tmp_path, data))
+    gone = of_type(out, "pin")["The quay"]
+    assert "element_id" not in gone and "element_type" not in gone
+    assert gone["x_legendkeeper_uri"] == "lk://resources/gone0000"
+    untitled = of_type(out, "pin")[f"Untitled pin ({CORNER})"]
+    assert "element_id" not in untitled and untitled["map"] == gone["map"]
+    assert len(report.pins_unlinked) == 2 and "gone0000" in report.pins_unlinked[0]
+    text = report.render()
+    assert "Pins with no element (2):" in text and "no uri; a Pin with no element" in text
+    assert "gone0000" not in json.dumps([b for b in bodies(out).values() if b["type"] == "pin"]).replace(
+        '"x_legendkeeper_uri": "lk://resources/gone0000"', ""
+    )
+
+
+def test_a_visible_pin_on_a_hidden_page_is_named(tmp_path: Path) -> None:
+    data = export3()
+    for r in data["resources"]:
+        if r["id"] == QUAY:
+            r["isHidden"] = True
+    out, report = run(tmp_path, write_json(tmp_path, data))
+    pin = of_type(out, "pin")["The quay"]
+    assert "hidden" not in pin and pin["element_id"] == eid(QUAY)
+    assert "'The quay': a visible pin on 'The quay map: Main' places the hidden 'The quay'" in report.notes

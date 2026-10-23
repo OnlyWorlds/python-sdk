@@ -1,14 +1,17 @@
 """The Kanka door (onlyworlds.kanka) on a real Kanka JSON export.
 
-``fixtures/kanka/seethe-ow-exports-world_20261023_074706.zip`` is the file Kanka 3.15 gave on
-2026-10-23 for a campaign Seethe made on a crew free account and typed in Kanka's own editor
-(her receipt: ``Carrier/Studio/desk/current/2026-10-23-exports/receipts/kanka.md``; Boss read it
-for keys, tokens, mail and sessions and found none). What she typed: two Characters (Ada Okafor,
-Ferry clerk; Mara Voss, Route planner), two Locations (The quay; The ferry crossing, under The
-quay), one Organisation (The Ferry Guild), one Note (The ledger of the first crossing), a two-way
-"friend" relationship Ada to Mara, and a post on Ada; the relationship and the post were made
-twice by a script rerun. Kanka seeded four starter entries in the new campaign, and they are in
-the file. Variants (a private entity, a hidden post) are the same file with one key changed.
+``fixtures/kanka/quay-export-world_20261023_074706.zip`` is the file Kanka 3.15 gave on 2026-10-23
+for a campaign Seethe made on a crew free account and typed in Kanka's own editor (her receipt:
+``Carrier/Studio/desk/current/2026-10-23-exports/receipts/kanka.md``; Boss read it for keys,
+tokens, mail and sessions and found none), its account identifiers scrubbed by Boss's script
+(OW Market h40 #11420, #11430): the username, the user id and the campaign id each a placeholder
+of the same length, so the campaign id that keys the ids is 910001; every other byte as exported.
+What she typed: two Characters (Ada Okafor, Ferry clerk; Mara Voss, Route planner), two Locations
+(The quay; The ferry crossing, under The quay), one Organisation (The Ferry Guild), one Note (The
+ledger of the first crossing), a two-way "friend" relationship Ada to Mara, and a post on Ada; the
+relationship and the post were made twice by a script rerun. Kanka seeded four starter entries in
+the new campaign, and they are in the file. Variants (a private entity, a hidden post) are the
+same file with one key changed.
 """
 
 from __future__ import annotations
@@ -40,9 +43,9 @@ from onlyworlds.kanka import (
 
 ROOT = Path(__file__).resolve().parents[1]
 LINT = ROOT / "codegen" / "schema-dist" / "walk" / "lint_folder.py"
-EXPORT = Path(__file__).resolve().parent / "fixtures" / "kanka" / "seethe-ow-exports-world_20261023_074706.zip"
-SHA256 = "3bd998ae40ba8b62429c4803c6a4c72ba6b3bebd239e5232072e6b6968294580"
-CAMPAIGN = 430270
+EXPORT = Path(__file__).resolve().parent / "fixtures" / "kanka" / "quay-export-world_20261023_074706.zip"
+SHA256 = "b900ea8161fd2a32b971a53f71f208734d33d39a6a8f75f7cf9eac8adf10e5e4"
+CAMPAIGN = 910001  # the scrubbed campaign id (a real user's ids are keyed on their own)
 
 # entity ids (the number in each filename)
 ADA, MARA, QUAY, CROSSING, GUILD, LEDGER = 10074602, 10074603, 10074604, 10074605, 10074606, 10074607
@@ -328,6 +331,37 @@ def test_deterministic(tmp_path: Path) -> None:
     assert tree(tmp_path / "one") == tree(tmp_path / "two") == tree(tmp_path / "three")
 
 
+def test_ids_do_not_move_with_the_supertype(tmp_path: Path) -> None:
+    """No tool name in a supertype (Skeld, OW Market h40 #11385): the real export's ids are those
+    0.41.0 gave (the sha256 of the sorted ids, one a line; 0.41.0 run on the scrubbed file, whose
+    campaign id moved the ids from those it gave on the unscrubbed one)."""
+    out, _ = run(tmp_path)
+    ids = sorted(bodies(out))
+    assert len(ids) == 14
+    assert hashlib.sha256("\n".join(ids).encode()).hexdigest() == (
+        "18a80950ae202537f882f17ed9d793e17d0dcb837f834bdd13b9b63714828530"
+    )
+
+
+def test_a_module_with_no_type_is_an_article_narrative(tmp_path: Path) -> None:
+    """No module of the real export lacks a type: a planted timelines/ file, the note's own shape."""
+    data = files()
+    doc = json.loads(data["notes/the-ledger-of-the-first-crossing_10074607.json"])
+    doc["id"], doc["name"] = 346499, "The crossing timeline"
+    doc["entity"].update(id=10074699, entity_id=346499, name="The crossing timeline")
+    data["timelines/the-crossing-timeline_10074699.json"] = json.dumps(doc).encode()
+    src = tmp_path / "planted.zip"
+    with zipfile.ZipFile(src, "w") as zf:
+        for rel, raw in data.items():
+            zf.writestr(rel, raw)
+    out, report = run(tmp_path, src)
+    timeline = by_name(out)["The crossing timeline"]
+    assert timeline["type"] == "narrative"
+    assert (timeline["supertype"], timeline["subtype"]) == ("Article", "timelines")  # what it is, never kanka
+    assert timeline["x_kanka_type"] == "Ledger"  # the module's own type word, kept
+    assert "supertype Article, subtype 'timelines'" in report.render()
+
+
 def test_round_trip_is_byte_equal(tmp_path: Path) -> None:
     out, _ = run(tmp_path)
     folder = read_folder(out)
@@ -352,7 +386,7 @@ def test_world_json(tmp_path: Path) -> None:
     out, _ = run(tmp_path)
     world = json.loads((out / "world.json").read_text(encoding="utf-8"))
     assert world["id"] == str(uuid.uuid5(KANKA_NAMESPACE, f"kanka:{CAMPAIGN}"))
-    assert world["name"] == "seethe-ow-export's world"
+    assert world["name"] == "crew-export-user's world"  # the scrubbed username's
     assert world["producer"]["tool"] == "onlyworlds" and world["producer"]["input"] == "kanka-export"
     assert world["format_version"] == FORMAT_VERSION
     assert "description" not in world  # the campaign has no entry
