@@ -370,6 +370,34 @@ def test_a_server_that_serves_no_origin_is_sent_none(tmp_path: Path) -> None:
     assert calls == [("GET", None)] and res.origin is None
 
 
+def test_a_contributors_push_is_not_failed_by_the_owners_origin(tmp_path: Path) -> None:
+    write_folder(tmp_path / "base", WORLD, {"character": [wire_char(C1, "A")]})
+    write_folder(
+        tmp_path / "edit", {**WORLD, "source": ELSEWHERE, "producer": PRODUCER}, {"character": [wire_char(C1, "B")]}
+    )
+    elements = echo()
+
+    def handler(method: str, url: str, headers: Mapping[str, str], body: bytes | None) -> Response:
+        if not url.endswith("/world/"):
+            return elements(method, url, headers, body)
+        if method == "PATCH":
+            err = {"type": "permission_error", "code": "owner_only", "message": "Only the owner.", "param": None}
+            return jresp(403, {"error": err})
+        return jresp(200, {**WORLD, "origin": NO_ORIGIN})
+
+    t = FakeTransport(handler=handler)
+    res = push(
+        tmp_path / "base",
+        tmp_path / "edit",
+        client=Client("ow_w_testkey", "1234", transport=t),
+        log_path=tmp_path / "a.jsonl",
+        workers=1,
+    )
+    assert res.ok == 1 and not res.failed and res.origin is None  # the element landed; origin was not its to set
+    logged = [json.loads(line) for line in (tmp_path / "a.jsonl").read_text(encoding="utf-8").splitlines()]
+    assert any(r.get("type") == "world" and r.get("skipped") == "owner_only" for r in logged)
+
+
 def test_client_never_sends_world() -> None:
     c = Client("k", transport=FakeTransport())
     with pytest.raises(ValueError, match="world"):

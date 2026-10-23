@@ -482,6 +482,10 @@ def _set_first_origin(
         data = client.call("PATCH", "world/", body)
     except (ApiError, ConnectionError, ValueError) as exc:
         rec.update(code=exc.status if isinstance(exc, ApiError) else 0, error=str(exc)[:300])
+        if isinstance(exc, ApiError) and exc.status == 403 and exc.code == "owner_only":
+            # A contributor's or guest's key: the world's origin is the owner's and co-builders'
+            # to write. Logged as not theirs, never a failure of a push that did its own work.
+            rec["skipped"] = "owner_only"
     else:
         served = data.get("origin") if isinstance(data, dict) else None
         wrong = [k for k in _ORIGIN_KEYS if not isinstance(served, dict) or not _same(served.get(k), body[k])]
@@ -490,7 +494,7 @@ def _set_first_origin(
             result.origin = body
     fh.write(json.dumps(rec, ensure_ascii=True) + "\n")
     fh.flush()
-    if rec.get("code") != 200 or rec.get("mismatch"):
+    if (rec.get("code") != 200 or rec.get("mismatch")) and not rec.get("skipped"):
         result.failed.append(rec)
         if on_failure:
             on_failure(rec)
