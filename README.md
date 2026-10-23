@@ -146,6 +146,22 @@ print(report.render())
 
 Each Kanka module becomes its type: characters Characters, locations Locations, organisations Institutions, notes, quests and journals Narratives (the text in `story`), families, races, items, creatures, events, abilities and maps their types, and any other module a Narrative with supertype `kanka`. The entry becomes the description as Markdown, with the posts after it under their own headings; a mention becomes the entity's name. A location's parent becomes `parent_location`, a character's places `location`, its appearance and personality traits `physicality` and `mentality`, and an attribute named like a field (`Architecture`) fills it. A relationship becomes a Relation, and a two-way one is one Relation, not two. Exact duplicates (the same relationship or post made twice) fold into one, and the report names each fold. What Kanka hides stays hidden: a private entity is imported with `hidden: true`, a private post becomes its own hidden Narrative, and a visible entity's private details go into one hidden Narrative beside it, so nothing is dropped and nothing private turns public. Kanka's starter entries (`[Your Character Name]`, ...) are imported like the rest, since nothing in the data marks them, and the report names them. Everything without a field is kept as `x_kanka_<key>`. Ids come from Kanka's ids, so a second import of the same campaign gives the same elements. No AI. Read on a real Kanka 3.15 export of characters, locations, organisations and notes; the other modules are built on the same shape and have not been seen in a file yet.
 
+A world kept in World Anvil becomes a folder from World Anvil's own export (world settings, Export World, Export this World; free accounts get it). It opens a page, not a download: save that page from the browser as HTML, then:
+
+```bash
+python -m onlyworlds.worldanvil --file the-quay-world-export.html my-world --plan   # what would become what; writes nothing
+python -m onlyworlds.worldanvil --file the-quay-world-export.html my-world
+```
+
+```python
+from onlyworlds.worldanvil import import_worldanvil
+
+report = import_worldanvil("the-quay-world-export.html", "my-world")
+print(report.render())
+```
+
+Each article becomes its template's type: Character a Character, Species a Species, Geographic Location a Location (and Settlement, Organization, Item and a few more, by one table, `TEMPLATE_TYPES`); an article of any other template becomes a Narrative (supertype `worldanvil`, the template's name as subtype). The body becomes the description as Markdown. A link to another article becomes its name in the text, with the linked element kept by id in `x_worldanvil_mentions`; a mention World Anvil left unresolved (`@Ada`) stays as you typed it, and the report names it. A template field named like a field (`Height`) fills it; every other (`Gender`, `Eyes`) is kept as `x_worldanvil_<field>`. The article's category is kept as `x_worldanvil_category`. What World Anvil hides stays hidden: an article that is not public is imported with `hidden: true`, and a Secret block becomes its own hidden Narrative, so nothing is dropped and nothing private turns public. The report names every field, link, mention and hidden article, and anything in the page the door did not read. Ids come from World Anvil's article ids, so a later export of the same world gives the same elements. No AI. Read on two real exports of a small world on a free account (three articles, links, a category); private articles and Secrets (a paid feature) have not been seen in a file yet.
+
 ## Export to OKF
 
 A world folder can be exported as a valid [Open Knowledge Format](https://github.com/GoogleCloudPlatform/open-knowledge-format) (OKF) 0.2 bundle, as the spec stands at one pinned commit (`onlyworlds.okf.OKF_COMMIT`): one markdown file per element, with its fields in the frontmatter, its text under headings and its links (in-prose `ow://` references included) as markdown links, plus an index per type. This needs PyYAML, which the rest of the package does not:
