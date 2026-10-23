@@ -92,9 +92,21 @@ def _export(
     return json.loads((out / "world.json").read_text(encoding="utf-8")), t
 
 
+def test_an_export_carries_the_servers_origin_beside_its_own_lines(
+    tmp_path: Path, make_client: Callable[..., Client]
+) -> None:
+    first = {"source": None, "producer": {"tool": "lantern", "version": "0.9.0", "input": "bare"}}
+    world = {"id": WID, "name": "W", "public_read": False, "origin": first}
+    w, _ = _export(tmp_path, make_client, jresp(200, _me("owner", "owner")), world=world)
+    assert w["origin"] == first  # v0.3.16: the world's first import, as the server keeps it
+    assert isinstance(w["source"], dict) and w["source"]["world"] == WID  # this export's own line, fresh
+    w2, _ = _export(tmp_path / "b", make_client, jresp(200, _me("owner", "owner")))
+    assert "origin" not in w2  # none served, none written
+
+
 def test_world_json_says_where_it_came_from(tmp_path: Path, make_client: Callable[..., Client]) -> None:
     w, _ = _export(tmp_path, make_client, jresp(200, _me("owner", "owner")))
-    assert w["format_version"] == "0.3.15" == FORMAT_VERSION
+    assert w["format_version"] == "0.3.16" == FORMAT_VERSION
     src = w["source"]
     assert isinstance(src, dict) and list(src) == ["server", "world", "at"]
     assert src["server"] == "https://www.onlyworlds.com"  # the API origin, not the /api/v2 base

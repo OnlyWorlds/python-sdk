@@ -2,6 +2,11 @@
 
 The package version runs on its own semver; the schema it is generated from is `SCHEMA_DIST_TAG`.
 
+## 0.33.0 (2026-10-23)
+
+- **Folder format v0.3.16** (§4.2, the `origin` key; Keel #571): `FORMAT_VERSION` moves to `0.3.16`. `origin` is a world's first import, `{source, producer}` as the tool that made the world from a folder gave them, kept by the server and served on `GET /world`. The writer carries it as given, from `GET /world` (so `export_world` writes it beside the export's own fresh `source`, `exported_as` and `producer`) or from a read `world.json`, and never derives one: a world that has none gets none. Nothing else in the package changes; keel serves `origin` from Keel #571, and the push sends nothing new until then.
+- Tests: `world_for_disk` keeps a carried `origin` beside the folder's own `source` and derives none from `source` or `producer`; an export of a world serving `origin` writes it as served, and one serving none writes none. Each watched failing on a mutant that drops it and one that derives it.
+
 ## 0.32.0 (2026-10-23)
 
 - **Private records stay home** (folder format v0.3.15, OW-8's private clause, §4.5 rule 11). `write_world_file` and `world_file_bytes` take `include_private_records: bool = False`. By default they read `records/RECORDS.json` and leave out, whole, every file under `records/<producer>/` for each producer whose entry has `"private": true` (the JSON boolean only: `"true"` or `1` marks nothing), the producer's name matched to its directory by the archive's one fold (NFC, then simple case folding), so a manifest's `Fold` leaves out `records/fold/` on a disk that ignores case; `RECORDS.json` itself travels byte-exact, its private entries kept, so a reader learns a producer was left out rather than never there. No manifest, nothing is private. Asked (`include_private_records=True`), every producer's records travel whole and the manifest is not read. A manifest the writer cannot read (not UTF-8 JSON, not a JSON array of objects, or a private entry whose `producer` is not one directory name) is refused with a plain `ValueError` naming the file and the keyword, never a guess and never a new `WorldFileError` cause; asked, it travels as it is. No other writer in the package copies `records/`.

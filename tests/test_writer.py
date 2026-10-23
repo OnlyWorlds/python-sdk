@@ -81,6 +81,14 @@ def test_world_for_disk_rules() -> None:
     assert "snapshot_counts" not in linked  # v0.3.6: a non-snapshot MUST NOT carry it
     snap = world_for_disk({"id": "w", "name": "n", "snapshot_of": "s", "snapshot_counts": {"x": 9}}, {"character": 2})
     assert snap["snapshot_counts"] == {"character": 2}  # recounted from the files written, never carried
+    first = {
+        "source": {"server": "https://www.onlyworlds.com", "world": "w0", "at": "2026-10-01T09:00:00Z"},
+        "producer": {"tool": "atlas", "version": "1.82.0", "input": "bare"},
+    }
+    origin = world_for_disk({"id": "w", "name": "n", "origin": first, "source": src})
+    assert origin["origin"] == first and origin["source"] == src  # v0.3.16: carried as given, beside this folder's own
+    none = world_for_disk({"id": "w", "name": "n", "source": src, "producer": first["producer"]})
+    assert "origin" not in none  # v0.3.16: never derived from source or producer
     with pytest.raises(ValueError):
         world_for_disk({"name": "no id"})
     with pytest.raises(ValueError):

@@ -1,6 +1,6 @@
 """The OnlyWorlds world folder: filenames, the writer, the reader.
 
-Spec: OnlyWorlds Folder Format v0.3.15.
+Spec: OnlyWorlds Folder Format v0.3.16.
 Section numbers below are that document's.
 
 ::
@@ -60,7 +60,7 @@ __all__ = [
 ]
 
 #: The spec version this module writes and reads against (§4.2 ``format_version``).
-FORMAT_VERSION = "0.3.15"
+FORMAT_VERSION = "0.3.16"
 
 #: §4.4 (v0.3.10; keel PR 113): the stub marker. keel hands a guest an element it reaches only
 #: through its own Character's sheet as a stub, ``known_of: true``: these keys, its type's public
@@ -228,6 +228,9 @@ def world_for_disk(world: Mapping[str, Any], counts: Mapping[str, int] | None = 
       carried like any key, so a folder rewritten from a read one keeps its parent's
       verbatim, and one that has none gets none; ``export_world`` is what writes them
       fresh.
+    - ``origin`` (§4.2, v0.3.16) is the world's first import as the server keeps it: carried
+      as given, from ``GET /world`` or a read ``world.json``, never derived from ``source`` or
+      ``producer``; a world that has none gets none.
     """
     wid = world.get("id")
     if not isinstance(wid, str) or not wid:
