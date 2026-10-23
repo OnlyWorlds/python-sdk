@@ -32,6 +32,14 @@ A stub is never pushed (folder spec v0.3.10 §4.4 rule 3; keel PR 113): an eleme
 ``PushPlan.known_of`` (and ``PushResult.known_of``), not in the membership lists: its absent
 fields are unknown, not edits, and it is not the folder's to create or delete.
 
+An element whose folder copy carries ``hidden: true`` (the hidden mark, keel #421) and whose
+baseline copy does not is left out of the diff and listed in ``PushPlan.hidden`` (and
+``PushResult.hidden``): keel takes the mark only through ``PUT /{type}/{id}/hidden``, never in a
+write body, so a patch would edit an element every reader still sees. Nothing is sent for it; the
+owner hides it on the server first (the site, or a client's hide call), and the next push patches it
+as usual. A folder and a baseline that both carry the mark patch normally (Skeld's ruling, OW Market
+h40 #11232; until keel takes the mark on a create, folder spec §4 DRAFTED).
+
 A generic link's two halves (Pin's ``element_type`` / ``element_id``) go together when
 either changed: keel refuses a write that sets one half. The run stops at the first
 answer that refuses the key itself (``stops_run``): a wrong PIN repeated across a push
@@ -194,6 +202,9 @@ class PushPlan:
     #: ids that are a stub (``known_of: true``) in the folder or the baseline — never pushed (§4.4);
     #: a skip, not a membership difference, so they never make the plan ``unmatched``
     known_of: list[str] = field(default_factory=list)
+    #: ids whose folder copy carries ``hidden: true`` and whose baseline copy does not: nothing is
+    #: sent for them (keel takes the mark only by its own route, so a patch would edit a visible element)
+    hidden: list[str] = field(default_factory=list)
 
     @property
     def unmatched(self) -> bool:
@@ -232,6 +243,9 @@ def plan_push(baseline: Folder | str | os.PathLike[str], folder: Folder | str | 
         if b.type != f.type:
             plan.type_changed.append(eid)
             continue
+        if f.body.get("hidden") is True and b.body.get("hidden") is not True:
+            plan.hidden.append(eid)
+            continue
         old, new = wire_view(b), wire_view(f)
         keys = list(new) + [k for k in old if k not in new]
         changed = {
@@ -262,6 +276,8 @@ class PushResult:
     aborted: str | None = None
     #: the stubs left out (``PushPlan.known_of``, §4.4): never pushed
     known_of: list[str] = field(default_factory=list)
+    #: the elements marked hidden in the folder and not on the server (``PushPlan.hidden``): nothing sent
+    hidden: list[str] = field(default_factory=list)
     #: patches answered 202 this run (keel #519): held as proposals, the element unchanged; not in ``ok``
     proposed: int = 0
     #: patches a previous run's log shows proposed (202), not sent again: a resend would file a second proposal
@@ -374,6 +390,7 @@ def push(
         already_proposed=held,
         log_path=log,
         known_of=plan.known_of,
+        hidden=plan.hidden,
     )
     work = todo[:limit] if limit is not None else todo
     if dry_run:

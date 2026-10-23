@@ -472,3 +472,39 @@ def test_a_rerun_never_proposes_the_same_patch_twice(tmp_path: Path, make_client
     t3 = FakeTransport(handler=echo())
     res3 = push(base, edit2, client=make_client(t3), log_path=log)
     assert (res3.already_proposed, res3.ok) == (0, 1)
+
+
+def test_an_element_hidden_only_in_the_folder_is_withheld(tmp_path: Path, make_client: MakeClient) -> None:
+    # keel takes the hidden mark only by its own route: a patch would edit a visible element
+    # (Skeld's ruling, OW Market h40 #11232)
+    base, edit = folders(
+        tmp_path,
+        {"character": [wire_char(C1, "Gelon"), wire_char(C2, "Hieron")]},
+        {
+            "character": [
+                wire_char(C1, "Gelon", description="Tyrant of Gela", hidden=True),
+                wire_char(C2, "Hieron", description="Of Syracuse"),
+            ]
+        },
+    )
+    plan = plan_push(base, edit)
+    assert plan.hidden == [C1]
+    assert [p.id for p in plan.patches] == [C2]
+    assert not plan.unmatched
+    t = FakeTransport(handler=echo())
+    res = push(base, edit, client=make_client(t), log_path=tmp_path / "log.jsonl")
+    assert res.hidden == [C1]
+    assert res.ok == 1 and not res.failed
+    assert not [c for c in t.calls if C1 in c.url]
+    assert [c.method for c in t.calls if C2 in c.url].count("PATCH") == 1
+
+
+def test_an_element_hidden_on_both_sides_patches_as_usual(tmp_path: Path) -> None:
+    base, edit = folders(
+        tmp_path,
+        {"character": [wire_char(C1, "Gelon", hidden=True)]},
+        {"character": [wire_char(C1, "Gelon", description="Tyrant of Gela", hidden=True)]},
+    )
+    plan = plan_push(base, edit)
+    assert plan.hidden == []
+    assert [(p.id, p.fields) for p in plan.patches] == [(C1, {"description": "Tyrant of Gela"})]
