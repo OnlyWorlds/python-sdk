@@ -3,7 +3,7 @@
     python -m onlyworlds.pack PATH/TO/WORLD-FOLDER OUT-DIR [--words N] [--bytes N] [--files N]
     python -m onlyworlds.pack --api OUT-DIR [--base-url URL] [--words N] [--bytes N] [--files N]
 
-with ``--rooms`` and ``--extensions`` on either, or ``pack_folder``, ``pack_api`` and ``pack_world``
+with ``--rooms``, ``--proposed`` and ``--extensions`` on either, or ``pack_folder``, ``pack_api`` and ``pack_world``
 from Python. A person uploads the files into a notebook and asks about their world. The caps fit
 NotebookLM (50 sources per notebook, 500,000 words per source: Google's FAQ) and Claude Projects
 (30 MB per file), with a margin: by default 400,000 words, 25,000,000 bytes and 50 files.
@@ -37,9 +37,16 @@ Agent) · id ...*`` when the element's supertype has its own word. File names ke
 slugs, a link keeps the target's slug, and ``x_names`` is never printed among the world's fields.
 
 Left out unless asked: room elements (the room profile, ``room.is_room_element``; ``--rooms``
-keeps them) and extension keys (``x_``, ``atlas_``, ``shadow_``; ``--extensions`` keeps them),
-each counted in the report. Server keys (``push.NOT_SENT``) are never written; a key that is not
-a field of its type is a note.
+keeps them), proposed elements (``is_proposed``: an AI seat's new element carrying
+``x_review_proposed`` with a value, not yet settled by a keeper; ``--proposed`` keeps them) and
+extension keys (``x_``, ``atlas_``, ``shadow_``; ``--extensions`` keeps them), each counted in the
+report. A proposed element is not canon until a keeper settles it, and one handed on as canon is
+where a planted instruction would get through (keel #565; Skeld's ruling, h29 #11116): so the world
+file's opening lines count the proposed elements left out, and with ``--proposed`` each kept one is
+labelled ``proposed, not yet reviewed`` under its id line, on its index line and on every link to it
+(a link to one left out still resolves to its name, as a link to a room element does, labelled the
+same). Server keys (``push.NOT_SENT``) are never written; a key that is not a field of its type is
+a note.
 
 Sizing. A type's file past ``--words`` (whitespace-split) or ``--bytes`` (UTF-8) is split at
 element boundaries into ``NN-<type>-1.md``, ``NN-<type>-2.md``, ... each headed ``(part k of n)``;
@@ -96,6 +103,7 @@ __all__ = [
     "PackError",
     "PackReport",
     "build_pack",
+    "is_proposed",
     "main",
     "pack_api",
     "pack_folder",
@@ -115,6 +123,40 @@ INTRO_LINE = (
     "the other files hold the elements, by type. A link between elements is written as the name and type "
     "of the element it points to.*"
 )
+
+#: The mark on an AI seat's new element written while the world's ``agent_writes_proposed`` is on
+#: (keel #565): ``{by, evidence, expires}``; a keeper's accept writes it null.
+PROPOSED_MARK = "x_review_proposed"
+#: The label a kept proposed element carries, wherever it or a link to it is printed.
+PROPOSED_LABEL = "proposed, not yet reviewed"
+PROPOSED_LINE = (
+    "*Proposed, not yet reviewed: an AI agent wrote this element and a keeper has not accepted it; "
+    "it is not canon yet.*"
+)
+
+
+def is_proposed(body: Mapping[str, Any]) -> bool:
+    """True when the element carries ``x_review_proposed`` with any value but null (keel #565). A
+    null mark is a settled one (an accept writes null); a malformed value still counts as marked,
+    so a doubt leaves the element out rather than handing it on as canon."""
+    return body.get(PROPOSED_MARK) is not None
+
+
+def proposed_line(left_out: int, kept: int) -> str | None:
+    """The world file's opening line on proposed elements (Skeld, h29 #11116), None when there are none."""
+    if left_out:
+        many = left_out != 1
+        return (
+            f"*{left_out:,} element{'s' if many else ''} proposed by an AI agent and not yet reviewed by a keeper "
+            f"{'are' if many else 'is'} left out of this pack.*"
+        )
+    if kept:
+        n = "1 element here was" if kept == 1 else f"{kept:,} elements here were"
+        return (
+            f"*{n} proposed by an AI agent and not yet reviewed by a keeper; each is labelled "
+            f'"{PROPOSED_LABEL}" and is not canon yet.*'
+        )
+    return None
 
 
 def made_by_line(exported_as: Mapping[str, Any] | None, world: Mapping[str, Any] | None = None) -> str | None:
@@ -174,6 +216,11 @@ class PackReport:
     words: int = 0
     bytes: int = 0
     rooms_left_out: int = 0
+    #: elements carrying a ``x_review_proposed`` mark (``is_proposed``), not written (no ``proposed``);
+    #: one that is a room element too counts here, the stronger reason
+    proposed_left_out: int = 0
+    #: proposed elements written, each labelled (``proposed``)
+    proposed_kept: int = 0
     #: extension keys with a value, on elements and the world, not written (no ``--extensions``)
     extensions_left_out: int = 0
     #: elements written as known-of stubs (§4.4)
@@ -220,8 +267,9 @@ _SENTENCE_END = re.compile(r"(?<=[.!?])\s")
 
 
 class _World:
-    """The names every link resolves to (the whole world read, room elements too), the world's own
-    words for the types (its names map), and the report."""
+    """The names every link resolves to (the whole world read, room and proposed elements too), the
+    ids of the proposed ones (a link to one is labelled, kept or left out), the world's own words for
+    the types (its names map), and the report."""
 
     def __init__(
         self,
@@ -231,8 +279,11 @@ class _World:
         world: Mapping[str, Any] | None = None,
     ):
         self.names: dict[str, tuple[str, str]] = {}
+        self.proposed: set[str] = set()
         for slug, body in everything:
             self.names[body["id"]] = (_name(body), slug)
+            if is_proposed(body):
+                self.proposed.add(body["id"])
         self.report, self.note, self.world = report, note, world
         self.unknown: Counter[tuple[str, str]] = Counter()
 
@@ -259,6 +310,8 @@ class _World:
         title, actual = self.names[eid]
         if target and actual != target:
             self.note(f"{here}: `{name}` -> a {actual}, where the schema expects a {target}; written as it is")
+        if eid in self.proposed:
+            return f"{title} ({actual}, {PROPOSED_LABEL})"
         return f"{title} ({actual})"
 
     def prose(self, text: str, here: str | None = None, name: str = "") -> str:
@@ -272,6 +325,10 @@ class _World:
                 self.report.unresolved.append(f"{here}: `{name}` (prose) -> {eid}")
                 return m.group(0)
             title = self.names[eid][0]
+            if eid in self.proposed:
+                if not label or label.casefold() == title.casefold():
+                    return f"{m.group(1) if label else title} ({PROPOSED_LABEL})"
+                return f"{m.group(1)} ({title}, {PROPOSED_LABEL})"
             if not label or label.casefold() == title.casefold():
                 return title if not label else m.group(1)
             return f"{m.group(1)} ({title})"
@@ -298,6 +355,9 @@ def element_block(slug: str, body: Mapping[str, Any], w: _World, *, extensions: 
     if _kind(body):
         meta.append(_kind(body))
     head = [f"## {title}", "*" + " · ".join(meta) + "*"]
+    if is_proposed(body):  # only kept when asked (``proposed``); the label shows with or without extensions
+        head.append(PROPOSED_LINE)
+        w.report.proposed_kept += 1
     if is_known_of(body):
         head.append(KNOWN_OF_LINE)
         w.report.known_of += 1
@@ -412,6 +472,8 @@ def _index_line(body: Mapping[str, Any], w: _World) -> str:
     line = f"- **{_name(body)}**"
     if _kind(body):
         line += f" ({_kind(body)})"
+    if is_proposed(body):
+        line += f" *({PROPOSED_LABEL})*"
     first = w.first_sentence(body["description"]) if _set(body.get("description")) else ""
     return f"{line}: {first}" if first else line
 
@@ -430,13 +492,14 @@ def world_parts(
     words: int,
     bytes_: int,
     exported_as: Mapping[str, Any] | None = None,
+    proposed: str | None = None,
 ) -> list[_Part]:
     """00-world.md: the world's fields, then the index, one line per element by type. Past a cap,
     parts at index-line boundaries: the fields in the first, each later part headed
-    ``## Index (continued)``, a type's heading repeated ``(continued)`` where it runs on."""
+    ``## Index (continued)``, a type's heading repeated ``(continued)`` where it runs on.
+    ``proposed`` (``proposed_line``) follows the made-by line among the opening lines."""
     fields = _world_fields(world, w, extensions=extensions)
-    made = made_by_line(exported_as, world)
-    intro = f"{INTRO_LINE}\n\n{made}" if made else INTRO_LINE
+    intro = "\n\n".join(s for s in (INTRO_LINE, made_by_line(exported_as, world), proposed) if s)
     items = [(slug, _name(b), _index_line(b, w) + "\n") for slug in ELEMENT_TYPES for b in index.get(slug, [])]
 
     def head(k: int, n: int) -> str:
@@ -578,6 +641,7 @@ def build_pack(
     bytes_: int = DEFAULT_BYTES,
     files: int = DEFAULT_FILES,
     rooms: bool = False,
+    proposed: bool = False,
     extensions: bool = False,
     note: Note | None = None,
     exported_as: Mapping[str, Any] | None = None,
@@ -586,7 +650,8 @@ def build_pack(
 
     ``elements`` are (type slug, body). ``note`` is called with each note as it is made (they are
     also in ``report.notes``). ``exported_as`` (spec 4.2's line, or None) puts one line in the world
-    file saying which kind of key made the pack. Raises ValueError when a cap is below 1.
+    file saying which kind of key made the pack. ``rooms`` and ``proposed`` keep room and proposed
+    elements, left out by default. Raises ValueError when a cap is below 1.
     """
     for flag, cap in (("words", words), ("bytes", bytes_), ("files", files)):
         if not isinstance(cap, int) or cap < 1:
@@ -611,7 +676,11 @@ def build_pack(
 
     kept: dict[str, list[Mapping[str, Any]]] = {}
     for slug, body in valid:
-        if not rooms and is_room_element({**body, "type": slug}):
+        # Proposed first: an element that is both is counted as proposed (the stronger reason: not
+        # canon yet), and with ``proposed`` asked a room element is still left out as a room element.
+        if not proposed and is_proposed(body):
+            report.proposed_left_out += 1
+        elif not rooms and is_room_element({**body, "type": slug}):
             report.rooms_left_out += 1
         else:
             kept.setdefault(slug, []).append(body)
@@ -632,8 +701,9 @@ def build_pack(
     report.types = len(kept)
 
     head = world_parts(
-        world, world_title, kept, w, extensions=extensions, words=words, bytes_=bytes_, exported_as=exported_as
-    )
+        world, world_title, kept, w, extensions=extensions, words=words, bytes_=bytes_, exported_as=exported_as,
+        proposed=proposed_line(report.proposed_left_out, report.proposed_kept),
+    )  # fmt: skip
     report.files_over = not _merge(units, files - len(head) + 1, words, bytes_)
 
     named: list[tuple[str, _Part, bool]] = []  # (file name, part, a world part)
@@ -674,6 +744,7 @@ def pack_world(
     bytes_: int = DEFAULT_BYTES,
     files: int = DEFAULT_FILES,
     rooms: bool = False,
+    proposed: bool = False,
     extensions: bool = False,
     note: Note | None = None,
     exported_as: Mapping[str, Any] | None = None,
@@ -691,6 +762,7 @@ def pack_world(
         bytes_=bytes_,
         files=files,
         rooms=rooms,
+        proposed=proposed,
         extensions=extensions,
         note=note,
         exported_as=exported_as,
@@ -729,6 +801,7 @@ def pack_folder(
     bytes_: int = DEFAULT_BYTES,
     files: int = DEFAULT_FILES,
     rooms: bool = False,
+    proposed: bool = False,
     extensions: bool = False,
     note: Note | None = None,
 ) -> PackReport:
@@ -748,8 +821,8 @@ def pack_folder(
 
     elements = _folder_elements(folder, noted)
     report = pack_world(
-        folder.world, elements, out, words=words, bytes_=bytes_, files=files, rooms=rooms, extensions=extensions,
-        note=note, exported_as=folder.world.get("exported_as"),
+        folder.world, elements, out, words=words, bytes_=bytes_, files=files, rooms=rooms, proposed=proposed,
+        extensions=extensions, note=note, exported_as=folder.world.get("exported_as"),
     )  # fmt: skip
     report.notes[:0] = early
     return report
@@ -763,6 +836,7 @@ def pack_api(
     bytes_: int = DEFAULT_BYTES,
     files: int = DEFAULT_FILES,
     rooms: bool = False,
+    proposed: bool = False,
     extensions: bool = False,
     note: Note | None = None,
 ) -> PackReport:
@@ -792,6 +866,7 @@ def pack_api(
         bytes_=bytes_,
         files=files,
         rooms=rooms,
+        proposed=proposed,
         extensions=extensions,
         note=note,
         exported_as=slice_,
@@ -814,6 +889,10 @@ def _sentence(report: PackReport, out: object) -> str:
     extra = []
     if report.rooms_left_out:
         extra.append(f"{_plural(report.rooms_left_out, 'room element')} left out")
+    if report.proposed_left_out:
+        extra.append(f"{_plural(report.proposed_left_out, 'proposed element')} left out")
+    if report.proposed_kept:
+        extra.append(f"{_plural(report.proposed_kept, 'proposed element')} kept, labelled")
     if report.extensions_left_out:
         extra.append(f"{_plural(report.extensions_left_out, 'extension field')} left out")
     if report.known_of:
@@ -855,6 +934,11 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--bytes", type=_positive, default=DEFAULT_BYTES, help=f"bytes per file (default {DEFAULT_BYTES})")
     ap.add_argument("--files", type=_positive, default=DEFAULT_FILES, help=f"files at most (default {DEFAULT_FILES})")
     ap.add_argument("--rooms", action="store_true", help="keep room elements (the room profile); left out by default")
+    ap.add_argument(
+        "--proposed",
+        action="store_true",
+        help="keep proposed elements (x_review_proposed, not yet reviewed), each labelled; left out by default",
+    )
     ap.add_argument("--extensions", action="store_true", help="keep x_, atlas_ and shadow_ keys; left out by default")
     try:
         args = ap.parse_args(argv)
@@ -872,6 +956,7 @@ def main(argv: list[str] | None = None) -> int:
         "bytes_": args.bytes,
         "files": args.files,
         "rooms": args.rooms,
+        "proposed": args.proposed,
         "extensions": args.extensions,
     }
 
