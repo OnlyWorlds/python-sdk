@@ -693,6 +693,8 @@ def test_patch_world_drops_the_read_only_keys_keel_refuses(make_client: MakeClie
         "owner_character": None,
         # keel #571: served on every GET /world, an unknown key to PATCH (written as source and producer)
         "origin": {"source": {"server": "https://www.onlyworlds.com", "world": "w0", "at": "a"}, "producer": None},
+        # keel #421 PR 4: a keyless read's counts, an unknown key to PATCH (Quillon h29 #11241)
+        "counts": {"total": 1, "types": {"character": 1}},
     }
     make_client(t).patch_world(body)
     assert t.calls[0].body == {"name": "W", "owner_character": None}

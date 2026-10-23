@@ -125,6 +125,7 @@ def _refuse_known_of(element: Mapping[str, Any], where: str) -> None:
 #: ``agent_writes_proposed`` (keel #519) is ``readOnly`` in the document, set on the world page.
 #: ``origin`` (keel #571) is served on every body and is an unknown key to PATCH (422): it is written
 #: as the plain keys ``source`` and ``producer``, which a read body does not carry.
+#: ``counts`` (keel #421 PR 4) rides only a keyless ``GET /world`` and is an unknown key to PATCH (422).
 #: ``owner_character`` is not here: PATCH takes it (a 200 on staging).
 WORLD_READ_ONLY_FIELDS: tuple[str, ...] = (
     "id",
@@ -134,6 +135,7 @@ WORLD_READ_ONLY_FIELDS: tuple[str, ...] = (
     "agent_narrator_rule",
     "agent_writes_proposed",
     "origin",
+    "counts",
 )
 _DISK_TO_WIRE_WORLD_KEYS = {disk: wire for wire, disk in WIRE_TO_DISK_WORLD_KEYS.items()}
 #: ``patch_world``'s default for ``source=`` and ``producer=``: not sent (``None`` sends null).
