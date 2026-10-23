@@ -162,6 +162,22 @@ print(report.render())
 
 Each article becomes its template's type: Character a Character, Species a Species, Geographic Location a Location (and Settlement, Organization, Item, Ethnicity, Myth / Legend, Vehicle, Profession and a few more, by one table, `TEMPLATE_TYPES`); an article of any other template becomes a Narrative (supertype `Article`, the template's name as subtype). The body becomes the description as Markdown. A link to another article becomes its name in the text, with the linked element kept by id in `x_worldanvil_mentions`; a mention World Anvil left unresolved (`@Ada`) stays as you typed it, and the report names it. A template field named like a field (`Height`) fills it; every other (`Gender`, `Eyes`) is kept as `x_worldanvil_<field>`. The article's category is kept as `x_worldanvil_category`, and its creation, last update and publication dates as ISO dates (`x_worldanvil_created`, `_updated`, `_published`; a date the door cannot read exactly is kept as printed and named). The author is named in the report, never written into the world. What World Anvil hides stays hidden: an article that is not public is imported with `hidden: true`, and a Secret block becomes its own hidden Narrative, so nothing is dropped and nothing private turns public. The report names every field, link, mention and hidden article, and anything in the page the door did not read. Ids come from World Anvil's article ids, so a later export of the same world gives the same elements. No AI. Read on two real exports of a small world on a free account (three articles, links, a category); private articles and Secrets (a paid feature) have not been seen in a file yet.
 
+A project kept in Campfire becomes a folder from Campfire's own export (File, Export Elements, the html format, Select all Elements; free accounts get it). It is a document, not data, and the door reads it as one:
+
+```bash
+python -m onlyworlds.campfire --file "Campfire Export.html" my-world --plan   # what would become what; writes nothing
+python -m onlyworlds.campfire --file "Campfire Export.html" my-world --project "Harbour Town"
+```
+
+```python
+from onlyworlds.campfire import import_campfire
+
+report = import_campfire("Campfire Export.html", "my-world", project="Harbour Town")
+print(report.render())
+```
+
+Each element heading becomes an element, its description the description. The file names no module, so the type is read from the template's own panel words (a Basic Information panel with Place of Residence is a Character, Location Details a Location; Species, Cultures, Items, Languages, Religions, Philosophies, Systems, Magic and Maps are mapped too, by one table, `MODULE_TYPES`); anything else becomes a Narrative (supertype `Article`). The report names, for each element, the panel words its type was read from. Every filled panel value is kept as `x_campfire_<panel>_<label>` (`x_campfire_basic_information_full_name`), a text panel as `x_campfire_<panel>`; an em dash is empty and not written. A document carries no ids, no links and no hidden marks, and the report says so each time: ids come from each element's type and name, so a later export gives the same elements only while the names hold. The file names no project either: `--project NAME` names the world and keys every id on it, so two projects exported under Campfire's default title, "Campfire Export", stay apart; without it the world takes the document's title. The one link made is a Character's Place of Residence that names a Location in the same export. No AI. Read on one real export (a Character and a Location); the other modules have not been seen in a file yet.
+
 ## Export to OKF
 
 A world folder can be exported as a valid [Open Knowledge Format](https://github.com/GoogleCloudPlatform/open-knowledge-format) (OKF) 0.2 bundle, as the spec stands at one pinned commit (`onlyworlds.okf.OKF_COMMIT`): one markdown file per element, with its fields in the frontmatter, its text under headings and its links (in-prose `ow://` references included) as markdown links, plus an index per type. This needs PyYAML, which the rest of the package does not:

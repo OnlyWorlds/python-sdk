@@ -1,0 +1,1158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="generator" content="Campfire Export Server">
+  <title>Campfire Export</title>
+  <style>
+    
+/* Import fonts - using weights for better typography control */
+@import url('https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,300;0,400;0,700;1,400&family=Source+Sans+Pro:ital,wght@0,400;0,600;0,700;1,400&display=swap');
+
+/* ============================================================================
+   CSS Custom Properties (Design Tokens)
+   ============================================================================ */
+:root {
+  /* Color Palette */
+  --color-primary: #122A3B;
+  --color-primary-light: #34495e;
+  --color-secondary: #FD901E;
+  --color-accent: #ef7b01;
+  --color-text: #333333;
+  --color-text-light: #666666;
+  --color-text-muted: #888888;
+  --color-background: #ffffff;
+  --color-background-alt: #f8f9fa;
+  --color-background-sidebar: #f4f1eb;
+  --color-border: #e0e0e0;
+  --color-border-light: #eeeeee;
+  --color-divider: #FD901E;
+  
+  /* Typography Scale (based on 1.25 ratio) */
+  --font-size-xs: 0.64rem;
+  --font-size-sm: 0.8rem;
+  --font-size-base: 1rem;
+  --font-size-md: 1.1rem;
+  --font-size-lg: 1.25rem;
+  --font-size-xl: 1.563rem;
+  --font-size-2xl: 1.953rem;
+  --font-size-3xl: 2.441rem;
+  --font-size-4xl: 3.052rem;
+  
+  /* Spacing Scale */
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+  --spacing-2xl: 3rem;
+  --spacing-3xl: 4rem;
+  
+  /* Font Families */
+  --font-heading: 'Merriweather', Georgia, 'Times New Roman', serif;
+  --font-body: 'Source Sans Pro', 'Helvetica Neue', Arial, sans-serif;
+  
+  /* Line Heights */
+  --line-height-tight: 1.25;
+  --line-height-normal: 1.6;
+  --line-height-relaxed: 1.75;
+}
+
+/* ============================================================================
+   Base Typography
+   ============================================================================ */
+body {
+  font-family: var(--font-body);
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-normal);
+  color: var(--color-text);
+  background-color: var(--color-background);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Headings */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  line-height: var(--line-height-tight);
+  color: var(--color-primary);
+  margin-top: var(--spacing-xl);
+  margin-bottom: var(--spacing-md);
+  page-break-after: avoid;
+}
+
+h1 {
+  font-size: var(--font-size-4xl);
+  letter-spacing: -0.02em;
+  border-bottom: 3px solid var(--color-divider);
+  padding-bottom: var(--spacing-md);
+  margin-top: 0;
+}
+
+h2 {
+  font-size: var(--font-size-3xl);
+  letter-spacing: -0.01em;
+  border-bottom: 2px solid var(--color-border);
+  padding-bottom: var(--spacing-sm);
+}
+
+h3 {
+  font-size: var(--font-size-2xl);
+  color: var(--color-primary-light);
+}
+
+h4 {
+  font-size: var(--font-size-xl);
+  font-weight: 600;
+}
+
+h5 {
+  font-size: var(--font-size-lg);
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+h6 {
+  font-size: var(--font-size-md);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-text-light);
+}
+
+/* Paragraphs and Body Text */
+p {
+  font-family: var(--font-body);
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-normal);
+  margin-top: 0;
+  margin-bottom: var(--spacing-md);
+  orphans: 3;
+  widows: 3;
+}
+
+a {
+  font-family: var(--font-body);
+  color: var(--color-secondary);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.2s ease;
+}
+
+a:hover {
+  border-bottom-color: var(--color-secondary);
+}
+
+/* Lists */
+ul, ol {
+  font-family: var(--font-body);
+  padding-left: var(--spacing-lg);
+  margin-top: 0;
+  margin-bottom: var(--spacing-md);
+}
+
+li {
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-normal);
+  margin-bottom: var(--spacing-sm);
+  padding-left: var(--spacing-xs);
+}
+
+ul li::marker {
+  color: var(--color-secondary);
+}
+
+ol li::marker {
+  color: var(--color-primary);
+  font-weight: 600;
+}
+
+/* Nested lists */
+ul ul, ol ol, ul ol, ol ul {
+  margin-top: var(--spacing-sm);
+  margin-bottom: 0;
+}
+
+/* Blockquotes */
+blockquote {
+  font-family: var(--font-heading);
+  font-size: var(--font-size-md);
+  font-style: italic;
+  line-height: var(--line-height-relaxed);
+  color: var(--color-text-light);
+  margin: var(--spacing-xl) 0;
+  padding: var(--spacing-lg) var(--spacing-xl);
+  border-left: 4px solid var(--color-divider);
+  background: linear-gradient(135deg, var(--color-background-alt) 0%, transparent 100%);
+  position: relative;
+}
+
+blockquote::before {
+  content: '"';
+  position: absolute;
+  top: -10px;
+  left: var(--spacing-md);
+  font-size: var(--font-size-4xl);
+  color: var(--color-divider);
+  font-family: Georgia, serif;
+  opacity: 0.5;
+}
+
+blockquote footer {
+  font-family: var(--font-body);
+  font-style: normal;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+  margin-top: var(--spacing-md);
+  text-align: right;
+}
+
+blockquote footer::before {
+  content: '— ';
+}
+
+/* Horizontal Rules */
+hr {
+  border: none;
+  height: 1px;
+  background: linear-gradient(to right, transparent, var(--color-border), transparent);
+  margin: var(--spacing-xl) 0;
+}
+
+/* Images */
+img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 4px;
+}
+
+/* Strong and Emphasis */
+strong, b {
+  font-weight: 700;
+  color: var(--color-primary);
+}
+
+em, i {
+  font-style: italic;
+}
+
+/* Code and Preformatted */
+code {
+  font-family: 'Consolas', 'Monaco', monospace;
+  font-size: 0.9em;
+  background-color: var(--color-background-alt);
+  padding: 0.15em 0.4em;
+  border-radius: 3px;
+  border: 1px solid var(--color-border-light);
+}
+
+/* Small text */
+small {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+
+/* Selection styling */
+::selection {
+  background-color: var(--color-accent);
+  color: white;
+}
+
+/* Print-specific base styles */
+@media print {
+  body {
+    font-size: 11pt;
+  }
+  
+  h1 {
+    font-size: 24pt;
+  }
+  
+  h2 {
+    font-size: 18pt;
+  }
+  
+  h3 {
+    font-size: 14pt;
+  }
+  
+  h4 {
+    font-size: 12pt;
+  }
+  
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+  
+  a[href]:after {
+    content: none;
+  }
+}
+
+    
+/* ============================================================================
+   Document Structure
+   ============================================================================ */
+.title {
+  text-align: center;
+  margin-bottom: var(--spacing-2xl);
+}
+
+.header-image {
+  text-align: center;
+  margin-bottom: var(--spacing-2xl);
+}
+
+.header-image img {
+  max-width: 200px;
+  height: auto;
+}
+
+.header, .subheader {
+  text-align: center;
+}
+
+.subtitle {
+  font-family: var(--font-body);
+  font-size: var(--font-size-lg);
+  font-weight: 400;
+  font-style: italic;
+  color: var(--color-text-light);
+  margin-top: calc(var(--spacing-md) * -1);
+  margin-bottom: var(--spacing-lg);
+  text-align: center;
+}
+
+/* ============================================================================
+   Panel Styling
+   ============================================================================ */
+.panel-header {
+  font-size: var(--font-size-xl);
+  color: var(--color-primary);
+  text-align: left;
+  margin-top: var(--spacing-xl);
+  margin-bottom: var(--spacing-md);
+  padding-bottom: var(--spacing-sm);
+  border-bottom: 2px solid var(--color-divider);
+}
+
+.panel-header + hr {
+  display: none;
+}
+
+/* Panel containers */
+.text-panel,
+.list-panel,
+.stats-panel,
+.custom-panel,
+.links-panel,
+.research-panel {
+  margin-bottom: var(--spacing-xl);
+}
+
+/* Panel divider */
+.panel-header ~ hr {
+  margin: var(--spacing-xl) 0;
+  border: none;
+  height: 1px;
+  background: linear-gradient(to right, var(--color-border), transparent);
+}
+
+/* ============================================================================
+   Article & Sidebar Layout
+   ============================================================================ */
+.sidebar-container {
+  background: linear-gradient(145deg, var(--color-background-sidebar) 0%, #ebe7df 100%);
+  border-radius: 8px;
+  padding: var(--spacing-lg);
+  margin-bottom: var(--spacing-xl);
+  border: 1px solid var(--color-border);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.sidebar-container h4,
+.sidebar-container h5 {
+  color: var(--color-primary);
+  margin-top: var(--spacing-md);
+}
+
+.sidebar-container h4:first-child,
+.sidebar-container h5:first-child {
+  margin-top: 0;
+}
+
+.sidebar-container .image-panel {
+  text-align: center;
+  margin-bottom: var(--spacing-md);
+}
+
+.sidebar-container .image-panel img {
+  max-width: 100%;
+  border-radius: 6px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+}
+
+.article-body {
+  margin-top: var(--spacing-lg);
+}
+
+.article-body > * {
+  margin-bottom: var(--spacing-lg);
+}
+
+.article-body > h4,
+.article-body > h5,
+.article-body > h6 {
+  margin-top: var(--spacing-xl);
+}
+
+/* ============================================================================
+   Table Styling
+   ============================================================================ */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: var(--spacing-lg) 0;
+  font-size: var(--font-size-sm);
+  page-break-inside: avoid;
+}
+
+thead {
+  background: linear-gradient(to bottom, var(--color-primary) 0%, var(--color-primary-light) 100%);
+}
+
+th {
+  font-family: var(--font-body);
+  font-weight: 600;
+  text-align: left;
+  padding: var(--spacing-md);
+  color: white;
+  border: none;
+  text-transform: uppercase;
+  font-size: var(--font-size-xs);
+  letter-spacing: 0.05em;
+}
+
+td {
+  padding: var(--spacing-md);
+  border-bottom: 1px solid var(--color-border-light);
+  vertical-align: top;
+}
+
+tr:nth-child(even) {
+  background-color: var(--color-background-alt);
+}
+
+tr:hover {
+  background-color: rgba(201, 162, 39, 0.05);
+}
+
+/* First column styling */
+td:first-child {
+  font-weight: 500;
+}
+
+/* ============================================================================
+   Section Headers
+   ============================================================================ */
+.section-header {
+  font-family: var(--font-heading);
+  font-weight: 600;
+  font-size: var(--font-size-lg);
+  color: var(--color-primary);
+  border-bottom: 2px solid var(--color-border);
+  padding-bottom: var(--spacing-sm);
+  margin-top: var(--spacing-xl);
+  margin-bottom: var(--spacing-md);
+}
+
+.section-header h4 {
+  margin: 0;
+  font-size: inherit;
+  color: inherit;
+  border: none;
+  padding: 0;
+}
+
+/* ============================================================================
+   List Panel Styling
+   ============================================================================ */
+.list-panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+.list-panel h5 {
+  color: var(--color-primary);
+  margin-bottom: var(--spacing-sm);
+  font-size: var(--font-size-md);
+}
+
+.list-panel .list-item {
+  display: flex;
+  gap: var(--spacing-md);
+  padding: var(--spacing-md);
+  background-color: var(--color-background-alt);
+  border-radius: 6px;
+  border-left: 3px solid var(--color-secondary);
+  break-inside: avoid;
+}
+
+.list-image {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 6px;
+  flex-shrink: 0;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* ============================================================================
+   Stats Panel Styling
+   ============================================================================ */
+.stats-panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.stats-panel .item {
+  display: flex;
+  align-items: baseline;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-md);
+  background-color: var(--color-background-alt);
+  border-radius: 4px;
+  margin-bottom: var(--spacing-xs);
+  break-inside: avoid;
+}
+
+.stats-panel .name {
+  font-weight: 600;
+  color: var(--color-primary);
+  text-decoration: none;
+  min-width: 120px;
+}
+
+.stats-panel .name::after {
+  content: '';
+}
+
+.stats-panel .units {
+  font-style: italic;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+
+.stats-panel .section-header {
+  background: none;
+  padding-left: 0;
+}
+
+/* ============================================================================
+   Custom Panel Styling
+   ============================================================================ */
+.custom-panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.custom-panel > div {
+  display: flex;
+  align-items: baseline;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm) 0;
+  border-bottom: 1px solid var(--color-border-light);
+  break-inside: avoid;
+}
+
+.custom-panel > div:last-child {
+  border-bottom: none;
+}
+
+.custom-panel strong {
+  font-weight: 600;
+  color: var(--color-primary);
+  min-width: 140px;
+  flex-shrink: 0;
+}
+
+/* Color swatch in custom fields */
+.custom-panel div[style*="background-color"] {
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+  display: inline-block;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.1);
+}
+
+/* ============================================================================
+   Image Panel Styling
+   ============================================================================ */
+.image-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-lg);
+  margin: var(--spacing-lg) 0;
+}
+
+.image-panel img {
+  max-width: 100%;
+  max-height: 500px;
+  object-fit: contain;
+  border-radius: 6px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+}
+
+.image-panel p {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-light);
+  font-style: italic;
+  text-align: center;
+  margin-top: calc(var(--spacing-md) * -1);
+}
+
+.images-wrapper {
+  display: flex;
+  justify-content: center;
+  gap: var(--spacing-lg);
+  flex-wrap: wrap;
+  margin: var(--spacing-lg) 0;
+}
+
+.images-wrapper > * {
+  flex: 1 1 200px;
+  max-width: 300px;
+}
+
+.img-wrapper {
+  display: flex;
+  justify-content: center;
+  margin: var(--spacing-lg) 0;
+}
+
+.img-wrapper img {
+  border-radius: 6px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+}
+
+.thumbnail {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.thumbnail img {
+  border-radius: 6px;
+}
+
+/* ============================================================================
+   Research Panel Styling
+   ============================================================================ */
+.research-panel {
+  background-color: var(--color-background-alt);
+  border-radius: 8px;
+  padding: var(--spacing-lg);
+  border-left: 4px solid var(--color-secondary);
+}
+
+.research-panel em {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+  display: block;
+  margin-bottom: var(--spacing-md);
+}
+
+.research-panel video {
+  max-width: 100%;
+  border-radius: 6px;
+}
+
+/* ============================================================================
+   Quote Styling (Article blocks)
+   ============================================================================ */
+.quote-block {
+  margin: var(--spacing-xl) var(--spacing-lg);
+}
+
+/* ============================================================================
+   Media Container
+   ============================================================================ */
+.media-container {
+  margin: var(--spacing-lg) 0;
+  text-align: center;
+}
+
+.media-container video {
+  max-width: 100%;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+}
+
+/* ============================================================================
+   Feature Links
+   ============================================================================ */
+.feature-links-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-md);
+  margin: var(--spacing-lg) 0;
+}
+
+.feature-links-container a {
+  display: inline-block;
+  padding: var(--spacing-sm) var(--spacing-md);
+  background-color: var(--color-background-alt);
+  border-radius: 4px;
+  border: 1px solid var(--color-border);
+  color: var(--color-secondary);
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.feature-links-container a:hover {
+  background-color: var(--color-secondary);
+  color: white;
+  border-color: var(--color-secondary);
+}
+
+/* ============================================================================
+   Links Panel
+   ============================================================================ */
+.links-panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.link-item {
+  display: flex;
+  gap: var(--spacing-md);
+  padding: var(--spacing-md);
+  background-color: var(--color-background-alt);
+  border-radius: 6px;
+  border-left: 3px solid var(--color-secondary);
+  align-items: center;
+  break-inside: avoid;
+}
+
+.link-image-wrapper {
+  flex-shrink: 0;
+}
+
+.link-thumbnail {
+  width: 40px;
+  height: 40px;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.link-initials {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-weight: 600;
+  font-size: 14px;
+  letter-spacing: 0.5px;
+}
+
+.link-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.link-name {
+  font-weight: 600;
+  color: var(--color-primary);
+  font-size: var(--font-size-base);
+}
+
+.link-type {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+  font-style: italic;
+}
+
+.link-description {
+  font-size: var(--font-size-sm);
+  color: var(--color-text);
+  margin-top: 2px;
+}
+
+/* ============================================================================
+   Page Breaks & Print Utilities
+   ============================================================================ */
+.pb_before { 
+  page-break-before: always !important;
+  break-before: page !important;
+}
+
+.pb_after { 
+  page-break-after: always !important;
+  break-after: page !important;
+}
+
+.pbi_avoid { 
+  page-break-inside: avoid !important;
+  break-inside: avoid !important;
+}
+
+/* ============================================================================
+   Footer Styling (Gift Templates)
+   ============================================================================ */
+.footer {
+  text-align: center;
+  margin-top: var(--spacing-3xl);
+  padding-top: var(--spacing-xl);
+  border-top: 1px solid var(--color-border);
+}
+
+.footer-header {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+  margin-bottom: var(--spacing-sm);
+}
+
+.footer-website {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+
+/* ============================================================================
+   Utility Classes
+   ============================================================================ */
+.center {
+  text-align: center;
+}
+
+.singlespace {
+  margin: var(--spacing-xs) 0;
+}
+
+.translucent {
+  opacity: 0.8;
+}
+
+/* ============================================================================
+   Manuscript-Specific Styling
+   ============================================================================ */
+.manuscript-content {
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.manuscript-content p {
+  margin-bottom: var(--spacing-sm);
+}
+
+.manuscript-content h1,
+.manuscript-content h2,
+.manuscript-content h3,
+.manuscript-content h4,
+.manuscript-content h5 {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.notes-section {
+  margin-top: var(--spacing-3xl);
+  padding-top: var(--spacing-xl);
+  border-top: 2px solid var(--color-divider);
+}
+
+.notes-section h2 {
+  color: var(--color-text-light);
+  font-size: var(--font-size-xl);
+}
+
+/* ============================================================================
+   Language Export Styling
+   ============================================================================ */
+.language-export {
+  margin-top: var(--spacing-lg);
+}
+
+.language-section {
+  margin-bottom: var(--spacing-2xl);
+}
+
+.language-section-title {
+  font-family: var(--font-heading);
+  font-size: var(--font-size-xl);
+  color: var(--color-primary);
+  border-bottom: 2px solid var(--color-divider);
+  padding-bottom: var(--spacing-sm);
+  margin-bottom: var(--spacing-lg);
+}
+
+/* Phonetics Table */
+.phonetics-table-wrapper {
+  overflow-x: auto;
+  margin-bottom: var(--spacing-lg);
+}
+
+.phonetics-table .phonetics-symbol-cell {
+  text-align: center;
+  font-size: 1.5rem;
+  min-width: 60px;
+  font-weight: 600;
+}
+
+.phonetics-table .phonetics-pronunciation-cell {
+  font-style: italic;
+  color: var(--color-text-light);
+  min-width: 100px;
+}
+
+.phonetics-table .phonetics-details-cell {
+  font-size: var(--font-size-sm);
+}
+
+.symbol-image {
+  max-width: 40px;
+  max-height: 40px;
+  vertical-align: middle;
+}
+
+.symbol-image-inline {
+  height: 1em;
+  width: auto;
+  vertical-align: baseline;
+}
+
+.symbol-description {
+  margin-bottom: var(--spacing-sm);
+}
+
+.symbol-modifiers {
+  margin-top: var(--spacing-sm);
+}
+
+.modifiers-label {
+  font-weight: 600;
+  font-size: var(--font-size-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-text-muted);
+  margin: 0 0 var(--spacing-xs) 0;
+}
+
+.modifiers-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.modifier-item {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  background: var(--color-background-alt);
+  border-radius: 4px;
+  font-size: var(--font-size-sm);
+}
+
+.modifier-condition {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+}
+
+.modifier-notes {
+  color: var(--color-text-light);
+  font-style: italic;
+  font-size: var(--font-size-xs);
+}
+
+/* Dictionary */
+.dictionary-entries {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.dictionary-entry {
+  padding: var(--spacing-md);
+  border-left: 3px solid var(--color-secondary);
+  background: var(--color-background-alt);
+  border-radius: 0 6px 6px 0;
+  page-break-inside: avoid;
+}
+
+.dictionary-entry-header {
+  display: flex;
+  align-items: baseline;
+  gap: var(--spacing-sm);
+  flex-wrap: wrap;
+  margin-bottom: var(--spacing-xs);
+}
+
+.dictionary-word {
+  font-size: var(--font-size-lg);
+  font-weight: 700;
+  color: var(--color-primary);
+}
+
+.dictionary-pronunciation {
+  font-style: italic;
+  color: var(--color-text-light);
+  font-size: var(--font-size-md);
+}
+
+.dictionary-pos {
+  font-size: var(--font-size-sm);
+  color: white;
+  background: var(--color-primary);
+  padding: 0.1em 0.5em;
+  border-radius: 3px;
+  text-transform: lowercase;
+  font-style: italic;
+}
+
+.dictionary-definition {
+  margin-top: var(--spacing-xs);
+  font-size: var(--font-size-md);
+  color: var(--color-text);
+}
+
+.dictionary-notes {
+  margin-top: var(--spacing-sm);
+  padding-top: var(--spacing-sm);
+  border-top: 1px solid var(--color-border-light);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-light);
+}
+
+.dictionary-note {
+  margin-bottom: var(--spacing-xs);
+}
+
+/* ============================================================================
+   Print Optimization
+   ============================================================================ */
+@media print {
+  .sidebar-container {
+    background: var(--color-background-alt) !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  
+  table thead {
+    background: var(--color-primary) !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  
+  th {
+    color: white !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  
+  .image-panel img,
+  .img-wrapper img {
+    box-shadow: none;
+    border: 1px solid var(--color-border);
+  }
+  
+  a {
+    color: var(--color-text) !important;
+  }
+}
+
+    
+  </style>
+</head>
+<body>
+  <div class="document-wrapper">
+    
+    <h1 class="title document-title">Campfire Export</h1>
+    <main class="document-content">
+      <div class="export-collection"><section class="export-item "><header class="item-header"><h2 class="item-title">Ada Okafor</h2><div class="item-description"><p style="line-height: 140%; margin: 0;"><span style="font-size: 12pt; ">The ferry’s ledger-keeper on the quay.</span></p>
+</div></header><div class="pages-collection"><div class="page-wrapper"><section class="page-section"><header class="page-header"><h3 class="page-title">Overview</h3></header><div class="page-panels">
+    <section class="panel-section panel-custom">
+      <h4 class="panel-header">Basic Information</h4>
+      <div class="panel-content">
+        <dl class="custom-panel attributes-list"><div class="attribute-row"><dt class="attribute-label">Full Name</dt><dd class="attribute-value"><p style="line-height: 140%; margin: 0;"><span style="font-size: 12pt; ">Ada Okafor</span></p>
+</dd></div><div class="attribute-row"><dt class="attribute-label">Origin Country</dt><dd class="attribute-value"><span class="no-value">—</span></dd></div><div class="attribute-row"><dt class="attribute-label">Place of Residence</dt><dd class="attribute-value"><p style="line-height: 140%; margin: 0;"><span style="font-size: 12pt; ">The quay</span></p>
+</dd></div><div class="attribute-row"><dt class="attribute-label">Gender</dt><dd class="attribute-value"><span class="no-value">—</span></dd></div><div class="attribute-row"><dt class="attribute-label">Formal Education</dt><dd class="attribute-value"><span class="no-value">—</span></dd></div><div class="attribute-row"><dt class="attribute-label">Occupation</dt><dd class="attribute-value"><span class="no-value">—</span></dd></div></dl>
+      </div>
+    </section>
+  
+    <section class="panel-section panel-text">
+      <h4 class="panel-header">Bio</h4>
+      <div class="panel-content">
+        <div class="text-panel text-content"><p style="line-height: 140%; margin: 0;"><span style="font-size: 12pt; ">Keeps the ferry’s ledger and knows every name that crossed. Mara Voss owes her a fare.</span></p>
+</div>
+      </div>
+    </section>
+  </div></section></div></div></section><section class="export-item pb_before"><header class="item-header"><h2 class="item-title">The Ferry Quay</h2><div class="item-description"><p style="line-height: 140%; margin: 0;"><span style="font-size: 12pt; ">The stone landing where the ferry ties up and the ledger is kept.</span></p>
+</div></header><div class="pages-collection"><div class="page-wrapper"><section class="page-section"><header class="page-header"><h3 class="page-title">Overview</h3></header><div class="page-panels">
+    <section class="panel-section panel-custom">
+      <h4 class="panel-header">Location Details</h4>
+      <div class="panel-content">
+        <dl class="custom-panel attributes-list"><div class="attribute-row"><dt class="attribute-label">Location Type</dt><dd class="attribute-value"><span class="no-value">—</span></dd></div><div class="attribute-row"><dt class="attribute-label">Location Age</dt><dd class="attribute-value"><span class="number-value">0</span></dd></div><div class="attribute-row"><dt class="attribute-label">Created/Built by</dt><dd class="attribute-value"><span class="no-value">—</span></dd></div><div class="attribute-row"><dt class="attribute-label">Date Created/Built</dt><dd class="attribute-value"><p style="line-height: 140%; margin: 0;"><span style="font-size: 12pt; "><br /></span></p>
+</dd></div><div class="attribute-row"><dt class="attribute-label">Purpose of Construction</dt><dd class="attribute-value"><p style="line-height: 140%; margin: 0;"><span style="font-size: 12pt; "><br /></span></p>
+</dd></div></dl>
+      </div>
+    </section>
+  
+    <section class="panel-section panel-text">
+      <h4 class="panel-header">Overview</h4>
+      <div class="panel-content">
+        <div class="text-panel text-content"><p style="line-height: 140%; margin: 0;"><span style="font-size: 12pt; "><br /></span></p>
+</div>
+      </div>
+    </section>
+  
+    <section class="panel-section panel-text">
+      <h4 class="panel-header">Geography</h4>
+      <div class="panel-content">
+        <div class="text-panel text-content"><p style="line-height: 140%; margin: 0;"><span style="font-size: 12pt; "><br /></span></p>
+</div>
+      </div>
+    </section>
+  
+    <section class="panel-section panel-custom">
+      <h4 class="panel-header">Basic Information</h4>
+      <div class="panel-content">
+        <dl class="custom-panel attributes-list"><div class="attribute-row"><dt class="attribute-label">Area</dt><dd class="attribute-value"><span class="number-value">0</span></dd></div><div class="attribute-row"><dt class="attribute-label">Ethnic Groups</dt><dd class="attribute-value"><span class="no-value">—</span></dd></div><div class="attribute-row"><dt class="attribute-label">Languages</dt><dd class="attribute-value"><span class="no-value">—</span></dd></div><div class="attribute-row"><dt class="attribute-label">Population</dt><dd class="attribute-value"><span class="number-value">0</span></dd></div><div class="attribute-row"><dt class="attribute-label">Average Temperature</dt><dd class="attribute-value"><span class="number-value">0</span></dd></div><div class="attribute-row"><dt class="attribute-label">Biome</dt><dd class="attribute-value"><span class="no-value">—</span></dd></div><div class="attribute-row"><dt class="attribute-label">Natural Resources</dt><dd class="attribute-value"><span class="no-value">—</span></dd></div><div class="attribute-row"><dt class="attribute-label">Aliases</dt><dd class="attribute-value"><span class="no-value">—</span></dd></div></dl>
+      </div>
+    </section>
+  
+    <section class="panel-section panel-text">
+      <h4 class="panel-header">Government</h4>
+      <div class="panel-content">
+        <div class="text-panel text-content"><p style="line-height: 140%; margin: 0;"><span style="font-size: 12pt; "><br /></span></p>
+</div>
+      </div>
+    </section>
+  
+    <section class="panel-section panel-text">
+      <h4 class="panel-header">History</h4>
+      <div class="panel-content">
+        <div class="text-panel text-content"><p style="line-height: 140%; margin: 0;"><span style="font-size: 12pt; "><br /></span></p>
+</div>
+      </div>
+    </section>
+  </div></section></div></div></section></div>
+    </main>
+  </div>
+</body>
+</html>
