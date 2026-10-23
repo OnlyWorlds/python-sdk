@@ -42,6 +42,16 @@ proposals): the element did not change, so it is neither pushed nor failed. It i
 ``PushResult.proposed``, logged with ``code: 202`` and its ``proposal`` id, never retried, and a
 rerun never sends that same patch again (``PushResult.already_proposed``): it would only file a
 second proposal. Whether a keeper accepted it shows in a fresh export (``verify_level``).
+
+The world's ``origin`` (keel #571, folder format §4.2) is a world's birth line, written once: a
+push sets it only on a first fill from a folder made elsewhere, never from a folder exported from
+the same world, and never over a first import. After the element patches (not on a dry run, not
+after a run that stopped), the push reads ``GET /world``; when its ``origin`` is null in both keys
+(a server that serves no ``origin`` counts as set) and the folder's ``source.world`` is not that
+world's id (a folder with no ``source`` line passes), it sends the folder's ``source`` and
+``producer`` from ``world.json`` as they are, a missing one as null, in one ``PATCH /world``. It
+is logged and read back like a patch, landed in ``PushResult.origin``, and a failure is in
+``PushResult.failed`` (``type: "world"``). ``Client.patch_world`` never sends the two.
 """
 
 from __future__ import annotations
@@ -255,6 +265,30 @@ class PushResult:
     proposed: int = 0
     #: patches a previous run's log shows proposed (202), not sent again: a resend would file a second proposal
     already_proposed: int = 0
+    #: the ``{source, producer}`` this run set as the world's ``origin`` (a first fill, see the module
+    #: docstring), read back as sent; None when it sent none or it did not land
+    origin: dict[str, Any] | None = None
+
+
+_ORIGIN_KEYS = ("source", "producer")
+
+
+def _origin_to_send(world: Mapping[str, Any], folder_world: Mapping[str, Any] | None) -> dict[str, Any] | None:
+    """The ``PATCH /world`` body that sets ``world``'s origin from the folder's ``world.json``, or None.
+
+    Only on a first fill: the served ``origin`` null in both keys (absent counts as set: an older
+    server), and the folder not exported from this same world (``source.world`` is not its id).
+    """
+    origin = world.get("origin")
+    if not isinstance(origin, dict) or any(k not in origin or origin[k] is not None for k in _ORIGIN_KEYS):
+        return None
+    body = {k: (folder_world or {}).get(k) for k in _ORIGIN_KEYS}
+    if all(v is None for v in body.values()):
+        return None
+    source = body["source"]
+    if isinstance(source, dict) and source.get("world") == world.get("id"):
+        return None
+    return body
 
 
 def stops_run(error: ApiError) -> bool:
@@ -316,9 +350,11 @@ def push(
     folders do not hold the same elements (``PushPlan.unmatched``) unless
     ``allow_unmatched``: creations and deletions are not a PATCH loop's to guess.
     ``workers`` defaults to 4 (keel runs at most 6 requests at once per worker
-    process and queues beyond that; 4 is the shape it was sized for).
+    process and queues beyond that; 4 is the shape it was sized for). A first fill also sets the
+    world's ``origin`` from the folder's ``world.json`` (the module docstring; ``PushResult.origin``).
     """
-    plan = plan_push(baseline, folder)
+    edited = folder if isinstance(folder, Folder) else read_folder(folder)
+    plan = plan_push(baseline, edited)
     if plan.unmatched and not allow_unmatched:
         raise ValueError(
             f"baseline and folder differ in membership: {len(plan.only_in_baseline)} only in baseline, "
@@ -339,7 +375,7 @@ def push(
         known_of=plan.known_of,
     )
     work = todo[:limit] if limit is not None else todo
-    if dry_run or not work:
+    if dry_run:
         return result
     if client is None:
         if not api_key:
@@ -420,7 +456,44 @@ def push(
 
         with ThreadPoolExecutor(max_workers=max(1, workers)) as ex:
             list(ex.map(one, work))
+        if result.aborted is None:
+            _set_first_origin(client, edited.world, result, fh, on_failure)
     return result
+
+
+def _set_first_origin(
+    client: Client,
+    folder_world: Mapping[str, Any] | None,
+    result: PushResult,
+    fh: Any,
+    on_failure: Callable[[dict[str, Any]], None] | None,
+) -> None:
+    """Set the world's ``origin`` from the folder on a first fill (``_origin_to_send``); log and read it back.
+    A folder with neither ``source`` nor ``producer`` has nothing to send: no call at all."""
+    if all((folder_world or {}).get(k) is None for k in _ORIGIN_KEYS):
+        return
+    rec: dict[str, Any] = {"at": _dt.datetime.now(_dt.UTC).isoformat(timespec="seconds"), "type": "world"}
+    try:
+        world = client.get_world()
+        body = _origin_to_send(world, folder_world)
+        if body is None:
+            return
+        rec.update(id=world["id"], fields=sorted(body), patch_sha256=Patch("world", world["id"], body).fingerprint)
+        data = client.call("PATCH", "world/", body)
+    except (ApiError, ConnectionError, ValueError) as exc:
+        rec.update(code=exc.status if isinstance(exc, ApiError) else 0, error=str(exc)[:300])
+    else:
+        served = data.get("origin") if isinstance(data, dict) else None
+        wrong = [k for k in _ORIGIN_KEYS if not isinstance(served, dict) or not _same(served.get(k), body[k])]
+        rec.update(code=200, mismatch=bool(wrong), mismatch_fields=wrong)
+        if not wrong:
+            result.origin = body
+    fh.write(json.dumps(rec, ensure_ascii=True) + "\n")
+    fh.flush()
+    if rec.get("code") != 200 or rec.get("mismatch"):
+        result.failed.append(rec)
+        if on_failure:
+            on_failure(rec)
 
 
 def verify_level(fresh_export: Folder | str | os.PathLike[str], folder: Folder | str | os.PathLike[str]) -> PushPlan:

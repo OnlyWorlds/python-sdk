@@ -85,6 +85,8 @@ result = push("moppetopia-before", "moppetopia", api_key="ow_w_â€¦", pin="ow_s_â
 
 `push` sends only the fields that changed, retries what the server asks it to retry, checks that what came back is what it sent, and logs every write, so running it again skips what already landed. `dry_run=True` shows the plan without sending it.
 
+The world's `origin` is a world's birth line, written once: a push sets it only on a first fill from a folder made elsewhere, never from a folder exported from the same world, and never over a first import. When `get_world()` serves `origin` null in both keys and the folder's `source.world` is not that world (or the folder has no `source` line, as a converter's first output), `push` sends the folder's `source` and `producer` from `world.json` in one `PATCH /world` and reports it in `result.origin`. `patch_world` never sends them.
+
 A world kept in Notion becomes a folder without retyping it. Export the workspace or page from Notion as "Markdown & CSV", then:
 
 ```bash

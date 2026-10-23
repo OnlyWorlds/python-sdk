@@ -303,6 +303,73 @@ def test_dry_run_and_key_pin_parameters(tmp_path: Path) -> None:
         push(base, edit, log_path=tmp_path / "log.jsonl")
 
 
+# keel #571, h58 #11038: origin is a world's birth line, written once: a push sets it only on a first
+# fill from a folder made elsewhere, never from a folder exported from the same world, and never over
+# a first import.
+NO_ORIGIN = {"source": None, "producer": None}
+PRODUCER = {"tool": "converter", "version": "1.0", "input": "notes"}
+ELSEWHERE = {"server": "https://www.onlyworlds.com", "world": "x0000000-0000-7000-8000-000000000009", "at": "a"}
+HERE = {**ELSEWHERE, "world": WORLD["id"]}
+ABSENT = object()
+
+
+def _origin_push(tmp_path: Path, served: Any, folder_keys: Mapping[str, Any]) -> tuple[Any, list[Any]]:
+    """Push one element edit to a world serving ``served`` as its origin (``ABSENT``: no key);
+    the folder's world.json carries ``folder_keys``. The result and the world calls made."""
+    write_folder(tmp_path / "base", WORLD, {"character": [wire_char(C1, "A")]})
+    write_folder(tmp_path / "edit", {**WORLD, **folder_keys}, {"character": [wire_char(C1, "B")]})
+    elements = echo()
+
+    def handler(method: str, url: str, headers: Mapping[str, str], body: bytes | None) -> Response:
+        if not url.endswith("/world/"):
+            return elements(method, url, headers, body)
+        world: dict[str, Any] = {**WORLD} if served is ABSENT else {**WORLD, "origin": served}
+        if method == "PATCH":
+            sent = json.loads(body or b"{}")
+            world["origin"] = {"source": sent.get("source"), "producer": sent.get("producer")}
+        return jresp(200, world)
+
+    t = FakeTransport(handler=handler)
+    res = push(
+        tmp_path / "base",
+        tmp_path / "edit",
+        client=Client("ow_w_testkey", "1234", transport=t),
+        log_path=tmp_path / "a.jsonl",
+        workers=1,
+    )
+    assert res.ok == 1 and not res.failed
+    return res, [(c.method, c.body) for c in t.calls if c.url.endswith("/world/")]
+
+
+@pytest.mark.parametrize(
+    "folder_keys",
+    [
+        {"source": ELSEWHERE, "producer": PRODUCER, "origin": NO_ORIGIN},  # exported from another world
+        {"producer": PRODUCER},  # a converter's first output: no source line at all
+    ],
+)
+def test_a_first_fill_sets_the_worlds_origin(tmp_path: Path, folder_keys: dict[str, Any]) -> None:
+    res, calls = _origin_push(tmp_path, NO_ORIGIN, folder_keys)
+    sent = {"source": folder_keys.get("source"), "producer": PRODUCER}
+    assert calls == [("GET", None), ("PATCH", sent)]  # only the two keys: never origin, never the folder's own
+    assert res.origin == sent
+
+
+def test_a_push_never_writes_over_a_first_import(tmp_path: Path) -> None:
+    res, calls = _origin_push(tmp_path, {"source": None, "producer": PRODUCER}, {"source": ELSEWHERE})
+    assert calls == [("GET", None)] and res.origin is None
+
+
+def test_a_push_never_sets_origin_from_the_same_worlds_export(tmp_path: Path) -> None:
+    res, calls = _origin_push(tmp_path, NO_ORIGIN, {"source": HERE, "producer": PRODUCER, "origin": NO_ORIGIN})
+    assert calls == [("GET", None)] and res.origin is None
+
+
+def test_a_server_that_serves_no_origin_is_sent_none(tmp_path: Path) -> None:
+    res, calls = _origin_push(tmp_path, ABSENT, {"source": ELSEWHERE, "producer": PRODUCER})
+    assert calls == [("GET", None)] and res.origin is None
+
+
 def test_client_never_sends_world() -> None:
     c = Client("k", transport=FakeTransport())
     with pytest.raises(ValueError, match="world"):

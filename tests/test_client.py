@@ -691,13 +691,40 @@ def test_patch_world_drops_the_read_only_keys_keel_refuses(make_client: MakeClie
         "agent_narrator_rule": False,
         "agent_writes_proposed": False,  # keel #519: read-only on GET /world, set on the world page
         "owner_character": None,
+        # keel #571: served on every GET /world, an unknown key to PATCH (written as source and producer)
+        "origin": {"source": {"server": "https://www.onlyworlds.com", "world": "w0", "at": "a"}, "producer": None},
     }
     make_client(t).patch_world(body)
     assert t.calls[0].body == {"name": "W", "owner_character": None}
 
 
+def test_patch_world_sends_a_get_world_bodys_extension_keys(make_client: MakeClient) -> None:
+    # keel #571: the World's x_*, atlas_* and shadow_* keys are served at the top level and PATCH sets them
+    # (null removes one), so a read body handed back sends them as given, beside the fields
+    t = FakeTransport(handler=lambda *_: jresp(200, {"id": "w"}))
+    names = {"version": 1, "types": {"character": {"one": "Employee", "many": "Employees"}}}
+    body = {
+        "id": "w",
+        "name": "W",
+        "origin": {"source": None, "producer": None},
+        "x_names": names,
+        "x_gone": None,
+        "atlas_calendar": {"months": 12},
+        "shadow_note": "n",
+    }
+    make_client(t).patch_world(body)
+    assert t.calls[0].body == {
+        "name": "W",
+        "x_names": names,
+        "x_gone": None,
+        "atlas_calendar": {"months": 12},
+        "shadow_note": "n",
+    }
+
+
 def test_patch_world_never_sends_what_only_a_folder_carries(make_client: MakeClient) -> None:
-    # a folder's world.json handed back whole: its own keys (§4.1, §4.2) say what the folder is
+    # a folder's world.json handed back whole: its own keys (§4.1, §4.2) say what the folder is, and the
+    # origin an export carries (v0.3.16, as GET /world served it) is not writable as itself
     t = FakeTransport(handler=lambda *_: jresp(200, {"id": "w"}))
     folder_world = {
         "id": "w",
@@ -710,6 +737,7 @@ def test_patch_world_never_sends_what_only_a_folder_carries(make_client: MakeCli
         "api": {"world_id": "w"},
         "snapshot_of": "w0",
         "snapshot_counts": {"character": 1},
+        "origin": {"source": None, "producer": {"tool": "atlas", "version": "1.82.0", "input": "folder"}},
         "x_calendar": {"months": 12},
     }
     make_client(t).patch_world(folder_world)

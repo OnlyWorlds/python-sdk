@@ -3,13 +3,13 @@
 Set ``OW_OPENAPI`` to the document's URL (``https://www.onlyworlds.com/api/v2/openapi.json``) or a
 saved copy; without it these tests skip. The client is run against a recording transport and
 what it sends and knows is compared with what the document describes: routes, query parameters,
-each type's fields and their kinds, what a write must not carry, the list envelope's names and
-the error envelope.
+each type's fields and their kinds, what a write must not carry (a world-meta write too, against
+World and WorldPatch), the list envelope's names and the error envelope.
 
 Blind spots, because the document gives no schema for them: the ``/changes`` response (its
-parameters, the head poll's ``If-None-Match`` and its 304 are declared and checked here),
-``/bulk`` (request and response) and the world-meta body. Those are covered by the
-scripted tests in ``test_client.py``, not here.
+parameters, the head poll's ``If-None-Match`` and its 304 are declared and checked here) and
+``/bulk`` (request and response). Those are covered by the scripted tests in ``test_client.py``,
+not here.
 """
 
 from __future__ import annotations
@@ -18,6 +18,7 @@ import gzip
 import json
 import os
 import pathlib
+import re
 import tempfile
 import urllib.error
 import urllib.request
@@ -336,6 +337,22 @@ def test_a_write_never_carries_what_the_write_schema_refuses(doc: dict[str, Any]
         refused = set(schemas[ty.capitalize()]["properties"]) - set(schemas[ty.capitalize() + "Write"]["properties"])
         leaked = refused & set(t.calls[-1].body)
         assert not leaked, f"{ty}: a write still carries {sorted(leaked)}"
+
+
+def test_patch_world_takes_back_every_key_the_world_body_serves(doc: dict[str, Any]) -> None:
+    """A ``GET /world`` body with every key the World schema serves, handed back to ``patch_world``,
+    sends only what WorldPatch takes (its properties and its extension pattern): the next read-only
+    key keel adds to the World (``origin``, keel #571) fails here, not as a caller's 422."""
+    schemas = doc["components"]["schemas"]
+    world, patch = schemas["World"], schemas["WorldPatch"]
+    assert patch.get("additionalProperties") is False
+    (pattern,) = patch["patternProperties"]
+    c, t = _recorder()
+    c.patch_world({**dict.fromkeys(world["properties"], None), "id": "w", "x_names": None})
+    sent = set(t.calls[-1].body)
+    leaked = {k for k in sent - set(patch["properties"]) if not re.match(pattern, k)}
+    assert not leaked, f"patch_world still sends {sorted(leaked)}"
+    assert "x_names" in sent
 
 
 def test_the_list_envelope_names_are_the_ones_iter_elements_follows(doc: dict[str, Any]) -> None:
