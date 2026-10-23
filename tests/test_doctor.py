@@ -1418,6 +1418,18 @@ def test_11_a_known_of_stub_is_not_judged(tmp_path: Path) -> None:
     assert r.compared[HR]["rules"][0]["scoped"] == 2
 
 
+def test_11_apply_checks_itself_judges_no_stub() -> None:
+    # rule 6 holds for a direct caller too, not only behind the doctor's own filter
+    rule = {"rule": "every Character carries a reputation", "where": {"type": "character"}}
+    rule["require"] = {"field": "reputation", "present": True}
+    whole = {"type": "character", "id": C1, "name": "Ann"}
+    stub = {"type": "character", "id": C3, "name": "Cy", "known_of": True}
+    (row,) = apply_checks([rule], [whole, stub])
+    assert row.scoped == 1 and [s["id"] for s in row.short] == [C1]
+    (row,) = apply_checks([rule], [{**stub, "known_of": False}])  # only true marks a stub
+    assert row.scoped == 1
+
+
 def test_11_rules_on_a_charter_that_is_not_a_law_are_not_read(tmp_path: Path) -> None:
     rules = checks_fixture()["rules"][:1]
     base = edit(clean(), "law", LAW1, supertype="Decree")

@@ -35,7 +35,7 @@ from dataclasses import dataclass
 from typing import Any
 
 from ._schema import EXTENSION_PREFIXES, FIELD_KINDS
-from .folder import FolderElement
+from .folder import FolderElement, is_known_of
 from .room import _WHITE_SPACE, _fold
 
 __all__ = ["CHECKS_FIELD", "PATTERN_CAP", "PREDICATES", "CheckRow", "apply_checks"]
@@ -262,12 +262,14 @@ def apply_checks(
     with a ``type``, or ``FolderElement`` objects), in the view the caller holds. One ``CheckRow`` per rule,
     in order; a rule that cannot be applied comes back ``not_checked`` with why. ``fields`` is type ->
     {field: kind}, the shape of ``FIELD_KINDS`` (the pinned schema's, the default). Reads only: the
-    list and the bodies are left as they are. Raises ``TypeError`` when ``rules`` is not a list (the
-    profile's slot is a list; the doctor reports that case on the Charter)."""
+    list and the bodies are left as they are. A known-of stub is judged by no rule (the profile's rule 6:
+    its absent fields are unknown, not short), so it is neither scoped nor short. Raises ``TypeError``
+    when ``rules`` is not a list (the profile's slot is a list; the doctor reports that case on the
+    Charter)."""
     if not isinstance(rules, list):
         raise TypeError(f"{CHECKS_FIELD} must be a list, not {type(rules).__name__}")
     known = FIELD_KINDS if fields is None else fields
-    held = [_element(el) for el in elements]
+    held = [h for h in (_element(el) for el in elements) if not is_known_of(h[1])]
     rows: list[CheckRow] = []
     for index, rule in enumerate(rules):
         sentence = rule.get("rule") if isinstance(rule, Mapping) else None
