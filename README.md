@@ -85,7 +85,7 @@ result = push("moppetopia-before", "moppetopia", api_key="ow_w_â€¦", pin="ow_s_â
 
 `push` sends only the fields that changed, retries what the server asks it to retry, checks that what came back is what it sent, and logs every write, so running it again skips what already landed. `dry_run=True` shows the plan without sending it.
 
-The world's `origin` is a world's birth line, written once: a push sets it only on a first fill from a folder made elsewhere, never from a folder exported from the same world, and never over a first import. When `get_world()` serves `origin` null in both keys and the folder's `source.world` is not that world (or the folder has no `source` line, as a converter's first output), `push` sends the folder's `source` and `producer` from `world.json` in one `PATCH /world` and reports it in `result.origin`. `patch_world` never sends them.
+The world's `origin` is a world's birth line, written once: a push sets it only on a first fill from a folder made elsewhere, never from a folder exported from the same world, and never over a first import. When `get_world()` serves `origin` null in both keys and the folder's `source.world` is not that world (or the folder has no `source` line, as a converter's first output), `push` sends the folder's `source` and `producer` from `world.json` in one `PATCH /world` and reports it in `result.origin`. `patch_world` sends the two only when you name them (`source=`, `producer=`; `None` clears one); a folder `world.json` handed to it keeps its own pair home, since that pair names the folder's maker.
 
 A world kept in Notion becomes a folder without retyping it. Export the workspace or page from Notion as "Markdown & CSV", then:
 
@@ -160,9 +160,10 @@ for p in client.walk_world_proposals(state="open"):  # newest first; keepers see
 client.accept_proposal("character", cid, row["id"])  # the keeper's own write; StaleProposal when a proposed field moved
 client.decline_proposal("character", cid, row["id"], reason="not yet")
 client.withdraw_proposal("character", cid, row["id"])  # the proposer's
+client.review_new_element("character", new_id, "accept")  # a marked new element; decline deletes it
 ```
 
-With **AI seats propose, a person accepts** on for the world (`agent_writes_proposed` on `get_world()`, read-only), a seat's `patch`, `upsert` or link edit raises `ProposedError` (`.proposal`) instead of returning a body that is not the element; `push` counts those as `proposed` and never resends one. The doctor's flag 12 reports the queue's open and lapsed rows.
+With **AI seats propose, a person accepts** on for the world (`agent_writes_proposed` on `get_world()`, read-only), a seat's `patch`, `upsert` or link edit raises `ProposedError` (`.proposal`) instead of returning a body that is not the element; `push` counts those as `proposed` and never resends one. A seat's new element lands marked (`x_review_proposed`) and the queue lists it as a `kind: "new_element"` row beside the proposals (`kind: "proposal"`); a keeper settles it with `review_new_element` (422 `not_proposed`, `is_not_proposed`, when there is no mark). A proposal's `fields` holds only what differs from the element, and a PUT's `omitted` names the fields it would empty; a seat's write that changes nothing makes no row and answers 200. The doctor's flag 12 reports the queue's open and lapsed rows, the proposals and the marked new elements counted apart.
 
 ## The doctor
 

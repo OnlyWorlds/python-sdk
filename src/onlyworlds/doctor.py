@@ -47,12 +47,16 @@ carries every rule's ``scoped`` and ``short`` counts and the view read (``folder
 key's role). A known-of stub is not judged (its absent fields are unknown), and the rules are
 on a Law only: a charter of another type that carries them is a finding, its rules not read.
 
-On the API door only, (12) proposals waiting (keel #519): the open and the lapsed proposals in
-the world's queue (``GET /world/proposals``, paged through), one finding on the world when any
-wait, with both counts and the oldest open one's age in days. ``compared`` carries both counts and
-the view read (a keeper reads every proposal, any other member its own). A key with no member
-reads no queue (403 or 404): the flag does not run, and says why. A proposal's ``evidence`` is
-outside text and is never read into a finding.
+On the API door only, (12) proposals waiting (keel #519): the open and the lapsed rows of the
+world's queue (``GET /world/proposals``, paged through), one finding on the world when any wait.
+The queue holds two kinds of row (keel #565): a proposal (``kind: "proposal"``, or no ``kind``
+from a server before #565) and a new element marked for review (``kind: "new_element"``, an
+element carrying ``x_review_proposed``), counted apart and never one as the other. The finding
+gives the proposals' open and lapsed counts, the marked new elements' when there are any, and the
+oldest open proposal's age in days. ``compared`` carries the four counts and the view read (a
+keeper reads every row, any other member its own). A key with no member reads no queue (403 or
+404): the flag does not run, and says why. A row's ``evidence`` is outside text and is never read
+into a finding.
 
 A flag the walk cannot evaluate is reported in ``not_run`` with its reason, never as clean,
 and every flag that ran says how much it could compare (``compared: {n, of}``): a clean
@@ -164,7 +168,7 @@ _UNITS: dict[str, str] = {
     "9": "world.json format_version",
     "10": "world.json",
     CHECKS_FLAG: "house rules applied",
-    PROPOSALS_FLAG: "open and lapsed proposals read",
+    PROPOSALS_FLAG: "open and lapsed queue rows read",
 }
 
 #: Fields that hold no prose even when the schema types them text.
@@ -858,6 +862,10 @@ def _charters(run: _Run, els: list[_El], rows: list[dict[str, Any]], head: Any, 
     run.ran("8", found, len(charters))
 
 
+#: The ``kind`` of a queue row that is a new element marked for review, not a proposal (keel #565).
+_NEW_ELEMENT = "new_element"
+
+
 def _queue(client: Reader, state: str) -> list[dict[str, Any]]:
     """Every row of the world's proposal queue in one state, paged through."""
     rows: list[dict[str, Any]] = []
@@ -874,7 +882,8 @@ def _queue(client: Reader, state: str) -> list[dict[str, Any]]:
 
 
 def _proposals(run: _Run, client: Reader, *, view: str, now: _dt.datetime) -> None:
-    """Flag 12: the open and the lapsed proposals waiting for a keeper, one finding on the world."""
+    """Flag 12: the open and the lapsed proposals, and the new elements marked for review, waiting
+    for a keeper: one finding on the world."""
     flag = PROPOSALS_FLAG
     if getattr(client, "world_proposals", None) is None:
         run.skip(flag, "this reader has no proposal queue read")
@@ -894,17 +903,32 @@ def _proposals(run: _Run, client: Reader, *, view: str, now: _dt.datetime) -> No
     except (ConnectionError, ValueError) as exc:
         run.skip(flag, f"the proposal queue could not be read ({exc})")
         return
-    opened, lapsed = len(waiting["open"]), len(waiting["lapsed"])
-    run.ran(flag, opened + lapsed, opened + lapsed, open=opened, lapsed=lapsed, view=view)
-    if not opened and not lapsed:
+    # keel #565: a marked new element is a row of its own kind, never a proposal.
+    proposals = {s: [r for r in rows if r.get("kind") != _NEW_ELEMENT] for s, rows in waiting.items()}
+    marked = {s: [r for r in rows if r.get("kind") == _NEW_ELEMENT] for s, rows in waiting.items()}
+    opened, lapsed = len(proposals["open"]), len(proposals["lapsed"])
+    new_open, new_lapsed = len(marked["open"]), len(marked["lapsed"])
+    total = opened + lapsed + new_open + new_lapsed
+    run.ran(flag, total, total, open=opened, lapsed=lapsed, new_open=new_open, new_lapsed=new_lapsed, view=view)
+    if not total:
         return
-    dated = [(t, r) for r in waiting["open"] if (t := _time(r.get("created_at"))) is not None]
+    dated = [(t, r) for r in proposals["open"] if (t := _time(r.get("created_at"))) is not None]
     oldest = min(dated, key=lambda tr: tr[0]) if dated else None
-    reason = f"{opened} proposals open and {lapsed} lapsed, waiting for a keeper"
-    evidence: dict[str, Any] = {"open": opened, "lapsed": lapsed, "oldest_open_days": None, "oldest_open": None}
+    said = [f"{opened} proposals open and {lapsed} lapsed"] if opened or lapsed else []
+    if new_open or new_lapsed:
+        said.append(f"{new_open} new elements open for review and {new_lapsed} lapsed")
+    reason = ", and ".join(said) + ", waiting for a keeper"
+    evidence: dict[str, Any] = {
+        "open": opened,
+        "lapsed": lapsed,
+        "new_open": new_open,
+        "new_lapsed": new_lapsed,
+        "oldest_open_days": None,
+        "oldest_open": None,
+    }
     if oldest is not None:
         days = (now - oldest[0]).days
-        reason += f"; the oldest open one is {days} days old"
+        reason += f"; the oldest open proposal is {days} days old"
         row = oldest[1]
         evidence["oldest_open_days"] = days
         evidence["oldest_open"] = {k: row.get(k) for k in ("id", "element_type", "element_id")}
@@ -981,7 +1005,10 @@ def _lines(report: Report) -> Iterable[str]:
         if c and flag == CHECKS_FLAG:
             counted += f" ({_rules_note(c)})"
         if c and flag == PROPOSALS_FLAG:
-            counted += f" (open: {c['open']}, lapsed: {c['lapsed']}; view: {c['view']})"
+            counted += f" (proposals open: {c['open']}, lapsed: {c['lapsed']}"
+            if c.get("new_open") or c.get("new_lapsed"):
+                counted += f"; new elements open: {c['new_open']}, lapsed: {c['new_lapsed']}"
+            counted += f"; view: {c['view']})"
         yield f"  {flag}. {FLAGS[flag]}{counted}"
         if c and flag == CHECKS_FLAG:
             yield from _rule_lines(c)

@@ -123,6 +123,7 @@ def _recorder(*, agent: bool = False) -> tuple[Client, FakeTransport]:
         "head": 0,
         "proposal": {"id": ID},
         "element": {"id": ID},
+        "deleted": ID,
     }
     t = FakeTransport(handler=lambda *a: jresp(200, everything))
     return Client("ow_w_testkey", "1234", transport=t, agent=agent), t
@@ -153,6 +154,8 @@ def _every_call(c: Client) -> None:
         c.accept_proposal(ty, ID, ID)
         c.decline_proposal(ty, ID, ID, reason="r")
         c.withdraw_proposal(ty, ID, ID)
+        c.review_new_element(ty, ID, "accept")
+        c.review_new_element(ty, ID, "decline", reason="r")
 
 
 def _declared_headers(doc: dict[str, Any], op: Mapping[str, Any]) -> set[str]:
@@ -228,6 +231,8 @@ def test_the_proposal_calls_send_only_declared_headers_and_bodies(doc: dict[str,
     c.accept_proposal("location", ID, ID)
     c.decline_proposal("location", ID, ID, reason="r")
     c.withdraw_proposal("location", ID, ID)
+    c.review_new_element("location", ID, "accept")
+    c.review_new_element("location", ID, "decline", reason="r")
     base = set(c._headers) | {"Content-Type"}
     problems: list[str] = []
     for call in t.calls:
@@ -265,6 +270,7 @@ def test_the_202_and_the_five_codes_are_what_the_client_reads(doc: dict[str, Any
         "stale_proposal": (409, "is_stale_proposal"),
         "proposed_only": (403, "is_proposed_only"),
         "own_proposal": (403, "is_own_proposal"),
+        "not_proposed": (422, "is_not_proposed"),
     }
     for code, (status, flag) in predicates.items():
         assert codes[code]["status"] == status, code
@@ -282,6 +288,42 @@ def test_the_proposal_list_envelope_is_the_one_the_walk_follows(doc: dict[str, A
     assert set(props) == {"data", "has_more", "next_cursor"}
     world = doc["components"]["schemas"]["World"]["properties"]["agent_writes_proposed"]
     assert world.get("readOnly") is True and "agent_writes_proposed" in _http.WORLD_READ_ONLY_FIELDS
+
+
+def test_the_queue_rows_are_the_two_kinds_the_doctor_tells_apart(doc: dict[str, Any]) -> None:
+    """keel #565: the queue's rows are a oneOf told apart by ``kind``; the doctor reads ``new_element``
+    as a marked new element and every other row as a proposal."""
+    from onlyworlds import doctor
+
+    rows = doc["components"]["schemas"]["ProposalList"]["properties"]["data"]["items"]["oneOf"]
+    resolved = [doc["components"]["schemas"][r["$ref"].rsplit("/", 1)[1]] if "$ref" in r else r for r in rows]
+    kinds = {k for r in resolved for k in r["properties"]["kind"]["enum"]}
+    assert kinds == {"proposal", doctor._NEW_ELEMENT}
+    assert all("kind" in r["required"] for r in resolved)
+    assert "omitted" in doc["components"]["schemas"]["Proposal"]["required"]
+
+
+def test_every_proposal_and_review_operation_is_reached_and_answers_what_review_reads(doc: dict[str, Any]) -> None:
+    """Every operation on a ``/proposals`` or ``/review`` route in the document is one a call reaches, on all
+    22 types; the review body's decisions are the two ``review_new_element`` takes, and its 200 is the
+    ``element`` or ``deleted`` it reads."""
+    ops = {
+        (route, method.upper())
+        for route, by in doc["paths"].items()
+        for method in by
+        if ("/proposals" in route or route.endswith("/review")) and method in ("get", "post", "put", "patch", "delete")
+    }
+    assert any(r.endswith("/review") for r, _ in ops), "the document has no review route: the reference moved"
+    c, t = _recorder()
+    _every_call(c)
+    reached = {(_norm(call.url), call.method) for call in t.calls}
+    missing = sorted(f"{m} {r}" for r, m in ops - reached)
+    assert not missing, "the document has proposal routes no call reaches:\n" + "\n".join(missing[:20])
+    review = doc["paths"]["/api/v2/location/{id}/review"]["post"]
+    body = review["requestBody"]["content"]["application/json"]["schema"]
+    assert set(body["properties"]["decision"]["enum"]) == {"accept", "decline"}
+    answers = review["responses"]["200"]["content"]["application/json"]["schema"]["oneOf"]
+    assert sorted(a["required"] for a in answers) == [["deleted"], ["element"]]
 
 
 def test_the_head_poll_header_and_its_304_are_declared(doc: dict[str, Any]) -> None:
@@ -353,6 +395,10 @@ def test_patch_world_takes_back_every_key_the_world_body_serves(doc: dict[str, A
     leaked = {k for k in sent - set(patch["properties"]) if not re.match(pattern, k)}
     assert not leaked, f"patch_world still sends {sorted(leaked)}"
     assert "x_names" in sent
+    # h29 #11077: the named pair goes under WorldPatch's own keys, each nullable there.
+    c.patch_world({"name": "x"}, source={"world": "w0"}, producer=None)
+    assert set(t.calls[-1].body) == {"name", "source", "producer"}
+    assert all("null" in patch["properties"][k]["type"] for k in ("source", "producer"))
 
 
 def test_the_list_envelope_names_are_the_ones_iter_elements_follows(doc: dict[str, Any]) -> None:

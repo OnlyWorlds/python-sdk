@@ -744,6 +744,26 @@ def test_patch_world_never_sends_what_only_a_folder_carries(make_client: MakeCli
     assert t.calls[0].body == {"name": "W", "x_calendar": {"months": 12}}
 
 
+def test_patch_world_sends_source_and_producer_only_when_named(make_client: MakeClient) -> None:
+    # h29 #11077: a client's world patch passes the pair through as given; a folder world.json's own
+    # pair (in the partial) names the folder's maker and is still left out.
+    t = FakeTransport(handler=lambda *_: jresp(200, {"id": "w"}))
+    c = make_client(t)
+    src = {"server": "https://www.onlyworlds.com", "world": "w0", "at": "2026-10-22T10:00:00.000Z"}
+    made = {"tool": "converter", "version": "2.0", "input": "notion"}
+    folders = {"source": {"world": "folder"}, "producer": {"tool": "folder"}}
+    c.patch_world({"name": "W", **folders}, source=src, producer=made)
+    c.patch_world({"name": "W"}, source=None)
+    c.patch_world({"name": "W"}, producer=None)
+    c.patch_world({"name": "W", **folders})
+    assert [x.body for x in t.calls] == [
+        {"name": "W", "source": src, "producer": made},
+        {"name": "W", "source": None},
+        {"name": "W", "producer": None},
+        {"name": "W"},
+    ]
+
+
 # --- keel #299: the agent declaration -------------------------------------
 
 

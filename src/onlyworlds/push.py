@@ -51,7 +51,8 @@ after a run that stopped), the push reads ``GET /world``; when its ``origin`` is
 world's id (a folder with no ``source`` line passes), it sends the folder's ``source`` and
 ``producer`` from ``world.json`` as they are, a missing one as null, in one ``PATCH /world``. It
 is logged and read back like a patch, landed in ``PushResult.origin``, and a failure is in
-``PushResult.failed`` (``type: "world"``). ``Client.patch_world`` never sends the two.
+``PushResult.failed`` (``type: "world"``). ``Client.patch_world`` sends the two only when named
+(``source=``, ``producer=``), never from a folder ``world.json`` handed to it.
 """
 
 from __future__ import annotations

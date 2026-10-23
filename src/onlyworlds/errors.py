@@ -207,8 +207,15 @@ class ApiError(Exception):
     def is_proposed_only(self) -> bool:
         """The world takes this agent seat's writes as proposals, and the act has no proposal form (403
         ``proposed_only``, keel #519): deleting an element the seat did not create, or accepting or
-        declining a proposal. Propose instead, or ask a keeper."""
+        declining a proposal. Propose instead, or ask a keeper. Also the review of a new element by
+        the member its ``x_review_proposed`` mark names, on any world (keel #565)."""
         return self.status == 403 and self.code == "proposed_only"
+
+    @property
+    def is_not_proposed(self) -> bool:
+        """A review found no ``x_review_proposed`` mark on the element (422 ``not_proposed``, keel
+        #565): nothing to settle, never marked or already accepted."""
+        return self.status == 422 and self.code == "not_proposed"
 
     @property
     def is_own_proposal(self) -> bool:
@@ -249,8 +256,9 @@ class StaleProposal(ApiError):
 class ProposedError(ApiError):
     """A write answered 202 (keel #519): the world takes this agent seat's writes as proposals (its
     owner's setting, ``agent_writes_proposed`` on ``GET /world``), so the element did NOT change.
-    ``proposal`` is the row the write became (None if a response ever lacks it); a keeper accepts or
-    declines it. Raised, not returned, so that no caller takes the answer for the element: a PATCH,
+    ``proposal`` is the row the write became (None if a response ever lacks it): since keel #565 its
+    ``fields`` holds only what differs, and a PUT's ``omitted`` names the fields it would empty. A
+    keeper accepts or declines it. Raised, not returned, so that no caller takes the answer for the element: a PATCH,
     PUT or link edit that returned normally changed the element; this one did not. ``status`` is 202
     and ``code`` None. A ``/bulk`` slot that says 202 is not raised: it stays in the result."""
 

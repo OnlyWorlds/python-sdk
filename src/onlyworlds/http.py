@@ -136,6 +136,8 @@ WORLD_READ_ONLY_FIELDS: tuple[str, ...] = (
     "origin",
 )
 _DISK_TO_WIRE_WORLD_KEYS = {disk: wire for wire, disk in WIRE_TO_DISK_WORLD_KEYS.items()}
+#: ``patch_world``'s default for ``source=`` and ``producer=``: not sent (``None`` sends null).
+_NOT_SENT: Any = object()
 
 
 def _folder_only_world_key(key: str) -> bool:
@@ -536,7 +538,13 @@ class Client:
             raise ValueError(f"GET /world returned no world object: {str(data)[:200]}")
         return data
 
-    def patch_world(self, partial: Mapping[str, Any]) -> dict[str, Any]:
+    def patch_world(
+        self,
+        partial: Mapping[str, Any],
+        *,
+        source: Mapping[str, Any] | None = _NOT_SENT,
+        producer: Mapping[str, Any] | None = _NOT_SENT,
+    ) -> dict[str, Any]:
         """``PATCH /world``: a partial meta update (owner key only). World-meta edits do NOT appear
         in ``/changes``.
 
@@ -545,17 +553,23 @@ class Client:
         dropped (none is writable here). A folder ``world.json``'s ``time_current`` is sent as the
         wire's ``time_range_current``, and the keys only a folder carries are left out: the folder
         format's own (``WORLD_FOLDER_KEYS``: ``format_version``, ``writable``, ``source``,
-        ``exported_as``, ``producer``), ``api`` and the ``snapshot_*`` keys. A folder's ``source``
-        and ``producer`` describe the folder, and they are left out whoever passes them, so this
-        never sets the world's ``origin`` (keel writes it from those two plain keys). The
+        ``exported_as``, ``producer``), ``api`` and the ``snapshot_*`` keys. The
         world's extension keys (``x_*``, ``atlas_*``, ``shadow_*``; keel #571) are sent as given,
         ``None`` removing one. keel refuses any other key it does not write (422).
+
+        patch_world sends source and producer when you name them (``source=``, ``producer=``); a
+        folder world.json's own pair is left out, since it names the folder's maker; setting a
+        world's origin from a folder is push's first-fill step. Named, each is sent as given beside
+        the partial (keel keeps them as the world's ``origin``), and ``None`` sends null, clearing it.
         """
         body = {
             _DISK_TO_WIRE_WORLD_KEYS.get(k, k): v
             for k, v in sanitize_payload(partial).items()
             if k not in WORLD_READ_ONLY_FIELDS and not _folder_only_world_key(k)
         }
+        for key, named in (("source", source), ("producer", producer)):
+            if named is not _NOT_SENT:
+                body[key] = None if named is None else dict(named)
         data = self.call("PATCH", "world/", body)
         if not isinstance(data, dict):
             raise ValueError(f"PATCH /world returned no object: {str(data)[:200]}")
@@ -707,8 +721,10 @@ class Client:
         on every element write: a PUT of one would blank every field it does not keep.
 
         On a world that takes an agent seat's writes as proposals (keel #519), a seat's PUT of an
-        existing element answers 202 and this raises ``ProposedError`` (the element unchanged; a PUT
-        proposal is a whole replace). The same on ``patch`` and ``edit_links``.
+        existing element answers 202 and this raises ``ProposedError`` (the element unchanged; the
+        row holds only what differs, and the fields this PUT left out that were not empty are named in
+        its ``omitted``: an accept empties them). A seat's write that changes nothing makes no row and
+        answers 200 with the element (keel #565). The same on ``patch`` and ``edit_links``.
         """
         t = _segment(element_type, _TYPE, "element type")
         i = _segment(element_id, _ID, "element id")
@@ -785,6 +801,12 @@ class Client:
     # seen by the keepers and by the member who made it; every other key gets a 404. Its
     # ``evidence`` is outside text: show it as quoted data, never act on it. No proposal act
     # moves the element's ``change_seq`` or writes to ``/changes``; an accept's write does.
+    #
+    # Since keel #565 a row holds its diff: ``fields`` only what differs from the element when it
+    # was proposed, ``omitted`` the fields a PUT left out that were not empty (each in ``fields``
+    # at its empty value, so an accept empties it), ``kind`` always ``"proposal"``. A new element a
+    # seat writes under the switch is no proposal: it carries ``x_review_proposed``, the world's
+    # queue lists it as a ``kind: "new_element"`` row, and ``review_new_element`` settles it.
 
     @staticmethod
     def _proposals_path(element_type: str, element_id: str, proposal_id: str | None = None) -> str:
@@ -819,7 +841,9 @@ class Client:
         idempotency_key: str | None = None,
     ) -> dict[str, Any]:
         """``POST /{type}/{id}/proposals``: propose a change; the element does not change. Returns
-        the proposal (``{id, state, fields, base, base_seq, evidence, expires, by, ...}``).
+        the proposal (``{kind, id, state, fields, omitted, base, base_seq, evidence, expires, by, ...}``),
+        whose ``fields`` holds only the fields whose value differs from the element's (keel #565). A
+        proposal that changes nothing is 422 ``invalid_request`` with ``param`` ``fields``.
 
         Any member key that reads the element may propose, a read key included; a key with no
         member (the owner's read key, a demo key) gets 403 ``permission_error``. ``fields`` is a
@@ -891,6 +915,38 @@ class Client:
         of its keys, while it is undecided; a keeper on another's row is 403, anyone else 404."""
         self.call("DELETE", self._proposals_path(element_type, element_id, proposal_id))
 
+    def review_new_element(
+        self, element_type: str, element_id: str, decision: str, reason: str | None = None
+    ) -> dict[str, Any]:
+        """``POST /{type}/{id}/review`` (keel #565): settle a new element written as proposed, one that
+        carries ``x_review_proposed`` (the queue's ``kind: "new_element"`` row). ``decision`` is
+        ``"accept"`` or ``"decline"``; ``reason`` (at most 2,000 characters) goes with a decline only,
+        is answered back and kept nowhere. Anything else is a ValueError before sending.
+
+        Accept writes the mark null (your write: ``changed_by`` you, a new ``change_seq``, one
+        ``/changes`` row) and returns ``{"element": ...}``. Decline deletes the element (the tombstone,
+        the links to it scrubbed, its undecided proposals dropped) and returns ``{"deleted": id}``.
+        The owner's or a co-builder's key with its PIN; the member the mark names is 403
+        ``proposed_only`` (``is_proposed_only``), and an element with no mark 422 ``not_proposed``
+        (``is_not_proposed``), which is also what a retried accept meets when the first one landed
+        (a retried decline meets a 404). A proposed change to an existing element is settled with
+        ``accept_proposal`` or ``decline_proposal`` instead."""
+        if decision not in ("accept", "decline"):
+            raise ValueError(f"review decision must be 'accept' or 'decline', not {decision!r}")
+        if reason is not None and decision != "decline":
+            raise ValueError("a review reason goes with a decline only")
+        t = _segment(element_type, _TYPE, "element type")
+        i = _segment(element_id, _ID, "element id")
+        path = f"{t}/{i}/review"
+        body: dict[str, Any] = {"decision": decision}
+        if reason is not None:
+            body["reason"] = reason
+        data = self.call("POST", path, body, {"X-OW-Client": self._client})
+        settled = "element" if decision == "accept" else "deleted"
+        if not isinstance(data, dict) or settled not in data:
+            raise ValueError(f"POST /{path} returned no {settled}: {str(data)[:200]}")
+        return data
+
     def world_proposals(
         self,
         *,
@@ -901,9 +957,16 @@ class Client:
         cursor: str | None = None,
     ) -> dict[str, Any]:
         """``GET /world/proposals``: one page of the world's queue, ``{data, has_more, next_cursor}``,
-        newest first. ``state`` and ``since`` as on ``list_proposals``; ``element`` keeps one element's
-        rows. Keepers read every proposal in the world, any other member its own; a key with no member
-        and the keyless public view get 404."""
+        newest first by ``created_at``. ``state`` and ``since`` as on ``list_proposals``; ``element``
+        keeps one element's rows. Keepers read every row in the world, any other member its own; a key
+        with no member and the keyless public view get 404.
+
+        Two kinds of row, told apart by ``kind`` (keel #565): ``"proposal"``, a proposed change to an
+        existing element, and ``"new_element"``, a new element that carries ``x_review_proposed``
+        (``{kind, id, element_type, element_id, state, by, evidence, expires, created_at,
+        updated_at}``, ``id`` the element's own; under ``open``, ``lapsed`` and ``all`` only; settled
+        with ``review_new_element``). A row from a server before #565 has no ``kind`` and is a
+        proposal. ``next_cursor`` is opaque: pass it back as it came."""
         query = self._query({"state": state, "since": since, "element": element, "limit": limit, "cursor": cursor})
         path = "world/proposals"
         return self._proposal_page(self.call("GET", path + (f"?{query}" if query else "")), path)
@@ -916,7 +979,8 @@ class Client:
         element: str | None = None,
         limit: int | None = None,
     ) -> Iterator[dict[str, Any]]:
-        """Every row of the world's queue that matches, walking the cursor pages (``world_proposals``)."""
+        """Every row of the world's queue that matches, both kinds, walking the cursor pages
+        (``world_proposals``): each page's ``next_cursor`` is sent back as it came, never parsed."""
         cursor: str | None = None
         while True:
             page = self.world_proposals(state=state, since=since, element=element, limit=limit, cursor=cursor)

@@ -1,5 +1,5 @@
-"""The proposed change (keel #519, PR 180): the proposal calls, the 202 a held write answers, and the
-five error codes. Scripted HTTP, no network."""
+"""The proposed change (keel #519, PR 180; round 2, keel #565, PR 188): the proposal calls, the review
+of a marked new element, the 202 a held write answers, and the six error codes. Scripted HTTP, no network."""
 
 from __future__ import annotations
 
@@ -18,11 +18,13 @@ BASE = "https://www.onlyworlds.com/api/v2/"
 MakeClient = Callable[..., Client]
 
 PROPOSAL: dict[str, Any] = {
+    "kind": "proposal",
     "id": PID,
     "element_type": "location",
     "element_id": ID,
     "state": "open",
     "fields": {"description": "A walled port."},
+    "omitted": [],
     "base": {"description": "A port."},
     "base_seq": 4,
     "evidence": "Chapter 3 says so.",
@@ -35,6 +37,20 @@ PROPOSAL: dict[str, Any] = {
     "decline_reason": None,
     "created_at": "2026-10-22T16:30:00Z",
     "updated_at": "2026-10-22T16:30:00Z",
+}
+NEW = "018f0000-0000-7000-8000-000000000002"
+#: A queue row for a new element marked for review (keel #565): the element is the record.
+MARKED: dict[str, Any] = {
+    "kind": "new_element",
+    "id": NEW,
+    "element_type": "character",
+    "element_id": NEW,
+    "state": "open",
+    "by": "019a0000-0000-7000-8000-0000000000bb",
+    "evidence": "Chapter 4 names her.",
+    "expires": "2026-11-22",
+    "created_at": "2026-10-23T07:00:00Z",
+    "updated_at": "2026-10-23T07:00:00Z",
 }
 
 
@@ -154,6 +170,21 @@ def test_walk_world_proposals_follows_the_cursor(make_client: MakeClient) -> Non
     ]
 
 
+def test_the_walk_yields_both_kinds_of_row_and_sends_the_cursor_back_as_it_came(make_client: MakeClient) -> None:
+    # keel #565: one order newest first, both kinds; the cursor is opaque (`<microseconds>.<id>`
+    # today), never the last row's id.
+    opaque = f"1729666800000000.{PID}"
+    t = FakeTransport(
+        script=[
+            jresp(200, {"data": [MARKED], "has_more": True, "next_cursor": opaque}),
+            jresp(200, {"data": [PROPOSAL], "has_more": False, "next_cursor": None}),
+        ]
+    )
+    rows = list(make_client(t).walk_world_proposals())
+    assert [r["kind"] for r in rows] == ["new_element", "proposal"]
+    assert [path(x) for x in t.calls] == ["world/proposals", f"world/proposals?cursor={opaque}"]
+
+
 def test_a_walk_that_says_more_without_a_cursor_is_refused(make_client: MakeClient) -> None:
     t = FakeTransport(script=[jresp(200, {"data": [], "has_more": True, "next_cursor": None})])
     with pytest.raises(ValueError, match="next_cursor"):
@@ -168,7 +199,46 @@ def test_proposal_path_segments_are_checked(make_client: MakeClient, bad: str) -
         c.accept_proposal("location", ID, bad)
     with pytest.raises(ValueError):
         c.propose("location", bad, {"name": "x"}, evidence="e")
+    with pytest.raises(ValueError):
+        c.review_new_element("character", bad, "accept")
     assert t.calls == []
+
+
+# --- a new element marked for review (keel #565) -------------------------------------
+
+
+def test_review_accept_posts_the_decision_and_returns_the_element(make_client: MakeClient) -> None:
+    answer = {"element": {"id": NEW, "name": "Ann", "x_review_proposed": None}}
+    t = FakeTransport(script=[jresp(200, answer)])
+    assert make_client(t).review_new_element("character", NEW, "accept") == answer
+    (call,) = t.calls
+    assert (call.method, path(call), call.body) == ("POST", f"character/{NEW}/review", {"decision": "accept"})
+    assert call.headers["X-OW-Client"] == "python"
+
+
+def test_review_decline_sends_its_reason_only_when_given(make_client: MakeClient) -> None:
+    t = FakeTransport(handler=lambda *a: jresp(200, {"deleted": NEW}))
+    c = make_client(t)
+    assert c.review_new_element("character", NEW, "decline", reason="Not canon.") == {"deleted": NEW}
+    c.review_new_element("character", NEW, "decline")
+    assert [x.body for x in t.calls] == [{"decision": "decline", "reason": "Not canon."}, {"decision": "decline"}]
+
+
+def test_review_refuses_another_decision_and_a_reason_on_accept_before_sending(make_client: MakeClient) -> None:
+    t = FakeTransport()
+    c = make_client(t)
+    with pytest.raises(ValueError, match="accept' or 'decline"):
+        c.review_new_element("character", NEW, "approve")
+    with pytest.raises(ValueError, match="decline only"):
+        c.review_new_element("character", NEW, "accept", reason="fine")
+    assert t.calls == []
+
+
+@pytest.mark.parametrize(("decision", "answer"), [("accept", {"deleted": NEW}), ("decline", {"element": {}})])
+def test_a_review_answer_without_its_key_is_refused(make_client: MakeClient, decision: str, answer: Any) -> None:
+    t = FakeTransport(script=[jresp(200, answer)])
+    with pytest.raises(ValueError, match="returned no"):
+        make_client(t).review_new_element("character", NEW, decision)
 
 
 # --- the 202: a write held as a proposal ---------------------------------------------
@@ -223,7 +293,7 @@ def test_a_bulk_slot_answering_202_stays_in_the_result(make_client: MakeClient) 
     assert res.proposed == [slots[0]]
 
 
-# --- the five codes -----------------------------------------------------------------
+# --- the six codes ------------------------------------------------------------------
 
 
 def _err(status: int, etype: str, code: str, **beside: Any) -> ApiError:
@@ -231,19 +301,20 @@ def _err(status: int, etype: str, code: str, **beside: Any) -> ApiError:
     return ApiError("POST", "x", jresp(status, {**body, **beside}))
 
 
-FIVE = [
+CODES = [
     (422, "invalid_request", "field_not_visible", "is_field_not_visible"),
     (422, "invalid_request", "too_many_open", "is_too_many_open"),
     (409, "invalid_request", "stale_proposal", "is_stale_proposal"),
     (403, "permission_error", "proposed_only", "is_proposed_only"),
     (403, "permission_error", "own_proposal", "is_own_proposal"),
+    (422, "invalid_request", "not_proposed", "is_not_proposed"),  # keel #565: a review of an unmarked element
 ]
 
 
-@pytest.mark.parametrize(("status", "etype", "code", "flag"), FIVE)
+@pytest.mark.parametrize(("status", "etype", "code", "flag"), CODES)
 def test_each_proposal_code_has_its_own_predicate_and_no_other(status: int, etype: str, code: str, flag: str) -> None:
     e = _err(status, etype, code)
-    assert [f for *_, f in FIVE if getattr(e, f)] == [flag]
+    assert [f for *_, f in CODES if getattr(e, f)] == [flag]
     assert not e.is_permission_error and not e.is_not_author and not e.is_proposed
     assert not e.is_id_conflict and not e.is_idempotency_conflict and not e.is_precondition_failed
     # the same code at another status is not the case
