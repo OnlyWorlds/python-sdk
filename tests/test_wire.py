@@ -410,8 +410,8 @@ def test_patch_world_takes_back_every_key_the_world_body_serves(doc: dict[str, A
 def test_the_list_envelope_names_are_the_ones_iter_elements_follows(doc: dict[str, Any]) -> None:
     names: dict[str, str] = {}
     for key, schema in doc["components"]["schemas"]["CharacterList"]["properties"].items():
-        t = schema["type"] if isinstance(schema["type"], list) else [schema["type"]]
-        names["data" if "array" in t else "more" if "boolean" in t else "next"] = key
+        kinds = schema["type"] if isinstance(schema["type"], list) else [schema["type"]]
+        names["data" if "array" in kinds else "more" if "boolean" in kinds else "next"] = key
     assert set(names) == {"data", "more", "next"}
     pages = [
         jresp(200, {names["data"]: [{"id": "1"}], names["more"]: True, names["next"]: "CURSOR-1"}),

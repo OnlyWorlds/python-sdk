@@ -34,6 +34,7 @@ def fingerprint(root: Path) -> dict[str, str]:
 @needs_fixture
 @pytest.mark.parametrize("legacy", [False, True], ids=["elements-only", "legacy-tolerant"])
 def test_conformance_fixture(legacy: bool) -> None:
+    assert FIXTURE is not None  # needs_fixture skips the test otherwise
     expected: dict[str, Any] = json.loads((FIXTURE / "expected.json").read_text(encoding="utf-8"))
     assert expected["fixture_version"] == "1.2.1"  # 1.2.0 to 1.2.1 changed no element
     world_dir = FIXTURE / "world"

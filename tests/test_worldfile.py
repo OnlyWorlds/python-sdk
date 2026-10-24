@@ -8,6 +8,7 @@ every verdict's zip is on disk, and the package's reader gives each one its verd
 from __future__ import annotations
 
 import hashlib
+import importlib
 import io
 import json
 import os
@@ -182,7 +183,7 @@ def test_a_records_manifest_the_writer_cannot_read_refuses_unless_asked(tmp_path
 
 
 def test_only_the_json_boolean_true_marks_records_private(tmp_path: Path) -> None:
-    entries = [
+    entries: list[dict[str, Any]] = [
         {"producer": "fold", "private": True},
         {"producer": "text", "private": "true"},
         {"producer": "one", "private": 1},
@@ -240,7 +241,7 @@ def test_the_fold_is_casefolding_15_1_c_and_s_rows_for_every_code_point() -> Non
 def test_the_generated_fold_table_is_current() -> None:
     sys.path.insert(0, str(REPO / "codegen"))
     try:
-        import generate_casefold
+        generate_casefold = importlib.import_module("generate_casefold")  # codegen/ is no package: found by path
     finally:
         sys.path.pop(0)
     expected = generate_casefold.render(generate_casefold.rows(CASE_FOLDING.read_text(encoding="utf-8")))
@@ -322,7 +323,7 @@ def test_the_nfc_is_the_pinned_one_not_the_interpreters() -> None:
 def test_the_generated_nfc_tables_are_current() -> None:
     sys.path.insert(0, str(REPO / "codegen"))
     try:
-        import generate_nfc
+        generate_nfc = importlib.import_module("generate_nfc")  # codegen/ is no package: found by path
     finally:
         sys.path.pop(0)
     expected, _ = generate_nfc.build()

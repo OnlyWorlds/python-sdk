@@ -170,7 +170,7 @@ def test_exported_as_mapping_names_only_what_it_knows() -> None:
 def test_a_fresh_export_writes_the_producer_line(tmp_path: Path, make_client: Callable[..., Client]) -> None:
     w, _ = _export(tmp_path, make_client, jresp(200, _me("owner", "owner")))
     assert w["producer"] == {"tool": "onlyworlds", "version": __version__, "input": "server"}
-    assert list(w["producer"]) == ["tool", "version", "input"]  # type: ignore[arg-type]
+    assert list(w["producer"]) == ["tool", "version", "input"]
     assert dict(EXPORT_PRODUCER) == w["producer"]
 
 
@@ -210,7 +210,7 @@ def test_a_tool_exporting_in_its_own_name_writes_its_own_line(
 ) -> None:
     keel = {"input": "server", "version": "2026.10.22", "tool": "keel"}  # any key order in, the spec's out
     w, _ = _export(tmp_path, make_client, jresp(200, _me("owner", "owner")), producer=keel)
-    assert w["producer"] == keel and list(w["producer"]) == ["tool", "version", "input"]  # type: ignore[arg-type]
+    assert w["producer"] == keel and list(w["producer"]) == ["tool", "version", "input"]
     other = {"tool": "papyrus", "version": "9", "input": "papyrus-scroll"}  # an input word is never refused
     w, _ = _export(tmp_path / "2", make_client, jresp(200, _me("owner", "owner")), producer=other)
     assert w["producer"] == other

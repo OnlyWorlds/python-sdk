@@ -433,7 +433,8 @@ def write_json(tmp: Path, data: dict[str, Any], name: str = "variant.json") -> P
 
 def map_doc(data: dict[str, Any], rid: str) -> dict[str, Any]:
     (doc,) = (d for r in data["resources"] if r["id"] == rid for d in r["documents"] if d["type"] == "map")
-    return doc
+    found: dict[str, Any] = doc
+    return found
 
 
 def of_type(out: Path, etype: str) -> dict[str, dict[str, Any]]:

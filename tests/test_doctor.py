@@ -26,6 +26,7 @@ from onlyworlds import (
     CheckRow,
     Client,
     Response,
+    __version__,
     apply_checks,
     doctor,
     read_folder,
@@ -937,7 +938,7 @@ def test_packets_one_entry_per_element_in_the_profiles_shape(tmp_path: Path) -> 
     r4, r6b = (f["reason"] for f in report.to_look_at if f["element"]["id"] == C2)
     assert packet["x_packet_elements"] == [{"type": "character", "id": C2, "reason": f"{r4}. {r6b}."}]
     assert packet["x_packet_source"] == {"server": None, "world": WORLD["id"]}
-    assert packet["x_packet_producer"] == {"tool": "onlyworlds doctor", "version": doctor.__version__}
+    assert packet["x_packet_producer"] == {"tool": "onlyworlds doctor", "version": __version__}
     assert msg["id"] not in json.dumps(packet)
     # a reader needs no lookup: every entry's three keys are strings
     for e in packet["x_packet_elements"]:
@@ -1059,7 +1060,7 @@ def test_11_the_fixture_not_checked_rows_replayed() -> None:
 
 def test_11_a_short_element_is_named_by_type_id_and_name() -> None:
     rules = checks_fixture()["rules"][:1]
-    els = [
+    els: list[dict[str, Any]] = [
         {"type": "character", "id": C1, "name": "Ann"},
         {"type": "character", "id": C2, "name": "Bo", "reputation": 0},
         {"type": "location", "id": L1, "name": "Harbor"},
@@ -1113,7 +1114,7 @@ def test_11_a_field_must_be_one_every_scoped_type_has() -> None:
 
 def test_11_links_min_counts_ids() -> None:
     rule = {"rule": "r", "where": {"type": "relation"}, "require": {"field": "institutions", "links_min": 2}}
-    els = [
+    els: list[dict[str, Any]] = [
         {"type": "relation", "id": "1", "name": "", "institutions": ["a", "b"]},
         {"type": "relation", "id": "2", "name": "", "institutions": ["a"]},
         {"type": "relation", "id": "3", "name": "", "institutions": "a"},

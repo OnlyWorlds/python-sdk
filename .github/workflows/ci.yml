@@ -19,7 +19,7 @@ jobs:
       - run: uv run pytest -q
       - run: uv run ruff check .
       - run: uv run ruff format --check .
-      - run: uv run mypy --strict src
+      - run: uv run mypy --strict src tests
       - run: uv run python codegen/generate_schema.py --check
 
   wire:

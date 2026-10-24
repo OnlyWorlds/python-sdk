@@ -7,11 +7,12 @@ import io
 import random
 from contextlib import redirect_stderr, redirect_stdout
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 import pytest
 
-from onlyworlds import ELEMENT_TYPES, pack, write_folder
+from onlyworlds import ELEMENT_TYPES, is_hidden, pack, write_folder
+from onlyworlds.doctor import Reader as DoctorReader
 from onlyworlds.pack import KNOWN_OF_LINE, build_pack, pack_api, pack_folder, pack_world
 
 W = "w0000000-0000-7000-8000-000000000000"
@@ -427,6 +428,9 @@ class FakeReader:
     def changes(self, *, since: str | None = None, limit: int | None = None) -> dict[str, Any]:
         raise AssertionError("the pack reads no feed")
 
+    def world_proposals(self, **kwargs: Any) -> dict[str, Any]:
+        raise AssertionError("the pack reads no proposals")
+
     def _write(self, *args: Any, **kwargs: Any) -> Any:
         raise AssertionError("the pack wrote")
 
@@ -521,7 +525,9 @@ def test_a_folder_with_an_exported_as_line_packs_it_and_the_api_asks_me(tmp_path
             return {"data": data, "has_more": False, "next_cursor": None}
 
     out2 = tmp_path / "pack-api"
-    pack_api(Reader(), out2)
+    # pack_api reads only me, get_world and list_page; the Reader protocol also names changes and
+    # world_proposals, which this minimal reader deliberately lacks
+    pack_api(cast(DoctorReader, Reader()), out2)
     assert "*Made as the Character Ann: that Character's view, not the whole world.*" in (
         out2 / "00-world.md"
     ).read_text(encoding="utf-8")
@@ -719,7 +725,7 @@ def test_hidden_elements_are_left_out_counted_and_never_named() -> None:
     for value in (False, None):
         _, report = built([(t, {**b, "hidden": value} if b["id"] == C3 else b) for t, b in with_hidden()])
         assert (report.hidden_left_out, report.elements) == (0, 9)
-    assert pack.is_hidden({"hidden": "yes"}) and not pack.is_hidden({"hidden": False})  # a doubt leaves it out
+    assert is_hidden({"hidden": "yes"}) and not is_hidden({"hidden": False})  # a doubt leaves it out
 
 
 def test_a_kept_hidden_element_is_labelled_and_so_is_every_link_to_it() -> None:

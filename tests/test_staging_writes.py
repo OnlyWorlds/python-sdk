@@ -10,7 +10,7 @@ from __future__ import annotations
 
 import os
 import uuid
-from collections.abc import Iterator
+from collections.abc import Callable, Iterator
 
 import pytest
 
@@ -203,7 +203,7 @@ def test_a_contributor_changes_only_what_they_made(owner: Client, contrib: Clien
 
     mine = owner.create("character", {"name": "Owner's"})
     made.append(("character", mine["id"]))
-    attempts = {
+    attempts: dict[str, Callable[[], object]] = {
         "patch": lambda: contrib.patch("character", mine["id"], {"description": "x"}),
         "delete": lambda: contrib.delete("character", mine["id"]),
         "put": lambda: contrib.upsert("character", mine["id"], {"name": "overwritten"}),

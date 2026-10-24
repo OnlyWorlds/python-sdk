@@ -185,7 +185,7 @@ def test_read_write_round_trip_is_byte_identical(tmp_path: Path) -> None:
         assert (tmp_path / "two" / p.relative_to(tmp_path / "one")).read_bytes() == p.read_bytes()
 
 
-def test_world_json_carries_the_three_unit_settings_under_the_same_spelling():
+def test_world_json_carries_the_three_unit_settings_under_the_same_spelling() -> None:
     """Canonical 00.31.00: length_unit, mass_unit and distance_unit are wire and disk keys alike.
 
     Folder spec v0.3.7.

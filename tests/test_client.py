@@ -45,7 +45,7 @@ def test_each_call_uses_its_verb_path_and_no_world(make_client: MakeClient) -> N
 
 def test_delete_is_204_and_returns_none(make_client: MakeClient) -> None:
     t = FakeTransport(script=[Response(204, b"", {})])
-    assert make_client(t).delete("character", ID) is None
+    assert make_client(t).delete("character", ID) is None  # type: ignore[func-returns-value]  # the 204 returns None
     assert (t.calls[0].method, t.calls[0].url.endswith(f"character/{ID}/")) == ("DELETE", True)
 
 
@@ -113,13 +113,14 @@ def test_iter_elements_follows_the_cursor_and_refuses_a_missing_one(make_client:
 
 def test_path_segments_are_checked(make_client: MakeClient) -> None:
     c = make_client(FakeTransport())
-    for call in (
+    refused: tuple[Callable[[], object], ...] = (
         lambda: c.get("character/../world", ID),
         lambda: c.get("character", "x/y"),
         lambda: c.get("Character", ID),
         lambda: c.edit_links("character", ID, "a?b", add=[]),
         lambda: c.list_page("a b"),
-    ):
+    )
+    for call in refused:
         with pytest.raises(ValueError, match="path segment"):
             call()
 

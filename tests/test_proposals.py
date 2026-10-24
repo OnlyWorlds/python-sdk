@@ -138,7 +138,7 @@ def test_decline_sends_its_reason_only_when_given(make_client: MakeClient) -> No
 
 def test_withdraw_is_a_delete_answering_204(make_client: MakeClient) -> None:
     t = FakeTransport(script=[Response(204, b"", {})])
-    assert make_client(t).withdraw_proposal("location", ID, PID) is None
+    assert make_client(t).withdraw_proposal("location", ID, PID) is None  # type: ignore[func-returns-value]  # the 204 returns None
     assert (t.calls[0].method, path(t.calls[0])) == ("DELETE", f"location/{ID}/proposals/{PID}")
 
 
