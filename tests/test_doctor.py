@@ -201,6 +201,27 @@ def test_4_an_element_only_linked_to_is_not_alone(tmp_path: Path) -> None:
     assert found(r, "4") == []
 
 
+def test_4_on_a_spine_world_a_dependency_is_a_link(tmp_path: Path) -> None:
+    """A spine draws its edges with x_spine_depends_on, so a row that only depends, or is only depended
+    on, is not unlinked. The same key name off the profile's prefix counts for nothing."""
+    a, b = "0192a000-aaaa-7bbb-8ccc-0000000000a1", "0192a000-aaaa-7bbb-8ccc-0000000000b2"
+    rows = with_(
+        clean(),
+        "object",
+        {"id": a, "name": "The app", "description": "x", "supertype": "Tool", "x_spine_depends_on": [b]},
+    )
+    rows = with_(rows, "object", {"id": b, "name": "The package", "description": "x", "supertype": "Package"})
+    assert [f["element"]["id"] for f in found(folder_report(tmp_path, rows), "4")] == []
+    off = with_(clean(), "object", {"id": a, "name": "The app", "description": "x", "x_other_depends_on": [b]})
+    off = with_(off, "object", {"id": b, "name": "The package", "description": "x"})
+    assert sorted(f["element"]["id"] for f in found(folder_report(tmp_path, off), "4")) == sorted([a, b])
+    lone = with_(
+        rows, "object", {"id": L2, "name": "Lonely", "description": "x", "supertype": "Tool", "x_spine_depends_on": []}
+    )
+    (f,) = found(folder_report(tmp_path, lone), "4")
+    assert f["element"]["id"] == L2 and "x_spine_depends_on" in f["reason"]  # an empty list is no dependency
+
+
 def test_4_never_calls_a_stub_linkless(tmp_path: Path) -> None:
     stub = {"id": C2, "name": "Bo", "description": "", "known_of": True, "updated_at": "2026-10-20T00:00:00Z"}
     r = folder_report(tmp_path, with_(clean(), "character", stub))

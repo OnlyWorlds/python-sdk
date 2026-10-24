@@ -2,6 +2,10 @@
 
 The package version runs on its own semver; the schema it is generated from is `SCHEMA_DIST_TAG`.
 
+## 0.45.2 (2026-10-24)
+
+- **The doctor's flag 4 counts a dependency as a link on a spine world.** A spine draws its edges with `x_spine_depends_on`, so on a world that carries the profile (any `x_spine_` key, flag 13's test) a non-empty list is a link out from its element and a link in to each id it names. Before, every element of the OnlyWorlds Spine read as having no links in or out (348 of 348 on its first run through a crew seat); now 102 of 378 do, each with neither a link field nor a dependency either way. An empty list is no dependency. On any other world nothing changes. A test with a mutant watched failing.
+
 ## 0.45.1 (2026-10-24)
 
 - **The `.owworld` reader's NFC is Unicode 15.1's own, built from the set's files.** OW-18 folds every entry name with NFC, then simple case folding, and two names that fold to one refuse the file. The fold was already a table from the vendored `CaseFolding-15.1.0.txt`; the NFC before it was the interpreter's `unicodedata.normalize`, which is Python's Unicode (15.0 on 3.12, 16.0 on 3.14). Since schema-dist serial 57 the spec (§4.7) rules that the NFC is built from `UnicodeData-15.1.0.txt` and `CompositionExclusions-15.1.0.txt`, vendored beside `CaseFolding`, never a runtime's. On 3.14 the old reader joined 20 code points that 15.1 leaves unassigned (Todhri, Tulu-Tigalari, Gurung Khema, Kirat Rai): U+11383 against U+11382 U+113C9 was refused as one name, and is two at 15.1. The same fold matches a private producer's `RECORDS.json` entry to its directory (OW-8), so that follows too.

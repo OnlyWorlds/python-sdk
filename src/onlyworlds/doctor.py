@@ -475,6 +475,15 @@ def _walk(run: _Run, els: list[_El], *, days: int, now: _dt.datetime, whole_view
             links_out.add(el.id)
             if isinstance(value, str):
                 linked_to.add(value)
+    # On a spine world (flag 13's test) a dependency is a link: the profile draws its edges with
+    # x_spine_depends_on, so a row that only depends, or is only depended on, is not unlinked.
+    spine = any(isinstance(k, str) and k.startswith(SPINE_PREFIX) for el in els for k in el.body)
+    if spine:
+        for el in els:
+            deps = read_spine_element(el.type, el.body).depends_on or ()
+            if deps:
+                links_out.add(el.id)
+                linked_to.update(deps)
     known = 0
     for el in els:
         if el.id in linked_to or el.id in links_out:
@@ -483,7 +492,10 @@ def _walk(run: _Run, els: list[_El], *, days: int, now: _dt.datetime, whole_view
         if el.known_of:
             continue  # a stub's absent links are unknown, not absent
         known += 1
-        run.find("4", el, "no link field is set on it and no element links to it", {})
+        why = "no link field is set on it and no element links to it"
+        if spine:
+            why = "no link field or x_spine_depends_on is set on it, and no element links to it or depends on it"
+        run.find("4", el, why, {})
     run.ran("4", known, len(els))
 
     # 5. Two elements of one type whose names collide after folding. Across types is no
