@@ -128,7 +128,7 @@ def test_the_clean_world_has_nothing_to_look_at(tmp_path: Path) -> None:
     r = folder_report(tmp_path, clean())
     assert r.findings == []
     assert r.ran == ["1", "3", "4", "5", "6a", "6b", "9", "10", "11"]
-    assert [x["flag"] for x in r.not_run] == ["2", "7", "8", "12"]
+    assert [x["flag"] for x in r.not_run] == ["2", "7", "8", "12", "13"]
     assert r.world == {"id": WORLD["id"], "name": WORLD["name"], "door": "folder"}
     assert r.written == 0
     assert r.compared["3"] == {"n": 1, "of": 1}
@@ -398,7 +398,7 @@ def test_the_prose_report_reads_counts_first(tmp_path: Path) -> None:
     write_folder(root, WORLD, edit(clean(), "event", E1, end_date=1))
     _, out, _ = run_main([str(root)])
     lines = out.splitlines()
-    assert lines[2] == "1 things to look at, 9 flags ran, 4 could not run, 0 things written"
+    assert lines[2] == "1 things to look at, 9 flags ran, 5 could not run, 0 things written"
     assert lines.index("What was checked") < lines.index("What could not be checked, and why")
     assert "  - event Storm (" + E1 + "): it ends before it starts" in lines
     assert (
@@ -535,6 +535,7 @@ def test_the_api_door_on_the_clean_world() -> None:
         "7": "read marks are not readable through the API",
         "9": "a file-side check: the API door reads no world.json",
         "10": "a file-side check: the API door reads no world.json",
+        "13": "no x_spine_ key in the world",
     }
     assert set(reader.calls) >= {"me", "get_world", "changes", "list_page character"}
 
@@ -1441,3 +1442,215 @@ def test_11_rules_on_a_charter_that_is_not_a_law_are_not_read(tmp_path: Path) ->
     assert f["element"]["id"] == CON1 and f["evidence"] == {"filed_as": "construct"}
     assert "a Law with supertype Charter" in f["reason"]
     assert r.compared[HR]["of"] == 0
+
+
+# --- 13. the spine (the spine profile and its audit) ---------------------------------
+
+SP = "13"
+SEAT1 = "s0000000-0000-7000-8000-000000000001"
+SEAT2 = "s0000000-0000-7000-8000-000000000002"
+PKG = "o0000000-0000-7000-8000-000000000001"
+PKG2 = "o0000000-0000-7000-8000-000000000002"
+REPO_L = "l0000000-0000-7000-8000-0000000000a1"
+STD = "k0000000-0000-7000-8000-000000000001"
+CHARTER = "a0000000-0000-7000-8000-0000000000c1"
+KAEL = "c0000000-0000-7000-8000-0000000000a1"
+SPECIES = "y0000000-0000-7000-8000-000000000001"
+SPINE_NOT_CHECKED = ["retirement", "probe passes", "x_spine_probed"]
+
+
+def spine() -> Elements:
+    """A spine world flag 13 finds nothing in: one seat keeps the four rows, the package's dependency
+    resolves, its probe is in the form. A Character and a Species are not rows."""
+    return {
+        "title": [
+            {
+                "id": SEAT1,
+                "name": "Assembly",
+                "supertype": "Seat",
+                "authority": "Keeps the SDK.",
+                "holders": [KAEL],
+                "objects": [PKG],
+                "locations": [REPO_L],
+                "constructs": [STD],
+                "laws": [CHARTER],
+            }
+        ],
+        "object": [
+            {
+                "id": PKG,
+                "name": "sdk",
+                "supertype": "Package",
+                "location": REPO_L,
+                "x_spine_address": ["npm: @onlyworlds/sdk"],
+                "x_spine_status": "live",
+                "x_spine_access": "public",
+                "x_spine_audience": ["builder", "agent"],
+                "x_spine_depends_on": [STD],
+                "x_spine_probe": "npm @onlyworlds/sdk",
+            }
+        ],
+        "location": [{"id": REPO_L, "name": "sdk repo", "supertype": "Repo", "x_spine_status": "live"}],
+        "construct": [{"id": STD, "name": "the schema", "supertype": "Standard"}],
+        "law": [{"id": CHARTER, "name": "Spine Charter", "supertype": "Charter", "declaration": "One owner a row."}],
+        "character": [{"id": KAEL, "name": "Kael", "supertype": "Mind"}],
+        "species": [{"id": SPECIES, "name": "Mind", "supertype": "Not on any list"}],
+    }
+
+
+def spine_found(r: Report) -> list[dict[str, Any]]:
+    return found(r, SP)
+
+
+def test_13_a_clean_spine_world_has_nothing_to_look_at(tmp_path: Path) -> None:
+    r = folder_report(tmp_path, spine())
+    assert spine_found(r) == [] and SP in r.ran
+    c = r.compared[SP]
+    assert {k: c[k] for k in ("n", "of", "rows", "seats", "depends_on", "stubs_not_judged")} == {
+        "n": 7,
+        "of": 7,
+        "rows": 4,
+        "seats": 1,
+        "depends_on": 1,
+        "stubs_not_judged": 0,
+    }
+    assert [x["check"] for x in c["not_checked"]] == SPINE_NOT_CHECKED
+    assert SP not in [x["flag"] for x in r.not_run]
+
+
+def test_13_does_not_run_on_a_world_with_no_x_spine_key(tmp_path: Path) -> None:
+    base = spine()
+    for bodies in base.values():
+        for body in bodies:
+            for key in [k for k in body if k.startswith("x_spine_")]:
+                del body[key]
+    for r in (folder_report(tmp_path, base), api_report(FakeReader(on_the_wire(base)))):
+        assert SP not in r.ran and SP not in r.compared and spine_found(r) == []
+        assert [x["why"] for x in r.not_run if x["flag"] == SP] == ["no x_spine_ key in the world"]
+
+
+def test_13_one_x_spine_key_anywhere_makes_a_spine_world(tmp_path: Path) -> None:
+    r = folder_report(tmp_path, edit(clean(), "character", C1, x_spine_status="live"))
+    assert SP in r.ran
+    # clean()'s Location, Title, Event, Narrative and Relation carry no listed supertype: each named
+    off = {f["element"]["id"] for f in spine_found(r) if "off the spine's list" in f["reason"]}
+    assert off == {L1, T1, E1, N1, R1}  # the Charter Law is on the list; the Character is free
+
+
+def test_13_an_off_list_supertype_on_a_listed_type(tmp_path: Path) -> None:
+    base = with_(spine(), "object", {"id": PKG2, "name": "docs", "supertype": "Page"})
+    r = folder_report(tmp_path, base)
+    (f,) = spine_found(r)
+    assert f["element"]["id"] == PKG2 and f["evidence"] == {"supertype": "Page"}
+    assert f["reason"].startswith("its supertype is off the spine's list for object (Tool, Service")
+    (f,) = spine_found(folder_report(tmp_path, with_(spine(), "object", {"id": PKG2, "name": "docs"})))
+    assert f["element"]["id"] == PKG2 and f["evidence"] == {"supertype": None}
+
+
+def test_13_a_type_off_the_list_and_a_free_type_are_not_findings(tmp_path: Path) -> None:
+    r = folder_report(tmp_path, edit(spine(), "character", KAEL, supertype="Anything at all"))
+    assert spine_found(r) == []  # nor is spine()'s Species, whose supertype is on no list
+
+
+def test_13_each_dropped_value_is_a_finding_with_its_key_and_value(tmp_path: Path) -> None:
+    r = folder_report(tmp_path, edit(spine(), "object", PKG, x_spine_access="secret", x_spine_audience=["alien", 7]))
+    assert [(f["element"]["id"], f["evidence"]) for f in spine_found(r)] == [
+        (PKG, {"key": "x_spine_access", "value": "secret"}),
+        (PKG, {"key": "x_spine_audience", "value": "alien"}),
+        (PKG, {"key": "x_spine_audience", "value": 7}),
+    ]
+    assert spine_found(r)[0]["reason"] == "the spine reader left out a value of x_spine_access"
+
+
+def test_13_a_probe_not_in_the_form_is_unsupported(tmp_path: Path) -> None:
+    r = folder_report(tmp_path, edit(spine(), "object", PKG, x_spine_probe="curl https://example.com"))
+    (f,) = spine_found(r)
+    assert f["element"]["id"] == PKG and f["evidence"] == {"probe": "curl https://example.com"}
+    assert "not in the probe form" in f["reason"]
+
+
+def test_13_a_row_no_seat_keeps(tmp_path: Path) -> None:
+    r = folder_report(tmp_path, edit(spine(), "title", SEAT1, objects=[]))
+    (f,) = spine_found(r)
+    assert f["element"]["id"] == PKG
+    assert f["reason"] == "no seat keeps it: no Title with supertype Seat lists it in its objects"
+    assert f["evidence"] == {"spine_kind": "Package", "field": "objects", "seats": []}
+
+
+def test_13_a_title_that_is_not_a_seat_keeps_nothing(tmp_path: Path) -> None:
+    base = edit(spine(), "title", SEAT1, supertype="Office")
+    r = folder_report(tmp_path, base)
+    no_seat = {f["element"]["id"] for f in spine_found(r) if f["reason"].startswith("no seat keeps it")}
+    assert no_seat == {PKG, REPO_L, STD, CHARTER}
+    assert r.compared[SP]["seats"] == 0
+
+
+def test_13_a_seat_is_read_trimmed_and_case_blind(tmp_path: Path) -> None:
+    assert spine_found(folder_report(tmp_path, edit(spine(), "title", SEAT1, supertype="  sEAT "))) == []
+
+
+def test_13_a_seat_keeps_a_row_only_through_the_rows_own_field(tmp_path: Path) -> None:
+    r = folder_report(tmp_path, edit(spine(), "title", SEAT1, objects=[], locations=[REPO_L, PKG]))
+    (f,) = spine_found(r)
+    assert f["element"]["id"] == PKG and f["evidence"]["field"] == "objects"
+
+
+def test_13_two_seats_keeping_one_row(tmp_path: Path) -> None:
+    second = {"id": SEAT2, "name": "Forge", "supertype": "Seat", "objects": [PKG, PKG]}
+    r = folder_report(tmp_path, with_(spine(), "title", second))
+    (f,) = spine_found(r)
+    assert f["element"]["id"] == PKG
+    assert f["reason"] == "2 seats keep it (Assembly, Forge): a row has one owner"
+    assert [s["id"] for s in f["evidence"]["seats"]] == [SEAT1, SEAT2]
+    assert r.compared[SP]["seats"] == 2
+
+
+def test_13_the_charter_is_a_row_like_any_other(tmp_path: Path) -> None:
+    """The page's audit is "one owner per row" and Charter is one of the row kinds; it exempts none."""
+    (f,) = spine_found(folder_report(tmp_path, edit(spine(), "title", SEAT1, laws=[])))
+    assert f["element"]["id"] == CHARTER and f["evidence"]["spine_kind"] == "Charter"
+
+
+def test_13_a_depends_on_id_that_is_not_in_the_world(tmp_path: Path) -> None:
+    base = edit(spine(), "object", PKG, x_spine_depends_on=[STD, GHOST])
+    for r in (folder_report(tmp_path, base), api_report(FakeReader(on_the_wire(base)))):
+        (f,) = spine_found(r)
+        assert f["element"]["id"] == PKG
+        assert f["evidence"] == {"key": "x_spine_depends_on", "missing_id": GHOST}
+        assert r.compared[SP]["depends_on"] == 2
+
+
+def test_13_depends_on_is_not_checked_through_a_guest_key() -> None:
+    base = on_the_wire(edit(spine(), "object", PKG, x_spine_depends_on=[GHOST]))
+    r = api_report(FakeReader(base, role="guest"))
+    assert spine_found(r) == [] and SP in r.ran
+    c = r.compared[SP]
+    assert c["depends_on"] is None
+    assert c["not_checked"][0] == {
+        "check": "x_spine_depends_on",
+        "why": "a guest key cannot see every element: an id it cannot see is not a missing one",
+    }
+    assert [x["check"] for x in c["not_checked"][1:]] == SPINE_NOT_CHECKED
+    assert len(spine_found(api_report(FakeReader(base, role="contributor")))) == 1
+
+
+def test_13_a_known_of_stub_is_not_read_but_a_stub_seat_still_keeps(tmp_path: Path) -> None:
+    stub = {"id": PKG2, "name": "docs", "known_of": True}
+    base = edit(with_(spine(), "object", stub), "title", SEAT1, known_of=True)
+    r = folder_report(tmp_path, base)
+    assert spine_found(r) == []
+    assert r.compared[SP]["stubs_not_judged"] == 2 and r.compared[SP]["n"] == 6 and r.compared[SP]["seats"] == 1
+
+
+def test_13_in_the_prose_report(tmp_path: Path) -> None:
+    root = tmp_path / "w"
+    write_folder(root, WORLD, edit(spine(), "title", SEAT1, objects=[]))
+    _, out, _ = run_main([str(root)])
+    lines = out.splitlines()
+    assert "13. The spine (its profile and its audit) (1)" in lines
+    assert f"  - object sdk ({PKG}): no seat keeps it: no Title with supertype Seat lists it in its objects" in lines
+    assert (
+        "  13. The spine (its profile and its audit): 7 of 7 elements read under the spine profile "
+        "(4 rows against 1 seats; 1 x_spine_depends_on ids compared)"
+    ) in lines
+    assert "      not checked, x_spine_probed: written by the probe gate only; the doctor does not read it" in lines

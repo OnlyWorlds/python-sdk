@@ -60,6 +60,20 @@ keeper reads every row, any other member its own). A key with no member reads no
 404): the flag does not run, and says why. A row's ``evidence`` is outside text and is never read
 into a finding.
 
+On both doors, (13) the spine (schema-dist ``profiles/spine.md``, serial 56), on a world where some
+element carries an ``x_spine_`` key (any other world skips it and says so). Each element is read by
+``onlyworlds.spine.read_spine_element``: a listed type whose supertype is off the spine's list (or
+empty) is a finding, and so is every value the reader drops (the key and the value) and a probe not in
+the probe form; a type the list does not name, and the three free types, are not. Then the audit's
+definite parts, which need the whole world: each row (an Object, Construct, Location or Law of a kind
+on the list, the world's ``Charter`` too: the page exempts none) is kept by exactly one Title with
+supertype ``Seat``, through the Seat's ``objects``, ``constructs``, ``locations`` or ``laws``; no seat,
+or two, is a finding. Every ``x_spine_depends_on`` id must be in the world, a check that does not run
+through a guest key. A ``legacy`` or ``provenance`` row's Retirement Event (named by its text, which
+no structure attributes), whether a probe passes and ``x_spine_probed`` (the probe gate's) are never
+checked, and ``compared`` names them in ``not_checked``. A known-of stub is not read, though a Seat
+that is one still keeps what it lists.
+
 A flag the walk cannot evaluate is reported in ``not_run`` with its reason, never as clean,
 and every flag that ran says how much it could compare (``compared: {n, of}``): a clean
 count over nothing compared is not a pass. A known-of stub's absent fields are unknown,
@@ -107,12 +121,13 @@ from itertools import pairwise
 from pathlib import Path
 from typing import Any, Protocol
 
-from ._schema import ELEMENT_TYPES, FIELD_KINDS, GENERIC_PAIRS, LINK_TARGETS
+from ._schema import ELEMENT_TYPES, FIELD_KINDS, GENERIC_PAIRS, LINK_TARGETS, SPINE_KINDS
 from ._version import __version__
 from .checks import CHECKS_FIELD, apply_checks
 from .errors import ApiError
 from .folder import FORMAT_VERSION, WORLD_FILE, Folder, is_known_of, read_folder
 from .http import API_BASE, Client
+from .spine import SPINE_OFF_LIST, SPINE_PREFIX, read_spine_element
 
 __all__ = [
     "CHECKS_FLAG",
@@ -121,6 +136,7 @@ __all__ = [
     "PACKET_CAP",
     "PACKET_TOOL",
     "PROPOSALS_FLAG",
+    "SPINE_FLAG",
     "Reader",
     "Report",
     "doctor_api",
@@ -135,6 +151,8 @@ __all__ = [
 CHECKS_FLAG = "11"
 #: The proposals flag (keel #519): the world's queue, on the API door only.
 PROPOSALS_FLAG = "12"
+#: The spine flag (the spine profile and its audit): on both doors, on a world that carries an x_spine_ key.
+SPINE_FLAG = "13"
 
 #: Flag id -> what it looks for. The ids are strings because flag 6 has two readings.
 FLAGS: dict[str, str] = {
@@ -151,6 +169,7 @@ FLAGS: dict[str, str] = {
     "10": "An api_key in a tracked world.json",
     CHECKS_FLAG: "House rules (the checks profile)",
     PROPOSALS_FLAG: "Proposals waiting",
+    SPINE_FLAG: "The spine (its profile and its audit)",
 }
 
 #: A finding on an element of these supertypes (compared case-folded) is ``kind: "message"``
@@ -171,6 +190,7 @@ _UNITS: dict[str, str] = {
     "10": "world.json",
     CHECKS_FLAG: "house rules applied",
     PROPOSALS_FLAG: "open and lapsed queue rows read",
+    SPINE_FLAG: "elements read under the spine profile",
 }
 
 #: Fields that hold no prose even when the schema types them text.
@@ -660,6 +680,123 @@ def _house_rules(run: _Run, els: list[_El], *, view: str, named: Any = _NOT_ASKE
     )
 
 
+#: A row kind's type -> the Seat's field that lists it (the spine profile: "Ownership is the standard's").
+_SEAT_FIELDS: dict[str, str] = {"object": "objects", "construct": "constructs", "location": "locations", "law": "laws"}
+#: What flag 13 never checks, and why (the audit's parts a structure cannot settle, and the gate's own).
+_SPINE_NOT_CHECKED: tuple[tuple[str, str], ...] = (
+    (
+        "retirement",
+        "a legacy or provenance row's Retirement Event names the row in its text, which a checker cannot "
+        "attribute by structure",
+    ),
+    ("probe passes", "whether a probe passes is the probe gate's to run; the doctor runs nothing"),
+    ("x_spine_probed", "written by the probe gate only; the doctor does not read it"),
+)
+
+
+def _spine(run: _Run, els: list[_El], *, whole_view: bool = True) -> None:
+    """Flag 13: each element read under the spine profile (``read_spine_element``), and the audit's
+    definite parts: one Seat per row, every ``x_spine_depends_on`` id resolving (only with the whole
+    view). Runs only on a world that carries an ``x_spine_`` key. A known-of stub is not read: its
+    absent supertype is unknown, not off the list."""
+    flag = SPINE_FLAG
+    if not any(isinstance(k, str) and k.startswith(SPINE_PREFIX) for el in els for k in el.body):
+        run.skip(flag, f"no {SPINE_PREFIX} key in the world")
+        return
+    ids = {el.id for el in els}
+    judged = [el for el in els if not el.known_of]
+    reads = [(el, read_spine_element(el.type, el.body)) for el in judged]
+
+    for el, read in reads:
+        if read.kind == SPINE_OFF_LIST and el.type in SPINE_KINDS:
+            listed = ", ".join(SPINE_KINDS[el.type])
+            supertype = el.body.get("supertype")
+            run.find(
+                flag,
+                el,
+                f"its supertype is off the spine's list for {el.type} ({listed})",
+                {"supertype": supertype},
+            )
+        for entry in read.dropped:
+            run.find(
+                flag,
+                el,
+                f"the spine reader left out a value of {entry['key']}",
+                {"key": entry["key"], "value": entry["value"]},
+            )
+        if read.probe == "unsupported":
+            run.find(
+                flag,
+                el,
+                "its x_spine_probe is not in the probe form, so it is never run",
+                {"probe": el.body.get("x_spine_probe")},
+            )
+
+    # One owner per row: exactly one Title with supertype Seat lists it.
+    # A Seat that is a known-of stub still keeps what it lists.
+    seats = [el for el in els if el.type == "title" and read_spine_element("title", el.body).kind == "Seat"]
+    keepers: dict[tuple[str, str], list[_El]] = defaultdict(list)
+    for seat in seats:
+        for fname in _SEAT_FIELDS.values():
+            value = seat.body.get(fname)
+            ids_listed = value if isinstance(value, list) else []
+            for rid in dict.fromkeys(v for v in ids_listed if isinstance(v, str)):
+                keepers[(fname, rid)].append(seat)
+    rows = [(el, read) for el, read in reads if el.type in _SEAT_FIELDS and read.kind != SPINE_OFF_LIST]
+    for el, read in rows:
+        fname = _SEAT_FIELDS[el.type]
+        kept = keepers.get((fname, el.id), [])
+        if not kept:
+            run.find(
+                flag,
+                el,
+                f"no seat keeps it: no Title with supertype Seat lists it in its {fname}",
+                {"spine_kind": read.kind, "field": fname, "seats": []},
+            )
+        elif len(kept) > 1:
+            names = ", ".join(s.name or s.id for s in kept)
+            run.find(
+                flag,
+                el,
+                f"{len(kept)} seats keep it ({names}): a row has one owner",
+                {"spine_kind": read.kind, "field": fname, "seats": [s.ref() for s in kept]},
+            )
+
+    # Every x_spine_depends_on id resolves to an element in the world.
+    not_checked = [{"check": check, "why": why} for check, why in _SPINE_NOT_CHECKED]
+    depends: int | None = None
+    if whole_view:
+        depends = 0
+        for el, read in reads:
+            for dep in read.depends_on or ():
+                depends += 1
+                if dep not in ids:
+                    run.find(
+                        flag,
+                        el,
+                        "its x_spine_depends_on names an id that is not in the world",
+                        {"key": "x_spine_depends_on", "missing_id": dep},
+                    )
+    else:
+        not_checked.insert(
+            0,
+            {
+                "check": "x_spine_depends_on",
+                "why": "a guest key cannot see every element: an id it cannot see is not a missing one",
+            },
+        )
+    run.ran(
+        flag,
+        len(reads),
+        len(els),
+        rows=len(rows),
+        seats=len(seats),
+        depends_on=depends,
+        stubs_not_judged=len(els) - len(judged),
+        not_checked=not_checked,
+    )
+
+
 # ---------------------------------------------------------------------------
 # The folder door
 # ---------------------------------------------------------------------------
@@ -739,6 +876,7 @@ def doctor_folder(folder: Folder, *, days: int = 14, changes: int = 50, now: _dt
     els = [_El(fe.type, eid, fe.body) for eid, fe in folder.all_elements().items()]
     _walk(run, els, days=days, now=now or _dt.datetime.now(_dt.UTC))
     _house_rules(run, els, view="folder")
+    _spine(run, els)
     run.skip("2", "needs the feed's history of Title.holders")
     run.skip("7", "read marks are not in the folder")
     run.skip("8", "no feed in a folder")
@@ -958,6 +1096,7 @@ def doctor_api(client: Reader, *, days: int = 14, changes: int = 50, now: _dt.da
         els.extend(_El(t, b["id"], b) for b in _list_all(client, t) if isinstance(b.get("id"), str))
     _walk(run, els, days=days, now=at, whole_view=role != "guest")
     _house_rules(run, els, view=view, named=named)
+    _spine(run, els, whole_view=role != "guest")
     try:
         rows, head = _feed(client)
     except (ApiError, ConnectionError, ValueError) as exc:
@@ -1011,9 +1150,14 @@ def _lines(report: Report) -> Iterable[str]:
             if c.get("new_open") or c.get("new_lapsed"):
                 counted += f"; new elements open: {c['new_open']}, lapsed: {c['new_lapsed']}"
             counted += f"; view: {c['view']})"
+        if c and flag == SPINE_FLAG:
+            counted += f" ({_spine_note(c)})"
         yield f"  {flag}. {FLAGS[flag]}{counted}"
         if c and flag == CHECKS_FLAG:
             yield from _rule_lines(c)
+        if c and flag == SPINE_FLAG:
+            for item in c.get("not_checked", []):
+                yield f"      not checked, {item['check']}: {item['why']}"
     if report.not_run:
         yield ""
         yield "What could not be checked, and why"
@@ -1036,6 +1180,16 @@ def _rules_note(c: Mapping[str, Any]) -> str:
         note += f"; no charter carries {CHECKS_FIELD}"
     if c.get("stubs_not_judged"):
         note += f"; {c['stubs_not_judged']} known-of stubs not judged"
+    return note
+
+
+def _spine_note(c: Mapping[str, Any]) -> str:
+    """The spine line's parenthesis: rows and seats, the dependencies compared, the stubs not read."""
+    note = f"{c['rows']} rows against {c['seats']} seats"
+    if c.get("depends_on") is not None:
+        note += f"; {c['depends_on']} x_spine_depends_on ids compared"
+    if c.get("stubs_not_judged"):
+        note += f"; {c['stubs_not_judged']} known-of stubs not read"
     return note
 
 
