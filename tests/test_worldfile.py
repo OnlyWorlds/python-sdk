@@ -32,12 +32,14 @@ from onlyworlds import (
 )
 from onlyworlds._jsonfmt import encode
 from onlyworlds.folder import slugify
-from onlyworlds.worldfile import REASONS, WORLD_FILE_MAX_BYTES, WORLD_FILE_MAX_ENTRIES, simple_case_fold
+from onlyworlds.worldfile import REASONS, WORLD_FILE_MAX_BYTES, WORLD_FILE_MAX_ENTRIES, nfc, simple_case_fold
 
 REPO = Path(__file__).resolve().parent.parent
 SET_ROOT = Path(os.environ.get("OW_OWWORLD_FIXTURES") or REPO / "codegen" / "schema-dist" / "fixtures" / "owworld")
 FIXTURES = SET_ROOT if (SET_ROOT / "verdicts.json").is_file() else SET_ROOT / "fixtures"
 CASE_FOLDING = REPO / "codegen" / "schema-dist" / "fixtures" / "owworld" / "CaseFolding-15.1.0.txt"
+# Unicode's conformance file as published (unicode.org/Public/15.1.0/ucd/NormalizationTest.txt), byte for byte.
+NORMALIZATION_TEST = REPO / "tests" / "fixtures" / "NormalizationTest-15.1.0.txt"
 HYPERION = REPO / "codegen" / "schema-dist" / "example" / "hyperion"
 WID = "0192a000-aaaa-7bbb-8ccc-000000000001"
 
@@ -243,6 +245,88 @@ def test_the_generated_fold_table_is_current() -> None:
         sys.path.pop(0)
     expected = generate_casefold.render(generate_casefold.rows(CASE_FOLDING.read_text(encoding="utf-8")))
     assert (REPO / "src" / "onlyworlds" / "_casefold.py").read_text(encoding="utf-8") == expected
+
+
+# --- the NFC before the fold (OW-18, serial 57) ------------------------------------------------
+
+
+def test_the_nfc_is_unicode_15_1_on_every_line_of_normalization_test() -> None:
+    data = NORMALIZATION_TEST.read_bytes()
+    assert hashlib.sha256(data).hexdigest() == "871238e37e3be0696ec2bd0891119a041b052da1a84485eda05a5438724b223e"
+    part, lines, wrong = "", 0, []
+    listed: set[int] = set()
+    for line in data.decode("utf-8").splitlines():
+        if line.startswith("@Part"):
+            part = line.split()[0]
+            continue
+        if not line or line.startswith("#"):
+            continue
+        c = ["".join(chr(int(h, 16)) for h in col.split()) for col in line.split(";")[:5]]
+        lines += 1
+        if part == "@Part1":
+            listed.add(ord(c[0]))
+        # The file's NFC invariants: c2 == NFC(c1) == NFC(c2) == NFC(c3), c4 == NFC(c4) == NFC(c5).
+        for source, want in ((0, 1), (1, 1), (2, 1), (3, 3), (4, 3)):
+            got = nfc(c[source])
+            if got != c[want]:
+                wrong.append(f"line {lines}: NFC(c{source + 1}) is {got.encode('unicode_escape')!r}")
+    assert lines == 19074, "the test lines of NormalizationTest 15.1"
+    assert wrong[:20] == [], f"{len(wrong)} disagreements with NormalizationTest-15.1.0.txt"
+    # And the file's rule for the rest: every code point Part 1 does not list is its own NFC.
+    moved = [f"U+{c:04X}" for c in range(0x110000) if c not in listed and nfc(chr(c)) != chr(c)]
+    assert moved[:20] == [], f"{len(moved)} code points outside Part 1 change under NFC"
+
+
+# The 20 code points Unicode 16.0 assigns with a canonical decomposition and 15.1 leaves unassigned
+# (Quillon's measurement, Armature/Notes/lane-nfc-data.md): Todhri, Tulu-Tigalari, Gurung Khema, Kirat Rai.
+UNASSIGNED_IN_15_1 = {
+    0x105C9: (0x105D2, 0x0307),
+    0x105E4: (0x105DA, 0x0307),
+    0x11383: (0x11382, 0x113C9),
+    0x11385: (0x11384, 0x113BB),
+    0x1138E: (0x1138B, 0x113C2),
+    0x11391: (0x11390, 0x113C9),
+    0x113C5: (0x113C2, 0x113C2),
+    0x113C7: (0x113C2, 0x113B8),
+    0x113C8: (0x113C2, 0x113C9),
+    0x16121: (0x1611E, 0x1611E),
+    0x16122: (0x1611E, 0x16129),
+    0x16123: (0x1611E, 0x1611F),
+    0x16124: (0x16129, 0x1611F),
+    0x16125: (0x1611E, 0x16120),
+    0x16126: (0x16121, 0x1611F),
+    0x16127: (0x16122, 0x1611F),
+    0x16128: (0x16121, 0x16120),
+    0x16D68: (0x16D67, 0x16D67),
+    0x16D69: (0x16D63, 0x16D67),
+    0x16D6A: (0x16D69, 0x16D67),
+}
+
+
+def test_the_nfc_is_the_pinned_one_not_the_interpreters() -> None:
+    # On Unicode 16.0 (Python 3.14) unicodedata joins each pair; at 15.1 they are two names.
+    joined_here = int(unicodedata.unidata_version.split(".")[0]) >= 16
+    for composite, parts in UNASSIGNED_IN_15_1.items():
+        one, two = chr(composite), "".join(map(chr, parts))
+        assert nfc(one) == one and nfc(two) == two, f"U+{composite:04X}"
+        if joined_here:
+            assert unicodedata.normalize("NFC", two) == one, (
+                f"U+{composite:04X} under Unicode {unicodedata.unidata_version}"
+            )
+        read_world_file(zip_of({"w/world.json": world_json(), f"w/media/{one}.png": b"1", f"w/media/{two}.png": b"2"}))
+    # What 15.1 assigns still joins, Hangul by arithmetic included.
+    for one, two in ((chr(0x1EC7), "ệ"), (chr(0xD55C), "한")):
+        refuses("collision", zip_of({"w/world.json": world_json(), f"w/media/{one}": b"1", f"w/media/{two}": b"2"}))
+
+
+def test_the_generated_nfc_tables_are_current() -> None:
+    sys.path.insert(0, str(REPO / "codegen"))
+    try:
+        import generate_nfc
+    finally:
+        sys.path.pop(0)
+    expected, _ = generate_nfc.build()
+    assert (REPO / "src" / "onlyworlds" / "_nfc.py").read_text(encoding="utf-8") == expected
 
 
 # --- the reader --------------------------------------------------------------------------------

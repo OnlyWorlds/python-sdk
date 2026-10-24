@@ -22,8 +22,9 @@ the reference checker's order:
 - ``name`` (OW-22): a Windows device name, a trailing dot or space, one of ``<>:"|?*``
   or a control character, a non-ASCII name without the UTF-8 flag, a flagged name that
   is not UTF-8.
-- ``duplicate`` (OW-17), ``collision`` (OW-18: NFC, then simple case folding from the
-  C and S rows of CaseFolding 15.1, ``_casefold.py``; never ``str.casefold()``).
+- ``duplicate`` (OW-17), ``collision`` (OW-18: NFC from UnicodeData and CompositionExclusions
+  15.1, ``_nfc.py``, never ``unicodedata``; then simple case folding from the C and S rows of
+  CaseFolding 15.1, ``_casefold.py``, never ``str.casefold()``).
 - ``too_many``, ``too_big`` (OW-14, OW-15): past the budget by count or declared size,
   or an entry that holds more bytes than it declares.
 - ``marker`` (OW-6): a root ``mimetype`` entry with other bytes than the media type.
@@ -61,7 +62,6 @@ import os
 import re
 import shutil
 import struct
-import unicodedata
 import uuid
 import zipfile
 import zlib
@@ -73,6 +73,7 @@ from typing import IO, Any, Literal, NoReturn
 
 from ._casefold import FOLD_RUNS
 from ._jsonfmt import encode
+from ._nfc import CLASS_RUNS, DECOMPOSITIONS, EXCLUSIONS
 from .folder import ELEMENTS_DIR, LEGACY_SPATIAL_DIR, WORLD_FILE, is_hidden, slugify
 
 __all__ = [
@@ -85,6 +86,7 @@ __all__ = [
     "WorldFile",
     "WorldFileError",
     "WorldFileReason",
+    "nfc",
     "read_world_file",
     "simple_case_fold",
     "world_file_bytes",
@@ -226,9 +228,97 @@ def simple_case_fold(text: str) -> str:
     return text.translate(_fold_table())
 
 
+# Hangul syllables are not in UnicodeData's mappings: they decompose and compose by arithmetic (UAX #15).
+_S_BASE, _L_BASE, _V_BASE, _T_BASE = 0xAC00, 0x1100, 0x1161, 0x11A7
+_L_COUNT, _V_COUNT, _T_COUNT = 19, 21, 28
+_N_COUNT = _V_COUNT * _T_COUNT
+_S_COUNT = _L_COUNT * _N_COUNT
+
+
+@cache
+def _nfc_tables() -> tuple[dict[int, int], dict[int, tuple[int, ...]], dict[tuple[int, int], int]]:
+    """Classes, full canonical decompositions, and the primary composites by their pair."""
+    classes = {start + k: cls for start, count, cls in CLASS_RUNS for k in range(count)}
+    mappings = {row[0]: row[1:] for row in DECOMPOSITIONS}
+    excluded = set(EXCLUSIONS)
+    # Full composition exclusion: the listed ones, singletons, and non-starter decompositions.
+    pairs = {
+        (to[0], to[1]): c
+        for c, to in mappings.items()
+        if len(to) == 2 and c not in excluded and c not in classes and to[0] not in classes
+    }
+
+    def full(c: int) -> tuple[int, ...]:
+        to = mappings.get(c)
+        return (c,) if to is None else tuple(x for t in to for x in full(t))
+
+    return classes, {c: full(c) for c in mappings}, pairs
+
+
+def _compose(a: int, b: int, pairs: dict[tuple[int, int], int]) -> int | None:
+    lv, v = a - _L_BASE, b - _V_BASE
+    if 0 <= lv < _L_COUNT and 0 <= v < _V_COUNT:
+        return _S_BASE + (lv * _V_COUNT + v) * _T_COUNT
+    s, t = a - _S_BASE, b - _T_BASE
+    if 0 <= s < _S_COUNT and s % _T_COUNT == 0 and 0 < t < _T_COUNT:
+        return a + t
+    return pairs.get((a, b))
+
+
+def nfc(text: str) -> str:
+    """Normalization Form C as Unicode 15.1's own files define it, the NFC OW-18 applies before folding.
+
+    UAX #15 from UnicodeData and CompositionExclusions 15.1 (``_nfc.py``): full canonical
+    decomposition, canonical ordering, canonical composition. Never ``unicodedata``, which is the
+    interpreter's Unicode (16.0 on Python 3.14 joins 20 code points that 15.1 leaves unassigned). A
+    code point 15.1 leaves unassigned stays as it is; lone surrogates pass through.
+    """
+    if not text or max(text) < "\xc0":  # below U+00C0 nothing decomposes and nothing has a class
+        return text
+    classes, decompositions, pairs = _nfc_tables()
+
+    cps: list[int] = []
+    for ch in text:
+        c = ord(ch)
+        s = c - _S_BASE
+        if 0 <= s < _S_COUNT:
+            cps += (_L_BASE + s // _N_COUNT, _V_BASE + s % _N_COUNT // _T_COUNT)
+            if s % _T_COUNT:
+                cps.append(_T_BASE + s % _T_COUNT)
+        else:
+            cps += decompositions.get(c, (c,))
+
+    # Canonical ordering: each run of nonzero classes sorted by class, stably.
+    i = 0
+    while i < len(cps):
+        j = i
+        while j < len(cps) and cps[j] in classes:
+            j += 1
+        if j - i > 1:
+            cps[i:j] = sorted(cps[i:j], key=classes.__getitem__)
+        i = j + 1
+
+    # Canonical composition: each code point joins the last starter unless one between blocks it.
+    out: list[int] = []
+    starter = -1
+    last = 0
+    for c in cps:
+        k = classes.get(c, 0)
+        if starter >= 0 and (len(out) - 1 == starter or 0 < last < k):
+            composed = _compose(out[starter], c, pairs)
+            if composed is not None:
+                out[starter] = composed
+                continue
+        if not k:
+            starter = len(out)
+        last = k
+        out.append(c)
+    return "".join(map(chr, out))
+
+
 def _fold_name(name: str) -> str:
     """OW-18's one fold for every reader: NFC, then simple case folding. ``/`` folds to itself."""
-    return simple_case_fold(unicodedata.normalize("NFC", name))
+    return simple_case_fold(nfc(name))
 
 
 def _check_collisions(names: Iterable[str]) -> None:

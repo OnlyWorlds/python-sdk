@@ -318,6 +318,7 @@ uv run pytest -q
 uv run ruff check . && uv run mypy --strict src
 uv run python codegen/generate_schema.py --check
 uv run python codegen/generate_casefold.py --check
+uv run python codegen/generate_nfc.py --check
 ```
 
 Three groups of tests run only when asked:
