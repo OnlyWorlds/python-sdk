@@ -124,6 +124,7 @@ NOT_SENT = frozenset(
         "atlas_page_intent",
         "atlas_page_theme",
         "atlas_page_pub",
+        "atlas_hidden_shown_online",
     }
 )
 _LEGACY_LINK_SPELLINGS: Mapping[str, Mapping[str, str]] = {

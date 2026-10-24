@@ -160,7 +160,18 @@ def test_atlas_local_only_fields_stay_home(tmp_path: Path) -> None:
     base, edit = folders(
         tmp_path,
         {"character": [wire_char(C1, "A")]},
-        {"character": [wire_char(C1, "A", atlas_aliases=["Al"], atlas_page_pub=True, atlas_color="#fff")]},
+        {
+            "character": [
+                wire_char(
+                    C1,
+                    "A",
+                    atlas_aliases=["Al"],
+                    atlas_page_pub=True,
+                    atlas_hidden_shown_online=False,
+                    atlas_color="#fff",
+                )
+            ]
+        },
     )
     plan = plan_push(base, edit)
     assert [(p.id, p.fields) for p in plan.patches] == [(C1, {"atlas_color": "#fff"})]

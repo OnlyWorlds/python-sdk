@@ -2,6 +2,10 @@
 
 The package version runs on its own semver; the schema it is generated from is `SCHEMA_DIST_TAG`.
 
+## 0.45.3 (2026-10-24)
+
+- **`push` never sends `atlas_hidden_shown_online`.** Atlas 1.86.2 keeps keel's word on the hidden mark in each element file it pushed (`ATLAS_LOCAL_ONLY_FIELDS`, written with its push stamp, never sent); it is now in `NOT_SENT` beside Atlas's other local-only fields, so a folder Atlas has pushed patches without it. Found by the bay's stitches gate the day Atlas added it.
+
 ## 0.45.2 (2026-10-24)
 
 - **The doctor's flag 4 counts a dependency as a link on a spine world.** A spine draws its edges with `x_spine_depends_on`, so on a world that carries the profile (any `x_spine_` key, flag 13's test) a non-empty list is a link out from its element and a link in to each id it names. Before, every element of the OnlyWorlds Spine read as having no links in or out (348 of 348 on its first run through a crew seat); now 102 of 378 do, each with neither a link field nor a dependency either way. An empty list is no dependency. On any other world nothing changes. A test with a mutant watched failing.
