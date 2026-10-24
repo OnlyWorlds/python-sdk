@@ -2,6 +2,14 @@
 
 The package version runs on its own semver; the schema it is generated from is `SCHEMA_DIST_TAG`.
 
+## 0.47.0 (2026-10-24)
+
+- **The Notion door reads the two layouts real exports use.** Read on two exports of one free-account workspace (invented content, two databases with select, date and relation properties, plain pages and a sub-page), which are now the door's fixtures:
+  - **Folders named by title alone**: a database's rows sit in `<Database>/` beside its CSV, and a page's sub-pages in `<Page>/`, with no id in the folder's name. The door looked only for `<Title> <id>/` folders, so every row came out twice (from the CSV, and its page as a Narrative) and a relation to a row page was refused. Rows now pair with their pages there, a page's parent is found the same way, and relation cells resolve by the id each carries: on the fixture, four Characters link their `location`.
+  - **Flat**: every page and CSV in one directory. A row now pairs with the page beside its CSV whose heading is the row's title and whose property lines equal the row's cells, only when that match is unique both ways; a row with no unique page keeps an id from its path and the report says why.
+  - A folder named like a database that also holds a page's sub-pages is not taken as the rows' folder: its rows pair by title and cells, and the other pages there stay pages, as the report says.
+- A relation cell's path may end in `.csv` (the export points at the row's database) though the row's own file is the `.md` page: the id in it is the target page's, and that is what resolves.
+
 ## 0.46.0 (2026-10-24)
 
 - **Schema repinned to schema-dist `v0.33.0-dist.59`** (from dist.57, through two serials; same canonical 00.33.00, no schema file moved). Serial 58 grows the `.owworld` set to 96: two OW-14 cases whose deflate stream ends before its declared compressed size or never ends, both refused as `not_openable`, and one OW-18 pair (U+11383 against U+11382 U+113C9) that is two names at Unicode 15.1 and is accepted. It also brings the spine profile's new audit sentences (below), a new `SECURITY.md`, and a revised README and LICENSE. Serial 59 is text only: the profile pages, the checks fixture's note and the folder lint say when a rule was ruled rather than where, and the set's `generate.py` and `verdicts.json` are regenerated with the same 96 zips byte for byte. `read_world_file` agrees with all 96.
