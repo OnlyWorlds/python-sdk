@@ -41,7 +41,7 @@ keeps them), proposed elements (``is_proposed``: an AI seat's new element carryi
 ``x_review_proposed`` with a value, not yet settled by a keeper; ``--proposed`` keeps them) and
 extension keys (``x_``, ``atlas_``, ``shadow_``; ``--extensions`` keeps them), each counted in the
 report. A proposed element is not canon until a keeper settles it, and one handed on as canon is
-where a planted instruction would get through (keel #565; Skeld's ruling, h29 #11116): so the world
+where a planted instruction would get through (ruled 2026-10-23): so the world
 file's opening lines count the proposed elements left out, and with ``--proposed`` each kept one is
 labelled ``proposed, not yet reviewed`` under its id line, on its index line and on every link to it
 (a link to one left out still resolves to its name, as a link to a room element does, labelled the
@@ -49,8 +49,8 @@ same).
 
 Hidden elements (``folder.is_hidden``: ``hidden: true`` at the top level, as a converter door writes
 what its source hid and as keel serves an owner's or co-builder's read) are hidden from whoever the
-world is handed to, never from its holder (folder format §4.8; Skeld's ruling, OW Council h58
-#11461), and a pack is handed on: left out unless ``--hidden`` (``hidden=True``), counted in the
+world is handed to, never from its holder (folder format §4.8; ruled
+2026-10-23), and a pack is handed on: left out unless ``--hidden`` (``hidden=True``), counted in the
 world file's opening lines and ``PackReport.hidden_left_out``. Kept, each is labelled ``hidden``
 under its id line, on its index line and on every link to it. Left out, nothing of it is written,
 its name included: a link to it is left out (``PackReport.hidden_links_left_out``) and an in-prose
@@ -136,7 +136,7 @@ INTRO_LINE = (
 )
 
 #: The mark on an AI seat's new element written while the world's ``agent_writes_proposed`` is on
-#: (keel #565): ``{by, evidence, expires}``; a keeper's accept writes it null.
+#: ``{by, evidence, expires}``; a keeper's accept writes it null.
 PROPOSED_MARK = "x_review_proposed"
 #: The label a kept proposed element carries, wherever it or a link to it is printed.
 PROPOSED_LABEL = "proposed, not yet reviewed"
@@ -155,7 +155,7 @@ HIDDEN_LINE = (
 
 
 def hidden_line(left_out: int, kept: int) -> str | None:
-    """The world file's opening line on hidden elements (h58 #11461), None when there are none."""
+    """The world file's opening line on hidden elements (ruled 2026-10-23), None when there are none."""
     if left_out:
         many = left_out != 1
         return f"*{left_out:,} hidden element{'s' if many else ''} {'are' if many else 'is'} left out of this pack.*"
@@ -169,14 +169,14 @@ def hidden_line(left_out: int, kept: int) -> str | None:
 
 
 def is_proposed(body: Mapping[str, Any]) -> bool:
-    """True when the element carries ``x_review_proposed`` with any value but null (keel #565). A
+    """True when the element carries ``x_review_proposed`` with any value but null. A
     null mark is a settled one (an accept writes null); a malformed value still counts as marked,
     so a doubt leaves the element out rather than handing it on as canon."""
     return body.get(PROPOSED_MARK) is not None
 
 
 def proposed_line(left_out: int, kept: int) -> str | None:
-    """The world file's opening line on proposed elements (Skeld, h29 #11116), None when there are none."""
+    """The world file's opening line on proposed elements (ruled 2026-10-23), None when there are none."""
     if left_out:
         many = left_out != 1
         return (
@@ -194,7 +194,7 @@ def proposed_line(left_out: int, kept: int) -> str | None:
 
 def made_by_line(exported_as: Mapping[str, Any] | None, world: Mapping[str, Any] | None = None) -> str | None:
     """The one line saying which kind of key made the pack (a label, never a fix: a pack holds only
-    what its key was served; Boss's four-way walk, h58 #10628). From the folder's ``exported_as``
+    what its key was served; measured 2026-10-22). From the folder's ``exported_as``
     (spec 4.2) or ``/me`` on the API; None, and no line, when the slice is not known. Never the key.
     A ``world`` with a names map says the Character in its own word: "the Employee (Character) Ann"."""
     if not isinstance(exported_as, Mapping):
@@ -741,7 +741,7 @@ def build_pack(
     for slug, body in valid:
         # Proposed first: an element that is both is counted as proposed (the stronger reason: not
         # canon yet), and with ``proposed`` asked a room element is still left out as a room element.
-        # Hidden before both (§4.8, h58 #11461): not for whoever the world is handed to at all.
+        # Hidden before both (§4.8): not for whoever the world is handed to at all.
         if not hidden and is_hidden(body):
             report.hidden_left_out += 1
         elif not proposed and is_proposed(body):

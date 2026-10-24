@@ -36,9 +36,9 @@ module; the shapes of ``character_families``, ``character_races`` and
 ``organisation_memberships`` items (``family_id``, ``race_id``, ``organisation_id``), of an
 organisation's ``members`` (``character_id``), of ``is_dead``, of ``[entity:N|text]``, of a
 campaign's ``entry``; that ``character_traits`` section 1 is appearance and 2 personality (Kanka's
-own API names them so, read live by Skeld on 2026-07-18; the export carries the number only).
+own API names them so, read live on 2026-07-18; the export carries the number only).
 
-What becomes what (the type map follows Skeld's ruled table for his staged converter):
+What becomes what (the type map follows a table ruled 2026-10-23):
 
 - **An entity becomes an element** of its module's type: ``characters`` Character, ``locations``
   Location, ``organisations`` Institution (Institution is the schema's organisation with a
@@ -109,7 +109,7 @@ What becomes what (the type map follows Skeld's ruled table for his staged conve
 whose every field is equal but their ids, positions and timestamps are one, and the report names
 each fold. Anything that differs is kept.
 
-**What the source hides, the folder hides: never dropped, never public** (Skeld's rule). Each
+**What the source hides, the folder hides: never dropped, never public** (ruled 2026-10-23). Each
 hidden thing is an element carrying ``hidden: true`` at the top of its body (OnlyWorlds' hidden
 mark), counted in the report:
 
@@ -212,10 +212,10 @@ KANKA_NAMESPACE = uuid.uuid5(uuid.NAMESPACE_URL, "https://onlyworlds.com/ns/kank
 EXT_PREFIX = "x_kanka_"
 
 #: The supertype of a Narrative made from a module with no OnlyWorlds type: what it is, never where
-#: it came from (the producer line and the x_kanka_ keys say that; Skeld, OW Market h40 #11385).
+#: it came from (the producer line and the x_kanka_ keys say that; ruled 2026-10-23).
 UNTYPED_SUPERTYPE = "Article"
 
-#: Export folder -> element type (Skeld's table; the four in ``PROVEN_MODULES`` read on a real file).
+#: Export folder -> element type (the ruled table; the four in ``PROVEN_MODULES`` read on a real file).
 MODULE_TYPES: dict[str, str] = {
     "characters": "character",
     "locations": "location",
@@ -1109,7 +1109,7 @@ class _Importer:
         self._generic(item)
 
     def _parent(self, item: _Item) -> None:
-        # Boss's shape point: a child's entity.parent_id is the parent's entity.id (the number in the
+        # A child's entity.parent_id is the parent's entity.id (the number in the
         # parent's filename), never its entity.entity_id, which is the parent's module row id.
         raw = item.ent.get("parent_id")
         pid = _int_id(raw)

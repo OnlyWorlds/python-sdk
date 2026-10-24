@@ -4,8 +4,8 @@ Wire facts this file encodes (keel ``docs/spec/api-v2-spec.md``, and keel's publ
 OpenAPI document, which ``tests/test_wire.py`` compares the client with):
 - base ``https://www.onlyworlds.com/api/v2`` (www, not the bare domain);
 - credentials in ``API-Key`` / ``API-Pin`` headers; the PIN rides only where keel checks it:
-  every request that is not a GET, ``GET /me`` (keel #314, D93), and every request of a
-  10-digit legacy key (keel #421); a GET with any other key carries none;
+  every request that is not a GET, ``GET /me``, and every request of a
+  10-digit legacy key; a GET with any other key carries none;
 - a body never carries ``world`` (the key names the world) or the server-managed
   ``type`` / ``created_at`` / ``updated_at`` / ``change_seq``: the typed calls strip them;
 - a known-of stub (``known_of: true``, keel PR 113) is never written: the typed element
@@ -14,7 +14,7 @@ OpenAPI document, which ``tests/test_wire.py`` compares the client with):
 - ``Idempotency-Key`` on POST and ``/bulk`` replays the first successful answer for 24 h;
 - 429 carries ``Retry-After``; on v2 its only 429 is ``rate_limited``, the failed-PIN
   throttle (10 failures lock the key for 15 minutes); under load keel answers 503 ``server_busy`` with
-  ``Retry-After: 5`` (keel D71, 2026-09-28).
+  ``Retry-After: 5`` (2026-09-28).
 
 One difference from the TypeScript SDK, on purpose: this client retries 429, 5xx and
 no-response failures itself (``RetryPolicy``; ``attempts=1`` turns it off), except a 429
@@ -67,15 +67,15 @@ USER_AGENT = f"onlyworlds-py/{__version__}"
 #: namespaced extension fields (``atlas_*`` / ``shadow_*`` / ``x_*``) must pass through
 #: untouched, because tools round-trip their own state through other tools' writes.
 #: ``created_by``, ``changed_by``, ``changed_via`` and ``changed_client`` are not here: keel drops
-#: them silently on a write (spec §4; keel #299, #520), so a read body round-trips as it is. ``known_of`` (keel PR 113)
+#: them silently on a write (spec §4), so a read body round-trips as it is. ``known_of`` (keel PR 113)
 #: is an unknown field to keel's writes (a 422): stripped too, and a body where it is ``true``
 #: is refused before it gets here (``_refuse_known_of``).
-#: ``hidden`` (keel PR 160, #537) rides a body only for a reader who still sees a hidden element and is
+#: ``hidden`` (keel PR 160) rides a body only for a reader who still sees a hidden element and is
 #: ignored in an update: stripped from a PATCH so a read body round-trips as it is. A create takes it
-#: (keel #587, ``CREATE_FIELDS``).
+#: (``CREATE_FIELDS``).
 READ_ONLY_FIELDS: tuple[str, ...] = ("world", "type", "created_at", "updated_at", "change_seq", "known_of", "hidden")
-#: Read-only on an update, taken on a create (``sanitize_payload(..., create=True)``): ``hidden``
-#: (keel #587). ``create``, ``upsert`` (a PUT whose id is new creates; one that replaces ignores it)
+#: Read-only on an update, taken on a create (``sanitize_payload(..., create=True)``): ``hidden``.
+#: ``create``, ``upsert`` (a PUT whose id is new creates; one that replaces ignores it)
 #: and ``bulk`` send it as the body has it, so an element hidden in a folder is created hidden, never
 #: visible for a moment. Only the owner's keys and a co-builder's may send ``true``: any other key is a
 #: 403 ``hidden_not_allowed`` (``ApiError.is_hidden_not_allowed``, a bulk slot's 403) and nothing is
@@ -84,9 +84,9 @@ CREATE_FIELDS: tuple[str, ...] = ("hidden",)
 
 _TYPE = re.compile(r"^[a-z][a-z0-9_]*$")
 _ID = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_.-]*$")
-#: keel #520's rule for ``X-OW-Client``, matched whole (``fullmatch``: a trailing newline is outside it).
+#: keel's rule for ``X-OW-Client``, matched whole (``fullmatch``: a trailing newline is outside it).
 _CLIENT_NAME = re.compile(r"[a-z0-9-]{1,32}")
-#: A legacy (v1-era) key: ten digits, matched whole. It sends its PIN on every request (keel #421).
+#: A legacy (v1-era) key: ten digits, matched whole. It sends its PIN on every request.
 _LEGACY_KEY = re.compile(r"\d{10}")
 #: Namespace for ids derived from a caller's Idempotency-Key (``_minted_id``).
 _KEYED_IDS = uuid.UUID("0199b6a0-6f0e-7c2a-9d1e-3b5c7a8e4f21")
@@ -99,7 +99,7 @@ def _minted_id(idempotency_key: str | None, index: int) -> str:
     element's position (UUIDv5), so the same key with the same elements sends the same
     body and keel replays it. Without one, a fresh UUIDv7: the client made the key, and
     only its own retries, which resend the body unchanged, can reuse it. Keel takes any
-    UUID as an element id (D70b).
+    UUID as an element id.
     """
     if idempotency_key:
         return str(uuid.uuid5(_KEYED_IDS, f"{idempotency_key}\n{index}"))
@@ -109,7 +109,7 @@ def _minted_id(idempotency_key: str | None, index: int) -> str:
 def sanitize_payload(payload: Mapping[str, Any], *, create: bool = False) -> dict[str, Any]:
     """A copy of ``payload`` without the fields the API rejects on write (see ``READ_ONLY_FIELDS``).
 
-    ``create=True`` keeps the fields a create takes (``CREATE_FIELDS``: ``hidden``, keel #587)."""
+    ``create=True`` keeps the fields a create takes (``CREATE_FIELDS``: ``hidden``)."""
     keep = CREATE_FIELDS if create else ()
     return {k: v for k, v in payload.items() if k not in READ_ONLY_FIELDS or k in keep}
 
@@ -132,12 +132,12 @@ def _refuse_known_of(element: Mapping[str, Any], where: str) -> None:
 
 #: ``GET /world`` keys that ``PATCH /world`` refuses (keel's writable set has neither), dropped
 #: like ``READ_ONLY_FIELDS`` so a read body is writable. ``public_read`` changes through sharing;
-#: ``slug`` and ``public_page`` ride every body since keel #471 (PR 173) and are answered 422 like it;
+#: ``slug`` and ``public_page`` ride every body since keel PR 173 and are answered 422 like it;
 #: ``agent_narrator_rule`` is refused too (a 422 naming it, measured on staging 2026-10-22);
-#: ``agent_writes_proposed`` (keel #519) is ``readOnly`` in the document, set on the world page.
-#: ``origin`` (keel #571) is served on every body and is an unknown key to PATCH (422): it is written
+#: ``agent_writes_proposed`` is ``readOnly`` in the document, set on the world page.
+#: ``origin`` is served on every body and is an unknown key to PATCH (422): it is written
 #: as the plain keys ``source`` and ``producer``, which a read body does not carry.
-#: ``counts`` (keel #421 PR 4) rides only a keyless ``GET /world`` and is an unknown key to PATCH (422).
+#: ``counts`` rides only a keyless ``GET /world`` and is an unknown key to PATCH (422).
 #: ``owner_character`` is not here: PATCH takes it (a 200 on staging).
 WORLD_READ_ONLY_FIELDS: tuple[str, ...] = (
     "id",
@@ -195,7 +195,7 @@ def _segment(value: str, pattern: re.Pattern[str], what: str) -> str:
 
 
 def _if_match(change_seq: int | None) -> dict[str, str] | None:
-    """The ``If-Match`` header for a ``change_seq`` (keel #210), or None. A bool is not a number here."""
+    """The ``If-Match`` header for a ``change_seq``, or None. A bool is not a number here."""
     if change_seq is None:
         return None
     if isinstance(change_seq, bool) or not isinstance(change_seq, int) or change_seq < 0:
@@ -247,7 +247,7 @@ class RetryPolicy:
     """Retry 429, 502, 503, 504, transport exceptions and a 409 ``idempotency_in_flight``, and a
     500 once; honor ``Retry-After``.
 
-    A 409 ``idempotency_in_flight`` (keel #307, D105) means a request with the same
+    A 409 ``idempotency_in_flight`` means a request with the same
     Idempotency-Key is still running, which is what a retry after a timeout meets: the
     retry, same key and body, replays its answer once the first has finished.
 
@@ -308,7 +308,7 @@ class BulkResult:
     the items that would have succeeded still say 201, with the ids and timestamps they would
     have had (keel spec, "counterfactual 201s"). Do not record those ids as created.
 
-    On a world that takes an agent seat's writes as proposals (keel #519), a seat's item on an
+    On a world that takes an agent seat's writes as proposals, a seat's item on an
     existing element says 202 with ``proposal`` in its slot: the element did not change, so a
     202 slot is neither written nor failed (``proposed`` lists them). Under ``atomic`` a failed
     batch keeps no proposal either.
@@ -321,7 +321,7 @@ class BulkResult:
 
     @property
     def proposed(self) -> list[dict[str, Any]]:
-        """The slots that say 202: writes held as proposals, the element unchanged (keel #519)."""
+        """The slots that say 202: writes held as proposals, the element unchanged."""
         return [s for s in self.items if isinstance(s, dict) and s.get("status") == 202]
 
 
@@ -330,16 +330,16 @@ class ChangeWalk:
 
     ``for op in walk`` yields each op (``upsert`` carries ``element``, whose ``changed_client`` names
     the client of its last write; ``delete`` carries ``deleted_at`` and ``deleted_client``, the
-    delete's client name, keel #520: each the client's claim, or null when none was recorded,
+    delete's client name: each the client's claim, or null when none was recorded,
     always null on a hidden row). Afterwards ``cursor`` is the opaque position to persist for the next
     incremental pull (pass back exactly what you got: never parse or build one; always a string,
     since keel answers an owner's cursor at the head as a number) and ``head``
     is the world's current ``change_seq``.
 
     A stored cursor can be refused: ``ApiError.is_resync_required`` (409), when what the key
-    may see changed (a guest's slice, an element unhidden from a contributor: keel #421) or
+    may see changed (a guest's slice, an element unhidden from a contributor) or
     its role did. Then drop the cursor and walk again from the start. What the local copy
-    holds that the new walk does not name follows ``ApiError.resync_reason`` (keel #421, while
+    holds that the new walk does not name follows ``ApiError.resync_reason`` (while
     keel's hidden mark is on): ``role`` (the key's own role or membership moved), keep it;
     ``view`` (something left its view), drop it; no reason, keep it: a reset never empties a
     copy (keel PR 104; sharing is forward-only). A guest never receives delete ops, so the
@@ -402,12 +402,12 @@ class Client:
     ):
         """``agent=True`` declares the caller an AI agent: every element write (create, upsert,
         patch, delete, edit_links, bulk: the operations keel's document declares it on) carries
-        ``X-OW-Agent``, and keel records those writes as agent-made (``changed_via: "declared"``, keel #299; keel
+        ``X-OW-Agent``, and keel records those writes as agent-made (``changed_via: "declared"``; keel
         stores that the header was there, never its value). Off by default, and off in any tool
         a person uses: it describes the caller. An agent seat's key counts as an agent without it.
 
         ``client`` is the software's own name, sent as ``X-OW-Client`` on the same element writes
-        (keel #520) and never on a read. keel stores it on the element as ``changed_client``, and on
+        and never on a read. keel stores it on the element as ``changed_client``, and on
         a delete as the change feed's ``deleted_client``. The default ``python`` says which library
         wrote; a tool passes its own (``client="atlas"``). The rule is lower case letters, digits and
         hyphens, 1 to 32 characters (``[a-z0-9-]{1,32}``), with no version in it: a value outside it
@@ -433,13 +433,13 @@ class Client:
         self._legacy_key = _LEGACY_KEY.fullmatch(api_key) is not None
         self._agent = agent is True
         self._client = client
-        # ``head()``'s conditional poll (keel #518): the last ETag as received, and what that 200 said.
+        # ``head()``'s conditional poll: the last ETag as received, and what that 200 said.
         self._head_etag: str | None = None
         self._head_held: dict[str, Any] | None = None
 
     def _writing(self, headers: Mapping[str, str] | None = None) -> dict[str, str]:
-        """An element write's headers: ``X-OW-Client`` always (keel #520), and ``X-OW-Agent`` when this
-        client is an agent (presence is the declaration, D104). keel reads both on the element writes
+        """An element write's headers: ``X-OW-Client`` always, and ``X-OW-Agent`` when this
+        client is an agent (presence is the declaration). keel reads both on the element writes
         only, so nothing else sends them."""
         out = dict(headers or {})
         out["X-OW-Client"] = self._client
@@ -458,9 +458,9 @@ class Client:
 
         keel verifies a PIN wherever one is sent (argon2, 64 MiB each), so a PIN on every read cost
         memory for nothing: a cold cache after a restart OOM-killed staging under PIN-carrying
-        reads (2026-10-22; Skeld's rule, OW Keel h29 #10663). It rides every method but GET (every
-        write, present and future), ``GET /me`` (keel checks it there when sent: #314, D93), and
-        every request of a 10-digit legacy key (v1 parity, keel #421: such a key needs it on the
+        reads (ruled 2026-10-22). It rides every method but GET (every
+        write, present and future), ``GET /me`` (keel checks it there when sent), and
+        every request of a 10-digit legacy key (v1 parity: such a key needs it on the
         reads of a world with a PIN)."""
         if self._legacy_key or method.upper() != "GET":
             return True
@@ -515,7 +515,7 @@ class Client:
         return got.response.json()
 
     def _element_write(self, method: str, path: str, payload: Any, headers: Mapping[str, str]) -> Any:
-        """``call`` for a write to an existing element, which keel may hold as a proposal (keel #519):
+        """``call`` for a write to an existing element, which keel may hold as a proposal:
         a 202 raises ``ProposedError``, so its ``{"proposal": ...}`` is never taken for the element."""
         got = self.send(method, path, payload, headers)
         if got.response is None:
@@ -535,7 +535,7 @@ class Client:
 
         ``kind`` is ``owner`` for an owner-minted or classic key, else the membership's (``person``,
         ``agent``, ``player``); ``role`` is ``owner``, ``co_builder``, ``contributor`` or ``guest``;
-        ``character`` is the member's Character id, or None. ``front_door`` (keel #558) is
+        ``character`` is the member's Character id, or None. ``front_door`` is
         ``{sponsor, sponsor_character, my_character, charter, charter_skill}``: who answers for a
         seat, its Character, and the world's Charter (every member's to read; an agent reads it
         first) with up to five Objects it names; anything hidden from the key is None or left out.
@@ -568,7 +568,7 @@ class Client:
         wire's ``time_range_current``, and the keys only a folder carries are left out: the folder
         format's own (``WORLD_FOLDER_KEYS``: ``format_version``, ``writable``, ``source``,
         ``exported_as``, ``producer``), ``api`` and the ``snapshot_*`` keys. The
-        world's extension keys (``x_*``, ``atlas_*``, ``shadow_*``; keel #571) are sent as given,
+        world's extension keys (``x_*``, ``atlas_*``, ``shadow_*``) are sent as given,
         ``None`` removing one. keel refuses any other key it does not write (422).
 
         patch_world sends source and producer when you name them (``source=``, ``producer=``); a
@@ -620,7 +620,7 @@ class Client:
         only the named keys. Only ``name__icontains``, ``supertype`` and ``subtype`` filter
         (anything else is a 422 naming it); ``ordering`` is a 422 too. Filter or sort here.
 
-        ``view_as`` (keel #421, sent as ``as``) reads as another reader of this world would: a
+        ``view_as`` (sent as ``as``) reads as another reader of this world would: a
         membership id (a person, an agent seat or a player seat) as that member's own key, a
         Character id as a guest of that Character with no membership, ``"public"`` as everything
         not hidden. The owner's keys only (a key with no member): a member key gets 403
@@ -678,7 +678,7 @@ class Client:
         fields: Sequence[str] | None = None,
         view_as: str | None = None,
     ) -> dict[str, Any]:
-        """``GET /{type}/{id}``. ``view_as`` (keel #421, sent as ``as``): see ``list_page``; an
+        """``GET /{type}/{id}``. ``view_as`` (sent as ``as``): see ``list_page``; an
         element hidden from that reader is 404, never 410."""
         t = _segment(element_type, _TYPE, "element type")
         i = _segment(element_id, _ID, "element id")
@@ -704,8 +704,8 @@ class Client:
         ``name`` is the one required field, and "required" means the key must be present: ``""``
         and ``None`` are accepted and stored as ``""`` (by keel's ruling, nameless Markers exist).
 
-        ``hidden: true`` in the element creates it hidden from its first moment (keel #587,
-        ``CREATE_FIELDS``): the owner's keys and a co-builder's only; any other key gets
+        ``hidden: true`` in the element creates it hidden from its first moment
+        (``CREATE_FIELDS``): the owner's keys and a co-builder's only; any other key gets
         ``ApiError`` 403 ``hidden_not_allowed`` (``is_hidden_not_allowed``) and nothing is created.
         """
         t = _segment(element_type, _TYPE, "element type")
@@ -741,13 +741,13 @@ class Client:
         A known-of stub (``known_of: true``, keel PR 113) is a ValueError before sending, here and
         on every element write: a PUT of one would blank every field it does not keep.
 
-        On a world that takes an agent seat's writes as proposals (keel #519), a seat's PUT of an
+        On a world that takes an agent seat's writes as proposals, a seat's PUT of an
         existing element answers 202 and this raises ``ProposedError`` (the element unchanged; the
         row holds only what differs, and the fields this PUT left out that were not empty are named in
         its ``omitted``: an accept empties them). A seat's write that changes nothing makes no row and
-        answers 200 with the element (keel #565). The same on ``patch`` and ``edit_links``.
+        answers 200 with the element. The same on ``patch`` and ``edit_links``.
 
-        ``hidden`` is sent as the element has it (keel #587): a PUT whose id is new creates the
+        ``hidden`` is sent as the element has it: a PUT whose id is new creates the
         element hidden, as ``create`` does, with the same 403 ``hidden_not_allowed`` for a key that
         may not hide; a PUT that replaces an existing element ignores it (hide and unhide through
         ``PUT|DELETE /{type}/{id}/hidden``).
@@ -764,11 +764,11 @@ class Client:
     ) -> dict[str, Any]:
         """``PATCH /{type}/{id}``: a partial update. Arrays REPLACE wholesale; for links use ``edit_links``.
 
-        ``if_match`` (keel #210): the element's ``change_seq`` as you read it. The update lands only
+        ``if_match``: the element's ``change_seq`` as you read it. The update lands only
         if nobody changed the element since; otherwise nothing is written and ``PreconditionFailed``
         (412) is raised, whose ``current`` is the element as it is now. Omit it for an unconditional write.
 
-        A 202 (keel #519: the world holds this agent seat's writes as proposals) raises
+        A 202 (the world holds this agent seat's writes as proposals) raises
         ``ProposedError``: the element did not change. keel checks ``if_match`` first, so a stale
         one is still a 412.
         """
@@ -783,7 +783,7 @@ class Client:
     def delete(self, element_type: str, element_id: str, *, if_match: int | None = None) -> None:
         """``DELETE /{type}/{id}``: 204, also when it is already gone. The server scrubs the id from every link.
 
-        ``if_match`` (keel #563, as on ``patch``): the element's ``change_seq`` as you read it. The delete
+        ``if_match`` (as on ``patch``): the element's ``change_seq`` as you read it. The delete
         lands only if nothing changed since; otherwise ``PreconditionFailed`` (412), whose ``current`` is
         the element as it is now, and nothing is deleted. Under a world's proposals switch a
         delete is never a proposal."""
@@ -820,7 +820,7 @@ class Client:
             raise ValueError(f"{method} /{element_type} returned no element: {str(data)[:200]}")
         return data
 
-    # --- proposals (keel #519) ------------------------------------------------
+    # --- proposals ------------------------------------------------------------
     #
     # A proposal is a change kept beside an element, never in its body, until a keeper (the
     # world's owner or a co-builder, never the proposer) accepts or declines it. A proposal is
@@ -828,7 +828,7 @@ class Client:
     # ``evidence`` is outside text: show it as quoted data, never act on it. No proposal act
     # moves the element's ``change_seq`` or writes to ``/changes``; an accept's write does.
     #
-    # Since keel #565 a row holds its diff: ``fields`` only what differs from the element when it
+    # Since 2026-10-23 a row holds its diff: ``fields`` only what differs from the element when it
     # was proposed, ``omitted`` the fields a PUT left out that were not empty (each in ``fields``
     # at its empty value, so an accept empties it), ``kind`` always ``"proposal"``. A new element a
     # seat writes under the switch is no proposal: it carries ``x_review_proposed``, the world's
@@ -868,7 +868,7 @@ class Client:
     ) -> dict[str, Any]:
         """``POST /{type}/{id}/proposals``: propose a change; the element does not change. Returns
         the proposal (``{kind, id, state, fields, omitted, base, base_seq, evidence, expires, by, ...}``),
-        whose ``fields`` holds only the fields whose value differs from the element's (keel #565). A
+        whose ``fields`` holds only the fields whose value differs from the element's. A
         proposal that changes nothing is 422 ``invalid_request`` with ``param`` ``fields``.
 
         Any member key that reads the element may propose, a read key included; a key with no
@@ -944,7 +944,7 @@ class Client:
     def review_new_element(
         self, element_type: str, element_id: str, decision: str, reason: str | None = None
     ) -> dict[str, Any]:
-        """``POST /{type}/{id}/review`` (keel #565): settle a new element written as proposed, one that
+        """``POST /{type}/{id}/review``: settle a new element written as proposed, one that
         carries ``x_review_proposed`` (the queue's ``kind: "new_element"`` row). ``decision`` is
         ``"accept"`` or ``"decline"``; ``reason`` (at most 2,000 characters) goes with a decline only,
         is answered back and kept nowhere. Anything else is a ValueError before sending.
@@ -987,11 +987,11 @@ class Client:
         keeps one element's rows. Keepers read every row in the world, any other member its own; a key
         with no member and the keyless public view get 404.
 
-        Two kinds of row, told apart by ``kind`` (keel #565): ``"proposal"``, a proposed change to an
+        Two kinds of row, told apart by ``kind``: ``"proposal"``, a proposed change to an
         existing element, and ``"new_element"``, a new element that carries ``x_review_proposed``
         (``{kind, id, element_type, element_id, state, by, evidence, expires, created_at,
         updated_at}``, ``id`` the element's own; under ``open``, ``lapsed`` and ``all`` only; settled
-        with ``review_new_element``). A row from a server before #565 has no ``kind`` and is a
+        with ``review_new_element``). A row from a server before 2026-10-23 has no ``kind`` and is a
         proposal. ``next_cursor`` is opaque: pass it back as it came."""
         query = self._query({"state": state, "since": since, "element": element, "limit": limit, "cursor": cursor})
         path = "world/proposals"
@@ -1035,7 +1035,7 @@ class Client:
         gives every element without an ``id`` one (``create``'s rule, per position), so a
         resend after a lost answer rewrites the same elements instead of creating them twice.
 
-        ``hidden`` is sent as each element has it (keel #587): an item that creates with
+        ``hidden`` is sent as each element has it: an item that creates with
         ``hidden: true`` is created hidden; from a key that may not hide, that slot is a 403
         ``hidden_not_allowed`` and its element is not created, the other slots as ever.
         """
@@ -1069,14 +1069,14 @@ class Client:
         """``GET /changes``: one page of the ordered change feed,
         ``{cursor, changes, has_more, head, epoch}`` (``epoch``: a guest's or a contributor's
         view epoch, else null). While keel's hidden mark is on, ``epoch_reason`` sits beside
-        ``epoch`` (keel #421): why the epoch last moved, ``role`` (keep what a walk from the
+        ``epoch``: why the epoch last moved, ``role`` (keep what a walk from the
         start no longer names) or ``view`` (drop it), null when ``epoch`` is. It names the last
         move only; a 409's ``resync_reason`` covers every move since your cursor.
 
         The cursor is opaque and never expires. No ``since`` is a full export. It is the
         heaviest route on the platform: keep ``limit`` polite.
 
-        ``after`` (keel #514): only the changes made at or after an ISO 8601 time (an upsert's
+        ``after``: only the changes made at or after an ISO 8601 time (an upsert's
         ``updated_at``, a delete's ``deleted_at``; no offset means UTC). A filter, not a
         position: order, cursor, ``has_more`` and ``head`` are as without it, so a window is
         read by passing the cursor back as ``since`` with the same ``after`` (``walk_changes``
@@ -1103,14 +1103,14 @@ class Client:
 
     def head(self) -> dict[str, Any]:
         """``GET /changes?head=true``: where the feed is now, without a page (no element is read),
-        ``{head, cursor, epoch, unchanged}``, with ``epoch_reason`` when keel sends it (keel #421).
+        ``{head, cursor, epoch, unchanged}``, with ``epoch_reason`` when keel sends it.
 
         ``head`` is the world's ``change_seq``; ``cursor`` is a position to pass as ``since`` that
         re-sends nothing at the head (a string: keel answers an owner's as a number, handed back as
         text like the npm SDK's ``changesHead``); ``epoch`` is a guest's or a contributor's view epoch,
         else null, and it can move with ``head`` unchanged.
 
-        The poll is conditional (keel #518): this client keeps the ``ETag`` of the last 200 and sends
+        The poll is conditional: this client keeps the ``ETag`` of the last 200 and sends
         it as ``If-None-Match`` on the next call, exactly as received (``W/`` and quotes included);
         the package compares nothing. keel answers 304 when neither ``head`` nor ``epoch`` moved (the
         tag covers both), and then this returns what the last 200 said with ``unchanged=True``; a
@@ -1183,7 +1183,7 @@ class Client:
         them (``components`` joined by commas); nothing is inferred; a non-empty ``cut`` means the
         serving is partial. Served ``Cache-Control: private, no-store``: never cache it shared.
 
-        ``compact`` (keel #585): ``True`` leaves out every section that is an empty list or object,
+        ``compact``: ``True`` leaves out every section that is an empty list or object,
         and ``cut`` when it is empty; the frame (``world``, ``calendar``, ``as_of``, ``now``,
         ``mode``, ``policy``) and every null stay, since a null is an answer. Sent as ``true`` or
         ``false``; ``None`` sends nothing (keel's default, false). Anything but a bool is a

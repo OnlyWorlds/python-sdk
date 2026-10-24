@@ -35,7 +35,7 @@ when ``world.json`` is tracked by git.
 And on both doors, (11) the world's own house rules: the checks profile (schema-dist
 ``profiles/checks.md``, dist.47; the list case and reader rules 6 to 8 from dist.54),
 ``x_checks_rules`` on the world's Charter, read by
-``onlyworlds.checks.apply_checks``. The Charter is D152's one (keel #558): the newest Law with
+``onlyworlds.checks.apply_checks``. The Charter is keel's one: the newest Law with
 supertype Charter made by the owner or a co-builder; through the API it is
 ``front_door.charter`` from ``GET /me``, on a folder the owner's newest (a folder carries no
 roster, so when a member's Charter is newer the doctor says it cannot tell and applies none).
@@ -49,10 +49,10 @@ key's role). A known-of stub is not judged (its absent fields are unknown; the p
 6), and the rules are
 on a Law only: a charter of another type that carries them is a finding, its rules not read.
 
-On the API door only, (12) proposals waiting (keel #519): the open and the lapsed rows of the
+On the API door only, (12) proposals waiting: the open and the lapsed rows of the
 world's queue (``GET /world/proposals``, paged through), one finding on the world when any wait.
-The queue holds two kinds of row (keel #565): a proposal (``kind: "proposal"``, or no ``kind``
-from a server before #565) and a new element marked for review (``kind: "new_element"``, an
+The queue holds two kinds of row: a proposal (``kind: "proposal"``, or no ``kind``
+from a server before 2026-10-23) and a new element marked for review (``kind: "new_element"``, an
 element carrying ``x_review_proposed``), counted apart and never one as the other. The finding
 gives the proposals' open and lapsed counts, the marked new elements' when there are any, and the
 oldest open proposal's age in days. ``compared`` carries the four counts and the view read (a
@@ -177,7 +177,7 @@ __all__ = [
 
 #: The house-rules flag (the checks profile): read from every Charter on both doors.
 CHECKS_FLAG = "11"
-#: The proposals flag (keel #519): the world's queue, on the API door only.
+#: The proposals flag: the world's queue, on the API door only.
 PROPOSALS_FLAG = "12"
 #: The spine flag (the spine profile and its audit): on both doors, on a world that carries an x_spine_ key.
 SPINE_FLAG = "13"
@@ -201,7 +201,7 @@ FLAGS: dict[str, str] = {
 }
 
 #: A finding on an element of these supertypes (compared case-folded) is ``kind: "message"``
-#: (TC's rule, h66 #9660): a world's own parlor, messages and room things, not facts about the world.
+#: (ruled 2026-10-21): a world's own parlor, messages and room things, not facts about the world.
 MESSAGE_SUPERTYPES: frozenset[str] = frozenset({"message", "board", "work item", "spec", "heart", "vote", "sitting"})
 
 #: What each flag's ``compared`` counts, for the prose report.
@@ -443,7 +443,7 @@ def _folded(value: Any) -> str:
 
 def fold_name(name: str) -> str:
     """A name as flag 5 compares it: NFKC, case-folded, every run of whitespace and punctuation
-    one space, trimmed. ``"Kael, Inspector"`` and ``"kael  inspector"`` fold alike."""
+    one space, trimmed. ``"Ada, Inspector"`` and ``"ada  inspector"`` fold alike."""
     out: list[str] = []
     gap = False
     for ch in unicodedata.normalize("NFKC", name).casefold():
@@ -596,7 +596,7 @@ def _json_kind(value: Any) -> str:
 
 
 #: ``named`` when the door could not ask keel which Law is the Charter (a folder, or a /me with no
-#: ``front_door``): the doctor applies D152's rule to what it holds instead.
+#: ``front_door``): the doctor applies keel's rule to what it holds instead.
 _NOT_ASKED = object()
 
 
@@ -606,8 +606,8 @@ def _newest(laws: list[_El]) -> _El | None:
 
 
 def _the_charter(laws: list[_El], named: Any) -> tuple[_El | None, str, str | None]:
-    """The world's Charter among ``laws`` (each a Law with supertype Charter), by D152's one
-    definition (keel #558; the checks profile from the serial after 47): the newest such Law made by
+    """The world's Charter among ``laws`` (each a Law with supertype Charter), by keel's one
+    definition (the checks profile from the serial after 47): the newest such Law made by
     the owner or a co-builder. Returns the Charter or None, where the answer came from, and a reason
     when it could not be told.
 
@@ -639,7 +639,7 @@ def _the_charter(laws: list[_El], named: Any) -> tuple[_El | None, str, str | No
 
 def _house_rules(run: _Run, els: list[_El], *, view: str, named: Any = _NOT_ASKED) -> None:
     """Flag 11: the Charter's ``x_checks_rules`` (the checks profile) applied to the elements the
-    door could read; the Charter is the one D152 names (``_the_charter``), and every other Law with
+    door could read; the Charter is the one keel names (``_the_charter``), and every other Law with
     supertype Charter is a finding, its rules not applied. Never writes, reorders or repairs a list."""
     flag = CHECKS_FLAG
     charters = [el for el in els if _folded(el.body.get("supertype")) == "charter"]
@@ -1271,7 +1271,7 @@ def _charters(run: _Run, els: list[_El], rows: list[dict[str, Any]], head: Any, 
         return
     for el in charters:
         if el.type != "law":
-            # BrainBoost files its charter as a Construct (TC, h67 #9814): still a charter to this flag,
+            # BrainBoost files its charter as a Construct: still a charter to this flag,
             # but keel's world page and the parlor read a Law with supertype Charter, so say so.
             run.find(
                 "8",
@@ -1298,7 +1298,7 @@ def _charters(run: _Run, els: list[_El], rows: list[dict[str, Any]], head: Any, 
     run.ran("8", found, len(charters))
 
 
-#: The ``kind`` of a queue row that is a new element marked for review, not a proposal (keel #565).
+#: The ``kind`` of a queue row that is a new element marked for review, not a proposal.
 _NEW_ELEMENT = "new_element"
 
 
@@ -1331,7 +1331,7 @@ def _proposals(run: _Run, client: Reader, *, view: str, now: _dt.datetime) -> No
             run.skip(
                 flag,
                 f"the proposal queue answered {exc.status}: a key with no member (the owner's read key, a "
-                "demo key) reads no queue, and a server before keel #519 has none",
+                "demo key) reads no queue, and an older server has none",
             )
         else:
             run.skip(flag, f"the proposal queue could not be read ({exc})")
@@ -1339,7 +1339,7 @@ def _proposals(run: _Run, client: Reader, *, view: str, now: _dt.datetime) -> No
     except (ConnectionError, ValueError) as exc:
         run.skip(flag, f"the proposal queue could not be read ({exc})")
         return
-    # keel #565: a marked new element is a row of its own kind, never a proposal.
+    # A marked new element is a row of its own kind, never a proposal.
     proposals = {s: [r for r in rows if r.get("kind") != _NEW_ELEMENT] for s, rows in waiting.items()}
     marked = {s: [r for r in rows if r.get("kind") == _NEW_ELEMENT] for s, rows in waiting.items()}
     opened, lapsed = len(proposals["open"]), len(proposals["lapsed"])

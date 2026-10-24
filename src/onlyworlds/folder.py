@@ -66,7 +66,7 @@ FORMAT_VERSION = "0.3.18"
 
 #: §4.4 (v0.3.10; keel PR 113): the stub marker. keel hands a guest an element it reaches only
 #: through its own Character's sheet as a stub, ``known_of: true``: these keys, its type's public
-#: fields with their values (keel PR 117, Keel #448: ``PUBLIC_FIELDS``), every other field unset.
+#: fields with their values (keel PR 117: ``PUBLIC_FIELDS``), every other field unset.
 KNOWN_OF = "known_of"
 #: The hidden mark's key (folder format §4.8, ``is_hidden``).
 HIDDEN = "hidden"
@@ -417,7 +417,7 @@ class Folder:
     @property
     def time_current(self) -> Any:
         """§5: accept both spellings forever, prefer a non-null ``time_current`` (a null one beside
-        ``time_range_current`` reads the range: Skeld's clarification, 2026-10-17)."""
+        ``time_range_current`` reads the range: clarified 2026-10-17)."""
         if self.world is None:
             return None
         if self.world.get("time_current") is not None:
@@ -441,7 +441,7 @@ def read_folder(root: str | os.PathLike[str], *, legacy: bool = True) -> Folder:
 
     - Every ``*.json`` in a type directory is ingested and keyed on its in-file ``id``;
       the filename is never parsed (§3.1). A dot-prefixed file there is a tool's litter,
-      not an element: skipped and listed (Skeld's clarification, 2026-10-17).
+      not an element: skipped and listed (clarified 2026-10-17).
     - A file that is not JSON, not an object, or has no non-empty string ``id`` is
       skipped, recorded in ``skipped``, and left where it is (§4.1).
     - A declared ``type`` beats the directory the file sits in; an absent one is

@@ -143,7 +143,7 @@ __all__ = [
     "parse_name",
 ]
 
-#: The ``producer.input`` word for this door (Skeld's ruling, decision 3 of the dossier's sheet).
+#: The ``producer.input`` word for this door (ruled 2026-10-22).
 PRODUCER_INPUT = "notion-export"
 
 #: The namespace every id this door mints is UUIDv5 in. Fixed for good: changing it would give
@@ -159,7 +159,7 @@ _EXT_BODY = f"{EXT_PREFIX}body"
 _RESERVED = frozenset({_EXT_ID, _EXT_PARENT, _EXT_BODY})
 
 #: The supertype an untyped database's rows carry: what they are, never where they came from (the
-#: producer line and the x_notion_ keys say that; Skeld, OW Market h40 #11385).
+#: producer line and the x_notion_ keys say that; ruled 2026-10-23).
 UNTYPED_SUPERTYPE = "Article"
 
 #: Where attachments land inside the folder (decision 2).

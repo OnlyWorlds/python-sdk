@@ -16,8 +16,8 @@ never by the diff that was sent.
 
 Never sent, whatever the diff says: ``id``; the wire's server-managed fields
 (``world``, ``type``, ``created_at``, ``updated_at``, ``change_seq``: the npm SDK's
-``sanitizePayload`` list; keel ignores ``world`` and 422s the rest); ``created_by`` (and since keel
-#299 ``changed_by`` and ``changed_via``, since #520 ``changed_client``), which keel drops
+``sanitizePayload`` list; keel ignores ``world`` and 422s the rest); ``created_by`` (and ``changed_by``, ``changed_via``
+and ``changed_client``), which keel drops
 from a write but still answers with a fresh ``change_seq`` (a folder without the key
 would otherwise rewrite every member-made element on every run); Atlas's in-file sync stamps
 ``local_updated_at`` / ``server_updated_at`` and ``image_media_id`` (spec §5, "not
@@ -32,15 +32,15 @@ A stub is never pushed (folder spec v0.3.10 §4.4 rule 3; keel PR 113): an eleme
 ``PushPlan.known_of`` (and ``PushResult.known_of``), not in the membership lists: its absent
 fields are unknown, not edits, and it is not the folder's to create or delete.
 
-An element whose folder copy carries ``hidden: true`` (the hidden mark, keel #421) and whose
+An element whose folder copy carries ``hidden: true`` (the hidden mark) and whose
 baseline copy does not is left out of the diff and listed in ``PushPlan.hidden`` (and
 ``PushResult.hidden``): it is in the baseline, so it exists on the server, visible, and keel drops
 ``hidden`` from an update (a PATCH, a PUT that replaces); it moves an existing element's mark only
 through ``PUT /{type}/{id}/hidden``, so a patch would edit an element every reader still sees. Nothing
 is sent for it; the owner hides it on the server first (the site, or a client's hide call), and the
 next push patches it as usual. A folder and a baseline that both carry the mark patch normally
-(Skeld's ruling, OW Market h40 #11232; folder spec §4.8). ``hidden`` is in ``NOT_SENT``: a patch never
-carries it. Since keel #587 a create takes the mark, but a push creates nothing (an element only in
+(ruled 2026-10-23; folder spec §4.8). ``hidden`` is in ``NOT_SENT``: a patch never
+carries it. Since 2026-10-23 a create takes the mark, but a push creates nothing (an element only in
 the folder is ``only_in_folder``): an element new to the server goes through ``Client.create``,
 ``upsert`` or ``bulk``, which send ``hidden: true`` as the folder has it, so it is created hidden
 from its first moment, or refused whole (403 ``hidden_not_allowed``) for a key that may not hide.
@@ -50,13 +50,13 @@ either changed: keel refuses a write that sets one half. The run stops at the fi
 answer that refuses the key itself (``stops_run``): a wrong PIN repeated across a push
 locks the key for every tool that uses it.
 
-A 202 is a patch held as a proposal (keel #519: the world takes this agent seat's writes as
+A 202 is a patch held as a proposal (the world takes this agent seat's writes as
 proposals): the element did not change, so it is neither pushed nor failed. It is counted in
 ``PushResult.proposed``, logged with ``code: 202`` and its ``proposal`` id, never retried, and a
 rerun never sends that same patch again (``PushResult.already_proposed``): it would only file a
 second proposal. Whether a keeper accepted it shows in a fresh export (``verify_level``).
 
-The world's ``origin`` (keel #571, folder format §4.2) is a world's birth line, written once: a
+The world's ``origin`` (folder format §4.2) is a world's birth line, written once: a
 push sets it only on a first fill from a folder made elsewhere, never from a folder exported from
 the same world, and never over a first import. After the element patches (not on a dry run, not
 after a run that stopped), the push reads ``GET /world``; when its ``origin`` is null in both keys
@@ -285,7 +285,7 @@ class PushResult:
     known_of: list[str] = field(default_factory=list)
     #: the elements marked hidden in the folder and not on the server (``PushPlan.hidden``): nothing sent
     hidden: list[str] = field(default_factory=list)
-    #: patches answered 202 this run (keel #519): held as proposals, the element unchanged; not in ``ok``
+    #: patches answered 202 this run: held as proposals, the element unchanged; not in ``ok``
     proposed: int = 0
     #: patches a previous run's log shows proposed (202), not sent again: a resend would file a second proposal
     already_proposed: int = 0
@@ -328,7 +328,7 @@ def stops_run(error: ApiError) -> bool:
 
 def _load_done(log_path: Path) -> tuple[set[str], set[str], set[str]]:
     """(fingerprints that landed, ids that landed under a log line with no fingerprint,
-    fingerprints that were proposed: a 202, keel #519).
+    fingerprints that were proposed: a 202).
 
     The second set reads logs written by the original script, which keyed on id alone.
     """
@@ -424,7 +424,7 @@ def push(
                     if on_failure:
                         on_failure(refused)
                 return
-            # An element write: the client's name and any agent declaration ride it (keel #520, #299).
+            # An element write: the client's name and any agent declaration ride it.
             got = client.send("PATCH", f"{p.type}/{p.id}/", p.fields, client._writing())
             code = got.response.status if got.response is not None else 0
             mismatch_fields: list[str] = []
@@ -450,7 +450,7 @@ def push(
                 "patch_sha256": p.fingerprint,
             }
             if code == 202 and got.response is not None:
-                # keel #519: held as a proposal, the element unchanged. Not a failure, not pushed.
+                # Held as a proposal, the element unchanged. Not a failure, not pushed.
                 try:
                     held_as = got.response.json()
                 except ValueError:

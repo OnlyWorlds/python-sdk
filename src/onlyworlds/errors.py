@@ -101,8 +101,8 @@ class ApiError(Exception):
 
     @property
     def is_idempotency_in_flight(self) -> bool:
-        """A request with this Idempotency-Key is still running (409 ``idempotency_in_flight``, keel
-        #307). The client retries it by itself; seen here only when the retries ran out."""
+        """A request with this Idempotency-Key is still running (409 ``idempotency_in_flight``).
+        The client retries it by itself; seen here only when the retries ran out."""
         return self.status == 409 and self.code == "idempotency_in_flight"
 
     @property
@@ -112,7 +112,7 @@ class ApiError(Exception):
 
     @property
     def is_not_author(self) -> bool:
-        """A contributor changed an element someone else created (403 ``not_author``, keel D72)."""
+        """A contributor changed an element someone else created (403 ``not_author``)."""
         return self.status == 403 and self.code == "not_author"
 
     @property
@@ -122,7 +122,7 @@ class ApiError(Exception):
 
     @property
     def is_view_as_owner_only(self) -> bool:
-        """A member key sent ``view_as`` (403 ``view_as_owner_only``, keel #421): reading as another
+        """A member key sent ``view_as`` (403 ``view_as_owner_only``): reading as another
         reader is the owner's, from a key with no member. Only while keel's hidden mark is on; until
         then ``as`` is an unknown parameter (422)."""
         return self.status == 403 and self.code == "view_as_owner_only"
@@ -136,8 +136,8 @@ class ApiError(Exception):
 
     @property
     def is_hidden_not_allowed(self) -> bool:
-        """A create carried ``hidden: true`` from a key that may not hide (403 ``hidden_not_allowed``,
-        keel #587): only the owner's keys and a co-builder's (a person's or a seat's) create an element
+        """A create carried ``hidden: true`` from a key that may not hide (403 ``hidden_not_allowed``):
+        only the owner's keys and a co-builder's (a person's or a seat's) create an element
         hidden. Nothing was created. Never retried, never resent without the mark (that would publish
         it): leave the element out, or ask a keeper. A server with the hidden mark off answers ``true``
         with a 422 instead (``param`` hidden), nothing created either."""
@@ -153,7 +153,7 @@ class ApiError(Exception):
     def is_resync_required(self) -> bool:
         """``/changes`` refused the cursor (409 ``resync_required``): what this key may see changed
         (a guest's slice moved; an element hidden from a contributor was unhidden; the key's role
-        moved to or from guest or contributor, whose cursors have other shapes; keel #421). Drop the
+        moved to or from guest or contributor, whose cursors have other shapes). Drop the
         cursor and walk again from the start. What to do with what the local copy holds that the new
         walk does not name is ``resync_reason``'s: ``role``, keep it; ``view``, drop it. Without a
         reason (keel's hidden mark off), keep it: a reset never empties a copy (keel PR 104; sharing
@@ -163,7 +163,7 @@ class ApiError(Exception):
     @property
     def resync_reason(self) -> str | None:
         """Why ``/changes`` refused the cursor, from the 409 ``resync_required`` envelope's ``reason``
-        (keel #421, only while keel's hidden mark is on): ``"role"`` (this key's own role or membership
+        (only while keel's hidden mark is on): ``"role"`` (this key's own role or membership
         moved: keep what the local copy holds that the new walk does not name; it is out of view now,
         not gone) or ``"view"`` (something left this key's view: a delete, a hide, an unhide, a
         Character change; drop what the new walk does not name). When both happened since the
@@ -182,13 +182,13 @@ class ApiError(Exception):
     @property
     def is_precondition_failed(self) -> bool:
         """A write sent with ``if_match`` found the element moved past that ``change_seq``
-        (412 ``precondition_failed``, keel #210): nothing written, nothing merged. The error is a
+        (412 ``precondition_failed``): nothing written, nothing merged. The error is a
         ``PreconditionFailed``, whose ``current`` is the element as it is now."""
         return self.status == 412 and self.code == "precondition_failed"
 
     @property
     def is_proposed(self) -> bool:
-        """The write was held as a proposal (202, keel #519): the world takes this agent seat's writes
+        """The write was held as a proposal (202): the world takes this agent seat's writes
         as proposals, and the element did not change. The error is a ``ProposedError``, whose
         ``proposal`` is the row a keeper (the owner or a co-builder) accepts or declines."""
         return self.status == 202
@@ -196,45 +196,45 @@ class ApiError(Exception):
     @property
     def is_field_not_visible(self) -> bool:
         """A proposal named a field this key's view of the element does not hold: it reads the element
-        as a known-of stub (422 ``field_not_visible``, keel #519; ``param`` names the field)."""
+        as a known-of stub (422 ``field_not_visible``; ``param`` names the field)."""
         return self.status == 422 and self.code == "field_not_visible"
 
     @property
     def is_too_many_open(self) -> bool:
         """This proposer already has 5 open proposals on the element, or 50 in the world (422
-        ``too_many_open``, keel #519): wait for a keeper, or withdraw one. A lapsed one no longer counts."""
+        ``too_many_open``): wait for a keeper, or withdraw one. A lapsed one no longer counts."""
         return self.status == 422 and self.code == "too_many_open"
 
     @property
     def is_stale_proposal(self) -> bool:
-        """An accept found a proposed field moved since the proposal was made (409 ``stale_proposal``,
-        keel #519): nothing written, the row stays open. The error is a ``StaleProposal``, whose
+        """An accept found a proposed field moved since the proposal was made (409 ``stale_proposal``):
+        nothing written, the row stays open. The error is a ``StaleProposal``, whose
         ``conflicts`` and ``current`` say what moved."""
         return self.status == 409 and self.code == "stale_proposal"
 
     @property
     def is_proposed_only(self) -> bool:
         """The world takes this agent seat's writes as proposals, and the act has no proposal form (403
-        ``proposed_only``, keel #519): deleting an element the seat did not create, or accepting or
+        ``proposed_only``): deleting an element the seat did not create, or accepting or
         declining a proposal. Propose instead, or ask a keeper. Also the review of a new element by
-        the member its ``x_review_proposed`` mark names, on any world (keel #565)."""
+        the member its ``x_review_proposed`` mark names, on any world."""
         return self.status == 403 and self.code == "proposed_only"
 
     @property
     def is_not_proposed(self) -> bool:
-        """A review found no ``x_review_proposed`` mark on the element (422 ``not_proposed``, keel
-        #565): nothing to settle, never marked or already accepted."""
+        """A review found no ``x_review_proposed`` mark on the element (422 ``not_proposed``):
+        nothing to settle, never marked or already accepted."""
         return self.status == 422 and self.code == "not_proposed"
 
     @property
     def is_own_proposal(self) -> bool:
-        """A keeper tried to accept or decline their own proposal (403 ``own_proposal``, keel #519):
+        """A keeper tried to accept or decline their own proposal (403 ``own_proposal``):
         another keeper decides it."""
         return self.status == 403 and self.code == "own_proposal"
 
 
 class PreconditionFailed(ApiError):
-    """412 ``precondition_failed`` (keel #210): the element changed since the ``change_seq`` sent as
+    """412 ``precondition_failed``: the element changed since the ``change_seq`` sent as
     ``if_match``. ``current`` is the element as it is now, as this key sees it (None if a response
     ever lacks it). The check is per element and the server never merges: compare the copy you
     edited from with ``current``; when the fields you changed are not the ones that moved, send
@@ -247,7 +247,7 @@ class PreconditionFailed(ApiError):
 
 
 class StaleProposal(ApiError):
-    """409 ``stale_proposal`` (keel #519): an accept found that a field the proposal names has moved
+    """409 ``stale_proposal``: an accept found that a field the proposal names has moved
     since it was made. Nothing was written and the proposal stays open. ``conflicts`` holds one
     ``{field, base, current}`` per moved field (empty if a response ever lacks it); ``current`` is the
     element as it is now (None if missing). A change to a field the proposal does not name never
@@ -263,9 +263,9 @@ class StaleProposal(ApiError):
 
 
 class ProposedError(ApiError):
-    """A write answered 202 (keel #519): the world takes this agent seat's writes as proposals (its
+    """A write answered 202: the world takes this agent seat's writes as proposals (its
     owner's setting, ``agent_writes_proposed`` on ``GET /world``), so the element did NOT change.
-    ``proposal`` is the row the write became (None if a response ever lacks it): since keel #565 its
+    ``proposal`` is the row the write became (None if a response ever lacks it): since 2026-10-23 its
     ``fields`` holds only what differs, and a PUT's ``omitted`` names the fields it would empty. A
     keeper accepts or declines it. Raised, not returned, so that no caller takes the answer for the element: a PATCH,
     PUT or link edit that returned normally changed the element; this one did not. ``status`` is 202

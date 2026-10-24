@@ -62,8 +62,8 @@ Each element concept:
     ``OkfReport.unresolved``.
 
 Hidden elements (``folder.is_hidden``: ``hidden: true`` at the top level, folder format §4.8) are
-hidden from whoever the world is handed to, never from its holder (Skeld's ruling, OW Council h58
-#11461), and a bundle is handed on: left out unless ``--hidden`` (``hidden=True``), counted in
+hidden from whoever the world is handed to, never from its holder (ruled
+2026-10-23), and a bundle is handed on: left out unless ``--hidden`` (``hidden=True``), counted in
 ``OkfReport.hidden_left_out`` and in world.md's ``onlyworlds_export`` block (``hidden_left_out``).
 Left out, nothing of it is written, its name included: no concept file, no index line, a link to it
 left out of the frontmatter and the body (``OkfReport.hidden_links_left_out``), an in-prose

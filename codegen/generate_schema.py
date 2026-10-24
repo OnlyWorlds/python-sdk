@@ -193,7 +193,7 @@ def extension_prefixes() -> tuple[str, ...]:
 
 def public_fields(types: list[str], layout: dict[str, Any]) -> dict[str, list[str]]:
     """type -> the fields the platform shows on a known-of stub beside the base keys, from the dist's
-    presentation.json ``types.<type>.public`` (keel's field tag ``public: true``, Keel #448). Every type
+    presentation.json ``types.<type>.public`` (keel's field tag ``public: true``). Every type
     must list one (``[]`` for none), and each name must be one of that type's own schema fields."""
     presentation: dict[str, Any] = json.loads((DIST / "presentation.json").read_text(encoding="utf-8"))
     by_type = presentation.get("types")
@@ -398,7 +398,7 @@ def render(
         "",
         "# type -> the fields the platform shows on a known-of stub (``known_of: true``) beside its name,",
         "# description, supertype, subtype and picture: presentation.json ``types.<type>.public`` (keel's field",
-        "# tag, Keel #448). For display; what a stub holds is what the server sent (folder.known_of_for_disk).",
+        "# tag). For display; what a stub holds is what the server sent (folder.known_of_for_disk).",
         "PUBLIC_FIELDS: dict[str, tuple[str, ...]] = {",
         *[line for t in types for line in wrapped(f'    "{t}": ', public[t], ",")],
         "}",

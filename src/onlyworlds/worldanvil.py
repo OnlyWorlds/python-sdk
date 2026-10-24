@@ -8,8 +8,8 @@ one print-style HTML page, ``/world/<slug>/export``, saved from the browser. ``-
 would become what and writes nothing. OUT-DIR must not exist yet (or be empty): a folder is
 written whole, once, through ``write_folder``.
 
-**Proven on two real exports** of one small world (2026-10-23, Seethe's world on a free account,
-both copies scrubbed of the page's scripts, forms and the account's handle by Boss's script;
+**Proven on two real exports** of one small world (2026-10-23, a maintainer's world on a free account,
+both copies scrubbed of the page's scripts, forms and the account's handle by a script;
 ``tests/fixtures/worldanvil/``): the world's title (``h1.world-title``), a World Codex
 (``#world-toc``) of ``#article-<uuid>`` anchors grouped under a category's ``<h5>`` (the rest under
 ``<h4>Uncategorized Articles</h4>``), then one ``div.article-print-container`` per article, its
@@ -32,7 +32,7 @@ What becomes what:
 
 - **An article becomes an element** of its template's type (``TEMPLATE_TYPES``, keyed on the
   template as the Metadata tab names it, ``Character``, or as a link's ``data-template-type``
-  names it, ``person``; the schema owner's table, Skeld, OW Market h40 #11360). A template not in
+  names it, ``person``; the schema owner's table, ruled 2026-10-23). A template not in
   the table, or an article with none, becomes a Narrative with supertype ``Article`` (what it is,
   never where it came from) and the template's name as World Anvil spells it as subtype; the
   report names each such template and its count. The ``h1`` is the name (the Codex's name when
@@ -62,7 +62,7 @@ What becomes what:
   ``_updated``, ``_published``) as ISO 8601 (``23 Oct, 2026`` is ``2026-10-23``);
   a date not parsed exactly is kept as printed and named in the report, never guessed. The Author
   is one platform username for the whole export, not a fact about an element: named in the
-  report, never on an element (Skeld, OW Market h40 #11360). The counters (Views, Favorites,
+  report, never on an element (ruled 2026-10-23). The counters (Views, Favorites,
   Comments) are not kept, and the report says so.
 - **A cover image** of the article's own becomes ``image_url``; World Anvil's inherited default
   (``img-inherited``) is counted and not kept.
@@ -70,8 +70,8 @@ What becomes what:
   page's chrome is kept as ``x_worldanvil_unread`` and named in the report; text on the page
   outside the articles (a filled Timelines section) is named in the report.
 
-**What the source hides, the folder hides: never dropped, never public** (Skeld's rule, OW Market
-h40 #11228; folder format §4.8). An article is written whole carrying ``hidden: true`` at the top
+**What the source hides, the folder hides: never dropped, never public** (ruled
+2026-10-23; folder format §4.8). An article is written whole carrying ``hidden: true`` at the top
 of its body, and the report names it with why, when any place that gives its privacy says other
 than public (a link's ``data-article-privacy``, the Metadata tab's Visibility), or when one place
 gives none while another gives one (a link with no ``data-article-privacy`` to an article
@@ -148,15 +148,15 @@ WORLDANVIL_NAMESPACE = uuid.uuid5(uuid.NAMESPACE_URL, "https://onlyworlds.com/ns
 EXT_PREFIX = "x_worldanvil_"
 
 #: The supertype of a Narrative made from an article whose template has no OnlyWorlds type: what
-#: the thing is, never where it came from (the producer line says that; Skeld, OW Market h40 #11360).
+#: the thing is, never where it came from (the producer line says that; ruled 2026-10-23).
 UNTYPED_SUPERTYPE = "Article"
 
 #: The most an export may hold, in bytes: a file past it is refused, not read.
 MAX_EXPORT_BYTES = 256 * 1024 * 1024
 
 #: World Anvil's article template -> element type: the one table, as the schema owner ruled it
-#: against the definitions page (Skeld, OW Market h40 #11360: every row below holds, the last four
-#: added on his reading; anything else stays unknown). Keyed lowercased on the template as the
+#: against the definitions page (2026-10-23: every row below holds, the last four
+#: added on that reading; anything else stays unknown). Keyed lowercased on the template as the
 #: Metadata tab names it (``Geographic Location``) or as a link's ``data-template-type`` names it
 #: (``person``). The keys in ``PROVEN_TEMPLATES`` were read on a real export; the rest are believed.
 TEMPLATE_TYPES: dict[str, str] = {
@@ -200,8 +200,8 @@ _OWN = (
     "unread",
 )
 
-#: The Metadata tab's dates, kept on the element under the owner's three names (Skeld, OW Market h40
-#: #11360: ``created``, ``updated``, ``published``, "or the template's own words"), as ISO 8601.
+#: The Metadata tab's dates, kept on the element under the owner's three names (ruled
+#: 2026-10-23: ``created``, ``updated``, ``published``, "or the template's own words"), as ISO 8601.
 DATE_KEYS: dict[str, str] = {
     "creation date": f"{EXT_PREFIX}created",
     "last update date": f"{EXT_PREFIX}updated",

@@ -23,9 +23,9 @@ into a ``Snapshot``; the converter reads only the snapshot, so both roads give t
 **The export file** (Project Settings, Export; ``.lk`` is the JSON gzipped, the JSON type the same
 data plain; read either, by its first bytes, never by its name) holds the whole project in one
 object, ``{version, exportId, exportedAt, resources, calendars, resourceCount, hash}``. **Proven on
-two real exports** of one project (version 1, 2026-10-23, Seethe's project on a crew trial account:
+two real exports** of one project (version 1, 2026-10-23, a maintainer's project on a trial account:
 ``tests/fixtures/legendkeeper/the-quay-world.lk``, and ``the-quay-world-3.json`` a few hours on,
-with a map of her own and two pins on it; the account's ids and its map image's asset id replaced
+with a map added and two pins on it; the account's ids and its map image's asset id replaced
 by placeholders). ``FileSource`` adapts where its shape is not the API's:
 
 - no project: the export names neither the project's id nor its name. Ids are keyed on the id of
@@ -54,7 +54,7 @@ by placeholders). ``FileSource`` adapts where its shape is not the API's:
 - a map document carries a ``map`` object (``mapId``, ``locatorId``, ``min_x``, ``max_x``,
   ``min_y``, ``max_y``, ``max_zoom``; none on a map with no image) and ``content.pins``; the pins
   ride on the document as ``pins``, beside the ``map`` object. The API's map shape is not known
-  (Boss's walk could neither make nor read a pin), so a map read through the API stays not
+  (a walk of it could neither make nor read a pin), so a map read through the API stays not
   imported, named: only the file makes Maps.
 - not kept, named in the report: ``exportId``, ``exportedAt`` and ``hash`` (the report names the
   export; two exports of one project give one folder), ``createdBy`` (an account id),
@@ -72,7 +72,7 @@ The templates (Character, Location, ...) are marked: they sit in LegendKeeper's 
 The Markdown zip LegendKeeper also exports is not a source: it loses the tags, the properties,
 the hidden marks and the ids.
 
-**Observed** (Boss, 2026-10-22, live on a real project; the recorded answers are this package's
+**Observed** (2026-10-22, live on a real project; the recorded answers are this package's
 test fixtures): the tree as one flat list of resources (``id``, ``name``, ``parentId``, ``tags``,
 ``aliases``, ``isHidden``, ``documents``), a resource's documents typed ``blank``, ``page``, ``map``
 or ``time``; a page's blocks (``heading``, ``paragraph``, ``infobox``, ``secret``, ``table``) and
@@ -128,12 +128,12 @@ What becomes what:
   ``x_legendkeeper_parent`` the resource it belongs to. ``start_date`` and ``end_date`` are left
   unset: the unit is the world's own time system, and converting minutes into it is a later step
   that needs the world's time settings named. Placeholders are layout and are counted.
-- **A map document** (read from the export file) **becomes a Map** (Skeld's ruling, OW Market h40
-  #11385), named ``<resource>: <document>`` as a hidden page's Narrative is: ``width`` is
+- **A map document** (read from the export file) **becomes a Map** (ruled
+  2026-10-23), named ``<resource>: <document>`` as a hidden page's Narrative is: ``width`` is
   ``max_x - min_x`` and ``height`` ``max_y - min_y`` from the document's ``map`` bounds (whole
   numbers), the bounds kept as ``x_legendkeeper_bounds`` and ``max_zoom`` as
   ``x_legendkeeper_max_zoom``. ``image_url`` is the map's ``mapId`` only when it is an http(s)
-  address, as given and never copied (Skeld #11386): the image lives on LegendKeeper's host and
+  address, as given and never copied (ruled 2026-10-23): the image lives on LegendKeeper's host and
   loads only as long as that account's asset does, which the report says; a bare asset id
   (LegendKeeper's tutorial map's) is kept as ``x_legendkeeper_map_id``, never written as a URL. A
   ``locatorId`` equal to the ``mapId`` is not kept; any other key of the ``map`` object is kept in
@@ -151,8 +151,8 @@ What becomes what:
   OnlyWorlds counts image pixels from the bottom left, so ``x`` is ``x * 2^max_zoom - min_x`` and
   ``y`` is ``y * 2^max_zoom - min_y``, a half rounded up, the exact pair kept as
   ``x_legendkeeper_pos``; the report names each map's scale (``positions scaled by 2^2 = 4``).
-  Measured on two pins of Seethe's quay map (an 800 by 600 image, bounds x 0..800, y -600..0,
-  ``max_zoom`` 2; OW Market h40 #11426, #11429, Skeld #11428): the first, read at image pixel
+  Measured on two pins of one quay map (an 800 by 600 image, bounds x 0..800, y -600..0,
+  ``max_zoom`` 2; 2026-10-23): the first, read at image pixel
   (127, 110) from the top left, is stored ``[-27.5, 32]`` (times 4, pixel 128, 110): x 128, y 490;
   the second, read at about (796, 524), is stored ``[-131.118, 199.314]``: x 797, y 76. Both fit
   the scaled reading and neither the unscaled one. A pin on a map with no bounds has no x, y, and
@@ -167,8 +167,8 @@ What becomes what:
   state, permissions, banners, event colours, and the server's computed event dates (they follow
   from the minutes and calendar).
 
-**What the source hides, the folder hides: never dropped, never public** (Skeld's rule, OW Market
-h40 #11228). Each hidden thing is an element carrying ``hidden: true`` at the top of its body
+**What the source hides, the folder hides: never dropped, never public** (ruled
+2026-10-23). Each hidden thing is an element carrying ``hidden: true`` at the top of its body
 (OnlyWorlds' hidden mark), counted in the report, from either road:
 
 - a resource whose ``isHidden`` is true, and every resource under it (LegendKeeper hides a
@@ -298,7 +298,7 @@ KEY_ENV = "LEGENDKEEPER_API_KEY"
 EXT_PREFIX = "x_legendkeeper_"
 
 #: The supertype a Narrative made from an untyped resource carries: what it is, never where it came
-#: from (the producer line and the x_legendkeeper_ keys say that; Skeld, OW Market h40 #11385).
+#: from (the producer line and the x_legendkeeper_ keys say that; ruled 2026-10-23).
 UNTYPED_SUPERTYPE = "Article"
 
 #: Resources and events per page (the API's maximum).
@@ -2129,7 +2129,7 @@ class _Converter:
                 " in zoom-0 units (an image pixel divided by 2^max_zoom), y from 0 at the map's top down to min_y,"
                 " and the bounds are image pixels; x is x * 2^max_zoom - min_x and y is y * 2^max_zoom - min_y"
                 " (OnlyWorlds counts from the bottom left), rounded to whole numbers, the exact pair kept as"
-                " x_legendkeeper_pos (measured on two pins of one map, Seethe's, OW Market h40 #11426, #11429)"
+                " x_legendkeeper_pos (measured on two pins of one map, 2026-10-23)"
             )
         if self.unplaced_pins:
             n.append(

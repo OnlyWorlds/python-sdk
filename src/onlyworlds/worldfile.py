@@ -49,7 +49,7 @@ portable ``.owworld`` (§4.1). A producer's records marked ``"private": true`` i
 ``records/RECORDS.json`` are left out whole unless asked (``include_private_records``;
 OW-8, §4.5 rule 11), the manifest carried byte-exact either way. An element file carrying
 ``hidden: true`` is copied byte for byte unless the file is a share (``include_hidden=False``:
-left out whole, and counted; folder format §4.8, Skeld's ruling, OW Atlas h20 #11469). The two
+left out whole, and counted; folder format §4.8, ruled 2026-10-23). The two
 defaults differ on purpose: private records stay out unless asked, hidden elements stay in unless
 the write is a share.
 """
@@ -97,7 +97,7 @@ __all__ = [
 MARKER_NAME = "mimetype"
 WORLD_FILE_MEDIA_TYPE = "application/vnd.onlyworlds.world+zip"
 
-#: The budget, uncompressed: the floor every reader accepts (OW-15, Boss's numbers).
+#: The budget, uncompressed: the floor every reader accepts (OW-15).
 WORLD_FILE_MAX_BYTES = 2 * 1024**3
 WORLD_FILE_MAX_ENTRIES = 500_000
 
@@ -519,7 +519,7 @@ def _inflate(b: _Bytes, e: _Cd) -> bytes:
             _refuse("not_openable", f"{e.name}: its deflate stream is broken.")
         if len(out) <= e.usize and not inflater.eof:
             _refuse("not_openable", f"{e.name}: its deflate stream is cut short.")
-        # OW-14's size bullet speaks of the compressed size too (ruled by Skeld 2026-10-24): bytes after the stream's
+        # OW-14's size bullet speaks of the compressed size too (ruled 2026-10-24): bytes after the stream's
         # end are no part of it, so a stream that ends before its declared compressed size is a broken entry.
         left = len(inflater.unused_data)
         if len(out) <= e.usize and left:
@@ -877,7 +877,7 @@ def _plan(
 
         files = {rel: src for rel, src in files.items() if not in_private(rel)}
     if not include_hidden:
-        # A share (§4.8, h20 #11469): each hidden element's file left out whole; nothing else rewritten.
+        # A share (§4.8): each hidden element's file left out whole; nothing else rewritten.
         hidden = sorted(rel for rel, src in files.items() if _hidden_element_file(rel, src))
         files = {rel: src for rel, src in files.items() if rel not in set(hidden)}
         if hidden_left_out is not None:
@@ -979,7 +979,7 @@ def write_world_file(
       so a reader learns a producer was left out. No manifest, nothing is private.
       ``include_private_records=True`` (the caller asks) carries every producer's records
       whole, and the manifest is not read.
-    - Hidden elements are kept (folder format §4.8; Skeld, OW Atlas h20 #11469): a world file is
+    - Hidden elements are kept (folder format §4.8; ruled 2026-10-23): a world file is
       a copy, and an element file carrying ``hidden: true`` at the top level travels byte for
       byte. ``include_hidden=False``, for a file made to hand to someone else (a share), leaves
       every such file in ``elements/`` or ``spatial/`` out whole (any value of the mark but null

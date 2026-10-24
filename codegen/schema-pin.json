@@ -29,22 +29,22 @@
     {
       "tag": "v0.33.0-dist.56",
       "manifest_sha256": "d206d35cf3b8628765143f80071e706db1fa1b49be1f205b2c2580703bc402fd",
-      "note": "superseded by v0.33.0-dist.57 (same canonical 00.33.00; fixtures/owworld/ at 93 cases: eight OW-18 NFC cases, six refused and two passed, with UnicodeData-15.1.0.txt and CompositionExclusions-15.1.0.txt beside CaseFolding, so a reader that builds its own normalisation can prove it (Quillon, OW Council #656, h58 #11904); verdicts.json, generate.py; no schema file moved)"
+      "note": "superseded by v0.33.0-dist.57 (same canonical 00.33.00; fixtures/owworld/ at 93 cases: eight OW-18 NFC cases, six refused and two passed, with UnicodeData-15.1.0.txt and CompositionExclusions-15.1.0.txt beside CaseFolding, so a reader that builds its own normalisation can prove it (2026-10-24); verdicts.json, generate.py; no schema file moved)"
     },
     {
       "tag": "v0.33.0-dist.55",
       "manifest_sha256": "7b4db33d576692918595d71ceba4832a5eb2ae56c8e83e0cafa68f62b6c1edc4",
-      "note": "superseded by v0.33.0-dist.56 (same canonical 00.33.00; profiles/spine.md's five readings the first reader found ambiguous: dropped as {key, value} entries compared as JSON values, a non-string truth or probe named, the probe form as syntax, verified.at a real calendar day, an empty depends_on stated; spine.fixture.json at 40 cases (OW Spine #614, h73 #11870, #11872); no schema file moved)"
+      "note": "superseded by v0.33.0-dist.56 (same canonical 00.33.00; profiles/spine.md's five readings the first reader found ambiguous: dropped as {key, value} entries compared as JSON values, a non-string truth or probe named, the probe form as syntax, verified.at a real calendar day, an empty depends_on stated; spine.fixture.json at 40 cases; no schema file moved)"
     },
     {
       "tag": "v0.33.0-dist.54",
       "manifest_sha256": "82ba25c181840f03f2ea7c4b0ac6288759fda9a250f5af4988a78489203e1b75",
-      "note": "superseded by v0.33.0-dist.55 (same canonical 00.33.00; profiles/ gains spine.md and spine.fixture.json, the spine profile: a world that maps a software ecosystem, a closed list of kinds as supertypes, eleven x_spine_* keys, a day count with its calendar, 34 conformance cases and six calendar steps (OW Spine #614); README's profiles row; no schema file moved)"
+      "note": "superseded by v0.33.0-dist.55 (same canonical 00.33.00; profiles/ gains spine.md and spine.fixture.json, the spine profile: a world that maps a software ecosystem, a closed list of kinds as supertypes, eleven x_spine_* keys, a day count with its calendar, 34 conformance cases and six calendar steps; README's profiles row; no schema file moved)"
     },
     {
       "tag": "v0.33.0-dist.49",
       "manifest_sha256": "d926f4dcb42d21ccc7249b6d474601c0dd6e7a42307ea46c19889e21038282f7",
-      "note": "superseded by v0.33.0-dist.54 (same canonical 00.33.00; five serials: 50 and 51 example/world-export.json's world block the World whole, with origin and x_names (Keel #516, #571; folder format v0.3.16); 52 profiles/review.md's reader rule (a reader that hands a world on leaves proposed elements out unless asked); 53 walk/lint_folder.py takes hidden as a folder key, a boolean (folder spec 4.8), and review.md's rule 4 on a malformed mark; 54 profiles/checks.md's where.type as a list and reader rules 6 to 8, checks.fixture.json's rule 6 with four cases and three not-checked rows (7 rules, 17 cases, 11 not-checked rows); no schema file moved)"
+      "note": "superseded by v0.33.0-dist.54 (same canonical 00.33.00; five serials: 50 and 51 example/world-export.json's world block the World whole, with origin and x_names (folder format v0.3.16); 52 profiles/review.md's reader rule (a reader that hands a world on leaves proposed elements out unless asked); 53 walk/lint_folder.py takes hidden as a folder key, a boolean (folder spec 4.8), and review.md's rule 4 on a malformed mark; 54 profiles/checks.md's where.type as a list and reader rules 6 to 8, checks.fixture.json's rule 6 with four cases and three not-checked rows (7 rules, 17 cases, 11 not-checked rows); no schema file moved)"
     },
     {
       "tag": "v0.33.0-dist.48",
@@ -54,17 +54,17 @@
     {
       "tag": "v0.33.0-dist.47",
       "manifest_sha256": "e46297fd9f17a1f8bc4c9c9f8d614d99c1674759caa64441dd6e2e90b1bccad0",
-      "note": "superseded by v0.33.0-dist.48 (same canonical 00.33.00; profiles/ gains names.md and names.fixture.json, the names profile: x_names on the World, a world's own words for the 22 types, 23 conformance cases; profiles/checks.md names the one Charter (D152); README's profiles row; no schema file moved)"
+      "note": "superseded by v0.33.0-dist.48 (same canonical 00.33.00; profiles/ gains names.md and names.fixture.json, the names profile: x_names on the World, a world's own words for the 22 types, 23 conformance cases; profiles/checks.md names the one Charter; README's profiles row; no schema file moved)"
     },
     {
       "tag": "v0.33.0-dist.46",
       "manifest_sha256": "da7e9cee801a529f509f8a2084ed352e433886e0ca76e272fc5c87ce9595530e",
-      "note": "superseded by v0.33.0-dist.47 (same canonical 00.33.00; profiles/ gains checks.md and checks.fixture.json, the checks profile: a Charter's house rules as x_checks_rules (OW Council #559); profiles/room.md defines trimmed and without regard to case once; no schema file moved)"
+      "note": "superseded by v0.33.0-dist.47 (same canonical 00.33.00; profiles/ gains checks.md and checks.fixture.json, the checks profile: a Charter's house rules as x_checks_rules; profiles/room.md defines trimmed and without regard to case once; no schema file moved)"
     },
     {
       "tag": "v0.33.0-dist.45",
       "manifest_sha256": "ed5fcab2d2e768d06282073993a4abac5c99f94753c8fd9c5f52596a636b4566",
-      "note": "superseded by v0.33.0-dist.46 (same canonical 00.33.00; keel #520's changed_client: example/world-export.json's bodies gain changed_client: null, walk/lint_folder.py's server-key set names it, one README sentence; no schema file moved)"
+      "note": "superseded by v0.33.0-dist.46 (same canonical 00.33.00; keel's changed_client: example/world-export.json's bodies gain changed_client: null, walk/lint_folder.py's server-key set names it, one README sentence; no schema file moved)"
     },
     {
       "tag": "v0.33.0-dist.43",

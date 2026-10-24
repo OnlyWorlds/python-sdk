@@ -45,7 +45,7 @@ U+00A0, U+1680, U+2000 to U+200A, U+2028, U+2029, U+202F, U+205F, U+3000.
 
 The profiles' "trimmed" (schema-dist ``profiles/room.md``, dist.47, "Trimmed and without regard to case,
 defined once") is leading and trailing whitespace removed, nothing inside touched, and whitespace is
-White_Space exactly (Skeld's ruling, OW Parlor h66 #10415): a byte order mark (U+FEFF) and a zero width
+White_Space exactly (ruled 2026-10-22): a byte order mark (U+FEFF) and a zero width
 space (U+200B) stay. Bare ``str.strip()`` is not used: it strips by ``str.isspace()``, which also takes
 U+001C to U+001F. The npm SDK's ``isRoomElement`` trims by the same 25."""
 

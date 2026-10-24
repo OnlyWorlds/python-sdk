@@ -10,10 +10,10 @@ name: release
 # back: the version is live, its files have the sha256 of the ones built here, and a clean
 # install from PyPI reads the public demo world.
 #
-# Grant: the Captain, 2026-10-11 (OW Infra h37 #3053): releases are the maintainer's.
+# Releases are the maintainer's (Titus, 2026-10-11).
 #
 # Once PyPI serves it, a last job makes the tag a GitHub release, its body the version's
-# CHANGELOG entry: the shared What's new page reads GitHub releases (OW Infra h37 #8766).
+# CHANGELOG entry: the shared What's new page reads GitHub releases.
 
 on:
   push:
@@ -43,7 +43,7 @@ jobs:
             echo "$v is already on PyPI"; exit 1
           fi
 
-      # Every release is written up where its users look (the changelog question, OW Infra h37 #8286)
+      # Every release is written up where its users look (ruled 2026-10-20)
       - name: The changelog has this version's entry
         run: |
           v="${GITHUB_REF_NAME#v}"
@@ -64,6 +64,8 @@ jobs:
       - run: uv run ruff check .
       - run: uv run mypy --strict src tests
       - run: uv run python codegen/generate_schema.py --check
+      # Published text names no one inside the team and points at no internal room or tracker.
+      - run: uv run python scripts/public_words.py
       - run: uv build
       - run: uvx twine check dist/*
       - uses: actions/upload-artifact@v4

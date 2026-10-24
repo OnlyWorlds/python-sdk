@@ -969,7 +969,7 @@ GENERIC_LINKS: dict[str, dict[str, tuple[str, str]]] = {
 
 # type -> the fields the platform shows on a known-of stub (``known_of: true``) beside its name,
 # description, supertype, subtype and picture: presentation.json ``types.<type>.public`` (keel's field
-# tag, Keel #448). For display; what a stub holds is what the server sent (folder.known_of_for_disk).
+# tag). For display; what a stub holds is what the server sent (folder.known_of_for_disk).
 PUBLIC_FIELDS: dict[str, tuple[str, ...]] = {
     "ability": (),
     "collective": (),

@@ -11,9 +11,9 @@ written whole, once, through ``write_folder``.
 **A documents door.** Campfire's web app has no data export: Export Elements gives four documents
 (docx, pdf, html, rtf), the same text four ways, and this door reads the html. A document has no
 ids, no links and no hidden marks, so the folder carries none of them either, and the report says
-so on every run (the schema owner's rules, Skeld, OW Market h40 #11368).
+so on every run (ruled 2026-10-23).
 
-**Proven on one real export** (2026-10-23, Seethe's project on a free account;
+**Proven on one real export** (2026-10-23, a maintainer's project on a free account;
 ``tests/fixtures/campfire/campfire-export.html``): the document's title (``h1.document-title``,
 ``Campfire Export``), then one ``section.export-item`` per element: its name in ``h2.item-title``,
 its description in ``div.item-description``, then its pages (``section.page-section``, a
@@ -37,7 +37,7 @@ What becomes what:
   template writes them, ``Basic Information`` / ``Place of Residence`` for Characters, ``Location
   Details`` / ``Location Type`` for Locations) and the type from the module (``MODULE_TYPES``, the
   one table, mapped against the OnlyWorlds definitions as the World Anvil door's is; reading the
-  module from the panels is ruled, Skeld, OW Market h40 #11396). A module not in ``MODULE_TYPES``
+  module from the panels was ruled 2026-10-23). A module not in ``MODULE_TYPES``
   becomes a Narrative with supertype ``Article`` and the module's name as subtype; an element
   whose panels match no module this door knows, or two, becomes a Narrative with supertype
   ``Article`` and no subtype. The report names, per element, the panel words its module was read
@@ -112,8 +112,7 @@ __all__ = [
     "main",
 ]
 
-#: The ``producer.input`` word for this door, on the folder spec's §4.2 list (v0.3.18; Skeld, OW
-#: Market h40 #11396).
+#: The ``producer.input`` word for this door, on the folder spec's §4.2 list (v0.3.18).
 PRODUCER_INPUT = "campfire-export"
 
 #: The namespace every id this door mints is UUIDv5 in. Fixed for good: changing it would give
@@ -124,7 +123,7 @@ CAMPFIRE_NAMESPACE = uuid.uuid5(uuid.NAMESPACE_URL, "https://onlyworlds.com/ns/c
 EXT_PREFIX = "x_campfire_"
 
 #: The supertype of a Narrative whose module has no OnlyWorlds type: what it is, never where it
-#: came from (the World Anvil ruling, Skeld, OW Market h40 #11360; for Campfire #11368).
+#: came from (the World Anvil ruling, 2026-10-23, and the same for Campfire).
 UNTYPED_SUPERTYPE = "Article"
 
 #: The most an export may hold, in bytes: a file past it is refused, not read.
@@ -133,7 +132,7 @@ MAX_EXPORT_BYTES = 256 * 1024 * 1024
 #: Campfire's module -> element type: the one table, keyed lowercased on the module's name as
 #: Campfire spells it, each row read against the OnlyWorlds definitions. ``SEEN_MODULES`` were
 #: in the real export (their elements, not the word: the file prints no module name); the rest
-#: are believed from Campfire's module list (the table as ruled, Skeld, OW Market h40 #11396).
+#: are believed from Campfire's module list (the table as ruled, 2026-10-23).
 #: Left out, so an Article Narrative: Timelines, Arcs, Manuscript, Encyclopedia and Research (an
 #: author's tools or a mix of kinds, not one thing in the world), and Relationships until a real
 #: file shows one with two ends (then Relation).
@@ -141,13 +140,13 @@ MODULE_TYPES: dict[str, str] = {
     "characters": "character",  # "an individual with agency and the capacity to make choices"
     "locations": "location",  # "a distinct place within the world where activities occur"
     "species": "species",  # "a distinct biological or cultural form of life"
-    "cultures": "species",  # the cultural half of Species, as Skeld ruled World Anvil's Ethnicity
+    "cultures": "species",  # the cultural half of Species, as World Anvil's Ethnicity was ruled
     "items": "object",  # "tangible, non-living things that can be made, owned, traded or destroyed"
     "languages": "language",  # "systems of shared meaning"
     "religions": "construct",  # "structured ideas or systems ... believed or structured"
     "philosophies": "construct",  # the same
     "systems": "construct",  # "structured ideas or systems that the world acknowledges"
-    "magic": "construct",  # "a magic system is how the world works, not a thing anyone does" (Skeld)
+    "magic": "construct",  # "a magic system is how the world works, not a thing anyone does"
     "maps": "map",  # "a spatial template"; a document carries no coordinates, only the name and text
 }
 SEEN_MODULES = frozenset({"characters", "locations"})
