@@ -60,26 +60,32 @@ keeper reads every row, any other member its own). A key with no member reads no
 404): the flag does not run, and says why. A row's ``evidence`` is outside text and is never read
 into a finding.
 
-On both doors, (13) the spine (schema-dist ``profiles/spine.md``, serial 56), on a world where some
+On both doors, (13) the spine (schema-dist ``profiles/spine.md``, serial 59), on a world where some
 element carries an ``x_spine_`` key (any other world skips it and says so). Each element is read by
 ``onlyworlds.spine.read_spine_element``: a listed type whose supertype is off the spine's list (or
 empty) is a finding, and so is every value the reader drops (the key and the value) and a probe not in
 the probe form; a type the list does not name, and the three free types, are not. Then the audit's
 definite parts, which need the whole world: each row (an Object, Construct, Location or Law of a kind
-on the list, the world's ``Charter`` too: the page exempts none) is kept by exactly one Title with
-supertype ``Seat``, through the Seat's ``objects``, ``constructs``, ``locations`` or ``laws``; no seat,
-or two, is a finding. Every ``x_spine_depends_on`` id must be in the world, a check that does not run
-through a guest key. A ``legacy`` or ``provenance`` row's Retirement Event (named by its text, which
-no structure attributes), whether a probe passes and ``x_spine_probed`` (the probe gate's) are never
-checked, and ``compared`` names them in ``not_checked``. A known-of stub is not read, though a Seat
-that is one still keeps what it lists.
+on the list, the world's ``Charter`` too: the page exempts none) is kept by exactly one Seat (a Title
+with supertype ``Seat``), through the Title's field for the row's own type (``objects`` for an Object,
+``constructs``, ``locations``, ``laws``); no seat, or two, is a finding, and a Title that is not a Seat
+neither owns nor counts. Every ``x_spine_depends_on`` id must be in the world, a check that does not
+run through a guest key. A ``legacy`` or ``provenance`` row is linked by an Event with supertype
+``Retirement`` through the Event's typed link field for the row's type (``objects``, ``constructs`` or
+``locations``), not only named in its text; a row no Retirement Event links is a finding. That check
+runs only through a key that sees every element and is served hidden ones, and never on a Law (an
+Event has no ``laws`` field). Two rows of one type whose names are one once trimmed and folded for case
+(as the room profile defines both) are a finding on the first by id, naming the others (flag 5 folds
+wider, on every element). Whether a probe passes, ``x_spine_probed`` (the probe gate's) and a Law's
+Retirement Event are never checked, and ``compared`` names them in ``not_checked``. A known-of stub is
+not read, though a Seat or a Retirement Event that is one still keeps or links what it lists.
 
-A projection (a public world built from a spine, its owners anonymised; Skeld, OW Spine h73 #11933)
-is marked on its World: ``x_spine_projection``, ``{source, at}`` (the Spine world's id as a string,
-the last rebuild's ISO time), which also makes flag 13 run. On a marked world each row must carry
-``x_spine_owner`` and no element may be hidden (a projection carries nothing hidden; through a key
-that is not served hidden elements, ``not_checked`` says so); the one-Seat check does not apply (a
-projection has no Seats) and is named in ``not_checked``, and the dependencies are still compared.
+A projection (a public world built from a spine, each row naming its keeping Seat in ``x_spine_owner``)
+is marked on its World: ``x_spine_projection``, ``{source, at}`` (the source world's id as a string,
+never a link, and the last rebuild's ISO time), which also makes flag 13 run. On a marked world each
+row must carry ``x_spine_owner`` and no element may be hidden (a projection carries nothing hidden;
+through a key that is not served hidden elements, ``not_checked`` says so); the one-Seat check does not
+apply (the Seats are the source world's) and is named in ``not_checked``, and the other checks run.
 On an unmarked world ``x_spine_owner`` on any element is a finding: it belongs on a projection only.
 A mark that is not an object with a string ``source`` and a string ``at`` is a finding on the World
 (``element`` null; on the folder door the evidence names ``world.json``), and the world is then read
@@ -138,6 +144,7 @@ from .checks import CHECKS_FIELD, apply_checks
 from .errors import ApiError
 from .folder import FORMAT_VERSION, HIDDEN, WORLD_FILE, Folder, is_hidden, is_known_of, read_folder
 from .http import API_BASE, Client
+from .room import _fold
 from .spine import SPINE_OFF_LIST, SPINE_PREFIX, read_spine_element
 
 __all__ = [
@@ -250,7 +257,7 @@ class ListReader(Protocol):
 
 class Reader(ListReader, Protocol):
     """The reads the API door makes; ``Client`` is one. Nothing here writes. A reader without
-    ``world_proposals`` (one written before keel #519) still works: flag 12 does not run."""
+    ``world_proposals`` (one written before keel served the proposals queue) still works: flag 12 does not run."""
 
     def changes(self, *, since: str | None = None, limit: int | None = None) -> dict[str, Any]: ...
 
@@ -708,29 +715,39 @@ def _house_rules(run: _Run, els: list[_El], *, view: str, named: Any = _NOT_ASKE
     )
 
 
-#: A row kind's type -> the Seat's field that lists it (the spine profile: "Ownership is the standard's").
+#: A row kind's type -> the Title's field that lists it (the spine profile: "Ownership is the standard's"), and
+#: the Retirement Event's typed link field for it (serial 58). An Event has no ``laws`` field.
 _SEAT_FIELDS: dict[str, str] = {"object": "objects", "construct": "constructs", "location": "locations", "law": "laws"}
+#: The statuses whose row has a Retirement Event (the page's "Status, in time").
+_RETIRING = ("legacy", "provenance")
 #: What flag 13 never checks, and why (the audit's parts a structure cannot settle, and the gate's own).
 _SPINE_NOT_CHECKED: tuple[tuple[str, str], ...] = (
     (
-        "retirement",
-        "a legacy or provenance row's Retirement Event names the row in its text, which a checker cannot "
-        "attribute by structure",
+        "a law's retirement",
+        "a legacy or provenance Law's Retirement Event cannot link it by structure: an Event has no laws field",
     ),
     ("probe passes", "whether a probe passes is the probe gate's to run; the doctor runs nothing"),
     ("x_spine_probed", "written by the probe gate only; the doctor does not read it"),
 )
-#: The World's mark of a projection (Skeld, OW Spine h73 #11933): ``{source, at}``, the projector's.
+#: The World's mark of a projection (the spine profile, serial 58): ``{source, at}``.
 _PROJECTION_KEY = f"{SPINE_PREFIX}projection"
-#: The key a projection's row carries in place of its seat (the profile's ``x_spine_owner`` row).
+#: The key a projection's row carries: the keeping Seat's name (spine.md serial 58; an anonymous key before).
 _OWNER_KEY = f"{SPINE_PREFIX}owner"
 #: The roles whose keys are served hidden elements (keel PR 160): any other key's view leaves them out.
 _SEES_HIDDEN = frozenset({"owner", "co_builder"})
 #: What flag 13 does not check on a projection.
-_SEAT_SKIPPED = {"check": "one seat per row", "why": "a projection has no Seats: its owners are anonymous keys"}
+_SEAT_SKIPPED = {
+    "check": "one seat per row",
+    "why": "a projection names each row's keeping Seat in x_spine_owner; the Seats are the source world's",
+}
 _HIDDEN_UNSEEN = {
     "check": "hidden",
     "why": "this key is not served hidden elements (the owner's and a co-builder's are): none seen is not none held",
+}
+_RETIREMENT_UNSEEN = {
+    "check": "retirement",
+    "why": "this key cannot see every element (a guest's) or is not served hidden ones: a Retirement Event it "
+    "cannot see is not a missing one",
 }
 
 
@@ -753,18 +770,22 @@ def _spine(
     world_file: str | None = None,
 ) -> None:
     """Flag 13: each element read under the spine profile (``read_spine_element``), and the audit's
-    definite parts: one Seat per row, every ``x_spine_depends_on`` id resolving (only with the whole
-    view). Runs on a world that carries an ``x_spine_`` key on an element, or the projection mark
-    (``x_spine_projection``) on its World. A known-of stub is not read: its absent supertype is unknown,
-    not off the list.
+    definite parts (spine.md serial 58): a row kept by exactly one Seat, through the Title's field for
+    the row's own type (a Title that is not a Seat neither owns nor counts); every ``x_spine_depends_on``
+    id resolving (only with the whole view); a ``legacy`` or ``provenance`` row linked by a ``Retirement``
+    Event through the Event's typed link field for the row's type (only with the whole view, hidden
+    elements served; a Law's is not checked: an Event has no ``laws``); a row's name unique within its
+    type once folded (trimmed, without regard to case). Runs on a world that carries an ``x_spine_`` key
+    on an element, or the projection mark (``x_spine_projection``) on its World. A known-of stub is not
+    read: its absent supertype is unknown, not off the list.
 
-    A projection (the World marked ``{source, at}``) has no Seats, its owners being anonymous keys:
+    A projection (the World marked ``{source, at}``) names each row's keeping Seat in ``x_spine_owner``:
     the one-Seat check is skipped and named in ``not_checked``, each row must carry ``x_spine_owner``,
     and no element may be hidden (``sees_hidden`` False: the key is not served hidden elements, so that
     is named in ``not_checked`` too). On an unmarked world ``x_spine_owner`` on any element is a finding.
-    A mark that is not an object with a string ``source`` and a string ``at`` is a finding on the World,
-    and the world is then read as unmarked (``x_spine_owner`` a finding, no row asked for one, the Seat
-    check run)."""
+    A mark that is not an object with a string ``source`` (the source world's id, never a link) and a
+    string ``at`` is a finding on the World, and the world is then read as unmarked (``x_spine_owner`` a
+    finding, no row asked for one, the Seat check run)."""
     flag = SPINE_FLAG
     raw_mark = world.get(_PROJECTION_KEY)
     if raw_mark is None and not any(isinstance(k, str) and k.startswith(SPINE_PREFIX) for el in els for k in el.body):
@@ -823,7 +844,7 @@ def _spine(
                     {"key": _OWNER_KEY, "value": el.body.get(_OWNER_KEY)},
                 )
     else:
-        # A projection: every row carries its owner's anonymous key, and nothing is hidden.
+        # A projection: every row carries its keeping Seat's name, and nothing is hidden.
         for el, read in rows:
             owner = el.body.get(_OWNER_KEY)
             if not (isinstance(owner, str) and owner.strip()):
@@ -845,8 +866,9 @@ def _spine(
             not_checked.insert(0, dict(_HIDDEN_UNSEEN))
         not_checked.insert(0, dict(_SEAT_SKIPPED))
 
-    # One owner per row: exactly one Title with supertype Seat lists it (not on a projection, whose
-    # owners are anonymous keys). A Seat that is a known-of stub still keeps what it lists.
+    # One owner per row: exactly one Title with supertype Seat lists it, in its field for the row's own
+    # type; a Title that is not a Seat neither owns nor counts (not on a projection, whose rows name their
+    # Seat in x_spine_owner). A Seat that is a known-of stub still keeps what it lists.
     seats = [el for el in els if el.type == "title" and read_spine_element("title", el.body).kind == "Seat"]
     keepers: dict[tuple[str, str], list[_El]] = defaultdict(list)
     for seat in seats:
@@ -897,6 +919,53 @@ def _spine(
                 "why": "a guest key cannot see every element: an id it cannot see is not a missing one",
             },
         )
+
+    # A legacy or provenance row has a Retirement Event that links it through its typed link field
+    # (serial 58), the Event's field for the row's own type. An Event has no laws field: a Law's is not
+    # checked. A Retirement Event that is a known-of stub still links what it lists.
+    retiring: int | None = None
+    if whole_view and sees_hidden:
+        retiring = 0
+        events = [el for el in els if el.type == "event" and read_spine_element("event", el.body).kind == "Retirement"]
+        linked: set[tuple[str, str]] = set()
+        for event in events:
+            for fname in _SEAT_FIELDS.values():
+                value = event.body.get(fname)
+                linked.update((fname, v) for v in (value if isinstance(value, list) else []) if isinstance(v, str))
+        for el, read in rows:
+            if read.status not in _RETIRING or el.type == "law":
+                continue
+            retiring += 1
+            fname = _SEAT_FIELDS[el.type]
+            if (fname, el.id) not in linked:
+                run.find(
+                    flag,
+                    el,
+                    f"it is {read.status} and no Event with supertype Retirement links it in its {fname}",
+                    {"spine_kind": read.kind, "status": read.status, "field": fname},
+                )
+    else:
+        not_checked.insert(0 if whole_view else 1, dict(_RETIREMENT_UNSEEN))  # after x_spine_depends_on's
+
+    # A row's name is unique within its type once folded (trimmed, without regard to case, as the room
+    # profile defines it): two that share one take names that say which.
+    by_name: dict[tuple[str, str], list[_El]] = defaultdict(list)
+    for el, _ in rows:
+        folded = _fold(el.name)
+        if folded:
+            by_name[(el.type, folded)].append(el)
+    for (_, folded), group in sorted(by_name.items(), key=lambda kv: (_type_order(kv[0][0]), kv[0][1])):
+        if len(group) < 2:
+            continue
+        same = sorted(group, key=lambda e: e.id)
+        run.find(
+            flag,
+            same[0],
+            f"{len(same)} rows of one type share this name once trimmed and folded for case: a row's name says "
+            "which it is",
+            {"folded": folded, "with": [e.ref() for e in same[1:]]},
+        )
+
     run.ran(
         flag,
         len(reads),
@@ -904,6 +973,7 @@ def _spine(
         rows=len(rows),
         seats=len(seats),
         depends_on=depends,
+        retiring=retiring,
         stubs_not_judged=len(els) - len(judged),
         projection=mark,
         not_checked=not_checked,
@@ -1305,6 +1375,8 @@ def _spine_note(c: Mapping[str, Any]) -> str:
         note = f"{c['rows']} rows against {c['seats']} seats"
     if c.get("depends_on") is not None:
         note += f"; {c['depends_on']} x_spine_depends_on ids compared"
+    if c.get("retiring"):
+        note += f"; {c['retiring']} legacy or provenance rows looked for in Retirement Events"
     if c.get("stubs_not_judged"):
         note += f"; {c['stubs_not_judged']} known-of stubs not read"
     return note

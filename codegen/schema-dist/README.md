@@ -4,6 +4,8 @@ The OnlyWorlds schema, packaged for tools: the YAML, the same schema decoded to 
 
 The files here are generated. The OnlyWorlds platform rebuilds and publishes them after every schema change, so a fix belongs upstream: open an issue rather than a pull request. The standard itself lives in [OnlyWorlds/OnlyWorlds](https://github.com/OnlyWorlds/OnlyWorlds).
 
+**Who writes this repository.** schema-dist is kept by Skeld, one of a crew of AI minds working with the OnlyWorlds founder, who answers for it. Skeld publishes each serial (one numbered publication of these files, tagged `v<schema version>-dist.<serial>`) and reads and answers the issues; until the crew posts from an identity of its own, those replies post from the founder's account, so a reply from `tmoosting` may be Skeld's. A serial's release notes name crew items (for example OW Council #656) that point at records outside this repository.
+
 ## Contents
 
 | File | What it is |
@@ -17,7 +19,7 @@ The files here are generated. The OnlyWorlds platform rebuilds and publishes the
 | `walk/schema_walk.py` | the reference decoder, in Python: reads the YAML and returns each type's fields. `schema.json` is its output. One module; its only dependency is PyYAML |
 | `walk/rulings.yaml` | rulings the YAML cannot carry (nullability, empty strings, extension fields). Code in any language should follow these rows |
 | `walk/lint_folder.py` | the folder check: run it on a world folder and it names every key that is not a field of its type, every link that does not resolve or points at the wrong type, every value of the wrong shape, and a `world.json` that carries an `api` block while git tracks it (a linked folder is never committed, folder spec 4.6 d). The example world passes it at every publish |
-| `fixtures/owworld/` | the `.owworld` conformance set (folder spec 4.7): 81 zips, one per check and one cause each, with `verdicts.json` saying what a reader must answer for every one (accept, or refuse with its cause from the one list) and what a writer may emit. A world-file reader in any language runs the set and compares; the Unity SDK, the TypeScript SDK and the reference checker give one verdict on all of it. `generate.py` rewrites every zip byte for byte (`python fixtures/owworld/generate.py --out fixtures/owworld`); `CaseFolding-15.1.0.txt` is Unicode's file as published, the C and S rows every reader folds names by, never a runtime's own fold |
+| `fixtures/owworld/` | the `.owworld` conformance set (folder spec 4.7): 96 zips, one per check and one cause each, with `verdicts.json` saying what a reader must answer for every one (accept, or refuse with its cause from the one list) and what a writer may emit. A world-file reader in any language runs the set and compares; the Unity SDK, the TypeScript SDK and the reference checker give one verdict on all of it. `generate.py` rewrites every zip byte for byte (`python fixtures/owworld/generate.py --out fixtures/owworld`); `CaseFolding-15.1.0.txt` is Unicode's file as published, the C and S rows every reader folds names by, never a runtime's own fold |
 | `VERSION` | three `key: value` lines: the canonical schema version, the dist serial, the publish date |
 | `MANIFEST.json` | the sha256 of every file above (not of itself) |
 
@@ -95,6 +97,6 @@ The list of element types is a literal inside the walk, so a 23rd type would arr
 
 [The standard](https://github.com/OnlyWorlds/OnlyWorlds) · [Docs](https://onlyworlds.github.io) · [Games and engines](https://onlyworlds.github.io/docs/development/games) · [TypeScript SDK](https://github.com/OnlyWorlds/sdk) · [Python SDK](https://github.com/OnlyWorlds/python-sdk) · [Unity SDK](https://github.com/OnlyWorlds/unity-sdk) · [Council](https://council.onlyworlds.com)
 
-## Licence
+## Licence and contributions
 
-MIT. See [LICENSE](LICENSE).
+MIT. See [LICENSE](LICENSE). The files here are generated, so a fix to the schema belongs upstream in [OnlyWorlds/OnlyWorlds](https://github.com/OnlyWorlds/OnlyWorlds); an issue here is right for a wrong hash, a reader that disagrees with a fixture, or a word in this README. Security reports: see [SECURITY.md](SECURITY.md). A reply can take a few days.

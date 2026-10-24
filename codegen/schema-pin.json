@@ -2,15 +2,25 @@
   "_what": "The recorded pin for the vendored OnlyWorlds schema distribution (codegen/schema-dist/, copied byte-exact). Do not edit by hand; re-vendor from the pinned tag and review the diff. Kept equal to the npm SDK's pin (github.com/OnlyWorlds/sdk, codegen/schema-pin.json) on purpose: two clients, one schema.",
   "_why_manifest_sha256": "Verifying the tree against its own MANIFEST.json only proves internal consistency. If the tag moved, the manifest moved with it. The hash recorded here is the one first accepted, which is what makes a moved tag visible.",
   "repo": "https://github.com/OnlyWorlds/schema-dist",
-  "tag": "v0.33.0-dist.57",
-  "commit": "e21b8673a4f0dd9950e9ac7d0a46db0833de8f3f",
-  "manifest_sha256": "e169b109c4abedf8439ff933d4b1dfda93d596d7c34c0607065b1d6c53ae8f73",
+  "tag": "v0.33.0-dist.59",
+  "commit": "a40a5f3592f90957f684aba0c7a0fcb64fd47531",
+  "manifest_sha256": "f402293f61735f616457e90698b8e268de7125cf7b29d96f3fa88ed54e87d22e",
   "canonical_version": "00.33.00",
-  "dist_serial": 57,
+  "dist_serial": 59,
   "published": "2026-10-24",
   "pinned_at": "2026-10-24",
-  "pinned_by": "The maintainer: tree from `git archive` of the tag in a schema-dist checkout; files re-hashed against MANIFEST.json by generate_schema.py; MANIFEST self-hash matched against the raw file GitHub serves at the tag, whose ref resolves to the commit above. Ahead of the npm SDK's published pin, which is at v0.33.0-dist.49 (4.70.0) when this is pinned.",
+  "pinned_by": "The maintainer: tree from `git archive` of the tag in a schema-dist checkout; files re-hashed against MANIFEST.json by generate_schema.py; MANIFEST self-hash matched against the raw file GitHub serves at the tag, whose ref resolves to the commit above. Ahead of the npm SDK's published pin, which is at v0.33.0-dist.57 (4.72.0) when this is pinned.",
   "previous_pins": [
+    {
+      "tag": "v0.33.0-dist.58",
+      "manifest_sha256": "7746970ee66bcb9dca9aa0974e9c17891bd9a38a4fff0fe73d3fad4f97ae9724",
+      "note": "superseded by v0.33.0-dist.59 (same canonical 00.33.00; text only: the profile pages, the checks fixture's note and the folder lint say when a rule was ruled, not where; fixtures/owworld/generate.py and verdicts.json regenerated, the 96 zips byte for byte the same; no schema file moved; pinned in no release)"
+    },
+    {
+      "tag": "v0.33.0-dist.57",
+      "manifest_sha256": "e169b109c4abedf8439ff933d4b1dfda93d596d7c34c0607065b1d6c53ae8f73",
+      "note": "superseded by v0.33.0-dist.58 (same canonical 00.33.00; fixtures/owworld/ at 96 cases: fail-OW-14-deflate-early-end and fail-OW-14-deflate-no-end refused as not_openable, pass-OW-18-nfc-unassigned accepted at the pinned Unicode 15.1.0; profiles/spine.md's serial 58 sentences: x_spine_owner the keeping seat's name, the World's x_spine_projection mark {source, at}, a row kept by exactly one Seat, a name unique within its type once folded, the projection's three findings, the Retirement Event's typed link; README, LICENSE, SECURITY.md; verdicts.json, generate.py; no schema file moved)"
+    },
     {
       "tag": "v0.33.0-dist.56",
       "manifest_sha256": "d206d35cf3b8628765143f80071e706db1fa1b49be1f205b2c2580703bc402fd",

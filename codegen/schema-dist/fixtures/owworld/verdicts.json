@@ -1,7 +1,7 @@
 {
   "set": "owworld-conformance",
   "generated_by": "generate.py",
-  "spec": "folder format spec section 4.7, the archive (drafted 2026-10-22 02:24, OW Council #522), on 0.3.12; tests OW-1..OW-22 (Armature/Notes/2026-10-21-owworld-as-tests.md)",
+  "spec": "folder format spec section 4.7, the archive (drafted 2026-10-22), on 0.3.12; tests OW-1..OW-22",
   "notes": [
     "reader: what a reader does with the file (accept, or refuse with `reason`). Every reader runner checks this field.",
     "writer: whether the file is one a conforming writer may emit as a portable .owworld, checked against `source` (every source file present byte-exact) and the writer's MUST rules (only the folder's parts, a marker only in its shape, no api, 1980 stamps, UTF-8 byte order, methods 0 and 8). A SHOULD never makes it refuse; `should` names one a fixture breaks. Only a reference checker checks it; the role says which side the test is about.",
@@ -309,7 +309,7 @@
       "role": "reader",
       "reader": "refuse",
       "writer": "refuse",
-      "rule": "The UTF-8 byte order mark before the media type: a reader that decodes the entry as text first drops the mark and passes it (the TypeScript reader did, SDK 4.53.2 fixed it, Kael h58 #9992); the bytes are compared as bytes, so these are other bytes, refused.",
+      "rule": "The UTF-8 byte order mark before the media type: a reader that decodes the entry as text first drops the mark and passes it (the TypeScript reader did until SDK 4.53.2); the bytes are compared as bytes, so these are other bytes, refused.",
       "reason": "marker",
       "sha256": "be68b474abf796d01faceeb5409abec6239ee2702d6dcd9973b30bfa83b41c63",
       "bytes": 2555
@@ -576,7 +576,7 @@
       "role": "reader",
       "reader": "refuse",
       "writer": "refuse",
-      "rule": "A stored entry declares 64 bytes and holds 73 (Kael, h58 #9829): the same lie as a deflated one, the same cause.",
+      "rule": "A stored entry declares 64 bytes and holds 73: the same lie as a deflated one, the same cause.",
       "reason": "too_big",
       "sha256": "3bf7937384c4375e84f81738a0d9e31b7f388585af587a91957b1b104984474e",
       "bytes": 2613
@@ -587,7 +587,7 @@
       "role": "reader",
       "reader": "refuse",
       "writer": "refuse",
-      "rule": "A stored entry declares 137 bytes and holds 73: fewer than it declares is a broken entry, not_openable (only more is too_big; Skeld h58 #9944).",
+      "rule": "A stored entry declares 137 bytes and holds 73: fewer than it declares is a broken entry, not_openable (only more is too_big; ruled 2026-10-22).",
       "reason": "not_openable",
       "sha256": "c260c8122affc5d37ec0d86f308b15d7e4985e0d1771d61d487a189544849a07",
       "bytes": 2615
@@ -598,10 +598,32 @@
       "role": "reader",
       "reader": "refuse",
       "writer": "refuse",
-      "rule": "An element whose bytes fail the CRC its headers declare (one bit off; Skeld h58 #9903, spec 4.7's size bullet): refused, never read as written.",
+      "rule": "An element whose bytes fail the CRC its headers declare (one bit off; folder spec 4.7's size bullet): refused, never read as written.",
       "reason": "not_openable",
       "sha256": "d062a3a2b78312235296d41bcbc1f801a9a205dd03b1e4e7ae9605f6f99aa984",
       "bytes": 2656
+    },
+    {
+      "file": "fail-OW-14-deflate-early-end.owworld",
+      "test": "OW-14",
+      "role": "reader",
+      "reader": "refuse",
+      "writer": "refuse",
+      "rule": "An element's deflate stream ends 4 bytes before the compressed size its headers declare, those bytes junk (FF FF FF FF); its inflated size and CRC are honest. The entry holds fewer deflate bytes than it declares, so its declared size lies: a broken entry, not_openable, never read by stopping at the stream's end and ignoring the rest.",
+      "reason": "not_openable",
+      "sha256": "b176e92b6bfe0c8bcb7fe143adcf2b7e967e2a21d14549b4ac0ffac17afe013c",
+      "bytes": 2666
+    },
+    {
+      "file": "fail-OW-14-deflate-no-end.owworld",
+      "test": "OW-14",
+      "role": "reader",
+      "reader": "refuse",
+      "writer": "refuse",
+      "rule": "An element's deflate stream never ends: every byte a literal, no end-of-block code, its sizes and CRC honest. A reader refuses an archive whose stream it cannot read to its declared end (folder spec 4.7's size bullet, ruled 2026-10-24), never one that stops once it holds the declared bytes.",
+      "reason": "not_openable",
+      "sha256": "7dec0fffdc42643b24b527a80b54116f504e4a5933d09c675d3bfd31cbeb5ef4",
+      "bytes": 2667
     },
     {
       "file": "pass-OW-15-zip64.owworld",
@@ -796,7 +818,7 @@
       "role": "reader",
       "reader": "refuse",
       "writer": "refuse",
-      "rule": "media/ﬅ.png (U+FB05, long s t) and media/ﬆ.png (U+FB06, s t): NFC keeps them apart; the S row of CaseFolding.txt 15.1.0 maps U+FB05 to U+FB06, the pair a runtime's lowercase misses (Kael, h58 #9829). One name, refused.",
+      "rule": "media/ﬅ.png (U+FB05, long s t) and media/ﬆ.png (U+FB06, s t): NFC keeps them apart; the S row of CaseFolding.txt 15.1.0 maps U+FB05 to U+FB06, the pair a runtime's lowercase misses. One name, refused.",
       "reason": "collision",
       "sha256": "dbab3c468e1c6689da96bdf38749fb4bba3e8730d03c35151cfbfdbae77bf61c",
       "bytes": 2798
@@ -907,6 +929,16 @@
       "rule": "media/ﬁ.png (U+FB01, the fi ligature) and media/fi.png: U+FB01's mapping is <compat>, so NFC keeps it (NFKC would not), and CaseFolding has only an F row for it (simple folding keeps it; a runtime's full casefold would not). Two names, accepted.",
       "sha256": "8980eb4ee3269a6760e600901444f4d1858ef1f297daf4c0d5d84be155952464",
       "bytes": 2796
+    },
+    {
+      "file": "pass-OW-18-nfc-unassigned.owworld",
+      "test": "OW-18",
+      "role": "reader",
+      "reader": "accept",
+      "writer": "accept",
+      "rule": "media/𑎃.png (U+11383) and media/𑎃.png (U+11382 U+113C9): Tulu-Tigalari, new in Unicode 16.0, where U+11383 decomposes to U+11382 U+113C9 and NFC joins them. At the pinned 15.1.0 all three are unassigned, so each is its own NFC: two names, accepted. A reader whose NFC is its runtime's at 16.0 (Python 3.14's unicodedata, Node 22's ICU 76) joins them and refuses with collision.",
+      "sha256": "b02a7871c3a9932a0646944c2e76850b3df63dca1fc3881fc89df4ae0b3544d4",
+      "bytes": 2810
     },
     {
       "file": "fail-OW-19-file-and-folder.owworld",
@@ -1078,7 +1110,7 @@
       "role": "reader",
       "reader": "refuse",
       "writer": "refuse",
-      "rule": "A name with the UTF-8 flag whose bytes are not UTF-8 (a Latin-1 e acute, 0xE9; Kael, h58 #9829): its spelling is a guess, refused.",
+      "rule": "A name with the UTF-8 flag whose bytes are not UTF-8 (a Latin-1 e acute, 0xE9): its spelling is a guess, refused.",
       "reason": "name",
       "sha256": "3b2f165011c1d2d0cc18c44c1e2f81b10171475bbd50d8a9f35c1d8b2a22ba6e",
       "bytes": 2613

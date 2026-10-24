@@ -120,33 +120,23 @@ def test_the_owworld_fixture_set_every_verdict_and_every_cause(tmp_path: Path) -
     print(f"the .owworld set: {run} fixtures run, {len(diffs)} disagreeing, from {FIXTURES}")
     for d in diffs:
         print(f"  disagrees: {d}")
-    assert run == len(on_disk) == 93, f"the set holds {run} fixtures"  # dist.57: eight OW-18 NFC cases
+    assert run == len(on_disk) == 96, f"the set holds {run} fixtures"  # dist.58: two OW-14 deflate cases, one NFC
     assert diffs == []
 
 
-# Three zips the next schema-dist serial brings (Quillon's set, verdicts.json of 2026-10-24; Skeld's ruling h58
-# #11968), copied here until it does: when the serial is vendored, delete tests/fixtures/owworld-next/ and this test,
-# and the set above carries them.
-NEXT = REPO / "tests" / "fixtures" / "owworld-next"
-NEXT_CASES = {
-    "fail-OW-14-deflate-early-end.owworld": (
-        "b176e92b6bfe0c8bcb7fe143adcf2b7e967e2a21d14549b4ac0ffac17afe013c",
-        "not_openable",
-    ),
-    "fail-OW-14-deflate-no-end.owworld": (
-        "7dec0fffdc42643b24b527a80b54116f504e4a5933d09c675d3bfd31cbeb5ef4",
-        "not_openable",
-    ),
-    "pass-OW-18-nfc-unassigned.owworld": ("b02a7871c3a9932a0646944c2e76850b3df63dca1fc3881fc89df4ae0b3544d4", None),
+# Serial 58's three cases (Quillon's; ruled by Skeld 2026-10-24), named on their own: the deflate stream read to its
+# declared end, and the U+11383 pair two names at Unicode 15.1.
+SERIAL_58_CASES = {
+    "fail-OW-14-deflate-early-end.owworld": "not_openable",
+    "fail-OW-14-deflate-no-end.owworld": "not_openable",
+    "pass-OW-18-nfc-unassigned.owworld": None,
 }
 
 
-@pytest.mark.parametrize("file", sorted(NEXT_CASES))
-def test_the_next_serials_three_cases_the_deflate_stream_to_its_declared_end_and_the_nfc_pair(file: str) -> None:
-    assert sorted(p.name for p in NEXT.iterdir()) == sorted(NEXT_CASES)
-    data = (NEXT / file).read_bytes()
-    digest, reason = NEXT_CASES[file]
-    assert hashlib.sha256(data).hexdigest() == digest, f"{file} is Quillon's"
+@pytest.mark.parametrize("file", sorted(SERIAL_58_CASES))
+def test_serial_58s_three_cases_the_deflate_stream_to_its_declared_end_and_the_nfc_pair(file: str) -> None:
+    data = (FIXTURES / file).read_bytes()
+    reason = SERIAL_58_CASES[file]
     if reason:
         refuses(reason, data)
     else:

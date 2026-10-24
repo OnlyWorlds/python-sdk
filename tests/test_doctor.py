@@ -1480,7 +1480,7 @@ STD = "k0000000-0000-7000-8000-000000000001"
 CHARTER = "a0000000-0000-7000-8000-0000000000c1"
 KAEL = "c0000000-0000-7000-8000-0000000000a1"
 SPECIES = "y0000000-0000-7000-8000-000000000001"
-SPINE_NOT_CHECKED = ["retirement", "probe passes", "x_spine_probed"]
+SPINE_NOT_CHECKED = ["a law's retirement", "probe passes", "x_spine_probed"]
 
 
 def spine() -> Elements:
@@ -1609,6 +1609,16 @@ def test_13_a_title_that_is_not_a_seat_keeps_nothing(tmp_path: Path) -> None:
     assert r.compared[SP]["seats"] == 0
 
 
+def test_13_a_title_that_is_not_a_seat_does_not_count(tmp_path: Path) -> None:
+    """Serial 58: "a Title that is not a Seat neither owns nor counts": beside the row's one Seat, an Office
+    that lists the row too makes no second owner."""
+    office = {"id": SEAT2, "name": "Docs desk", "supertype": "Office", "objects": [PKG], "laws": [CHARTER]}
+    r = folder_report(tmp_path, with_(spine(), "title", office))
+    (f,) = spine_found(r)  # the Office is only off the spine's list for a Title
+    assert f["element"]["id"] == SEAT2 and f["evidence"] == {"supertype": "Office"}
+    assert r.compared[SP]["seats"] == 1
+
+
 def test_13_a_seat_is_read_trimmed_and_case_blind(tmp_path: Path) -> None:
     assert spine_found(folder_report(tmp_path, edit(spine(), "title", SEAT1, supertype="  sEAT "))) == []
 
@@ -1654,7 +1664,8 @@ def test_13_depends_on_is_not_checked_through_a_guest_key() -> None:
         "check": "x_spine_depends_on",
         "why": "a guest key cannot see every element: an id it cannot see is not a missing one",
     }
-    assert [x["check"] for x in c["not_checked"][1:]] == SPINE_NOT_CHECKED
+    assert c["not_checked"][1]["check"] == "retirement"
+    assert [x["check"] for x in c["not_checked"][2:]] == SPINE_NOT_CHECKED
     assert len(spine_found(api_report(FakeReader(base, role="contributor")))) == 1
 
 
@@ -1664,6 +1675,94 @@ def test_13_a_known_of_stub_is_not_read_but_a_stub_seat_still_keeps(tmp_path: Pa
     r = folder_report(tmp_path, base)
     assert spine_found(r) == []
     assert r.compared[SP]["stubs_not_judged"] == 2 and r.compared[SP]["n"] == 6 and r.compared[SP]["seats"] == 1
+
+
+RETIRE = "e0000000-0000-7000-8000-0000000000e1"
+
+
+def retirement(**fields: Any) -> dict[str, Any]:
+    return {"id": RETIRE, "name": "the old sdk retired", "supertype": "Retirement", **fields}
+
+
+def test_13_a_legacy_or_provenance_row_no_retirement_event_links(tmp_path: Path) -> None:
+    """Serial 58: a legacy or provenance row has a Retirement Event, "and the Event links the row through its
+    typed link field", so the audit attributes it by structure."""
+    base = edit(edit(spine(), "object", PKG, x_spine_status="Legacy"), "location", REPO_L, x_spine_status="provenance")
+    for r in both_doors(tmp_path, base, WORLD):
+        assert {f["element"]["id"]: (f["reason"], f["evidence"]) for f in spine_found(r)} == {
+            PKG: (
+                "it is legacy and no Event with supertype Retirement links it in its objects",
+                {"spine_kind": "Package", "status": "legacy", "field": "objects"},
+            ),
+            REPO_L: (
+                "it is provenance and no Event with supertype Retirement links it in its locations",
+                {"spine_kind": "Repo", "status": "provenance", "field": "locations"},
+            ),
+        }
+        assert len(spine_found(r)) == 2
+        assert r.compared[SP]["retiring"] == 2
+    assert spine_found(folder_report(tmp_path, spine())) == []  # a live row needs none
+    # a projection's rows are audited for it too
+    (f,) = spine_found(folder_report(tmp_path, edit(projection(), "object", PKG, x_spine_status="legacy"), PWORLD))
+    assert f["element"]["id"] == PKG and f["evidence"]["field"] == "objects"
+
+
+def test_13_a_retirement_event_attributes_the_row_by_its_typed_link_field_only(tmp_path: Path) -> None:
+    base = edit(spine(), "object", PKG, x_spine_status="legacy")
+    linked = with_(base, "event", retirement(objects=[PKG]))
+    assert spine_found(folder_report(tmp_path, linked)) == []
+    assert spine_found(folder_report(tmp_path, edit(linked, "event", RETIRE, known_of=True))) == []  # a stub links
+    unlinked = {
+        "named in its text only": retirement(description=f"The sdk ({PKG}) is retired."),
+        "another field": retirement(locations=[PKG]),
+        "another supertype": {**retirement(objects=[PKG]), "supertype": "Release"},
+    }
+    for why, event in unlinked.items():
+        found_ = spine_found(folder_report(tmp_path, with_(base, "event", event)))
+        assert [f["element"]["id"] for f in found_] == [PKG], why
+
+
+def test_13_a_laws_retirement_is_not_checked_an_event_has_no_laws(tmp_path: Path) -> None:
+    r = folder_report(tmp_path, edit(spine(), "law", CHARTER, x_spine_status="legacy"))
+    assert spine_found(r) == [] and r.compared[SP]["retiring"] == 0
+    (nc,) = [x for x in r.compared[SP]["not_checked"] if x["check"] == "a law's retirement"]
+    assert "an Event has no laws field" in nc["why"]
+
+
+def test_13_retirement_is_checked_only_through_a_key_that_sees_every_element() -> None:
+    base = on_the_wire(edit(spine(), "object", PKG, x_spine_status="legacy"))
+    for role in ("guest", "contributor"):
+        r = api_report(FakeReader(base, role=role))
+        assert spine_found(r) == [] and r.compared[SP]["retiring"] is None
+        (nc,) = [x for x in r.compared[SP]["not_checked"] if x["check"] == "retirement"]
+        assert "a Retirement Event it cannot see is not a missing one" in nc["why"]
+    for role in ("owner", "co_builder"):
+        assert len(spine_found(api_report(FakeReader(base, role=role)))) == 1
+
+
+def test_13_two_rows_of_one_type_share_a_name_once_trimmed_and_folded(tmp_path: Path) -> None:
+    """Serial 58: "a name unique within its type once folded (trimmed, without regard to case)"."""
+    twin = {"id": PKG2, "name": "  SDK ", "supertype": "Tool"}
+    base = edit(with_(spine(), "object", twin), "title", SEAT1, objects=[PKG, PKG2])
+    for r in both_doors(tmp_path, base, WORLD):
+        (f,) = spine_found(r)
+        assert f["element"]["id"] == PKG
+        assert f["reason"] == (
+            "2 rows of one type share this name once trimmed and folded for case: a row's name says which it is"
+        )
+        assert f["evidence"] == {"folded": "sdk", "with": [{"type": "object", "id": PKG2, "name": "  SDK "}]}
+    # across types is no collision, and the fold is the page's, not flag 5's (punctuation stays)
+    assert spine_found(folder_report(tmp_path, edit(spine(), "location", REPO_L, name="SDK"))) == []
+    renamed = edit(edit(base, "object", PKG2, name="sdk."), "title", SEAT1, objects=[PKG, PKG2])
+    assert spine_found(folder_report(tmp_path, renamed)) == []
+
+
+def test_13_name_uniqueness_is_the_rows_not_every_element(tmp_path: Path) -> None:
+    """The narrow reading (a question for the profile's owner): the rows of the four types, not the Seats or
+    the free types. Flag 5 still names two Characters that share a name."""
+    base = with_(spine(), "character", {"id": C1, "name": "kael ", "supertype": "Mind"})
+    r = folder_report(tmp_path, base)
+    assert spine_found(r) == [] and len(found(r, "5")) == 1
 
 
 def test_13_in_the_prose_report(tmp_path: Path) -> None:
@@ -1680,21 +1779,24 @@ def test_13_in_the_prose_report(tmp_path: Path) -> None:
     assert "      not checked, x_spine_probed: written by the probe gate only; the doctor does not read it" in lines
 
 
-# --- 13. a projection (the World's x_spine_projection mark; Skeld, OW Spine h73 #11933) ---------
+# --- 13. a projection (the World's x_spine_projection mark; the spine profile, serial 58) -------
 
 SPINE_SOURCE = "5378fde7-0000-7000-8000-000000000000"
 MARK = {"source": SPINE_SOURCE, "at": "2026-10-24T09:00:00Z"}
 PWORLD = {**WORLD, "x_spine_projection": MARK}
-SEAT_SKIPPED = {"check": "one seat per row", "why": "a projection has no Seats: its owners are anonymous keys"}
+SEAT_SKIPPED = {
+    "check": "one seat per row",
+    "why": "a projection names each row's keeping Seat in x_spine_owner; the Seats are the source world's",
+}
 
 
 def projection() -> Elements:
-    """spine() projected: no Seat, each row carrying its owner's anonymous key, nothing hidden."""
+    """spine() projected: no Seat, each row carrying its keeping Seat's name (serial 58), nothing hidden."""
     out = copy.deepcopy(spine())
     del out["title"]
     for etype in ("object", "location", "construct", "law"):
         for body in out[etype]:
-            body["x_spine_owner"] = "owner-1"
+            body["x_spine_owner"] = "SDK seat"
     return out
 
 
@@ -1795,7 +1897,16 @@ def test_13_a_marked_world_runs_the_flag_with_no_x_spine_key_on_an_element(tmp_p
 
 @pytest.mark.parametrize(
     "bad",
-    ["yes", [], {"source": SPINE_SOURCE}, {"at": "2026-10-24"}, {"source": 5378, "at": "2026-10-24"}],
+    [
+        "yes",
+        [],
+        {"source": SPINE_SOURCE},
+        {"at": "2026-10-24"},
+        {"source": 5378, "at": "2026-10-24"},
+        # serial 58: source is the source world's id "as a string, never a link"
+        {"source": [SPINE_SOURCE], "at": "2026-10-24T09:00:00Z"},
+        {"source": {"id": SPINE_SOURCE, "type": "world"}, "at": "2026-10-24T09:00:00Z"},
+    ],
 )
 def test_13_a_malformed_mark_is_a_finding_on_the_world_read_as_unmarked(tmp_path: Path, bad: Any) -> None:
     base = edit(spine(), "object", PKG, x_spine_owner="owner-1")

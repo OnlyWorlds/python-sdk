@@ -519,8 +519,8 @@ def _inflate(b: _Bytes, e: _Cd) -> bytes:
             _refuse("not_openable", f"{e.name}: its deflate stream is broken.")
         if len(out) <= e.usize and not inflater.eof:
             _refuse("not_openable", f"{e.name}: its deflate stream is cut short.")
-        # OW-14's size bullet speaks of the compressed size too (Skeld h58 #11968): bytes after the stream's end
-        # are no part of it, so a stream that ends before its declared compressed size is a broken entry.
+        # OW-14's size bullet speaks of the compressed size too (ruled by Skeld 2026-10-24): bytes after the stream's
+        # end are no part of it, so a stream that ends before its declared compressed size is a broken entry.
         left = len(inflater.unused_data)
         if len(out) <= e.usize and left:
             _refuse(

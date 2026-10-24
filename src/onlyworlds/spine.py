@@ -1,11 +1,12 @@
-"""The spine profile (schema-dist ``profiles/spine.md``, serial 56): a world that maps a software ecosystem.
+"""The spine profile (schema-dist ``profiles/spine.md``, serial 59): a world that maps a software ecosystem.
 
 A spine world describes what is built, the contracts it speaks, where each thing lives, who keeps it and
 what it depends on, in the 22 types and nothing more. Each kind is a type with a supertype from a closed
 list (``SPINE_KINDS``, generated from the pinned dist: ``Tool``, ``Service`` and nine more on an Object,
 ``Repo`` and six more on a Location, ...); a Character, an Institution and a Collective take any supertype
-(``SPINE_FREE_TYPES``). Eleven ``x_spine_*`` keys carry what no schema field holds. Ownership is the
-standard's (a Title with supertype ``Seat`` lists what it keeps), so no key on a row names its owner.
+(``SPINE_FREE_TYPES``). The ``x_spine_*`` keys carry what no schema field holds. Ownership is the
+standard's (a Title with supertype ``Seat`` lists what it keeps), so no key on a row names its owner (on a
+projection, ``x_spine_owner`` does: the keeping Seat's name, serial 58).
 
 ``read_spine_element(type, element)`` reads one element as the profile's conforming reader does and
 returns a ``SpineRead``: its kind (the list's spelling, ``"off-list"`` for a listed type whose supertype
@@ -19,13 +20,15 @@ every machine value is compared trimmed and without regard to case as the room p
 (Unicode White_Space at both ends, Unicode simple case folding: ``room._fold``), never ``str.strip()``
 or ``str.casefold()``. An ``x_spine_`` key the reader does not know is ignored, never an error.
 
-What one element cannot say is the world's audit, not this reader's: one owner per row, whether a
-``x_spine_depends_on`` id resolves, a ``legacy`` or ``provenance`` row's Retirement Event. Nor does it
-read ``x_spine_probed`` (the probe gate's) or ``x_spine_owner`` (a projection's only), and it never runs
-a probe. A spine counts days from day 0 (2012-01-01) through a Construct with supertype ``Calendar``
-whose ``atlas_calendar`` the profile ships; this package has no calendar kernel, so the fixture's
-calendar steps are checked by the npm SDK's kernel (4.70.0), not here. The fixture
-(``codegen/schema-dist/profiles/spine.fixture.json``) is replayed whole by ``tests/test_spine.py``.
+What one element cannot say is the world's audit, not this reader's (the doctor's flag 13 does it): a
+row kept by exactly one Seat, whether a ``x_spine_depends_on`` id resolves, a ``legacy`` or ``provenance``
+row's Retirement Event linking it, a row's name unique within its type once folded, and a projection's
+three. Nor does it read ``x_spine_probed`` (the probe gate's), ``x_spine_owner`` (a projection's only) or
+``x_spine_projection`` (a projection's World's), and it never runs a probe. A spine counts days from
+day 0 (2012-01-01) through a Construct with supertype ``Calendar`` whose ``atlas_calendar`` the profile
+ships; this package has no calendar kernel, so the fixture's calendar steps are checked by the npm SDK's
+kernel (4.70.0), not here. The fixture (``codegen/schema-dist/profiles/spine.fixture.json``) is replayed
+whole by ``tests/test_spine.py``.
 """
 
 from __future__ import annotations

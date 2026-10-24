@@ -45,7 +45,7 @@ BODY_EXTRA_KEYS = {"type", "created_at", "updated_at", "change_seq", "created_by
 # Keys the folder format itself puts in an element file (folder spec section 5,
 # the linked-folder guidance): Atlas's two sync stamps and the media id. A
 # linked folder carries them on every edited element; Kael's first run on the
-# Captain's Atlas folders flagged all 1,669 of one world's elements (2026-10-12).
+# Titus's Atlas folders flagged all 1,669 of one world's elements (2026-10-12).
 # `hidden` (folder spec 4.8, 2026-10-23): what the source hid stays hidden in the
 # folder; a converter door writes it, a push withholds the element until keel
 # takes the mark on a create. Must be a boolean (checked below).
