@@ -54,7 +54,7 @@ jobs:
       - run: uv sync
       - run: uv run pytest -q
       - run: uv run ruff check .
-      - run: uv run mypy --strict src
+      - run: uv run mypy --strict src tests
       - run: uv run python codegen/generate_schema.py --check
       - run: uv build
       - run: uvx twine check dist/*
