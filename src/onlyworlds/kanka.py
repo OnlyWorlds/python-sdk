@@ -22,6 +22,14 @@ and ``entityAttributes``. Two numbering systems meet in one file: ``entity.paren
 ``relationships[].owner_id``/``target_id`` and an ``[entity:N]`` mention name entity ids, while a
 module row's foreign keys (``entityLocations[].location_id``) name module row ids.
 
+**And on a second** (Kanka 3.15, made 2026-10-24 on the same campaign, beside the first in
+``tests/fixtures/kanka/``): a private Character with a post not visible to all, a ``tags/`` folder
+(a tag's row carries ``is_private``, ``is_hidden``, ``is_auto_applied``, ``colour``), a Character
+naming its tag in ``entity.entityTags`` as ``[{"tag_id": <the tags row's id>}]``, and a top-level
+``gallery/``: per upload a ``<uuid>.json`` (``id`` the uuid, ``name``, ``ext``, ``visibility_id``,
+``metadata`` width and height, ...) and the image ``<uuid>.<ext>``. An entity names its picture by
+``entity.image_uuid``; the gallery also holds uploads no entity names.
+
 **Believed**, not yet seen in a file: the folders ``families/``, ``races/``, ``items/``,
 ``creatures/``, ``events/``, ``abilities/``, ``quests/``, ``journals/``, ``maps/`` and every other
 module; the shapes of ``character_families``, ``character_races`` and
@@ -60,6 +68,20 @@ What becomes what (the type map follows Skeld's ruled table for his staged conve
   ``race_id`` to Character ``species``; ``character_families`` to ``family``;
   ``organisation_memberships`` and an organisation's ``members`` to the Character's
   ``institutions`` (the link direction the schema has).
+- **Tags**: ``entityTags`` resolves through the tags rows' ids, and the tag's Narrative links each
+  element that carries it, in Narrative's field for that element's type (``characters``,
+  ``locations``, ``institutions``, ...), tags and carriers in entity id order. A carrier whose type
+  has no such field (a Narrative, a Map) is not linked, and the report names it, as it names a
+  ``tag_id`` no tags row has. The carrier keeps ``x_kanka_entity_tags`` as Kanka wrote it.
+- **Pictures**: ``gallery/`` is Kanka's image store, not a module: its uploads are read for what an
+  entity names and counted in one report line. An entity whose ``image_uuid`` names an upload keeps
+  ``x_kanka_image``, ``{"uuid", "name", "ext"}`` from the upload's JSON; one that names no upload
+  keeps ``{"uuid"}`` alone, and so does a visible element whose upload is not visible to all
+  (its ``visibility_id`` not 1): the upload's name stays out of it. The picture itself is not
+  imported: an ``image_url`` is a URL, and the folder format has no place for image files yet, so
+  no ``image_url`` is set and no file copied.
+  The report names each element whose picture was named, with the gallery file and its original
+  file name.
 - **A character's traits**: appearance (section 1) to ``physicality`` and personality (section 2)
   to ``mentality``, one ``Name: entry`` line each; another section is kept as ``x_kanka_traits``.
   ``is_dead`` puts ``[Deceased] `` before ``physicality`` (the schema skill's convention for a
@@ -79,9 +101,9 @@ What becomes what (the type map follows Skeld's ruled table for his staged conve
   extensions.
 - **Every key not placed** (on the row or the entity) is kept as ``x_kanka_<key>`` and listed in
   the report. Not kept, named in the report: timestamps and who made or changed a row, Kanka's
-  own numbering kept elsewhere (``campaign_id``, ``type_id``), image focus points and uploads'
-  uuids, marketplace ids, pin and display flags, the server's ``mentions`` index (the text holds
-  the mentions), and the camelCase twins of a character's lists.
+  own numbering kept elsewhere (``campaign_id``, ``type_id``), image focus points and the header
+  image's upload uuid (``header_uuid``), marketplace ids, pin and display flags, the server's
+  ``mentions`` index (the text holds the mentions), and the camelCase twins of a character's lists.
 
 **Exact duplicates fold into one**: two relationships, posts, traits or attributes on one entity
 whose every field is equal but their ids, positions and timestamps are one, and the report names
@@ -105,7 +127,12 @@ mark), counted in the report:
   details``, its ``story`` a section per kind (``## Personality``, ``## Attributes``, ...) and a
   private list item kept as ``x_kanka_<list>``, linked to the entity the same way.
 
-A visible text that mentions a hidden entity by name is named in the report.
+A visible text that mentions a hidden entity by name is named in the report. A visible tag never
+links a hidden element: the link is not made, the element keeps ``x_kanka_entity_tags`` and the
+report names both. A private tag (``is_private``, the entity rule above) is a hidden Narrative
+whole and links what carries it, hidden or not; a tag row's ``is_hidden`` is kept as
+``x_kanka_is_hidden`` and hides nothing (believed: Kanka's flag for not showing a tag on its
+entities, beside ``is_private`` on the same row).
 
 **Starter entries travel.** A new Kanka campaign seeds template entries (``[Your Character
 Name]``, ``[Your Kingdom Name]``, ...), and they are in the export. Nothing in the data marks
@@ -165,8 +192,10 @@ __all__ = [
     "Hidden",
     "ImportReport",
     "ModulePlan",
+    "Picture",
     "Unplaced",
     "Unresolved",
+    "Untagged",
     "html_to_markdown",
     "import_kanka",
     "main",
@@ -220,6 +249,9 @@ _PARENT_FIELD: dict[str, str] = {
     "map": "parent_map",
 }
 
+#: Kanka's image store: per upload ``<uuid>.json`` and the image ``<uuid>.<ext>``; not a module.
+_GALLERY = "gallery"
+
 #: Root files the door reads; anything else at the root is named in the report.
 _ROOT_FILES = frozenset({"info.json", "campaign.json"})
 
@@ -241,6 +273,7 @@ _ROW_HANDLED = frozenset(
         "organisation_memberships",
         "members",
         "is_personality_visible",
+        "image_uuid",
     }
 )
 _ENTITY_HANDLED = frozenset(
@@ -257,6 +290,7 @@ _ENTITY_HANDLED = frozenset(
         "relationships",
         "entityLocations",
         "entityAttributes",
+        "image_uuid",
     }
 )
 
@@ -273,7 +307,6 @@ _NOT_KEPT_KEYS = frozenset(
         "deleted_by",
         "focus_x",
         "focus_y",
-        "image_uuid",
         "header_uuid",
         "marketplace_uuid",
         "is_personality_pinned",
@@ -290,7 +323,8 @@ _NOT_KEPT_KEYS = frozenset(
 _KEPT_WHEN_TRUE = frozenset({"is_template"})
 _NOT_KEPT = (
     "timestamps and who made or changed a row (created_at, updated_at, created_by, updated_by), "
-    "campaign_id and type_id, image focus points and upload uuids, marketplace ids, pin and display flags, "
+    "campaign_id and type_id, image focus points and the header image's upload uuid, marketplace ids, "
+    "pin and display flags, "
     "the server's mentions index (the text holds the mentions), and the camelCase twins of a character's lists "
     "(characterTraits and the rest: the same rows without their ids)"
 )
@@ -639,6 +673,29 @@ class Folded:
     copies: int
 
 
+@dataclass(frozen=True)
+class Picture:
+    """An entity's picture (``image_uuid``), named on its element as ``x_kanka_image`` but not imported."""
+
+    element: str
+    uuid: str
+    #: the upload's file in the export (``gallery/<uuid>.<ext>``); None when ``gallery/`` has no such upload
+    path: str | None
+    #: the upload's own file name (``<name>.<ext>``, from its JSON); None when there is no upload
+    original: str | None
+    #: the upload is not visible to all (``visibility_id`` not 1) and the element is: the uuid kept alone
+    private: bool = False
+
+
+@dataclass(frozen=True)
+class Untagged:
+    """An element that carries a tag (``entityTags``) and that the tag's Narrative does not link."""
+
+    tag: str
+    element: str
+    why: str
+
+
 @dataclass
 class Hidden:
     """What the source hides, imported with ``hidden: true``: never dropped, never public."""
@@ -672,6 +729,13 @@ class ImportReport:
     hidden: Hidden = field(default_factory=Hidden)
     #: names of the entities made within STARTER_WINDOW seconds of the campaign (imported all the same)
     possibly_starter: list[str] = field(default_factory=list)
+    #: uploads read in ``gallery/`` (one JSON each), and how many of them an entity names
+    uploads: int = 0
+    uploads_named: int = 0
+    #: pictures named on an element and not imported, in the elements' order
+    pictures: list[Picture] = field(default_factory=list)
+    #: carriers of a tag its Narrative does not link (a hidden element under a visible tag, a type with no field)
+    untagged: list[Untagged] = field(default_factory=list)
     notes: list[str] = field(default_factory=list)
     #: where the folder was written; None for a plan
     out: Path | None = None
@@ -743,6 +807,28 @@ class ImportReport:
             )
         if said:
             lines.append("Hidden as the source hides it (elements carrying hidden: true): " + "; ".join(said) + ".")
+        if self.untagged:
+            lines.append(f"Tags not linked to an element that carries them ({len(self.untagged)}):")
+            lines += [f"  - {u.tag!r} on {u.element!r}: {u.why}" for u in self.untagged]
+        if self.uploads:
+            lines.append(
+                f"gallery/: {self.uploads} upload{'' if self.uploads == 1 else 's'} read as Kanka's image store;"
+                f" {self.uploads_named} named by an entity."
+            )
+        if self.pictures:
+            lines.append(
+                f"Pictures named but not imported ({len(self.pictures)}): an OnlyWorlds image_url is a URL, and the"
+                " folder format has no place for image files yet; each element keeps x_kanka_image:"
+            )
+            lines += [
+                f"  - {p.element!r}: upload {p.uuid} is not visible to all; its name and file stay out of this"
+                " visible element, the uuid kept alone"
+                if p.private
+                else f"  - {p.element!r}: {p.path}" + (f" ({p.original})" if p.original else "")
+                if p.path is not None
+                else f"  - {p.element!r}: upload {p.uuid} is not in gallery/; the uuid kept alone"
+                for p in self.pictures
+            ]
         if self.unplaced:
             lines.append(f"Keys not placed on a field ({len(self.unplaced)}), kept as extensions:")
             lines += [f"  - {u.element!r} / {u.key!r}: {u.why}; kept as {u.kept_as}" for u in self.unplaced]
@@ -798,6 +884,9 @@ class _Importer:
         self.relations: list[dict[str, Any]] = []
         #: hidden Narratives: one per private post, one per entity's hidden details
         self.narratives: list[dict[str, Any]] = []
+        #: gallery/: upload uuid -> (its JSON's path without ``.json``, the JSON); the uuids an entity names
+        self.uploads: dict[str, tuple[str, dict[str, Any]]] = {}
+        self.named_uploads: set[str] = set()
         self._unplaced_seen: set[Unplaced] = set()
 
     def _json(self, rel: str) -> Any:
@@ -835,6 +924,9 @@ class _Importer:
             folder = parts[0]
             if folder == "settings":
                 self._setting(rel)
+                continue
+            if folder == _GALLERY:
+                self._upload(rel, parts)
                 continue
             if len(parts) != 2 or not rel.lower().endswith(".json"):
                 self.report.notes.append(f"{rel}: not an entity file (one JSON per entity in a module folder); skipped")
@@ -883,12 +975,25 @@ class _Importer:
         elif rel not in ("settings/modules.json", "settings/custom-modules.json"):
             self.report.notes.append(f"{rel}: a settings file this door does not read")
 
+    def _upload(self, rel: str, parts: list[str]) -> None:
+        """One file of ``gallery/``: an upload's JSON is read; its image (and anything else) is left."""
+        if len(parts) != 2 or not rel.lower().endswith(".json"):
+            return
+        data = self._json(rel)
+        if not isinstance(data, dict):
+            return
+        stem = rel[: -len(".json")]
+        key = str(data.get("id") or "").strip() or parts[1][: -len(".json")]
+        self.uploads.setdefault(key, (stem, data))
+        self.report.uploads = len(self.uploads)
+
     # -- pass 2: fields, links, text -----------------------------------------
 
     def fill(self) -> None:
         for item in self.items:
             self._fill(item)
         self._memberships()
+        self._tags()
         for item in self.items:
             self._details(item)
         self._relationships()
@@ -978,6 +1083,7 @@ class _Importer:
             if not _empty(kind):
                 self._keep(item, "type", kind, "a module with no OnlyWorlds type keeps its own type")
         self._parent(item)
+        self._image(item)
 
         # text: the entry, then the posts
         parts: list[str] = []
@@ -1020,6 +1126,36 @@ class _Importer:
         pfield = _PARENT_FIELD.get(item.etype)
         if pfield and parent.etype == item.etype:
             item.fields[pfield] = parent.eid
+
+    def _image(self, item: _Item) -> None:
+        """``image_uuid`` names an upload in ``gallery/``: its uuid, name and ext kept as ``x_kanka_image``.
+        The picture itself is not imported (an ``image_url`` is a URL); the report names it."""
+        raw = item.ent.get("image_uuid") if not _empty(item.ent.get("image_uuid")) else item.row.get("image_uuid")
+        if _empty(raw):
+            return
+        key = str(raw).strip()
+        found = self.uploads.get(key)
+        if found is None:
+            self._own(item, "image", {"uuid": key})
+            self.report.pictures.append(Picture(item.name, key, None, None))
+            return
+        stem, data = found
+        self.named_uploads.add(key)
+        self.report.uploads_named = len(self.named_uploads)
+        if not item.hidden and not _public(data.get("visibility_id")):
+            # an upload not visible to all, on a visible element: its name and file stay out of it
+            self._own(item, "image", {"uuid": key})
+            self.report.pictures.append(Picture(item.name, key, None, None, private=True))
+            return
+        image: dict[str, Any] = {"uuid": key}
+        for k in ("name", "ext"):
+            if not _empty(data.get(k)):
+                image[k] = data[k]
+        self._own(item, "image", image)
+        ext = data.get("ext")
+        path = f"{stem}.{ext}" if not _empty(ext) else stem
+        original = ".".join(str(data[k]) for k in ("name", "ext") if not _empty(data.get(k))) or None
+        self.report.pictures.append(Picture(item.name, key, path, original))
 
     def _posts(self, item: _Item) -> list[str]:
         posts = [p for p in item.ent.get("posts") or [] if isinstance(p, dict)]
@@ -1297,6 +1433,36 @@ class _Importer:
                 for m in members
             ):
                 self._keep(org, "members", members, "a member carries more than the character it links (a role)")
+
+    def _tags(self) -> None:
+        """A tag's Narrative links each element that carries it (``entityTags``, whose ``tag_id`` is the
+        tags row's id), in Narrative's field for the element's type, tags and carriers in entity id order.
+        A visible tag never links a hidden element."""
+        carried: dict[int, dict[int, _Item]] = {}
+        for item in self.items:
+            for t in item.ent.get("entityTags") or []:
+                raw = t.get("tag_id") if isinstance(t, dict) else t
+                rid = _int_id(raw)
+                tag = self.by_row.get(("tags", rid)) if rid is not None else None
+                if tag is None:
+                    self.report.unresolved.append(Unresolved(item.name, "entityTags", str(raw), "no tags row"))
+                    continue
+                carried.setdefault(tag.entity_id, {})[item.entity_id] = item
+        for tag_id in sorted(carried):
+            tag = self.by_entity[tag_id]
+            for _, item in sorted(carried[tag_id].items()):
+                if item.hidden and not tag.hidden:
+                    why = "the element is hidden and the tag is not; the element keeps x_kanka_entity_tags"
+                    self.report.untagged.append(Untagged(tag.name, item.name, why))
+                    continue
+                fname = _NARRATIVE_FIELD_FOR.get(item.etype)
+                if fname is None:
+                    why = f"Narrative has no field for a {item.etype}; the element keeps x_kanka_entity_tags"
+                    self.report.untagged.append(Untagged(tag.name, item.name, why))
+                    continue
+                links = tag.fields.setdefault(fname, [])
+                if item.eid not in links:
+                    links.append(item.eid)
 
     def _relationships(self) -> None:
         rows: dict[int, tuple[_Item, dict[str, Any]]] = {}

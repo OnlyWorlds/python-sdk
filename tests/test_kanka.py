@@ -12,6 +12,13 @@ ledger of the first crossing), a two-way "friend" relationship Ada to Mara, and 
 relationship and the post were made twice by a script rerun. Kanka seeded four starter entries in
 the new campaign, and they are in the file. Variants (a private entity, a hidden post) are the
 same file with one key changed.
+
+``fixtures/kanka/quay-export-world_20261024_180340.zip`` is the same campaign's second export
+(Kanka 3.15, 2026-10-24), its account identifiers scrubbed the same way (the same placeholder
+campaign id). It adds a private Character (Orla Pike) with a post not visible to all, a tag
+(lamp-keeper) that she carries, and a ``gallery/`` of six uploads, one of them her portrait and five
+named by no entity. What it lacks (a tag on a visible element, a private tag, an ``image_uuid`` that
+names no upload) is planted in the first export.
 """
 
 from __future__ import annotations
@@ -36,6 +43,9 @@ from onlyworlds.kanka import (
     KANKA_NAMESPACE,
     PRODUCER_INPUT,
     ImportReport,
+    Picture,
+    Unresolved,
+    Untagged,
     html_to_markdown,
     import_kanka,
     main,
@@ -60,6 +70,19 @@ TYPED = {
 }
 STARTER = ["[Allied Character Name]", "[Your Character Name]", "[Your Capital City]", "[Your Kingdom Name]"]
 ADA_FILE, MARA_FILE = "characters/ada-okafor_10074602.json", "characters/mara-voss_10074603.json"
+YOU_FILE = "characters/your-character-name_10074596.json"
+QUAY_FILE, LEDGER_FILE = "locations/the-quay_10074604.json", "notes/the-ledger-of-the-first-crossing_10074607.json"
+
+# the second export
+EXPORT2 = EXPORT.parent / "quay-export-world_20261024_180340.zip"
+SHA256_2 = "597a3b053d33d7c7db692527fa9a9b989b8240397ae0d899bed248e1a0798ae4"
+ORLA, LAMP_KEEPER = 10080178, 10080176
+PORTRAIT = "01a16f11-cf47-727c-bb5f-26753402b503"  # the one upload an entity names
+TAG_ROW = 619734  # the tags row's id, what entityTags names
+
+# planted in the first export: a tag shaped like the second export's, and gallery uploads
+KEEPER, KEEPER_ROW, KEEPER_FILE = 10074699, 346600, "tags/keeper_10074699.json"
+UP1, UP2, UP3 = (f"00000000-0000-7000-8000-00000000000{n}" for n in (1, 2, 3))
 
 
 def eid(entity_id: int) -> str:
@@ -82,6 +105,61 @@ def variant(tmp: Path, change: Callable[[dict[str, Any]], None], path: str, name
         for rel, raw in data.items():
             zf.writestr(rel, raw)
     return out
+
+
+def planted(
+    tmp: Path,
+    add: dict[str, Any] | None = None,
+    change: dict[str, Callable[[dict[str, Any]], None]] | None = None,
+    name: str = "planted.zip",
+) -> Path:
+    """The first export with files added (JSON, or bytes as they are) and files' JSON changed."""
+    data = files()
+    for path, fn in (change or {}).items():
+        doc = json.loads(data[path])
+        fn(doc)
+        data[path] = json.dumps(doc).encode()
+    for path, value in (add or {}).items():
+        data[path] = value if isinstance(value, bytes) else json.dumps(value).encode()
+    out = tmp / name
+    with zipfile.ZipFile(out, "w") as zf:
+        for rel, raw in data.items():
+            zf.writestr(rel, raw)
+    return out
+
+
+def a_tag(is_private: int = 0) -> dict[str, Any]:
+    """A tags row shaped like the second export's."""
+    return {
+        "id": KEEPER_ROW,
+        "name": "keeper",
+        "is_private": is_private,
+        "colour": "",
+        "icon": None,
+        "is_auto_applied": False,
+        "is_hidden": False,
+        "entity": {"id": KEEPER, "entity_id": KEEPER_ROW, "parent_id": None, "name": "keeper", "type": "Role"},
+    }
+
+
+def tagged(*tag_ids: int) -> Callable[[dict[str, Any]], None]:
+    def change(doc: dict[str, Any]) -> None:
+        doc["entity"]["entityTags"] = [{"tag_id": t} for t in tag_ids]
+
+    return change
+
+
+def an_upload(uid: str, name: str) -> dict[str, Any]:
+    """A gallery upload's JSON shaped like the second export's."""
+    return {
+        "id": uid,
+        "campaign_id": CAMPAIGN,
+        "name": name,
+        "ext": "png",
+        "size": 1,
+        "visibility_id": 1,
+        "metadata": {"width": 96, "height": 96},
+    }
 
 
 def run(tmp: Path, src: Path = EXPORT, name: str = "world", **kw: Any) -> tuple[Path, ImportReport]:
@@ -444,6 +522,186 @@ def test_not_a_kanka_export(tmp_path: Path) -> None:
         zf.writestr("notes.md", "# hello")
     with pytest.raises(ValueError, match=r"campaign\.json"):
         import_kanka(bad, tmp_path / "x")
+
+
+# --- the second export: a private Character, a tag, a gallery ----------------
+
+
+def test_the_second_fixture_is_the_real_file() -> None:
+    assert hashlib.sha256(EXPORT2.read_bytes()).hexdigest() == SHA256_2
+
+
+def test_second_export_the_private_character_comes_in_hidden_whole(tmp_path: Path) -> None:
+    out, report = run(tmp_path, EXPORT2)
+    assert report.counts == {"character": 5, "institution": 1, "location": 4, "narrative": 4, "relation": 2}
+    orla = by_name(out)["Orla Pike"]
+    assert orla["hidden"] is True and orla["id"] == eid(ORLA)
+    assert orla["description"].startswith("Orla lights the lamp")
+    assert "## The late tally" in orla["description"]  # her post travels inside her hidden element
+    assert orla["x_kanka_posts_meta"] == [{"name": "The late tally", "visibility_id": 4}]
+    assert report.hidden.entities == 1 and report.unresolved == []
+
+
+def test_second_export_the_gallery_is_an_image_store(tmp_path: Path) -> None:
+    """Her portrait is followed by its uuid; the five unused uploads give no note, and nothing is copied."""
+    out, report = run(tmp_path, EXPORT2)
+    orla = by_name(out)["Orla Pike"]
+    assert orla["x_kanka_image"] == {"uuid": PORTRAIT, "name": "lamp", "ext": "png"}
+    assert "image_url" not in orla
+    assert not any(b.get("x_kanka_image") for n, b in by_name(out).items() if n != "Orla Pike")
+    assert not any("gallery/" in n for n in report.notes)
+    assert (report.uploads, report.uploads_named) == (6, 1)
+    assert report.pictures == [Picture("Orla Pike", PORTRAIT, f"gallery/{PORTRAIT}.png", "lamp.png")]
+    assert not any(u.key == "image_uuid" for u in report.unplaced)
+    assert not [p for p in out.rglob("*") if p.suffix.lower() == ".png"]
+    text = report.render()
+    assert "gallery/: 6 uploads read as Kanka's image store; 1 named by an entity." in text
+    assert f"  - 'Orla Pike': gallery/{PORTRAIT}.png (lamp.png)" in text
+
+
+def test_second_export_a_visible_tag_does_not_link_its_hidden_carrier(tmp_path: Path) -> None:
+    out, report = run(tmp_path, EXPORT2)
+    els = by_name(out)
+    tag = els["lamp-keeper"]
+    assert "hidden" not in tag and tag["id"] == eid(LAMP_KEEPER)
+    assert (tag["supertype"], tag["subtype"]) == ("Article", "tags")
+    assert eid(ORLA) not in json.dumps(tag)  # no link from the visible tag to the hidden Character
+    assert els["Orla Pike"]["x_kanka_entity_tags"] == [{"tag_id": TAG_ROW}]
+    assert [(u.tag, u.element) for u in report.untagged] == [("lamp-keeper", "Orla Pike")]
+    assert "'lamp-keeper' on 'Orla Pike': the element is hidden and the tag is not" in report.render()
+
+
+def test_second_export_deterministic_and_lint_clean(tmp_path: Path) -> None:
+    run(tmp_path, EXPORT2, name="one")
+    run(tmp_path, EXPORT2, name="two")
+    assert tree(tmp_path / "one") == tree(tmp_path / "two")
+    pytest.importorskip("yaml", reason="the dist's lint decodes the schema YAML")
+    r = subprocess.run([sys.executable, str(LINT), str(tmp_path / "one")], capture_output=True, text=True)
+    problems = [line for line in r.stdout.strip().splitlines()[:-1] if not line.startswith("walk note:")]
+    assert problems == [] and r.returncode == 0, r.stdout + r.stderr
+
+
+# --- the gallery, planted ------------------------------------------------------
+
+
+def test_only_the_upload_an_entity_names_is_followed(tmp_path: Path) -> None:
+    """Three uploads, one named: one report line for the store, no note per file."""
+    uploads: dict[str, Any] = {}
+    for uid, name in ((UP1, "harbour"), (UP2, "portrait"), (UP3, "harbour")):
+        uploads[f"gallery/{uid}.json"] = an_upload(uid, name)
+        uploads[f"gallery/{uid}.png"] = b"\x89PNG\r\n\x1a\n"
+
+    def portrait(doc: dict[str, Any]) -> None:
+        doc["entity"]["image_uuid"] = UP2
+
+    src = planted(tmp_path, uploads, {ADA_FILE: portrait})
+    out, report = run(tmp_path, src)
+    els = by_name(out)
+    assert els["Ada Okafor"]["x_kanka_image"] == {"uuid": UP2, "name": "portrait", "ext": "png"}
+    assert "image_url" not in els["Ada Okafor"] and "x_kanka_image" not in els["Mara Voss"]
+    assert report.counts["character"] == 4 and not any("gallery/" in n for n in report.notes)
+    assert (report.uploads, report.uploads_named) == (3, 1)
+    assert report.pictures == [Picture("Ada Okafor", UP2, f"gallery/{UP2}.png", "portrait.png")]
+    assert "gallery/: 3 uploads read as Kanka's image store; 1 named by an entity." in report.render()
+    assert not [p for p in out.rglob("*") if p.suffix.lower() == ".png"]
+    run(tmp_path, src, name="again")
+    assert tree(out) == tree(tmp_path / "again")
+
+
+def test_an_image_uuid_that_names_no_upload_keeps_the_uuid_alone(tmp_path: Path) -> None:
+    def portrait(doc: dict[str, Any]) -> None:
+        doc["entity"]["image_uuid"] = UP3
+
+    src = planted(tmp_path, {f"gallery/{UP1}.json": an_upload(UP1, "harbour")}, {ADA_FILE: portrait})
+    out, report = run(tmp_path, src)
+    ada = by_name(out)["Ada Okafor"]
+    assert ada["x_kanka_image"] == {"uuid": UP3} and "image_url" not in ada
+    assert report.pictures == [Picture("Ada Okafor", UP3, None, None)]
+    assert (report.uploads, report.uploads_named) == (1, 0)
+    assert f"  - 'Ada Okafor': upload {UP3} is not visible to all; the uuid kept alone" not in report.render()
+    assert f"  - 'Ada Okafor': upload {UP3} is not in gallery/; the uuid kept alone" in report.render()
+
+
+def test_an_upload_not_visible_to_all_keeps_its_name_off_a_visible_element(tmp_path: Path) -> None:
+    """An upload at visibility 4 (only me) named by a visible Character: the uuid alone, no name or ext."""
+    up = an_upload(UP2, "secret-portrait")
+    up["visibility_id"] = 4
+
+    def portrait(doc: dict[str, Any]) -> None:
+        doc["entity"]["image_uuid"] = UP2
+
+    src = planted(
+        tmp_path, {f"gallery/{UP2}.json": up, f"gallery/{UP2}.png": b"\x89PNG\r\n\x1a\n"}, {ADA_FILE: portrait}
+    )
+    out, report = run(tmp_path, src)
+    ada = by_name(out)["Ada Okafor"]
+    assert "hidden" not in ada and ada["x_kanka_image"] == {"uuid": UP2}
+    assert "secret-portrait" not in json.dumps(ada)
+    assert report.pictures == [Picture("Ada Okafor", UP2, None, None, private=True)]
+    assert (report.uploads, report.uploads_named) == (1, 1)
+    assert "is not visible to all; its name and file stay out of this visible element" in report.render()
+    assert not [
+        p for p in out.rglob("*") if p.is_file() and "secret-portrait" in p.read_text(encoding="utf-8", errors="ignore")
+    ]
+
+
+# --- tags, planted -------------------------------------------------------------
+
+
+def test_a_visible_tag_links_its_visible_carriers_only(tmp_path: Path) -> None:
+    """Characters in entity id order (Your Character Name before Ada, though Ada's file sorts first),
+    a Location in locations; the hidden Mara, the Narrative ledger and a tag id with no row are named."""
+
+    def private(doc: dict[str, Any]) -> None:
+        doc["entity"]["is_private"] = True
+        tagged(KEEPER_ROW)(doc)
+
+    change = {
+        ADA_FILE: tagged(KEEPER_ROW, 999),
+        YOU_FILE: tagged(KEEPER_ROW),
+        MARA_FILE: private,
+        QUAY_FILE: tagged(KEEPER_ROW),
+        LEDGER_FILE: tagged(KEEPER_ROW),
+    }
+    src = planted(tmp_path, {KEEPER_FILE: a_tag()}, change)
+    out, report = run(tmp_path, src)
+    els = by_name(out)
+    tag = els["keeper"]
+    assert "hidden" not in tag and tag["id"] == eid(KEEPER)
+    assert tag["characters"] == [eid(YOU), eid(ADA)]
+    assert tag["locations"] == [eid(QUAY)]
+    assert eid(MARA) not in json.dumps(tag)
+    assert els["Mara Voss"]["hidden"] is True
+    assert els["Mara Voss"]["x_kanka_entity_tags"] == [{"tag_id": KEEPER_ROW}]
+    assert els["Ada Okafor"]["x_kanka_entity_tags"] == [{"tag_id": KEEPER_ROW}, {"tag_id": 999}]
+    assert report.untagged == [
+        Untagged(
+            "keeper", "Mara Voss", "the element is hidden and the tag is not; the element keeps x_kanka_entity_tags"
+        ),
+        Untagged(
+            "keeper",
+            "The ledger of the first crossing",
+            "Narrative has no field for a narrative; the element keeps x_kanka_entity_tags",
+        ),
+    ]
+    assert Unresolved("Ada Okafor", "entityTags", "999", "no tags row") in report.unresolved
+    assert "Tags not linked to an element that carries them (2):" in report.render()
+    run(tmp_path, src, name="again")
+    assert tree(out) == tree(tmp_path / "again")
+
+
+def test_a_private_tag_is_hidden_whole_and_links_hidden_carriers(tmp_path: Path) -> None:
+    def private(doc: dict[str, Any]) -> None:
+        doc["entity"]["is_private"] = True
+        tagged(KEEPER_ROW)(doc)
+
+    src = planted(tmp_path, {KEEPER_FILE: a_tag(is_private=1)}, {ADA_FILE: tagged(KEEPER_ROW), MARA_FILE: private})
+    out, report = run(tmp_path, src)
+    tag = by_name(out)["keeper"]
+    assert tag["hidden"] is True
+    assert tag["characters"] == [eid(ADA), eid(MARA)]
+    assert report.untagged == []
+    assert report.hidden.entities == 2  # the tag and Mara
 
 
 # --- the command line --------------------------------------------------------

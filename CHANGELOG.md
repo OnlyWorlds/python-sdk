@@ -2,6 +2,12 @@
 
 The package version runs on its own semver; the schema it is generated from is `SCHEMA_DIST_TAG`.
 
+## 0.49.0 (2026-10-24)
+
+- **The Kanka door reads Kanka's `gallery/` as its image store.** An export with uploaded pictures has a top-level `gallery/` folder, one `<uuid>.json` and one image per upload. The door used to read it as a module and write two notes per file. Now the report gives one line (`gallery/: 6 uploads read as Kanka's image store; 1 named by an entity`), and only the uploads an entity names through its `image_uuid` are followed; the others are left alone. An element whose picture is in the gallery keeps `x_kanka_image`, the upload's `uuid`, `name` and `ext`, and the report lists each such element with the gallery file and its original file name. The picture itself is not imported: an `image_url` is a URL, and the folder format has no place for image files yet, so no `image_url` is set and no file is copied. An `image_uuid` that names no upload keeps the uuid alone, and the report says so. So does a visible element whose upload is not visible to all (its `visibility_id` is not 1): the upload's name and file stay out of the visible element. `image_uuid` is no longer dropped.
+- **A Kanka tag links what carries it.** A tag (the `tags/` module, a Narrative with supertype `Article`, subtype `tags`) now links each element that names it in `entityTags`, in the Narrative's field for that element's type (`characters`, `locations`, `institutions`, ...), in entity id order. A visible tag never links a hidden element: the link is left out, the element keeps `x_kanka_entity_tags`, and the report names both. A private tag is a hidden Narrative and links every carrier. A carrier whose type has no such field on a Narrative (a Narrative, a Map) is named in the report, and so is a `tag_id` that no tag in the export has. Every carrier still keeps `x_kanka_entity_tags`.
+- The second real Kanka export (a private Character, a tag, a gallery of six uploads) is a test fixture beside the first, with its account identifiers scrubbed.
+
 ## 0.48.0 (2026-10-24)
 
 - **Schema repinned to schema-dist `v0.33.0-dist.60`** (from dist.59; same canonical 00.33.00, no schema file or fixture moved). Serial 60 is text only: `profiles/spine.md` rules eight readings from the doctor's build of flag 13, and the doctor now follows each.
