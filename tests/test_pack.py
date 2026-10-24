@@ -7,12 +7,11 @@ import io
 import random
 from contextlib import redirect_stderr, redirect_stdout
 from pathlib import Path
-from typing import Any, cast
+from typing import Any
 
 import pytest
 
 from onlyworlds import ELEMENT_TYPES, is_hidden, pack, write_folder
-from onlyworlds.doctor import Reader as DoctorReader
 from onlyworlds.pack import KNOWN_OF_LINE, build_pack, pack_api, pack_folder, pack_world
 
 W = "w0000000-0000-7000-8000-000000000000"
@@ -525,9 +524,7 @@ def test_a_folder_with_an_exported_as_line_packs_it_and_the_api_asks_me(tmp_path
             return {"data": data, "has_more": False, "next_cursor": None}
 
     out2 = tmp_path / "pack-api"
-    # pack_api reads only me, get_world and list_page; the Reader protocol also names changes and
-    # world_proposals, which this minimal reader deliberately lacks
-    pack_api(cast(DoctorReader, Reader()), out2)
+    pack_api(Reader(), out2)  # a reader with only me, get_world and list_page (ListReader)
     assert "*Made as the Character Ann: that Character's view, not the whole world.*" in (
         out2 / "00-world.md"
     ).read_text(encoding="utf-8")

@@ -98,7 +98,7 @@ from ._schema import (
     SECTIONS,
     WORLD_FIELDS,
 )
-from .doctor import _LEGACY_LINK_SPELLINGS, Reader, _list_all
+from .doctor import _LEGACY_LINK_SPELLINGS, ListReader, _list_all
 from .errors import ApiError
 from .export import exported_as as _exported_as
 from .folder import KNOWN_OF, WORLD_FILE, Folder, is_hidden, is_known_of, read_folder
@@ -899,7 +899,7 @@ def pack_folder(
 
 
 def pack_api(
-    client: Reader,
+    client: ListReader,
     out: str | os.PathLike[str],
     *,
     words: int = DEFAULT_WORDS,

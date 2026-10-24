@@ -137,6 +137,7 @@ __all__ = [
     "PACKET_TOOL",
     "PROPOSALS_FLAG",
     "SPINE_FLAG",
+    "ListReader",
     "Reader",
     "Report",
     "doctor_api",
@@ -224,9 +225,8 @@ _RELATION_FIELD: dict[str, str] = {
 }
 
 
-class Reader(Protocol):
-    """The reads the API door makes; ``Client`` is one. Nothing here writes. A reader without
-    ``world_proposals`` (one written before keel #519) still works: flag 12 does not run."""
+class ListReader(Protocol):
+    """The reads a whole-world walk makes (the pack's API door needs only these); ``Client`` is one."""
 
     def me(self) -> dict[str, Any]: ...
 
@@ -235,6 +235,11 @@ class Reader(Protocol):
     def list_page(
         self, element_type: str, *, limit: int | None = None, cursor: str | None = None
     ) -> dict[str, Any]: ...
+
+
+class Reader(ListReader, Protocol):
+    """The reads the API door makes; ``Client`` is one. Nothing here writes. A reader without
+    ``world_proposals`` (one written before keel #519) still works: flag 12 does not run."""
 
     def changes(self, *, since: str | None = None, limit: int | None = None) -> dict[str, Any]: ...
 
@@ -902,7 +907,7 @@ def doctor_folder(folder: Folder, *, days: int = 14, changes: int = 50, now: _dt
 # ---------------------------------------------------------------------------
 
 
-def _list_all(client: Reader, element_type: str) -> Iterator[dict[str, Any]]:
+def _list_all(client: ListReader, element_type: str) -> Iterator[dict[str, Any]]:
     cursor: str | None = None
     while True:
         page = client.list_page(element_type, limit=_PAGE, cursor=cursor)
