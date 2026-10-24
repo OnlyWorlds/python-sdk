@@ -1,9 +1,11 @@
-"""The Notion door (onlyworlds.notion) on a fixture built here from the export's believed shape.
+"""The Notion door (onlyworlds.notion) on a fixture built here from the export's believed shape,
+and on one real export.
 
-No real Notion export has been read yet: the tree below is what the module's docstring believes
-(the 32-hex suffix, ``_all.csv``, a database's rows in a folder named like its CSV, sub-pages in a
-folder named like their page, relation cells as ``Title (path)``). A real export, banked beside
-this file, is the fixture to come.
+The built tree is what the module's docstring believes (the 32-hex suffix, ``_all.csv``, a
+database's rows in a folder named like its CSV, sub-pages in a folder named like their page,
+relation cells as ``Title (path)``). The real one, ``fixtures/notion/notion-page-export-with-subpages.zip``,
+is a free account's page export with sub-pages, Markdown & CSV, "Create folders for subpages" off
+(Boss, 2026-10-24; invented content, no personal data): flat, every page and CSV in one directory.
 """
 
 from __future__ import annotations
@@ -178,8 +180,7 @@ def test_untyped_rows_are_narratives(imported: tuple[Path, ImportReport]) -> Non
 
 def test_ids_do_not_move_with_the_supertype(imported: tuple[Path, ImportReport]) -> None:
     """No tool name in a supertype (Skeld, OW Market h40 #11385): the fixture's ids are those 0.41.0
-    gave (the sha256 of the sorted ids, one a line). No real Notion export has been through the
-    door, so the fixture is the one built here."""
+    gave (the sha256 of the sorted ids, one a line), on the fixture built here."""
     out, _ = imported
     ids = sorted(bodies(out))
     assert len(ids) == 6
@@ -215,26 +216,33 @@ def test_world_json(imported: tuple[Path, ImportReport]) -> None:
     assert world["format_version"] == FORMAT_VERSION
 
 
-def test_folder_lint_is_green(imported: tuple[Path, ImportReport]) -> None:
-    """Gate 1: the dist's own folder lint on the output, its count line the output's count."""
+def assert_lint_green(out: Path, report: ImportReport) -> None:
+    """The dist's own folder lint on the output, its count line the output's count."""
     pytest.importorskip("yaml", reason="the dist's lint decodes the schema YAML")
-    out, report = imported
     r = subprocess.run([sys.executable, str(LINT), str(out)], capture_output=True, text=True)
     assert r.returncode == 0, r.stdout + r.stderr
     assert str(report.total) in r.stdout.strip().splitlines()[-1]
 
 
-def test_round_trip_is_byte_equal(imported: tuple[Path, ImportReport], tmp_path: Path) -> None:
-    """Gate 2: read_folder opens it, and write_folder of what it read gives the same bytes."""
-    out, _ = imported
+def assert_round_trip(out: Path, again: Path) -> None:
+    """read_folder opens it, and write_folder of what it read gives the same bytes."""
     folder = read_folder(out)
     assert not folder.skipped and folder.world is not None
     by_type: dict[str, list[dict[str, Any]]] = {}
     for el in folder.elements.values():
         by_type.setdefault(el.type, []).append(el.body)
-    again = tmp_path / "again"
     write_folder(again, folder.world, by_type)
     assert tree(again) == tree(out, skip="media/")
+
+
+def test_folder_lint_is_green(imported: tuple[Path, ImportReport]) -> None:
+    """Gate 1: the dist's own folder lint on the output."""
+    assert_lint_green(*imported)
+
+
+def test_round_trip_is_byte_equal(imported: tuple[Path, ImportReport], tmp_path: Path) -> None:
+    """Gate 2: the folder round-trips byte for byte."""
+    assert_round_trip(imported[0], tmp_path / "again")
 
 
 def test_deterministic(tmp_path: Path) -> None:
@@ -314,3 +322,143 @@ def test_cli(tmp_path: Path) -> None:
         assert main([str(src), str(out)]) == 0
     assert (out / "world.json").is_file()
     assert main([str(src), str(out)]) == 2
+
+
+# ---------------------------------------------------------------------------
+# The real export: flat, no database has a folder
+# ---------------------------------------------------------------------------
+
+REAL = ROOT / "tests" / "fixtures" / "notion" / "notion-page-export-with-subpages.zip"
+CHARACTERS = ("Mara Voss", "Tobin Ashgrove", "Zéphyrine Dubois", "Old Ketch", "Brannoch O'Dell")
+PLACES = ("Aurelia Harbour", "Stonewick", "O'Brannock's Rest", "Lac Élan", "The Hollow Mile")
+PAGES = ("Welcome to Notion", "World overview", "Calendar and seasons")
+
+
+def real_files() -> dict[str, bytes]:
+    with zipfile.ZipFile(REAL) as zf:
+        return {i.filename: zf.read(i) for i in zf.infolist()}
+
+
+def real_ids() -> dict[str, str]:
+    """Every page's title -> its Notion id, read from the zip's names."""
+    out: dict[str, str] = {}
+    for name in real_files():
+        if name.endswith(".md"):
+            title, notion_id = parse_name(name[:-3])
+            assert notion_id is not None and title not in out
+            out[title] = notion_id
+    return out
+
+
+def remade(tmp: Path, name: str, edit: dict[str, bytes | None]) -> Path:
+    """The real export with entries replaced, added, or (None) removed."""
+    files = {**real_files(), **edit}
+    path = tmp / name
+    with zipfile.ZipFile(path, "w") as zf:
+        for rel, data in sorted(files.items()):
+            if data is not None:
+                zf.writestr(rel, data)
+    return path
+
+
+def test_real_export_is_flat() -> None:
+    """The fixture is what the door's flat rule is for: no database has a folder, every page sits beside the CSVs."""
+    names = list(real_files())
+    assert len(names) == 17 and not any("/" in n for n in names)
+    assert sum(n.endswith(".csv") for n in names) == 4 and sum(n.endswith(".md") for n in names) == 13
+
+
+def test_flat_rows_pair_with_their_pages(tmp_path: Path) -> None:
+    """Each row once, with its page's id and text; no Narrative repeats a row; the plain pages stay pages."""
+    out = tmp_path / "real"
+    report = import_notion(REAL, out)
+    ids = real_ids()
+    assert report.counts == {"character": 5, "narrative": 8}
+    assert report.pages == len(PAGES)
+    assert report.ids_from_path == []
+    els = list(bodies(out).values())
+    assert sorted(e["name"] for e in els) == sorted(CHARACTERS + PLACES + PAGES)  # each name once
+    for e in els:
+        assert e["id"] == eid(ids[e["name"]]) and e["x_notion_id"] == ids[e["name"]]
+    by_name = {e["name"]: e for e in els}
+    assert all(by_name[n]["type"] == "character" for n in CHARACTERS)
+    for n in PLACES:
+        place = by_name[n]
+        assert (place["type"], place["supertype"], place["subtype"]) == ("narrative", "Article", "Places")
+        assert "description" not in place  # its page holds only its property line
+    for n in PAGES:
+        assert by_name[n]["type"] == "narrative" and "supertype" not in by_name[n]
+    brannoch = by_name["Brannoch O'Dell"]
+    assert brannoch["description"].startswith("## Early life")  # the heading and property lines left out
+    assert "Born:" not in brannoch["description"] and brannoch["x_notion_born"] == "September 21, 1405"
+    # Home is no Character field: kept verbatim, by design
+    assert brannoch["x_notion_home"].startswith("O'Brannock's Rest (O'Brannock's%20Rest%20")
+    assert "x_notion_home" not in by_name["Old Ketch"]
+    assert sum("no folder of its own: 5 of its 5 rows paired" in n for n in report.notes) == 2
+
+
+def test_flat_real_export_lints_round_trips_and_repeats(tmp_path: Path) -> None:
+    one = tmp_path / "one"
+    report = import_notion(REAL, one)
+    assert_lint_green(one, report)
+    assert_round_trip(one, tmp_path / "again")
+    import_notion(REAL, tmp_path / "two")
+    assert tree(one) == tree(tmp_path / "two")
+
+
+def test_flat_relation_resolves_by_the_id_in_its_cell(tmp_path: Path) -> None:
+    """A relation cell names its target as ``Title (Title%20<id>.csv)``, a file not in the zip; the id
+    is the target row's page, so the link resolves once the rows carry their pages' ids. Here the
+    real export retitled: Places as Locations, Home as birthplace (a Character field)."""
+    edit: dict[str, bytes | None] = {}
+    for rel, data in real_files().items():
+        if rel.startswith("Places "):
+            edit[rel] = None
+            edit["Locations " + rel[len("Places ") :]] = data
+        elif rel.startswith("Characters "):
+            edit[rel] = data.replace(b",Home,", b",birthplace,")
+        elif b"\nHome: " in data:
+            edit[rel] = data.replace(b"\nHome: ", b"\nbirthplace: ")
+    out = tmp_path / "out"
+    report = import_notion(remade(tmp_path, "relinked.zip", edit), out)
+    ids = real_ids()
+    assert report.counts == {"character": 5, "location": 5, "narrative": 3} and report.ids_from_path == []
+    by_name = {e["name"]: e for e in bodies(out).values()}
+    assert by_name["Mara Voss"]["birthplace"] == eid(ids["Aurelia Harbour"])
+    assert by_name["Zéphyrine Dubois"]["birthplace"] == eid(ids["Lac Élan"])
+    assert by_name["Brannoch O'Dell"]["birthplace"] == eid(ids["O'Brannock's Rest"])
+    assert "birthplace" not in by_name["Old Ketch"]
+    assert not any("x_notion_birthplace" in e for e in by_name.values())
+    assert all(u.where != "column birthplace" for u in report.unresolved)
+
+
+def test_flat_row_without_a_unique_page_keeps_the_path_id(tmp_path: Path) -> None:
+    """A row whose cells no page beside the CSV repeats, a row two pages fit, and two rows one page
+    fits, stay CSV rows with no page (path ids, listed with why); those pages stay pages."""
+    ids = real_ids()
+    files = real_files()
+    names = {parse_name(rel[:-3])[0]: rel for rel in files if rel.endswith(".md")}
+    twin = "Stonewick " + "0" * 32 + ".md"
+    edit: dict[str, bytes | None] = {
+        names["Aurelia Harbour"]: b"# Aurelia Harbour\n\nKind: Village\n",  # a cell the row does not hold
+        twin: b"# Stonewick\n\nKind: Town\n",  # a second page that fits the row
+    }
+    for rel, data in files.items():
+        if rel.startswith("Places "):
+            edit[rel] = data + b"\r\nThe Hollow Mile,Road"  # a second row the page fits (no final newline, as Notion)
+    out = tmp_path / "out"
+    report = import_notion(remade(tmp_path, "unsure.zip", edit), out)
+    whys = {p.path: p.why for p in report.ids_from_path}
+    places = next(d.path for d in report.databases if d.title == "Places")
+    assert set(whys) == {f"{places}#row {n}" for n in (2, 3, 6, 7)}
+    assert "no page beside its CSV carries the row's title and cells" in whys[f"{places}#row 2"]
+    assert "2 pages beside its CSV fit the row" in whys[f"{places}#row 3"]
+    assert whys[f"{places}#row 6"] == whys[f"{places}#row 7"]
+    assert f"{names['The Hollow Mile']} fits it and another row" in whys[f"{places}#row 6"]
+    els = list(bodies(out).values())
+    rows = [e for e in els if e.get("subtype") == "Places"]
+    assert len(rows) == 6
+    pages = sorted(e["name"] for e in els if "subtype" not in e and e["type"] == "narrative")
+    assert pages == sorted([*PAGES, "Aurelia Harbour", "Stonewick", "Stonewick", "The Hollow Mile"])
+    assert eid(ids["Aurelia Harbour"]) not in {e["id"] for e in rows}
+    assert "'Places' has no folder of its own: 2 of its 6 rows paired" in report.render()

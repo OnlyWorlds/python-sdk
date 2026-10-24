@@ -7,25 +7,38 @@ export, the zip as downloaded or a directory it was unzipped into. ``--plan`` pr
 become what and writes nothing. OUT-DIR must not exist yet (or be empty): a folder is written
 whole, once, through ``write_folder``.
 
-**No real export has been read yet.** The shape below is believed from Notion's help page and
+**One real export has been read** (a free account's page export with sub-pages, flat:
+``tests/fixtures/notion/``); the rest of the shape below is believed from Notion's help page and
 from practice, and every name this module reads is parsed in one place (``parse_name``,
 ``_cell_items``, ``_ID_IN_URL``, the ``_all`` suffix in ``_Importer._databases``) so a real export can
-correct them in one place. Believed:
+correct them in one place. The shape:
 
 - every exported page is ``<Title> <32 hex>.md``; the 32 hex digits are the page's Notion id
   (identity), the title before them is presentation;
 - a full-page database is ``<Title> <32 hex>.csv``, sometimes beside ``<Title> <32 hex>_all.csv``
   holding every property: ``_all`` is read when both exist, never both;
-- a database's rows are pages whose ``.md`` files sit in a folder named ``<Title> <32 hex>/``
-  beside the CSV; a CSV row is matched to its page by title (exactly, then with the characters
-  a filename cannot hold removed and case folded); a row page repeats the row's properties as
-  ``Key: value`` lines under its ``# Title`` heading, and those lines are left out of its text;
-- sub-pages sit in a folder named like their parent page (``<Title> <32 hex>/``);
+- a database's rows are pages; a row page repeats the row's properties as ``Key: value`` lines
+  under its ``# Title`` heading (an empty property has no line), and those lines are left out of
+  its text. Where the rows' ``.md`` files sit in a folder named ``<Title> <32 hex>/`` beside the
+  CSV, a CSV row is matched to its page in that folder by title (exactly, then with the characters
+  a filename cannot hold removed and case folded);
+- an export can be **flat** (seen: a page export with sub-pages, "Create folders for subpages"
+  off): the CSVs and every page, the rows' pages among them, sit in one directory, and no
+  database has a folder. A database with no folder of its own pairs a row with a page in its
+  CSV's directory whose ``# Title`` heading matches the row's title (the rule above) and whose
+  property lines each equal the row's cell for that column (a relation's target compared by its
+  id, since the CSV's path ends ``.csv`` where the page's ends ``.md``), with at least one such
+  line when the row has a cell besides its title. Paired only when the row fits one page and the
+  page fits no other row; a row left unpaired is a CSV row with no page (below), and the report
+  says why;
+- sub-pages sit in a folder named like their parent page (``<Title> <32 hex>/``), or beside it in
+  a flat export, where the tree is not in the files and ``x_notion_parent`` is not written;
 - a page's text opens with ``# <Title>``, which is left out (it is the name);
 - the CSV's first column is the title property (usually ``Name``), UTF-8 with a byte order mark;
 - a relation cell lists page titles separated by commas, each often followed by its exported
-  path or its notion.so URL in parentheses (``Harbor (Locations%20<id>/Harbor%20<id>.md)``)
-  or written as a Markdown link; the target's id is read from that URL;
+  path or its notion.so URL in parentheses (``Harbor (Locations%20<id>/Harbor%20<id>.md)``;
+  seen: ``Harbor (Harbor%20<id>.csv)``, a path to no file, the id the row page's) or written as a
+  Markdown link; the target's id is read from that URL;
 - links between pages in a page's text are relative Markdown links to the exported files,
   percent-encoded; callouts come as HTML (``<aside>``) and are kept as text;
 - attachments are files beside the page, in the page's folder;
@@ -468,6 +481,8 @@ class _Database:
     #: the type its title names, or None
     typed_type: str | None
     headers: list[str] = field(default_factory=list)
+    #: the CSV's rows below the header, blank rows left out
+    rows: list[list[str]] = field(default_factory=list)
     #: one ``x_notion_`` key per column
     ext_keys: list[str] = field(default_factory=list)
     #: the Type column's index, when the title names no type and the database has one
@@ -508,6 +523,29 @@ def _decode(data: bytes) -> str:
     return data.decode("utf-8-sig", errors="replace").replace("\r\n", "\n")
 
 
+def _heading_at(lines: list[str]) -> int:
+    """The index of a page's first non-blank line (its ``# Title`` heading, when it has one)."""
+    i = 0
+    while i < len(lines) and not lines[i].strip():
+        i += 1
+    return i
+
+
+def _prop_span(lines: list[str], i: int, keys: set[str]) -> tuple[int, int]:
+    """``(j, k)``: ``lines[j:k]`` are the ``Key: value`` lines from ``i`` on (blank lines first are passed)
+    whose key is one of ``keys``; ``j == k`` when there are none."""
+    j = i
+    while j < len(lines) and not lines[j].strip():
+        j += 1
+    k = j
+    while k < len(lines):
+        m = _PROP_LINE.match(lines[k])
+        if m is None or m["key"].strip() not in keys:
+            break
+        k += 1
+    return j, k
+
+
 def _page_text(raw: str, titles: Iterable[str], props: Iterable[str] = ()) -> str:
     """A page's Markdown less its ``# Title`` heading and, for a row's page, the property lines under it.
 
@@ -516,27 +554,57 @@ def _page_text(raw: str, titles: Iterable[str], props: Iterable[str] = ()) -> st
     """
     lines = raw.split("\n")
     names = {t.strip() for t in titles}
-    i = 0
-    while i < len(lines) and not lines[i].strip():
-        i += 1
+    i = _heading_at(lines)
     if i < len(lines) and lines[i].startswith("# ") and lines[i][2:].strip() in names:
         i += 1
         keys = set(props)
         if keys:
-            j = i
-            while j < len(lines) and not lines[j].strip():
-                j += 1
-            k = j
-            while k < len(lines):
-                m = _PROP_LINE.match(lines[k])
-                if m is None or m["key"].strip() not in keys:
-                    break
-                k += 1
+            j, k = _prop_span(lines, i, keys)
             if k > j:
                 i = k
     else:
         i = 0
     return "\n".join(lines[i:]).strip("\n").rstrip()
+
+
+def _heading_and_props(raw: str, keys: set[str]) -> tuple[str | None, list[tuple[str, str]]]:
+    """A page's ``# Title`` heading (None when its first line is not one) and the property lines
+    under it that ``_page_text`` would leave out for a row of a database with these column names."""
+    lines = raw.split("\n")
+    i = _heading_at(lines)
+    if i >= len(lines) or not lines[i].startswith("# "):
+        return None, []
+    j, k = _prop_span(lines, i + 1, keys)
+    props: list[tuple[str, str]] = []
+    for line in lines[j:k]:
+        m = _PROP_LINE.match(line)
+        assert m is not None
+        props.append((m["key"].strip(), m["value"] or ""))
+    return lines[i][2:].strip(), props
+
+
+def _cell_key(value: str) -> list[tuple[str, str | None]]:
+    """A cell read as relation items, each target by its Notion id when it holds one: a row's page
+    writes ``Harbor (Harbor%20<id>.md)`` where the CSV writes ``Harbor (Harbor%20<id>.csv)``."""
+    return [(t, (_id_in_url(u) or u) if u is not None else None) for t, u in _cell_items(value)]
+
+
+def _same_cell(page_value: str, cell: str) -> bool:
+    """A row page's property value is the row's cell: equal as text, or as relation items whose
+    titles and target ids agree (the extensions may differ)."""
+    a, b = page_value.strip(), cell.strip()
+    if a == b:
+        return True
+    ka = _cell_key(a)
+    return any(u is not None for _, u in ka) and ka == _cell_key(b)
+
+
+def _props_fit(props: list[tuple[str, str]], cells: list[str], cols: dict[str, list[int]]) -> bool:
+    """Each of a page's property lines equals the row's cell for its column, and a row with a cell
+    besides its title has at least one line (so a plain page that only shares a row's title is not it)."""
+    if not props and any(c.strip() for c in cells[1:]):
+        return False
+    return all(any(_same_cell(v, cells[i] if i < len(cells) else "") for i in cols[k]) for k, v in props)
 
 
 class _Importer:
@@ -608,7 +676,15 @@ class _Importer:
                 (row_mds.setdefault(d, []) if d in row_dirs else pages).append(rel)
 
         for db in databases:
-            self._collect_database(db, row_mds.pop(db.rows_dir, []))
+            rows = self._read_csv(db.csv)
+            db.headers = rows[0] if rows else []
+            db.rows = [r for r in rows[1:] if any(c.strip() for c in r)]
+        flat = self._pair_flat([db for db in databases if db.rows_dir not in row_mds], pages)
+        paired = {md for pairs in flat.values() for md, _why in pairs if md is not None}
+        pages = [rel for rel in pages if rel not in paired]
+
+        for db in databases:
+            self._collect_database(db, row_mds.pop(db.rows_dir, []), flat.get(db.csv))
         for rel in pages:
             title, nid = parse_name(posixpath.basename(rel)[:-3])
             eid, kept = self._claim_id(rel, nid, "no Notion id in the file's name")
@@ -629,28 +705,105 @@ class _Importer:
         page = self.by_md.get(f"{d}.md") if d else None
         return page.eid if page is not None else None
 
-    def _collect_database(self, db: _Database, mds: list[str]) -> None:
-        rows = self._read_csv(db.csv)
-        db.headers = rows[0] if rows else []
-        body_rows = [r for r in rows[1:] if any(c.strip() for c in r)]
+    def _pair_flat(self, dbs: list[_Database], pages: list[str]) -> dict[str, list[tuple[str | None, str]]]:
+        """Each database with no folder of its own (a flat export: its rows' pages sit beside the CSV
+        among the other pages) -> per row, its page and, when it has none, why.
+
+        A row's page is a page in the CSV's directory whose ``# Title`` heading is the row's title
+        (exactly, else folded, as the folder rule matches) and whose property lines each equal the
+        row's cell for that column (at least one line when the row has a cell besides its title).
+        Paired only when the row has one such page and the page fits no other row.
+        """
+        beside: dict[str, list[str]] = {}
+        for rel in pages:
+            beside.setdefault(posixpath.dirname(rel), []).append(rel)
+        raw: dict[str, str] = {}
+        hits: dict[tuple[str, int], list[str]] = {}
+        claims: dict[str, int] = {}
+        for db in dbs:
+            cols: dict[str, list[int]] = {}
+            for i, h in enumerate(db.headers):
+                cols.setdefault(h.strip(), []).append(i)
+            read: list[tuple[str, str | None, list[tuple[str, str]]]] = []
+            for md in beside.get(posixpath.dirname(db.csv), []):
+                if md not in raw:
+                    raw[md] = _decode(self.tree.files[md]())
+                read.append((md, *_heading_and_props(raw[md], set(cols))))
+            for n, cells in enumerate(db.rows):
+                title = cells[0].strip() if cells else ""
+                found = [
+                    (md, head)
+                    for md, head, props in read
+                    if title
+                    and head is not None
+                    and _fold_title(head) == _fold_title(title)
+                    and _props_fit(props, cells, cols)
+                ]
+                exact = [md for md, head in found if head == title]
+                pick = exact if exact else [md for md, _head in found]
+                hits[(db.csv, n)] = pick
+                for md in pick:
+                    claims[md] = claims.get(md, 0) + 1
+        out: dict[str, list[tuple[str | None, str]]] = {}
+        for db in dbs:
+            pairs: list[tuple[str | None, str]] = []
+            for n in range(len(db.rows)):
+                pick = hits[(db.csv, n)]
+                if len(pick) == 1 and claims[pick[0]] == 1:
+                    pairs.append((pick[0], ""))
+                elif not pick:
+                    pairs.append(
+                        (
+                            None,
+                            "a CSV row with no page of its own (the database has no folder, and no page beside"
+                            " its CSV carries the row's title and cells)",
+                        )
+                    )
+                elif len(pick) > 1:
+                    pairs.append(
+                        (None, f"a CSV row with no page of its own ({len(pick)} pages beside its CSV fit the row)")
+                    )
+                else:
+                    pairs.append((None, f"a CSV row with no page of its own ({pick[0]} fits it and another row)"))
+            out[db.csv] = pairs
+            if db.rows:
+                got = sum(md is not None for md, _why in pairs)
+                self.report.notes.append(
+                    f"database {db.title!r} has no folder of its own: {got} of its {len(db.rows)} rows paired"
+                    " with a page beside its CSV by title and cells"
+                )
+        return out
+
+    def _collect_database(
+        self, db: _Database, mds: list[str], flat: list[tuple[str | None, str]] | None = None
+    ) -> None:
+        body_rows = db.rows
         if db.typed_type is None:
             db.type_col = next((i for i, h in enumerate(db.headers) if i > 0 and h.strip().lower() == "type"), None)
         db.ext_keys = self._ext_keys(db.headers)
         type_col = db.type_col
 
-        # match rows to their pages: exactly by title, then folded; each page used once
+        # match rows to their pages: in a flat export, as _pair_flat paired them; else in the
+        # database's folder, exactly by title, then folded; each page used once
         pending = [(parse_name(posixpath.basename(m)[:-3]), m) for m in mds]
         matched: list[str | None] = []
-        for cells in body_rows:
-            title = cells[0].strip() if cells else ""
-            pick = next((i for i, ((t, _), _m) in enumerate(pending) if t == title), None)
-            if pick is None:
-                pick = next((i for i, ((t, _), _m) in enumerate(pending) if _fold_title(t) == _fold_title(title)), None)
-            matched.append(pending.pop(pick)[1] if pick is not None else None)
+        whys = ["a CSV row with no page of its own"] * len(body_rows)
+        if flat is not None:
+            matched = [md for md, _why in flat]
+            whys = [why for _md, why in flat]
+        else:
+            for cells in body_rows:
+                title = cells[0].strip() if cells else ""
+                pick = next((i for i, ((t, _), _m) in enumerate(pending) if t == title), None)
+                if pick is None:
+                    pick = next(
+                        (i for i, ((t, _), _m) in enumerate(pending) if _fold_title(t) == _fold_title(title)), None
+                    )
+                matched.append(pending.pop(pick)[1] if pick is not None else None)
 
         becomes: dict[str, int] = {}
         typed_by = "title" if db.typed_type else ("column" if type_col is not None else "untyped")
-        for n, (cells, md) in enumerate(zip(body_rows, matched, strict=True), start=2):
+        for n, (cells, md, why) in enumerate(zip(body_rows, matched, whys, strict=True), start=2):
             etype = db.typed_type
             consumed = False
             if etype is None and type_col is not None and type_col < len(cells):
@@ -659,7 +812,7 @@ class _Importer:
             if md is not None:
                 eid, nid = self._claim_id(md, parse_name(posixpath.basename(md)[:-3])[1], "no Notion id in the name")
             else:
-                eid, nid = self._claim_id(f"{db.csv}#row {n}", None, "a CSV row with no page of its own")
+                eid, nid = self._claim_id(f"{db.csv}#row {n}", None, why)
             title = cells[0] if cells else ""
             if not title.strip() and md is not None:
                 title = parse_name(posixpath.basename(md)[:-3])[0]
