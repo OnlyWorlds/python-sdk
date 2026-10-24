@@ -52,6 +52,7 @@ from .http import (
 from .names import type_word
 from .push import Patch, PushPlan, PushResult, plan_push, push, verify_level
 from .room import is_room_element
+from .spine import SPINE_KINDS, SpineRead, read_spine_element
 from .worldfile import (
     WORLD_FILE_MEDIA_TYPE,
     WorldFile,
@@ -75,6 +76,7 @@ __all__ = [
     "SCHEMA_DIST_TAG",
     "SCHEMA_MANIFEST_SHA256",
     "SCHEMA_VERSION",
+    "SPINE_KINDS",
     "WORLD_FILE_MEDIA_TYPE",
     "ApiError",
     "BulkResult",
@@ -91,6 +93,7 @@ __all__ = [
     "Response",
     "RetryPolicy",
     "SkippedFile",
+    "SpineRead",
     "StaleProposal",
     "Transport",
     "UrllibTransport",
@@ -109,6 +112,7 @@ __all__ = [
     "plan_push",
     "push",
     "read_folder",
+    "read_spine_element",
     "read_world_file",
     "resolve_filenames",
     "sanitize_payload",

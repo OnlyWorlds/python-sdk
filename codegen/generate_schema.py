@@ -255,6 +255,39 @@ def room_mark() -> str:
     return mark
 
 
+SPINE_ROW = re.compile(r"^\|\s*([A-Z][a-z]+)\s*\|((?:\s*`[^`]+`\s*,?)+)\|\s*$")
+SPINE_WORD = re.compile(r"`([^`]+)`")
+
+
+def spine_kinds(types: list[str]) -> dict[str, list[str]]:
+    """The spine profile's kinds (dist serial 55 on, profiles/spine.md): each listed type's closed list of
+    supertypes, in the page's order and spelling. The page's table is the only copy (the fixture names no
+    list), so it is checked against the fixture's cases instead: every kind a case reads must be on its
+    type's list, and every type on the list must be one of the 22, or generation fails."""
+    page_path, fixture_path = DIST / "profiles" / "spine.md", DIST / "profiles" / "spine.fixture.json"
+    kinds: dict[str, list[str]] = {}
+    for line in page_path.read_text(encoding="utf-8").splitlines():
+        m = SPINE_ROW.match(line)
+        if not m:
+            continue
+        t, words = m[1].lower(), SPINE_WORD.findall(m[2])
+        if t not in types or t in kinds:
+            raise SystemExit(f"spine.md: a kinds row for {m[1]!r}, not an element type or named twice")
+        if any(not w or w != w.strip() or '"' in w or "\\" in w for w in words):
+            raise SystemExit(f"spine.md: {m[1]}'s kinds {words}: a supertype this emitter refuses")
+        if len({w.lower() for w in words}) != len(words):
+            raise SystemExit(f"spine.md: {m[1]}'s kinds repeat one another without regard to case: {words}")
+        kinds[t] = words
+    if not kinds:
+        raise SystemExit("spine.md: no kinds table found")
+    fixture: dict[str, Any] = json.loads(fixture_path.read_text(encoding="utf-8"))
+    for case in fixture.get("cases") or []:
+        t, kind = case.get("type"), (case.get("read") or {}).get("kind")
+        if kind not in ("off-list", "free") and kind not in kinds.get(t, []):
+            raise SystemExit(f"spine.fixture.json: case {case.get('name')!r} reads {kind!r}, not on {t}'s list")
+    return kinds
+
+
 def element_types(walk: Any) -> list[str]:
     from_walk: list[str] = list(walk.ELEMENT_TYPES)
     from_files = sorted(p.stem for p in (DIST / "schema").glob("*.yaml") if p.stem not in NON_ELEMENT_SCHEMA_FILES)
@@ -273,6 +306,7 @@ def render(
     public: dict[str, list[str]],
     room: list[tuple[str, str]],
     mark: str,
+    spine: dict[str, list[str]],
 ) -> str:
     def strs(names: list[str]) -> str:
         return "(" + ", ".join(f'"{n}"' for n in names) + ("," if len(names) == 1 else "") + ")"
@@ -383,6 +417,13 @@ def render(
         "# world or sitting the room belongs to (room.fixture.json's mark.field, checked against room.md).",
         f'ROOM_MARK = "{mark}"',
         "",
+        "# The spine profile (profiles/spine.md): each listed type's closed list of supertypes (its kinds), in",
+        "# the page's order and spelling, compared trimmed and without regard to case (spine.read_spine_element).",
+        "# From the page's table, checked against spine.fixture.json's cases. A convention on the 22 types.",
+        "SPINE_KINDS: dict[str, tuple[str, ...]] = {",
+        *[line for t, words in spine.items() for line in wrapped(f'    "{t}": ', words, ",")],
+        "}",
+        "",
     ]
     return "\n".join(lines)
 
@@ -406,6 +447,7 @@ def main() -> int:
         public_fields(types, layout),
         room_pairs(types),
         room_mark(),
+        spine_kinds(types),
     )
     if args.check:
         current = OUT.read_bytes().decode("utf-8") if OUT.is_file() else ""

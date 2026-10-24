@@ -1,0 +1,854 @@
+{
+  "profile": "spine",
+  "profile_page": "profiles/spine.md",
+  "notes": [
+    "type: the element's type slug; element: the keys a reader sees on the body (supertype and x_spine_*).",
+    "read: what a conforming reader of one element says. kind: the list's spelling, 'off-list', or 'free' (Character, Institution, Collective).",
+    "Each key is its value as read, or null when not stated. primary: the audience's first known word. probe: the verb ('http', 'gh repo', 'gh release', 'npm', 'pypi', 'dns', 'room', 'file', 'none') or 'unsupported'.",
+    "dropped: what the reader named and left out, as '<key>: <the value as JSON>', in key order address, access, status, layer, audience, depends_on, verified.",
+    "Not here: whether an id resolves, one owner per row, a Retirement Event: the world's audit, never a reader of one element."
+  ],
+  "cases": [
+    {
+      "name": "tool-whole",
+      "type": "object",
+      "element": {
+        "supertype": "Tool",
+        "x_spine_address": [
+          "https://atlas.onlyworlds.com"
+        ],
+        "x_spine_truth": "the repo's main",
+        "x_spine_access": "public",
+        "x_spine_status": "live",
+        "x_spine_layer": "interface",
+        "x_spine_audience": [
+          "builder",
+          "stranger"
+        ],
+        "x_spine_depends_on": [
+          "0190a1b2-0000-7000-8000-000000000001"
+        ],
+        "x_spine_probe": "http GET https://atlas.onlyworlds.com expect 200",
+        "x_spine_verified": {
+          "at": "2026-10-24",
+          "by": "0190a1b2-0000-7000-8000-0000000000aa"
+        }
+      },
+      "read": {
+        "kind": "Tool",
+        "address": [
+          "https://atlas.onlyworlds.com"
+        ],
+        "truth": "the repo's main",
+        "access": "public",
+        "status": "live",
+        "layer": "interface",
+        "audience": [
+          "builder",
+          "stranger"
+        ],
+        "primary": "builder",
+        "depends_on": [
+          "0190a1b2-0000-7000-8000-000000000001"
+        ],
+        "probe": "http",
+        "verified_at": "2026-10-24",
+        "dropped": []
+      }
+    },
+    {
+      "name": "supertype-trimmed-folded",
+      "type": "object",
+      "element": {
+        "supertype": "  pACKAGE "
+      },
+      "read": {
+        "kind": "Package",
+        "address": null,
+        "truth": null,
+        "access": null,
+        "status": null,
+        "layer": null,
+        "audience": null,
+        "primary": null,
+        "depends_on": null,
+        "probe": null,
+        "verified_at": null,
+        "dropped": []
+      }
+    },
+    {
+      "name": "supertype-two-words",
+      "type": "construct",
+      "element": {
+        "supertype": "route FAMILY"
+      },
+      "read": {
+        "kind": "Route family",
+        "address": null,
+        "truth": null,
+        "access": null,
+        "status": null,
+        "layer": null,
+        "audience": null,
+        "primary": null,
+        "depends_on": null,
+        "probe": null,
+        "verified_at": null,
+        "dropped": []
+      }
+    },
+    {
+      "name": "supertype-other-type",
+      "type": "object",
+      "element": {
+        "supertype": "Page"
+      },
+      "read": {
+        "kind": "off-list",
+        "address": null,
+        "truth": null,
+        "access": null,
+        "status": null,
+        "layer": null,
+        "audience": null,
+        "primary": null,
+        "depends_on": null,
+        "probe": null,
+        "verified_at": null,
+        "dropped": []
+      }
+    },
+    {
+      "name": "supertype-empty",
+      "type": "location",
+      "element": {
+        "supertype": ""
+      },
+      "read": {
+        "kind": "off-list",
+        "address": null,
+        "truth": null,
+        "access": null,
+        "status": null,
+        "layer": null,
+        "audience": null,
+        "primary": null,
+        "depends_on": null,
+        "probe": null,
+        "verified_at": null,
+        "dropped": []
+      }
+    },
+    {
+      "name": "supertype-absent",
+      "type": "location",
+      "element": {},
+      "read": {
+        "kind": "off-list",
+        "address": null,
+        "truth": null,
+        "access": null,
+        "status": null,
+        "layer": null,
+        "audience": null,
+        "primary": null,
+        "depends_on": null,
+        "probe": null,
+        "verified_at": null,
+        "dropped": []
+      }
+    },
+    {
+      "name": "supertype-free-type",
+      "type": "character",
+      "element": {
+        "supertype": "Founder"
+      },
+      "read": {
+        "kind": "free",
+        "address": null,
+        "truth": null,
+        "access": null,
+        "status": null,
+        "layer": null,
+        "audience": null,
+        "primary": null,
+        "depends_on": null,
+        "probe": null,
+        "verified_at": null,
+        "dropped": []
+      }
+    },
+    {
+      "name": "charter-the-world",
+      "type": "law",
+      "element": {
+        "supertype": "charter"
+      },
+      "read": {
+        "kind": "Charter",
+        "address": null,
+        "truth": null,
+        "access": null,
+        "status": null,
+        "layer": null,
+        "audience": null,
+        "primary": null,
+        "depends_on": null,
+        "probe": null,
+        "verified_at": null,
+        "dropped": []
+      }
+    },
+    {
+      "name": "charter-a-project",
+      "type": "law",
+      "element": {
+        "supertype": "Project charter"
+      },
+      "read": {
+        "kind": "Project charter",
+        "address": null,
+        "truth": null,
+        "access": null,
+        "status": null,
+        "layer": null,
+        "audience": null,
+        "primary": null,
+        "depends_on": null,
+        "probe": null,
+        "verified_at": null,
+        "dropped": []
+      }
+    },
+    {
+      "name": "event-release",
+      "type": "event",
+      "element": {
+        "supertype": "Release"
+      },
+      "read": {
+        "kind": "Release",
+        "address": null,
+        "truth": null,
+        "access": null,
+        "status": null,
+        "layer": null,
+        "audience": null,
+        "primary": null,
+        "depends_on": null,
+        "probe": null,
+        "verified_at": null,
+        "dropped": []
+      }
+    },
+    {
+      "name": "narrative-stop",
+      "type": "narrative",
+      "element": {
+        "supertype": "stop"
+      },
+      "read": {
+        "kind": "Stop",
+        "address": null,
+        "truth": null,
+        "access": null,
+        "status": null,
+        "layer": null,
+        "audience": null,
+        "primary": null,
+        "depends_on": null,
+        "probe": null,
+        "verified_at": null,
+        "dropped": []
+      }
+    },
+    {
+      "name": "type-off-list",
+      "type": "species",
+      "element": {
+        "supertype": "Tool"
+      },
+      "read": {
+        "kind": "off-list",
+        "address": null,
+        "truth": null,
+        "access": null,
+        "status": null,
+        "layer": null,
+        "audience": null,
+        "primary": null,
+        "depends_on": null,
+        "probe": null,
+        "verified_at": null,
+        "dropped": []
+      }
+    },
+    {
+      "name": "address-a-string",
+      "type": "object",
+      "element": {
+        "supertype": "Tool",
+        "x_spine_address": "https://x.example"
+      },
+      "read": {
+        "kind": "Tool",
+        "address": null,
+        "truth": null,
+        "access": null,
+        "status": null,
+        "layer": null,
+        "audience": null,
+        "primary": null,
+        "depends_on": null,
+        "probe": null,
+        "verified_at": null,
+        "dropped": [
+          "x_spine_address: \"https://x.example\""
+        ]
+      }
+    },
+    {
+      "name": "address-mixed",
+      "type": "object",
+      "element": {
+        "supertype": "Tool",
+        "x_spine_address": [
+          "https://a.example",
+          "",
+          5,
+          "npm: b"
+        ]
+      },
+      "read": {
+        "kind": "Tool",
+        "address": [
+          "https://a.example",
+          "npm: b"
+        ],
+        "truth": null,
+        "access": null,
+        "status": null,
+        "layer": null,
+        "audience": null,
+        "primary": null,
+        "depends_on": null,
+        "probe": null,
+        "verified_at": null,
+        "dropped": [
+          "x_spine_address: \"\"",
+          "x_spine_address: 5"
+        ]
+      }
+    },
+    {
+      "name": "address-empty-list",
+      "type": "object",
+      "element": {
+        "supertype": "Tool",
+        "x_spine_address": []
+      },
+      "read": {
+        "kind": "Tool",
+        "address": null,
+        "truth": null,
+        "access": null,
+        "status": null,
+        "layer": null,
+        "audience": null,
+        "primary": null,
+        "depends_on": null,
+        "probe": null,
+        "verified_at": null,
+        "dropped": []
+      }
+    },
+    {
+      "name": "truth-blank",
+      "type": "object",
+      "element": {
+        "supertype": "Tool",
+        "x_spine_truth": "  "
+      },
+      "read": {
+        "kind": "Tool",
+        "address": null,
+        "truth": null,
+        "access": null,
+        "status": null,
+        "layer": null,
+        "audience": null,
+        "primary": null,
+        "depends_on": null,
+        "probe": null,
+        "verified_at": null,
+        "dropped": []
+      }
+    },
+    {
+      "name": "status-trimmed-folded",
+      "type": "object",
+      "element": {
+        "supertype": "Tool",
+        "x_spine_status": " Legacy "
+      },
+      "read": {
+        "kind": "Tool",
+        "address": null,
+        "truth": null,
+        "access": null,
+        "status": "legacy",
+        "layer": null,
+        "audience": null,
+        "primary": null,
+        "depends_on": null,
+        "probe": null,
+        "verified_at": null,
+        "dropped": []
+      }
+    },
+    {
+      "name": "status-unknown",
+      "type": "object",
+      "element": {
+        "supertype": "Tool",
+        "x_spine_status": "archived"
+      },
+      "read": {
+        "kind": "Tool",
+        "address": null,
+        "truth": null,
+        "access": null,
+        "status": null,
+        "layer": null,
+        "audience": null,
+        "primary": null,
+        "depends_on": null,
+        "probe": null,
+        "verified_at": null,
+        "dropped": [
+          "x_spine_status: \"archived\""
+        ]
+      }
+    },
+    {
+      "name": "access-archived-is-not-access",
+      "type": "location",
+      "element": {
+        "supertype": "Repo",
+        "x_spine_access": "archived"
+      },
+      "read": {
+        "kind": "Repo",
+        "address": null,
+        "truth": null,
+        "access": null,
+        "status": null,
+        "layer": null,
+        "audience": null,
+        "primary": null,
+        "depends_on": null,
+        "probe": null,
+        "verified_at": null,
+        "dropped": [
+          "x_spine_access: \"archived\""
+        ]
+      }
+    },
+    {
+      "name": "access-crew-only",
+      "type": "location",
+      "element": {
+        "supertype": "Room",
+        "x_spine_access": "Crew-Only"
+      },
+      "read": {
+        "kind": "Room",
+        "address": null,
+        "truth": null,
+        "access": "crew-only",
+        "status": null,
+        "layer": null,
+        "audience": null,
+        "primary": null,
+        "depends_on": null,
+        "probe": null,
+        "verified_at": null,
+        "dropped": []
+      }
+    },
+    {
+      "name": "layer-folded",
+      "type": "object",
+      "element": {
+        "supertype": "Package",
+        "x_spine_layer": "Client"
+      },
+      "read": {
+        "kind": "Package",
+        "address": null,
+        "truth": null,
+        "access": null,
+        "status": null,
+        "layer": "client",
+        "audience": null,
+        "primary": null,
+        "depends_on": null,
+        "probe": null,
+        "verified_at": null,
+        "dropped": []
+      }
+    },
+    {
+      "name": "audience-primary-and-drop",
+      "type": "object",
+      "element": {
+        "supertype": "Tool",
+        "x_spine_audience": [
+          "agent",
+          "Stranger",
+          "robots"
+        ]
+      },
+      "read": {
+        "kind": "Tool",
+        "address": null,
+        "truth": null,
+        "access": null,
+        "status": null,
+        "layer": null,
+        "audience": [
+          "agent",
+          "stranger"
+        ],
+        "primary": "agent",
+        "depends_on": null,
+        "probe": null,
+        "verified_at": null,
+        "dropped": [
+          "x_spine_audience: \"robots\""
+        ]
+      }
+    },
+    {
+      "name": "audience-none-known",
+      "type": "object",
+      "element": {
+        "supertype": "Tool",
+        "x_spine_audience": [
+          "everyone"
+        ]
+      },
+      "read": {
+        "kind": "Tool",
+        "address": null,
+        "truth": null,
+        "access": null,
+        "status": null,
+        "layer": null,
+        "audience": null,
+        "primary": null,
+        "depends_on": null,
+        "probe": null,
+        "verified_at": null,
+        "dropped": [
+          "x_spine_audience: \"everyone\""
+        ]
+      }
+    },
+    {
+      "name": "audience-a-string",
+      "type": "object",
+      "element": {
+        "supertype": "Tool",
+        "x_spine_audience": "crew"
+      },
+      "read": {
+        "kind": "Tool",
+        "address": null,
+        "truth": null,
+        "access": null,
+        "status": null,
+        "layer": null,
+        "audience": null,
+        "primary": null,
+        "depends_on": null,
+        "probe": null,
+        "verified_at": null,
+        "dropped": [
+          "x_spine_audience: \"crew\""
+        ]
+      }
+    },
+    {
+      "name": "depends-on-a-string",
+      "type": "object",
+      "element": {
+        "supertype": "Tool",
+        "x_spine_depends_on": "abc"
+      },
+      "read": {
+        "kind": "Tool",
+        "address": null,
+        "truth": null,
+        "access": null,
+        "status": null,
+        "layer": null,
+        "audience": null,
+        "primary": null,
+        "depends_on": null,
+        "probe": null,
+        "verified_at": null,
+        "dropped": [
+          "x_spine_depends_on: \"abc\""
+        ]
+      }
+    },
+    {
+      "name": "depends-on-mixed",
+      "type": "object",
+      "element": {
+        "supertype": "Tool",
+        "x_spine_depends_on": [
+          "id-1",
+          7
+        ]
+      },
+      "read": {
+        "kind": "Tool",
+        "address": null,
+        "truth": null,
+        "access": null,
+        "status": null,
+        "layer": null,
+        "audience": null,
+        "primary": null,
+        "depends_on": [
+          "id-1"
+        ],
+        "probe": null,
+        "verified_at": null,
+        "dropped": [
+          "x_spine_depends_on: 7"
+        ]
+      }
+    },
+    {
+      "name": "probe-npm",
+      "type": "object",
+      "element": {
+        "supertype": "Package",
+        "x_spine_probe": "npm @onlyworlds/sdk"
+      },
+      "read": {
+        "kind": "Package",
+        "address": null,
+        "truth": null,
+        "access": null,
+        "status": null,
+        "layer": null,
+        "audience": null,
+        "primary": null,
+        "depends_on": null,
+        "probe": "npm",
+        "verified_at": null,
+        "dropped": []
+      }
+    },
+    {
+      "name": "probe-gh-release",
+      "type": "object",
+      "element": {
+        "supertype": "Package",
+        "x_spine_probe": "gh release OnlyWorlds/sdk"
+      },
+      "read": {
+        "kind": "Package",
+        "address": null,
+        "truth": null,
+        "access": null,
+        "status": null,
+        "layer": null,
+        "audience": null,
+        "primary": null,
+        "depends_on": null,
+        "probe": "gh release",
+        "verified_at": null,
+        "dropped": []
+      }
+    },
+    {
+      "name": "probe-gh-other-verb",
+      "type": "location",
+      "element": {
+        "supertype": "Repo",
+        "x_spine_probe": "gh issue OnlyWorlds/sdk"
+      },
+      "read": {
+        "kind": "Repo",
+        "address": null,
+        "truth": null,
+        "access": null,
+        "status": null,
+        "layer": null,
+        "audience": null,
+        "primary": null,
+        "depends_on": null,
+        "probe": "unsupported",
+        "verified_at": null,
+        "dropped": []
+      }
+    },
+    {
+      "name": "probe-a-shell-line",
+      "type": "object",
+      "element": {
+        "supertype": "Tool",
+        "x_spine_probe": "curl -s https://x.example | grep ok"
+      },
+      "read": {
+        "kind": "Tool",
+        "address": null,
+        "truth": null,
+        "access": null,
+        "status": null,
+        "layer": null,
+        "audience": null,
+        "primary": null,
+        "depends_on": null,
+        "probe": "unsupported",
+        "verified_at": null,
+        "dropped": []
+      }
+    },
+    {
+      "name": "probe-http-no-status",
+      "type": "object",
+      "element": {
+        "supertype": "Tool",
+        "x_spine_probe": "http GET https://x.example"
+      },
+      "read": {
+        "kind": "Tool",
+        "address": null,
+        "truth": null,
+        "access": null,
+        "status": null,
+        "layer": null,
+        "audience": null,
+        "primary": null,
+        "depends_on": null,
+        "probe": "unsupported",
+        "verified_at": null,
+        "dropped": []
+      }
+    },
+    {
+      "name": "probe-none",
+      "type": "object",
+      "element": {
+        "supertype": "Cron",
+        "x_spine_probe": "none runs on the crew's machine"
+      },
+      "read": {
+        "kind": "Cron",
+        "address": null,
+        "truth": null,
+        "access": null,
+        "status": null,
+        "layer": null,
+        "audience": null,
+        "primary": null,
+        "depends_on": null,
+        "probe": "none",
+        "verified_at": null,
+        "dropped": []
+      }
+    },
+    {
+      "name": "verified-not-a-date",
+      "type": "object",
+      "element": {
+        "supertype": "Tool",
+        "x_spine_verified": {
+          "at": "yesterday",
+          "by": "t"
+        }
+      },
+      "read": {
+        "kind": "Tool",
+        "address": null,
+        "truth": null,
+        "access": null,
+        "status": null,
+        "layer": null,
+        "audience": null,
+        "primary": null,
+        "depends_on": null,
+        "probe": null,
+        "verified_at": null,
+        "dropped": [
+          "x_spine_verified: {\"at\": \"yesterday\", \"by\": \"t\"}"
+        ]
+      }
+    },
+    {
+      "name": "unknown-spine-key",
+      "type": "object",
+      "element": {
+        "supertype": "Tool",
+        "x_spine_colour": "teal"
+      },
+      "read": {
+        "kind": "Tool",
+        "address": null,
+        "truth": null,
+        "access": null,
+        "status": null,
+        "layer": null,
+        "audience": null,
+        "primary": null,
+        "depends_on": null,
+        "probe": null,
+        "verified_at": null,
+        "dropped": []
+      }
+    }
+  ],
+  "calendar": {
+    "notes": "The calendar config in spine.md's json block, run through a calendar-profile reader: each step reads as written, with its weekday. Valid to step 32200; step 32201 (29 February 2100) is the first drift, no century rule.",
+    "steps": [
+      {
+        "step": 0,
+        "reads": "1 January 2012",
+        "weekday": "Sunday"
+      },
+      {
+        "step": 59,
+        "reads": "29 February 2012",
+        "weekday": "Wednesday"
+      },
+      {
+        "step": 60,
+        "reads": "1 March 2012",
+        "weekday": "Thursday"
+      },
+      {
+        "step": 1520,
+        "reads": "29 February 2016",
+        "weekday": "Monday"
+      },
+      {
+        "step": 5410,
+        "reads": "24 October 2026",
+        "weekday": "Saturday"
+      },
+      {
+        "step": 32200,
+        "reads": "28 February 2100",
+        "weekday": "Sunday"
+      }
+    ]
+  }
+}

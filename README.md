@@ -295,6 +295,19 @@ word = type_word(folder.world, "character", many=True) or "Characters"
 
 The profile: [`profiles/names.md`](https://github.com/OnlyWorlds/schema-dist/blob/main/profiles/names.md).
 
+### The spine
+
+A world may map a software ecosystem: what is built, where each thing lives, who keeps it and what it depends on. Each kind is a type with a supertype from a closed list (`onlyworlds.SPINE_KINDS`: a `Tool` or a `Package` is an Object, a `Repo` a Location, a `Seat` a Title), and `x_spine_*` keys carry the rest. `onlyworlds.read_spine_element(type, element)` reads one element as the profile does: its kind (or `off-list`), each key as read or `None`, and every value it left out, named in `dropped`.
+
+```python
+from onlyworlds import read_spine_element
+
+read = read_spine_element("object", {"supertype": "Package", "x_spine_status": "live"})
+read.kind, read.status  # ("Package", "live")
+```
+
+Whether a row has one owner and whether its dependencies resolve is the world's audit, not a reader of one element. The profile: [`profiles/spine.md`](https://github.com/OnlyWorlds/schema-dist/blob/main/profiles/spine.md).
+
 Not yet: typed element models, the account routes, a snapshot writer.
 
 ## Develop
