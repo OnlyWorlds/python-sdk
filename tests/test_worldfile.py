@@ -124,6 +124,35 @@ def test_the_owworld_fixture_set_every_verdict_and_every_cause(tmp_path: Path) -
     assert diffs == []
 
 
+# Three zips the next schema-dist serial brings (Quillon's set, verdicts.json of 2026-10-24; Skeld's ruling h58
+# #11968), copied here until it does: when the serial is vendored, delete tests/fixtures/owworld-next/ and this test,
+# and the set above carries them.
+NEXT = REPO / "tests" / "fixtures" / "owworld-next"
+NEXT_CASES = {
+    "fail-OW-14-deflate-early-end.owworld": (
+        "b176e92b6bfe0c8bcb7fe143adcf2b7e967e2a21d14549b4ac0ffac17afe013c",
+        "not_openable",
+    ),
+    "fail-OW-14-deflate-no-end.owworld": (
+        "7dec0fffdc42643b24b527a80b54116f504e4a5933d09c675d3bfd31cbeb5ef4",
+        "not_openable",
+    ),
+    "pass-OW-18-nfc-unassigned.owworld": ("b02a7871c3a9932a0646944c2e76850b3df63dca1fc3881fc89df4ae0b3544d4", None),
+}
+
+
+@pytest.mark.parametrize("file", sorted(NEXT_CASES))
+def test_the_next_serials_three_cases_the_deflate_stream_to_its_declared_end_and_the_nfc_pair(file: str) -> None:
+    assert sorted(p.name for p in NEXT.iterdir()) == sorted(NEXT_CASES)
+    data = (NEXT / file).read_bytes()
+    digest, reason = NEXT_CASES[file]
+    assert hashlib.sha256(data).hexdigest() == digest, f"{file} is Quillon's"
+    if reason:
+        refuses(reason, data)
+    else:
+        assert read_world_file(data).entries
+
+
 def test_the_private_case_both_sides_of_the_writer(tmp_path: Path) -> None:
     """OW-8's private clause (§4.5 rule 11), the set's two-sided case: the source world rebuilt from
     the asked side (it carries every source file, each checked against ``sources.private``), written
