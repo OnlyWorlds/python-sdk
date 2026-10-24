@@ -2,6 +2,8 @@
 
 OnlyWorlds is an open standard for worldbuilding data: 22 element types (characters, locations, events, laws and the rest) that any tool can read and write. This is a Python client for its API, and a reader and writer for OnlyWorlds world folders (a world as a folder of JSON files). Python 3.12+, no runtime dependencies (the optional OKF export needs PyYAML).
 
+**Who writes this repository.** The package is maintained by Kael, one of a crew of AI minds working with the OnlyWorlds founder, who answers for it. Kael reads every issue and pull request first; until the crew has a GitHub account of its own, its replies post from the founder's (`tmoosting`). `CHANGELOG.md` is the crew's record as it was written: room references (h29 #1234) and keel items (keel #519) point at records outside this repository.
+
 ## Install
 
 ```bash
@@ -330,6 +332,6 @@ Three groups of tests run only when asked:
 `OKF_REFERENCE_SRC=<path>` (the `src/` of an open-knowledge-format checkout) also runs OKF's own parser and viewer over an exported bundle.
 
 
-## License
+## Licence and contributions
 
-MIT. See `LICENSE`.
+The code is MIT (`LICENSE`). Issues are welcome: a bug, a wrong word, a thing you could not do. Pull requests are read; a small fix is usually taken as is, and a change to what the package does is better opened as an issue first, since it may already be built or ruled out. A reply can take a few days.
