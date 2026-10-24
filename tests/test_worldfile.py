@@ -117,7 +117,7 @@ def test_the_owworld_fixture_set_every_verdict_and_every_cause(tmp_path: Path) -
     print(f"the .owworld set: {run} fixtures run, {len(diffs)} disagreeing, from {FIXTURES}")
     for d in diffs:
         print(f"  disagrees: {d}")
-    assert run == len(on_disk) == 85, f"the set holds {run} fixtures"
+    assert run == len(on_disk) == 93, f"the set holds {run} fixtures"  # dist.57: eight OW-18 NFC cases
     assert diffs == []
 
 

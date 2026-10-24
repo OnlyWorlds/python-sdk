@@ -725,6 +725,58 @@ def fixtures():
         build_zip(base(extra=[("media/straße.png", PNG), ("media/strasse.png", PNG)])), test="OW-18",
         rule="media/straße.png and media/strasse.png: simple case folding leaves U+00DF alone (full folding "
              "makes it 'ss'); two names, accepted.")
+    # The NFC pairs (OW Council #656, Skeld h58 #11887): one per step of NFC a reader without one, or with a wrong one,
+    # gets wrong. NFC here is Unicode 15.1.0's, built from UnicodeData-15.1.0.txt and CompositionExclusions-15.1.0.txt
+    # (run_py.py's `nfc`, proven on NormalizationTest-15.1.0.txt); each pair's two names are spelled in escapes.
+    add("fail-OW-18-nfc-singleton.owworld",
+        build_zip(base(extra=[("media/豈.png", PNG), ("media/豈.png", PNG)])), test="OW-18",
+        reader="refuse", reason="collision",
+        rule="media/豈.png (U+F900, a CJK compatibility ideograph) and media/豈.png (U+8C48): U+F900's "
+             "decomposition is the one code point U+8C48 (a singleton), and no case folding applies, so only NFC "
+             "joins them. One name, refused.")
+    add("fail-OW-18-nfc-singleton-angstrom.owworld",
+        build_zip(base(extra=[("media/Å.png", PNG), ("media/Å.png", PNG)])), test="OW-18",
+        reader="refuse", reason="collision",
+        rule="media/Å.png (U+212B ANGSTROM SIGN) and media/Å.png (A + U+030A): NFC takes U+212B to U+00C5 "
+             "(a singleton, never recomposed) and composes A + U+030A to U+00C5. Against U+00C5 itself the pair "
+             "needs no NFC (CaseFolding's C rows take U+212B and U+00C5 both to U+00E5), so the other side is the "
+             "decomposed one: folding alone leaves a + U+030A. One name, refused.")
+    add("fail-OW-18-nfc-exclusion.owworld",
+        build_zip(base(extra=[("media/क़.png", PNG), ("media/क़.png", PNG)])), test="OW-18",
+        reader="refuse", reason="collision",
+        rule="media/क़.png (U+0958 DEVANAGARI LETTER QA) and media/क़.png (U+0915 U+093C): U+0958 "
+             "decomposes to U+0915 U+093C and is a composition exclusion, so NFC of both is U+0915 U+093C, never "
+             "U+0958. One name, refused. (A reader that wrongly recomposes U+0958 joins them too: no case folding "
+             "applies to an excluded character, so no pair of names can show that fault; NormalizationTest does.)")
+    add("fail-OW-18-nfc-reorder.owworld",
+        build_zip(base(extra=[("media/lệ.png", PNG), ("media/lệ.png", PNG)])),
+        test="OW-18", reader="refuse", reason="collision",
+        rule="media/lệ.png and media/lệ.png (e + dot below U+0323, class 220, and circumflex "
+             "U+0302, class 230, in either order): canonical ordering puts U+0323 first, and both compose to U+1EC7. "
+             "A reader that composes without ordering gets U+1EC7 and U+00EA U+0323, two names. One name, refused.")
+    add("pass-OW-18-nfc-same-class.owworld",
+        build_zip(base(extra=[("media/lá̀.png", PNG), ("media/là́.png", PNG)])),
+        test="OW-18",
+        rule="media/lá̀.png and media/là́.png (acute U+0301 and grave U+0300, both class "
+             "230, in either order): marks of one class keep their order, so NFC gives U+00E1 U+0300 and U+00E0 "
+             "U+0301. A reader that sorts marks by code point, or unstably, joins them. Two names, accepted.")
+    add("fail-OW-18-nfc-hangul.owworld",
+        build_zip(base(extra=[("media/한.png", PNG), ("media/한.png", PNG)])), test="OW-18",
+        reader="refuse", reason="collision",
+        rule="media/한.png (U+D55C, the syllable han) and media/한.png (its jamo U+1112 "
+             "U+1161 U+11AB): Hangul composes by arithmetic (L+V, then LV+T), not by UnicodeData's field 5, which "
+             "lists no syllable. One name, refused.")
+    add("fail-OW-18-nfc-non-starter.owworld",
+        build_zip(base(extra=[("media/ΐ.png", PNG), ("media/ΐ.png", PNG)])),
+        test="OW-18", reader="refuse", reason="collision",
+        rule="media/ΐ.png (iota + U+0344, a mark whose decomposition U+0308 U+0301 starts with a "
+             "non-starter: excluded from composition) and media/ΐ.png: NFC decomposes U+0344 and "
+             "composes both to U+0390. One name, refused.")
+    add("pass-OW-18-nfc-compat.owworld",
+        build_zip(base(extra=[("media/ﬁ.png", PNG), ("media/fi.png", PNG)])), test="OW-18",
+        rule="media/ﬁ.png (U+FB01, the fi ligature) and media/fi.png: U+FB01's mapping is <compat>, so NFC "
+             "keeps it (NFKC would not), and CaseFolding has only an F row for it (simple folding keeps it; a "
+             "runtime's full casefold would not). Two names, accepted.")
 
     # -- OW-19: no path is both a file and a folder ------------------------------------------------------------------
     add("fail-OW-19-file-and-folder.owworld", build_zip(base(extra=[("media", b"not a folder\n")])), test="OW-19",

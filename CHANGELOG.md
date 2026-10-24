@@ -2,6 +2,11 @@
 
 The package version runs on its own semver; the schema it is generated from is `SCHEMA_DIST_TAG`.
 
+## 0.45.0 (2026-10-24)
+
+- **The doctor's flag 13, the spine** (OW Spine #614's last half: "the doctor lints the Spine world against it"). On a world where some element carries an `x_spine_` key (any other world skips the flag and says so), every element is read by `read_spine_element`. A listed type whose supertype is off the spine's list or empty is a finding; so is each value the reader drops (its key and value) and a probe that is not in the probe form. Then the audit's definite parts: each row (an Object, Construct, Location or Law of a listed kind, the world's Charter included, since the page exempts none) must be kept by exactly one Title with supertype `Seat`, through the Seat's field for that type; no seat, or two, is a finding. Every `x_spine_depends_on` id must be in the world (not checked through a guest key: an id a guest cannot see is not a missing one). Never checked, and named so in the report: a `legacy` or `provenance` row's Retirement Event (the page names it by the row's text, which no structure attributes), whether a probe passes, and `x_spine_probed`. Known-of stubs are not read. Run on the landing's 360 rows as a folder, it names the 21 probes written as prose; every row reads "no seat keeps it" until the seats' Titles land.
+- **Schema repinned to schema-dist `v0.33.0-dist.57`** (from dist.56; same canonical 00.33.00, no schema file moved). The `.owworld` set grows to 93: eight OW-18 cases on NFC, with Unicode 15.1.0's `UnicodeData` and `CompositionExclusions` beside `CaseFolding`. `read_world_file` agrees with all 93. Its NFC is the interpreter's `unicodedata` (Python 3.12 ships Unicode 15.0, 3.14 ships 16.0), not a normaliser built from the set's files; the eight cases use characters every one of those versions treats alike.
+
 ## 0.44.1 (2026-10-24)
 
 - **Schema repinned to schema-dist `v0.33.0-dist.56`** (from dist.55; same canonical 00.33.00, no schema file moved). The one serial settles five readings of `profiles/spine.md` that the first reader found ambiguous, and the fixture grows to 40 cases.
