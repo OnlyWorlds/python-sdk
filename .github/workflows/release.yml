@@ -51,6 +51,14 @@ jobs:
             echo "CHANGELOG.md has no '## $v' entry: write it, then tag"; exit 1
           fi
 
+      - name: The entry carries no crew words (it becomes the public release notes; ruled 2026-10-24)
+        run: |
+          v="${GITHUB_REF_NAME#v}"
+          awk -v h="$v" '$1=="##" { if (f) exit; if ($2==h) { f=1; next } } f' CHANGELOG.md > entry.md
+          if grep -nE 'h[0-9]{1,3} #[0-9]+|\b([Kk]eel|OW [A-Z][a-z]+) #[0-9]+|\bCaptain\b|\bthe Deck\b|\bCarrier\b|Armature|Orrery|Hangar|Hatchery|allthecarriercrew' entry.md; then
+            echo "the $v entry names a room, an item, the crew's ship or a bay (above): say the rule and its date instead"; exit 1
+          fi
+
       - run: uv sync
       - run: uv run pytest -q
       - run: uv run ruff check .
