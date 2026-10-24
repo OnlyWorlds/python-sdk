@@ -7,40 +7,53 @@ export, the zip as downloaded or a directory it was unzipped into. ``--plan`` pr
 become what and writes nothing. OUT-DIR must not exist yet (or be empty): a folder is written
 whole, once, through ``write_folder``.
 
-**One real export has been read** (a free account's page export with sub-pages, flat:
-``tests/fixtures/notion/``); the rest of the shape below is believed from Notion's help page and
-from practice, and every name this module reads is parsed in one place (``parse_name``,
-``_cell_items``, ``_ID_IN_URL``, the ``_all`` suffix in ``_Importer._databases``) so a real export can
-correct them in one place. The shape:
+**Two real exports have been read** (a free account's page export with sub-pages, once flat
+and once with folders: ``tests/fixtures/notion/``); what they showed is marked *seen*, the rest is
+believed from Notion's help page and from practice. Every name this module reads is parsed in one
+place (``parse_name``, ``_cell_items``, ``_ID_IN_URL``, the ``_all`` suffix in
+``_Importer._databases``) so a real export can correct them in one place. The shape:
 
 - every exported page is ``<Title> <32 hex>.md``; the 32 hex digits are the page's Notion id
-  (identity), the title before them is presentation;
-- a full-page database is ``<Title> <32 hex>.csv``, sometimes beside ``<Title> <32 hex>_all.csv``
-  holding every property: ``_all`` is read when both exist, never both;
+  (identity), the title before them is presentation (seen);
+- a full-page database is ``<Title> <32 hex>.csv``, beside ``<Title> <32 hex>_all.csv`` holding
+  every property (seen, both times, the two alike): ``_all`` is read when both exist, never both;
+- the CSV's first column is the title property (``Name``), UTF-8 with a byte order mark (seen);
 - a database's rows are pages; a row page repeats the row's properties as ``Key: value`` lines
-  under its ``# Title`` heading (an empty property has no line), and those lines are left out of
-  its text. Where the rows' ``.md`` files sit in a folder named ``<Title> <32 hex>/`` beside the
-  CSV, a CSV row is matched to its page in that folder by title (exactly, then with the characters
-  a filename cannot hold removed and case folded);
-- an export can be **flat** (seen: a page export with sub-pages, "Create folders for subpages"
-  off): the CSVs and every page, the rows' pages among them, sit in one directory, and no
-  database has a folder. A database with no folder of its own pairs a row with a page in its
-  CSV's directory whose ``# Title`` heading matches the row's title (the rule above) and whose
-  property lines each equal the row's cell for that column (a relation's target compared by its
-  id, since the CSV's path ends ``.csv`` where the page's ends ``.md``), with at least one such
-  line when the row has a cell besides its title. Paired only when the row fits one page and the
-  page fits no other row; a row left unpaired is a CSV row with no page (below), and the report
-  says why;
-- sub-pages sit in a folder named like their parent page (``<Title> <32 hex>/``), or beside it in
-  a flat export, where the tree is not in the files and ``x_notion_parent`` is not written;
-- a page's text opens with ``# <Title>``, which is left out (it is the name);
-- the CSV's first column is the title property (usually ``Name``), UTF-8 with a byte order mark;
-- a relation cell lists page titles separated by commas, each often followed by its exported
-  path or its notion.so URL in parentheses (``Harbor (Locations%20<id>/Harbor%20<id>.md)``;
-  seen: ``Harbor (Harbor%20<id>.csv)``, a path to no file, the id the row page's) or written as a
-  Markdown link; the target's id is read from that URL;
+  under its ``# Title`` heading, an empty property with no line (seen), and those lines are left
+  out of its text;
+- a page's text opens with ``# <Title>``, which is left out (it is the name; seen).
+
+Where the rows' pages and the sub-pages are, three layouts:
+
+- **Folders named by title** (seen: a page export with "Create folders for subpages" on). A
+  database's rows sit in ``<Title>/`` beside its CSV (``Characters 4037....csv`` and
+  ``Characters/Mara Voss 4037....md``), and a page's sub-pages in ``<Title>/`` beside the page
+  (``World overview 4037....md`` and ``World overview/Calendar and seasons 4037....md``).
+- **Folders named by title and id** (believed, not yet seen): ``<Title> <32 hex>/`` in the same
+  places. Read first when both exist.
+- **Flat** (seen: the same export with that switch off): the CSVs and every page, the rows' pages
+  among them, in one directory. The tree is not in the files, so no ``x_notion_parent`` is
+  written.
+
+In a database's folder a CSV row is matched to its page by title (exactly, else with the
+characters a filename cannot hold removed and case folded), the folder's name matched to the
+database's title the same way. A database with no folder (flat), or whose ``<Title>/`` folder is
+also named by a page beside it with the same title (it then holds that page's sub-pages too) or by
+a second database, pairs each row with a page in that directory whose ``# Title`` heading matches
+the row's title and whose property lines each equal the row's cell for that column (a relation's
+target compared by its id, since the CSV's path ends ``.csv`` where the page's ends ``.md``), with
+at least one such line when the row has a cell besides its title. Paired only when the row fits
+one page and the page fits no other row; a row left unpaired is a CSV row with no page (below),
+and the report says why; a page left unpaired stays a page.
+
+The rest:
+
+- a relation cell lists page titles separated by commas, each followed by its exported path in
+  parentheses (seen: ``Harbor (Harbor%20<id>.csv)`` flat, ``Harbor (Locations/Harbor%20<id>.csv)``
+  with folders: a path to no file, the id the row page's; believed: a ``.md`` path, a notion.so
+  URL, a Markdown link); the target's id is read from that path; an empty relation is an empty cell;
 - links between pages in a page's text are relative Markdown links to the exported files,
-  percent-encoded; callouts come as HTML (``<aside>``) and are kept as text;
+  percent-encoded (seen); callouts come as HTML (``<aside>``) and are kept as text;
 - attachments are files beside the page, in the page's folder;
 - a large export may hold its parts as inner zips (``...-Part-1.zip``); one level is read.
 
@@ -489,6 +502,28 @@ class _Database:
     type_col: int | None = None
 
 
+@dataclass(frozen=True)
+class _Candidates:
+    """A database whose rows are paired with pages by title and cells, and where those pages are."""
+
+    db: _Database
+    #: the directory whose pages may be its rows
+    dir: str
+    #: where that is, as the report says it (``beside its CSV``, ``in <folder>/``)
+    place: str
+    #: what the report says first when no page fits a row
+    lead: str
+    #: why its folder is not read by the folder rule ("shares its folder ... with ..."), or "" (flat)
+    shared: str
+
+
+def _by_title[T](named: Iterable[tuple[str, T]], title: str) -> list[T]:
+    """The values whose name is ``title``: exactly, else folded (the door's title rule)."""
+    pairs = list(named)
+    exact = [v for n, v in pairs if n == title]
+    return exact or [v for n, v in pairs if _fold_title(n) == _fold_title(title)]
+
+
 @dataclass
 class _Item:
     """One element being built."""
@@ -615,6 +650,8 @@ class _Importer:
         self.by_md: dict[str, _Item] = {}
         self.by_notion: dict[str, _Item] = {}
         self.by_title: dict[tuple[str, str], list[_Item]] = {}
+        #: directory -> the pages (rows' pages too) in it, for the parent rule
+        self._pages_in: dict[str, list[_Item]] = {}
         #: export-relative path of an attachment -> its folder-relative path
         self.media: dict[str, str] = {}
         self._unplaced_seen: set[Unplaced] = set()
@@ -667,24 +704,24 @@ class _Importer:
 
     def collect(self) -> None:
         databases = self._databases()
-        row_dirs = {db.rows_dir: db for db in databases}
-        row_mds: dict[str, list[str]] = {}
-        pages: list[str] = []
-        for rel in sorted(self.tree.files):
-            if rel.lower().endswith(".md"):
-                d = posixpath.dirname(rel)
-                (row_mds.setdefault(d, []) if d in row_dirs else pages).append(rel)
+        mds = [rel for rel in sorted(self.tree.files) if rel.lower().endswith(".md")]
+        by_dir: dict[str, list[str]] = {}
+        for rel in mds:
+            by_dir.setdefault(posixpath.dirname(rel), []).append(rel)
 
         for db in databases:
             rows = self._read_csv(db.csv)
             db.headers = rows[0] if rows else []
             db.rows = [r for r in rows[1:] if any(c.strip() for c in r)]
-        flat = self._pair_flat([db for db in databases if db.rows_dir not in row_mds], pages)
+        folders, strict = self._row_folders(databases, by_dir)
+        taken = set(folders.values())
+        flat = self._pair_flat(strict, {d: rels for d, rels in by_dir.items() if d not in taken})
         paired = {md for pairs in flat.values() for md, _why in pairs if md is not None}
-        pages = [rel for rel in pages if rel not in paired]
+        pages = [rel for rel in mds if posixpath.dirname(rel) not in taken and rel not in paired]
 
         for db in databases:
-            self._collect_database(db, row_mds.pop(db.rows_dir, []), flat.get(db.csv))
+            folder = folders.get(db.csv)
+            self._collect_database(db, by_dir[folder] if folder is not None else [], flat.get(db.csv))
         for rel in pages:
             title, nid = parse_name(posixpath.basename(rel)[:-3])
             eid, kept = self._claim_id(rel, nid, "no Notion id in the file's name")
@@ -695,6 +732,8 @@ class _Importer:
 
         # parents: a page's is the page whose folder holds it; a row's, its database's own page
         # (an .md named like the CSV) or else the page whose folder holds the CSV
+        for rel, item in self.by_md.items():
+            self._pages_in.setdefault(posixpath.dirname(rel), []).append(item)
         for item in self.items:
             if item.db is not None:
                 item.parent = self._page_for_dir(item.db.rows_dir) or self._page_for_dir(posixpath.dirname(item.db.csv))
@@ -702,30 +741,83 @@ class _Importer:
                 item.parent = self._page_for_dir(posixpath.dirname(item.md))
 
     def _page_for_dir(self, d: str) -> str | None:
-        page = self.by_md.get(f"{d}.md") if d else None
+        """The page whose sub-pages folder ``d`` is: ``<d>.md`` (a ``<Title> <id>/`` folder), else the one
+        page beside the folder whose title is the folder's name (a ``<Title>/`` folder)."""
+        if not d:
+            return None
+        page = self.by_md.get(f"{d}.md")
+        if page is None:
+            up, name = posixpath.split(d)
+            near = [(parse_name(posixpath.basename(i.md or "")[:-3])[0], i) for i in self._pages_in.get(up, [])]
+            hits = _by_title(near, name)
+            page = hits[0] if len(hits) == 1 else None
         return page.eid if page is not None else None
 
-    def _pair_flat(self, dbs: list[_Database], pages: list[str]) -> dict[str, list[tuple[str | None, str]]]:
-        """Each database with no folder of its own (a flat export: its rows' pages sit beside the CSV
-        among the other pages) -> per row, its page and, when it has none, why.
+    def _row_folders(
+        self, databases: list[_Database], by_dir: dict[str, list[str]]
+    ) -> tuple[dict[str, str], list[_Candidates]]:
+        """Where each database's rows' pages are.
 
-        A row's page is a page in the CSV's directory whose ``# Title`` heading is the row's title
-        (exactly, else folded, as the folder rule matches) and whose property lines each equal the
-        row's cell for that column (at least one line when the row has a cell besides its title).
-        Paired only when the row has one such page and the page fits no other row.
+        Returns the databases read by the folder rule (CSV -> its folder: ``<Title> <id>/`` beside the
+        CSV, else ``<Title>/``, the title matched exactly, else folded) and those whose rows are
+        paired by title and cells instead: a database with no folder (flat), and a database whose
+        ``<Title>/`` folder another database, or a page beside it with the same title, also names.
+        Such a folder holds the page's sub-pages as well as the rows, so only the pages that fit a
+        row by title and cells are rows; the rest stay pages under that page.
         """
-        beside: dict[str, list[str]] = {}
-        for rel in pages:
-            beside.setdefault(posixpath.dirname(rel), []).append(rel)
+        folders: dict[str, str] = {}
+        by_title_dir: dict[str, list[_Database]] = {}
+        strict: list[_Candidates] = []
+        for db in databases:
+            if db.rows_dir in by_dir:
+                folders[db.csv] = db.rows_dir
+                continue
+            d = posixpath.dirname(db.csv)
+            subs = [(posixpath.basename(x), x) for x in sorted(by_dir) if x and x != d and posixpath.dirname(x) == d]
+            hits = _by_title(subs, db.title)
+            if len(hits) == 1:
+                by_title_dir.setdefault(hits[0], []).append(db)
+            else:
+                strict.append(_Candidates(db, d, "beside its CSV", "the database has no folder, and ", ""))
+        for sub, dbs in sorted(by_title_dir.items()):
+            up, name = posixpath.split(sub)
+            own = {db.notion_id for db in dbs}
+            named = [
+                rel
+                for rel in _by_title([(parse_name(posixpath.basename(r)[:-3])[0], r) for r in by_dir.get(up, [])], name)
+                if parse_name(posixpath.basename(rel)[:-3])[1] not in own
+            ]
+            if len(dbs) == 1 and not named:
+                folders[dbs[0].csv] = sub
+                continue
+            for db in dbs:
+                others = [*(f"database {o.title!r}" for o in dbs if o is not db), *(f"page {p}" for p in named)]
+                shared = f"shares its folder {sub}/ with {', '.join(others)}"
+                strict.append(_Candidates(db, sub, f"in {sub}/", "", shared))
+        return folders, strict
+
+    def _pair_flat(
+        self, groups: list[_Candidates], by_dir: dict[str, list[str]]
+    ) -> dict[str, list[tuple[str | None, str]]]:
+        """Each database whose rows are paired by title and cells -> per row, its page and, when it
+        has none, why.
+
+        A row's page is a page in the group's directory (the CSV's, in a flat export) whose ``# Title``
+        heading is the row's title (exactly, else folded, as the folder rule matches) and whose
+        property lines each equal the row's cell for that column (at least one line when the row has
+        a cell besides its title). Paired only when the row has one such page and the page fits no
+        other row.
+        """
         raw: dict[str, str] = {}
         hits: dict[tuple[str, int], list[str]] = {}
         claims: dict[str, int] = {}
-        for db in dbs:
+        for group in groups:
+            db = group.db
             cols: dict[str, list[int]] = {}
             for i, h in enumerate(db.headers):
                 cols.setdefault(h.strip(), []).append(i)
             read: list[tuple[str, str | None, list[tuple[str, str]]]] = []
-            for md in beside.get(posixpath.dirname(db.csv), []):
+            for md in by_dir.get(group.dir, []):
                 if md not in raw:
                     raw[md] = _decode(self.tree.files[md]())
                 read.append((md, *_heading_and_props(raw[md], set(cols))))
@@ -745,32 +837,28 @@ class _Importer:
                 for md in pick:
                     claims[md] = claims.get(md, 0) + 1
         out: dict[str, list[tuple[str | None, str]]] = {}
-        for db in dbs:
+        for group in groups:
+            db, place = group.db, group.place
             pairs: list[tuple[str | None, str]] = []
             for n in range(len(db.rows)):
                 pick = hits[(db.csv, n)]
                 if len(pick) == 1 and claims[pick[0]] == 1:
                     pairs.append((pick[0], ""))
                 elif not pick:
-                    pairs.append(
-                        (
-                            None,
-                            "a CSV row with no page of its own (the database has no folder, and no page beside"
-                            " its CSV carries the row's title and cells)",
-                        )
-                    )
+                    why = f"{group.lead}no page {place} carries the row's title and cells"
+                    pairs.append((None, f"a CSV row with no page of its own ({why})"))
                 elif len(pick) > 1:
-                    pairs.append(
-                        (None, f"a CSV row with no page of its own ({len(pick)} pages beside its CSV fit the row)")
-                    )
+                    pairs.append((None, f"a CSV row with no page of its own ({len(pick)} pages {place} fit the row)"))
                 else:
                     pairs.append((None, f"a CSV row with no page of its own ({pick[0]} fits it and another row)"))
             out[db.csv] = pairs
             if db.rows:
                 got = sum(md is not None for md, _why in pairs)
+                head = group.shared or "has no folder of its own"
+                rest = " (the other pages there stay pages)" if group.shared else ""
                 self.report.notes.append(
-                    f"database {db.title!r} has no folder of its own: {got} of its {len(db.rows)} rows paired"
-                    " with a page beside its CSV by title and cells"
+                    f"database {db.title!r} {head}: {got} of its {len(db.rows)} rows paired"
+                    f" with a page {place} by title and cells{rest}"
                 )
         return out
 

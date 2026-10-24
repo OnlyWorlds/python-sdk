@@ -1,11 +1,13 @@
 """The Notion door (onlyworlds.notion) on a fixture built here from the export's believed shape,
-and on one real export.
+and on two real exports.
 
 The built tree is what the module's docstring believes (the 32-hex suffix, ``_all.csv``, a
 database's rows in a folder named like its CSV, sub-pages in a folder named like their page,
-relation cells as ``Title (path)``). The real one, ``fixtures/notion/notion-page-export-with-subpages.zip``,
-is a free account's page export with sub-pages, Markdown & CSV, "Create folders for subpages" off
-(Boss, 2026-10-24; invented content, no personal data): flat, every page and CSV in one directory.
+relation cells as ``Title (path)``). The real ones, in ``fixtures/notion/``, are a free account's
+page export with sub-pages, Markdown & CSV (Boss, 2026-10-24; invented content, no personal data):
+``notion-page-export-with-subpages.zip`` with "Create folders for subpages" off, flat, every page
+and CSV in one directory; ``notion-page-export-folders-locations.zip`` with it on, the same
+workspace with Places renamed Locations and Home renamed Location, its folders named by title alone.
 """
 
 from __future__ import annotations
@@ -325,34 +327,42 @@ def test_cli(tmp_path: Path) -> None:
 
 
 # ---------------------------------------------------------------------------
-# The real export: flat, no database has a folder
+# The real exports: flat (no database has a folder), and with folders named by title
 # ---------------------------------------------------------------------------
 
 REAL = ROOT / "tests" / "fixtures" / "notion" / "notion-page-export-with-subpages.zip"
+#: the same workspace, Places renamed Locations and Home renamed Location, "Create folders for subpages" on
+FOLDERED = ROOT / "tests" / "fixtures" / "notion" / "notion-page-export-folders-locations.zip"
 CHARACTERS = ("Mara Voss", "Tobin Ashgrove", "Zéphyrine Dubois", "Old Ketch", "Brannoch O'Dell")
 PLACES = ("Aurelia Harbour", "Stonewick", "O'Brannock's Rest", "Lac Élan", "The Hollow Mile")
 PAGES = ("Welcome to Notion", "World overview", "Calendar and seasons")
+HOMES = {
+    "Mara Voss": "Aurelia Harbour",
+    "Tobin Ashgrove": "Stonewick",
+    "Zéphyrine Dubois": "Lac Élan",
+    "Brannoch O'Dell": "O'Brannock's Rest",
+}
 
 
-def real_files() -> dict[str, bytes]:
-    with zipfile.ZipFile(REAL) as zf:
+def real_files(src: Path = REAL) -> dict[str, bytes]:
+    with zipfile.ZipFile(src) as zf:
         return {i.filename: zf.read(i) for i in zf.infolist()}
 
 
-def real_ids() -> dict[str, str]:
+def real_ids(src: Path = REAL) -> dict[str, str]:
     """Every page's title -> its Notion id, read from the zip's names."""
     out: dict[str, str] = {}
-    for name in real_files():
+    for name in real_files(src):
         if name.endswith(".md"):
-            title, notion_id = parse_name(name[:-3])
+            title, notion_id = parse_name(name.rsplit("/", 1)[-1][:-3])
             assert notion_id is not None and title not in out
             out[title] = notion_id
     return out
 
 
-def remade(tmp: Path, name: str, edit: dict[str, bytes | None]) -> Path:
-    """The real export with entries replaced, added, or (None) removed."""
-    files = {**real_files(), **edit}
+def remade(tmp: Path, name: str, edit: dict[str, bytes | None], src: Path = REAL) -> Path:
+    """A real export with entries replaced, added, or (None) removed."""
+    files = {**real_files(src), **edit}
     path = tmp / name
     with zipfile.ZipFile(path, "w") as zf:
         for rel, data in sorted(files.items()):
@@ -397,13 +407,78 @@ def test_flat_rows_pair_with_their_pages(tmp_path: Path) -> None:
     assert sum("no folder of its own: 5 of its 5 rows paired" in n for n in report.notes) == 2
 
 
-def test_flat_real_export_lints_round_trips_and_repeats(tmp_path: Path) -> None:
+@pytest.mark.parametrize("src", [REAL, FOLDERED], ids=["flat", "foldered"])
+def test_real_export_lints_round_trips_and_repeats(src: Path, tmp_path: Path) -> None:
     one = tmp_path / "one"
-    report = import_notion(REAL, one)
+    report = import_notion(src, one)
     assert_lint_green(one, report)
     assert_round_trip(one, tmp_path / "again")
-    import_notion(REAL, tmp_path / "two")
+    import_notion(src, tmp_path / "two")
     assert tree(one) == tree(tmp_path / "two")
+
+
+def test_foldered_export_layout() -> None:
+    """The second fixture's folders are named by title alone: a database's beside its CSV, a page's beside the page."""
+    names = list(real_files(FOLDERED))
+    assert len(names) == 17
+    assert "Welcome to Notion/Characters 403709f00ea1817189e3c97a2b7784e2.csv" in names
+    assert sum(n.startswith("Welcome to Notion/Characters/") for n in names) == 5
+    assert sum(n.startswith("Welcome to Notion/Locations/") for n in names) == 5
+    assert any(n.startswith("Welcome to Notion/World overview/Calendar and seasons ") for n in names)
+    assert not any(parse_name(n.rsplit("/", 1)[0])[1] for n in names if "/" in n)  # no folder carries an id
+
+
+def test_title_folders_hold_rows_and_sub_pages(tmp_path: Path) -> None:
+    """Rows in ``<Title>/`` pair with their pages; the Location cells resolve by id to the Location
+    elements; sub-pages in ``<Title>/`` beside their page sit under it."""
+    out = tmp_path / "foldered"
+    report = import_notion(FOLDERED, out)
+    ids = real_ids(FOLDERED)
+    assert report.counts == {"character": 5, "location": 5, "narrative": 3}
+    assert report.pages == len(PAGES) and report.ids_from_path == []
+    els = list(bodies(out).values())
+    assert sorted(e["name"] for e in els) == sorted(CHARACTERS + PLACES + PAGES)  # each name once
+    for e in els:
+        assert e["id"] == eid(ids[e["name"]]) and e["x_notion_id"] == ids[e["name"]]
+    by_name = {e["name"]: e for e in els}
+    assert all(by_name[n]["type"] == "character" for n in CHARACTERS)
+    assert all(by_name[n]["type"] == "location" for n in PLACES)
+    assert {n: by_name[n].get("location") for n in CHARACTERS} == {
+        **{n: eid(ids[home]) for n, home in HOMES.items()},
+        "Old Ketch": None,
+    }
+    assert not any("x_notion_location" in e for e in els)
+    assert not any(u.where == "column Location" for u in report.unresolved)
+    assert by_name["Brannoch O'Dell"]["description"].startswith("## Early life")
+    welcome, overview = by_name["Welcome to Notion"], by_name["World overview"]
+    assert "x_notion_parent" not in welcome
+    assert overview["x_notion_parent"] == welcome["id"]
+    assert by_name["Calendar and seasons"]["x_notion_parent"] == overview["id"]
+    assert all(by_name[n]["x_notion_parent"] == welcome["id"] for n in CHARACTERS + PLACES)
+    assert json.loads((out / "world.json").read_text(encoding="utf-8"))["name"] == "Welcome to Notion"
+
+
+def test_title_folder_shared_with_a_page(tmp_path: Path) -> None:
+    """A ``<Title>/`` folder that a page beside it with the database's title also names holds that
+    page's sub-pages too: only the pages that fit a row by title and cells are rows; the others stay
+    pages under that page."""
+    page, sub = f"Characters {nid('cast page')}", f"Cast notes {nid('cast notes')}"
+    edit: dict[str, bytes | None] = {
+        f"Welcome to Notion/{page}.md": b"# Characters\n\nA page about the cast.\n",
+        f"Welcome to Notion/Characters/{sub}.md": b"# Cast notes\n\nWho is who.\n",
+    }
+    out = tmp_path / "out"
+    report = import_notion(remade(tmp_path, "shared.zip", edit, FOLDERED), out)
+    ids = real_ids(FOLDERED)
+    assert report.counts == {"character": 5, "location": 5, "narrative": 5} and report.ids_from_path == []
+    by_name = {e["name"]: e for e in bodies(out).values()}
+    assert all(by_name[n]["id"] == eid(ids[n]) for n in CHARACTERS)
+    assert by_name["Mara Voss"]["location"] == eid(ids["Aurelia Harbour"])
+    assert by_name["Cast notes"]["x_notion_parent"] == by_name["Characters"]["id"] == eid(nid("cast page"))
+    assert (
+        "database 'Characters' shares its folder Welcome to Notion/Characters/ with page"
+        f" Welcome to Notion/{page}.md: 5 of its 5 rows paired" in report.render()
+    )
 
 
 def test_flat_relation_resolves_by_the_id_in_its_cell(tmp_path: Path) -> None:
