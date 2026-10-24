@@ -2,6 +2,12 @@
 
 The package version runs on its own semver; the schema it is generated from is `SCHEMA_DIST_TAG`.
 
+## 0.50.0 (2026-10-24)
+
+- **Schema repinned to schema-dist `v0.33.0-dist.61`** (from dist.60; same canonical 00.33.00, no schema file moved). Serial 61 gives `schema.json` the YAMLs' advisory minimum and maximum on the 15 integer fields that have them (this package's generated tables read field kinds, not bounds, and do not move), rules two spine readings, and adds four cases to the spine fixture, whose every reading now carries `retires`; the folder lint names the format's version and warns on a newer stamp.
+- **`read_spine_element` reads `x_spine_retires`** (`SpineRead.retires`, and `retires` in `as_dict()`), as serial 61's spine profile rules: the retired row's id as given, untrimmed, its form unchecked, on whatever element carries it (whether it sits on a Retirement Event, and whether it names a row, is the audit's, which the doctor's flag 13 already runs); a non-string is not stated and named in `dropped`, after `x_spine_verified`; a blank string is not stated and drops nothing. Until serial 60 the reader of one element left the key to the audit.
+- **The doctor's flag 13 names a non-string `x_spine_retires`** on its Event ("the spine reader left out a value of x_spine_retires"), as it names every value the reader drops; the row it fails to name is still its own finding.
+
 ## 0.49.0 (2026-10-24)
 
 - **The Kanka door reads Kanka's `gallery/` as its image store.** An export with uploaded pictures has a top-level `gallery/` folder, one `<uuid>.json` and one image per upload. The door used to read it as a module and write two notes per file. Now the report gives one line (`gallery/: 6 uploads read as Kanka's image store; 1 named by an entity`), and only the uploads an entity names through its `image_uuid` are followed; the others are left alone. An element whose picture is in the gallery keeps `x_kanka_image`, the upload's `uuid`, `name` and `ext`, and the report lists each such element with the gallery file and its original file name. The picture itself is not imported: an `image_url` is a URL, and the folder format has no place for image files yet, so no `image_url` is set and no file is copied. An `image_uuid` that names no upload keeps the uuid alone, and the report says so. So does a visible element whose upload is not visible to all (its `visibility_id` is not 1): the upload's name and file stay out of the visible element. `image_uuid` is no longer dropped.

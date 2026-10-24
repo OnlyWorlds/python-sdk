@@ -1737,7 +1737,11 @@ def test_13_a_retirement_event_names_the_row_in_its_key_and_links_it_by_its_type
     }
     for why, event in unnamed.items():
         found_ = spine_found(folder_report(tmp_path, with_(base, "event", event)))
-        assert [f["reason"].endswith("names it in x_spine_retires") for f in found_] == [True], why
+        # serial 61: the reader names a non-string x_spine_retires in dropped, so the Event gets its own finding
+        left_out = [f for f in found_ if f["reason"] == "the spine reader left out a value of x_spine_retires"]
+        assert [f["element"]["id"] for f in left_out] == ([RETIRE] if why == "the key not a string" else []), why
+        rest = [f for f in found_ if f not in left_out]
+        assert [f["reason"].endswith("names it in x_spine_retires") for f in rest] == [True], why
     unlinked = {
         "another field": retirement(x_spine_retires=PKG, locations=[PKG]),
         "the link on another Event": retirement(x_spine_retires=PKG),

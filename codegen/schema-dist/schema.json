@@ -73,7 +73,9 @@
         "kind": "scalar_int",
         "desc": "Relative measure of the ability's inherent potency or force, used for scaling or comparison purposes",
         "section": "Mechanics",
-        "required": false
+        "required": false,
+        "minimum": 0,
+        "maximum": 100
       },
       {
         "name": "range",
@@ -395,42 +397,54 @@
         "kind": "scalar_int",
         "desc": "Ability to attract, inspire, and influence others",
         "section": "Personality",
-        "required": false
+        "required": false,
+        "minimum": 0,
+        "maximum": 100
       },
       {
         "name": "coercion",
         "kind": "scalar_int",
         "desc": "Capacity to dominate, intimidate, or apply force to shape outcomes",
         "section": "Personality",
-        "required": false
+        "required": false,
+        "minimum": 0,
+        "maximum": 100
       },
       {
         "name": "competence",
         "kind": "scalar_int",
         "desc": "Skill in planning, understanding, and managing complex systems or situations",
         "section": "Personality",
-        "required": false
+        "required": false,
+        "minimum": 0,
+        "maximum": 100
       },
       {
         "name": "compassion",
         "kind": "scalar_int",
         "desc": "Willingness to empathize with and care for others",
         "section": "Personality",
-        "required": false
+        "required": false,
+        "minimum": 0,
+        "maximum": 100
       },
       {
         "name": "creativity",
         "kind": "scalar_int",
         "desc": "Ability to generate novel ideas, perspectives, or solutions",
         "section": "Personality",
-        "required": false
+        "required": false,
+        "minimum": 0,
+        "maximum": 100
       },
       {
         "name": "courage",
         "kind": "scalar_int",
         "desc": "Readiness to face danger, risk, or adversity",
         "section": "Personality",
-        "required": false
+        "required": false,
+        "minimum": 0,
+        "maximum": 100
       },
       {
         "name": "family",
@@ -2162,7 +2176,9 @@
         "kind": "scalar_int",
         "desc": "Significance of the relation, on a relative scale of 0 to 100",
         "section": "Nature",
-        "required": false
+        "required": false,
+        "minimum": 0,
+        "maximum": 100
       },
       {
         "name": "actor",
@@ -2388,7 +2404,9 @@
         "kind": "scalar_int",
         "desc": "General aggressiveness level, on relative scale of 0 to 100",
         "section": "Psychology",
-        "required": false
+        "required": false,
+        "minimum": 0,
+        "maximum": 100
       },
       {
         "name": "traits",
@@ -2667,42 +2685,54 @@
         "kind": "scalar_int",
         "desc": "Affecting a character's charisma score",
         "section": "Quantitative",
-        "required": false
+        "required": false,
+        "minimum": -100,
+        "maximum": 100
       },
       {
         "name": "coercion",
         "kind": "scalar_int",
         "desc": "Affecting a character's coercion score",
         "section": "Quantitative",
-        "required": false
+        "required": false,
+        "minimum": -100,
+        "maximum": 100
       },
       {
         "name": "competence",
         "kind": "scalar_int",
         "desc": "Affecting a character's competence score",
         "section": "Quantitative",
-        "required": false
+        "required": false,
+        "minimum": -100,
+        "maximum": 100
       },
       {
         "name": "compassion",
         "kind": "scalar_int",
         "desc": "Affecting a character's compassion score",
         "section": "Quantitative",
-        "required": false
+        "required": false,
+        "minimum": -100,
+        "maximum": 100
       },
       {
         "name": "creativity",
         "kind": "scalar_int",
         "desc": "Affecting a character's creativity score",
         "section": "Quantitative",
-        "required": false
+        "required": false,
+        "minimum": -100,
+        "maximum": 100
       },
       {
         "name": "courage",
         "kind": "scalar_int",
         "desc": "Affecting a character's courage score",
         "section": "Quantitative",
-        "required": false
+        "required": false,
+        "minimum": -100,
+        "maximum": 100
       },
       {
         "name": "significance",

@@ -14,7 +14,9 @@ Server-managed keys (`type`, `created_at`, `updated_at`, `change_seq`,
 `shadow_`) pass; nothing else undeclared does. A string field may be null on
 disk (read as "", the unset string). A known-of stub (`known_of: true`, folder
 spec 4.4) passes with only the keys it keeps; one that writes an unset field
-is reported. `records/` (spec 4.5) is not elements and is not read. The last line is the count it checked, so an empty
+is reported. `records/` (spec 4.5) is not elements and is not read. A `world.json`
+whose `format_version` is newer than FORMAT_VERSION below gets one warning line,
+never a problem; an older or absent stamp passes. The last line is the count it checked, so an empty
 report is a result and not a silence. Exit 0 clean, 1 with problems, 2 when
 the folder is not a world folder.
 
@@ -37,6 +39,11 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from schema_walk import decode_schema  # noqa: E402
 
+# The folder format's version this lint was written against: the folder spec's
+# own version line, the one source. It moves when the spec's version moves, and
+# publish_dist.py writes the dist README's version sentence from it.
+FORMAT_VERSION = "0.3.18"
+
 # Keys an element body carries that the schema does not declare: the type
 # slug and the server-managed fields (elements/serialize.py READONLY_FIELDS
 # minus `world`, which bodies never carry). Extension prefixes as served.
@@ -53,7 +60,7 @@ FOLDER_KEYS = {"local_updated_at", "server_updated_at", "image_media_id", "known
                "hidden"}
 EXTENSION_PREFIXES = ("x_", "atlas_", "shadow_")
 # A known-of stub (folder spec 4.4) keeps these and leaves every unset field out
-# (rule 1); a field keel marks public (Keel #448) may also be there, set. The
+# (rule 1); a field keel marks public (presentation.json's `public` lists) may also be there, set. The
 # lint cannot tell public from not without keel's wrapper, so it flags only
 # what rule 1 forbids outright: an unset value written into a stub.
 STUB_KEEPS = {"id", "type", "name", "description", "supertype", "subtype", "image_url",
@@ -65,6 +72,7 @@ class Report:
 
     def __init__(self) -> None:
         self.problems: list[str] = []
+        self.warnings: list[str] = []  # printed, never counted: the exit code is the problems'
         self.files = 0
         self.types: set[str] = set()
 
@@ -85,6 +93,16 @@ def is_uuid(value) -> bool:
     except ValueError:
         return False
     return True
+
+
+def version_tuple(value) -> tuple[int, ...] | None:
+    """`"0.3.18"` -> (0, 3, 18); None for anything that is not dotted integers."""
+    if not isinstance(value, str):
+        return None
+    try:
+        return tuple(int(p) for p in value.split("."))
+    except ValueError:
+        return None
 
 
 def git_tracks(path: Path) -> bool:
@@ -116,6 +134,13 @@ def lint_folder(src: Path, decoded: dict) -> Report:
             report.add("world.json: carries an `api` block and git tracks it; a linked "
                        "folder is never committed (folder spec 4.6 d), keep the key "
                        "outside the repository")
+        stamp = world.get("format_version") if isinstance(world, dict) else None
+        known = version_tuple(FORMAT_VERSION)
+        seen = version_tuple(stamp)
+        if seen is not None and seen > known:
+            report.warnings.append(
+                f"world.json: format_version {stamp} is newer than this lint knows "
+                f"({FORMAT_VERSION}): update the lint, or read the spec for what changed")
 
     base = {f["name"]: f for f in decoded["base"] if f["name"] != "world"}
     bodies: dict[str, tuple[str, dict, str]] = {}
@@ -229,6 +254,8 @@ def main(argv=None) -> int:
     for n in notes:
         print(f"walk note: {n}")
     report = lint_folder(src, decoded)
+    for w in report.warnings:
+        print(w)
     for p in report.problems:
         print(p)
     print(report.summary)

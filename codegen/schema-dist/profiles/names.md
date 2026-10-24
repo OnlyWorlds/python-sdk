@@ -4,7 +4,7 @@
 
 What it is not: a way to make new categories. A world still has 22 types with their fields and links; the map changes no field, no link, no rule and no validation.
 
-**Key name and home.** `x_names`, **on the World** (the body `GET /world` returns, `world.json` in a folder), beside the world's other settings (`time_*`, the units). One map per world; not on an element, since a world has one vocabulary and a reader must find it without a search. (keel serves `x_` keys on the World from Keel #571; until then a folder may carry the key and a reader of folders reads it.) The folder format's §4.1 binds a writer to carry every `world.json` key the source had, so a folder keeps the map.
+**Key name and home.** `x_names`, **on the World** (the body `GET /world` returns, `world.json` in a folder), beside the world's other settings (`time_*`, the units). One map per world; not on an element, since a world has one vocabulary and a reader must find it without a search. (keel serves `x_` keys on the World since 2026-10-23; a folder may carry the key too, and a reader of folders reads it.) The folder format's §4.1 binds a writer to carry every `world.json` key the source had, so a folder keeps the map.
 
 **The value.** A JSON object. A writer writes the object; a reader reads only an object (a string is not a map).
 
@@ -37,4 +37,4 @@ The word replaces the **type's display name** wherever the tool shows it: a card
 
 **Conformance.** `names.fixture.json`, beside this page: 23 cases of `{map, type, supertype?, many}` → the word a reader prints, or `null` for "the standard's name". **Every tool that implements the lookup runs the fixture as its own test** (two readers disagreeing on one case is the failure this profile exists to prevent): the TypeScript SDK's `typeWord(world, type, {supertype, many})`, the Python package's `type_word(world, element_type, supertype=, many=)`, the Unity SDK's `OWNames`, the plugin's own.
 
-Source: OW Council #567 (Titus's framing: a translation file, nothing more; the reads of Kael, Boss, Quillon and Temper, 2026-10-22); the first readers the TypeScript SDK and the Python package.
+Source: Titus's framing, a translation file and nothing more, and the reads of Kael, Boss, Quillon and Temper, 2026-10-22; the first readers the TypeScript SDK and the Python package.

@@ -229,6 +229,14 @@ def _resolve_target(
 _SCALAR_KINDS = {"string": "scalar_str", "integer": "scalar_int", "boolean": "scalar_bool"}
 
 
+def _copy_bounds(fspec: dict, spec: dict) -> None:
+    """`minimum` and `maximum`, as the YAML has them. Advisory: the platform does
+    not enforce them (rulings.yaml, maximum-is-advisory-and-zero-means-unbounded)."""
+    for key in ("minimum", "maximum"):
+        if key in fspec:
+            spec[key] = fspec[key]
+
+
 def _flat_fields(
     doc: dict,
     owner: str,
@@ -256,6 +264,7 @@ def _flat_fields(
         spec["required"] = name in req
         if fspec.get("description") is not None:
             spec["desc"] = fspec["description"]
+        _copy_bounds(fspec, spec)
         out.append(spec)
     return out
 
@@ -276,7 +285,8 @@ def decode_schema(
     data spells them in lowercase (`id`, `image_url`), so `base` gives them in
     lowercase. Every field carries `required`, and `desc` when the YAML has a
     description; type fields carry `section`; a generic link carries
-    `type_key` and `id_key`, the two keys that hold it in data.
+    `type_key` and `id_key`, the two keys that hold it in data; a field whose
+    YAML has `minimum` or `maximum` carries them as written (advisory bounds).
     """
     schema_dir = Path(schema_dir)
     base = _flat_fields(load_yaml(schema_dir, "base_properties"),
@@ -287,10 +297,12 @@ def decode_schema(
         fields = flatten_fields(doc, slug, note, include_required=True,
                                 include_desc=True, include_sections=True)
         for f in fields:
+            group = doc["properties"][f["section"]]
+            fspec = (group.get("properties") or {}).get(f["name"], group)
             if f["kind"] == "generic":
-                fspec = doc["properties"][f["section"]]["properties"][f["name"]]
                 f["type_key"] = fspec.get("content_type_field_name", "element_type")
                 f["id_key"] = fspec.get("object_id_field_name", "element_id")
+            _copy_bounds(fspec, f)
         types[slug] = fields
     world = _flat_fields(load_yaml(schema_dir, "world"), "world", note,
                          lowercase=False)

@@ -1,4 +1,4 @@
-"""The spine profile (schema-dist ``profiles/spine.md``, serial 60): a world that maps a software ecosystem.
+"""The spine profile (schema-dist ``profiles/spine.md``, serial 61): a world that maps a software ecosystem.
 
 A spine world describes what is built, the contracts it speaks, where each thing lives, who keeps it and
 what it depends on, in the 22 types and nothing more. Each kind is a type with a supertype from a closed
@@ -14,7 +14,9 @@ name, serial 58).
 returns a ``SpineRead``: its kind (the list's spelling, ``"off-list"`` for a listed type whose supertype
 is off its list or empty, and for every type the list does not name, ``"free"`` for the three free types),
 each key as read or ``None`` when not stated, the audience's primary, the probe's verb (or
-``"unsupported"``), the verified date, and every value it left out, named in ``dropped`` as
+``"unsupported"``), the verified date, ``x_spine_retires`` as read (the retired row's id, serial 61:
+stated on whatever element carries it, the placement being the audit's to judge), and every value it
+left out, named in ``dropped`` as
 ``{"key", "value"}`` with the value exactly as the element held it (compared as JSON values, never as
 text: Python and JavaScript write JSON differently). A probe's verb is syntax, matched as written
 (case-sensitive, single spaces), after the outer trim. A supertype and
@@ -24,12 +26,11 @@ or ``str.casefold()``. An ``x_spine_`` key the reader does not know is ignored, 
 
 What one element cannot say is the world's audit, not this reader's (the doctor's flag 13 does it): a
 row kept by exactly one Seat, whether a ``x_spine_depends_on`` id resolves, a ``legacy`` or ``provenance``
-row's Retirement Event naming it in ``x_spine_retires`` and linking it, a row still at ``gone``, a row's
+row's Retirement Event naming it in ``x_spine_retires`` and linking it (this reader surfaces the id and
+judges nothing: not the element's type, not whether the id resolves), a row still at ``gone``, a row's
 name unique within its row type once folded, and a projection's three. Nor does it read
-``x_spine_probed`` (the probe gate's), ``x_spine_owner`` (a projection's only), ``x_spine_projection`` (a
-projection's World's) or ``x_spine_retires`` (a Retirement Event's, the audit's structural attribution of
-a retirement: the page's conformance read of one element, and its fixture, carry no such key), and it
-never runs a probe. A spine counts days from
+``x_spine_probed`` (the probe gate's), ``x_spine_owner`` (a projection's only) or ``x_spine_projection`` (a
+projection's World's), and it never runs a probe. A spine counts days from
 day 0 (2012-01-01) through a Construct with supertype ``Calendar`` whose ``atlas_calendar`` the profile
 ships; this package has no calendar kernel, so the fixture's calendar steps are checked by the npm SDK's
 kernel (4.70.0), not here. The fixture (``codegen/schema-dist/profiles/spine.fixture.json``) is replayed
@@ -68,8 +69,8 @@ __all__ = [
 #: The profile's reserved prefix: every key it defines starts with it.
 SPINE_PREFIX = "x_spine_"
 #: The thirteen keys the profile defines, in the page's table order (serial 60 adds ``x_spine_retires``).
-#: ``read_spine_element`` reads nine; ``x_spine_probed`` is the probe gate's, ``x_spine_owner``,
-#: ``x_spine_projection`` and ``x_spine_retires`` the world's audit's.
+#: ``read_spine_element`` reads ten (``x_spine_retires`` since serial 61); ``x_spine_probed`` is the probe
+#: gate's, ``x_spine_owner`` and ``x_spine_projection`` the world's audit's.
 SPINE_KEYS: tuple[str, ...] = (
     "x_spine_address",
     "x_spine_truth",
@@ -126,11 +127,11 @@ class SpineRead:
     ``kind`` is the list's spelling, ``SPINE_OFF_LIST`` or ``SPINE_FREE``. Every other field is ``None``
     when its key is not stated. ``address``, ``audience`` and ``depends_on`` keep the value's order;
     ``access``, ``status``, ``layer`` and each audience word are the list's spelling; ``truth`` and
-    ``verified_at`` are the value as written (``verified_at`` trimmed). ``primary`` is the audience's
-    first known word, ``probe`` the probe's verb or ``"unsupported"``. ``dropped`` names each value left
-    out as ``{"key": <the x_spine_ key>, "value": <the value as the element held it>}``, in key order
-    address, truth, access, status, layer, audience, depends_on, probe, verified (within a list, the
-    list's order)."""
+    ``verified_at`` are the value as written (``verified_at`` trimmed), and so is ``retires``.
+    ``primary`` is the audience's first known word, ``probe`` the probe's verb or ``"unsupported"``.
+    ``dropped`` names each value left out as ``{"key": <the x_spine_ key>, "value": <the value as the
+    element held it>}``, in key order address, truth, access, status, layer, audience, depends_on, probe,
+    verified, retires (within a list, the list's order)."""
 
     kind: str
     address: tuple[str, ...] | None = None
@@ -143,6 +144,7 @@ class SpineRead:
     depends_on: tuple[str, ...] | None = None
     probe: str | None = None
     verified_at: str | None = None
+    retires: str | None = None
     dropped: tuple[dict[str, Any], ...] = ()
 
     def as_dict(self) -> dict[str, Any]:
@@ -163,6 +165,7 @@ class SpineRead:
             "depends_on": listed(self.depends_on),
             "probe": self.probe,
             "verified_at": self.verified_at,
+            "retires": self.retires,
             "dropped": [dict(entry) for entry in self.dropped],
         }
 
@@ -221,8 +224,9 @@ def read_spine_element(type: str, element: Mapping[str, Any] | FolderElement) ->
     rest dropped, the primary the first known; ``x_spine_depends_on`` a list whose strings are kept, an
     empty list stated as empty (whether an id resolves is the world's audit); ``x_spine_probe`` a string
     in the probe form, or ``"unsupported"`` (a non-string dropped); ``x_spine_verified`` an object whose
-    ``at`` is a real calendar day. A key
-    that is absent or ``None`` is not stated and drops nothing.
+    ``at`` is a real calendar day; ``x_spine_retires`` a string that is not blank, as given and untrimmed,
+    on any element (a non-string dropped; whether it names a row, and whether it sits on a Retirement
+    Event, is the audit's). A key that is absent or ``None`` is not stated and drops nothing.
     """
     body: Mapping[str, Any] = element.body if isinstance(element, FolderElement) else element
     dropped: list[dict[str, Any]] = []
@@ -284,6 +288,11 @@ def read_spine_element(type: str, element: Mapping[str, Any] | FolderElement) ->
     if verified_at is None and raw is not None:
         dropped.append(_named("x_spine_verified", raw))
 
+    raw = body.get("x_spine_retires")
+    retires = raw if isinstance(raw, str) and raw.strip(_WHITE_SPACE) else None
+    if raw is not None and not isinstance(raw, str):
+        dropped.append(_named("x_spine_retires", raw))
+
     return SpineRead(
         kind=_kind(type, body.get("supertype")) if isinstance(type, str) else SPINE_OFF_LIST,
         address=address,
@@ -296,5 +305,6 @@ def read_spine_element(type: str, element: Mapping[str, Any] | FolderElement) ->
         depends_on=depends_on,
         probe=probe,
         verified_at=verified_at,
+        retires=retires,
         dropped=tuple(dropped),
     )

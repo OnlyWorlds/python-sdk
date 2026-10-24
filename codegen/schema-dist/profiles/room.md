@@ -31,4 +31,4 @@
 
 **Where the list is read from.** The SDK exports the list and `isRoomElement(element)`; the Python package the same in snake case. A tool with its own copy of the eight pairs replaces it with the SDK's the release after the SDK carries them (Atlas `src/core/parlor-room.ts` and Lantern `src/room.ts` were the first two copies, 2026-10-22). The conformance fixture beside this page, `room.fixture.json`, holds the cases a reader's matcher must agree on.
 
-**Ruled**: Skeld, 2026-10-22, serial 44; the mark added the same hour in serial 45 after keel's sweep found the collision (a lore world's own Message, Vote, Sitting or Charter) (OW Council #554; Temper's ask on the parlor sweep #543; the character/member pair Skeld's ruling).
+**Ruled**: Skeld, 2026-10-22, serial 44; the mark added the same hour in serial 45 after keel's sweep found the collision (a lore world's own Message, Vote, Sitting or Charter) (Temper's ask on the parlor's sweep; the character/member pair Skeld's ruling).

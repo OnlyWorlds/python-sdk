@@ -4,7 +4,7 @@ The OnlyWorlds schema, packaged for tools: the YAML, the same schema decoded to 
 
 The files here are generated. The OnlyWorlds platform rebuilds and publishes them after every schema change, so a fix belongs upstream: open an issue rather than a pull request. The standard itself lives in [OnlyWorlds/OnlyWorlds](https://github.com/OnlyWorlds/OnlyWorlds).
 
-**Who writes this repository.** schema-dist is kept by Skeld, one of a crew of AI minds working with the OnlyWorlds founder, who answers for it. Skeld publishes each serial (one numbered publication of these files, tagged `v<schema version>-dist.<serial>`) and reads and answers the issues; until the crew posts from an identity of its own, those replies post from the founder's account, so a reply from `tmoosting` may be Skeld's. A serial's release notes name crew items (for example OW Council #656) that point at records outside this repository.
+**Who writes this repository.** schema-dist is kept by Skeld, one of a crew of AI minds working with the OnlyWorlds founder, who answers for it. Skeld publishes each serial (one numbered publication of these files, tagged `v<schema version>-dist.<serial>`) and reads and answers the issues; until the crew posts from an identity of its own, those replies post from the founder's account, so a reply from `tmoosting` may be Skeld's. A serial's release notes say what changed and date each ruling; the working records behind a ruling are kept outside this repository.
 
 ## Contents
 
@@ -38,11 +38,13 @@ Each field has a `kind`, explained in `kinds` at the top of the file:
 - `generic`: a link to an element of any type. Only `pin.element` has it. In data it is two keys, `element_type` (the type's slug, such as `"character"`) and `element_id` (the UUID), both set or both null; `type_key` and `id_key` name them.
 - `list`: an array (World fields only); `items` gives the kind of each entry.
 
+A field whose YAML sets `minimum` or `maximum` carries them, as written (the 0 to 100 and -100 to 100 scales). They are advisory: the platform accepts any integer, so show them (a slider's range) and never reject a value past one (`walk/rulings.yaml`, `maximum-is-advisory-and-zero-means-unbounded`).
+
 Only `id` and `name` are required. Element bodies read from the API also carry keys the schema does not declare: `type`, `created_at`, `updated_at`, `change_seq`, `created_by`, `changed_by`, `changed_via` and `changed_client`, all set by the server. Fields starting `x_` (and the tool prefixes `atlas_`, `shadow_`) are extensions, which a tool keeps and writes back unchanged. A few have a published meaning, one page each in `profiles/`. `walk/rulings.yaml` has the rest.
 
 ## The example world
 
-`example/hyperion/` is a world folder: `world.json` for the world, and one JSON file per element at `elements/<type>/<name>--<id tail>.json`. The `id` inside a file is the element's identity; the filename is only for people. It needs no account or key: load it, check it against `schema.json`, and you have tested your reader on real data. The format is described at [World Folders](https://onlyworlds.github.io/docs/schema/folders).
+`example/hyperion/` is a world folder: `world.json` for the world, and one JSON file per element at `elements/<type>/<name>--<id tail>.json`. The `id` inside a file is the element's identity; the filename is only for people. It needs no account or key: load it, check it against `schema.json`, and you have tested your reader on real data. The format is described at [World Folders](https://onlyworlds.github.io/docs/schema/folders). The folder format is at 0.3.18 (the spec's own version line); a folder stamps `format_version` from it.
 
 ## Using the walk (Python)
 

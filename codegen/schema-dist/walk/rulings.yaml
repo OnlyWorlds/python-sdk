@@ -189,16 +189,17 @@ rulings:
       appears on 26 more fields (dates, weights, heights, counts, durations)
       and means "no maximum", never a cap at zero. A consumer reading such a
       copy must not honour it.
-      The walk does not return bounds, and will not: the API does not enforce
-      them, so a decoder carrying them would ship a constraint the platform
-      does not keep.
+      The walk and schema.json carry the bounds as the YAML has them, as
+      advisory data for display (a slider's range, a generated page's number
+      ranges); no emitter generates validation from them and no consumer
+      rejects a value past one; the API does not enforce them.
     rationale: >
       The danger is asymmetric: a careful implementer is the one who breaks
       this, because honouring a declared constraint is the right instinct
       everywhere else in the standard. A careless emitter that ignores bounds
       is accidentally safe; a careful one would cap 26 fields at zero. If a tool
       wants the numbers for display (a slider's range), it reads them from
-      the YAML as a hint and still accepts any integer.
+      schema.json or the YAML as a hint and still accepts any integer.
     since: "2026-07-29"
     status: >
       ruled, advisory. Canonical 00.30.01 removed the 26 `maximum: 0`

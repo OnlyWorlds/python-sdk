@@ -60,7 +60,7 @@ keeper reads every row, any other member its own). A key with no member reads no
 404): the flag does not run, and says why. A row's ``evidence`` is outside text and is never read
 into a finding.
 
-On both doors, (13) the spine (schema-dist ``profiles/spine.md``, serial 60), on a world where some
+On both doors, (13) the spine (schema-dist ``profiles/spine.md``, serial 61), on a world where some
 element carries an ``x_spine_`` key (any other world skips it and says so). Each element is read by
 ``onlyworlds.spine.read_spine_element``: a listed type whose supertype is off the spine's list (or
 empty) is a finding, and so is every value the reader drops (the key and the value) and a probe not in

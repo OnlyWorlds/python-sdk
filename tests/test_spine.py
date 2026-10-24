@@ -102,12 +102,23 @@ def test_the_thirteen_keys_are_the_pages_key_table() -> None:
     assert "thirteen extension keys" in PAGE.read_text(encoding="utf-8")
 
 
-def test_the_reader_of_one_element_leaves_x_spine_retires_to_the_audit() -> None:
-    """The page's conformance read of one element has no retires entry and its dropped order no such key
-    (the fixture did not move at serial 60): the key is the audit's attribution, read by the doctor."""
-    for value in ("o0000000-0000-7000-8000-000000000001", 7, ["x"]):
+def test_x_spine_retires_is_read_as_given_and_judges_nothing() -> None:
+    """Serial 61's three rulings: the key is stated on any element that carries it (on a Tool too: the
+    placement is the audit's); a non-string is not stated and named in dropped; a blank string is not
+    stated and drops nothing, any other string is stated as given, untrimmed, its id form unchecked."""
+    rid = "0190a1b2-0000-7000-8000-000000000001"
+    assert read_spine_element("event", {"supertype": "Retirement", "x_spine_retires": rid}).retires == rid
+    assert read_spine_element("object", {"supertype": "Tool", "x_spine_retires": rid}).retires == rid
+    assert read_spine_element("event", {"supertype": "Launch", "x_spine_retires": rid}).retires == rid
+    for value in (7, ["x"], {"id": rid}, True):
         read = read_spine_element("event", {"supertype": "Retirement", "x_spine_retires": value})
-        assert read == SpineRead(kind="Retirement") and read.as_dict()["dropped"] == []
+        assert read.retires is None
+        assert as_json(read.as_dict()["dropped"]) == as_json([{"key": "x_spine_retires", "value": value}])
+    for blank in ("", " ", chr(0x3000) + chr(0x2028)):  # ideographic space, line separator
+        read = read_spine_element("event", {"supertype": "Retirement", "x_spine_retires": blank})
+        assert read == SpineRead(kind="Retirement")
+    for given in (f" {rid} ", "not an id", "\x1c"):
+        assert read_spine_element("event", {"supertype": "Retirement", "x_spine_retires": given}).retires == given
 
 
 # Unicode's White_Space property, the 25 code points (PropList.txt), typed here apart from the room module's
@@ -170,7 +181,7 @@ def test_verified_at_must_be_a_day_on_the_calendar() -> None:
 
 
 def test_null_is_not_stated_and_drops_nothing_and_an_empty_depends_on_is_stated() -> None:
-    keys = ("address", "truth", "access", "status", "layer", "audience", "depends_on", "probe", "verified")
+    keys = ("address", "truth", "access", "status", "layer", "audience", "depends_on", "probe", "verified", "retires")
     read = read_spine_element("object", {"supertype": "Tool", **{f"x_spine_{k}": None for k in keys}})
     assert read == SpineRead(kind="Tool")
     assert read_spine_element("object", {"supertype": "Tool", "x_spine_depends_on": []}).depends_on == ()
@@ -181,6 +192,7 @@ def test_a_dropped_value_is_the_elements_own_value_in_the_pages_key_order() -> N
     and is not ``1``), a copy the caller can't reach back through; a non-string truth or probe is named."""
     element: dict[str, Any] = {
         "supertype": "Tool",
+        "x_spine_retires": 3,
         "x_spine_verified": {"at": "soon"},
         "x_spine_probe": ["npm", "x"],
         "x_spine_status": True,
@@ -195,6 +207,7 @@ def test_a_dropped_value_is_the_elements_own_value_in_the_pages_key_order() -> N
             {"key": "x_spine_status", "value": True},
             {"key": "x_spine_probe", "value": ["npm", "x"]},
             {"key": "x_spine_verified", "value": {"at": "soon"}},
+            {"key": "x_spine_retires", "value": 3},
         ]
     )
     dropped[3]["value"].append("y")
