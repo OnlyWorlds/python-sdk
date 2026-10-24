@@ -74,6 +74,17 @@ no structure attributes), whether a probe passes and ``x_spine_probed`` (the pro
 checked, and ``compared`` names them in ``not_checked``. A known-of stub is not read, though a Seat
 that is one still keeps what it lists.
 
+A projection (a public world built from a spine, its owners anonymised; Skeld, OW Spine h73 #11933)
+is marked on its World: ``x_spine_projection``, ``{source, at}`` (the Spine world's id as a string,
+the last rebuild's ISO time), which also makes flag 13 run. On a marked world each row must carry
+``x_spine_owner`` and no element may be hidden (a projection carries nothing hidden; through a key
+that is not served hidden elements, ``not_checked`` says so); the one-Seat check does not apply (a
+projection has no Seats) and is named in ``not_checked``, and the dependencies are still compared.
+On an unmarked world ``x_spine_owner`` on any element is a finding: it belongs on a projection only.
+A mark that is not an object with a string ``source`` and a string ``at`` is a finding on the World
+(``element`` null; on the folder door the evidence names ``world.json``), and the world is then read
+as unmarked. ``compared`` carries the mark as ``projection`` (null when unmarked).
+
 A flag the walk cannot evaluate is reported in ``not_run`` with its reason, never as clean,
 and every flag that ran says how much it could compare (``compared: {n, of}``): a clean
 count over nothing compared is not a pass. A known-of stub's absent fields are unknown,
@@ -125,7 +136,7 @@ from ._schema import ELEMENT_TYPES, FIELD_KINDS, GENERIC_PAIRS, LINK_TARGETS, SP
 from ._version import __version__
 from .checks import CHECKS_FIELD, apply_checks
 from .errors import ApiError
-from .folder import FORMAT_VERSION, WORLD_FILE, Folder, is_known_of, read_folder
+from .folder import FORMAT_VERSION, HIDDEN, WORLD_FILE, Folder, is_hidden, is_known_of, read_folder
 from .http import API_BASE, Client
 from .spine import SPINE_OFF_LIST, SPINE_PREFIX, read_spine_element
 
@@ -709,17 +720,66 @@ _SPINE_NOT_CHECKED: tuple[tuple[str, str], ...] = (
     ("probe passes", "whether a probe passes is the probe gate's to run; the doctor runs nothing"),
     ("x_spine_probed", "written by the probe gate only; the doctor does not read it"),
 )
+#: The World's mark of a projection (Skeld, OW Spine h73 #11933): ``{source, at}``, the projector's.
+_PROJECTION_KEY = f"{SPINE_PREFIX}projection"
+#: The key a projection's row carries in place of its seat (the profile's ``x_spine_owner`` row).
+_OWNER_KEY = f"{SPINE_PREFIX}owner"
+#: The roles whose keys are served hidden elements (keel PR 160): any other key's view leaves them out.
+_SEES_HIDDEN = frozenset({"owner", "co_builder"})
+#: What flag 13 does not check on a projection.
+_SEAT_SKIPPED = {"check": "one seat per row", "why": "a projection has no Seats: its owners are anonymous keys"}
+_HIDDEN_UNSEEN = {
+    "check": "hidden",
+    "why": "this key is not served hidden elements (the owner's and a co-builder's are): none seen is not none held",
+}
 
 
-def _spine(run: _Run, els: list[_El], *, whole_view: bool = True) -> None:
+def _projection_mark(value: Any) -> dict[str, str] | None:
+    """The mark as ``{source, at}`` when it is an object with a string ``source`` and a string ``at``."""
+    if isinstance(value, Mapping):
+        source, at = value.get("source"), value.get("at")
+        if isinstance(source, str) and isinstance(at, str):
+            return {"source": source, "at": at}
+    return None
+
+
+def _spine(
+    run: _Run,
+    els: list[_El],
+    world: Mapping[str, Any],
+    *,
+    whole_view: bool = True,
+    sees_hidden: bool = True,
+    world_file: str | None = None,
+) -> None:
     """Flag 13: each element read under the spine profile (``read_spine_element``), and the audit's
     definite parts: one Seat per row, every ``x_spine_depends_on`` id resolving (only with the whole
-    view). Runs only on a world that carries an ``x_spine_`` key. A known-of stub is not read: its
-    absent supertype is unknown, not off the list."""
+    view). Runs on a world that carries an ``x_spine_`` key on an element, or the projection mark
+    (``x_spine_projection``) on its World. A known-of stub is not read: its absent supertype is unknown,
+    not off the list.
+
+    A projection (the World marked ``{source, at}``) has no Seats, its owners being anonymous keys:
+    the one-Seat check is skipped and named in ``not_checked``, each row must carry ``x_spine_owner``,
+    and no element may be hidden (``sees_hidden`` False: the key is not served hidden elements, so that
+    is named in ``not_checked`` too). On an unmarked world ``x_spine_owner`` on any element is a finding.
+    A mark that is not an object with a string ``source`` and a string ``at`` is a finding on the World,
+    and the world is then read as unmarked (``x_spine_owner`` a finding, no row asked for one, the Seat
+    check run)."""
     flag = SPINE_FLAG
-    if not any(isinstance(k, str) and k.startswith(SPINE_PREFIX) for el in els for k in el.body):
+    raw_mark = world.get(_PROJECTION_KEY)
+    if raw_mark is None and not any(isinstance(k, str) and k.startswith(SPINE_PREFIX) for el in els for k in el.body):
         run.skip(flag, f"no {SPINE_PREFIX} key in the world")
         return
+    mark = _projection_mark(raw_mark)
+    if raw_mark is not None and mark is None:
+        where = {"file": world_file} if world_file else {}
+        run.find(
+            flag,
+            None,
+            f"the world's {_PROJECTION_KEY} is malformed: the mark is an object with a string source and a "
+            "string at, so the world is read as unmarked",
+            {**where, "key": _PROJECTION_KEY, "value": raw_mark},
+        )
     ids = {el.id for el in els}
     judged = [el for el in els if not el.known_of]
     reads = [(el, read_spine_element(el.type, el.body)) for el in judged]
@@ -749,8 +809,44 @@ def _spine(run: _Run, els: list[_El], *, whole_view: bool = True) -> None:
                 {"probe": el.body.get("x_spine_probe")},
             )
 
-    # One owner per row: exactly one Title with supertype Seat lists it.
-    # A Seat that is a known-of stub still keeps what it lists.
+    not_checked = [{"check": check, "why": why} for check, why in _SPINE_NOT_CHECKED]
+    rows = [(el, read) for el, read in reads if el.type in _SEAT_FIELDS and read.kind != SPINE_OFF_LIST]
+    if mark is None:
+        # x_spine_owner belongs on a projection only. Any element: a stub's present key is present.
+        for el in els:
+            if el.body.get(_OWNER_KEY) is not None:
+                run.find(
+                    flag,
+                    el,
+                    f"it carries {_OWNER_KEY}, which belongs on a projection only, and the world carries no "
+                    f"{_PROJECTION_KEY} mark",
+                    {"key": _OWNER_KEY, "value": el.body.get(_OWNER_KEY)},
+                )
+    else:
+        # A projection: every row carries its owner's anonymous key, and nothing is hidden.
+        for el, read in rows:
+            owner = el.body.get(_OWNER_KEY)
+            if not (isinstance(owner, str) and owner.strip()):
+                run.find(
+                    flag,
+                    el,
+                    f"it is a row of a projection and carries no {_OWNER_KEY}",
+                    {"spine_kind": read.kind, "key": _OWNER_KEY, "value": owner},
+                )
+        for el in els:
+            if is_hidden(el.body):
+                run.find(
+                    flag,
+                    el,
+                    "it is hidden, and a projection carries nothing hidden",
+                    {"key": HIDDEN, "value": el.body.get(HIDDEN)},
+                )
+        if not sees_hidden:
+            not_checked.insert(0, dict(_HIDDEN_UNSEEN))
+        not_checked.insert(0, dict(_SEAT_SKIPPED))
+
+    # One owner per row: exactly one Title with supertype Seat lists it (not on a projection, whose
+    # owners are anonymous keys). A Seat that is a known-of stub still keeps what it lists.
     seats = [el for el in els if el.type == "title" and read_spine_element("title", el.body).kind == "Seat"]
     keepers: dict[tuple[str, str], list[_El]] = defaultdict(list)
     for seat in seats:
@@ -759,8 +855,8 @@ def _spine(run: _Run, els: list[_El], *, whole_view: bool = True) -> None:
             ids_listed = value if isinstance(value, list) else []
             for rid in dict.fromkeys(v for v in ids_listed if isinstance(v, str)):
                 keepers[(fname, rid)].append(seat)
-    rows = [(el, read) for el, read in reads if el.type in _SEAT_FIELDS and read.kind != SPINE_OFF_LIST]
-    for el, read in rows:
+    seat_rows = rows if mark is None else []
+    for el, read in seat_rows:
         fname = _SEAT_FIELDS[el.type]
         kept = keepers.get((fname, el.id), [])
         if not kept:
@@ -780,7 +876,6 @@ def _spine(run: _Run, els: list[_El], *, whole_view: bool = True) -> None:
             )
 
     # Every x_spine_depends_on id resolves to an element in the world.
-    not_checked = [{"check": check, "why": why} for check, why in _SPINE_NOT_CHECKED]
     depends: int | None = None
     if whole_view:
         depends = 0
@@ -810,6 +905,7 @@ def _spine(run: _Run, els: list[_El], *, whole_view: bool = True) -> None:
         seats=len(seats),
         depends_on=depends,
         stubs_not_judged=len(els) - len(judged),
+        projection=mark,
         not_checked=not_checked,
     )
 
@@ -893,7 +989,7 @@ def doctor_folder(folder: Folder, *, days: int = 14, changes: int = 50, now: _dt
     els = [_El(fe.type, eid, fe.body) for eid, fe in folder.all_elements().items()]
     _walk(run, els, days=days, now=now or _dt.datetime.now(_dt.UTC))
     _house_rules(run, els, view="folder")
-    _spine(run, els)
+    _spine(run, els, world, world_file=WORLD_FILE)
     run.skip("2", "needs the feed's history of Title.holders")
     run.skip("7", "read marks are not in the folder")
     run.skip("8", "no feed in a folder")
@@ -1113,7 +1209,7 @@ def doctor_api(client: Reader, *, days: int = 14, changes: int = 50, now: _dt.da
         els.extend(_El(t, b["id"], b) for b in _list_all(client, t) if isinstance(b.get("id"), str))
     _walk(run, els, days=days, now=at, whole_view=role != "guest")
     _house_rules(run, els, view=view, named=named)
-    _spine(run, els, whole_view=role != "guest")
+    _spine(run, els, world, whole_view=role != "guest", sees_hidden=role in _SEES_HIDDEN)
     try:
         rows, head = _feed(client)
     except (ApiError, ConnectionError, ValueError) as exc:
@@ -1202,7 +1298,11 @@ def _rules_note(c: Mapping[str, Any]) -> str:
 
 def _spine_note(c: Mapping[str, Any]) -> str:
     """The spine line's parenthesis: rows and seats, the dependencies compared, the stubs not read."""
-    note = f"{c['rows']} rows against {c['seats']} seats"
+    mark = c.get("projection")
+    if mark:
+        note = f"{c['rows']} rows of a projection of {mark['source']}, rebuilt {mark['at']}"
+    else:
+        note = f"{c['rows']} rows against {c['seats']} seats"
     if c.get("depends_on") is not None:
         note += f"; {c['depends_on']} x_spine_depends_on ids compared"
     if c.get("stubs_not_judged"):

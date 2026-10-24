@@ -478,9 +478,11 @@ class FakeReader:
         proposals: Mapping[str, list[dict[str, Any]]] | None = None,
         queue_error: Exception | None = None,
         front_door: Mapping[str, Any] | None = None,
+        world: Mapping[str, Any] | None = None,
     ):
         self.elements = elements
         self.front_door = front_door
+        self.world = {"id": WORLD["id"], "name": WORLD["name"], **(world or {})}
         self.rows = feed_of(elements) if rows is None else rows
         self.role = role
         self.page = page
@@ -498,7 +500,7 @@ class FakeReader:
 
     def get_world(self) -> dict[str, Any]:
         self.calls.append("get_world")
-        return {"id": WORLD["id"], "name": WORLD["name"]}
+        return dict(self.world)
 
     def list_page(self, element_type: str, *, limit: int | None = None, cursor: str | None = None) -> dict[str, Any]:
         self.calls.append(f"list_page {element_type}")
@@ -1676,3 +1678,141 @@ def test_13_in_the_prose_report(tmp_path: Path) -> None:
         "(4 rows against 1 seats; 1 x_spine_depends_on ids compared)"
     ) in lines
     assert "      not checked, x_spine_probed: written by the probe gate only; the doctor does not read it" in lines
+
+
+# --- 13. a projection (the World's x_spine_projection mark; Skeld, OW Spine h73 #11933) ---------
+
+SPINE_SOURCE = "5378fde7-0000-7000-8000-000000000000"
+MARK = {"source": SPINE_SOURCE, "at": "2026-10-24T09:00:00Z"}
+PWORLD = {**WORLD, "x_spine_projection": MARK}
+SEAT_SKIPPED = {"check": "one seat per row", "why": "a projection has no Seats: its owners are anonymous keys"}
+
+
+def projection() -> Elements:
+    """spine() projected: no Seat, each row carrying its owner's anonymous key, nothing hidden."""
+    out = copy.deepcopy(spine())
+    del out["title"]
+    for etype in ("object", "location", "construct", "law"):
+        for body in out[etype]:
+            body["x_spine_owner"] = "owner-1"
+    return out
+
+
+def both_doors(tmp_path: Path, elements: Elements, world: Mapping[str, Any], **kw: Any) -> list[Report]:
+    extra = {k: v for k, v in world.items() if k not in WORLD}
+    return [folder_report(tmp_path, elements, world), api_report(FakeReader(on_the_wire(elements), world=extra, **kw))]
+
+
+def test_13_a_clean_projection_has_nothing_to_look_at(tmp_path: Path) -> None:
+    for r in both_doors(tmp_path, projection(), PWORLD):
+        assert spine_found(r) == [] and SP in r.ran
+        c = r.compared[SP]
+        assert c["projection"] == MARK and c["rows"] == 4 and c["depends_on"] == 1
+        assert c["not_checked"][0] == SEAT_SKIPPED
+        assert [x["check"] for x in c["not_checked"][1:]] == SPINE_NOT_CHECKED
+    prose = render_prose(folder_report(tmp_path, projection(), PWORLD)).splitlines()
+    assert (
+        "  13. The spine (its profile and its audit): 6 of 6 elements read under the spine profile "
+        f"(4 rows of a projection of {SPINE_SOURCE}, rebuilt 2026-10-24T09:00:00Z; 1 x_spine_depends_on ids compared)"
+    ) in prose
+    assert f"      not checked, one seat per row: {SEAT_SKIPPED['why']}" in prose
+
+
+def test_13_x_spine_owner_on_an_unmarked_world(tmp_path: Path) -> None:
+    for r in both_doors(tmp_path, edit(spine(), "object", PKG, x_spine_owner="owner-1"), WORLD):
+        (f,) = spine_found(r)
+        assert f["element"]["id"] == PKG
+        assert f["reason"] == (
+            "it carries x_spine_owner, which belongs on a projection only, and the world carries no "
+            "x_spine_projection mark"
+        )
+        assert f["evidence"] == {"key": "x_spine_owner", "value": "owner-1"}
+        assert r.compared[SP]["projection"] is None
+
+
+def test_13_a_projection_row_without_x_spine_owner(tmp_path: Path) -> None:
+    base = edit(projection(), "object", PKG, x_spine_owner=None)
+    base = edit(base, "law", CHARTER, x_spine_owner="  ")
+    for r in both_doors(tmp_path, base, PWORLD):
+        assert {f["element"]["id"]: f["evidence"] for f in spine_found(r)} == {
+            PKG: {"spine_kind": "Package", "key": "x_spine_owner", "value": None},
+            CHARTER: {"spine_kind": "Charter", "key": "x_spine_owner", "value": "  "},
+        }
+        assert len(spine_found(r)) == 2
+        assert {f["reason"] for f in spine_found(r)} == {"it is a row of a projection and carries no x_spine_owner"}
+    # a Character is no row: it needs no owner key
+    assert spine_found(folder_report(tmp_path, projection(), PWORLD)) == []
+
+
+def test_13_a_projection_holding_a_hidden_element(tmp_path: Path) -> None:
+    base = edit(projection(), "character", KAEL, hidden=True)
+    for r in both_doors(tmp_path, base, PWORLD):
+        (f,) = spine_found(r)
+        assert f["element"]["id"] == KAEL
+        assert f["reason"] == "it is hidden, and a projection carries nothing hidden"
+        assert f["evidence"] == {"key": "hidden", "value": True}
+        assert "hidden" not in [x["check"] for x in r.compared[SP]["not_checked"]]
+    # unmarked, a hidden element is no finding of this flag
+    assert spine_found(folder_report(tmp_path, edit(spine(), "character", KAEL, hidden=True))) == []
+
+
+def test_13_a_key_not_served_hidden_elements_says_so_on_a_projection() -> None:
+    for role in ("contributor", "guest"):
+        r = api_report(FakeReader(on_the_wire(projection()), world={"x_spine_projection": MARK}, role=role))
+        assert spine_found(r) == []
+        checks = [x["check"] for x in r.compared[SP]["not_checked"]]
+        assert "one seat per row" in checks and "hidden" in checks
+    r = api_report(FakeReader(on_the_wire(projection()), world={"x_spine_projection": MARK}, role="co_builder"))
+    assert "hidden" not in [x["check"] for x in r.compared[SP]["not_checked"]]
+
+
+def test_13_the_seat_check_is_skipped_on_a_projection_but_depends_on_is_not(tmp_path: Path) -> None:
+    base = edit(projection(), "object", PKG, x_spine_depends_on=[STD, GHOST])
+    for r in both_doors(tmp_path, base, PWORLD):
+        (f,) = spine_found(r)  # no "no seat keeps it" on any of the four rows
+        assert f["evidence"] == {"key": "x_spine_depends_on", "missing_id": GHOST}
+    # the same rows, unmarked: every row is unkept (and every owner key out of place)
+    r = folder_report(tmp_path, projection())
+    assert {f["element"]["id"] for f in spine_found(r) if f["reason"].startswith("no seat")} == {
+        PKG,
+        REPO_L,
+        STD,
+        CHARTER,
+    }
+
+
+def test_13_a_marked_world_runs_the_flag_with_no_x_spine_key_on_an_element(tmp_path: Path) -> None:
+    base = projection()
+    for bodies in base.values():
+        for body in bodies:
+            for key in [k for k in body if k.startswith("x_spine_")]:
+                del body[key]
+    for r in both_doors(tmp_path, base, PWORLD):
+        assert SP in r.ran
+        missing = {f["element"]["id"] for f in spine_found(r) if "carries no x_spine_owner" in f["reason"]}
+        assert missing == {PKG, REPO_L, STD, CHARTER}
+
+
+@pytest.mark.parametrize(
+    "bad",
+    ["yes", [], {"source": SPINE_SOURCE}, {"at": "2026-10-24"}, {"source": 5378, "at": "2026-10-24"}],
+)
+def test_13_a_malformed_mark_is_a_finding_on_the_world_read_as_unmarked(tmp_path: Path, bad: Any) -> None:
+    base = edit(spine(), "object", PKG, x_spine_owner="owner-1")
+    reports = both_doors(tmp_path, base, {**WORLD, "x_spine_projection": bad})
+    for r, where in zip(reports, ({"file": "world.json"}, {}), strict=True):
+        world_f, owner_f = spine_found(r)
+        assert world_f["element"] is None
+        assert world_f["reason"] == (
+            "the world's x_spine_projection is malformed: the mark is an object with a string source and a "
+            "string at, so the world is read as unmarked"
+        )
+        assert world_f["evidence"] == {**where, "key": "x_spine_projection", "value": bad}
+        assert owner_f["element"]["id"] == PKG and "belongs on a projection only" in owner_f["reason"]
+        c = r.compared[SP]
+        assert c["projection"] is None and [x["check"] for x in c["not_checked"]] == SPINE_NOT_CHECKED
+    prose = render_prose(folder_report(tmp_path, spine(), {**WORLD, "x_spine_projection": bad})).splitlines()
+    assert (
+        "  - the world: the world's x_spine_projection is malformed: the mark is an object with a string "
+        "source and a string at, so the world is read as unmarked" in prose
+    )
