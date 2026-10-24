@@ -2,6 +2,16 @@
 
 The package version runs on its own semver; the schema it is generated from is `SCHEMA_DIST_TAG`.
 
+## 0.48.0 (2026-10-24)
+
+- **Schema repinned to schema-dist `v0.33.0-dist.60`** (from dist.59; same canonical 00.33.00, no schema file or fixture moved). Serial 60 is text only: `profiles/spine.md` rules eight readings from the doctor's build of flag 13, and the doctor now follows each.
+- **A Retirement Event names the row it retires in `x_spine_retires`**, the profile's thirteenth key (the row's id as a string). A `legacy` or `provenance` row needs an Event with supertype `Retirement` that names it there and also links it through its typed field where the type has one (`objects`, `constructs`, `locations`). A Law is now checked too: an Event has no `laws` field, so a Law's retirement is attributed by the key alone, and "a law's retirement" is gone from `not_checked`. A row no Retirement Event names is a finding (its evidence lists any Event that links it without naming it, so you know which one wants the key); so is a row whose naming Event does not link it. An Event that names the row only in its text, or in a key that is not a string, does not count.
+- **A row still at `gone` is a finding**: its retirement is unfinished. A `gone` row is meant to be removed once its Retirement Event is written.
+- **On a projection only the projection's three checks run** (every row of a marked world carries `x_spine_owner`, nothing on it is hidden, and `x_spine_owner` on an unmarked world is a finding). The source world's checks (one Seat per row, `x_spine_depends_on`, the Retirement Event, `gone`, name uniqueness) no longer run on a world marked with `x_spine_projection`, and `not_checked` names each, through any key. A projection's `x_spine_owner` is the keeping Seat's name in the source and need match nothing in the projection; a Seat row there describes the organisation and owns nothing.
+- **The projection mark's `source` and `at` are checked.** `source` must be a UUID (the projected-from world's id) and must not equal the id of any element in the world; `at` must parse as an ISO 8601 time (`datetime.fromisoformat`). Each is a finding on the World, which is still read as a projection. A mark that is not an object with a string `source` and a string `at` is still a finding that makes the world read as unmarked.
+- **Name uniqueness stays the four row types', per type**: two Seats, or two Characters, that share a name are flag 5's, not flag 13's.
+- **`onlyworlds.spine.SPINE_KEYS`**, the profile's thirteen keys in the page's order. `read_spine_element` reads nine of them, as before: `x_spine_retires`, like `x_spine_owner` and `x_spine_projection`, is the world's audit's, and the reader neither reads nor drops it (the page's read of one element and its fixture carry no such key).
+
 ## 0.47.0 (2026-10-24)
 
 - **The Notion door reads the two layouts real exports use.** Read on two exports of one free-account workspace (invented content, two databases with select, date and relation properties, plain pages and a sub-page), which are now the door's fixtures:

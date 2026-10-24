@@ -1,4 +1,4 @@
-"""The spine profile (schema-dist ``profiles/spine.md``, serial 56): ``read_spine_element`` on every
+"""The spine profile (schema-dist ``profiles/spine.md``, serial 60): ``read_spine_element`` on every
 conformance case in ``codegen/schema-dist/profiles/spine.fixture.json``, vendored with the distribution;
 the closed lists against the page; the trim and the fold the room profile defines. The fixture's
 calendar steps are the npm SDK kernel's to check: this package has no calendar kernel."""
@@ -15,6 +15,7 @@ from onlyworlds.spine import (
     SPINE_ACCESS,
     SPINE_AUDIENCE,
     SPINE_FREE_TYPES,
+    SPINE_KEYS,
     SPINE_LAYERS,
     SPINE_PROBE_VERBS,
     SPINE_STATUSES,
@@ -91,6 +92,22 @@ def test_the_value_lists_are_the_pages_key_rows() -> None:
     assert all(form.startswith(verb + " ") for verb, form in zip(SPINE_PROBE_VERBS, forms, strict=True))
     assert "A Character, an Institution and a Collective take any supertype" in PAGE.read_text(encoding="utf-8")
     assert SPINE_FREE_TYPES == ("character", "institution", "collective")
+
+
+def test_the_thirteen_keys_are_the_pages_key_table() -> None:
+    """Serial 60: "thirteen extension keys carry what no schema field holds", x_spine_retires the thirteenth."""
+    keys = tuple(m[1] for line in page_lines() if (m := re.match(r"^\| `(x_spine_[a-z_]+)` \|", line)))
+    assert keys == SPINE_KEYS
+    assert len(SPINE_KEYS) == 13 and "x_spine_retires" in SPINE_KEYS
+    assert "thirteen extension keys" in PAGE.read_text(encoding="utf-8")
+
+
+def test_the_reader_of_one_element_leaves_x_spine_retires_to_the_audit() -> None:
+    """The page's conformance read of one element has no retires entry and its dropped order no such key
+    (the fixture did not move at serial 60): the key is the audit's attribution, read by the doctor."""
+    for value in ("o0000000-0000-7000-8000-000000000001", 7, ["x"]):
+        read = read_spine_element("event", {"supertype": "Retirement", "x_spine_retires": value})
+        assert read == SpineRead(kind="Retirement") and read.as_dict()["dropped"] == []
 
 
 # Unicode's White_Space property, the 25 code points (PropList.txt), typed here apart from the room module's

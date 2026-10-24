@@ -1,12 +1,14 @@
-"""The spine profile (schema-dist ``profiles/spine.md``, serial 59): a world that maps a software ecosystem.
+"""The spine profile (schema-dist ``profiles/spine.md``, serial 60): a world that maps a software ecosystem.
 
 A spine world describes what is built, the contracts it speaks, where each thing lives, who keeps it and
 what it depends on, in the 22 types and nothing more. Each kind is a type with a supertype from a closed
 list (``SPINE_KINDS``, generated from the pinned dist: ``Tool``, ``Service`` and nine more on an Object,
 ``Repo`` and six more on a Location, ...); a Character, an Institution and a Collective take any supertype
-(``SPINE_FREE_TYPES``). The ``x_spine_*`` keys carry what no schema field holds. Ownership is the
-standard's (a Title with supertype ``Seat`` lists what it keeps), so no key on a row names its owner (on a
-projection, ``x_spine_owner`` does: the keeping Seat's name, serial 58).
+(``SPINE_FREE_TYPES``). Thirteen ``x_spine_*`` keys (``SPINE_KEYS``) carry what no schema field holds
+(two of them, ``x_spine_owner`` and ``x_spine_projection``, only on a projection; one, ``x_spine_retires``,
+only on a Retirement Event). Ownership is the standard's (a Title with supertype ``Seat`` lists what it
+keeps), so no key on a row names its owner (on a projection, ``x_spine_owner`` does: the keeping Seat's
+name, serial 58).
 
 ``read_spine_element(type, element)`` reads one element as the profile's conforming reader does and
 returns a ``SpineRead``: its kind (the list's spelling, ``"off-list"`` for a listed type whose supertype
@@ -22,9 +24,12 @@ or ``str.casefold()``. An ``x_spine_`` key the reader does not know is ignored, 
 
 What one element cannot say is the world's audit, not this reader's (the doctor's flag 13 does it): a
 row kept by exactly one Seat, whether a ``x_spine_depends_on`` id resolves, a ``legacy`` or ``provenance``
-row's Retirement Event linking it, a row's name unique within its type once folded, and a projection's
-three. Nor does it read ``x_spine_probed`` (the probe gate's), ``x_spine_owner`` (a projection's only) or
-``x_spine_projection`` (a projection's World's), and it never runs a probe. A spine counts days from
+row's Retirement Event naming it in ``x_spine_retires`` and linking it, a row still at ``gone``, a row's
+name unique within its row type once folded, and a projection's three. Nor does it read
+``x_spine_probed`` (the probe gate's), ``x_spine_owner`` (a projection's only), ``x_spine_projection`` (a
+projection's World's) or ``x_spine_retires`` (a Retirement Event's, the audit's structural attribution of
+a retirement: the page's conformance read of one element, and its fixture, carry no such key), and it
+never runs a probe. A spine counts days from
 day 0 (2012-01-01) through a Construct with supertype ``Calendar`` whose ``atlas_calendar`` the profile
 ships; this package has no calendar kernel, so the fixture's calendar steps are checked by the npm SDK's
 kernel (4.70.0), not here. The fixture (``codegen/schema-dist/profiles/spine.fixture.json``) is replayed
@@ -49,6 +54,7 @@ __all__ = [
     "SPINE_AUDIENCE",
     "SPINE_FREE",
     "SPINE_FREE_TYPES",
+    "SPINE_KEYS",
     "SPINE_KINDS",
     "SPINE_LAYERS",
     "SPINE_OFF_LIST",
@@ -61,6 +67,24 @@ __all__ = [
 
 #: The profile's reserved prefix: every key it defines starts with it.
 SPINE_PREFIX = "x_spine_"
+#: The thirteen keys the profile defines, in the page's table order (serial 60 adds ``x_spine_retires``).
+#: ``read_spine_element`` reads nine; ``x_spine_probed`` is the probe gate's, ``x_spine_owner``,
+#: ``x_spine_projection`` and ``x_spine_retires`` the world's audit's.
+SPINE_KEYS: tuple[str, ...] = (
+    "x_spine_address",
+    "x_spine_truth",
+    "x_spine_access",
+    "x_spine_status",
+    "x_spine_layer",
+    "x_spine_audience",
+    "x_spine_depends_on",
+    "x_spine_probe",
+    "x_spine_probed",
+    "x_spine_owner",
+    "x_spine_projection",
+    "x_spine_retires",
+    "x_spine_verified",
+)
 #: The kind of an element of a listed type whose supertype is off its list or empty, and of a type the list
 #: does not name.
 SPINE_OFF_LIST = "off-list"

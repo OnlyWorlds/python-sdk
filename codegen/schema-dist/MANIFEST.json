@@ -153,7 +153,7 @@
     "profiles/room.fixture.json": "6116dc50f75e072d5c77e0138c05f72e838ba4aa334bb30119be4ba701598233",
     "profiles/room.md": "f9133e84186d089d6a8ade526c1e14af613434d3e752b7c23fda2dca4c19677c",
     "profiles/spine.fixture.json": "595c99f49d6a3a6e5cb2f9c9d5b8ad06c596cf9cbc443ffd0144556042d77973",
-    "profiles/spine.md": "35eea0329eed16961594bfd5b06c07f5b7cc82317ec473e375227960412092b4",
+    "profiles/spine.md": "b59175bf3c5d13b613d57219a654ee1a4aecc39119e4dbb59ba41c0c5336604f",
     "README.md": "9a9a843edea8f6e359cbd5ecadf6748559ed82efc91638b27a8d2f069099d4cc",
     "schema/ability.yaml": "9fb53aa50af02134714e804b7e4c54652b63dd7adc11dd4aef991c64503205fc",
     "schema/base_properties.yaml": "f611711e5e46e0165db0da84ca215755056adf9760b06aad354851d7d88b3796",
@@ -181,7 +181,7 @@
     "schema/zone.yaml": "9828429f3172b83b6277c0a71a75a3f4079b8b1eccb2135418a458f2fc80f2b7",
     "schema.json": "b0bd929d273cbf2201ac414ad98d10bd6759056a0302b838abd6fc7bb8f317b4",
     "SECURITY.md": "939ee364b06f0b749bdd4cbe66b2fe49322c95abe732650ec4ef062a0c03820a",
-    "VERSION": "c6ce094063ffe0c67fe6efdc81d78cc0b459671b823829db5c3704168cc2bd71",
+    "VERSION": "92e64d4b546f6f2b29f80131158ff6d083a11e7cd85c513841d7b5c626cb7d52",
     "walk/lint_folder.py": "5d4861eb6c6f351d9bf1a070219cd222157011eca49459fdd9923f1a8afe5de0",
     "walk/rulings.yaml": "75fff534c7dd47763ba79d489a31c7792b4f0569e5d3cbbf44f46e677e92deef",
     "walk/schema_walk.py": "0ab025b14a05e87890075b6750d1224f8c560b92246b8f35280605a4115e2966"

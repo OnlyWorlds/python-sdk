@@ -2,15 +2,20 @@
   "_what": "The recorded pin for the vendored OnlyWorlds schema distribution (codegen/schema-dist/, copied byte-exact). Do not edit by hand; re-vendor from the pinned tag and review the diff. Kept equal to the npm SDK's pin (github.com/OnlyWorlds/sdk, codegen/schema-pin.json) on purpose: two clients, one schema.",
   "_why_manifest_sha256": "Verifying the tree against its own MANIFEST.json only proves internal consistency. If the tag moved, the manifest moved with it. The hash recorded here is the one first accepted, which is what makes a moved tag visible.",
   "repo": "https://github.com/OnlyWorlds/schema-dist",
-  "tag": "v0.33.0-dist.59",
-  "commit": "a40a5f3592f90957f684aba0c7a0fcb64fd47531",
-  "manifest_sha256": "f402293f61735f616457e90698b8e268de7125cf7b29d96f3fa88ed54e87d22e",
+  "tag": "v0.33.0-dist.60",
+  "commit": "fbcbef85a87e0c55ba62c51c169cc3ed5b78bf55",
+  "manifest_sha256": "4517246eec6f34bc27f79cea644b8d828e4adf5745cdee7cb1c4ca455da0d5d3",
   "canonical_version": "00.33.00",
-  "dist_serial": 59,
+  "dist_serial": 60,
   "published": "2026-10-24",
   "pinned_at": "2026-10-24",
-  "pinned_by": "The maintainer: tree from `git archive` of the tag in a schema-dist checkout; files re-hashed against MANIFEST.json by generate_schema.py; MANIFEST self-hash matched against the raw file GitHub serves at the tag, whose ref resolves to the commit above. Ahead of the npm SDK's published pin, which is at v0.33.0-dist.57 (4.72.0) when this is pinned.",
+  "pinned_by": "The maintainer: tree from `git archive` of the tag in a schema-dist checkout; files re-hashed against MANIFEST.json by generate_schema.py; MANIFEST self-hash matched against the raw file GitHub serves at the tag, whose ref resolves to the commit above. Ahead of the npm SDK's published pin, which is at v0.33.0-dist.59 (4.72.1) when this is pinned.",
   "previous_pins": [
+    {
+      "tag": "v0.33.0-dist.59",
+      "manifest_sha256": "f402293f61735f616457e90698b8e268de7125cf7b29d96f3fa88ed54e87d22e",
+      "note": "superseded by v0.33.0-dist.60 (same canonical 00.33.00; text only: profiles/spine.md's serial 60 readings, x_spine_retires on a Retirement Event (the thirteenth key, a Law's retirement attributed by it alone), a row's name unique within its row type, the source's checks not run on a projection, the mark's source a UUID that is no element's id and its at a parsed ISO 8601 time, a row still at gone a finding; VERSION; no schema file or fixture moved)"
+    },
     {
       "tag": "v0.33.0-dist.58",
       "manifest_sha256": "7746970ee66bcb9dca9aa0974e9c17891bd9a38a4fff0fe73d3fad4f97ae9724",
