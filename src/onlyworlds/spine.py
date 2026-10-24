@@ -1,4 +1,4 @@
-"""The spine profile (schema-dist ``profiles/spine.md``, serial 55): a world that maps a software ecosystem.
+"""The spine profile (schema-dist ``profiles/spine.md``, serial 56): a world that maps a software ecosystem.
 
 A spine world describes what is built, the contracts it speaks, where each thing lives, who keeps it and
 what it depends on, in the 22 types and nothing more. Each kind is a type with a supertype from a closed
@@ -11,7 +11,10 @@ standard's (a Title with supertype ``Seat`` lists what it keeps), so no key on a
 returns a ``SpineRead``: its kind (the list's spelling, ``"off-list"`` for a listed type whose supertype
 is off its list or empty, and for every type the list does not name, ``"free"`` for the three free types),
 each key as read or ``None`` when not stated, the audience's primary, the probe's verb (or
-``"unsupported"``), the verified date, and every value it left out, named in ``dropped``. A supertype and
+``"unsupported"``), the verified date, and every value it left out, named in ``dropped`` as
+``{"key", "value"}`` with the value exactly as the element held it (compared as JSON values, never as
+text: Python and JavaScript write JSON differently). A probe's verb is syntax, matched as written
+(case-sensitive, single spaces), after the outer trim. A supertype and
 every machine value is compared trimmed and without regard to case as the room profile defines it
 (Unicode White_Space at both ends, Unicode simple case folding: ``room._fold``), never ``str.strip()``
 or ``str.casefold()``. An ``x_spine_`` key the reader does not know is ignored, never an error.
@@ -27,8 +30,8 @@ calendar steps are checked by the npm SDK's kernel (4.70.0), not here. The fixtu
 
 from __future__ import annotations
 
+import copy
 import datetime
-import json
 import re
 from collections.abc import Mapping
 from dataclasses import dataclass
@@ -98,8 +101,9 @@ class SpineRead:
     ``access``, ``status``, ``layer`` and each audience word are the list's spelling; ``truth`` and
     ``verified_at`` are the value as written (``verified_at`` trimmed). ``primary`` is the audience's
     first known word, ``probe`` the probe's verb or ``"unsupported"``. ``dropped`` names each value left
-    out as ``"<key>: <the value as JSON>"``, in key order address, access, status, layer, audience,
-    depends_on, verified."""
+    out as ``{"key": <the x_spine_ key>, "value": <the value as the element held it>}``, in key order
+    address, truth, access, status, layer, audience, depends_on, probe, verified (within a list, the
+    list's order)."""
 
     kind: str
     address: tuple[str, ...] | None = None
@@ -112,7 +116,7 @@ class SpineRead:
     depends_on: tuple[str, ...] | None = None
     probe: str | None = None
     verified_at: str | None = None
-    dropped: tuple[str, ...] = ()
+    dropped: tuple[dict[str, Any], ...] = ()
 
     def as_dict(self) -> dict[str, Any]:
         """The fixture's shape: tuples as lists, ``None`` kept."""
@@ -132,12 +136,12 @@ class SpineRead:
             "depends_on": listed(self.depends_on),
             "probe": self.probe,
             "verified_at": self.verified_at,
-            "dropped": list(self.dropped),
+            "dropped": [dict(entry) for entry in self.dropped],
         }
 
 
-def _named(key: str, value: Any) -> str:
-    return f"{key}: {json.dumps(value, ensure_ascii=False, default=repr)}"
+def _named(key: str, value: Any) -> dict[str, Any]:
+    return {"key": key, "value": copy.deepcopy(value)}
 
 
 def _one_of(value: Any, words: tuple[str, ...]) -> str | None:
@@ -185,15 +189,16 @@ def read_spine_element(type: str, element: Mapping[str, Any] | FolderElement) ->
 
     How each key reads (spine.md's table): ``x_spine_address`` a list whose non-empty strings are kept
     (a blank entry and a non-string are dropped; no entry left, or not a list, is not stated);
-    ``x_spine_truth`` a string that is not blank; ``x_spine_access``, ``x_spine_status`` and
+    ``x_spine_truth`` a string that is not blank (a non-string dropped); ``x_spine_access``, ``x_spine_status`` and
     ``x_spine_layer`` one of their lists; ``x_spine_audience`` a list whose known words are kept and the
     rest dropped, the primary the first known; ``x_spine_depends_on`` a list whose strings are kept, an
     empty list stated as empty (whether an id resolves is the world's audit); ``x_spine_probe`` a string
-    in the probe form, or ``"unsupported"``; ``x_spine_verified`` an object whose ``at`` is a date. A key
+    in the probe form, or ``"unsupported"`` (a non-string dropped); ``x_spine_verified`` an object whose
+    ``at`` is a real calendar day. A key
     that is absent or ``None`` is not stated and drops nothing.
     """
     body: Mapping[str, Any] = element.body if isinstance(element, FolderElement) else element
-    dropped: list[str] = []
+    dropped: list[dict[str, Any]] = []
 
     address: tuple[str, ...] | None = None
     raw = body.get("x_spine_address")
@@ -206,6 +211,8 @@ def read_spine_element(type: str, element: Mapping[str, Any] | FolderElement) ->
 
     raw = body.get("x_spine_truth")
     truth = raw if isinstance(raw, str) and raw.strip(_WHITE_SPACE) else None
+    if raw is not None and not isinstance(raw, str):
+        dropped.append(_named("x_spine_truth", raw))
 
     one_of: dict[str, str | None] = {}
     for key, words in (
@@ -242,6 +249,8 @@ def read_spine_element(type: str, element: Mapping[str, Any] | FolderElement) ->
 
     raw = body.get("x_spine_probe")
     probe = _probe_verb(raw) if isinstance(raw, str) else None
+    if raw is not None and not isinstance(raw, str):
+        dropped.append(_named("x_spine_probe", raw))
 
     raw = body.get("x_spine_verified")
     verified_at = _verified_at(raw)

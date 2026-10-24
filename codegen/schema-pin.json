@@ -2,15 +2,20 @@
   "_what": "The recorded pin for the vendored OnlyWorlds schema distribution (codegen/schema-dist/, copied byte-exact). Do not edit by hand; re-vendor from the pinned tag and review the diff. Kept equal to the npm SDK's pin (github.com/OnlyWorlds/sdk, codegen/schema-pin.json) on purpose: two clients, one schema.",
   "_why_manifest_sha256": "Verifying the tree against its own MANIFEST.json only proves internal consistency. If the tag moved, the manifest moved with it. The hash recorded here is the one first accepted, which is what makes a moved tag visible.",
   "repo": "https://github.com/OnlyWorlds/schema-dist",
-  "tag": "v0.33.0-dist.55",
-  "commit": "2937031f9dc15a326186136c04e60a7ce0c8f83d",
-  "manifest_sha256": "7b4db33d576692918595d71ceba4832a5eb2ae56c8e83e0cafa68f62b6c1edc4",
+  "tag": "v0.33.0-dist.56",
+  "commit": "473f88298d5aabeecb80d59cf09290df00f330fd",
+  "manifest_sha256": "d206d35cf3b8628765143f80071e706db1fa1b49be1f205b2c2580703bc402fd",
   "canonical_version": "00.33.00",
-  "dist_serial": 55,
+  "dist_serial": 56,
   "published": "2026-10-24",
   "pinned_at": "2026-10-24",
   "pinned_by": "The maintainer: tree from `git archive` of the tag in a schema-dist checkout; files re-hashed against MANIFEST.json by generate_schema.py; MANIFEST self-hash matched against the raw file GitHub serves at the tag, whose ref resolves to the commit above. Ahead of the npm SDK's published pin, which is at v0.33.0-dist.49 (4.70.0) when this is pinned.",
   "previous_pins": [
+    {
+      "tag": "v0.33.0-dist.55",
+      "manifest_sha256": "7b4db33d576692918595d71ceba4832a5eb2ae56c8e83e0cafa68f62b6c1edc4",
+      "note": "superseded by v0.33.0-dist.56 (same canonical 00.33.00; profiles/spine.md's five readings the first reader found ambiguous: dropped as {key, value} entries compared as JSON values, a non-string truth or probe named, the probe form as syntax, verified.at a real calendar day, an empty depends_on stated; spine.fixture.json at 40 cases (OW Spine #614, h73 #11870, #11872); no schema file moved)"
+    },
     {
       "tag": "v0.33.0-dist.54",
       "manifest_sha256": "82ba25c181840f03f2ea7c4b0ac6288759fda9a250f5af4988a78489203e1b75",

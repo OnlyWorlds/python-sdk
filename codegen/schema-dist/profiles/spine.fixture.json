@@ -5,7 +5,7 @@
     "type: the element's type slug; element: the keys a reader sees on the body (supertype and x_spine_*).",
     "read: what a conforming reader of one element says. kind: the list's spelling, 'off-list', or 'free' (Character, Institution, Collective).",
     "Each key is its value as read, or null when not stated. primary: the audience's first known word. probe: the verb ('http', 'gh repo', 'gh release', 'npm', 'pypi', 'dns', 'room', 'file', 'none') or 'unsupported'.",
-    "dropped: what the reader named and left out, as '<key>: <the value as JSON>', in key order address, access, status, layer, audience, depends_on, verified.",
+    "dropped: what the reader named and left out, each {key, value} with the value exactly as the element held it (compare as JSON values, never as text), in key order address, truth, access, status, layer, audience, depends_on, probe, verified, and within a list in the list's order.",
     "Not here: whether an id resolves, one owner per row, a Retirement Event: the world's audit, never a reader of one element."
   ],
   "cases": [
@@ -305,7 +305,10 @@
         "probe": null,
         "verified_at": null,
         "dropped": [
-          "x_spine_address: \"https://x.example\""
+          {
+            "key": "x_spine_address",
+            "value": "https://x.example"
+          }
         ]
       }
     },
@@ -337,8 +340,14 @@
         "probe": null,
         "verified_at": null,
         "dropped": [
-          "x_spine_address: \"\"",
-          "x_spine_address: 5"
+          {
+            "key": "x_spine_address",
+            "value": ""
+          },
+          {
+            "key": "x_spine_address",
+            "value": 5
+          }
         ]
       }
     },
@@ -428,7 +437,10 @@
         "probe": null,
         "verified_at": null,
         "dropped": [
-          "x_spine_status: \"archived\""
+          {
+            "key": "x_spine_status",
+            "value": "archived"
+          }
         ]
       }
     },
@@ -452,7 +464,10 @@
         "probe": null,
         "verified_at": null,
         "dropped": [
-          "x_spine_access: \"archived\""
+          {
+            "key": "x_spine_access",
+            "value": "archived"
+          }
         ]
       }
     },
@@ -527,7 +542,10 @@
         "probe": null,
         "verified_at": null,
         "dropped": [
-          "x_spine_audience: \"robots\""
+          {
+            "key": "x_spine_audience",
+            "value": "robots"
+          }
         ]
       }
     },
@@ -553,7 +571,10 @@
         "probe": null,
         "verified_at": null,
         "dropped": [
-          "x_spine_audience: \"everyone\""
+          {
+            "key": "x_spine_audience",
+            "value": "everyone"
+          }
         ]
       }
     },
@@ -577,7 +598,10 @@
         "probe": null,
         "verified_at": null,
         "dropped": [
-          "x_spine_audience: \"crew\""
+          {
+            "key": "x_spine_audience",
+            "value": "crew"
+          }
         ]
       }
     },
@@ -601,7 +625,10 @@
         "probe": null,
         "verified_at": null,
         "dropped": [
-          "x_spine_depends_on: \"abc\""
+          {
+            "key": "x_spine_depends_on",
+            "value": "abc"
+          }
         ]
       }
     },
@@ -630,7 +657,10 @@
         "probe": null,
         "verified_at": null,
         "dropped": [
-          "x_spine_depends_on: 7"
+          {
+            "key": "x_spine_depends_on",
+            "value": 7
+          }
         ]
       }
     },
@@ -789,7 +819,13 @@
         "probe": null,
         "verified_at": null,
         "dropped": [
-          "x_spine_verified: {\"at\": \"yesterday\", \"by\": \"t\"}"
+          {
+            "key": "x_spine_verified",
+            "value": {
+              "at": "yesterday",
+              "by": "t"
+            }
+          }
         ]
       }
     },
@@ -810,6 +846,168 @@
         "audience": null,
         "primary": null,
         "depends_on": null,
+        "probe": null,
+        "verified_at": null,
+        "dropped": []
+      }
+    },
+    {
+      "name": "truth-not-a-string",
+      "type": "object",
+      "element": {
+        "supertype": "Tool",
+        "x_spine_truth": 7
+      },
+      "read": {
+        "kind": "Tool",
+        "address": null,
+        "truth": null,
+        "access": null,
+        "status": null,
+        "layer": null,
+        "audience": null,
+        "primary": null,
+        "depends_on": null,
+        "probe": null,
+        "verified_at": null,
+        "dropped": [
+          {
+            "key": "x_spine_truth",
+            "value": 7
+          }
+        ]
+      }
+    },
+    {
+      "name": "probe-not-a-string",
+      "type": "object",
+      "element": {
+        "supertype": "Tool",
+        "x_spine_probe": [
+          "npm",
+          "x"
+        ]
+      },
+      "read": {
+        "kind": "Tool",
+        "address": null,
+        "truth": null,
+        "access": null,
+        "status": null,
+        "layer": null,
+        "audience": null,
+        "primary": null,
+        "depends_on": null,
+        "probe": null,
+        "verified_at": null,
+        "dropped": [
+          {
+            "key": "x_spine_probe",
+            "value": [
+              "npm",
+              "x"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "probe-verb-is-syntax",
+      "type": "object",
+      "element": {
+        "supertype": "Package",
+        "x_spine_probe": "NPM @onlyworlds/sdk"
+      },
+      "read": {
+        "kind": "Package",
+        "address": null,
+        "truth": null,
+        "access": null,
+        "status": null,
+        "layer": null,
+        "audience": null,
+        "primary": null,
+        "depends_on": null,
+        "probe": "unsupported",
+        "verified_at": null,
+        "dropped": []
+      }
+    },
+    {
+      "name": "verified-impossible-day",
+      "type": "object",
+      "element": {
+        "supertype": "Tool",
+        "x_spine_verified": {
+          "at": "2026-02-30",
+          "by": "t"
+        }
+      },
+      "read": {
+        "kind": "Tool",
+        "address": null,
+        "truth": null,
+        "access": null,
+        "status": null,
+        "layer": null,
+        "audience": null,
+        "primary": null,
+        "depends_on": null,
+        "probe": null,
+        "verified_at": null,
+        "dropped": [
+          {
+            "key": "x_spine_verified",
+            "value": {
+              "at": "2026-02-30",
+              "by": "t"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "verified-with-time",
+      "type": "object",
+      "element": {
+        "supertype": "Tool",
+        "x_spine_verified": {
+          "at": "2026-10-24T12:00:00Z",
+          "by": "t"
+        }
+      },
+      "read": {
+        "kind": "Tool",
+        "address": null,
+        "truth": null,
+        "access": null,
+        "status": null,
+        "layer": null,
+        "audience": null,
+        "primary": null,
+        "depends_on": null,
+        "probe": null,
+        "verified_at": "2026-10-24T12:00:00Z",
+        "dropped": []
+      }
+    },
+    {
+      "name": "depends-on-empty-is-stated",
+      "type": "object",
+      "element": {
+        "supertype": "Tool",
+        "x_spine_depends_on": []
+      },
+      "read": {
+        "kind": "Tool",
+        "address": null,
+        "truth": null,
+        "access": null,
+        "status": null,
+        "layer": null,
+        "audience": null,
+        "primary": null,
+        "depends_on": [],
         "probe": null,
         "verified_at": null,
         "dropped": []

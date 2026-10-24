@@ -1,4 +1,4 @@
-"""The spine profile (schema-dist ``profiles/spine.md``, serial 55): ``read_spine_element`` on every
+"""The spine profile (schema-dist ``profiles/spine.md``, serial 56): ``read_spine_element`` on every
 conformance case in ``codegen/schema-dist/profiles/spine.fixture.json``, vendored with the distribution;
 the closed lists against the page; the trim and the fold the room profile defines. The fixture's
 calendar steps are the npm SDK kernel's to check: this package has no calendar kernel."""
@@ -37,15 +37,21 @@ def page_lines() -> list[str]:
     return PAGE.read_text(encoding="utf-8").splitlines()
 
 
+def as_json(value: Any) -> str:
+    """One canonical JSON text, so the comparison is JSON's: Python's ``==`` holds ``True == 1`` and
+    ``1 == 1.0``, which JSON values do not."""
+    return json.dumps(value, sort_keys=True, ensure_ascii=False)
+
+
 def test_read_spine_element_reads_every_fixture_case_as_its_read_block() -> None:
     cases = load_fixture()["cases"]
     wrong = [
         f"{c['name']}: {c['type']} {c['element']} read {got}, the fixture says {c['read']}"
         for c in cases
-        if (got := read_spine_element(c["type"], c["element"]).as_dict()) != c["read"]
+        if as_json(got := read_spine_element(c["type"], c["element"]).as_dict()) != as_json(c["read"])
     ]
     assert wrong == []
-    assert len(cases) >= 34, f"the fixture holds {len(cases)} cases"  # dist.55's count; a later serial adds cases
+    assert len(cases) >= 40, f"the fixture holds {len(cases)} cases"  # dist.56's count; a later serial adds cases
 
 
 def test_the_calendar_block_is_there_with_its_six_steps_and_is_not_checked_here() -> None:
@@ -142,7 +148,7 @@ def test_verified_at_must_be_a_day_on_the_calendar() -> None:
     assert at(" 2026-10-24 ").verified_at == "2026-10-24"
     assert at("2026-10-24T10:00:00Z").verified_at == "2026-10-24T10:00:00Z"
     assert at("2026-02-30").verified_at is None
-    assert at("2026-02-30").dropped == ('x_spine_verified: {"at": "2026-02-30", "by": "t"}',)
+    assert at("2026-02-30").dropped == ({"key": "x_spine_verified", "value": {"at": "2026-02-30", "by": "t"}},)
     assert at("\u0662\u0660\u0662\u0666-10-24").verified_at is None  # Arabic-Indic digits are not the form's
 
 
@@ -151,3 +157,41 @@ def test_null_is_not_stated_and_drops_nothing_and_an_empty_depends_on_is_stated(
     read = read_spine_element("object", {"supertype": "Tool", **{f"x_spine_{k}": None for k in keys}})
     assert read == SpineRead(kind="Tool")
     assert read_spine_element("object", {"supertype": "Tool", "x_spine_depends_on": []}).depends_on == ()
+
+
+def test_a_dropped_value_is_the_elements_own_value_in_the_pages_key_order() -> None:
+    """Serial 56: each entry ``{key, value}``, the value as the element held it (a boolean stays a boolean,
+    and is not ``1``), a copy the caller can't reach back through; a non-string truth or probe is named."""
+    element: dict[str, Any] = {
+        "supertype": "Tool",
+        "x_spine_verified": {"at": "soon"},
+        "x_spine_probe": ["npm", "x"],
+        "x_spine_status": True,
+        "x_spine_truth": 7,
+        "x_spine_address": [False],
+    }
+    dropped = read_spine_element("object", element).as_dict()["dropped"]
+    assert as_json(dropped) == as_json(
+        [
+            {"key": "x_spine_address", "value": False},
+            {"key": "x_spine_truth", "value": 7},
+            {"key": "x_spine_status", "value": True},
+            {"key": "x_spine_probe", "value": ["npm", "x"]},
+            {"key": "x_spine_verified", "value": {"at": "soon"}},
+        ]
+    )
+    dropped[3]["value"].append("y")
+    assert element["x_spine_probe"] == ["npm", "x"]
+    assert read_spine_element("object", {"supertype": "Tool", "x_spine_truth": 7}).truth is None
+    assert read_spine_element("object", {"supertype": "Tool", "x_spine_truth": ""}).dropped == ()  # blank: unstated
+
+
+def test_the_probe_form_is_syntax() -> None:
+    def verb(probe: str) -> str | None:
+        return read_spine_element("object", {"supertype": "Tool", "x_spine_probe": probe}).probe
+
+    assert verb("npm @onlyworlds/sdk") == "npm"
+    assert verb(" npm @onlyworlds/sdk ") == "npm"  # the outer trim
+    assert verb("NPM @onlyworlds/sdk") == "unsupported"
+    assert verb("npm  @onlyworlds/sdk") == "unsupported"
+    assert verb("http get https://x expect 200") == "unsupported"
