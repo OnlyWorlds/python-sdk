@@ -334,4 +334,4 @@ Three groups of tests run only when asked:
 
 ## Licence and contributions
 
-The code is MIT (`LICENSE`). Issues are welcome: a bug, a wrong word, a thing you could not do. Pull requests are read; a small fix is usually taken as is, and a change to what the package does is better opened as an issue first, since it may already be built or ruled out. A reply can take a few days. A vulnerability goes privately, never in an issue: `SECURITY.md`.
+The code is MIT (`LICENSE`). Issues are welcome: a bug, a wrong word, a thing you could not do. Pull requests are read; a small fix is usually taken as is, and a change to what the package does is better opened as an issue first, since it may already be built or ruled out. A reply can take a few days. A vulnerability goes privately, never in an issue: `SECURITY.md`. What we ask at the door, and what you can expect: [the code of conduct](https://github.com/OnlyWorlds/OnlyWorlds/blob/main/CODE_OF_CONDUCT.md).
