@@ -63,6 +63,15 @@ by placeholders). ``FileSource`` adapts where its shape is not the API's:
   ``sources``, and ``calendars`` (the export of 2026-10-23 holds none, though its timeline names a
   calendar).
 
+**A world pushed from OnlyWorlds comes back as itself.** A push into LegendKeeper writes the element's
+id in a key-value row ``onlyworlds-id``, its supertype and subtype as tags ``ow-supertype:<value>`` and
+``ow-subtype:<value>``, extension keys (``x_*``, ``atlas_*``, ``shadow_*``) as rows under their own names
+(a list or an object as JSON text), and what had no slot in ``onlyworlds-unmapped``. Read back, a uuid in
+``onlyworlds-id`` is the element's id (one claimed twice, or not a uuid, is kept and the id derived), the
+tags fill the two fields, the extension keys return under their names, and the unmapped rows go to the
+report. Measured on a push of ten Moppetopia elements: ids, names, descriptions, scalar fields and the
+links inside the slice all equal (2026-10-25).
+
 LegendKeeper's starter pages (the tutorial a new project is seeded with: Wiki City, Temple of
 Time, ...) travel like the rest: nothing in the file marks them, so they are imported. On the one
 real export their ``createdBy`` is another account than the person's, which is a tell, not a rule.
@@ -303,6 +312,16 @@ EXT_PREFIX = "x_legendkeeper_"
 #: from (the producer line and the x_legendkeeper_ keys say that; ruled 2026-10-23).
 UNTYPED_SUPERTYPE = "Article"
 
+#: The push convention (OnlyWorlds into LegendKeeper, the trial of 2026-10-25): a key-value row keyed
+#: ``onlyworlds-id`` holds the element's own id, ``onlyworlds-unmapped`` what had no slot, and tags
+#: ``ow-supertype:<value>`` and ``ow-subtype:<value>`` the two fields. Read back, the id is the element's id.
+OW_ID_KEY = "onlyworlds-id"
+OW_UNMAPPED_KEY = "onlyworlds-unmapped"
+OW_TAG_PREFIXES = {"ow-supertype:": "supertype", "ow-subtype:": "subtype"}
+_UUID_TEXT = re.compile(r"[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}")
+#: a key that is an extension key in the standard's own namespaces comes back under its own name
+_EXT_KEY = re.compile(r"(?:x|atlas|shadow)_[a-z0-9_]+")
+
 #: Resources and events per page (the API's maximum).
 PAGE_SIZE = 100
 
@@ -383,6 +402,17 @@ _PLAIN_MARKS = ("underline", "sub", "sup", "color", "highlight")
 def _norm(name: str) -> str:
     """A key or title lowercased, whitespace runs as underscores: the name a field is compared to."""
     return re.sub(r"\s+", "_", name.strip().lower())
+
+
+def _json_or_text(text: str) -> Any:
+    """An extension value as a push writes it: a JSON array or object when the text is one (a list
+    or an object cannot ride a key-value row otherwise), else the text itself."""
+    if text[:1] in "[{":
+        try:
+            return json.loads(text)
+        except ValueError:
+            pass
+    return text
 
 
 def _uuid(key: str) -> str:
@@ -1139,6 +1169,8 @@ class ImportReport:
     notes: list[str] = field(default_factory=list)
     #: tags on the resources kept untyped -> how many carry each: what ``--map`` could type
     untyped_tags: dict[str, int] = field(default_factory=dict)
+    #: what an OnlyWorlds push said it could not place (its ``onlyworlds-unmapped`` rows), one line each
+    ow_unmapped: list[str] = field(default_factory=list)
     #: where the folder was written; None for a plan
     out: Path | None = None
 
@@ -1177,6 +1209,9 @@ class ImportReport:
             lines.append(
                 f"Titled links with no field, kept as Relation elements ({sum(self.relations.values())}): {listed}."
             )
+        if self.ow_unmapped:
+            lines.append(f"What the OnlyWorlds push could not place, as it says ({len(self.ow_unmapped)}):")
+            lines += [f"  - {u}" for u in self.ow_unmapped]
         if self.unresolved:
             lines.append(f"Links and mentions whose target is not in the folder ({len(self.unresolved)}):")
             lines += [f"  - {u.element!r}, {u.where}: {u.target}: {u.why}" for u in self.unresolved]
@@ -1337,14 +1372,28 @@ class _Converter:
         self.templates: list[str] = []
         self.placeholders = 0
         self._unplaced_seen: set[Unplaced] = set()
+        #: elements whose id is the ``onlyworlds-id`` they carry
+        self.own_ids = 0
 
     def _id(self, *parts: str) -> str:
         return _uuid(":".join(("legendkeeper", self.snap.project_id, *parts)))
 
     # -- pass 1: every element, with its type and id --------------------------
 
+    def _own_id(self, rid: str) -> str | None:
+        """The element id a resource carries in an ``onlyworlds-id`` key-value row, when it is a uuid."""
+        for prop in _obj(self.snap.full.get(rid)).get("properties") or []:
+            if not isinstance(prop, dict) or prop.get("kind") != "keyValue":
+                continue
+            for row in prop.get("rows") or []:
+                if isinstance(row, dict) and str(row.get("key") or "").strip() == OW_ID_KEY:
+                    text = _plain(row.get("content")) or str(row.get("text") or "").strip()
+                    return text.lower() if _UUID_TEXT.fullmatch(text.lower()) else None
+        return None
+
     def collect(self) -> None:
         untyped_tags: dict[str, int] = {}
+        claimed: dict[str, str] = {}
         for row in self.snap.resources:
             rid = row["id"]
             st = self.state[rid]
@@ -1353,11 +1402,26 @@ class _Converter:
             elif st == "under":
                 self.report.hidden.under_hidden += 1
             tags = [t for t in row.get("tags") or [] if isinstance(t, str)]
+            ow_tags = {
+                fname: t[len(pre) :].strip()
+                for t in tags
+                for pre, fname in OW_TAG_PREFIXES.items()
+                if t.lower().startswith(pre) and t[len(pre) :].strip()
+            }
+            tags = [t for t in tags if not any(t.lower().startswith(pre) for pre in OW_TAG_PREFIXES)]
             etype, by = self._type_of(tags)
             name = str(row.get("name") or "").strip() or f"Untitled ({rid})"
+            own = self._own_id(rid)
+            if own is not None and own in claimed:
+                self.report.notes.append(
+                    f"{name!r}: its {OW_ID_KEY} {own} is another resource's ({claimed[own]!r}): its id is derived"
+                )
+                own = None
+            if own is not None:
+                claimed[own] = name
             item = _Item(
                 etype,
-                self._id(rid),
+                own or self._id(rid),
                 name,
                 rid,
                 typed=by != "untyped" and not by.startswith("ambiguous"),
@@ -1368,6 +1432,9 @@ class _Converter:
                 item.fields["supertype"] = UNTYPED_SUPERTYPE
                 for t in tags:
                     untyped_tags[t] = untyped_tags.get(t, 0) + 1
+            item.fields.update(ow_tags)
+            if own is not None:
+                self.own_ids += 1
             self.items[rid] = item
             self.report.typed.append(Typed(name, rid, etype, by))
         self.report.untyped_tags = untyped_tags
@@ -1761,6 +1828,16 @@ class _Converter:
         text = self._runs(item, runs) if runs else str(row.get("text") or "").strip()
         if not text:
             return  # a key with no value carries nothing
+        if key == OW_ID_KEY:
+            if item.eid != text.lower():  # not the element's id: kept, never dropped
+                self._keep(item, key, text, f"not used as the id ({item.name!r} has its own)")
+            return
+        if key == OW_UNMAPPED_KEY:
+            self.report.ow_unmapped.append(f"{item.name!r}: {text}")
+            return
+        if _EXT_KEY.fullmatch(key) and not key.startswith(EXT_PREFIX) and key not in item.ext:
+            item.ext[key] = _json_or_text(text)
+            return
         if not item.typed:
             self._keep(item, key, text, "the resource's type is not known")
             return
@@ -2156,6 +2233,11 @@ class _Converter:
 
     def _notes(self) -> None:
         n = self.report.notes
+        if self.own_ids:
+            n.append(
+                f"{self.own_ids} element{'' if self.own_ids == 1 else 's'} take their id from their {OW_ID_KEY!r} row"
+                " (an OnlyWorlds push wrote it), so a round trip gives back the same elements"
+            )
         if self.templates:
             listed = ", ".join(repr(t) for t in self.templates)
             n.append(

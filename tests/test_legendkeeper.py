@@ -593,6 +593,65 @@ def test_the_api_source_walks_the_same_folder(tmp_path: Path) -> None:
         assert KEY.encode() not in data, path
 
 
+OW_ALDRIC = "0195f3a2-7c1e-7d4b-9a10-3c5e8f2b6a01"
+
+
+def pushed(ans: dict[str, Any], rid: str, rows: list[dict[str, Any]], tags: tuple[str, ...] = ()) -> None:
+    """What the OnlyWorlds push writes on a resource: a Fields key-value property and its tags."""
+    ans[f"{P}/resources/{rid}"]["properties"].append(
+        {"id": f"fields-{rid}", "rank": "a", "kind": "keyValue", "title": "Fields", "rows": rows, "display": "list"}
+    )
+    for where in (ans[f"{P}/resources/{rid}"], next(r for r in ans[f"{P}/resources"]["data"] if r["id"] == rid)):
+        where["tags"] = [*where.get("tags", []), *tags]
+
+
+def test_a_pushed_element_comes_back_with_its_own_id_and_conventions(tmp_path: Path) -> None:
+    """The push convention read back (OnlyWorlds into LegendKeeper and out): the id from the
+    onlyworlds-id row, supertype and subtype from their tags, extension keys under their own names
+    (JSON text read back as JSON), the push's unmapped note in the report and not on the element."""
+    ans = answers()
+    rows = [
+        kv("onlyworlds-id", OW_ALDRIC.upper()),
+        kv("onlyworlds-unmapped", "rivals: 1 link(s) outside the slice"),
+        kv("atlas_aliases", '["Al", "the Heir"]'),
+        kv("x_house_motto", "Ever onward"),
+    ]
+    pushed(ans, ALDRIC, rows, ("ow-supertype:Hero", "ow-subtype:Knight"))
+    pushed(ans, BOSS, [], ("ow-supertype:Ledger",))  # an untyped page: its own supertype over Article
+    out, report = run(tmp_path, ans)
+    els = by_name(out)
+    aldric = els["Aldric Veyra"]
+    assert aldric["id"] == OW_ALDRIC
+    assert (aldric["supertype"], aldric["subtype"]) == ("Hero", "Knight")
+    assert aldric["atlas_aliases"] == ["Al", "the Heir"] and aldric["x_house_motto"] == "Ever onward"
+    assert not [k for k in aldric if "onlyworlds" in k]
+    assert report.ow_unmapped == ["'Aldric Veyra': rivals: 1 link(s) outside the slice"]
+    assert by_name(out)["Boss wire test (delete me)"]["supertype"] == "Ledger"
+    assert not [tag for tag in report.untyped_tags if tag.startswith("ow-")]
+    assert any(n.startswith("1 element take their id from their 'onlyworlds-id' row") for n in report.notes)
+    # every link to Aldric uses that id
+    home = relations(out)[0]
+    assert home["actor"] == OW_ALDRIC and home["x_legendkeeper_source"] == OW_ALDRIC
+    # a second trip gives back the same element
+    out2, _ = run(tmp_path, ans, name="again")
+    assert by_name(out2)["Aldric Veyra"]["id"] == OW_ALDRIC
+
+
+def test_an_onlyworlds_id_that_is_not_a_uuid_or_is_claimed_twice_is_not_the_id(tmp_path: Path) -> None:
+    ans = answers()
+    pushed(ans, ALDRIC, [kv("onlyworlds-id", OW_ALDRIC)])
+    pushed(ans, CASTLE, [kv("onlyworlds-id", OW_ALDRIC)])  # the same id on a second resource
+    pushed(ans, BOSS, [kv("onlyworlds-id", "not-a-uuid")])
+    out, report = run(tmp_path, ans)
+    els = by_name(out)
+    assert els["Aldric Veyra"]["id"] == OW_ALDRIC
+    assert els["Castle Veyra"]["id"] == eid(CASTLE)
+    assert els["Castle Veyra"]["x_legendkeeper_onlyworlds-id"] == OW_ALDRIC  # kept, never dropped
+    boss = els["Boss wire test (delete me)"]
+    assert boss["id"] == eid(BOSS) and boss["x_legendkeeper_onlyworlds-id"] == "not-a-uuid"
+    assert any("is another resource's ('Aldric Veyra')" in n for n in report.notes)
+
+
 def test_the_api_source_paces_and_retries() -> None:
     sleeps: list[float] = []
     fake = FakeTransport(
