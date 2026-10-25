@@ -85,7 +85,7 @@ COUNTS = {
     "location": 1,
     "map": 4 + 1,
     "marker": 56,
-    "narrative": 52 + 39,
+    "narrative": 52 + 39 + 4,  # + the timeline's Narrative and its three lanes' (0.56.0)
     "pin": 16 + 51,
     "relation": 3 + 2,
     "zone": 14,
@@ -370,19 +370,21 @@ def test_cli_reads_the_file(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> 
 
 
 def element_digests(out: Path) -> tuple[str, str]:
-    """(the folder, the ids) as OLD_FOLDER and OLD_IDS were taken: Maps and Pins aside, and what a
-    board made (each carries x_legendkeeper_board_map), Article read back as 0.41.0's supertype, so only
-    the rule's own change is undone."""
+    """(the folder, the ids) as OLD_FOLDER and OLD_IDS were taken: Maps and Pins aside, what a board
+    made (each carries x_legendkeeper_board_map) and a timeline's Narratives (supertype Timeline, since
+    0.56.0), Article read back as 0.41.0's supertype, so only the rule's own change is undone."""
     h = hashlib.sha256()
     for p in sorted(out.rglob("*")):
         rel = p.relative_to(out).as_posix()
         skip = ("elements/map/", "elements/pin/", "records/")  # the board's records are new, beside the elements
         if p.is_file() and p.name != "world.json" and not rel.startswith(skip):
             raw = p.read_bytes().replace(b'"supertype": "Article"', b'"supertype": "legendkeeper"')
-            if b'"x_legendkeeper_board_map":' not in raw:
+            if b'"x_legendkeeper_board_map":' not in raw and b'"supertype": "Timeline"' not in raw:
                 h.update(rel.encode() + b"\0" + raw + b"\0")
     ids = sorted(
-        b["id"] for b in bodies(out).values() if b["type"] not in ("map", "pin") and "x_legendkeeper_board_map" not in b
+        b["id"]
+        for b in bodies(out).values()
+        if b["type"] not in ("map", "pin") and "x_legendkeeper_board_map" not in b and b.get("supertype") != "Timeline"
     )
     return h.hexdigest(), hashlib.sha256("\n".join(ids).encode()).hexdigest()
 
@@ -398,6 +400,7 @@ def test_the_first_export_gives_its_old_folder_but_for_the_supertype(tmp_path: P
         if b["type"] == "narrative"
         and "supertype" in b
         and "x_legendkeeper_board_map" not in b  # a board's notes: Note
+        and b["supertype"] != "Timeline"  # a timeline's Narratives
     ]
     assert untyped and {b["supertype"] for b in untyped} == {"Article"}
     assert not any(
@@ -417,7 +420,7 @@ COUNTS_3 = {
     "location": 1,
     "map": 5 + 1,
     "marker": 56,
-    "narrative": 54 + 39,
+    "narrative": 54 + 39 + 4,
     "pin": 18 + 51,
     "relation": 3 + 2,
     "zone": 14,
@@ -499,7 +502,7 @@ def test_the_third_export_is_banked_with_no_account_asset_or_id() -> None:
 
 def test_the_third_export_becomes_the_element_set(tmp_path: Path) -> None:
     out, report = run(tmp_path, EXPORT3)
-    assert report.counts == COUNTS_3 and report.total == len(bodies(out)) == 113 + 163  # 163 from the board
+    assert report.counts == COUNTS_3 and report.total == len(bodies(out)) == 113 + 163 + 4  # 163 from the board
     assert [(m.name, m.width, m.height, m.pins, m.image, m.mapless, m.max_zoom) for m in report.maps] == [
         ("The Realm of Tutoria: Main", 10000, 7000, 16, "id", False, 6),
         ("Creature: Habitat Map", None, None, 0, "none", True, None),

@@ -569,10 +569,10 @@ def test_a_plan_writes_no_records_and_the_folder_reads_and_lints(tmp_path: Path)
         "records/RECORDS.json",
         RECORD,
     ]
-    assert len(read_folder(out).elements) == 113 + 163  # the folder still opens, records beside its elements
+    assert len(read_folder(out).elements) == 113 + 163 + 4  # the folder still opens, records beside its elements
     r = subprocess.run([sys.executable, "-m", "onlyworlds.lint", str(out)], capture_output=True, text=True)
     lines = r.stdout.strip().splitlines()
-    assert r.returncode == 0 and "276" in lines[-1], r.stdout + r.stderr
+    assert r.returncode == 0 and "280" in lines[-1], r.stdout + r.stderr
     assert [line for line in lines[:-1] if not line.startswith("walk note:")] == [], r.stdout + r.stderr
 
 

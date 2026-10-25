@@ -149,7 +149,7 @@ def test_namespace_is_pinned() -> None:
 
 def test_the_tree_converts_to_the_element_set(tmp_path: Path) -> None:
     out, report = run(tmp_path)
-    assert report.counts == {"character": 1, "event": 2, "map": 1, "narrative": 5, "relation": 3}
+    assert report.counts == {"character": 1, "event": 2, "map": 1, "narrative": 7, "relation": 3}
     els = by_name(out)
     aldric = els["Aldric Veyra"]
     assert aldric["id"] == eid(ALDRIC) and aldric["type"] == "character"
@@ -175,7 +175,7 @@ def test_map_adds_tag_types(tmp_path: Path) -> None:
         "institution": 1,
         "location": 1,
         "map": 1,
-        "narrative": 3,
+        "narrative": 5,
         "relation": 3,
     }
     els = by_name(out)
@@ -295,6 +295,33 @@ def test_the_timeline_becomes_events_with_raw_minutes(tmp_path: Path) -> None:
     assert any("History" in n and "2 events" in n for n in report.notes)
 
 
+def test_a_timeline_is_a_narrative_holding_its_events_and_its_lanes(tmp_path: Path) -> None:
+    """Convention 3: a Narrative with supertype Timeline whose events are its Events, linked to its
+    resource as a hidden page's Narrative is; each lane a child Narrative holding that lane's Events."""
+    out, _ = run(tmp_path, type_map=MAP)  # Order of the Ash is an Institution through --map
+    els = by_name(out)
+    tl, lane = els["Order of the Ash: History"], els["Wars"]
+    siege, founding = event_id(SIEGE), event_id(FOUNDING)
+    assert (tl["type"], tl["supertype"]) == ("narrative", "Timeline") and "subtype" not in tl
+    assert sorted(tl["events"]) == sorted([siege, founding])
+    assert tl["institutions"] == [eid(ORDER)] and tl["x_legendkeeper_parent"] == eid(ORDER)
+    assert tl["x_legendkeeper_calendar"] == "gregorian" and tl["x_legendkeeper_document"] == "ke9g0py4"
+    assert (lane["supertype"], lane["subtype"], lane["parent_narrative"]) == ("Timeline", "lane", tl["id"])
+    assert sorted(lane["events"]) == sorted([siege, founding])
+    assert "hidden" not in tl and "hidden" not in lane
+    # an untyped owner (a Narrative) is the timeline's parent_narrative
+    out2, _ = run(tmp_path, name="untyped")
+    assert by_name(out2)["Order of the Ash: History"]["parent_narrative"] == eid(ORDER)
+
+
+def test_a_hidden_resource_hides_its_timeline_and_lanes(tmp_path: Path) -> None:
+    out, report = run(tmp_path, hide(answers(), ORDER), type_map=MAP)
+    els = by_name(out)
+    assert els["Order of the Ash: History"]["hidden"] is True and els["Wars"]["hidden"] is True
+    assert report.hidden.timelines == 1
+    assert "1 hidden timeline, its Narrative and its lanes'" in report.render()
+
+
 def secret_id(rid: str, did: str, n: int) -> str:
     return str(uuid.uuid5(LEGENDKEEPER_NAMESPACE, f"legendkeeper:{PID}:secret:{rid}:{did}:{n}"))
 
@@ -326,7 +353,7 @@ def test_a_hidden_resource_is_an_element_carrying_the_mark(tmp_path: Path) -> No
     report = import_legendkeeper(src, PID, out)
     assert any(ORDER in path for path in src.calls)  # read like any other: nothing is dropped
     assert report.hidden.resources == 1
-    assert report.counts == {"character": 1, "event": 2, "map": 1, "narrative": 5, "relation": 3}
+    assert report.counts == {"character": 1, "event": 2, "map": 1, "narrative": 7, "relation": 3}
     els = by_name(out)
     order = els["Order of the Ash"]
     assert order["hidden"] is True and list(order)[:4] == ["type", "id", "name", "hidden"]
@@ -344,7 +371,7 @@ def test_a_hidden_resource_is_an_element_carrying_the_mark(tmp_path: Path) -> No
 
 def test_a_hidden_parent_hides_its_subtree(tmp_path: Path) -> None:
     out, report = run(tmp_path, hide(answers(), BOSS))
-    assert report.counts == {"character": 1, "event": 2, "map": 1, "narrative": 4, "relation": 3}  # no secret Narrative
+    assert report.counts == {"character": 1, "event": 2, "map": 1, "narrative": 6, "relation": 3}  # no secret Narrative
     assert (report.hidden.resources, report.hidden.under_hidden) == (1, 3)
     shown = [b["name"] for b in bodies(out).values() if not b.get("hidden")]
     assert shown == ["Sikelia"]
@@ -399,7 +426,7 @@ def test_plan_writes_nothing(tmp_path: Path) -> None:
     out = tmp_path / "planned"
     report = import_legendkeeper(RecordedSource(answers()), PID, out, plan_only=True)
     assert not out.exists() and report.out is None
-    assert report.counts == {"character": 1, "event": 2, "map": 1, "narrative": 5, "relation": 3}
+    assert report.counts == {"character": 1, "event": 2, "map": 1, "narrative": 7, "relation": 3}
     text = report.render()
     assert "Plan only: nothing written." in text
     assert "'faction'" in text and "'place'" in text  # the tags --map could type
@@ -421,9 +448,9 @@ def test_the_report_names_everything_not_placed(tmp_path: Path) -> None:
 def test_ids_do_not_move_with_the_supertype(tmp_path: Path) -> None:
     """Untyped is supertype Article now (no tool name in a supertype, Skeld, OW Market h40 #11385);
     the ids are those 0.41.0 gave: the sha256 of the sorted ids, one a line. The Region map's Map,
-    made since 0.53.0, is the one id added."""
+    made since 0.53.0, and the timeline's Narrative and its lane's, since 0.56.0, are the ids added."""
     out, _ = run(tmp_path)
-    ids = sorted(i for i, b in bodies(out).items() if b["type"] != "map")
+    ids = sorted(i for i, b in bodies(out).items() if b["type"] != "map" and b.get("supertype") != "Timeline")
     assert [b["name"] for b in bodies(out).values() if b["type"] == "map"] == ["Castle Veyra: Region map"]
     assert hashlib.sha256("\n".join(ids).encode()).hexdigest() == (
         "d5ffef3b277079ef64e225c9c91ada4d877292aae9ce06c6ff7392863a4a31e1"

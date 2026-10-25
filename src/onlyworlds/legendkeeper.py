@@ -144,7 +144,11 @@ What becomes what:
   ``x_legendkeeper_lane`` its lane's name, ``x_legendkeeper_timeline`` the document's name,
   ``x_legendkeeper_parent`` the resource it belongs to. ``start_date`` and ``end_date`` are left
   unset: the unit is the world's own time system, and converting minutes into it is a later step
-  that needs the world's time settings named. Placeholders are layout and are counted.
+  that needs the world's time settings named. Placeholders are layout and are counted. The timeline
+  itself is a Narrative, ``<resource>: <document>``, with supertype ``Timeline``, its ``events`` the
+  Events read on it, linked to its resource as a hidden page's Narrative is; each lane is a child
+  Narrative (supertype ``Timeline``, subtype ``lane``, ``parent_narrative`` the timeline) holding that
+  lane's Events. Hidden with its resource or document, a lane also on its own mark.
 - **A map document** (from either road) **becomes a Map** (ruled
   2026-10-23), named ``<resource>: <document>`` as a hidden page's Narrative is: ``width`` is
   ``max_x - min_x`` and ``height`` ``max_y - min_y`` from the document's ``map`` bounds (whole
@@ -369,6 +373,8 @@ EXT_PREFIX = "x_legendkeeper_"
 #: The supertype a Narrative made from an untyped resource carries: what it is, never where it came
 #: from (the producer line and the x_legendkeeper_ keys say that; ruled 2026-10-23).
 UNTYPED_SUPERTYPE = "Article"
+#: a timeline's Narrative and its lanes' supertype
+TIMELINE = "Timeline"
 
 #: The push convention (OnlyWorlds into LegendKeeper, the trial of 2026-10-25): a key-value row keyed
 #: ``onlyworlds-id`` holds the element's own id, ``onlyworlds-unmapped`` what had no slot, and tags
@@ -1299,6 +1305,8 @@ class Hidden:
     boards: int = 0
     #: cards on a visible board that show a hidden page: hidden Pins
     board_pins: int = 0
+    #: timelines hidden, or of a hidden resource: hidden Timeline Narratives (their lanes with them)
+    timelines: int = 0
 
 
 @dataclass(frozen=True)
@@ -1456,6 +1464,11 @@ class ImportReport:
                 "secret blocks inside hidden text, kept in place",
             ),
             (h.events, "hidden timeline event", "hidden timeline events"),
+            (
+                h.timelines,
+                "hidden timeline, its Narrative and its lanes'",
+                "hidden timelines, each its Narrative and its lanes'",
+            ),
             (h.relations, "Relation with a hidden end", "Relations with a hidden end"),
             (h.maps, "hidden Map (its document or resource hidden)", "hidden Maps (their document or resource hidden)"),
             (h.pins, "hidden Pin (the pin or its Map hidden)", "hidden Pins (the pin or its Map hidden)"),
@@ -1644,6 +1657,8 @@ class _Converter:
         self.events: list[dict[str, Any]] = []
         self.event_ids: set[str] = set()
         self.maps: list[dict[str, Any]] = []
+        #: a timeline's Narrative and its lanes' (convention 3)
+        self.timelines: list[dict[str, Any]] = []
         self.pins: list[dict[str, Any]] = []
         #: what boards make beside their Maps and Pins
         self.zones: list[dict[str, Any]] = []
@@ -2293,6 +2308,8 @@ class _Converter:
         lanes = {str(lane.get("id")): lane for lane in self.snap.lanes.get(did, [])}
         calendar = doc.get("calendarId")
         made = 0
+        mine: list[str] = []  # the events read on this timeline, in order
+        per_lane: dict[str, list[str]] = {}
         for ev in events:
             ev_id = ev.get("id")
             if not isinstance(ev_id, str) or ev_id in self.event_ids:
@@ -2365,10 +2382,53 @@ class _Converter:
             body.update(ext)
             self.events.append(body)
             made += 1
+            mine.append(body["id"])
+            if lane is not None:
+                per_lane.setdefault(str(lane.get("id")), []).append(body["id"])
+        self._timeline_narratives(item, doc, lanes, mine, per_lane)
         self.report.notes.append(
-            f"timeline {doc.get('name')!r} on {item.name!r}: {made} event{'' if made == 1 else 's'} (start and end"
-            " kept as minutes, with the formatted date when the source gives one; start_date and end_date unset)"
+            f"timeline {doc.get('name')!r} on {item.name!r}: a Narrative (supertype {TIMELINE}) holding {made}"
+            f" event{'' if made == 1 else 's'} and a child Narrative for each of its {len(lanes)}"
+            f" lane{'' if len(lanes) == 1 else 's'} (start and end kept as minutes, with the formatted date when the"
+            " source gives one; start_date and end_date unset)"
         )
+
+    def _timeline_narratives(
+        self,
+        item: _Item,
+        doc: dict[str, Any],
+        lanes: Mapping[str, dict[str, Any]],
+        events: list[str],
+        per_lane: Mapping[str, list[str]],
+    ) -> None:
+        """A timeline as a Narrative with supertype Timeline whose ``events`` are its Events, linked to
+        its resource as a hidden page's Narrative is; each lane a child Narrative (subtype lane) holding
+        that lane's Events. Hidden with the resource or the timeline; a lane hides on its own mark."""
+        did = str(doc.get("id"))
+        dname = str(doc.get("name") or "").strip() or "Timeline"
+        hidden = item.hidden or bool(doc.get("isHidden"))
+        tl_id = self._id("timeline", item.lk_id, did)
+        fields: dict[str, Any] = {"supertype": TIMELINE, "events": events} if events else {"supertype": TIMELINE}
+        if item.etype == "narrative":
+            fields["parent_narrative"] = item.eid
+        elif item.etype in _NARRATIVE_FIELD_FOR:
+            fields[_NARRATIVE_FIELD_FOR[item.etype]] = [item.eid]
+        ext: dict[str, Any] = {f"{EXT_PREFIX}document": did, f"{EXT_PREFIX}parent": item.eid}
+        if doc.get("calendarId"):
+            ext[f"{EXT_PREFIX}calendar"] = doc.get("calendarId")
+        self.timelines.append(self._body("narrative", tl_id, f"{item.name}: {dname}", hidden, fields, ext))
+        if hidden:
+            self.report.hidden.timelines += 1
+        for lid, lane in lanes.items():
+            lane_hidden = hidden or bool(lane.get("isHidden"))
+            lf: dict[str, Any] = {"supertype": TIMELINE, "subtype": "lane", "parent_narrative": tl_id}
+            if per_lane.get(lid):
+                lf["events"] = per_lane[lid]
+            lname = str(lane.get("name") or "").strip() or f"Lane ({lid})"
+            lext = {f"{EXT_PREFIX}id": lid, f"{EXT_PREFIX}parent": item.eid}
+            self.timelines.append(
+                self._body("narrative", self._id("lane", item.lk_id, did, lid), lname, lane_hidden, lf, lext)
+            )
 
     # -- maps ----------------------------------------------------------------
 
@@ -2776,7 +2836,16 @@ class _Converter:
             if item.mentions:
                 body[f"{EXT_PREFIX}mentions"] = item.mentions
             out.setdefault(item.etype, []).append(body)
-        for body in self.relations + self.events + self.maps + self.pins + self.zones + self.markers + self.notes_made:
+        for body in (
+            self.relations
+            + self.events
+            + self.maps
+            + self.pins
+            + self.zones
+            + self.markers
+            + self.notes_made
+            + self.timelines
+        ):
             out.setdefault(body["type"], []).append(body)
         self.report.counts = {t: len(b) for t, b in sorted(out.items())}
         self._notes()
