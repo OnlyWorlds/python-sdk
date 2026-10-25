@@ -67,8 +67,10 @@ by placeholders). ``FileSource`` adapts where its shape is not the API's:
 - not kept, named in the report: ``exportId``, ``exportedAt`` and ``hash`` (the report names the
   export; two exports of one project give one folder), ``createdBy`` (an account id),
   ``schemaVersion``, ``showPropertyBar``, ``isFullWidth``, document locators, ``transforms`` and
-  ``sources``, and ``calendars`` (the export of 2026-10-23 holds none, though its timeline names a
-  calendar).
+  ``sources``.
+- the export's ``calendars`` list answers as the API's calendars route does. Its calendar shape is
+  assumed equal to the API's and is unproven on a real file: the export of 2026-10-23 holds none,
+  though its timeline names a calendar (which the report then names as not among the calendars).
 
 **A world pushed from OnlyWorlds comes back as itself.** A push into LegendKeeper writes the element's
 id in a key-value row ``onlyworlds-id``, its supertype and subtype as tags ``ow-supertype:<value>`` and
@@ -142,13 +144,28 @@ What becomes what:
   minutes and the formatted string as ``x_legendkeeper_start``/``x_legendkeeper_end``
   (``{"minutes": ..., "formatted": ...}``), ``x_legendkeeper_calendar`` the calendar's id,
   ``x_legendkeeper_lane`` its lane's name, ``x_legendkeeper_timeline`` the document's name,
-  ``x_legendkeeper_parent`` the resource it belongs to. ``start_date`` and ``end_date`` are left
-  unset: the unit is the world's own time system, and converting minutes into it is a later step
-  that needs the world's time settings named. Placeholders are layout and are counted. The timeline
+  ``x_legendkeeper_parent`` the resource it belongs to. When the timeline's calendar is exact (the
+  next point), ``start_date`` and ``end_date`` are days: the minutes divided by the minutes in the
+  calendar's day, rounded down (minute -1 is day -1); otherwise they are left unset and the minutes
+  stand alone. Placeholders are layout and are counted. The timeline
   itself is a Narrative, ``<resource>: <document>``, with supertype ``Timeline``, its ``events`` the
   Events read on it, linked to its resource as a hidden page's Narrative is; each lane is a child
   Narrative (supertype ``Timeline``, subtype ``lane``, ``parent_narrative`` the timeline) holding that
   lane's Events. Hidden with its resource or document, a lane also on its own mark.
+- **A calendar a timeline names** (its ``calendarId``, among the project's calendars: ``GET
+  /projects/<id>/calendars``, read once; every project carries six presets, read live 2026-10-25)
+  **becomes a Construct** with supertype ``calendar``, named by the calendar, its ``description``
+  the calendar's, ``x_legendkeeper_id`` its id and ``x_legendkeeper_calendar`` the whole calendar as
+  read, so a push back is exact. It carries ``atlas_calendar`` (the calendar profile,
+  schema-dist ``profiles/calendar.md``: grain ``day``, one step a day) only when the profile can say
+  the calendar exactly; ``_calendar_config`` holds the rules and what witnessed them. Of the
+  presets, five are exact: Eberron, Exandria and Greyhawk in the profile's version 1, Gregorian
+  and Harptos in its version 2 (schema-dist serial 68: a leap rule with exceptions, read on the
+  year as shown). Scrolls is not: its later eras restart their years, which no probe has
+  witnessed. The report names each calendar made, exact or kept raw
+  with its reasons, and counts the calendars no timeline names, which are not made. A calendar id
+  not among the calendars is a report line, and its events keep their minutes only. The Construct
+  is hidden while only hidden timelines name it.
 - **A map document** (from either road) **becomes a Map** (ruled
   2026-10-23), named ``<resource>: <document>`` as a hidden page's Narrative is: ``width`` is
   ``max_x - min_x`` and ``height`` ``max_y - min_y`` from the document's ``map`` bounds (whole
@@ -268,9 +285,12 @@ block of a page (the export gives a block no id, so both roads count them) and
 ``legendkeeper:<project id>:pin:<resource id>:<document id>:<pin id>`` for a Pin;
 ``legendkeeper:<project id>:board:<resource id>:<document id>`` for a board's Map, with ``:<shape
 id>`` for what a shape makes (a card's Pin, a frame's Zone, an arrow's Relation, a note's
-Narrative), its Pin ``:<shape id>:pin`` and a frame's Markers ``:<shape id>:<order>``. A second
+Narrative), its Pin ``:<shape id>:pin`` and a frame's Markers ``:<shape id>:<order>``;
+``legendkeeper:<project id>:calendar:<calendar id>`` for a calendar's Construct. A second
 import of the same project finds the same elements. ``world.json``: ``id`` UUIDv5 of
-``legendkeeper:<project id>``, ``name`` the project's name, ``producer`` ``{"tool": "onlyworlds",
+``legendkeeper:<project id>``, ``name`` the project's name, ``time_basic_unit`` ``day`` when at
+least one Event got a date (the folder is a new world, so it has no unit of its own yet; without
+a dated Event no unit is set), ``producer`` ``{"tool": "onlyworlds",
 "version": ..., "input": ...}`` with ``legendkeeper-api`` (``PRODUCER_INPUT``) from the API and
 ``legendkeeper-export`` (``PRODUCER_INPUT_FILE``) from the file (both on the folder spec's list,
 §4.2, v0.3.17), ``format_version`` this package's.
@@ -307,6 +327,7 @@ import uuid
 from collections import Counter
 from collections.abc import Callable, Iterable, Mapping
 from dataclasses import dataclass, field
+from itertools import pairwise
 from pathlib import Path
 from typing import Any, Protocol
 
@@ -878,6 +899,10 @@ class FileSource:
                     out[f"{rpath}/docs/{d['id']}/lanes"] = {"data": lanes, "hasMore": False}
                     out[f"{rpath}/docs/{d['id']}/events"] = {"data": events, "hasMore": False}
         out["resources"] = {"data": listed, "hasMore": False, "nextCursor": None}
+        # assumed in the API's shape: no real export holding a calendar has been read
+        calendars = self.export.get("calendars")
+        rows_c = [c for c in calendars if isinstance(c, dict)] if isinstance(calendars, list) else []
+        out["calendars"] = {"data": rows_c, "hasMore": False, "nextCursor": None}
         return out
 
     def _note(self, first: dict[str, Any] | None, project_id: str | None) -> None:
@@ -898,7 +923,10 @@ class FileSource:
             self.notes.append(f"the export says it holds {count} resources and lists {len(self._rows)}")
         calendars = e.get("calendars")
         if isinstance(calendars, list) and calendars:
-            self.notes.append(f"{len(calendars)} calendar{'' if len(calendars) == 1 else 's'} in the export: not read")
+            self.notes.append(
+                f"{len(calendars)} calendar{'' if len(calendars) == 1 else 's'} in the export, read as the API serves"
+                " calendars (the export's calendar shape is assumed the API's: unproven on a real file)"
+            )
         if self._icons:
             self.notes.append(f"{self._icons} inline icon{'' if self._icons == 1 else 's'}: not kept")
         if self._shows_row:
@@ -1053,6 +1081,240 @@ class FileSource:
 
 
 # ---------------------------------------------------------------------------
+# Calendars: a LegendKeeper calendar as the calendar profile's atlas_calendar
+# ---------------------------------------------------------------------------
+
+#: The calendar profile's key (schema-dist ``profiles/calendar.md``) and the supertype of the
+#: Construct that carries it, by the profile's convention.
+CALENDAR_FIELD = "atlas_calendar"
+CALENDAR_SUPERTYPE = "calendar"
+
+#: LegendKeeper's day-format tokens (each a run of one letter) and the profile's template tokens.
+_LK_FORMAT_TOKENS = {
+    "MMMM": "{month}",
+    "D": "{day}",
+    "DD": "{day}",
+    "DDDD": "{weekday}",
+    "YYYY": "{year}",
+    "E": "{era}",
+    "EE": "{era}",
+}
+
+
+def _lk_template(template: str) -> str | None:
+    """LegendKeeper's ``day`` template in the profile's tokens: ``^`` (the ordinal suffix) dropped,
+    ``[literal]`` kept. None when it holds a token the profile has no twin for (``MMM``, ``DDD``, ``H``)."""
+    out: list[str] = []
+    i = 0
+    while i < len(template):
+        ch = template[i]
+        if ch == "[":
+            j = template.find("]", i)
+            if j < 0:
+                return None
+            out.append(template[i + 1 : j])
+            i = j + 1
+        elif ch == "^":
+            i += 1
+        elif ch.isalpha():
+            j = i
+            while j < len(template) and template[j] == ch:
+                j += 1
+            token = _LK_FORMAT_TOKENS.get(template[i:j])
+            if token is None:
+                return None
+            out.append(token)
+            i = j
+        else:
+            out.append(ch)
+            i += 1
+    return "".join(out)
+
+
+def _minutes_in_day(cal: Mapping[str, Any]) -> int:
+    return int(cal.get("hoursInDay") or 24) * int(cal.get("minutesInHour") or 60)
+
+
+def _day_of(minutes: Any, day: int) -> int | None:
+    """The day a LegendKeeper minute falls in: a real floor of ``minutes / day``, so minute -1 is day -1."""
+    if isinstance(minutes, bool):
+        return None
+    if isinstance(minutes, int):
+        return minutes // day
+    if isinstance(minutes, float) and math.isfinite(minutes):
+        return math.floor(minutes / day)
+    return None
+
+
+def _leap_rule(interval: Any, offset: int, zero: bool) -> tuple[dict[str, Any] | None, str]:
+    """A leap day's ``interval`` (``4``, ``400,!100,4``) as the profile's ``every_years``, ``except``
+    and ``offset``; None and why when the profile cannot say it."""
+    terms = [t.strip() for t in str(interval or "").split(",") if t.strip()]
+    if any("+" in t for t in terms) or offset:
+        return None, "carries an offset of its own (unwitnessed)"
+    chain: list[tuple[int, bool]] = []
+    for t in terms:
+        digits = t[1:] if t.startswith("!") else t
+        if not digits.isdigit() or int(digits) < 1:
+            return None, "is not a list of whole numbers of years"
+        chain.append((int(digits), not t.startswith("!")))
+    chain.sort()
+    ns = [n for n, _ in chain]
+    if not chain or any(on != (i % 2 == 0) for i, (_, on) in enumerate(chain)):
+        return None, "does not alternate on, off, on from its smallest term"
+    if any(b <= a or b % a for a, b in pairwise(ns)):
+        return None, "has a term that is not a larger multiple of the one before"
+    rule: dict[str, Any] = {"every_years": ns[0]}
+    if ns[1:]:
+        rule["except"] = ns[1:]
+    if not zero and ns != [1]:  # LegendKeeper reads the rule on the year as shown, index + 1 with no year 0
+        rule["offset"] = 1
+    return rule, ""
+
+
+def _calendar_config(cal: Mapping[str, Any]) -> tuple[dict[str, Any] | None, list[str]]:
+    """A LegendKeeper calendar as an ``atlas_calendar`` value (grain ``day``, one step a day; the
+    profile's version 2 when a leap rule needs ``except`` or ``offset``, else version 1), or None
+    and the reasons it cannot be exact (none when exact).
+
+    Witnessed on LegendKeeper's six preset calendars (2026-10-25): its own breakdown of 559 chosen
+    minutes, read back from events made on each, against the TypeScript SDK's ``breakdownStep``
+    (4.76.0) on the config made here; Gregorian, Harptos, Eberron, Exandria and Greyhawk agree on
+    every one. The rules, each kept for a reason the witness gave:
+
+    - a month is a month; one marked ``isIntercalary`` and one day long is an ``intercalary`` day
+      after the months before it; a longer one (Greyhawk's festivals) a month; a month that does
+      not come every year (``interval`` other than 1) is not exact.
+    - a leap day is an ``intercalary`` day after the month it lengthens (after that month's own day,
+      when that month is itself one day long). Its rule's terms, smallest first, must alternate on,
+      off, on (``4``, ``!100``, ``400``), each a larger multiple of the one before: the first is
+      ``every_years``, the rest ``except``. LegendKeeper reads the rule on the year as shown (the
+      year index plus one with no year 0; 286 of 286 probed days of Gregorian, Harptos and Scrolls
+      agree, before the epoch too), so with no year 0 the entry carries ``offset`` 1. A term with its own
+      ``+`` offset, or a leap day's own nonzero ``offset``, is not exact (unwitnessed).
+    - a week that restarts each month is ``nested``; else ``free``, the names turned so the first
+      is the weekday at minute 0 (``epochWeekday``).
+    - the first era starts at 0; every era starts on a day; an era that restarts months and days
+      (``resetMode`` ``calendar``) is not exact, nor a later era that restarts its years
+      (unwitnessed), nor a later era counting on from the epoch with no year 0. The first era's
+      ``year_base`` is 0 with a year 0, else 1. A negative era is a ``down`` era, pivot 0, ``end``
+      its start in days, ``year_base`` 1, listed first: an era without an end runs to the next
+      era's start, so a down era listed after the up era at 0 would end that era where it begins.
+    - the ``day`` format's tokens become the profile's; one with no twin leaves the profile's
+      default. Moons and the clock have no place in the profile: they stay in the raw calendar.
+    """
+    try:
+        cfg, why = _read_calendar(cal)
+    except (KeyError, TypeError, ValueError, AttributeError) as exc:
+        return None, [f"not read as a calendar ({type(exc).__name__}: {exc})"]
+    return (None if why else cfg), why
+
+
+def _read_calendar(cal: Mapping[str, Any]) -> tuple[dict[str, Any], list[str]]:
+    why: list[str] = []
+    day = _minutes_in_day(cal)
+    if day < 1:
+        why.append(f"a day of {day} minutes")
+        day = 1
+    zero = bool(cal.get("hasZeroYear"))
+    months: list[Mapping[str, Any]] = list(cal.get("months") or [])
+    # month index -> the leap days that lengthen it
+    leaps: dict[int, list[dict[str, Any]]] = {}
+    for ld in cal.get("leapDays") or []:
+        label = str(ld.get("name") or "Leap day")
+        rule, said = _leap_rule(ld.get("interval"), int(ld.get("offset") or 0), zero)
+        if rule is None:
+            why.append(f"leap day {label!r}: its rule {ld.get('interval')!r} {said}")
+            continue
+        mi = int(ld.get("month") or 0)
+        if not 0 <= mi < len(months):
+            why.append(f"leap day {label!r} lengthens month {mi}, which the calendar does not have")
+            continue
+        if int(ld.get("day") or 0) != 0 or ld.get("intercalary"):
+            why.append(f"leap day {label!r}: a day inside the month or its own intercalary mark (unwitnessed)")
+        leaps.setdefault(mi, []).append({"name": label, **rule})
+    names: list[str] = []
+    lengths: list[int] = []
+    inter: list[dict[str, Any]] = []
+    for i, m in enumerate(months):
+        name = str(m.get("name") or f"Month {i + 1}")
+        length = int(m["length"])
+        if int(m.get("interval") or 1) != 1:
+            why.append(f"month {name!r} comes every {m.get('interval')} years")
+        elif m.get("isIntercalary") and length == 1:
+            inter.append({"name": name, "after_month": len(names)})
+        else:
+            if length < 1:
+                why.append(f"month {name!r} is {length} days long")
+            names.append(name)
+            lengths.append(length)
+        # LegendKeeper lengthens the month itself: its leap day follows the month's own days
+        inter += [{"name": lp["name"], "after_month": len(names), **lp} for lp in leaps.get(i, [])]
+    if not names:
+        why.append("no month that comes every year")
+    cfg: dict[str, Any] = {
+        # version 2 says except and offset; a reader of version 1 alone refuses it whole, never misreads it
+        "version": 2 if any("except" in e or "offset" in e for e in inter) else 1,
+        "grain": "day",
+        "step_name": "day",
+        "bundles": {"months": {"names": names, "lengths": lengths}},
+    }
+    wd = [str(_obj(w).get("name") or "") for w in cal.get("weekdays") or []]
+    if wd:
+        if cal.get("weekResetsEachMonth"):
+            cfg["bundles"]["week"] = {"length": len(wd), "names": wd, "mode": "nested"}
+        else:
+            k = int(cal.get("epochWeekday") or 0) % len(wd)
+            cfg["bundles"]["week"] = {"length": len(wd), "names": wd[k:] + wd[:k], "mode": "free"}
+    if inter:
+        cfg["intercalary"] = inter
+    eras: list[dict[str, Any]] = []
+    for i, e in enumerate(cal.get("positiveEras") or []):
+        ename = str(e["name"])
+        start = int(e["startsAt"])
+        if i == 0 and start != 0:
+            why.append(f"the first era {ename!r} starts at minute {start}, not 0")
+        if start % day:
+            why.append(f"era {ename!r} starts inside a day")
+        mode = e.get("resetMode") or "none"
+        if mode == "calendar":
+            why.append(f"era {ename!r} restarts months and days")
+        elif mode not in ("none", "year"):
+            why.append(f"era {ename!r}: reset mode {mode!r} not known here")
+        elif i > 0 and mode == "year":
+            why.append(f"era {ename!r} restarts its years at minute {start} (unwitnessed)")
+        elif i > 0 and not zero:
+            why.append(f"era {ename!r} counts its years on from the epoch, which has no year 0")
+        era: dict[str, Any] = {"name": ename, "abbrev": "" if e.get("hideAbbr") else str(e.get("abbr") or "AD")}
+        era["start"] = start // day
+        if i == 0 or mode == "year":
+            era["year_base"] = 0 if zero else 1
+        else:
+            era["restart"] = False
+        eras.append(era)
+    ne = cal.get("negativeEra")
+    if ne:
+        ename = str(ne["name"])
+        start = int(ne["startsAt"])
+        if start >= 0:
+            why.append(f"the negative era {ename!r} starts at minute {start}, not before 0")
+        if start % day:
+            why.append(f"era {ename!r} starts inside a day")
+        # first in the list: an era without an end runs to the next era's start, so this down era
+        # listed after the up era at 0 would end that era where it begins
+        down = {"name": ename, "abbrev": "" if ne.get("hideAbbr") else str(ne.get("abbr") or "AD"), "start": 0}
+        eras.insert(0, {**down, "end": start // day, "direction": "down", "year_base": 1})
+    if eras:
+        cfg["eras"] = eras
+    fmt = _obj(cal.get("format")).get("day")
+    if isinstance(fmt, str) and fmt:
+        template = _lk_template(fmt)
+        if template:
+            cfg["format"] = template
+    return cfg, why
+
+
+# ---------------------------------------------------------------------------
 # Reading: a source walked into a snapshot
 # ---------------------------------------------------------------------------
 
@@ -1072,6 +1334,8 @@ class Snapshot:
     #: time document id -> its lanes / its events
     lanes: dict[str, list[dict[str, Any]]] = field(default_factory=dict)
     events: dict[str, list[dict[str, Any]]] = field(default_factory=dict)
+    #: the project's calendars (``GET /projects/<id>/calendars``; the export file's ``calendars``)
+    calendars: list[dict[str, Any]] = field(default_factory=list)
     #: every answer that could not be read, one line each
     unread: list[str] = field(default_factory=list)
     #: what the source read past (the export file's adaptations), one line each
@@ -1167,11 +1431,14 @@ def _api_map(doc: dict[str, Any], image: Any, features: list[dict[str, Any]]) ->
 
 
 def read_project(source: Source, project_id: str) -> Snapshot:
-    """Walk a project: the project, its whole tree, then each resource, its page blocks, its
-    timelines, maps and boards, hidden ones too (the converter marks them hidden; nothing is left out).
+    """Walk a project: the project, its whole tree, its calendars, then each resource, its page
+    blocks, its timelines, maps and boards, hidden ones too (the converter marks them hidden;
+    nothing is left out).
 
-    The project and the tree must answer (a ``SourceError`` otherwise); a resource, a page or a
-    timeline that does not is listed in ``unread`` and the walk goes on.
+    The project and the tree must answer (a ``SourceError`` otherwise); the calendars, a
+    resource, a page or a timeline that does not is listed in ``unread`` and the walk goes on.
+    The calendars are one list, read once (the route takes no page size, by LegendKeeper's
+    OpenAPI document).
     """
     root = f"/projects/{_seg(project_id)}"
     project = source.get(root)
@@ -1180,6 +1447,10 @@ def read_project(source: Source, project_id: str) -> Snapshot:
     resources = [r for r in _paged(source, f"{root}/resources", sized=True) if isinstance(r.get("id"), str)]
     snap = Snapshot(project_id, project, resources)
     snap.producer_input = str(getattr(source, "producer_input", PRODUCER_INPUT))
+    try:
+        snap.calendars = _paged(source, f"{root}/calendars", sized=False)
+    except SourceError as exc:
+        snap.unread.append(f"the project's calendars: {exc}; its events keep their minutes, with no dates")
     for row in resources:
         rid = row["id"]
         rpath = f"{root}/resources/{_seg(rid)}"
@@ -1688,6 +1959,14 @@ class _Converter:
         self._unplaced_seen: set[Unplaced] = set()
         #: elements whose id is the ``onlyworlds-id`` they carry
         self.own_ids = 0
+        #: the project's calendars by id; the Constructs made for those a timeline names
+        self.calendars = {c["id"]: c for c in snap.calendars if isinstance(c.get("id"), str) and c["id"]}
+        self.constructs: list[dict[str, Any]] = []
+        #: calendar id -> (its name, minutes in its day when exact else None, why not exact)
+        self._cal: dict[str, tuple[str, int | None, list[str]]] = {}
+        self._cal_bodies: dict[str, dict[str, Any]] = {}
+        #: calendar id -> the Events dated from it
+        self._cal_dated: Counter[str] = Counter()
 
     def _id(self, *parts: str) -> str:
         return _uuid(":".join(("legendkeeper", self.snap.project_id, *parts)))
@@ -2307,7 +2586,8 @@ class _Converter:
             return  # listed in unread
         lanes = {str(lane.get("id")): lane for lane in self.snap.lanes.get(did, [])}
         calendar = doc.get("calendarId")
-        made = 0
+        day = self._calendar(item, doc, calendar) if isinstance(calendar, str) and calendar else None
+        made = dated = 0
         mine: list[str] = []  # the events read on this timeline, in order
         per_lane: dict[str, list[str]] = {}
         for ev in events:
@@ -2348,6 +2628,11 @@ class _Converter:
             ):
                 if minutes is not None:
                     ext[f"{EXT_PREFIX}{key}"] = {"minutes": minutes, **({"formatted": text} if text else {})}
+                when = _day_of(minutes, day) if day is not None else None
+                if when is not None:
+                    fields[f"{key}_date"] = when
+            if "start_date" in fields or "end_date" in fields:
+                dated += 1
             if calendar:
                 ext[f"{EXT_PREFIX}calendar"] = calendar
             if lane is not None:
@@ -2386,12 +2671,51 @@ class _Converter:
             if lane is not None:
                 per_lane.setdefault(str(lane.get("id")), []).append(body["id"])
         self._timeline_narratives(item, doc, lanes, mine, per_lane)
+        if isinstance(calendar, str) and dated:
+            self._cal_dated[calendar] += dated
+            dates = f"start_date and end_date in days from the calendar {self._cal[calendar][0]!r} ({dated} dated)"
+        elif isinstance(calendar, str) and calendar in self._cal:
+            dates = f"start_date and end_date unset: the calendar {self._cal[calendar][0]!r} is kept raw"
+        else:
+            dates = "start_date and end_date unset: no calendar read"
         self.report.notes.append(
             f"timeline {doc.get('name')!r} on {item.name!r}: a Narrative (supertype {TIMELINE}) holding {made}"
             f" event{'' if made == 1 else 's'} and a child Narrative for each of its {len(lanes)}"
             f" lane{'' if len(lanes) == 1 else 's'} (start and end kept as minutes, with the formatted date when the"
-            " source gives one; start_date and end_date unset)"
+            f" source gives one; {dates})"
         )
+
+    def _calendar(self, item: _Item, doc: dict[str, Any], cid: str) -> int | None:
+        """The calendar a timeline names, made a Construct the first time (supertype ``calendar``,
+        the raw calendar whole as ``x_legendkeeper_calendar``, ``atlas_calendar`` only when exact).
+        Returns the minutes in its day when exact, so its Events get dates; else None. Hidden while
+        only hidden timelines name it (a custom calendar's names can tell what the timeline hides)."""
+        shown = not (item.hidden or bool(doc.get("isHidden")))
+        if cid in self._cal:
+            if shown:
+                self._cal_bodies[cid].pop("hidden", None)
+            return self._cal[cid][1]
+        cal = self.calendars.get(cid)
+        if cal is None:
+            self.report.notes.append(
+                f"timeline {doc.get('name')!r} on {item.name!r} names the calendar {cid!r}, which is not among the"
+                " project's calendars: its events keep their minutes, with no dates"
+            )
+            return None
+        config, why = _calendar_config(cal)
+        name = str(cal.get("name") or "").strip() or f"Calendar ({cid})"
+        fields: dict[str, Any] = {"supertype": CALENDAR_SUPERTYPE}
+        if isinstance(cal.get("description"), str) and cal["description"].strip():
+            fields["description"] = cal["description"].strip()
+        ext: dict[str, Any] = {CALENDAR_FIELD: config} if config is not None else {}
+        ext[f"{EXT_PREFIX}id"] = cid
+        ext[f"{EXT_PREFIX}calendar"] = copy.deepcopy(cal)
+        body = self._body("construct", self._id("calendar", cid), name, not shown, fields, ext)
+        self.constructs.append(body)
+        self._cal_bodies[cid] = body
+        day = _minutes_in_day(cal) if config is not None else None
+        self._cal[cid] = (name, day, why)
+        return day
 
     def _timeline_narratives(
         self,
@@ -2845,6 +3169,7 @@ class _Converter:
             + self.markers
             + self.notes_made
             + self.timelines
+            + self.constructs
         ):
             out.setdefault(body["type"], []).append(body)
         self.report.counts = {t: len(b) for t, b in sorted(out.items())}
@@ -2934,18 +3259,43 @@ class _Converter:
         if self.marks:
             listed = ", ".join(f"{m} {c}" for m, c in sorted(self.marks.items()))
             n.append(f"runs with marks Markdown has no syntax for, read as plain text: {listed}")
+        for cid, (name, day, why) in self._cal.items():
+            if day is not None:
+                k = self._cal_dated[cid]
+                n.append(
+                    f"calendar {name!r} ({cid}): a Construct (supertype {CALENDAR_SUPERTYPE}) carrying"
+                    f" {CALENDAR_FIELD}, grain day; {k} event{'' if k == 1 else 's'} dated, start_date and end_date"
+                    f" the minutes divided by {day} (a day), rounded down, the minutes kept beside; the calendar kept"
+                    " whole as"
+                    f" {EXT_PREFIX}calendar"
+                )
+            else:
+                n.append(
+                    f"calendar {name!r} ({cid}): a Construct (supertype {CALENDAR_SUPERTYPE}), kept raw as"
+                    f" {EXT_PREFIX}calendar, with no {CALENDAR_FIELD} and no dates, not exact: " + "; ".join(why)
+                )
+        left = [str(c.get("name") or cid) for cid, c in self.calendars.items() if cid not in self._cal]
+        if left:
+            n.append(
+                f"{len(left)} calendar{'' if len(left) == 1 else 's'} no timeline names, not made: "
+                + ", ".join(repr(x) for x in left)
+            )
+        if sum(self._cal_dated.values()):
+            n.append(
+                "the world's time_basic_unit is day: every date in the folder counts days from the calendar's epoch"
+            )
         if self.items:
             n.append(f"not kept: {_NOT_KEPT}")
 
     def world(self) -> dict[str, Any]:
         pid = self.snap.project_id
         name = str(self.snap.project.get("name") or "").strip() or f"LegendKeeper project {pid}"
-        return {
-            "id": _uuid(f"legendkeeper:{pid}"),
-            "name": name,
-            "format_version": FORMAT_VERSION,
-            "producer": {"tool": "onlyworlds", "version": __version__, "input": self.snap.producer_input},
-        }
+        world: dict[str, Any] = {"id": _uuid(f"legendkeeper:{pid}"), "name": name}
+        if sum(self._cal_dated.values()):  # a new world has no unit yet: the dates name it
+            world["time_basic_unit"] = "day"
+        world["format_version"] = FORMAT_VERSION
+        world["producer"] = {"tool": "onlyworlds", "version": __version__, "input": self.snap.producer_input}
+        return world
 
 
 def _type_map(pairs: Mapping[str, str] | None) -> dict[str, str]:

@@ -45,6 +45,8 @@ def answers(rec: dict[str, Any] | None = None) -> dict[str, Any]:
         base = f"{P}/resources/{m['resource']}/docs/{did}"
         out[base] = m["doc"]
         out[f"{base}/features"] = m["features"]
+    # the six preset calendars every project carries (no timeline here: none is made)
+    out[f"{P}/calendars"] = json.loads((FIX / "api-calendars.json").read_text(encoding="utf-8"))["answer"]
     return out
 
 

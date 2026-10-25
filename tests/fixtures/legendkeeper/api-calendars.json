@@ -1,0 +1,1116 @@
+{
+ "recorded": "2026-10-25, the LegendKeeper API v3, GET /projects/{id}/calendars on a Pro project: the six preset calendars every project carries",
+ "answer": {
+  "data": [
+   {
+    "id": "gregorian",
+    "name": "Gregorian",
+    "hoursInDay": 24,
+    "minutesInHour": 60,
+    "hasZeroYear": false,
+    "halfClock": true,
+    "format": {
+     "id": "american-verbose",
+     "time": "MMMM D^, YYYY E, HH:mm",
+     "year": "YYYY E",
+     "month": "MMMM YYYY E",
+     "day": "MMMM D^, YYYY E"
+    },
+    "moons": [
+     {
+      "id": "luna",
+      "name": "Moon",
+      "phase": 42524.0463,
+      "shift": 15238,
+      "color": "#FFFFFF"
+     }
+    ],
+    "epochWeekday": 1,
+    "weekdays": [
+     {
+      "id": "sun",
+      "name": "Sunday"
+     },
+     {
+      "id": "mon",
+      "name": "Monday"
+     },
+     {
+      "id": "tue",
+      "name": "Tuesday"
+     },
+     {
+      "id": "wed",
+      "name": "Wednesday"
+     },
+     {
+      "id": "thu",
+      "name": "Thursday"
+     },
+     {
+      "id": "fri",
+      "name": "Friday"
+     },
+     {
+      "id": "sat",
+      "name": "Saturday"
+     }
+    ],
+    "months": [
+     {
+      "id": "jan",
+      "name": "January",
+      "isIntercalary": false,
+      "length": 31,
+      "interval": 1,
+      "offset": 0
+     },
+     {
+      "id": "feb",
+      "name": "February",
+      "isIntercalary": false,
+      "length": 28,
+      "interval": 1,
+      "offset": 0
+     },
+     {
+      "id": "mar",
+      "name": "March",
+      "isIntercalary": false,
+      "length": 31,
+      "interval": 1,
+      "offset": 0
+     },
+     {
+      "id": "apr",
+      "name": "April",
+      "isIntercalary": false,
+      "length": 30,
+      "interval": 1,
+      "offset": 0
+     },
+     {
+      "id": "may",
+      "name": "May",
+      "isIntercalary": false,
+      "length": 31,
+      "interval": 1,
+      "offset": 0
+     },
+     {
+      "id": "jun",
+      "name": "June",
+      "isIntercalary": false,
+      "length": 30,
+      "interval": 1,
+      "offset": 0
+     },
+     {
+      "id": "jul",
+      "name": "July",
+      "isIntercalary": false,
+      "length": 31,
+      "interval": 1,
+      "offset": 0
+     },
+     {
+      "id": "aug",
+      "name": "August",
+      "isIntercalary": false,
+      "length": 31,
+      "interval": 1,
+      "offset": 0
+     },
+     {
+      "id": "sep",
+      "name": "September",
+      "isIntercalary": false,
+      "length": 30,
+      "interval": 1,
+      "offset": 0
+     },
+     {
+      "id": "oct",
+      "name": "October",
+      "isIntercalary": false,
+      "length": 31,
+      "interval": 1,
+      "offset": 0
+     },
+     {
+      "id": "nov",
+      "name": "November",
+      "isIntercalary": false,
+      "length": 30,
+      "interval": 1,
+      "offset": 0
+     },
+     {
+      "id": "dec",
+      "name": "December",
+      "isIntercalary": false,
+      "length": 31,
+      "interval": 1,
+      "offset": 0
+     }
+    ],
+    "leapDays": [
+     {
+      "id": "leap-day",
+      "name": "Leap Day",
+      "intercalary": false,
+      "month": 1,
+      "addsWeekDay": false,
+      "day": 0,
+      "weekDay": "",
+      "interval": "400,!100,4",
+      "offset": 0
+     }
+    ],
+    "negativeEra": {
+     "id": "bc",
+     "abbr": "BCE",
+     "name": "Before Common Era",
+     "hideAbbr": false,
+     "resetMode": "none",
+     "startsAt": -756864000
+    },
+    "positiveEras": [
+     {
+      "id": "AD",
+      "abbr": "CE",
+      "name": "Common Era",
+      "resetMode": "none",
+      "hideAbbr": false,
+      "startsAt": 0
+     }
+    ],
+    "maxMinutes": 2103269760,
+    "version": "2cd3f55b3121d207"
+   },
+   {
+    "id": "harptos",
+    "name": "Harptos",
+    "hoursInDay": 24,
+    "minutesInHour": 60,
+    "hasZeroYear": false,
+    "format": {
+     "id": "default",
+     "year": "YYYY",
+     "month": "MMMM YYYY",
+     "day": "MMMM D^, YYYY",
+     "time": "MMMM D^, YYYY, HH:mm"
+    },
+    "halfClock": false,
+    "weekdays": [
+     {
+      "id": "i",
+      "name": "I"
+     },
+     {
+      "id": "ii",
+      "name": "II"
+     },
+     {
+      "id": "iii",
+      "name": "III"
+     },
+     {
+      "id": "iv",
+      "name": "IV"
+     },
+     {
+      "id": "v",
+      "name": "V"
+     },
+     {
+      "id": "vi",
+      "name": "VI"
+     },
+     {
+      "id": "vii",
+      "name": "VII"
+     },
+     {
+      "id": "viii",
+      "name": "VIII"
+     },
+     {
+      "id": "ix",
+      "name": "IX"
+     },
+     {
+      "id": "x",
+      "name": "X"
+     }
+    ],
+    "epochWeekday": 0,
+    "weekResetsEachMonth": true,
+    "months": [
+     {
+      "id": "hammer",
+      "name": "Hammer",
+      "isIntercalary": false,
+      "length": 30,
+      "interval": 1,
+      "offset": 1
+     },
+     {
+      "id": "midwinter",
+      "name": "Midwinter",
+      "isIntercalary": true,
+      "length": 1,
+      "interval": 1,
+      "offset": 1
+     },
+     {
+      "id": "alturiak",
+      "name": "Alturiak",
+      "isIntercalary": false,
+      "length": 30,
+      "interval": 1,
+      "offset": 1
+     },
+     {
+      "id": "spring-equinox",
+      "name": "Ches",
+      "isIntercalary": false,
+      "length": 30,
+      "interval": 1,
+      "offset": 1
+     },
+     {
+      "id": "tarsakh",
+      "name": "Tarsak",
+      "isIntercalary": false,
+      "length": 30,
+      "interval": 1,
+      "offset": 1
+     },
+     {
+      "id": "greengrass",
+      "name": "Greengrass",
+      "isIntercalary": true,
+      "length": 1,
+      "interval": 1,
+      "offset": 1
+     },
+     {
+      "id": "mirtul",
+      "name": "Mirtul",
+      "isIntercalary": false,
+      "length": 30,
+      "interval": 1,
+      "offset": 1
+     },
+     {
+      "id": "summer-solstice",
+      "name": "Kythorn",
+      "isIntercalary": false,
+      "length": 30,
+      "interval": 1,
+      "offset": 1
+     },
+     {
+      "id": "flamerule",
+      "name": "Flamerule",
+      "isIntercalary": false,
+      "length": 30,
+      "interval": 1,
+      "offset": 1
+     },
+     {
+      "id": "midsummer",
+      "name": "Midsummer",
+      "isIntercalary": true,
+      "length": 1,
+      "interval": 1,
+      "offset": 1
+     },
+     {
+      "id": "shieldmeet",
+      "name": "Eleasis",
+      "isIntercalary": false,
+      "length": 30,
+      "interval": 1,
+      "offset": 1
+     },
+     {
+      "id": "eleasis",
+      "name": "Eleint",
+      "isIntercalary": false,
+      "length": 30,
+      "interval": 1,
+      "offset": 1
+     },
+     {
+      "id": "autumn-equinox",
+      "name": "Highharvestide",
+      "isIntercalary": true,
+      "length": 1,
+      "interval": 1,
+      "offset": 1
+     },
+     {
+      "id": "highharvestide",
+      "name": "Marpenoth",
+      "isIntercalary": false,
+      "length": 30,
+      "interval": 1,
+      "offset": 1
+     },
+     {
+      "id": "uktar",
+      "name": "Uktar",
+      "isIntercalary": false,
+      "length": 30,
+      "interval": 1,
+      "offset": 1
+     },
+     {
+      "id": "feast-of-the-moon",
+      "name": "The Feast of the Moon",
+      "isIntercalary": true,
+      "length": 1,
+      "interval": 1,
+      "offset": 1
+     },
+     {
+      "id": "nightal",
+      "name": "Nightal",
+      "isIntercalary": false,
+      "length": 30,
+      "interval": 1,
+      "offset": 1
+     }
+    ],
+    "leapDays": [
+     {
+      "id": "midwinter-leap-day",
+      "name": "Shieldsmeet",
+      "intercalary": false,
+      "month": 9,
+      "addsWeekDay": false,
+      "day": 0,
+      "weekDay": "",
+      "interval": "4",
+      "offset": 0
+     }
+    ],
+    "positiveEras": [
+     {
+      "id": "DR",
+      "abbr": "DR",
+      "name": "Dale Reckoning",
+      "hideAbbr": false,
+      "startsAt": 0,
+      "resetMode": "none"
+     }
+    ],
+    "maxMinutes": 1577352960,
+    "version": "2f9be446d7493196"
+   },
+   {
+    "id": "eberron",
+    "name": "Eberron",
+    "description": "Calendar of the Eberron setting with 12 months of 28 days and 7 special festival days",
+    "hoursInDay": 24,
+    "minutesInHour": 60,
+    "hasZeroYear": false,
+    "epochWeekday": 0,
+    "halfClock": false,
+    "format": {
+     "id": "american-verbose",
+     "time": "MMMM D^, YYYY E, HH:mm",
+     "year": "YYYY",
+     "month": "MMMM YYYY",
+     "day": "MMMM D^, YYYY E"
+    },
+    "weekdays": [
+     {
+      "id": "sul",
+      "name": "Sul"
+     },
+     {
+      "id": "mol",
+      "name": "Mol"
+     },
+     {
+      "id": "zol",
+      "name": "Zol"
+     },
+     {
+      "id": "wir",
+      "name": "Wir"
+     },
+     {
+      "id": "zor",
+      "name": "Zor"
+     },
+     {
+      "id": "far",
+      "name": "Far"
+     },
+     {
+      "id": "sar",
+      "name": "Sar"
+     }
+    ],
+    "months": [
+     {
+      "id": "zarantyr",
+      "name": "Zarantyr",
+      "isIntercalary": false,
+      "length": 28,
+      "interval": 1,
+      "offset": 0
+     },
+     {
+      "id": "olarune",
+      "name": "Olarune",
+      "isIntercalary": false,
+      "length": 28,
+      "interval": 1,
+      "offset": 0
+     },
+     {
+      "id": "therendor",
+      "name": "Therendor",
+      "isIntercalary": false,
+      "length": 28,
+      "interval": 1,
+      "offset": 0
+     },
+     {
+      "id": "eyre",
+      "name": "Eyre",
+      "isIntercalary": false,
+      "length": 28,
+      "interval": 1,
+      "offset": 0
+     },
+     {
+      "id": "dravago",
+      "name": "Dravago",
+      "isIntercalary": false,
+      "length": 28,
+      "interval": 1,
+      "offset": 0
+     },
+     {
+      "id": "nymm",
+      "name": "Nymm",
+      "isIntercalary": false,
+      "length": 28,
+      "interval": 1,
+      "offset": 0
+     },
+     {
+      "id": "lharvion",
+      "name": "Lharvion",
+      "isIntercalary": false,
+      "length": 28,
+      "interval": 1,
+      "offset": 0
+     },
+     {
+      "id": "barrakas",
+      "name": "Barrakas",
+      "isIntercalary": false,
+      "length": 28,
+      "interval": 1,
+      "offset": 0
+     },
+     {
+      "id": "rhaan",
+      "name": "Rhaan",
+      "isIntercalary": false,
+      "length": 28,
+      "interval": 1,
+      "offset": 0
+     },
+     {
+      "id": "sypheros",
+      "name": "Sypheros",
+      "isIntercalary": false,
+      "length": 28,
+      "interval": 1,
+      "offset": 0
+     },
+     {
+      "id": "aryth",
+      "name": "Aryth",
+      "isIntercalary": false,
+      "length": 28,
+      "interval": 1,
+      "offset": 0
+     },
+     {
+      "id": "vult",
+      "name": "Vult",
+      "isIntercalary": false,
+      "length": 28,
+      "interval": 1,
+      "offset": 0
+     }
+    ],
+    "leapDays": [],
+    "positiveEras": [
+     {
+      "id": "YK",
+      "abbr": "YK",
+      "name": "Year of the Kingdom",
+      "resetMode": "none",
+      "hideAbbr": false,
+      "startsAt": 0
+     }
+    ],
+    "maxMinutes": 998860320,
+    "version": "50e91df057944eeb"
+   },
+   {
+    "id": "exandria",
+    "name": "Exandria",
+    "description": "Calendar of the Exandria setting from Critical Role",
+    "hoursInDay": 24,
+    "minutesInHour": 60,
+    "hasZeroYear": true,
+    "epochWeekday": 0,
+    "halfClock": false,
+    "format": {
+     "id": "american-verbose",
+     "time": "MMMM D^, YYYY E, HH:mm",
+     "year": "YYYY",
+     "month": "MMMM YYYY",
+     "day": "MMMM D^, YYYY E"
+    },
+    "weekdays": [
+     {
+      "id": "miresen",
+      "name": "Miresen"
+     },
+     {
+      "id": "grissen",
+      "name": "Grissen"
+     },
+     {
+      "id": "whelsen",
+      "name": "Whelsen"
+     },
+     {
+      "id": "conthsen",
+      "name": "Conthsen"
+     },
+     {
+      "id": "folsen",
+      "name": "Folsen"
+     },
+     {
+      "id": "yulisen",
+      "name": "Yulisen"
+     },
+     {
+      "id": "dasen",
+      "name": "Da'sen"
+     }
+    ],
+    "months": [
+     {
+      "id": "horisal",
+      "name": "Horisal",
+      "isIntercalary": false,
+      "length": 29,
+      "interval": 1,
+      "offset": 0
+     },
+     {
+      "id": "misuthar",
+      "name": "Misuthar",
+      "isIntercalary": false,
+      "length": 30,
+      "interval": 1,
+      "offset": 0
+     },
+     {
+      "id": "dualahei",
+      "name": "Dualahei",
+      "isIntercalary": false,
+      "length": 30,
+      "interval": 1,
+      "offset": 0
+     },
+     {
+      "id": "thunsheer",
+      "name": "Thunsheer",
+      "isIntercalary": false,
+      "length": 31,
+      "interval": 1,
+      "offset": 0
+     },
+     {
+      "id": "unndilar",
+      "name": "Unndilar",
+      "isIntercalary": false,
+      "length": 28,
+      "interval": 1,
+      "offset": 0
+     },
+     {
+      "id": "brussendar",
+      "name": "Brussendar",
+      "isIntercalary": false,
+      "length": 31,
+      "interval": 1,
+      "offset": 0
+     },
+     {
+      "id": "sydenstar",
+      "name": "Sydenstar",
+      "isIntercalary": false,
+      "length": 32,
+      "interval": 1,
+      "offset": 0
+     },
+     {
+      "id": "fessuran",
+      "name": "Fessuran",
+      "isIntercalary": false,
+      "length": 29,
+      "interval": 1,
+      "offset": 0
+     },
+     {
+      "id": "quen'pillar",
+      "name": "Quen'pillar",
+      "isIntercalary": false,
+      "length": 27,
+      "interval": 1,
+      "offset": 0
+     },
+     {
+      "id": "cuersaar",
+      "name": "Cuersaar",
+      "isIntercalary": false,
+      "length": 29,
+      "interval": 1,
+      "offset": 0
+     },
+     {
+      "id": "duscar",
+      "name": "Duscar",
+      "isIntercalary": false,
+      "length": 32,
+      "interval": 1,
+      "offset": 0
+     }
+    ],
+    "leapDays": [],
+    "positiveEras": [
+     {
+      "id": "PD",
+      "abbr": "PD",
+      "name": "Post-Divergence",
+      "resetMode": "none",
+      "hideAbbr": false,
+      "startsAt": 0
+     }
+    ],
+    "maxMinutes": 970074720,
+    "version": "96fd68ce27c77b75"
+   },
+   {
+    "id": "greyhawk",
+    "name": "Greyhawk",
+    "description": "Calendar of the Greyhawk setting with 12 months of 28 days and 4 festival weeks",
+    "hoursInDay": 24,
+    "minutesInHour": 60,
+    "hasZeroYear": false,
+    "epochWeekday": 0,
+    "halfClock": false,
+    "format": {
+     "id": "american-verbose",
+     "time": "MMMM D^, YYYY E, HH:mm",
+     "year": "YYYY",
+     "month": "MMMM YYYY",
+     "day": "MMMM D^, YYYY E"
+    },
+    "weekdays": [
+     {
+      "id": "starday",
+      "name": "Starday"
+     },
+     {
+      "id": "sunday",
+      "name": "Sunday"
+     },
+     {
+      "id": "moonday",
+      "name": "Moonday"
+     },
+     {
+      "id": "godsday",
+      "name": "Godsday"
+     },
+     {
+      "id": "waterday",
+      "name": "Waterday"
+     },
+     {
+      "id": "earthday",
+      "name": "Earthday"
+     },
+     {
+      "id": "freeday",
+      "name": "Freeday"
+     }
+    ],
+    "months": [
+     {
+      "id": "fireseek",
+      "name": "Fireseek",
+      "isIntercalary": false,
+      "length": 28,
+      "interval": 1,
+      "offset": 0
+     },
+     {
+      "id": "readying",
+      "name": "Readying",
+      "isIntercalary": false,
+      "length": 28,
+      "interval": 1,
+      "offset": 0
+     },
+     {
+      "id": "coldeven",
+      "name": "Coldeven",
+      "isIntercalary": false,
+      "length": 28,
+      "interval": 1,
+      "offset": 0
+     },
+     {
+      "id": "growfest",
+      "name": "Growfest",
+      "isIntercalary": true,
+      "length": 7,
+      "interval": 1,
+      "offset": 0
+     },
+     {
+      "id": "planting",
+      "name": "Planting",
+      "isIntercalary": false,
+      "length": 28,
+      "interval": 1,
+      "offset": 0
+     },
+     {
+      "id": "flocktime",
+      "name": "Flocktime",
+      "isIntercalary": false,
+      "length": 28,
+      "interval": 1,
+      "offset": 0
+     },
+     {
+      "id": "wealsun",
+      "name": "Wealsun",
+      "isIntercalary": false,
+      "length": 28,
+      "interval": 1,
+      "offset": 0
+     },
+     {
+      "id": "richfest",
+      "name": "Richfest",
+      "isIntercalary": true,
+      "length": 7,
+      "interval": 1,
+      "offset": 0
+     },
+     {
+      "id": "reaping",
+      "name": "Reaping",
+      "isIntercalary": false,
+      "length": 28,
+      "interval": 1,
+      "offset": 0
+     },
+     {
+      "id": "goodmonth",
+      "name": "Goodmonth",
+      "isIntercalary": false,
+      "length": 28,
+      "interval": 1,
+      "offset": 0
+     },
+     {
+      "id": "harvester",
+      "name": "Harvester",
+      "isIntercalary": false,
+      "length": 28,
+      "interval": 1,
+      "offset": 0
+     },
+     {
+      "id": "brewfest",
+      "name": "Brewfest",
+      "isIntercalary": true,
+      "length": 7,
+      "interval": 1,
+      "offset": 0
+     },
+     {
+      "id": "patchwall",
+      "name": "Patchwall",
+      "isIntercalary": false,
+      "length": 28,
+      "interval": 1,
+      "offset": 0
+     },
+     {
+      "id": "ready'reat",
+      "name": "Ready'reat",
+      "isIntercalary": false,
+      "length": 28,
+      "interval": 1,
+      "offset": 0
+     },
+     {
+      "id": "sunsebb",
+      "name": "Sunsebb",
+      "isIntercalary": false,
+      "length": 28,
+      "interval": 1,
+      "offset": 0
+     },
+     {
+      "id": "needfest",
+      "name": "Needfest",
+      "isIntercalary": true,
+      "length": 7,
+      "interval": 1,
+      "offset": 0
+     }
+    ],
+    "leapDays": [],
+    "positiveEras": [
+     {
+      "id": "CY",
+      "abbr": "CY",
+      "name": "Common Year",
+      "resetMode": "none",
+      "hideAbbr": false,
+      "startsAt": 0
+     }
+    ],
+    "maxMinutes": 2096115840,
+    "version": "46995779ed511656"
+   },
+   {
+    "id": "elder-scrolls",
+    "name": "Scrolls",
+    "hoursInDay": 24,
+    "minutesInHour": 60,
+    "epochWeekday": 0,
+    "format": {
+     "id": "scrolls",
+     "year": "E YYYY",
+     "month": "MMMM, E YYYY",
+     "day": "D^ MMMM, E YYYY",
+     "time": "D^ MMMM, E YYYY, HH:mm"
+    },
+    "halfClock": false,
+    "weekdays": [
+     {
+      "id": "sundas",
+      "name": "Sundas"
+     },
+     {
+      "id": "morndas",
+      "name": "Morndas"
+     },
+     {
+      "id": "tirdas",
+      "name": "Tirdas"
+     },
+     {
+      "id": "middas",
+      "name": "Middas"
+     },
+     {
+      "id": "turdas",
+      "name": "Turdas"
+     },
+     {
+      "id": "fredas",
+      "name": "Fredas"
+     },
+     {
+      "id": "loredas",
+      "name": "Loredas"
+     }
+    ],
+    "months": [
+     {
+      "id": "morning-star",
+      "name": "Morning Star",
+      "isIntercalary": false,
+      "length": 31,
+      "interval": 1,
+      "offset": 0
+     },
+     {
+      "id": "suns-dawn",
+      "name": "Sun's Dawn",
+      "isIntercalary": false,
+      "length": 28,
+      "interval": 1,
+      "offset": 0
+     },
+     {
+      "id": "first-seed",
+      "name": "First Seed",
+      "isIntercalary": false,
+      "length": 31,
+      "interval": 1,
+      "offset": 0
+     },
+     {
+      "id": "rains-hand",
+      "name": "Rain's Hand",
+      "isIntercalary": false,
+      "length": 30,
+      "interval": 1,
+      "offset": 0
+     },
+     {
+      "id": "second-seed",
+      "name": "Second Seed",
+      "isIntercalary": false,
+      "length": 31,
+      "interval": 1,
+      "offset": 0
+     },
+     {
+      "id": "midyear",
+      "name": "Midyear",
+      "isIntercalary": false,
+      "length": 30,
+      "interval": 1,
+      "offset": 0
+     },
+     {
+      "id": "suns-height",
+      "name": "Sun's Height",
+      "isIntercalary": false,
+      "length": 31,
+      "interval": 1,
+      "offset": 0
+     },
+     {
+      "id": "last-seed",
+      "name": "Last Seed",
+      "isIntercalary": false,
+      "length": 31,
+      "interval": 1,
+      "offset": 0
+     },
+     {
+      "id": "hearthfire",
+      "name": "Hearthfire",
+      "isIntercalary": false,
+      "length": 30,
+      "interval": 1,
+      "offset": 0
+     },
+     {
+      "id": "frostfall",
+      "name": "Frostfall",
+      "isIntercalary": false,
+      "length": 31,
+      "interval": 1,
+      "offset": 0
+     },
+     {
+      "id": "suns-dusk",
+      "name": "Sun's Dusk",
+      "isIntercalary": false,
+      "length": 30,
+      "interval": 1,
+      "offset": 0
+     },
+     {
+      "id": "evening-star",
+      "name": "Evening Star",
+      "isIntercalary": false,
+      "length": 31,
+      "interval": 1,
+      "offset": 0
+     }
+    ],
+    "leapDays": [
+     {
+      "id": "leap-day",
+      "name": "Leap Day",
+      "intercalary": false,
+      "month": 1,
+      "addsWeekDay": false,
+      "day": 0,
+      "weekDay": "",
+      "interval": "400,!100,4",
+      "offset": 0
+     }
+    ],
+    "negativeEra": {
+     "id": "me",
+     "name": "Merethic Era",
+     "abbr": "ME",
+     "hideAbbr": false,
+     "resetMode": "none",
+     "startsAt": -1314872640
+    },
+    "hasZeroYear": true,
+    "positiveEras": [
+     {
+      "id": "first-era",
+      "name": "First Era",
+      "abbr": "1E",
+      "hideAbbr": false,
+      "startsAt": 0,
+      "resetMode": "year"
+     },
+     {
+      "id": "second-era",
+      "name": "Second Era",
+      "abbr": "2E",
+      "hideAbbr": false,
+      "startsAt": 1536298560,
+      "resetMode": "year"
+     },
+     {
+      "id": "third-era",
+      "name": "Third Era",
+      "abbr": "3E",
+      "hideAbbr": false,
+      "startsAt": 2006496000,
+      "resetMode": "year"
+     },
+     {
+      "id": "fourth-era",
+      "name": "Fourth Era",
+      "abbr": "4E",
+      "hideAbbr": false,
+      "startsAt": 2234232000,
+      "resetMode": "year"
+     }
+    ],
+    "maxMinutes": 3155695200,
+    "version": "c6dbe866989f7023"
+   }
+  ],
+  "hasMore": false,
+  "nextCursor": null
+ }
+}
