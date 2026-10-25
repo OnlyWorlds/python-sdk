@@ -3200,6 +3200,174 @@
             "intercalary": null,
             "weekday": "Thursday"
           }
+        },
+        {
+          "step": 693653,
+          "words": "February 28, 1900 CE",
+          "breakdown": {
+            "absYear": 1899,
+            "year": 1900,
+            "era": "Common Era",
+            "month": 2,
+            "monthName": "February",
+            "day": 28,
+            "intercalary": null,
+            "weekday": "Wednesday"
+          }
+        },
+        {
+          "step": 693654,
+          "words": "March 1, 1900 CE",
+          "breakdown": {
+            "absYear": 1899,
+            "year": 1900,
+            "era": "Common Era",
+            "month": 3,
+            "monthName": "March",
+            "day": 1,
+            "intercalary": null,
+            "weekday": "Thursday"
+          }
+        },
+        {
+          "step": 693655,
+          "words": "March 2, 1900 CE",
+          "breakdown": {
+            "absYear": 1899,
+            "year": 1900,
+            "era": "Common Era",
+            "month": 3,
+            "monthName": "March",
+            "day": 2,
+            "intercalary": null,
+            "weekday": "Friday"
+          }
+        },
+        {
+          "step": 693959,
+          "words": "December 31, 1900 CE",
+          "breakdown": {
+            "absYear": 1899,
+            "year": 1900,
+            "era": "Common Era",
+            "month": 12,
+            "monthName": "December",
+            "day": 31,
+            "intercalary": null,
+            "weekday": "Monday"
+          }
+        },
+        {
+          "step": 730177,
+          "words": "February 28, 2000 CE",
+          "breakdown": {
+            "absYear": 1999,
+            "year": 2000,
+            "era": "Common Era",
+            "month": 2,
+            "monthName": "February",
+            "day": 28,
+            "intercalary": null,
+            "weekday": "Monday"
+          }
+        },
+        {
+          "step": 730178,
+          "words": "Leap Day, 2000 CE",
+          "breakdown": {
+            "absYear": 1999,
+            "year": 2000,
+            "era": "Common Era",
+            "month": null,
+            "monthName": null,
+            "day": null,
+            "intercalary": "Leap Day",
+            "weekday": "Tuesday"
+          }
+        },
+        {
+          "step": 730179,
+          "words": "March 1, 2000 CE",
+          "breakdown": {
+            "absYear": 1999,
+            "year": 2000,
+            "era": "Common Era",
+            "month": 3,
+            "monthName": "March",
+            "day": 1,
+            "intercalary": null,
+            "weekday": "Wednesday"
+          }
+        },
+        {
+          "step": 730484,
+          "words": "December 31, 2000 CE",
+          "breakdown": {
+            "absYear": 1999,
+            "year": 2000,
+            "era": "Common Era",
+            "month": 12,
+            "monthName": "December",
+            "day": 31,
+            "intercalary": null,
+            "weekday": "Sunday"
+          }
+        },
+        {
+          "step": 766702,
+          "words": "February 28, 2100 CE",
+          "breakdown": {
+            "absYear": 2099,
+            "year": 2100,
+            "era": "Common Era",
+            "month": 2,
+            "monthName": "February",
+            "day": 28,
+            "intercalary": null,
+            "weekday": "Sunday"
+          }
+        },
+        {
+          "step": 766703,
+          "words": "March 1, 2100 CE",
+          "breakdown": {
+            "absYear": 2099,
+            "year": 2100,
+            "era": "Common Era",
+            "month": 3,
+            "monthName": "March",
+            "day": 1,
+            "intercalary": null,
+            "weekday": "Monday"
+          }
+        },
+        {
+          "step": 766704,
+          "words": "March 2, 2100 CE",
+          "breakdown": {
+            "absYear": 2099,
+            "year": 2100,
+            "era": "Common Era",
+            "month": 3,
+            "monthName": "March",
+            "day": 2,
+            "intercalary": null,
+            "weekday": "Tuesday"
+          }
+        },
+        {
+          "step": 767008,
+          "words": "December 31, 2100 CE",
+          "breakdown": {
+            "absYear": 2099,
+            "year": 2100,
+            "era": "Common Era",
+            "month": 12,
+            "monthName": "December",
+            "day": 31,
+            "intercalary": null,
+            "weekday": "Friday"
+          }
         }
       ]
     },

@@ -145,7 +145,7 @@ def version_fits(value: dict[str, Any]) -> bool:
 
 
 def test_the_helper_reads_the_vendored_fixture_as_the_profile_does() -> None:
-    """The calendar fixture beside the profile (serial 68: 64 cases, 30 calendars and 34 refusals):
+    """The calendar fixture beside the profile (serial 69: 64 cases, 30 calendars and 34 refusals):
     the helper refuses exactly the values the fixture marks not valid."""
     fixture = json.loads((DIST / "profiles" / "calendar.fixture.json").read_text(encoding="utf-8"))
     cases = fixture["cases"]
