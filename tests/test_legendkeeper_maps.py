@@ -205,6 +205,26 @@ def test_a_second_feature_on_one_zone_and_map_makes_its_own_zone(tmp_path: Path)
     assert any("another region or path already holds: a new Zone" in n for n in report.notes)
 
 
+def test_a_region_linking_a_location_is_its_zone_and_a_set_zone_stays(tmp_path: Path) -> None:
+    """Ruled 2026-10-25: a region drawn and linked to a Location page is that place's own area, so an
+    empty Location.zone takes the new Zone; a zone already set is never overwritten, and the report
+    names it. A page that is not a Location keeps its links (Wiki City, a Narrative, above)."""
+    area = feature("area1", "region", [[-1.0, 1.0], [-2.0, 2.0], [-3.0, 1.0]], "ijf7xwmd", "The Location's area")
+    border = feature("border1", "path", [[-4.0, 4.0], [-5.0, 5.0]], "ijf7xwmd", "The Location's border")
+    report = import_legendkeeper(RecordedSource(answers(drawn([area, border]))), PID, tmp_path / "w")
+    zones = {z["name"]: z for z in of(tmp_path / "w", "zone")}
+    place = next(b for b in of(tmp_path / "w", "location") if b["x_legendkeeper_id"] == "ijf7xwmd")
+    # the first feature's Zone; the second does not overwrite it
+    assert place["zone"] == zones["The Location's area"]["id"]
+    assert zones["The Location's border"]["x_legendkeeper_page"] == place["id"]
+    assert zones["The Location's area"]["x_legendkeeper_page"] == place["id"]
+    assert any(
+        n.startswith("Location 'Location': its zone is already set; the Zone \"The Location's border\"")
+        for n in report.notes
+    )
+    assert "1 Location take their Zone as zone" in " ".join(report.notes)
+
+
 def test_hidden_regions_and_paths_follow_the_pins(tmp_path: Path) -> None:
     hidden_road = {**ROAD, "isHidden": True}
     report = import_legendkeeper(

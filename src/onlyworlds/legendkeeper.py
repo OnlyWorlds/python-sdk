@@ -228,9 +228,12 @@ What becomes what:
   feature is a new Zone with that ``shape``, named by the feature, else by the page it links (as
   LegendKeeper shows it), else ``Untitled region (<id>)``; the linked page's element id is
   ``x_legendkeeper_page``, its id and uri ``x_legendkeeper_id`` and ``x_legendkeeper_uri``, its other
-  keys (``inherited``, ``isSynced``, ...) ``x_legendkeeper_feature``. The linked element's own
-  ``zone`` is never set. A region with fewer than 3 points, a path with fewer than 2, or a point that
-  is not ``[y, x]``: no Zone, named in the report. Another feature type is named, not read.
+  keys (``inherited``, ``isSynced``, ...) ``x_legendkeeper_feature``. When the linked page reads as
+  a Location whose ``zone`` is empty, that ``zone`` is set to the new Zone: a region the user drew and
+  linked to a place is that place's own area (ruled 2026-10-25); a ``zone`` already set is never
+  overwritten and the report names it, and no other type's link is set. A region with fewer than 3
+  points, a path with fewer than 2, or a point that is not ``[y, x]``: no Zone, named in the report.
+  Another feature type is named, not read.
 - **A board document becomes a Map with supertype Board** (ruled 2026-10-25), named
   ``<resource>: <document>``, with no image; ``location`` and ``x_legendkeeper_document`` as a
   map's. **The board's records are kept whole** (``{shapes, bindings, assets, pages}``, each list
@@ -2236,6 +2239,10 @@ class _Converter:
         self._zone_shapes: dict[str, list[tuple[str, str]]] = {}
         #: (Zone resource id, Map id) already holding a region's or path's Markers
         self._zone_on_map: set[tuple[str, str]] = set()
+        #: (Location resource id, the new Zone's id, its name, where): a region or path linking a Location
+        self._zone_places: list[tuple[str, str, str, str]] = []
+        #: Locations whose empty ``zone`` took the Zone of a region or path linking them
+        self.zoned_locations = 0
         self.marks: dict[str, int] = {}
         self.unsupported = 0
         self.unknown: dict[str, int] = {}
@@ -2343,6 +2350,18 @@ class _Converter:
                     f"Zone {zone.name!r}: its own shape {zone.fields['shape']!r} gives way to {shape!r}, from {where}"
                 )
             zone.fields["shape"] = shape
+        # a region or path linking a Location draws that place's own area (Location.zone, ruled
+        # 2026-10-25): an empty zone takes the new Zone, one already set is never overwritten
+        for rid, zone_id, zname, where in self._zone_places:
+            place = self.items[rid]
+            if place.fields.get("zone"):
+                self.report.notes.append(
+                    f"Location {place.name!r}: its zone is already set; the Zone {zname!r} ({where}) names it"
+                    f" in {EXT_PREFIX}page only"
+                )
+                continue
+            place.fields["zone"] = zone_id
+            self.zoned_locations += 1
 
     def _fill(self, item: _Item) -> None:
         row = item.row
@@ -3258,6 +3277,8 @@ class _Converter:
                 ext[f"{EXT_PREFIX}uri"] = uri
             if target is not None:
                 ext[f"{EXT_PREFIX}page"] = target.eid
+                if target.etype == "location":
+                    self._zone_places.append((target.lk_id, zone_id, zname, f"{kind} {fid} on {map_name!r}"))
                 if target.etype == "zone":
                     self.report.notes.append(
                         f"{kind} {label!r} ({fid}) on {map_name!r} links the Zone {target.name!r}, whose Markers on"
@@ -3640,6 +3661,12 @@ class _Converter:
                 f" take shape; {z - own} new, shape polygon for a region and line for a path, the page a feature links"
                 f" in {EXT_PREFIX}page), with {k} Marker{'' if k == 1 else 's'}, one per point in order: map, zone,"
                 f" order, and x, y as a pin's ({self.placed_markers} placed), the point kept as {EXT_PREFIX}pos"
+                + (
+                    f"; {self.zoned_locations} Location{'' if self.zoned_locations == 1 else 's'} take their Zone as"
+                    " zone"
+                    if self.zoned_locations
+                    else ""
+                )
             )
         if self.unplaced_markers or self.unscaled_markers:
             u, s = self.unplaced_markers, self.unscaled_markers
