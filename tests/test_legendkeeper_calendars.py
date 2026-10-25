@@ -486,6 +486,45 @@ def test_a_leap_day_on_a_regular_month_comes_before_the_festival_after_it() -> N
     ]
 
 
+def test_a_leap_day_s_day_is_not_read() -> None:
+    """LegendKeeper's API document: the app writes ``day`` 1 on a leap day and does not read it; one
+    calendar made with its leap day's ``day`` 0 and 1 gave identical dates for the same 70 minutes
+    (2026-10-25). Any day gives Gregorian's exact config; the leap day's own intercalary mark is
+    still refused."""
+    want = _calendar_config(preset("Gregorian"))
+    assert want[1] == [] and want[0] == GREGORIAN
+    for day in (1, 0, 5, -3):
+        cal = preset("Gregorian")
+        cal["leapDays"][0]["day"] = day
+        assert _calendar_config(cal) == want, day
+    cal = preset("Gregorian")
+    cal["leapDays"][0]["intercalary"] = True
+    assert _calendar_config(cal) == (None, ["leap day 'Leap Day': its own intercalary mark (unwitnessed)"])
+
+
+def test_events_before_the_first_era_are_counted_not_changed(tmp_path: Path) -> None:
+    """An Event dated before every era (Harptos's Dale Reckoning starts at day 0; Gregorian's BCE
+    runs down to day -525600) is named by LegendKeeper, read in no era by the profile: a report
+    line, its dates as any other's."""
+    bce_end = -756864000 // DAY  # Gregorian's negative era starts there
+    timelines = [
+        ("tl1", "harptos", [ev("h0", 0), ev("h1", -1), ev("h2", -3 * DAY, -DAY)]),
+        ("tl2", "gregorian", [ev("g0", bce_end * DAY), ev("g1", (bce_end - 1) * DAY), ev("g2", -DAY)]),
+        ("tl3", "elder-scrolls", [ev("s0", -(10**12))]),  # kept raw: not exact, not counted
+    ]
+    out, report = run(tmp_path, project(timelines))
+    els = by_lk_id(out)
+    assert [els[k]["start_date"] for k in ("h0", "h1", "h2", "g0", "g1", "g2")] == [0, -1, -3, bce_end, bce_end - 1, -1]
+    assert els["h2"]["end_date"] == -1 and "start_date" not in els["s0"]
+    said = [n for n in report.notes if "before the calendar's first era" in n]
+    assert said == [
+        "calendar 'Harptos' (harptos): 2 events before the calendar's first era (start_date below day 0):"
+        " LegendKeeper still names them, the calendar profile reads no era there",
+        f"calendar 'Gregorian' (gregorian): 1 event before the calendar's first era (start_date below day {bce_end}):"
+        " LegendKeeper still names it, the calendar profile reads no era there",
+    ]
+
+
 def test_the_rest_of_the_rules() -> None:
     cal = preset("Eberron")
     cal["months"][3]["interval"] = 2

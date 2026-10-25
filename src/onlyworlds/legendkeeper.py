@@ -57,7 +57,10 @@ by placeholders). ``FileSource`` adapts where its shape is not the API's:
   ride on the document as ``pins``, beside the ``map`` object. The API serves the same map as the
   document's ``mapImage`` (bounds in zoom-0 units) and its pins under ``/features``; ``read_project``
   puts them on the document in this shape (``_api_map``), so both roads make the same Maps and Pins
-  (the tutorial map's 16 pins land on the same pixels from either, 2026-10-25).
+  (the tutorial map's 16 pins land on the same pixels from either, 2026-10-25). The API's regions and
+  paths ride on the document as ``regions`` and ``paths`` beside ``pins``, and the file's
+  ``content.regions`` and ``content.paths`` are read the same way; that file shape is this door's
+  choice, unwitnessed, since no export read holds a region or a path.
 - a board document's ``content`` is ``{shapes, bindings, shapesV2}``, ``shapesV2`` a list of
   ``{key, val}`` whose ``val`` is a tldraw record (``typeName`` shape, binding, asset, page or
   document); the records ride on the document as ``board``, ``{shapes, bindings, assets, pages}``
@@ -175,7 +178,9 @@ What becomes what:
   and Harptos in its version 2 (schema-dist serial 68: a leap rule with exceptions, read on the
   year as shown). Scrolls is not: its later eras restart their years, which no probe has
   witnessed. The report names each calendar made, exact or kept raw
-  with its reasons, and counts the calendars no timeline names, which are not made. A calendar id
+  with its reasons, and counts the calendars no timeline names, which are not made. On an exact
+  calendar it also counts the Events dated before every era (LegendKeeper still names them; the
+  calendar profile reads no era there); their dates are as any other's. A calendar id
   not among the calendars is a report line, and its events keep their minutes only. The Construct
   is hidden while only hidden timelines name it.
 - **A map document** (from either road) **becomes a Map** (ruled
@@ -211,6 +216,21 @@ What becomes what:
   ``labelVisibility``, ``isSynced`` and any other key but its id, name, pos, uri, hidden mark, rank
   and timestamps) are kept together as ``x_legendkeeper_pin``, its id as ``x_legendkeeper_id``,
   its uri as ``x_legendkeeper_uri``.
+- **Each region and path becomes a Zone of Markers** on its Map (a ``region``'s ``polygon`` and a
+  ``path``'s ``polyline``, each a list of ``[y, x]`` points as a pin's ``pos``; 15 regions and 329
+  paths read live on a pushed map, 2026-10-25). A Marker per point, in order: ``map``, ``zone``,
+  ``order`` 0 to n-1, ``x`` and ``y`` by the pin's conversion, the point kept as
+  ``x_legendkeeper_pos``, the feature's id as ``x_legendkeeper_id``, named ``<zone>: point <n>``.
+  When the feature's uri names a resource read as a Zone (a push from OnlyWorlds writes each Zone as
+  a page and a feature linking it), the Markers are that Zone's and it takes ``shape``, ``polygon``
+  for a region and ``line`` for a path (named in the report when it had another, or when a region
+  and a path draw it); a second feature linking that Zone on the same map makes its own. Else the
+  feature is a new Zone with that ``shape``, named by the feature, else by the page it links (as
+  LegendKeeper shows it), else ``Untitled region (<id>)``; the linked page's element id is
+  ``x_legendkeeper_page``, its id and uri ``x_legendkeeper_id`` and ``x_legendkeeper_uri``, its other
+  keys (``inherited``, ``isSynced``, ...) ``x_legendkeeper_feature``. The linked element's own
+  ``zone`` is never set. A region with fewer than 3 points, a path with fewer than 2, or a point that
+  is not ``[y, x]``: no Zone, named in the report. Another feature type is named, not read.
 - **A board document becomes a Map with supertype Board** (ruled 2026-10-25), named
   ``<resource>: <document>``, with no image; ``location`` and ``x_legendkeeper_document`` as a
   map's. **The board's records are kept whole** (``{shapes, bindings, assets, pages}``, each list
@@ -279,11 +299,13 @@ What becomes what:
 - a Relation either end of which is hidden;
 - a map document whose ``isHidden`` is true, or on a hidden resource: its Map and every Pin on it;
 - a pin whose ``isHidden`` is true: its Pin (no real file has one yet: the tests plant it);
+- a region or path whose ``isHidden`` is true, or on a hidden Map: its Markers, and its Zone when
+  made new (a Zone of the project keeps its own mark);
 - a board document whose ``isHidden`` is true, or on a hidden resource: its Map and everything
   made from it; on a visible board, a card on a hidden page, and an arrow either end of which is.
 
-A visible text that mentions a hidden element by name, or a visible pin that places one, is named
-in the report. A hidden blank document is counted as a visible one is.
+A visible text that mentions a hidden element by name, or a visible pin, region or path that places
+one, is named in the report. A hidden blank document is counted as a visible one is.
 
 **Ids are UUIDv5** in ``LEGENDKEEPER_NAMESPACE``: of ``legendkeeper:<project id>:<resource id>`` for
 a resource, ``legendkeeper:<project id>:event:<event id>`` for an event,
@@ -294,7 +316,10 @@ Narrative, ``legendkeeper:<project id>:secret:<resource id>:<document id>:<n>`` 
 block of a page (the export gives a block no id, so both roads count them) and
 ``legendkeeper:<project id>:properties:<resource id>`` for a resource's hidden properties,
 ``legendkeeper:<project id>:map:<resource id>:<document id>`` for a Map and
-``legendkeeper:<project id>:pin:<resource id>:<document id>:<pin id>`` for a Pin;
+``legendkeeper:<project id>:pin:<resource id>:<document id>:<pin id>`` for a Pin,
+``legendkeeper:<project id>:zone:<resource id>:<document id>:<feature id>`` for a region's or path's
+new Zone and ``legendkeeper:<project id>:marker:<resource id>:<document id>:<feature id>:<order>``
+for its Markers;
 ``legendkeeper:<project id>:board:<resource id>:<document id>`` for a board's Map, with ``:<shape
 id>`` for what a shape makes (a card's Pin, a frame's Zone, an arrow's Relation, a note's
 Narrative), its Pin ``:<shape id>:pin`` and a frame's Markers ``:<shape id>:<order>``;
@@ -455,6 +480,8 @@ _OWN = (
     "map",
     "pos",
     "pin",
+    "page",
+    "feature",
     "board_record",
     "board_map",
     "board_pos",
@@ -500,6 +527,11 @@ _BOUNDS = ("min_x", "max_x", "min_y", "max_y")
 #: What a pin carries that is said elsewhere (its own fields, or the report's not-kept line):
 #: everything else on it (icon, label, isSynced, ...) is kept together as ``x_legendkeeper_pin``.
 _PIN_SAID = frozenset({"id", "name", "pos", "uri", "isHidden", "rank", "createdAt", "updatedAt"})
+
+#: A map feature read as a Zone of Markers: its kind -> (its points' key, Zone's ``shape``, the fewest points)
+_ZONE_FEATURES = {"region": ("polygon", "polygon", 3), "path": ("polyline", "line", 2)}
+#: What a region or path carries that is said elsewhere
+_FEATURE_SAID = frozenset({"id", "name", "uri", "polygon", "polyline", "isHidden", "rank", "createdAt", "updatedAt"})
 
 #: The tldraw records a board carries, by ``typeName``: what rides on a board document as ``board``.
 _BOARD_RECORDS = (("shapes", "shape"), ("bindings", "binding"), ("assets", "asset"), ("pages", "page"))
@@ -889,8 +921,10 @@ class FileSource:
             heads = [{k: v for k, v in d.items() if k != "content"} for d in docs]
             for head, d in zip(heads, docs, strict=True):
                 if d.get("type") == "map":  # its pins ride on the document, beside its map object
-                    pins = _obj(d.get("content")).get("pins")
-                    head["pins"] = [p for p in pins if isinstance(p, dict)] if isinstance(pins, list) else []
+                    # regions and paths: the keys are this door's choice, unwitnessed (no export read holds one)
+                    for key in ("pins", "regions", "paths"):
+                        got = _obj(d.get("content")).get(key)
+                        head[key] = [p for p in got if isinstance(p, dict)] if isinstance(got, list) else []
                 elif d.get("type") == "board":  # its tldraw records ride on the document, split by kind
                     head["board"] = _board_records(_obj(d.get("content")))
             row = {k: v for k, v in r.items() if k not in ("documents", "properties")}
@@ -1206,7 +1240,10 @@ def _calendar_config(cal: Mapping[str, Any]) -> tuple[dict[str, Any] | None, lis
       ``every_years``, the rest ``except``. LegendKeeper reads the rule on the year as shown (the
       year index plus one with no year 0; 286 of 286 probed days of Gregorian, Harptos and Scrolls
       agree, before the epoch too), so with no year 0 the entry carries ``offset`` 1. A term with its own
-      ``+`` offset, or a leap day's own nonzero ``offset``, is not exact (unwitnessed).
+      ``+`` offset, a leap day's own nonzero ``offset``, or its own ``intercalary`` mark, is not exact
+      (unwitnessed). Its ``day`` is not read: LegendKeeper's API document says the app writes ``day`` 1
+      on a leap day and does not read it, and one calendar made twice, its leap day's ``day`` 0 and 1,
+      gave identical dates for the same 70 minutes (2026-10-25).
     - a week that restarts each month is ``nested``; else ``free``, the names turned so the first
       is the weekday at minute 0 (``epochWeekday``).
     - the first era starts at 0; every era starts on a day; an era that restarts months and days
@@ -1247,8 +1284,9 @@ def _read_calendar(cal: Mapping[str, Any]) -> tuple[dict[str, Any], list[str]]:
         if not 0 <= mi < len(months):
             why.append(f"leap day {label!r} lengthens month {mi}, which the calendar does not have")
             continue
-        if int(ld.get("day") or 0) != 0 or ld.get("intercalary"):
-            why.append(f"leap day {label!r}: a day inside the month or its own intercalary mark (unwitnessed)")
+        # its ``day`` is not read (LegendKeeper writes 1 and reads nothing there: _calendar_config says how we know)
+        if ld.get("intercalary"):
+            why.append(f"leap day {label!r}: its own intercalary mark (unwitnessed)")
         leaps.setdefault(mi, []).append({"name": label, **rule})
     names: list[str] = []
     lengths: list[int] = []
@@ -1601,10 +1639,16 @@ def _api_map(doc: dict[str, Any], image: Any, features: list[dict[str, Any]]) ->
     ``{mapId, min_x, max_x, min_y, max_y, max_zoom}`` in image pixels, so each bound is scaled by
     ``2^maxNativeZoom``. A pin is a feature of type ``pin``, its ``pos`` the file's (measured on
     LegendKeeper's tutorial map, the same 16 pin ids and positions on both roads, 2026-10-25).
+
+    A ``region`` (its ``polygon``, a list of ``[y, x]`` points) and a ``path`` (its ``polyline``, the
+    same) ride on the document as ``regions`` and ``paths``, each feature as the API gives it but its
+    ``type``, beside ``pins``. The export file's shape for them is unwitnessed: the exports read hold
+    no region or path, so the file road's ``regions`` and ``paths`` keys are this door's choice.
     Returns the notes for what is not read: features of another type."""
-    pins = [f for f in features if f.get("type") == "pin"]
-    other = Counter(str(f.get("type")) for f in features if f.get("type") != "pin")
-    doc["pins"] = [{k: v for k, v in f.items() if k != "type"} for f in pins]
+    kinds = {"pin": "pins", "region": "regions", "path": "paths"}
+    other = Counter(str(f.get("type")) for f in features if f.get("type") not in kinds)
+    for kind, key in kinds.items():
+        doc[key] = [{k: v for k, v in f.items() if k != "type"} for f in features if f.get("type") == kind]
     m: dict[str, Any] = {}
     if isinstance(image, dict):
         tiles = _obj(image.get("tiles"))
@@ -1633,7 +1677,8 @@ def _api_map(doc: dict[str, Any], image: Any, features: list[dict[str, Any]]) ->
         m.update(rest)
     doc["map"] = m or None
     return [
-        f"{n} map feature{'' if n == 1 else 's'} of type {kind!r} on {doc.get('name')!r}: not read (only pins are)"
+        f"{n} map feature{'' if n == 1 else 's'} of type {kind!r} on {doc.get('name')!r}: not read (only pins,"
+        " regions and paths are)"
         for kind, n in sorted(other.items())
     ]
 
@@ -1780,6 +1825,8 @@ class Hidden:
     maps: int = 0
     #: pins hidden, or on a hidden Map: hidden Pins
     pins: int = 0
+    #: regions and paths hidden, or on a hidden Map: their Markers hidden, and their Zone when made new
+    map_zones: int = 0
     #: board documents hidden, or of a hidden resource: hidden Maps, everything made from them hidden
     boards: int = 0
     #: cards on a visible board that show a hidden page: hidden Pins
@@ -1807,6 +1854,10 @@ class MapMade:
     hidden: bool = False
     #: the map's max_zoom: its pins' positions are scaled by 2^max_zoom; None when it gives none
     max_zoom: float | None = None
+    #: regions and paths read as Zones: all of them, those on a Zone of the project, and their Markers
+    zones: int = 0
+    zones_own: int = 0
+    markers: int = 0
 
 
 @dataclass
@@ -1961,6 +2012,11 @@ class ImportReport:
             (h.maps, "hidden Map (its document or resource hidden)", "hidden Maps (their document or resource hidden)"),
             (h.pins, "hidden Pin (the pin or its Map hidden)", "hidden Pins (the pin or its Map hidden)"),
             (
+                h.map_zones,
+                "hidden region or path (it or its Map hidden): its Markers, and its Zone when made new",
+                "hidden regions and paths (they or their Map hidden): their Markers, and their Zones when made new",
+            ),
+            (
                 h.boards,
                 "hidden board (its document or resource hidden), its Map and everything on it",
                 "hidden boards (their document or resource hidden), each its Map and everything on it",
@@ -1994,7 +2050,13 @@ class ImportReport:
                         "none": "no image",
                     }[m.image]
                     what = f"{size}, {pins}, {image}"
-                    if m.pins and m.width is not None and m.height is not None:
+                    if m.zones:
+                        what += (
+                            f", {m.zones} {'region or path' if m.zones == 1 else 'regions and paths'} read as Zones"
+                            f" ({m.zones_own} on Zones of the project, {m.zones - m.zones_own} new) with"
+                            f" {m.markers} Marker{'' if m.markers == 1 else 's'}"
+                        )
+                    if (m.pins or m.markers) and m.width is not None and m.height is not None:
                         what += (
                             f", {_scale_said(m.max_zoom)}"
                             if m.max_zoom is not None
@@ -2166,6 +2228,14 @@ class _Converter:
         self.unplaced_pins = 0
         #: pins with a pos on a map with bounds but no max_zoom: the scale is not known, so no x, y
         self.unscaled_pins = 0
+        #: the Markers of regions and paths, as the pins: placed, with no x, y, with no scale
+        self.placed_markers = 0
+        self.unplaced_markers = 0
+        self.unscaled_markers = 0
+        #: resource id of a Zone of the project -> the shape each region or path linking it gives, and where
+        self._zone_shapes: dict[str, list[tuple[str, str]]] = {}
+        #: (Zone resource id, Map id) already holding a region's or path's Markers
+        self._zone_on_map: set[tuple[str, str]] = set()
         self.marks: dict[str, int] = {}
         self.unsupported = 0
         self.unknown: dict[str, int] = {}
@@ -2186,6 +2256,9 @@ class _Converter:
         self._cal_bodies: dict[str, dict[str, Any]] = {}
         #: calendar id -> the Events dated from it
         self._cal_dated: Counter[str] = Counter()
+        #: exact calendar id -> the first day any of its eras covers; the Events whose start_date is before it
+        self._cal_first: dict[str, int] = {}
+        self._cal_before: Counter[str] = Counter()
 
     def _id(self, *parts: str) -> str:
         return _uuid(":".join(("legendkeeper", self.snap.project_id, *parts)))
@@ -2258,6 +2331,18 @@ class _Converter:
             self._fill(item)
         for card in self._cards:
             self._card_on_map(card)
+        # a Zone of the project takes the shape of the region or path that draws it, once every row is read
+        for rid, drawn in self._zone_shapes.items():
+            zone, (shape, where) = self.items[rid], drawn[0]
+            if len({s for s, _ in drawn}) > 1:
+                self.report.notes.append(
+                    f"Zone {zone.name!r}: drawn as a region and as a path; shape {shape!r}, from its first, {where}"
+                )
+            if zone.fields.get("shape") not in (None, shape):
+                self.report.notes.append(
+                    f"Zone {zone.name!r}: its own shape {zone.fields['shape']!r} gives way to {shape!r}, from {where}"
+                )
+            zone.fields["shape"] = shape
 
     def _fill(self, item: _Item) -> None:
         row = item.row
@@ -2837,6 +2922,9 @@ class _Converter:
                     fields[f"{key}_date"] = when
             if "start_date" in fields or "end_date" in fields:
                 dated += 1
+            first = self._cal_first.get(calendar) if isinstance(calendar, str) else None
+            if first is not None and "start_date" in fields and fields["start_date"] < first:
+                self._cal_before[str(calendar)] += 1
             if calendar:
                 ext[f"{EXT_PREFIX}calendar"] = calendar
             if lane is not None:
@@ -2919,6 +3007,9 @@ class _Converter:
         self._cal_bodies[cid] = body
         day = _minutes_in_day(cal) if config is not None else None
         self._cal[cid] = (name, day, why)
+        eras = (config or {}).get("eras") or []
+        if eras:  # a down era covers from its end up to its start; an up era from its start on
+            self._cal_first[cid] = min(int(e["end"] if e.get("direction") == "down" else e["start"]) for e in eras)
         return day
 
     def _timeline_narratives(
@@ -3014,6 +3105,12 @@ class _Converter:
         pins = [p for p in doc.get("pins") or [] if isinstance(p, dict)]
         for n, pin in enumerate(pins, 1):
             self._pin(pin, n, item, did, name, map_id, hidden, bounds, zoom)
+        zones = zones_own = markers = 0
+        for kind in _ZONE_FEATURES:
+            for n, feature in enumerate((f for f in doc.get(f"{kind}s") or [] if isinstance(f, dict)), 1):
+                got = self._zone_feature(feature, kind, n, item, did, name, map_id, hidden, bounds, zoom)
+                if got is not None:
+                    zones, zones_own, markers = zones + 1, zones_own + got[1], markers + got[0]
         self.report.maps.append(
             MapMade(
                 name,
@@ -3025,6 +3122,9 @@ class _Converter:
                 mapless=not isinstance(m, dict),
                 hidden=hidden,
                 max_zoom=zoom,
+                zones=zones,
+                zones_own=zones_own,
+                markers=markers,
             )
         )
 
@@ -3059,17 +3159,12 @@ class _Converter:
         else:
             self.report.pins_unlinked.append(f"{name!r} on {map_name!r}: no uri; a Pin with no element")
         pos = pin.get("pos")
-        yx = [_number(v) for v in pos] if isinstance(pos, list) and len(pos) == 2 else []
-        if len(yx) == 2 and yx[0] is not None and yx[1] is not None and len(bounds) == len(_BOUNDS):
-            if zoom is None:  # the scale is not known: never guessed
-                self.unscaled_pins += 1
-            else:
-                # LegendKeeper's pos is [y, x] in zoom-0 units (an image pixel / 2^max_zoom), y from 0 at the top
-                # down to min_y; the bounds are image pixels, and OnlyWorlds counts from the bottom left
-                scale = 2.0**zoom
-                fields["x"] = _whole(yx[1] * scale - bounds["min_x"])
-                fields["y"] = _whole(yx[0] * scale - bounds["min_y"])
-                self.placed_pins += 1
+        at = self._pixel(pos, bounds, zoom)
+        if isinstance(at, dict):
+            fields.update(at)
+            self.placed_pins += 1
+        elif at == "unscaled":
+            self.unscaled_pins += 1
         else:
             self.unplaced_pins += 1
         hidden = map_hidden or pin.get("isHidden") is True
@@ -3092,6 +3187,110 @@ class _Converter:
         if target is not None and target.hidden and not hidden and note not in self.report.notes:
             self.report.notes.append(note)
         self.pins.append(body)
+
+    @staticmethod
+    def _pixel(pos: Any, bounds: Mapping[str, float], zoom: float | None) -> dict[str, int] | str:
+        """A LegendKeeper map point (a pin's ``pos``, a region's or path's vertex) as OnlyWorlds'
+        ``{x, y}``; else why not: ``unplaced`` (no ``[y, x]``, or a map with no bounds) or
+        ``unscaled`` (a map with no max_zoom: the scale is not known, never guessed)."""
+        yx = [_number(v) for v in pos] if isinstance(pos, list) and len(pos) == 2 else []
+        if len(yx) != 2 or yx[0] is None or yx[1] is None or len(bounds) != len(_BOUNDS):
+            return "unplaced"
+        if zoom is None:
+            return "unscaled"
+        # LegendKeeper's point is [y, x] in zoom-0 units (an image pixel / 2^max_zoom), y from 0 at the top
+        # down to min_y; the bounds are image pixels, and OnlyWorlds counts from the bottom left
+        scale = 2.0**zoom
+        return {"x": _whole(yx[1] * scale - bounds["min_x"]), "y": _whole(yx[0] * scale - bounds["min_y"])}
+
+    def _zone_feature(
+        self,
+        feature: dict[str, Any],
+        kind: str,
+        n: int,
+        item: _Item,
+        did: str,
+        map_name: str,
+        map_id: str,
+        map_hidden: bool,
+        bounds: dict[str, float],
+        zoom: float | None,
+    ) -> tuple[int, bool] | None:
+        """A region (``polygon``) or path (``polyline``) as a Zone and one Marker per point, in order.
+        The Zone is the project's own when the feature's uri names a resource read as a Zone (a push
+        from OnlyWorlds writes each Zone so), which then takes ``shape``; else a new Zone, linking the
+        page it names in ``x_legendkeeper_page``. Returns (Markers made, on a Zone of the project),
+        or None when the feature has too few points or a point that is not ``[y, x]`` (named)."""
+        key, shape, least = _ZONE_FEATURES[kind]
+        fid = str(feature.get("id") or f"{kind}#{n}")
+        uri = feature.get("uri")
+        link = _LK_URI.match(uri) if isinstance(uri, str) else None
+        target = self.items.get(link["rid"]) if link is not None else None
+        name = str(feature.get("name") or "").strip()
+        label = name or (target.name if target is not None else f"Untitled {kind} ({fid})")
+        raw = feature.get(key)
+        points = [p for p in raw] if isinstance(raw, list) else []
+        if not all(isinstance(p, list) and len(p) == 2 and all(_number(v) is not None for v in p) for p in points):
+            self.report.notes.append(
+                f"{kind} {label!r} ({fid}) on {map_name!r}: a point that is not [y, x]; no Zone, no Markers"
+            )
+            return None
+        if len(points) < least:
+            self.report.notes.append(
+                f"{kind} {label!r} ({fid}) on {map_name!r}: {len(points)} point{'' if len(points) == 1 else 's'},"
+                f" fewer than a {kind}'s {least}; no Zone, no Markers"
+            )
+            return None
+        hidden = map_hidden or feature.get("isHidden") is True
+        if hidden:
+            self.report.hidden.map_zones += 1
+        own = target is not None and target.etype == "zone" and (target.lk_id, map_id) not in self._zone_on_map
+        if target is not None and own:
+            zone_id, zname = target.eid, target.name
+            self._zone_on_map.add((target.lk_id, map_id))
+            self._zone_shapes.setdefault(target.lk_id, []).append((shape, f"{kind} {fid} on {map_name!r}"))
+        else:
+            zone_id, zname = self._id("zone", item.lk_id, did, fid), label
+            if not name:  # LegendKeeper shows the linked page's name on a feature that has none
+                self.report.notes.append(f"a {kind} with no name ({fid}) on {map_name!r}: its Zone is named {label!r}")
+            ext: dict[str, Any] = {f"{EXT_PREFIX}id": fid}
+            if uri:
+                ext[f"{EXT_PREFIX}uri"] = uri
+            if target is not None:
+                ext[f"{EXT_PREFIX}page"] = target.eid
+                if target.etype == "zone":
+                    self.report.notes.append(
+                        f"{kind} {label!r} ({fid}) on {map_name!r} links the Zone {target.name!r}, whose Markers on"
+                        " this map another region or path already holds: a new Zone, the page in"
+                        f" {EXT_PREFIX}page"
+                    )
+            elif link is not None:
+                self.report.notes.append(
+                    f"{kind} {label!r} ({fid}) on {map_name!r}: its uri names {link['rid']}, {self._MISSING};"
+                    " a Zone with no page"
+                )
+            rest = {k: v for k, v in feature.items() if k not in _FEATURE_SAID}
+            if rest:
+                ext[f"{EXT_PREFIX}feature"] = rest
+            self.zones.append(self._body("zone", zone_id, zname, hidden, {"shape": shape}, ext))
+        if target is not None and target.hidden and not hidden:
+            note = f"{label!r}: a visible {kind} on {map_name!r} places the hidden {target.name!r}"
+            if note not in self.report.notes:
+                self.report.notes.append(note)
+        for order, pt in enumerate(points):
+            fields: dict[str, Any] = {"map": map_id, "zone": zone_id, "order": order}
+            at = self._pixel(pt, bounds, zoom)
+            if isinstance(at, dict):
+                fields.update(at)
+                self.placed_markers += 1
+            elif at == "unscaled":
+                self.unscaled_markers += 1
+            else:
+                self.unplaced_markers += 1
+            mext = {f"{EXT_PREFIX}id": fid, f"{EXT_PREFIX}pos": pt}
+            mid = self._id("marker", item.lk_id, did, fid, str(order))
+            self.markers.append(self._body("marker", mid, f"{zname}: point {order + 1}", hidden, fields, mext))
+        return len(points), own
 
     # -- boards ----------------------------------------------------------------
 
@@ -3432,6 +3631,22 @@ class _Converter:
                 " max_zoom: LegendKeeper's pos is scaled by 2^max_zoom, so with none the place is not guessed (pos"
                 " kept as x_legendkeeper_pos)"
             )
+        drawn = [m for m in self.report.maps if m.zones]
+        if drawn:
+            z, own, k = (sum(getattr(m, a) for m in drawn) for a in ("zones", "zones_own", "markers"))
+            n.append(
+                f"{z} map {'region or path' if z == 1 else 'regions and paths'} read as Zones ({own} on Zones of the"
+                " project, which"
+                f" take shape; {z - own} new, shape polygon for a region and line for a path, the page a feature links"
+                f" in {EXT_PREFIX}page), with {k} Marker{'' if k == 1 else 's'}, one per point in order: map, zone,"
+                f" order, and x, y as a pin's ({self.placed_markers} placed), the point kept as {EXT_PREFIX}pos"
+            )
+        if self.unplaced_markers or self.unscaled_markers:
+            u, s = self.unplaced_markers, self.unscaled_markers
+            n.append(
+                f"{u + s} Marker{'' if u + s == 1 else 's'} with no x, y: {u} with no point or on a map with no bounds,"
+                f" {s} on a map with no max_zoom (the point kept as {EXT_PREFIX}pos)"
+            )
         if self.report.boards:
             n.append(
                 "board places: tldraw's page space (y down), each shape through its parent chain (a frame's or a"
@@ -3473,6 +3688,13 @@ class _Converter:
                     " whole as"
                     f" {EXT_PREFIX}calendar"
                 )
+                if self._cal_before[cid]:
+                    k = self._cal_before[cid]
+                    n.append(
+                        f"calendar {name!r} ({cid}): {k} event{'' if k == 1 else 's'} before the calendar's first era"
+                        f" (start_date below day {self._cal_first[cid]}): LegendKeeper still names"
+                        f" {'it' if k == 1 else 'them'}, the calendar profile reads no era there"
+                    )
             else:
                 n.append(
                     f"calendar {name!r} ({cid}): a Construct (supertype {CALENDAR_SUPERTYPE}), kept raw as"
