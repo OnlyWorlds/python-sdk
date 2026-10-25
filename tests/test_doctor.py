@@ -1043,7 +1043,7 @@ def test_11_the_fixture_cases_replayed() -> None:
             if got != want:
                 misses.append(f"{case['name']}: rule {idx} wants {want}, got {got}")
     assert misses == []
-    assert len(fx["rules"]) >= 7 and len(fx["cases"]) >= 17 and expectations >= 39  # dist.54's counts
+    assert len(fx["rules"]) >= 7 and len(fx["cases"]) >= 19 and expectations >= 48  # dist.64's counts (two stub cases)
 
 
 def test_11_the_fixture_not_checked_rows_replayed() -> None:

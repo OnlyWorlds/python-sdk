@@ -4,6 +4,10 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+## 0.51.1 (2026-10-25)
+
+- **Schema repinned to schema-dist `v0.33.0-dist.64`** (from dist.63; same canonical 00.33.00, no schema file moved). The checks profile's fixture gains two known-of stub cases, a bare stub and one with its fields filled, and `apply_checks` judges neither by any rule, as the profile says: the test replays the fixture whole, now 19 cases and 48 expectations, and its floors moved to those counts. No package code changed.
+
 ## 0.51.0 (2026-10-25)
 
 - **Schema repinned to schema-dist `v0.33.0-dist.63`** (from dist.61; same canonical 00.33.00, no schema file moved). Serials 62 and 63 change `walk/lint_folder.py` alone: it imports the walk only when run as a command, so a program can load it and call `lint_folder()` with no YAML library and no change to its import path.

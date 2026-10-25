@@ -2,15 +2,20 @@
   "_what": "The recorded pin for the vendored OnlyWorlds schema distribution (codegen/schema-dist/, copied byte-exact). Do not edit by hand; re-vendor from the pinned tag and review the diff. Kept equal to the npm SDK's pin (github.com/OnlyWorlds/sdk, codegen/schema-pin.json) on purpose: two clients, one schema.",
   "_why_manifest_sha256": "Verifying the tree against its own MANIFEST.json only proves internal consistency. If the tag moved, the manifest moved with it. The hash recorded here is the one first accepted, which is what makes a moved tag visible.",
   "repo": "https://github.com/OnlyWorlds/schema-dist",
-  "tag": "v0.33.0-dist.63",
-  "commit": "6326386ecf02d7f70f5f5e8cf4ffd4eeb228265b",
-  "manifest_sha256": "8326836abd7738d3ce51923e9dad496f3cd8e662c9ed985a44fe61373af2071a",
+  "tag": "v0.33.0-dist.64",
+  "commit": "b31b4890153fc8be1c3e756307a2ad1f466f1835",
+  "manifest_sha256": "558c4e953f03dd9bbeaec1697be5db1e2651f25f00b3648ab1e55a3db094b46e",
   "canonical_version": "00.33.00",
-  "dist_serial": 63,
+  "dist_serial": 64,
   "published": "2026-10-25",
   "pinned_at": "2026-10-25",
-  "pinned_by": "The maintainer: tree from `git archive` of the tag in a schema-dist checkout; files re-hashed against MANIFEST.json by generate_schema.py; MANIFEST self-hash matched against the raw file GitHub serves at the tag, whose ref resolves to the commit above. The npm SDK pins the same serial in 4.72.4.",
+  "pinned_by": "The maintainer: tree from `git archive` of the tag in a schema-dist checkout, less one file the MANIFEST does not list (walk/__pycache__/schema_walk.cpython-313.pyc, swept into the tag by mistake and removed on schema-dist main at 6708eb2); files re-hashed against MANIFEST.json by generate_schema.py; MANIFEST self-hash matched against the raw file GitHub serves at the tag, whose ref resolves to the commit above. Ahead of the npm SDK's pin (v0.33.0-dist.63, 4.72.4), which replays no file serial 64 moved.",
   "previous_pins": [
+    {
+      "tag": "v0.33.0-dist.63",
+      "manifest_sha256": "8326836abd7738d3ce51923e9dad496f3cd8e662c9ed985a44fe61373af2071a",
+      "note": "superseded by v0.33.0-dist.64 (same canonical 00.33.00; profiles/checks.fixture.json gains two known-of stub cases, a bare stub and one with its fields filled, both judged by no rule; checks.md's fixture sentence; no schema file moved)"
+    },
     {
       "tag": "v0.33.0-dist.62",
       "manifest_sha256": "1f3adbe9f9454550e00894f8c487158f9ddd799d6d8ca617ca584c5cc2e42cf3",
