@@ -2,15 +2,20 @@
   "_what": "The recorded pin for the vendored OnlyWorlds schema distribution (codegen/schema-dist/, copied byte-exact). Do not edit by hand; re-vendor from the pinned tag and review the diff. Kept equal to the npm SDK's pin (github.com/OnlyWorlds/sdk, codegen/schema-pin.json) on purpose: two clients, one schema.",
   "_why_manifest_sha256": "Verifying the tree against its own MANIFEST.json only proves internal consistency. If the tag moved, the manifest moved with it. The hash recorded here is the one first accepted, which is what makes a moved tag visible.",
   "repo": "https://github.com/OnlyWorlds/schema-dist",
-  "tag": "v0.33.0-dist.66",
-  "commit": "c4873649c54dd5f6c7cd9b2c75499a603410b2a0",
-  "manifest_sha256": "360e274956ab796a36589cfd1aa8c0fed6a908f1a43c8087b46bae544b49ff8e",
+  "tag": "v0.33.0-dist.68",
+  "commit": "8b43a334a35f9d07b3b3368dc4b9a58909e66548",
+  "manifest_sha256": "5ca5619f70a661100686ce2f692512fdaa64dc51fd3aa1be572b183060c5ed05",
   "canonical_version": "00.33.00",
-  "dist_serial": 66,
+  "dist_serial": 68,
   "published": "2026-10-25",
   "pinned_at": "2026-10-25",
-  "pinned_by": "The maintainer: tree from `git archive` of the tag in a schema-dist checkout, less one file the MANIFEST does not list (walk/__pycache__/schema_walk.cpython-313.pyc, swept into the tag by mistake and removed on schema-dist main at 6708eb2); files re-hashed against MANIFEST.json by generate_schema.py; MANIFEST self-hash matched against the raw file GitHub serves at the tag, whose ref resolves to the commit above. Ahead of the npm SDK's pin (v0.33.0-dist.63, 4.72.4), which replays no file serial 64 moved.",
+  "pinned_by": "The maintainer: tree from `git archive` of the tag in a schema-dist checkout (189 files, every one the MANIFEST lists); files re-hashed against MANIFEST.json by generate_schema.py; MANIFEST self-hash matched against the raw file GitHub serves at the tag, whose ref resolves to the commit above. Equal to the npm SDK's pin (v0.33.0-dist.68).",
   "previous_pins": [
+    {
+      "tag": "v0.33.0-dist.66",
+      "manifest_sha256": "360e274956ab796a36589cfd1aa8c0fed6a908f1a43c8087b46bae544b49ff8e",
+      "note": "superseded by v0.33.0-dist.68 (same canonical 00.33.00; two serials: 67 profiles/ gains import-map.md, import-map.json and import-map.fixture.json, the import map profile (LegendKeeper's tags to the 22 types, offered and applied on the user's yes, 27 cases); 68 profiles/calendar.md at version 2 (an intercalary entry's except and offset; an open era's end skips down eras), calendar.fixture.json at 64 cases; README; no schema file moved)"
+    },
     {
       "tag": "v0.33.0-dist.64",
       "manifest_sha256": "558c4e953f03dd9bbeaec1697be5db1e2651f25f00b3648ab1e55a3db094b46e",

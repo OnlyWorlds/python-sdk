@@ -37,7 +37,13 @@ def _broken(tmp_path: Path) -> Path:
 def test_the_vendored_checker_is_the_dists_byte_for_byte() -> None:
     assert (WALK / "lint_folder.py").read_bytes() == (DIST / "walk" / "lint_folder.py").read_bytes()
     assert (WALK / "schema.json").read_bytes() == (DIST / "schema.json").read_bytes()
-    assert sorted(p.name for p in WALK.iterdir() if p.name != "__pycache__") == ["lint_folder.py", "schema.json"]
+    # the import map profile's table, read by the LegendKeeper door (0.58.0)
+    assert (WALK / "import-map.json").read_bytes() == (DIST / "profiles" / "import-map.json").read_bytes()
+    assert sorted(p.name for p in WALK.iterdir() if p.name != "__pycache__") == [
+        "import-map.json",
+        "lint_folder.py",
+        "schema.json",
+    ]
 
 
 def test_loading_the_checker_has_no_side_effect() -> None:

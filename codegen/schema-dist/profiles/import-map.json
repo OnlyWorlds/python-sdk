@@ -1,0 +1,29 @@
+{
+  "version": 1,
+  "sources": {
+    "legendkeeper": {
+      "source": "LegendKeeper",
+      "matches": "tag",
+      "types": {
+        "artifact": "object",
+        "city": "location",
+        "country": "location",
+        "ethnicity": "species",
+        "item": "object",
+        "myth": "narrative",
+        "organization": "institution",
+        "point of interest": "location",
+        "quest": "narrative",
+        "scene": "narrative",
+        "technology": "construct"
+      },
+      "no_type": [
+        "guide",
+        "keeper",
+        "tips",
+        "tutorial"
+      ],
+      "ruled": "2026-10-25"
+    }
+  }
+}

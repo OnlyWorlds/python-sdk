@@ -2,11 +2,11 @@
   "profile": "atlas_calendar",
   "source": {
     "package": "@onlyworlds/sdk",
-    "version": "4.42.2",
-    "profile_tag": "v0.32.2-dist.33",
+    "version": "4.76.0",
+    "profile_tag": "v0.33.0-dist.68",
     "profile_page": "profiles/calendar.md"
   },
-  "generated_by": "generate.mjs",
+  "generated_by": "@onlyworlds/sdk scripts/calendar-fixture-cases.mjs (the amendment's cases) over the 4.42.2 fixture",
   "notes": [
     "value: the raw atlas_calendar field value (an object, or a JSON string). valid: the SDK reader (readCalendarValue) returns a calendar; false means not a calendar, the reader shows bare numbers.",
     "words: exactly what formatStep prints. breakdown: breakdownStep with its keys, except era, which is the era's name (or null) in place of the era object."
@@ -14,9 +14,9 @@
   "cases": [
     {
       "name": "refuse-version",
-      "why": "version is not 1",
+      "why": "version is neither 1 nor 2",
       "value": {
-        "version": 2,
+        "version": 3,
         "grain": "day",
         "bundles": {
           "months": {
@@ -1990,7 +1990,7 @@
     },
     {
       "name": "era-overlap-down-later-start",
-      "why": "a down era (pivot 100, no end) overlaps an up era from 0: the later start (the down era) wins; and an up era without end ends at the next era's start even when that era counts down, so from step 100 no era holds",
+      "why": "a down era (pivot 100, no end) overlaps an up era from 0: the later start (the down era) wins below 100; from step 100 the up era holds again, its open end skipping the down era",
       "value": {
         "version": 1,
         "grain": "month",
@@ -2072,11 +2072,25 @@
         },
         {
           "step": 100,
-          "words": "10",
+          "words": "11 Rise",
           "breakdown": {
             "absYear": 10,
-            "year": 10,
-            "era": null,
+            "year": 11,
+            "era": "Rise",
+            "month": null,
+            "monthName": null,
+            "day": null,
+            "intercalary": null,
+            "weekday": null
+          }
+        },
+        {
+          "step": 150,
+          "words": "16 Rise",
+          "breakdown": {
+            "absYear": 15,
+            "year": 16,
+            "era": "Rise",
             "month": null,
             "monthName": null,
             "day": null,
@@ -2864,6 +2878,1501 @@
           }
         }
       ]
+    },
+    {
+      "name": "v2-except-chain-gregorian",
+      "why": "version 2: every_years 4, except [100, 400], offset 1 (no year 0): LegendKeeper's Gregorian; every step read back from LegendKeeper as it shows it (its leap day is the 29th of February, ours the day named Leap Day after February)",
+      "value": {
+        "version": 2,
+        "grain": "day",
+        "step_name": "day",
+        "bundles": {
+          "months": {
+            "names": [
+              "January",
+              "February",
+              "March",
+              "April",
+              "May",
+              "June",
+              "July",
+              "August",
+              "September",
+              "October",
+              "November",
+              "December"
+            ],
+            "lengths": [
+              31,
+              28,
+              31,
+              30,
+              31,
+              30,
+              31,
+              31,
+              30,
+              31,
+              30,
+              31
+            ]
+          },
+          "week": {
+            "length": 7,
+            "names": [
+              "Monday",
+              "Tuesday",
+              "Wednesday",
+              "Thursday",
+              "Friday",
+              "Saturday",
+              "Sunday"
+            ],
+            "mode": "free"
+          }
+        },
+        "intercalary": [
+          {
+            "name": "Leap Day",
+            "after_month": 2,
+            "every_years": 4,
+            "except": [
+              100,
+              400
+            ],
+            "offset": 1
+          }
+        ],
+        "eras": [
+          {
+            "name": "Before Common Era",
+            "abbrev": "BCE",
+            "start": 0,
+            "end": -525600,
+            "direction": "down",
+            "year_base": 1
+          },
+          {
+            "name": "Common Era",
+            "abbrev": "CE",
+            "start": 0,
+            "year_base": 1
+          }
+        ],
+        "format": "{month} {day}, {year} {era}"
+      },
+      "valid": true,
+      "steps": [
+        {
+          "step": -36500,
+          "words": "January 26, 100 BCE",
+          "breakdown": {
+            "absYear": -100,
+            "year": 100,
+            "era": "Before Common Era",
+            "month": 1,
+            "monthName": "January",
+            "day": 26,
+            "intercalary": null,
+            "weekday": "Saturday"
+          }
+        },
+        {
+          "step": -1,
+          "words": "December 31, 1 BCE",
+          "breakdown": {
+            "absYear": -1,
+            "year": 1,
+            "era": "Before Common Era",
+            "month": 12,
+            "monthName": "December",
+            "day": 31,
+            "intercalary": null,
+            "weekday": "Sunday"
+          }
+        },
+        {
+          "step": 58,
+          "words": "February 28, 1 CE",
+          "breakdown": {
+            "absYear": 0,
+            "year": 1,
+            "era": "Common Era",
+            "month": 2,
+            "monthName": "February",
+            "day": 28,
+            "intercalary": null,
+            "weekday": "Wednesday"
+          }
+        },
+        {
+          "step": 89,
+          "words": "March 31, 1 CE",
+          "breakdown": {
+            "absYear": 0,
+            "year": 1,
+            "era": "Common Era",
+            "month": 3,
+            "monthName": "March",
+            "day": 31,
+            "intercalary": null,
+            "weekday": "Saturday"
+          }
+        },
+        {
+          "step": 181,
+          "words": "July 1, 1 CE",
+          "breakdown": {
+            "absYear": 0,
+            "year": 1,
+            "era": "Common Era",
+            "month": 7,
+            "monthName": "July",
+            "day": 1,
+            "intercalary": null,
+            "weekday": "Sunday"
+          }
+        },
+        {
+          "step": 303,
+          "words": "October 31, 1 CE",
+          "breakdown": {
+            "absYear": 0,
+            "year": 1,
+            "era": "Common Era",
+            "month": 10,
+            "monthName": "October",
+            "day": 31,
+            "intercalary": null,
+            "weekday": "Wednesday"
+          }
+        },
+        {
+          "step": 730,
+          "words": "January 1, 3 CE",
+          "breakdown": {
+            "absYear": 2,
+            "year": 3,
+            "era": "Common Era",
+            "month": 1,
+            "monthName": "January",
+            "day": 1,
+            "intercalary": null,
+            "weekday": "Wednesday"
+          }
+        },
+        {
+          "step": 1153,
+          "words": "February 28, 4 CE",
+          "breakdown": {
+            "absYear": 3,
+            "year": 4,
+            "era": "Common Era",
+            "month": 2,
+            "monthName": "February",
+            "day": 28,
+            "intercalary": null,
+            "weekday": "Saturday"
+          }
+        },
+        {
+          "step": 1154,
+          "words": "Leap Day, 4 CE",
+          "breakdown": {
+            "absYear": 3,
+            "year": 4,
+            "era": "Common Era",
+            "month": null,
+            "monthName": null,
+            "day": null,
+            "intercalary": "Leap Day",
+            "weekday": "Sunday"
+          }
+        },
+        {
+          "step": 1275,
+          "words": "June 29, 4 CE",
+          "breakdown": {
+            "absYear": 3,
+            "year": 4,
+            "era": "Common Era",
+            "month": 6,
+            "monthName": "June",
+            "day": 29,
+            "intercalary": null,
+            "weekday": "Tuesday"
+          }
+        },
+        {
+          "step": 1368,
+          "words": "September 30, 4 CE",
+          "breakdown": {
+            "absYear": 3,
+            "year": 4,
+            "era": "Common Era",
+            "month": 9,
+            "monthName": "September",
+            "day": 30,
+            "intercalary": null,
+            "weekday": "Thursday"
+          }
+        },
+        {
+          "step": 1461,
+          "words": "January 1, 5 CE",
+          "breakdown": {
+            "absYear": 4,
+            "year": 5,
+            "era": "Common Era",
+            "month": 1,
+            "monthName": "January",
+            "day": 1,
+            "intercalary": null,
+            "weekday": "Saturday"
+          }
+        },
+        {
+          "step": 1519,
+          "words": "February 28, 5 CE",
+          "breakdown": {
+            "absYear": 4,
+            "year": 5,
+            "era": "Common Era",
+            "month": 2,
+            "monthName": "February",
+            "day": 28,
+            "intercalary": null,
+            "weekday": "Monday"
+          }
+        },
+        {
+          "step": 1551,
+          "words": "April 1, 5 CE",
+          "breakdown": {
+            "absYear": 4,
+            "year": 5,
+            "era": "Common Era",
+            "month": 4,
+            "monthName": "April",
+            "day": 1,
+            "intercalary": null,
+            "weekday": "Friday"
+          }
+        },
+        {
+          "step": 1672,
+          "words": "July 31, 5 CE",
+          "breakdown": {
+            "absYear": 4,
+            "year": 5,
+            "era": "Common Era",
+            "month": 7,
+            "monthName": "July",
+            "day": 31,
+            "intercalary": null,
+            "weekday": "Sunday"
+          }
+        },
+        {
+          "step": 1765,
+          "words": "November 1, 5 CE",
+          "breakdown": {
+            "absYear": 4,
+            "year": 5,
+            "era": "Common Era",
+            "month": 11,
+            "monthName": "November",
+            "day": 1,
+            "intercalary": null,
+            "weekday": "Tuesday"
+          }
+        },
+        {
+          "step": 146100,
+          "words": "January 4, 401 CE",
+          "breakdown": {
+            "absYear": 400,
+            "year": 401,
+            "era": "Common Era",
+            "month": 1,
+            "monthName": "January",
+            "day": 4,
+            "intercalary": null,
+            "weekday": "Thursday"
+          }
+        }
+      ]
+    },
+    {
+      "name": "v2-offset-harptos",
+      "why": "version 2: every_years 4, offset 1 (no year 0): Shieldsmeet in displayed years 4, 8, ... (year index 3, 7, ...), after Midsummer; every step read back from LegendKeeper",
+      "value": {
+        "version": 2,
+        "grain": "day",
+        "step_name": "day",
+        "bundles": {
+          "months": {
+            "names": [
+              "Hammer",
+              "Alturiak",
+              "Ches",
+              "Tarsak",
+              "Mirtul",
+              "Kythorn",
+              "Flamerule",
+              "Eleasis",
+              "Eleint",
+              "Marpenoth",
+              "Uktar",
+              "Nightal"
+            ],
+            "lengths": [
+              30,
+              30,
+              30,
+              30,
+              30,
+              30,
+              30,
+              30,
+              30,
+              30,
+              30,
+              30
+            ]
+          },
+          "week": {
+            "length": 10,
+            "names": [
+              "I",
+              "II",
+              "III",
+              "IV",
+              "V",
+              "VI",
+              "VII",
+              "VIII",
+              "IX",
+              "X"
+            ],
+            "mode": "nested"
+          }
+        },
+        "intercalary": [
+          {
+            "name": "Midwinter",
+            "after_month": 1
+          },
+          {
+            "name": "Greengrass",
+            "after_month": 4
+          },
+          {
+            "name": "Midsummer",
+            "after_month": 7
+          },
+          {
+            "name": "Shieldsmeet",
+            "after_month": 7,
+            "every_years": 4,
+            "offset": 1
+          },
+          {
+            "name": "Highharvestide",
+            "after_month": 9
+          },
+          {
+            "name": "The Feast of the Moon",
+            "after_month": 11
+          }
+        ],
+        "eras": [
+          {
+            "name": "Dale Reckoning",
+            "abbrev": "DR",
+            "start": 0,
+            "year_base": 1
+          }
+        ],
+        "format": "{month} {day}, {year}"
+      },
+      "valid": true,
+      "steps": [
+        {
+          "step": 0,
+          "words": "Hammer 1, 1",
+          "breakdown": {
+            "absYear": 0,
+            "year": 1,
+            "era": "Dale Reckoning",
+            "month": 1,
+            "monthName": "Hammer",
+            "day": 1,
+            "intercalary": null,
+            "weekday": "I"
+          }
+        },
+        {
+          "step": 91,
+          "words": "Tarsak 1, 1",
+          "breakdown": {
+            "absYear": 0,
+            "year": 1,
+            "era": "Dale Reckoning",
+            "month": 4,
+            "monthName": "Tarsak",
+            "day": 1,
+            "intercalary": null,
+            "weekday": "I"
+          }
+        },
+        {
+          "step": 211,
+          "words": "Flamerule 30, 1",
+          "breakdown": {
+            "absYear": 0,
+            "year": 1,
+            "era": "Dale Reckoning",
+            "month": 7,
+            "monthName": "Flamerule",
+            "day": 30,
+            "intercalary": null,
+            "weekday": "X"
+          }
+        },
+        {
+          "step": 212,
+          "words": "Midsummer, 1 DR",
+          "breakdown": {
+            "absYear": 0,
+            "year": 1,
+            "era": "Dale Reckoning",
+            "month": null,
+            "monthName": null,
+            "day": null,
+            "intercalary": "Midsummer",
+            "weekday": null
+          }
+        },
+        {
+          "step": 303,
+          "words": "Marpenoth 30, 1",
+          "breakdown": {
+            "absYear": 0,
+            "year": 1,
+            "era": "Dale Reckoning",
+            "month": 10,
+            "monthName": "Marpenoth",
+            "day": 30,
+            "intercalary": null,
+            "weekday": "X"
+          }
+        },
+        {
+          "step": 730,
+          "words": "Hammer 1, 3",
+          "breakdown": {
+            "absYear": 2,
+            "year": 3,
+            "era": "Dale Reckoning",
+            "month": 1,
+            "monthName": "Hammer",
+            "day": 1,
+            "intercalary": null,
+            "weekday": "I"
+          }
+        },
+        {
+          "step": 1156,
+          "words": "Ches 1, 4",
+          "breakdown": {
+            "absYear": 3,
+            "year": 4,
+            "era": "Dale Reckoning",
+            "month": 3,
+            "monthName": "Ches",
+            "day": 1,
+            "intercalary": null,
+            "weekday": "I"
+          }
+        },
+        {
+          "step": 1276,
+          "words": "Kythorn 30, 4",
+          "breakdown": {
+            "absYear": 3,
+            "year": 4,
+            "era": "Dale Reckoning",
+            "month": 6,
+            "monthName": "Kythorn",
+            "day": 30,
+            "intercalary": null,
+            "weekday": "X"
+          }
+        },
+        {
+          "step": 1307,
+          "words": "Midsummer, 4 DR",
+          "breakdown": {
+            "absYear": 3,
+            "year": 4,
+            "era": "Dale Reckoning",
+            "month": null,
+            "monthName": null,
+            "day": null,
+            "intercalary": "Midsummer",
+            "weekday": null
+          }
+        },
+        {
+          "step": 1308,
+          "words": "Shieldsmeet, 4 DR",
+          "breakdown": {
+            "absYear": 3,
+            "year": 4,
+            "era": "Dale Reckoning",
+            "month": null,
+            "monthName": null,
+            "day": null,
+            "intercalary": "Shieldsmeet",
+            "weekday": null
+          }
+        },
+        {
+          "step": 1368,
+          "words": "Eleint 30, 4",
+          "breakdown": {
+            "absYear": 3,
+            "year": 4,
+            "era": "Dale Reckoning",
+            "month": 9,
+            "monthName": "Eleint",
+            "day": 30,
+            "intercalary": null,
+            "weekday": "X"
+          }
+        },
+        {
+          "step": 1460,
+          "words": "Nightal 30, 4",
+          "breakdown": {
+            "absYear": 3,
+            "year": 4,
+            "era": "Dale Reckoning",
+            "month": 12,
+            "monthName": "Nightal",
+            "day": 30,
+            "intercalary": null,
+            "weekday": "X"
+          }
+        },
+        {
+          "step": 1551,
+          "words": "Ches 30, 5",
+          "breakdown": {
+            "absYear": 4,
+            "year": 5,
+            "era": "Dale Reckoning",
+            "month": 3,
+            "monthName": "Ches",
+            "day": 30,
+            "intercalary": null,
+            "weekday": "X"
+          }
+        },
+        {
+          "step": 1643,
+          "words": "Flamerule 1, 5",
+          "breakdown": {
+            "absYear": 4,
+            "year": 5,
+            "era": "Dale Reckoning",
+            "month": 7,
+            "monthName": "Flamerule",
+            "day": 1,
+            "intercalary": null,
+            "weekday": "I"
+          }
+        },
+        {
+          "step": 1673,
+          "words": "Midsummer, 5 DR",
+          "breakdown": {
+            "absYear": 4,
+            "year": 5,
+            "era": "Dale Reckoning",
+            "month": null,
+            "monthName": null,
+            "day": null,
+            "intercalary": "Midsummer",
+            "weekday": null
+          }
+        },
+        {
+          "step": 1735,
+          "words": "Marpenoth 1, 5",
+          "breakdown": {
+            "absYear": 4,
+            "year": 5,
+            "era": "Dale Reckoning",
+            "month": 10,
+            "monthName": "Marpenoth",
+            "day": 1,
+            "intercalary": null,
+            "weekday": "I"
+          }
+        },
+        {
+          "step": 2922,
+          "words": "Hammer 1, 9",
+          "breakdown": {
+            "absYear": 8,
+            "year": 9,
+            "era": "Dale Reckoning",
+            "month": 1,
+            "monthName": "Hammer",
+            "day": 1,
+            "intercalary": null,
+            "weekday": "I"
+          }
+        }
+      ]
+    },
+    {
+      "name": "v2-except-offset-small",
+      "why": "every 4 except every 8, read on year index + 2: the leap day falls in index 2, 10, 18, -6 (Y = 4, 12, 20, -4) and not in index 6, 14, -2 (Y = 8, 16, 0)",
+      "value": {
+        "version": 2,
+        "grain": "day",
+        "bundles": {
+          "months": {
+            "names": [
+              "Frost",
+              "Thaw"
+            ],
+            "lengths": [
+              10,
+              10
+            ]
+          }
+        },
+        "intercalary": [
+          {
+            "name": "Leap",
+            "after_month": 2,
+            "every_years": 4,
+            "except": [
+              8
+            ],
+            "offset": 2
+          }
+        ]
+      },
+      "valid": true,
+      "steps": [
+        {
+          "step": 40,
+          "words": "1 Frost, 2",
+          "breakdown": {
+            "absYear": 2,
+            "year": 2,
+            "era": null,
+            "month": 1,
+            "monthName": "Frost",
+            "day": 1,
+            "intercalary": null,
+            "weekday": null
+          }
+        },
+        {
+          "step": 60,
+          "words": "Leap, 2",
+          "breakdown": {
+            "absYear": 2,
+            "year": 2,
+            "era": null,
+            "month": null,
+            "monthName": null,
+            "day": null,
+            "intercalary": "Leap",
+            "weekday": null
+          }
+        },
+        {
+          "step": 61,
+          "words": "1 Frost, 3",
+          "breakdown": {
+            "absYear": 3,
+            "year": 3,
+            "era": null,
+            "month": 1,
+            "monthName": "Frost",
+            "day": 1,
+            "intercalary": null,
+            "weekday": null
+          }
+        },
+        {
+          "step": 80,
+          "words": "10 Thaw, 3",
+          "breakdown": {
+            "absYear": 3,
+            "year": 3,
+            "era": null,
+            "month": 2,
+            "monthName": "Thaw",
+            "day": 10,
+            "intercalary": null,
+            "weekday": null
+          }
+        },
+        {
+          "step": 140,
+          "words": "10 Thaw, 6",
+          "breakdown": {
+            "absYear": 6,
+            "year": 6,
+            "era": null,
+            "month": 2,
+            "monthName": "Thaw",
+            "day": 10,
+            "intercalary": null,
+            "weekday": null
+          }
+        },
+        {
+          "step": 141,
+          "words": "1 Frost, 7",
+          "breakdown": {
+            "absYear": 7,
+            "year": 7,
+            "era": null,
+            "month": 1,
+            "monthName": "Frost",
+            "day": 1,
+            "intercalary": null,
+            "weekday": null
+          }
+        },
+        {
+          "step": 160,
+          "words": "10 Thaw, 7",
+          "breakdown": {
+            "absYear": 7,
+            "year": 7,
+            "era": null,
+            "month": 2,
+            "monthName": "Thaw",
+            "day": 10,
+            "intercalary": null,
+            "weekday": null
+          }
+        },
+        {
+          "step": 180,
+          "words": "10 Thaw, 8",
+          "breakdown": {
+            "absYear": 8,
+            "year": 8,
+            "era": null,
+            "month": 2,
+            "monthName": "Thaw",
+            "day": 10,
+            "intercalary": null,
+            "weekday": null
+          }
+        },
+        {
+          "step": 181,
+          "words": "1 Frost, 9",
+          "breakdown": {
+            "absYear": 9,
+            "year": 9,
+            "era": null,
+            "month": 1,
+            "monthName": "Frost",
+            "day": 1,
+            "intercalary": null,
+            "weekday": null
+          }
+        },
+        {
+          "step": 200,
+          "words": "10 Thaw, 9",
+          "breakdown": {
+            "absYear": 9,
+            "year": 9,
+            "era": null,
+            "month": 2,
+            "monthName": "Thaw",
+            "day": 10,
+            "intercalary": null,
+            "weekday": null
+          }
+        },
+        {
+          "step": 221,
+          "words": "Leap, 10",
+          "breakdown": {
+            "absYear": 10,
+            "year": 10,
+            "era": null,
+            "month": null,
+            "monthName": null,
+            "day": null,
+            "intercalary": "Leap",
+            "weekday": null
+          }
+        },
+        {
+          "step": 222,
+          "words": "1 Frost, 11",
+          "breakdown": {
+            "absYear": 11,
+            "year": 11,
+            "era": null,
+            "month": 1,
+            "monthName": "Frost",
+            "day": 1,
+            "intercalary": null,
+            "weekday": null
+          }
+        },
+        {
+          "step": 300,
+          "words": "9 Thaw, 14",
+          "breakdown": {
+            "absYear": 14,
+            "year": 14,
+            "era": null,
+            "month": 2,
+            "monthName": "Thaw",
+            "day": 9,
+            "intercalary": null,
+            "weekday": null
+          }
+        },
+        {
+          "step": 301,
+          "words": "10 Thaw, 14",
+          "breakdown": {
+            "absYear": 14,
+            "year": 14,
+            "era": null,
+            "month": 2,
+            "monthName": "Thaw",
+            "day": 10,
+            "intercalary": null,
+            "weekday": null
+          }
+        },
+        {
+          "step": 380,
+          "words": "9 Thaw, 18",
+          "breakdown": {
+            "absYear": 18,
+            "year": 18,
+            "era": null,
+            "month": 2,
+            "monthName": "Thaw",
+            "day": 9,
+            "intercalary": null,
+            "weekday": null
+          }
+        },
+        {
+          "step": 381,
+          "words": "10 Thaw, 18",
+          "breakdown": {
+            "absYear": 18,
+            "year": 18,
+            "era": null,
+            "month": 2,
+            "monthName": "Thaw",
+            "day": 10,
+            "intercalary": null,
+            "weekday": null
+          }
+        },
+        {
+          "step": 382,
+          "words": "Leap, 18",
+          "breakdown": {
+            "absYear": 18,
+            "year": 18,
+            "era": null,
+            "month": null,
+            "monthName": null,
+            "day": null,
+            "intercalary": "Leap",
+            "weekday": null
+          }
+        },
+        {
+          "step": 383,
+          "words": "1 Frost, 19",
+          "breakdown": {
+            "absYear": 19,
+            "year": 19,
+            "era": null,
+            "month": 1,
+            "monthName": "Frost",
+            "day": 1,
+            "intercalary": null,
+            "weekday": null
+          }
+        },
+        {
+          "step": -20,
+          "words": "1 Frost, -1",
+          "breakdown": {
+            "absYear": -1,
+            "year": -1,
+            "era": null,
+            "month": 1,
+            "monthName": "Frost",
+            "day": 1,
+            "intercalary": null,
+            "weekday": null
+          }
+        },
+        {
+          "step": -21,
+          "words": "10 Thaw, -2",
+          "breakdown": {
+            "absYear": -2,
+            "year": -2,
+            "era": null,
+            "month": 2,
+            "monthName": "Thaw",
+            "day": 10,
+            "intercalary": null,
+            "weekday": null
+          }
+        },
+        {
+          "step": -40,
+          "words": "1 Frost, -2",
+          "breakdown": {
+            "absYear": -2,
+            "year": -2,
+            "era": null,
+            "month": 1,
+            "monthName": "Frost",
+            "day": 1,
+            "intercalary": null,
+            "weekday": null
+          }
+        },
+        {
+          "step": -41,
+          "words": "10 Thaw, -3",
+          "breakdown": {
+            "absYear": -3,
+            "year": -3,
+            "era": null,
+            "month": 2,
+            "monthName": "Thaw",
+            "day": 10,
+            "intercalary": null,
+            "weekday": null
+          }
+        },
+        {
+          "step": -60,
+          "words": "1 Frost, -3",
+          "breakdown": {
+            "absYear": -3,
+            "year": -3,
+            "era": null,
+            "month": 1,
+            "monthName": "Frost",
+            "day": 1,
+            "intercalary": null,
+            "weekday": null
+          }
+        },
+        {
+          "step": -61,
+          "words": "10 Thaw, -4",
+          "breakdown": {
+            "absYear": -4,
+            "year": -4,
+            "era": null,
+            "month": 2,
+            "monthName": "Thaw",
+            "day": 10,
+            "intercalary": null,
+            "weekday": null
+          }
+        },
+        {
+          "step": -101,
+          "words": "Leap, -6",
+          "breakdown": {
+            "absYear": -6,
+            "year": -6,
+            "era": null,
+            "month": null,
+            "monthName": null,
+            "day": null,
+            "intercalary": "Leap",
+            "weekday": null
+          }
+        },
+        {
+          "step": -102,
+          "words": "10 Thaw, -6",
+          "breakdown": {
+            "absYear": -6,
+            "year": -6,
+            "era": null,
+            "month": 2,
+            "monthName": "Thaw",
+            "day": 10,
+            "intercalary": null,
+            "weekday": null
+          }
+        },
+        {
+          "step": -121,
+          "words": "1 Frost, -6",
+          "breakdown": {
+            "absYear": -6,
+            "year": -6,
+            "era": null,
+            "month": 1,
+            "monthName": "Frost",
+            "day": 1,
+            "intercalary": null,
+            "weekday": null
+          }
+        }
+      ]
+    },
+    {
+      "name": "v1-ignores-leap-keys",
+      "why": "a version-1 value carrying except and offset reads them as unknown keys: the plain rule, every 4 from index 0",
+      "value": {
+        "version": 1,
+        "grain": "day",
+        "bundles": {
+          "months": {
+            "names": [
+              "Frost",
+              "Thaw"
+            ],
+            "lengths": [
+              10,
+              10
+            ]
+          }
+        },
+        "intercalary": [
+          {
+            "name": "Leap",
+            "after_month": 2,
+            "every_years": 4,
+            "except": [
+              8
+            ],
+            "offset": 2
+          }
+        ]
+      },
+      "valid": true,
+      "steps": [
+        {
+          "step": 20,
+          "words": "Leap, 0",
+          "breakdown": {
+            "absYear": 0,
+            "year": 0,
+            "era": null,
+            "month": null,
+            "monthName": null,
+            "day": null,
+            "intercalary": "Leap",
+            "weekday": null
+          }
+        },
+        {
+          "step": 40,
+          "words": "10 Thaw, 1",
+          "breakdown": {
+            "absYear": 1,
+            "year": 1,
+            "era": null,
+            "month": 2,
+            "monthName": "Thaw",
+            "day": 10,
+            "intercalary": null,
+            "weekday": null
+          }
+        },
+        {
+          "step": 41,
+          "words": "1 Frost, 2",
+          "breakdown": {
+            "absYear": 2,
+            "year": 2,
+            "era": null,
+            "month": 1,
+            "monthName": "Frost",
+            "day": 1,
+            "intercalary": null,
+            "weekday": null
+          }
+        },
+        {
+          "step": 80,
+          "words": "10 Thaw, 3",
+          "breakdown": {
+            "absYear": 3,
+            "year": 3,
+            "era": null,
+            "month": 2,
+            "monthName": "Thaw",
+            "day": 10,
+            "intercalary": null,
+            "weekday": null
+          }
+        },
+        {
+          "step": 81,
+          "words": "1 Frost, 4",
+          "breakdown": {
+            "absYear": 4,
+            "year": 4,
+            "era": null,
+            "month": 1,
+            "monthName": "Frost",
+            "day": 1,
+            "intercalary": null,
+            "weekday": null
+          }
+        },
+        {
+          "step": 100,
+          "words": "10 Thaw, 4",
+          "breakdown": {
+            "absYear": 4,
+            "year": 4,
+            "era": null,
+            "month": 2,
+            "monthName": "Thaw",
+            "day": 10,
+            "intercalary": null,
+            "weekday": null
+          }
+        }
+      ]
+    },
+    {
+      "name": "refuse-except-not-chain",
+      "why": "an except that is not a multiple of the one before",
+      "value": {
+        "version": 2,
+        "grain": "day",
+        "bundles": {
+          "months": {
+            "names": [
+              "Frost",
+              "Thaw"
+            ],
+            "lengths": [
+              10,
+              10
+            ]
+          }
+        },
+        "intercalary": [
+          {
+            "name": "Leap",
+            "after_month": 2,
+            "every_years": 4,
+            "except": [
+              100,
+              250
+            ]
+          }
+        ]
+      },
+      "valid": false
+    },
+    {
+      "name": "refuse-except-descending",
+      "why": "an except list not ascending",
+      "value": {
+        "version": 2,
+        "grain": "day",
+        "bundles": {
+          "months": {
+            "names": [
+              "Frost",
+              "Thaw"
+            ],
+            "lengths": [
+              10,
+              10
+            ]
+          }
+        },
+        "intercalary": [
+          {
+            "name": "Leap",
+            "after_month": 2,
+            "every_years": 4,
+            "except": [
+              400,
+              100
+            ]
+          }
+        ]
+      },
+      "valid": false
+    },
+    {
+      "name": "refuse-except-not-multiple",
+      "why": "an except that is not a multiple of every_years",
+      "value": {
+        "version": 2,
+        "grain": "day",
+        "bundles": {
+          "months": {
+            "names": [
+              "Frost",
+              "Thaw"
+            ],
+            "lengths": [
+              10,
+              10
+            ]
+          }
+        },
+        "intercalary": [
+          {
+            "name": "Leap",
+            "after_month": 2,
+            "every_years": 4,
+            "except": [
+              6
+            ]
+          }
+        ]
+      },
+      "valid": false
+    },
+    {
+      "name": "refuse-except-not-list",
+      "why": "except present and not a list",
+      "value": {
+        "version": 2,
+        "grain": "day",
+        "bundles": {
+          "months": {
+            "names": [
+              "Frost",
+              "Thaw"
+            ],
+            "lengths": [
+              10,
+              10
+            ]
+          }
+        },
+        "intercalary": [
+          {
+            "name": "Leap",
+            "after_month": 2,
+            "every_years": 4,
+            "except": 100
+          }
+        ]
+      },
+      "valid": false
+    },
+    {
+      "name": "refuse-offset-fraction",
+      "why": "an offset that is not a whole number",
+      "value": {
+        "version": 2,
+        "grain": "day",
+        "bundles": {
+          "months": {
+            "names": [
+              "Frost",
+              "Thaw"
+            ],
+            "lengths": [
+              10,
+              10
+            ]
+          }
+        },
+        "intercalary": [
+          {
+            "name": "Leap",
+            "after_month": 2,
+            "every_years": 4,
+            "offset": 0.5
+          }
+        ]
+      },
+      "valid": false
+    },
+    {
+      "name": "refuse-offset-without-period",
+      "why": "offset on an entry with no every_years",
+      "value": {
+        "version": 2,
+        "grain": "day",
+        "bundles": {
+          "months": {
+            "names": [
+              "Frost",
+              "Thaw"
+            ],
+            "lengths": [
+              10,
+              10
+            ]
+          }
+        },
+        "intercalary": [
+          {
+            "name": "Leap",
+            "after_month": 2,
+            "offset": 1
+          }
+        ]
+      },
+      "valid": false
+    },
+    {
+      "name": "era-up-skips-down",
+      "why": "an up era with no end runs to the next up era's start and skips a down era: listed before a down era with the same pivot, it still holds every step from 0 (it was empty before the amendment)",
+      "value": {
+        "version": 1,
+        "grain": "year",
+        "eras": [
+          {
+            "name": "After",
+            "abbrev": "AF",
+            "start": 0
+          },
+          {
+            "name": "Before",
+            "abbrev": "BF",
+            "start": 0,
+            "direction": "down"
+          }
+        ]
+      },
+      "valid": true,
+      "steps": [
+        {
+          "step": -2,
+          "words": "2 BF",
+          "breakdown": {
+            "absYear": -2,
+            "year": 2,
+            "era": "Before",
+            "month": null,
+            "monthName": null,
+            "day": null,
+            "intercalary": null,
+            "weekday": null
+          }
+        },
+        {
+          "step": -1,
+          "words": "1 BF",
+          "breakdown": {
+            "absYear": -1,
+            "year": 1,
+            "era": "Before",
+            "month": null,
+            "monthName": null,
+            "day": null,
+            "intercalary": null,
+            "weekday": null
+          }
+        },
+        {
+          "step": 0,
+          "words": "1 AF",
+          "breakdown": {
+            "absYear": 0,
+            "year": 1,
+            "era": "After",
+            "month": null,
+            "monthName": null,
+            "day": null,
+            "intercalary": null,
+            "weekday": null
+          }
+        },
+        {
+          "step": 5,
+          "words": "6 AF",
+          "breakdown": {
+            "absYear": 5,
+            "year": 6,
+            "era": "After",
+            "month": null,
+            "monthName": null,
+            "day": null,
+            "intercalary": null,
+            "weekday": null
+          }
+        },
+        {
+          "step": 100,
+          "words": "101 AF",
+          "breakdown": {
+            "absYear": 100,
+            "year": 101,
+            "era": "After",
+            "month": null,
+            "monthName": null,
+            "day": null,
+            "intercalary": null,
+            "weekday": null
+          }
+        }
+      ]
+    },
+    {
+      "name": "refuse-except-equal-period",
+      "why": "an except not larger than every_years (every 4, not every 4: a rule that selects no year)",
+      "value": {
+        "version": 2,
+        "grain": "day",
+        "bundles": {
+          "months": {
+            "names": [
+              "Frost",
+              "Thaw"
+            ],
+            "lengths": [
+              10,
+              10
+            ]
+          }
+        },
+        "intercalary": [
+          {
+            "name": "Leap",
+            "after_month": 2,
+            "every_years": 4,
+            "except": [
+              4
+            ]
+          }
+        ]
+      },
+      "valid": false
     }
   ]
 }

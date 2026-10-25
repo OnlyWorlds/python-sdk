@@ -1,0 +1,455 @@
+{
+  "profile": "import-map",
+  "profile_page": "profiles/import-map.md",
+  "notes": [
+    "source: the source key a door reads from the file's sources; tags: the resource's tags as the export spells them; map: the user's own map for this run (tag to type), when the case has one; template: true for a resource in the tool's templates folder.",
+    "file: the import map value a door read, in place of import-map.json beside this page, when the case has one. A file whose version is not the number 1 is not an import map: the door reads no table, never an error, and every case on such a file is typed as if the file were not there. A declined offer reads the same way.",
+    "type: the type a door that applied the table (on the user's yes) gives the resource, or null: untyped (the Python package's Narrative with supertype Article). why: the strongest way that named the type (user map, then tag, then table), or why none: ambiguous (two distinct types named), no type (every tag a no_type word), template (a template left untyped that carries a tag the table has), untyped (anything else).",
+    "offered: the tags of an untyped resource that a door lists as ones a map could type: folded (trimmed, lower-cased), once each, sorted, without the no_type words of a table it read; empty on a typed resource."
+  ],
+  "cases": [
+    {
+      "name": "table-word",
+      "source": "legendkeeper",
+      "tags": [
+        "city"
+      ],
+      "type": "location",
+      "why": "table",
+      "offered": []
+    },
+    {
+      "name": "type-name-tag",
+      "source": "legendkeeper",
+      "tags": [
+        "character"
+      ],
+      "type": "character",
+      "why": "tag",
+      "offered": []
+    },
+    {
+      "name": "trimmed-and-cased",
+      "source": "legendkeeper",
+      "tags": [
+        "  Point of Interest "
+      ],
+      "type": "location",
+      "why": "table",
+      "offered": []
+    },
+    {
+      "name": "table-and-tag-same-type",
+      "source": "legendkeeper",
+      "tags": [
+        "artifact",
+        "Object"
+      ],
+      "type": "object",
+      "why": "tag",
+      "offered": []
+    },
+    {
+      "name": "two-table-words-same-type",
+      "source": "legendkeeper",
+      "tags": [
+        "artifact",
+        "item"
+      ],
+      "type": "object",
+      "why": "table",
+      "offered": []
+    },
+    {
+      "name": "two-types-ambiguous",
+      "source": "legendkeeper",
+      "tags": [
+        "city",
+        "organization"
+      ],
+      "type": null,
+      "why": "ambiguous",
+      "offered": [
+        "city",
+        "organization"
+      ]
+    },
+    {
+      "name": "table-word-and-tag-two-types",
+      "source": "legendkeeper",
+      "tags": [
+        "myth",
+        "event"
+      ],
+      "type": null,
+      "why": "ambiguous",
+      "offered": [
+        "event",
+        "myth"
+      ]
+    },
+    {
+      "name": "no-type-alone",
+      "source": "legendkeeper",
+      "tags": [
+        "guide"
+      ],
+      "type": null,
+      "why": "no type",
+      "offered": []
+    },
+    {
+      "name": "no-type-words-only",
+      "source": "legendkeeper",
+      "tags": [
+        "guide",
+        "tips",
+        "tutorial"
+      ],
+      "type": null,
+      "why": "no type",
+      "offered": []
+    },
+    {
+      "name": "no-type-beside-table-word",
+      "source": "legendkeeper",
+      "tags": [
+        "city",
+        "guide"
+      ],
+      "type": "location",
+      "why": "table",
+      "offered": []
+    },
+    {
+      "name": "no-type-beside-unknown",
+      "source": "legendkeeper",
+      "tags": [
+        "Guide",
+        "harbour"
+      ],
+      "type": null,
+      "why": "untyped",
+      "offered": [
+        "harbour"
+      ]
+    },
+    {
+      "name": "unknown-tag",
+      "source": "legendkeeper",
+      "tags": [
+        "harbour"
+      ],
+      "type": null,
+      "why": "untyped",
+      "offered": [
+        "harbour"
+      ]
+    },
+    {
+      "name": "no-tags",
+      "source": "legendkeeper",
+      "tags": [],
+      "type": null,
+      "why": "untyped",
+      "offered": []
+    },
+    {
+      "name": "user-map-over-table",
+      "source": "legendkeeper",
+      "tags": [
+        "country"
+      ],
+      "map": {
+        "country": "zone"
+      },
+      "type": "zone",
+      "why": "user map",
+      "offered": []
+    },
+    {
+      "name": "user-map-folded",
+      "source": "legendkeeper",
+      "tags": [
+        "city"
+      ],
+      "map": {
+        " City ": "zone"
+      },
+      "type": "zone",
+      "why": "user map",
+      "offered": []
+    },
+    {
+      "name": "user-map-types-unknown",
+      "source": "legendkeeper",
+      "tags": [
+        "faction"
+      ],
+      "map": {
+        "faction": "institution"
+      },
+      "type": "institution",
+      "why": "user map",
+      "offered": []
+    },
+    {
+      "name": "user-map-on-no-type-word",
+      "source": "legendkeeper",
+      "tags": [
+        "keeper"
+      ],
+      "map": {
+        "keeper": "character"
+      },
+      "type": "character",
+      "why": "user map",
+      "offered": []
+    },
+    {
+      "name": "user-map-and-table-agree",
+      "source": "legendkeeper",
+      "tags": [
+        "city",
+        "organization"
+      ],
+      "map": {
+        "organization": "location"
+      },
+      "type": "location",
+      "why": "user map",
+      "offered": []
+    },
+    {
+      "name": "template-table-word",
+      "source": "legendkeeper",
+      "tags": [
+        "scene"
+      ],
+      "template": true,
+      "type": null,
+      "why": "template",
+      "offered": [
+        "scene"
+      ]
+    },
+    {
+      "name": "template-two-table-words",
+      "source": "legendkeeper",
+      "tags": [
+        "artifact",
+        "item"
+      ],
+      "template": true,
+      "type": null,
+      "why": "template",
+      "offered": [
+        "artifact",
+        "item"
+      ]
+    },
+    {
+      "name": "template-type-name-tag",
+      "source": "legendkeeper",
+      "tags": [
+        "character"
+      ],
+      "template": true,
+      "type": "character",
+      "why": "tag",
+      "offered": []
+    },
+    {
+      "name": "template-user-map",
+      "source": "legendkeeper",
+      "tags": [
+        "quest"
+      ],
+      "map": {
+        "quest": "narrative"
+      },
+      "template": true,
+      "type": "narrative",
+      "why": "user map",
+      "offered": []
+    },
+    {
+      "name": "source-not-in-file",
+      "source": "kanka",
+      "tags": [
+        "city"
+      ],
+      "type": null,
+      "why": "untyped",
+      "offered": [
+        "city"
+      ]
+    },
+    {
+      "name": "refuse-version-2",
+      "source": "legendkeeper",
+      "tags": [
+        "city"
+      ],
+      "file": {
+        "version": 2,
+        "sources": {
+          "legendkeeper": {
+            "source": "LegendKeeper",
+            "matches": "tag",
+            "types": {
+              "artifact": "object",
+              "city": "location",
+              "country": "location",
+              "ethnicity": "species",
+              "item": "object",
+              "myth": "narrative",
+              "organization": "institution",
+              "point of interest": "location",
+              "quest": "narrative",
+              "scene": "narrative",
+              "technology": "construct"
+            },
+            "no_type": [
+              "guide",
+              "keeper",
+              "tips",
+              "tutorial"
+            ],
+            "ruled": "2026-10-25"
+          }
+        }
+      },
+      "type": null,
+      "why": "untyped",
+      "offered": [
+        "city"
+      ]
+    },
+    {
+      "name": "refuse-version-2-no-type-word",
+      "source": "legendkeeper",
+      "tags": [
+        "guide"
+      ],
+      "file": {
+        "version": 2,
+        "sources": {
+          "legendkeeper": {
+            "source": "LegendKeeper",
+            "matches": "tag",
+            "types": {
+              "artifact": "object",
+              "city": "location",
+              "country": "location",
+              "ethnicity": "species",
+              "item": "object",
+              "myth": "narrative",
+              "organization": "institution",
+              "point of interest": "location",
+              "quest": "narrative",
+              "scene": "narrative",
+              "technology": "construct"
+            },
+            "no_type": [
+              "guide",
+              "keeper",
+              "tips",
+              "tutorial"
+            ],
+            "ruled": "2026-10-25"
+          }
+        }
+      },
+      "type": null,
+      "why": "untyped",
+      "offered": [
+        "guide"
+      ]
+    },
+    {
+      "name": "refuse-version-2-two-table-words",
+      "source": "legendkeeper",
+      "tags": [
+        "artifact",
+        "item"
+      ],
+      "file": {
+        "version": 2,
+        "sources": {
+          "legendkeeper": {
+            "source": "LegendKeeper",
+            "matches": "tag",
+            "types": {
+              "artifact": "object",
+              "city": "location",
+              "country": "location",
+              "ethnicity": "species",
+              "item": "object",
+              "myth": "narrative",
+              "organization": "institution",
+              "point of interest": "location",
+              "quest": "narrative",
+              "scene": "narrative",
+              "technology": "construct"
+            },
+            "no_type": [
+              "guide",
+              "keeper",
+              "tips",
+              "tutorial"
+            ],
+            "ruled": "2026-10-25"
+          }
+        }
+      },
+      "type": null,
+      "why": "untyped",
+      "offered": [
+        "artifact",
+        "item"
+      ]
+    },
+    {
+      "name": "refuse-version-true",
+      "source": "legendkeeper",
+      "tags": [
+        "organization"
+      ],
+      "file": {
+        "version": true,
+        "sources": {
+          "legendkeeper": {
+            "source": "LegendKeeper",
+            "matches": "tag",
+            "types": {
+              "artifact": "object",
+              "city": "location",
+              "country": "location",
+              "ethnicity": "species",
+              "item": "object",
+              "myth": "narrative",
+              "organization": "institution",
+              "point of interest": "location",
+              "quest": "narrative",
+              "scene": "narrative",
+              "technology": "construct"
+            },
+            "no_type": [
+              "guide",
+              "keeper",
+              "tips",
+              "tutorial"
+            ],
+            "ruled": "2026-10-25"
+          }
+        }
+      },
+      "type": null,
+      "why": "untyped",
+      "offered": [
+        "organization"
+      ]
+    }
+  ]
+}

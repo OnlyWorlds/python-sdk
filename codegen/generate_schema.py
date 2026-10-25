@@ -44,6 +44,8 @@ OUT = HERE.parent / "src" / "onlyworlds" / "_schema.py"
 VENDORED = {
     DIST / "walk" / "lint_folder.py": HERE.parent / "src" / "onlyworlds" / "_walk" / "lint_folder.py",
     DIST / "schema.json": HERE.parent / "src" / "onlyworlds" / "_walk" / "schema.json",
+    # the import map profile's table (profiles/import-map.md), read by the LegendKeeper door
+    DIST / "profiles" / "import-map.json": HERE.parent / "src" / "onlyworlds" / "_walk" / "import-map.json",
 }
 
 NON_ELEMENT_SCHEMA_FILES = {"base_properties", "world"}

@@ -33,7 +33,8 @@ from onlyworlds.legendkeeper import (
 )
 
 ROOT = Path(__file__).resolve().parents[1]
-LINT = ROOT / "codegen" / "schema-dist" / "walk" / "lint_folder.py"
+DIST = ROOT / "codegen" / "schema-dist"
+LINT = DIST / "walk" / "lint_folder.py"
 FIX = Path(__file__).resolve().parent / "fixtures" / "legendkeeper"
 PID = "calendar0"
 P = f"/projects/{PID}"
@@ -61,40 +62,45 @@ def whole(v: Any, least: int | None = None) -> bool:
     return isinstance(v, int) and not isinstance(v, bool) and (least is None or v >= least)
 
 
+def at(value: Any, key: str) -> Any:
+    """``value[key]`` when value is an object, else None (a JavaScript reader's ``value?.key``)."""
+    return value.get(key) if isinstance(value, dict) else None
+
+
 def not_a_calendar(value: Any) -> list[str]:
     """Every rule of the profile's "Not a calendar" list the value breaks (version 2, schema-dist
-    serial 68), and its version row: version 2 exactly when an intercalary entry carries ``except``
-    or ``offset``. [] when a reader takes it."""
+    serial 68); [] when a reader takes it. Replayed against the vendored fixture's 64 cases."""
+    if isinstance(value, str):  # the same object as a JSON string, strict JSON only
+        try:
+            value = json.loads(value)
+        except ValueError:
+            return ["a string that is not JSON"]
     if not isinstance(value, dict):
         return ["not an object"]
     out = []
     if value.get("version") not in (1, 2):
         out.append("version is not 1 or 2")
-    raw = value.get("intercalary")
-    entries: list[Any] = raw if isinstance(raw, list) else []
-    needs_2 = any(isinstance(i, dict) and ("except" in i or "offset" in i) for i in entries)
-    if value.get("version") in (1, 2) and (value["version"] == 2) != needs_2:
-        out.append("version 2 is for an entry with except or offset, and only for one")
     if not isinstance(value.get("grain"), str):
         out.append("grain is not a string")
-    bundles = value.get("bundles") or {}
-    months = bundles.get("months")
-    if months is not None:
-        names, lengths = months.get("names"), months.get("lengths")
+    bundles = value.get("bundles")
+    months = at(bundles, "months")
+    if months not in (None, False, 0, ""):  # a falsy value reads as absent, as in the SDK's reader
+        names, lengths = at(months, "names"), at(months, "lengths")
         if not isinstance(names, list) or not isinstance(lengths, list) or len(names) != len(lengths) or not names:
             out.append("months' names and lengths are not lists of one non-zero length")
         elif not all(isinstance(n, str) for n in names):
             out.append("a month name is not a string")
         elif not all(whole(n, 1) for n in lengths):
             out.append("a month length is not a whole number from 1")
-    year = bundles.get("year")
-    if year is not None and not whole(year.get("steps"), 1):
+    year = at(bundles, "year")
+    if year is not None and not whole(at(year, "steps"), 1):
         out.append("bundles.year.steps is not a whole number from 1")
-    week = bundles.get("week")
+    week = at(bundles, "week")
     if week is not None:
-        if not whole(week.get("length"), 1):
+        if not whole(at(week, "length"), 1):
             out.append("bundles.week.length is not a whole number from 1")
-        if not isinstance(week.get("names"), list) or not all(isinstance(n, str) for n in week["names"]):
+        wnames = at(week, "names")
+        if not isinstance(wnames, list) or not all(isinstance(n, str) for n in wnames):
             out.append("bundles.week.names is not a list of strings")
     if "eras" in value and value["eras"] is not None:
         eras = value["eras"]
@@ -116,6 +122,8 @@ def not_a_calendar(value: Any) -> list[str]:
                     out.append("an intercalary entry lacks a string name or a whole after_month")
                 elif i.get("every_years") is not None and not whole(i["every_years"], 1):
                     out.append("an every_years is not a whole number from 1")
+                elif i.get("every_years") is None and (i.get("offset") is not None or i.get("except") is not None):
+                    out.append("an offset or except on an entry with no every_years")
                 elif i.get("offset") is not None and not whole(i["offset"]):
                     out.append("an offset is not a whole number")
                 elif i.get("except") is not None:
@@ -127,15 +135,34 @@ def not_a_calendar(value: Any) -> list[str]:
     return out
 
 
+def version_fits(value: dict[str, Any]) -> bool:
+    """The writer's side of the version row: 2 exactly when an intercalary entry carries ``except``
+    or ``offset``, so a reader of version 1 alone refuses it whole rather than misreading it."""
+    raw = value.get("intercalary")
+    entries: list[Any] = raw if isinstance(raw, list) else []
+    needs_2 = any(isinstance(i, dict) and ("except" in i or "offset" in i) for i in entries)
+    return value.get("version") == (2 if needs_2 else 1)
+
+
+def test_the_helper_reads_the_vendored_fixture_as_the_profile_does() -> None:
+    """The calendar fixture beside the profile (serial 68: 64 cases, 30 calendars and 34 refusals):
+    the helper refuses exactly the values the fixture marks not valid."""
+    fixture = json.loads((DIST / "profiles" / "calendar.fixture.json").read_text(encoding="utf-8"))
+    cases = fixture["cases"]
+    assert len(cases) == 64 and sum(not c["valid"] for c in cases) == 34
+    wrong = [c["name"] for c in cases if bool(not_a_calendar(c["value"])) == c["valid"]]
+    assert wrong == []
+
+
 def test_the_helper_refuses_what_the_profile_refuses() -> None:
     good: dict[str, Any] = {"version": 1, "grain": "day", "bundles": {"months": {"names": ["A"], "lengths": [3]}}}
     assert not_a_calendar(good) == []
     four = {"name": "Leap", "after_month": 1, "every_years": 4}
     assert not_a_calendar({**good, "version": 2, "intercalary": [{**four, "except": [100, 400], "offset": 1}]}) == []
+    assert version_fits(good) and not version_fits({**good, "version": 2})  # nothing that needs it
+    assert not version_fits({**good, "intercalary": [{**four, "offset": 1}]})  # version 1 with a version 2 key
     bad = [
         {**good, "version": 3},
-        {**good, "version": 2},  # nothing that needs it
-        {**good, "intercalary": [{**four, "offset": 1}]},  # version 1 with a version 2 key
         {**good, "version": 2, "intercalary": [{**four, "except": [4]}]},
         {**good, "version": 2, "intercalary": [{**four, "except": [100, 250]}]},
         {**good, "version": 2, "intercalary": [{**four, "offset": 0.5}]},
@@ -345,7 +372,7 @@ def test_each_preset_is_exact_or_refused_with_its_reasons() -> None:
     ids=["Eberron", "Exandria", "Greyhawk", "Gregorian", "Harptos"],
 )
 def test_the_exact_configs_are_calendars_by_the_profile(config: dict[str, Any]) -> None:
-    assert not_a_calendar(config) == []
+    assert not_a_calendar(config) == [] and version_fits(config)
 
 
 def test_the_week_turns_so_its_first_name_is_the_weekday_at_minute_0() -> None:
@@ -365,8 +392,8 @@ def test_the_week_turns_so_its_first_name_is_the_weekday_at_minute_0() -> None:
 
 
 def test_a_negative_era_is_a_down_era_listed_first() -> None:
-    """An era without an end runs to the next era's start: listed after the up era at 0, the down
-    era would end that era where it begins."""
+    """Before serial 68 an open era ran to the next era's start, down eras too: listed after the up
+    era at 0, the down era ended that era where it began. Listed first, every reader reads it."""
     cal = preset("Eberron")
     cal["negativeEra"] = {"id": "bk", "name": "Before the Kingdom", "abbr": "BK", "startsAt": -100 * 336 * DAY}
     cfg, why = _calendar_config(cal)

@@ -2,8 +2,9 @@
 export file: read-only, no AI.
 
     LEGENDKEEPER_API_KEY=lk_... python -m onlyworlds.legendkeeper --project ID OUT-DIR [--plan]
-        [--key-file PATH] [--map TAG=TYPE ...]
+        [--key-file PATH] [--map TAG=TYPE ...] [--import-map]
     python -m onlyworlds.legendkeeper --file EXPORT.lk OUT-DIR [--plan] [--project ID] [--map TAG=TYPE ...]
+        [--import-map]
 
 or ``import_legendkeeper(ApiSource(key), project_id, out_dir, ...)`` and
 ``import_legendkeeper("EXPORT.lk", out_dir=...)``. The key is the person's own (Project Settings,
@@ -107,11 +108,22 @@ real worldbuilder's project is the walk still to come.
 
 What becomes what:
 
-- **A resource becomes an element.** Its type is a tag equal to one of the 22 type names (any
-  case), or a tag ``--map TAG=TYPE`` names; never a guess. A resource whose tags name no type, or
+- **A resource becomes an element.** Its type is a tag equal to one of the 22 type names, or a
+  tag ``--map TAG=TYPE`` names, or, on the user's yes, a tag the import map names; never a guess.
+  Every tag is matched trimmed and case-folded, and ``--map`` wins over the table for its tag.
+  **The import map** (schema-dist ``profiles/import-map.md``, its table the vendored
+  ``_walk/import-map.json``: LegendKeeper's common tags, ``city`` to ``location``,
+  ``organization`` to ``institution``, ...) is offered, never applied unasked: the report names
+  every row that would type a resource, with how many (``city → location (5)``), and it types
+  only with ``--import-map`` (``import_map=True``) or a yes to the question a run at a terminal
+  asks; a plan and any other run print the offer and leave it. A template is out of its reach,
+  its ``no_type`` words (the tool's help pages) are never offered as tags a map could type, and a
+  resource it typed says ``import map: TAG=TYPE`` in the report. The file's refusals give no
+  table, never an error. A resource whose tags name no type, or
   name two, becomes a Narrative with supertype ``Article`` (what it is, never where it came from:
   the producer line and the ``x_legendkeeper_`` keys say that; the report lists the tags
-  ``--map`` could use, and the two-type ones). ``name`` is its name; its page documents' blocks,
+  ``--map`` could use, and the two-type ones). The resource's own tags stay in
+  ``x_legendkeeper_tags``, never a type name. ``name`` is its name; its page documents' blocks,
   as Markdown, its ``description`` (each page under ``## <document name>`` when it has more than
   one; a first heading equal to the name is left out). ``x_legendkeeper_id`` is the resource's
   id, ``x_legendkeeper_tags`` and ``x_legendkeeper_aliases`` its tags and aliases,
@@ -342,6 +354,7 @@ from .worldfile import RECORDS_MANIFEST
 __all__ = [
     "API_BASE",
     "EXT_PREFIX",
+    "IMPORT_MAP_SOURCE",
     "KEY_ENV",
     "LEGENDKEEPER_NAMESPACE",
     "PRODUCER_INPUT",
@@ -350,6 +363,8 @@ __all__ = [
     "BoardMade",
     "FileSource",
     "Hidden",
+    "ImportMap",
+    "ImportMapOffer",
     "ImportReport",
     "MapMade",
     "NotImported",
@@ -1198,8 +1213,10 @@ def _calendar_config(cal: Mapping[str, Any]) -> tuple[dict[str, Any] | None, lis
       (``resetMode`` ``calendar``) is not exact, nor a later era that restarts its years
       (unwitnessed), nor a later era counting on from the epoch with no year 0. The first era's
       ``year_base`` is 0 with a year 0, else 1. A negative era is a ``down`` era, pivot 0, ``end``
-      its start in days, ``year_base`` 1, listed first: an era without an end runs to the next
-      era's start, so a down era listed after the up era at 0 would end that era where it begins.
+      its start in days, ``year_base`` 1, listed first. Since schema-dist serial 68 an open era's
+      end skips down eras, so the order does not matter to a current reader; before it, an open
+      era ran to the next era's start, and a down era listed after the up era at 0 ended that era
+      where it began (the SDK before 4.76.0 reads it so).
     - the ``day`` format's tokens become the profile's; one with no twin leaves the profile's
       default. Moons and the clock have no place in the profile: they stay in the raw calendar.
     """
@@ -1300,8 +1317,8 @@ def _read_calendar(cal: Mapping[str, Any]) -> tuple[dict[str, Any], list[str]]:
             why.append(f"the negative era {ename!r} starts at minute {start}, not before 0")
         if start % day:
             why.append(f"era {ename!r} starts inside a day")
-        # first in the list: an era without an end runs to the next era's start, so this down era
-        # listed after the up era at 0 would end that era where it begins
+        # first in the list, so a reader from before serial 68 (an open era ran to the next era's
+        # start, down eras too) does not end the up era at 0 where it begins
         down = {"name": ename, "abbrev": "" if ne.get("hideAbbr") else str(ne.get("abbr") or "AD"), "start": 0}
         eras.insert(0, {**down, "end": start // day, "direction": "down", "year_base": 1})
     if eras:
@@ -1312,6 +1329,197 @@ def _read_calendar(cal: Mapping[str, Any]) -> tuple[dict[str, Any], list[str]]:
         if template:
             cfg["format"] = template
     return cfg, why
+
+
+# ---------------------------------------------------------------------------
+# The import map: LegendKeeper's tags to the 22 types, offered, applied on a yes
+# ---------------------------------------------------------------------------
+
+#: This door's source key in the import map profile (schema-dist ``profiles/import-map.md``).
+IMPORT_MAP_SOURCE = "legendkeeper"
+#: The vendored table, copied byte-exact from the pinned schema distribution by the codegen.
+_IMPORT_MAP_FILE = Path(__file__).resolve().parent / "_walk" / "import-map.json"
+#: The one ``matches`` value this door knows.
+_IMPORT_MAP_MATCHES = "tag"
+
+
+def _fold(word: str) -> str:
+    """Trimmed and without regard to case (the room profile's one definition): ``casefold()``."""
+    return word.strip().casefold()
+
+
+@dataclass(frozen=True)
+class ImportMap:
+    """One source's table from the import map: a folded word to a type, and the words with no type."""
+
+    source: str
+    types: Mapping[str, str]
+    no_type: frozenset[str]
+    ruled: str | None = None
+
+
+def _read_import_map(value: Any, source: str = IMPORT_MAP_SOURCE) -> ImportMap | None:
+    """One source's table from an import map value, or None: the profile's refusals (not an object,
+    ``version`` not the number 1, ``sources`` not an object, the source's entry not an object or its
+    ``matches`` not ``tag``) give no table, never an error. Ignored, the rest read: unknown keys,
+    another source's entry, a row whose value is not a type slug as the schema spells it, a
+    ``no_type`` entry that is not a string, a ``types`` that is not an object and a ``no_type`` that
+    is not an array."""
+    if not isinstance(value, dict):
+        return None
+    version = value.get("version")
+    if isinstance(version, bool) or not isinstance(version, (int, float)) or version != 1:
+        return None
+    sources = value.get("sources")
+    if not isinstance(sources, dict):
+        return None
+    entry = sources.get(source)
+    if not isinstance(entry, dict) or entry.get("matches") != _IMPORT_MAP_MATCHES:
+        return None
+    raw_types = entry.get("types")
+    types = (
+        {_fold(k): v for k, v in raw_types.items() if isinstance(k, str) and isinstance(v, str) and v in ELEMENT_TYPES}
+        if isinstance(raw_types, dict)
+        else {}
+    )
+    raw_none = entry.get("no_type")
+    no_type = frozenset(_fold(w) for w in raw_none if isinstance(w, str)) if isinstance(raw_none, list) else frozenset()
+    name = entry.get("source")
+    ruled = entry.get("ruled")
+    return ImportMap(
+        source=name if isinstance(name, str) and name.strip() else source,
+        types=types,
+        no_type=no_type,
+        ruled=ruled if isinstance(ruled, str) else None,
+    )
+
+
+def _load_import_map() -> ImportMap | None:
+    """The vendored table for this door; None when the file is missing, not JSON, or refused."""
+    try:
+        value = json.loads(_IMPORT_MAP_FILE.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return None
+    return _read_import_map(value)
+
+
+@dataclass(frozen=True)
+class _Typing:
+    """How one resource is typed: the type or None (untyped), the profile's ``why`` (``user map``,
+    ``tag``, ``table``, ``ambiguous``, ``no type``, ``template``, ``untyped``), the report's words for
+    it, and the tags offered as ones a map could type (folded, once, sorted; none when typed)."""
+
+    type: str | None
+    why: str
+    by: str
+    offered: tuple[str, ...]
+    #: the table's words that named the type, when the table typed it
+    table_words: tuple[str, ...] = ()
+
+
+#: The strongest way first: the user's map, then a type-name tag, then the table.
+_RANKS = {"user map": 0, "tag": 1, "table": 2}
+
+
+def _type_resource(
+    tags: Iterable[str], user_map: Mapping[str, str], table: ImportMap | None, *, template: bool = False
+) -> _Typing:
+    """A resource's type from its tags (``profiles/import-map.md``, How a door reads it, 1 to 3).
+    For each tag, folded: the user's map names its type; else, on a resource that is not a template,
+    the table's entry; else a tag equal to a type slug. One named type types the resource; two leave
+    it untyped and ambiguous; a ``no_type`` word only drops out of the offered tags. With no table
+    (none read, or the offer not taken) it is the door's typing from before the import map."""
+    umap = {_fold(k): str(v).strip().casefold() for k, v in user_map.items()}
+    words = [(t, _fold(t)) for t in tags if _fold(t)]
+    named: dict[str, tuple[int, str, str]] = {}  # type -> (rank, how, the tag as written)
+    table_words: dict[str, list[str]] = {}
+    for tag, f in words:
+        if f in umap:
+            etype, how = umap[f], "user map"
+        elif table is not None and not template and f in table.types:
+            etype, how = table.types[f], "table"
+            table_words.setdefault(etype, []).append(f)
+        elif f in ELEMENT_TYPES:
+            etype, how = f, "tag"
+        else:
+            continue
+        if etype not in named or _RANKS[how] < named[etype][0]:
+            named[etype] = (_RANKS[how], how, tag)
+    offered = tuple(sorted({f for _, f in words if table is None or f not in table.no_type}))
+    if len(named) == 1:
+        ((etype, (_, how, tag)),) = named.items()
+        f = _fold(tag)
+        by = {"user map": f"--map {f}={etype}", "tag": f"tag {tag!r}", "table": f"import map: {f}={etype}"}[how]
+        return _Typing(etype, how, by, (), tuple(dict.fromkeys(table_words.get(etype, []))) if how == "table" else ())
+    if named:
+        return _Typing(None, "ambiguous", "ambiguous: its tags name " + " and ".join(sorted(named)), offered)
+    if table is not None and template and any(f in table.types for _, f in words):
+        return _Typing(None, "template", "untyped", offered)
+    if table is not None and words and all(f in table.no_type for _, f in words):
+        return _Typing(None, "no type", "untyped", offered)
+    return _Typing(None, "untyped", "untyped", offered)
+
+
+@dataclass
+class ImportMapOffer:
+    """The import map's offer for one project (``profiles/import-map.md``, Offer, then apply): every
+    row that would type at least one resource, with how many, and whether the user's yes applied it."""
+
+    source: str
+    ruled: str | None
+    #: (the tool's word, the type, how many resources it would type), by word
+    rows: list[tuple[str, str, int]]
+    #: how many resources the table would type
+    would_type: int
+    #: resources typed without the table that it would leave ambiguous (two types named)
+    unsettled: list[str] = field(default_factory=list)
+    applied: bool = False
+
+    def said(self) -> str:
+        """The offer in one line: ``city → location (5)`` per row."""
+        rows = ", ".join(f"{w} → {t} ({n})" for w, t, n in self.rows)
+        ruled = f", ruled {self.ruled}" if self.ruled else ""
+        out = (
+            f"Import map ({self.source}'s common tags to the 22 types{ruled}): it would type"
+            f" {self.would_type} resource{'' if self.would_type == 1 else 's'}: {rows}."
+        )
+        if self.unsettled:
+            listed = ", ".join(repr(n) for n in self.unsettled)
+            out += f" It would leave {len(self.unsettled)} typed without it ambiguous: {listed}."
+        return out
+
+
+def _typing_tags(row: Mapping[str, Any]) -> list[str]:
+    """A resource's tags that can type it: its tags but the push convention's ``ow-supertype:`` and ``ow-subtype:``."""
+    tags = [t for t in row.get("tags") or [] if isinstance(t, str)]
+    return [t for t in tags if not any(t.lower().startswith(pre) for pre in OW_TAG_PREFIXES)]
+
+
+def _is_template(row: Mapping[str, Any], ids: Iterable[str]) -> bool:
+    return row.get("parentId") == TEMPLATES_PARENT and TEMPLATES_PARENT not in set(ids)
+
+
+def _offer(snap: Snapshot, user_map: Mapping[str, str], table: ImportMap | None) -> ImportMapOffer | None:
+    """What the table would do to this project, or None when it would type nothing and unsettle nothing."""
+    if table is None:
+        return None
+    ids = [r["id"] for r in snap.resources]
+    counts: Counter[tuple[str, str]] = Counter()
+    typed = 0
+    unsettled: list[str] = []
+    for row in snap.resources:
+        tags, template = _typing_tags(row), _is_template(row, ids)
+        with_table = _type_resource(tags, user_map, table, template=template)
+        if with_table.why == "table":
+            typed += 1
+            for word in with_table.table_words:
+                counts[(word, with_table.type or "")] += 1
+        elif with_table.why == "ambiguous" and _type_resource(tags, user_map, None, template=template).type:
+            unsettled.append(str(row.get("name") or row["id"]))
+    if not typed and not unsettled:
+        return None
+    rows = [(w, t, n) for (w, t), n in sorted(counts.items())]
+    return ImportMapOffer(table.source, table.ruled, rows, typed, unsettled)
 
 
 # ---------------------------------------------------------------------------
@@ -1671,6 +1879,8 @@ class ImportReport:
     untyped_tags: dict[str, int] = field(default_factory=dict)
     #: what an OnlyWorlds push said it could not place (its ``onlyworlds-unmapped`` rows), one line each
     ow_unmapped: list[str] = field(default_factory=list)
+    #: the import map's offer for this project (None when it would type nothing), and whether it was applied
+    import_map: ImportMapOffer | None = None
     #: where the folder was written; None for a plan
     out: Path | None = None
 
@@ -1698,6 +1908,13 @@ class ImportReport:
             for t in self.typed:
                 if t.by.startswith("ambiguous"):
                     lines.append(f"  - {t.name!r} kept untyped: {t.by}")
+        if self.import_map is not None:
+            lines.append(self.import_map.said())
+            lines.append(
+                "  Applied on your yes: the resources it typed say 'import map: TAG=TYPE' above."
+                if self.import_map.applied
+                else "  Not applied (it never types anything without a yes): --import-map applies it for a run."
+            )
         if self.untyped_tags:
             listed = ", ".join(f"{t!r} {n}" for t, n in sorted(self.untyped_tags.items()))
             lines.append(f"Tags on the untyped resources (--map TAG=TYPE types them): {listed}.")
@@ -1910,9 +2127,11 @@ def _quote(text: str, marker: str = "> ") -> str:
 
 
 class _Converter:
-    def __init__(self, snap: Snapshot, type_map: Mapping[str, str]) -> None:
+    def __init__(self, snap: Snapshot, type_map: Mapping[str, str], table: ImportMap | None = None) -> None:
         self.snap = snap
         self.type_map = dict(type_map)
+        #: the import map's table, only when the user said yes to it
+        self.table = table
         self.report = ImportReport(project=snap.project_id, world={}, unread=list(snap.unread), notes=list(snap.notes))
         self.rows = {r["id"]: r for r in snap.resources}
         self.state = _split_hidden(snap.resources)
@@ -1994,15 +2213,15 @@ class _Converter:
                 self.report.hidden.resources += 1
             elif st == "under":
                 self.report.hidden.under_hidden += 1
-            tags = [t for t in row.get("tags") or [] if isinstance(t, str)]
+            all_tags = [t for t in row.get("tags") or [] if isinstance(t, str)]
             ow_tags = {
                 fname: t[len(pre) :].strip()
-                for t in tags
+                for t in all_tags
                 for pre, fname in OW_TAG_PREFIXES.items()
                 if t.lower().startswith(pre) and t[len(pre) :].strip()
             }
-            tags = [t for t in tags if not any(t.lower().startswith(pre) for pre in OW_TAG_PREFIXES)]
-            etype, by = self._type_of(tags)
+            typing = _type_resource(_typing_tags(row), self.type_map, self.table, template=_is_template(row, self.rows))
+            etype, by = typing.type or "narrative", typing.by
             name = str(row.get("name") or "").strip() or f"Untitled ({rid})"
             own = self._own_id(rid)
             if own is not None and own in claimed:
@@ -2023,7 +2242,7 @@ class _Converter:
             )
             if not item.typed:
                 item.fields["supertype"] = UNTYPED_SUPERTYPE
-                for t in tags:
+                for t in typing.offered:  # folded, once each, without the table's no_type words
                     untyped_tags[t] = untyped_tags.get(t, 0) + 1
             item.fields.update(ow_tags)
             if own is not None:
@@ -2031,21 +2250,6 @@ class _Converter:
             self.items[rid] = item
             self.report.typed.append(Typed(name, rid, etype, by))
         self.report.untyped_tags = untyped_tags
-
-    def _type_of(self, tags: list[str]) -> tuple[str, str]:
-        found: dict[str, str] = {}
-        for tag in tags:
-            low = tag.strip().lower()
-            if low in self.type_map:
-                found.setdefault(self.type_map[low], f"--map {low}={self.type_map[low]}")
-            elif low in ELEMENT_TYPES:
-                found.setdefault(low, f"tag {tag!r}")
-        if len(found) == 1:
-            ((etype, by),) = found.items()
-            return etype, by
-        if not found:
-            return "narrative", "untyped"
-        return "narrative", "ambiguous: its tags name " + " and ".join(sorted(found))
 
     # -- pass 2: fields, links, text, timelines -----------------------------
 
@@ -3301,7 +3505,7 @@ class _Converter:
 def _type_map(pairs: Mapping[str, str] | None) -> dict[str, str]:
     out: dict[str, str] = {}
     for tag, etype in (pairs or {}).items():
-        t, e = str(tag).strip().lower(), str(etype).strip().lower()
+        t, e = _fold(str(tag)), _fold(str(etype))
         if not t:
             raise ValueError("a --map needs a tag before the '='")
         if e not in ELEMENT_TYPES:
@@ -3317,6 +3521,8 @@ def import_legendkeeper(
     *,
     plan_only: bool = False,
     type_map: Mapping[str, str] | None = None,
+    import_map: bool = False,
+    ask: Callable[[ImportMapOffer], bool] | None = None,
 ) -> ImportReport:
     """Read a LegendKeeper project from ``source`` into a world folder at ``out_dir``, which must
     not exist or be empty.
@@ -3331,6 +3537,12 @@ def import_legendkeeper(
     ``FileExistsError`` for an ``out_dir`` that is not empty, ``FileNotFoundError`` for a missing
     export file, ``ValueError`` for a ``type_map`` that names no type or a file that is not an
     export, ``SourceError`` when the project or its tree cannot be read.
+
+    The import map (schema-dist ``profiles/import-map.md``: LegendKeeper's common tags, such as
+    ``city`` or ``organization``, to the 22 types) is offered, never applied unasked: the report's
+    ``import_map`` says what it would type, and it types only with ``import_map=True`` (the user's
+    yes for this run), or when ``ask`` (the command line's question) is given the offer and answers
+    True. ``type_map`` wins over the table for each tag it names.
     """
     mapping = _type_map(type_map)
     out = Path(out_dir) if out_dir is not None else None
@@ -3348,7 +3560,13 @@ def import_legendkeeper(
     if not isinstance(project_id, str) or not project_id.strip():
         raise ValueError("give the LegendKeeper project id")
     snap = read_project(source, project_id.strip())
-    conv = _Converter(snap, mapping)
+    table = _load_import_map()
+    offer = _offer(snap, mapping, table)
+    applied = bool(import_map) or (offer is not None and ask is not None and bool(ask(offer)))
+    if offer is not None:
+        offer.applied = applied
+    conv = _Converter(snap, mapping, table if applied else None)
+    conv.report.import_map = offer
     conv.collect()
     conv.fill()
     elements = conv.bodies()
@@ -3394,6 +3612,21 @@ def _read_key(key_file: Path | None) -> str:
     return key
 
 
+def _interactive() -> bool:
+    """Someone at a terminal to ask: stdin and stdout both a TTY."""
+    return sys.stdin.isatty() and sys.stdout.isatty()
+
+
+def _ask(offer: ImportMapOffer) -> bool:
+    """The import map's question on the terminal: yes only on ``y`` or ``yes``; anything else, or no answer, is no."""
+    print(offer.said())
+    try:
+        answer = input("Apply the import map to this import? [y/N] ")
+    except EOFError:
+        return False
+    return answer.strip().casefold() in ("y", "yes")
+
+
 def main(argv: list[str] | None = None, *, source: Source | None = None, transport: Transport | None = None) -> int:
     """The command line. ``source`` (a recorded one) or ``transport`` (a fake HTTP) are for tests."""
     for stream in (sys.stdout, sys.stderr):
@@ -3408,6 +3641,12 @@ def main(argv: list[str] | None = None, *, source: Source | None = None, transpo
     ap.add_argument("--plan", action="store_true", help="read the project, print what would become what, write nothing")
     ap.add_argument("--key-file", type=Path, help=f"a file holding the API key (else ${KEY_ENV})")
     ap.add_argument("--map", action="append", default=[], metavar="TAG=TYPE", help="type the resources with this tag")
+    ap.add_argument(
+        "--import-map",
+        action="store_true",
+        help="apply the import map (LegendKeeper's common tags, city or organization, to the 22 types) for this run;"
+        " without it a run at a terminal asks, and any other run, --plan included, only prints the offer",
+    )
     args = ap.parse_args(argv)
     if args.out is None and not args.plan:
         print("give OUT-DIR, or --plan", file=sys.stderr)
@@ -3431,7 +3670,10 @@ def main(argv: list[str] | None = None, *, source: Source | None = None, transpo
             src = args.file
         else:
             src = source if source is not None else ApiSource(_read_key(args.key_file), transport=transport)
-        report = import_legendkeeper(src, args.project, args.out, plan_only=args.plan, type_map=pairs)
+        ask = _ask if not args.import_map and not args.plan and _interactive() else None
+        report = import_legendkeeper(
+            src, args.project, args.out, plan_only=args.plan, type_map=pairs, import_map=args.import_map, ask=ask
+        )
     except (FileExistsError, FileNotFoundError, ValueError, SourceError) as exc:
         print(f"{exc}", file=sys.stderr)
         return 2
