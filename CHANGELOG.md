@@ -2,6 +2,10 @@
 
 The package version runs on its own semver; the schema it is generated from is `SCHEMA_DIST_TAG`.
 
+## Unreleased
+
+- **The Kanka import on a third real export** (`tests/fixtures/kanka/quay-export-world_20261025_011029.zip`, scrubbed of account identifiers): a public Character with three posts at Only me (`visibility_id` 4), Members of the campaign (5) and Admins (2) comes in visible, each post its own hidden Narrative linked to it, no post's text on the Character. The rule was built on planted data; no code changed.
+
 ## 0.50.0 (2026-10-24)
 
 - **Schema repinned to schema-dist `v0.33.0-dist.61`** (from dist.60; same canonical 00.33.00, no schema file moved). Serial 61 gives `schema.json` the YAMLs' advisory minimum and maximum on the 15 integer fields that have them (this package's generated tables read field kinds, not bounds, and do not move), rules two spine readings, and adds four cases to the spine fixture, whose every reading now carries `retires`; the folder lint names the format's version and warns on a newer stamp.

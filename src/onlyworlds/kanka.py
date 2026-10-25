@@ -30,6 +30,12 @@ naming its tag in ``entity.entityTags`` as ``[{"tag_id": <the tags row's id>}]``
 ``metadata`` width and height, ...) and the image ``<uuid>.<ext>``. An entity names its picture by
 ``entity.image_uuid``; the gallery also holds uploads no entity names.
 
+**And on a third** (Kanka 3.15, made 2026-10-25 on the same campaign, beside the others): a public
+Character with three posts, one at each visibility short of all, as the menu names them and the
+file numbers them: Only me ``visibility_id`` 4, Members of the campaign 5, Admins 2 (each post's
+own text names the visibility it was set to). Each comes in as its own hidden Narrative, the
+Character visible: the hidden-post rule below, read on a real file.
+
 **Believed**, not yet seen in a file: the folders ``families/``, ``races/``, ``items/``,
 ``creatures/``, ``events/``, ``abilities/``, ``quests/``, ``journals/``, ``maps/`` and every other
 module; the shapes of ``character_families``, ``character_races`` and

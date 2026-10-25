@@ -19,6 +19,12 @@ campaign id). It adds a private Character (Orla Pike) with a post not visible to
 (lamp-keeper) that she carries, and a ``gallery/`` of six uploads, one of them her portrait and five
 named by no entity. What it lacks (a tag on a visible element, a private tag, an ``image_uuid`` that
 names no upload) is planted in the first export.
+
+``fixtures/kanka/quay-export-world_20261025_011029.zip`` is the third (Kanka 3.15, 2026-10-25),
+scrubbed the same way. It adds a public Character (Perrin Shaw) with three posts, one at each
+visibility Kanka's menu offers short of all: Only me (``visibility_id`` 4), Members of the campaign
+(5) and Admins (2), each post's own text naming the visibility it was set to. The hidden post on a
+visible element, planted in the first export, read on a real file.
 """
 
 from __future__ import annotations
@@ -79,6 +85,16 @@ SHA256_2 = "597a3b053d33d7c7db692527fa9a9b989b8240397ae0d899bed248e1a0798ae4"
 ORLA, LAMP_KEEPER = 10080178, 10080176
 PORTRAIT = "01a16f11-cf47-727c-bb5f-26753402b503"  # the one upload an entity names
 TAG_ROW = 619734  # the tags row's id, what entityTags names
+
+# the third export
+EXPORT3 = EXPORT.parent / "quay-export-world_20261025_011029.zip"
+SHA256_3 = "f80f00559fefe1abcd400510c2fc7623f585e1b5eef00103e1898df42d6e7574"
+PERRIN = 10080339
+PERRIN_POSTS = {
+    1577355: ("A note, only me", 4, "Only me"),
+    1577356: ("A note, members of the campaign", 5, "Members of the campaign"),
+    1577357: ("A note, admins", 2, "Admins"),
+}
 
 # planted in the first export: a tag shaped like the second export's, and gallery uploads
 KEEPER, KEEPER_ROW, KEEPER_FILE = 10074699, 346600, "tags/keeper_10074699.json"
@@ -574,6 +590,42 @@ def test_second_export_a_visible_tag_does_not_link_its_hidden_carrier(tmp_path: 
 def test_second_export_deterministic_and_lint_clean(tmp_path: Path) -> None:
     run(tmp_path, EXPORT2, name="one")
     run(tmp_path, EXPORT2, name="two")
+    assert tree(tmp_path / "one") == tree(tmp_path / "two")
+    pytest.importorskip("yaml", reason="the dist's lint decodes the schema YAML")
+    r = subprocess.run([sys.executable, str(LINT), str(tmp_path / "one")], capture_output=True, text=True)
+    problems = [line for line in r.stdout.strip().splitlines()[:-1] if not line.startswith("walk note:")]
+    assert problems == [] and r.returncode == 0, r.stdout + r.stderr
+
+
+# --- the third export: posts at each visibility on a public Character ----------
+
+
+def test_the_third_fixture_is_the_real_file() -> None:
+    assert hashlib.sha256(EXPORT3.read_bytes()).hexdigest() == SHA256_3
+
+
+def test_third_export_each_post_not_visible_to_all_is_its_own_hidden_narrative(tmp_path: Path) -> None:
+    out, report = run(tmp_path, EXPORT3)
+    assert report.counts == {"character": 6, "institution": 1, "location": 4, "narrative": 7, "relation": 2}
+    els = by_name(out)
+    perrin = els["Perrin Shaw"]
+    assert "hidden" not in perrin and perrin["id"] == eid(PERRIN) and perrin["supertype"] == "Dockhand"
+    assert perrin["description"].startswith("Perrin tends the rope")
+    assert "visible to" not in json.dumps(perrin)  # no post's text reaches the visible element
+    for pid, (name, vis, words) in PERRIN_POSTS.items():
+        post = els[name]
+        assert post["hidden"] is True and post["type"] == "narrative"
+        assert post["story"] == f"A note on the rope, visible to: {words}."
+        assert post["characters"] == [eid(PERRIN)] and post["x_kanka_parent"] == eid(PERRIN)
+        assert (post["x_kanka_id"], post["x_kanka_visibility_id"]) == (pid, vis)
+        assert post["id"] == str(uuid.uuid5(KANKA_NAMESPACE, f"kanka:{CAMPAIGN}:post:{pid}"))
+    assert report.hidden.posts == 3 and report.hidden.entities == 1 and report.unresolved == []
+    assert "3 posts not visible to all, each its own Narrative (visibility_id)" in report.render()
+
+
+def test_third_export_deterministic_and_lint_clean(tmp_path: Path) -> None:
+    run(tmp_path, EXPORT3, name="one")
+    run(tmp_path, EXPORT3, name="two")
     assert tree(tmp_path / "one") == tree(tmp_path / "two")
     pytest.importorskip("yaml", reason="the dist's lint decodes the schema YAML")
     r = subprocess.run([sys.executable, str(LINT), str(tmp_path / "one")], capture_output=True, text=True)
