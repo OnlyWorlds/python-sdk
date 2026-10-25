@@ -2,8 +2,9 @@
   "profile": "room",
   "profile_page": "profiles/room.md",
   "notes": [
-    "pairs: the eight type-and-supertype pairs a reader matches, each trimmed and compared without regard to case.",
+    "pairs: the nine type-and-supertype pairs a reader matches, each trimmed and compared without regard to case.",
     "mark: x_room_of, the id of the world or the sitting the room belongs to; a room element carries it, a lore element never does.",
+    "item: x_room_item, written only on a Take, the id of the work item the take is on; it makes nothing a room element, the pair and the mark do.",
     "cases: element gives type, supertype and x_room_of as a body might carry them; in_room is what isRoomElement must answer: the pair AND the mark."
   ],
   "pairs": [
@@ -26,6 +27,10 @@
     {
       "type": "relation",
       "supertype": "Heart"
+    },
+    {
+      "type": "relation",
+      "supertype": "Take"
     },
     {
       "type": "relation",
@@ -83,6 +88,16 @@
         "type": "relation",
         "supertype": "Heart",
         "x_room_of": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f"
+      },
+      "in_room": true
+    },
+    {
+      "name": "take",
+      "element": {
+        "type": "relation",
+        "supertype": "Take",
+        "x_room_of": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+        "x_room_item": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a"
       },
       "in_room": true
     },
@@ -200,6 +215,14 @@
       "element": {
         "type": "relation",
         "supertype": "Vote"
+      },
+      "in_room": false
+    },
+    {
+      "name": "lore-take-no-mark",
+      "element": {
+        "type": "relation",
+        "supertype": "Take"
       },
       "in_room": false
     },

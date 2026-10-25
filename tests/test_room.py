@@ -26,7 +26,7 @@ def load_fixture() -> dict[str, Any]:
 def test_room_pairs_are_the_fixtures_in_order_and_the_mark_is_x_room_of() -> None:
     doc = load_fixture()
     assert [{"type": t, "supertype": s} for t, s in ROOM_PAIRS] == doc["pairs"]
-    assert len(ROOM_PAIRS) == 8
+    assert len(ROOM_PAIRS) == 9
     assert doc["mark"]["field"] == "x_room_of"
 
 
@@ -38,7 +38,7 @@ def test_is_room_element_answers_every_fixture_case() -> None:
         if (got := is_room_element(c["element"])) is not c["in_room"]
     ]
     assert wrong == []
-    assert len(cases) >= 23, f"the fixture holds {len(cases)} cases"
+    assert len(cases) >= 25, f"the fixture holds {len(cases)} cases"
 
 
 def test_without_a_string_type_supertype_or_mark_it_is_not_in_the_room() -> None:

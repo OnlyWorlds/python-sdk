@@ -2,15 +2,20 @@
   "_what": "The recorded pin for the vendored OnlyWorlds schema distribution (codegen/schema-dist/, copied byte-exact). Do not edit by hand; re-vendor from the pinned tag and review the diff. Kept equal to the npm SDK's pin (github.com/OnlyWorlds/sdk, codegen/schema-pin.json) on purpose: two clients, one schema.",
   "_why_manifest_sha256": "Verifying the tree against its own MANIFEST.json only proves internal consistency. If the tag moved, the manifest moved with it. The hash recorded here is the one first accepted, which is what makes a moved tag visible.",
   "repo": "https://github.com/OnlyWorlds/schema-dist",
-  "tag": "v0.33.0-dist.64",
-  "commit": "b31b4890153fc8be1c3e756307a2ad1f466f1835",
-  "manifest_sha256": "558c4e953f03dd9bbeaec1697be5db1e2651f25f00b3648ab1e55a3db094b46e",
+  "tag": "v0.33.0-dist.66",
+  "commit": "c4873649c54dd5f6c7cd9b2c75499a603410b2a0",
+  "manifest_sha256": "360e274956ab796a36589cfd1aa8c0fed6a908f1a43c8087b46bae544b49ff8e",
   "canonical_version": "00.33.00",
-  "dist_serial": 64,
+  "dist_serial": 66,
   "published": "2026-10-25",
   "pinned_at": "2026-10-25",
   "pinned_by": "The maintainer: tree from `git archive` of the tag in a schema-dist checkout, less one file the MANIFEST does not list (walk/__pycache__/schema_walk.cpython-313.pyc, swept into the tag by mistake and removed on schema-dist main at 6708eb2); files re-hashed against MANIFEST.json by generate_schema.py; MANIFEST self-hash matched against the raw file GitHub serves at the tag, whose ref resolves to the commit above. Ahead of the npm SDK's pin (v0.33.0-dist.63, 4.72.4), which replays no file serial 64 moved.",
   "previous_pins": [
+    {
+      "tag": "v0.33.0-dist.64",
+      "manifest_sha256": "558c4e953f03dd9bbeaec1697be5db1e2651f25f00b3648ab1e55a3db094b46e",
+      "note": "superseded by v0.33.0-dist.66 (same canonical 00.33.00; two serials: 65 a README line, 66 the room profile's ninth pair relation/Take and its second field x_room_item, the room fixture at 25 cases; no schema file moved)"
+    },
     {
       "tag": "v0.33.0-dist.63",
       "manifest_sha256": "8326836abd7738d3ce51923e9dad496f3cd8e662c9ed985a44fe61373af2071a",

@@ -4,6 +4,10 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+## 0.52.0 (2026-10-25)
+
+- **Schema repinned to schema-dist `v0.33.0-dist.66`** (from dist.64; same canonical 00.33.00, no schema file moved). `ROOM_PAIRS` gains the room profile's ninth pair, `relation`/`Take` (one member's take on a work item; it also carries `x_room_item`, the item's id), so `is_room_element` counts a marked Take as a room element, and the pack and `apply_checks`, which read the room through it, leave a marked Take out as they do the other room elements. The room fixture's 25 cases are replayed.
+
 ## 0.51.1 (2026-10-25)
 
 - **Schema repinned to schema-dist `v0.33.0-dist.64`** (from dist.63; same canonical 00.33.00, no schema file moved). The checks profile's fixture gains two known-of stub cases, a bare stub and one with its fields filled, and `apply_checks` judges neither by any rule, as the profile says: the test replays the fixture whole, now 19 cases and 48 expectations, and its floors moved to those counts. No package code changed.
