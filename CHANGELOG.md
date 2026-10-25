@@ -4,6 +4,10 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+## 0.53.0 (2026-10-25)
+
+- **The LegendKeeper door makes Maps and Pins through the API too.** A map document read through LegendKeeper's API used to be left out ("the API's map shape is not known"). It is read now: the document's `mapImage` gives the size and bounds (in zoom-0 units, scaled by `2^maxNativeZoom` to image pixels) and its `/features` the pins, put into the export file's shape so one converter makes both roads' Maps and Pins. On LegendKeeper's tutorial map, read live on a Pro project, the API puts the same 16 pins, by id, on the same pixels as an export file of the same map (a test holds it: `tests/test_legendkeeper_maps.py`, on recorded answers in `fixtures/legendkeeper/api-maps.json`). A map with no image yet is a Map with no size and no pins, as from the file. The image itself: `image_url` when LegendKeeper gives a `url`, `x_legendkeeper_map_id` for an asset id, and a tiled map's tile address kept in `x_legendkeeper_map`. A feature that is not a pin is named in the report and not read. A map whose document or features do not answer is listed under unread and not imported, as before. Board documents are still not imported: the API serves no board content.
+
 ## 0.52.0 (2026-10-25)
 
 - **Schema repinned to schema-dist `v0.33.0-dist.66`** (from dist.64; same canonical 00.33.00, no schema file moved). `ROOM_PAIRS` gains the room profile's ninth pair, `relation`/`Take` (one member's take on a work item; it also carries `x_room_item`, the item's id), so `is_room_element` counts a marked Take as a room element, and the pack and `apply_checks`, which read the room through it, leave a marked Take out as they do the other room elements. The room fixture's 25 cases are replayed.

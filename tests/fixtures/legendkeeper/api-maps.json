@@ -1,0 +1,1677 @@
+{
+ "recorded": "2026-10-25, the LegendKeeper API v3, a Pro project seeded with LegendKeeper's tutorial",
+ "maps": {
+  "zt44sv1p": {
+   "resource": "xc0y9nz3",
+   "doc": {
+    "id": "zt44sv1p",
+    "name": "Main",
+    "type": "map",
+    "rank": "O",
+    "isHidden": false,
+    "createdAt": "2026-10-25T10:42:57.655Z",
+    "updatedAt": "2026-10-25T10:42:57.655Z",
+    "mapImage": {
+     "assetId": null,
+     "url": null,
+     "width": 10000,
+     "height": 7000,
+     "bounds": [
+      [
+       -109.375,
+       0
+      ],
+      [
+       0,
+       156.25
+      ]
+     ],
+     "tiles": {
+      "urlTemplate": "https://tiles.legendkeeper.com/processed/ckt3hmegk00023h677l0o5ff9/tiles/{z}/{x}/{y}",
+      "maxNativeZoom": 6
+     }
+    }
+   },
+   "features": {
+    "data": [
+     {
+      "id": "daeydntx",
+      "pos": [
+       -24.289565058479525,
+       55.5190058479532
+      ],
+      "uri": "lk://resources/x9c50azb",
+      "rank": "Q",
+      "isSynced": true,
+      "isHidden": false,
+      "linkedResourceId": "x9c50azb",
+      "type": "pin",
+      "updatedAt": "2026-10-25T10:42:58.556Z",
+      "inherited": {
+       "name": "Wiki City",
+       "iconGlyph": "fas fa-landmark",
+       "iconColor": "#d33e00",
+       "iconShape": "shield",
+       "iconSize": "medium"
+      }
+     },
+     {
+      "id": "cb73moul",
+      "pos": [
+       -68.54317296228847,
+       100.22589859413763
+      ],
+      "uri": "lk://resources/ips83vhi",
+      "rank": "V",
+      "isSynced": true,
+      "isHidden": false,
+      "linkedResourceId": "ips83vhi",
+      "type": "pin",
+      "updatedAt": "2026-10-25T10:42:58.558Z",
+      "inherited": {
+       "name": "Board Bastion",
+       "iconGlyph": "shapes",
+       "iconColor": "#0079d3",
+       "iconShape": "banner",
+       "iconSize": "medium"
+      }
+     },
+     {
+      "id": "dgxnx05o",
+      "pos": [
+       -37.96995912299433,
+       110.5813419913179
+      ],
+      "uri": "lk://resources/w66u2arc",
+      "rank": "W",
+      "isSynced": true,
+      "isHidden": false,
+      "linkedResourceId": "w66u2arc",
+      "type": "pin",
+      "updatedAt": "2026-10-25T10:42:58.559Z",
+      "inherited": {
+       "name": "Offline Outpost",
+       "iconGlyph": "fas fa-cloud-upload-alt",
+       "iconColor": "#FFFFFF",
+       "iconShape": "none"
+      }
+     },
+     {
+      "id": "jc2o9hd1",
+      "pos": [
+       -75.04808030259828,
+       37.70768145709669
+      ],
+      "uri": "lk://resources/r40gg2dl",
+      "rank": "\\",
+      "isSynced": true,
+      "isHidden": false,
+      "linkedResourceId": "r40gg2dl",
+      "type": "pin",
+      "updatedAt": "2026-10-25T10:42:58.560Z",
+      "inherited": {
+       "name": "Temple of Time",
+       "iconGlyph": "fas fa-clock",
+       "iconColor": "#c49454",
+       "iconShape": "diamond",
+       "iconSize": "medium"
+      }
+     },
+     {
+      "id": "wt5pihnv",
+      "pos": [
+       -15.454047606246055,
+       109.29357379262674
+      ],
+      "uri": "lk://resources/wes31svj",
+      "rank": "_",
+      "isSynced": true,
+      "isHidden": false,
+      "linkedResourceId": "wes31svj",
+      "type": "pin",
+      "updatedAt": "2026-10-25T10:42:58.561Z",
+      "inherited": {
+       "name": "Export Expanse",
+       "iconGlyph": "fas fa-snowflake",
+       "iconColor": "#FFFFFF",
+       "iconShape": "none"
+      }
+     },
+     {
+      "id": "ttbi8qli",
+      "pos": [
+       -77.55812771149674,
+       140.21658080260303
+      ],
+      "uri": "lk://resources/b5tk9j1z",
+      "rank": "d",
+      "isSynced": true,
+      "isHidden": false,
+      "linkedResourceId": "b5tk9j1z",
+      "type": "pin",
+      "updatedAt": "2026-10-25T10:42:58.562Z",
+      "inherited": {
+       "name": "Right-click me! Drag me!",
+       "iconGlyph": ":point_right:",
+       "iconColor": "#000",
+       "iconShape": "arch",
+       "iconSize": "medium"
+      }
+     },
+     {
+      "id": "pumuu603",
+      "pos": [
+       -53.093102825499514,
+       41.39723089872281
+      ],
+      "uri": "lk://resources/fq7eizj0",
+      "rank": "h",
+      "isSynced": true,
+      "isHidden": false,
+      "linkedResourceId": "fq7eizj0",
+      "type": "pin",
+      "updatedAt": "2026-10-25T10:42:58.563Z",
+      "inherited": {
+       "name": "Shortcut Shoals",
+       "iconGlyph": "fas fa-water",
+       "iconColor": "#FFFFFF",
+       "iconShape": "none"
+      }
+     },
+     {
+      "id": "ya7tja95",
+      "pos": [
+       -25.491212546385245,
+       136.69662727999088
+      ],
+      "uri": "lk://resources/vtz37yzr",
+      "rank": "j",
+      "isSynced": true,
+      "isHidden": false,
+      "linkedResourceId": "vtz37yzr",
+      "type": "pin",
+      "updatedAt": "2026-10-25T10:42:58.564Z",
+      "inherited": {
+       "name": "Tab Tundra",
+       "iconGlyph": "fas fa-bookmark",
+       "iconColor": "#FFFFFF",
+       "iconShape": "none"
+      }
+     },
+     {
+      "id": "s6r3kaio",
+      "pos": [
+       -92.56496555906142,
+       41.58254046629093
+      ],
+      "uri": "lk://resources/tpouulbq",
+      "rank": "l",
+      "isSynced": true,
+      "isHidden": false,
+      "linkedResourceId": "tpouulbq",
+      "type": "pin",
+      "updatedAt": "2026-10-25T10:42:58.564Z",
+      "inherited": {
+       "name": "Autolink Academy",
+       "iconGlyph": "fas fa-chart-network",
+       "iconColor": "#FFFFFF",
+       "iconShape": "none"
+      }
+     },
+     {
+      "id": "y2br9olz",
+      "pos": [
+       -75.83635732549611,
+       57.51454830778171
+      ],
+      "uri": "lk://resources/h2gt028z",
+      "rank": "q",
+      "isSynced": true,
+      "isHidden": false,
+      "linkedResourceId": "h2gt028z",
+      "type": "pin",
+      "updatedAt": "2026-10-25T10:42:58.565Z",
+      "inherited": {
+       "name": "Sharing Shipyard",
+       "iconGlyph": "fas fa-ship",
+       "iconColor": "#FFFFFF",
+       "iconShape": "none"
+      }
+     },
+     {
+      "id": "cu9o32mp",
+      "pos": [
+       -92.97547304694584,
+       77.21985284718407
+      ],
+      "uri": "lk://resources/lgl2mj31",
+      "rank": "s",
+      "isSynced": true,
+      "isHidden": false,
+      "linkedResourceId": "lgl2mj31",
+      "type": "pin",
+      "updatedAt": "2026-10-25T10:42:58.566Z",
+      "inherited": {
+       "name": "Mode Manor",
+       "iconGlyph": "fas fa-sun",
+       "iconColor": "#FFFFFF",
+       "iconShape": "none"
+      }
+     },
+     {
+      "id": "ikmlty1f",
+      "pos": [
+       -80.33217297075578,
+       76.02316752404857
+      ],
+      "uri": "lk://resources/xcs94nz5",
+      "rank": "v",
+      "isSynced": true,
+      "isHidden": false,
+      "linkedResourceId": "xcs94nz5",
+      "type": "pin",
+      "updatedAt": "2026-10-25T10:42:58.567Z",
+      "inherited": {
+       "name": "Icon Inn",
+       "iconGlyph": "fas fa-home-heart",
+       "iconColor": "#FFFFFF",
+       "iconShape": "none"
+      }
+     },
+     {
+      "id": "nsjop37i",
+      "pos": [
+       -55.90307115257495,
+       124.63920213573485
+      ],
+      "uri": "lk://resources/t4gehemt",
+      "rank": "{",
+      "isSynced": true,
+      "isHidden": false,
+      "linkedResourceId": "t4gehemt",
+      "type": "pin",
+      "updatedAt": "2026-10-25T10:42:58.568Z",
+      "inherited": {
+       "name": "Drag and Drop Den",
+       "iconGlyph": "fas fa-dragon",
+       "iconColor": "#FFFFFF",
+       "iconShape": "none"
+      }
+     },
+     {
+      "id": "njdu7ln7",
+      "pos": [
+       -84.76231563951276,
+       61.98648731500247
+      ],
+      "uri": "lk://resources/vfuvd1mg",
+      "rank": "|",
+      "isSynced": true,
+      "isHidden": false,
+      "linkedResourceId": "vfuvd1mg",
+      "type": "pin",
+      "updatedAt": "2026-10-25T10:42:58.568Z",
+      "inherited": {
+       "name": "Template Tavern",
+       "iconGlyph": "fas fa-beer",
+       "iconColor": "#FFFFFF",
+       "iconShape": "none"
+      }
+     },
+     {
+      "id": "bc3p62pw",
+      "pos": [
+       -49.04567576698525,
+       57.97483573511713
+      ],
+      "uri": "lk://resources/gwvrwq6p",
+      "rank": "}",
+      "isSynced": true,
+      "isHidden": false,
+      "linkedResourceId": "gwvrwq6p",
+      "type": "pin",
+      "updatedAt": "2026-10-25T10:42:58.569Z",
+      "inherited": {
+       "name": "Map Mountain",
+       "iconGlyph": "fas fa-mountains",
+       "iconColor": "#8c13d4",
+       "iconShape": "flag",
+       "iconSize": "medium"
+      }
+     },
+     {
+      "id": "spkxzj0f",
+      "pos": [
+       -100.04067245119305,
+       118.66526572668111
+      ],
+      "uri": "lk://resources/uae3k4za",
+      "rank": "}V",
+      "isSynced": true,
+      "isHidden": false,
+      "linkedResourceId": "uae3k4za",
+      "type": "pin",
+      "updatedAt": "2026-10-25T10:42:58.569Z",
+      "inherited": {
+       "name": "Banner Bay",
+       "iconGlyph": "fas fa-tree-palm",
+       "iconColor": "#FFFFFF",
+       "iconShape": "none"
+      }
+     }
+    ]
+   }
+  },
+  "e8z1h19f": {
+   "resource": "ijf7xwmd",
+   "doc": {
+    "id": "e8z1h19f",
+    "name": "Map",
+    "type": "map",
+    "rank": "B",
+    "isHidden": false,
+    "createdAt": "2026-10-25T10:42:58.641Z",
+    "updatedAt": "2026-10-25T10:42:58.641Z",
+    "mapImage": null
+   },
+   "features": {
+    "data": []
+   }
+  }
+ },
+ "resources": {
+  "b5tk9j1z": {
+   "row": {
+    "id": "b5tk9j1z",
+    "name": "Right-click me! Drag me!",
+    "parentId": "l2h55js2",
+    "iconGlyph": ":point_right:",
+    "iconColor": "#000",
+    "tags": [],
+    "aliases": [],
+    "rank": "M",
+    "isHidden": false,
+    "createdAt": null,
+    "updatedAt": "2026-10-25T10:42:57.639Z",
+    "iconShape": "arch",
+    "iconSize": "medium",
+    "documents": [
+     {
+      "id": "y1ui7i2c",
+      "name": "Tips",
+      "type": "page"
+     }
+    ],
+    "hasChildren": false
+   },
+   "full": {
+    "id": "b5tk9j1z",
+    "name": "Right-click me! Drag me!",
+    "tags": [],
+    "aliases": [],
+    "iconGlyph": ":point_right:",
+    "iconColor": "#000",
+    "parentId": "l2h55js2",
+    "rank": "M",
+    "pos": "M",
+    "isHidden": false,
+    "isLocked": false,
+    "showPropertyBar": false,
+    "imageUrl": "https://assets.legendkeeper.com/57cfe2a7-e10a-4230-9074-8122bb8ee4d5.png",
+    "banner": {
+     "enabled": false,
+     "url": "",
+     "yPosition": 50
+    },
+    "permissions": {},
+    "createdAt": "2026-10-25T10:42:57.636Z",
+    "updatedAt": "2026-10-25T10:42:57.639Z",
+    "iconShape": "arch",
+    "iconSize": "medium",
+    "documents": [
+     {
+      "id": "y1ui7i2c",
+      "name": "Tips",
+      "type": "page",
+      "rank": "A",
+      "isHidden": false,
+      "createdAt": "2026-10-25T10:42:57.644Z",
+      "updatedAt": "2026-10-25T10:42:57.644Z"
+     }
+    ],
+    "ancestors": [
+     {
+      "id": "xc0y9nz3",
+      "name": "The Realm of Tutoria"
+     },
+     {
+      "id": "l2h55js2",
+      "name": "Points of Interest"
+     }
+    ],
+    "properties": []
+   }
+  },
+  "fq7eizj0": {
+   "row": {
+    "id": "fq7eizj0",
+    "name": "Shortcut Shoals",
+    "parentId": "l2h55js2",
+    "iconGlyph": "fas fa-water",
+    "iconColor": "#FFFFFF",
+    "tags": [],
+    "aliases": [],
+    "rank": "K",
+    "isHidden": false,
+    "createdAt": null,
+    "updatedAt": "2026-10-25T10:42:57.672Z",
+    "iconShape": "none",
+    "documents": [
+     {
+      "id": "dqscbykv",
+      "name": "Main",
+      "type": "page"
+     }
+    ],
+    "hasChildren": false
+   },
+   "full": {
+    "id": "fq7eizj0",
+    "name": "Shortcut Shoals",
+    "tags": [],
+    "aliases": [],
+    "iconGlyph": "fas fa-water",
+    "iconColor": "#FFFFFF",
+    "parentId": "l2h55js2",
+    "rank": "K",
+    "pos": "K",
+    "isHidden": false,
+    "isLocked": false,
+    "showPropertyBar": false,
+    "banner": {
+     "enabled": false,
+     "url": "",
+     "yPosition": 50
+    },
+    "permissions": {},
+    "createdAt": "2026-10-25T10:42:57.672Z",
+    "updatedAt": "2026-10-25T10:42:57.672Z",
+    "iconShape": "none",
+    "documents": [
+     {
+      "id": "dqscbykv",
+      "name": "Main",
+      "type": "page",
+      "rank": "O",
+      "isHidden": false,
+      "createdAt": "2026-10-25T10:42:57.673Z",
+      "updatedAt": "2026-10-25T10:42:57.673Z"
+     }
+    ],
+    "ancestors": [
+     {
+      "id": "xc0y9nz3",
+      "name": "The Realm of Tutoria"
+     },
+     {
+      "id": "l2h55js2",
+      "name": "Points of Interest"
+     }
+    ],
+    "properties": []
+   }
+  },
+  "gwvrwq6p": {
+   "row": {
+    "id": "gwvrwq6p",
+    "name": "Map Mountain",
+    "parentId": "xc0y9nz3",
+    "iconGlyph": "fas fa-mountains",
+    "iconColor": "#8c13d4",
+    "tags": [],
+    "aliases": [],
+    "rank": "NN",
+    "isHidden": false,
+    "createdAt": null,
+    "updatedAt": "2026-10-25T10:42:57.728Z",
+    "iconShape": "flag",
+    "iconSize": "medium",
+    "documents": [
+     {
+      "id": "hhlmeadq",
+      "name": "Main",
+      "type": "page"
+     }
+    ],
+    "hasChildren": false
+   },
+   "full": {
+    "id": "gwvrwq6p",
+    "name": "Map Mountain",
+    "tags": [],
+    "aliases": [],
+    "iconGlyph": "fas fa-mountains",
+    "iconColor": "#8c13d4",
+    "parentId": "xc0y9nz3",
+    "rank": "NN",
+    "pos": "NN",
+    "isHidden": false,
+    "isLocked": false,
+    "showPropertyBar": false,
+    "banner": {
+     "enabled": false,
+     "url": "",
+     "yPosition": 50
+    },
+    "permissions": {},
+    "createdAt": "2026-10-25T10:42:57.728Z",
+    "updatedAt": "2026-10-25T10:42:57.728Z",
+    "iconShape": "flag",
+    "iconSize": "medium",
+    "documents": [
+     {
+      "id": "hhlmeadq",
+      "name": "Main",
+      "type": "page",
+      "rank": "O",
+      "isHidden": false,
+      "createdAt": "2026-10-25T10:42:57.729Z",
+      "updatedAt": "2026-10-25T10:42:57.729Z"
+     }
+    ],
+    "ancestors": [
+     {
+      "id": "xc0y9nz3",
+      "name": "The Realm of Tutoria"
+     }
+    ],
+    "properties": []
+   }
+  },
+  "h2gt028z": {
+   "row": {
+    "id": "h2gt028z",
+    "name": "Sharing Shipyard",
+    "parentId": "l2h55js2",
+    "iconGlyph": "fas fa-ship",
+    "iconColor": "#FFFFFF",
+    "tags": [],
+    "aliases": [],
+    "rank": "J",
+    "isHidden": false,
+    "createdAt": null,
+    "updatedAt": "2026-10-25T10:42:57.746Z",
+    "iconShape": "none",
+    "documents": [
+     {
+      "id": "re8er9ha",
+      "name": "Main",
+      "type": "page"
+     }
+    ],
+    "hasChildren": false
+   },
+   "full": {
+    "id": "h2gt028z",
+    "name": "Sharing Shipyard",
+    "tags": [],
+    "aliases": [],
+    "iconGlyph": "fas fa-ship",
+    "iconColor": "#FFFFFF",
+    "parentId": "l2h55js2",
+    "rank": "J",
+    "pos": "J",
+    "isHidden": false,
+    "isLocked": false,
+    "showPropertyBar": false,
+    "banner": {
+     "enabled": false,
+     "url": "",
+     "yPosition": 50
+    },
+    "permissions": {},
+    "createdAt": "2026-10-25T10:42:57.746Z",
+    "updatedAt": "2026-10-25T10:42:57.746Z",
+    "iconShape": "none",
+    "documents": [
+     {
+      "id": "re8er9ha",
+      "name": "Main",
+      "type": "page",
+      "rank": "O",
+      "isHidden": false,
+      "createdAt": "2026-10-25T10:42:57.746Z",
+      "updatedAt": "2026-10-25T10:42:57.746Z"
+     }
+    ],
+    "ancestors": [
+     {
+      "id": "xc0y9nz3",
+      "name": "The Realm of Tutoria"
+     },
+     {
+      "id": "l2h55js2",
+      "name": "Points of Interest"
+     }
+    ],
+    "properties": []
+   }
+  },
+  "ijf7xwmd": {
+   "row": {
+    "id": "ijf7xwmd",
+    "name": "Location",
+    "parentId": "templates",
+    "iconGlyph": "fas fa-place-of-worship",
+    "iconColor": "#FFFFFF",
+    "tags": [
+     "location"
+    ],
+    "aliases": [],
+    "rank": "r",
+    "isHidden": false,
+    "createdAt": null,
+    "updatedAt": "2026-10-25T10:42:58.295Z",
+    "iconShape": "none",
+    "documents": [
+     {
+      "id": "e05tvhgd",
+      "name": "History",
+      "type": "page"
+     },
+     {
+      "id": "e8z1h19f",
+      "name": "Map",
+      "type": "map"
+     },
+     {
+      "id": "kvze94zt",
+      "name": "Overview",
+      "type": "page"
+     }
+    ],
+    "hasChildren": false
+   },
+   "full": {
+    "id": "ijf7xwmd",
+    "name": "Location",
+    "tags": [
+     "location"
+    ],
+    "aliases": [],
+    "iconGlyph": "fas fa-place-of-worship",
+    "iconColor": "#FFFFFF",
+    "parentId": "templates",
+    "rank": "r",
+    "pos": "r",
+    "isHidden": false,
+    "isLocked": false,
+    "showPropertyBar": true,
+    "imageUrl": "",
+    "permissions": {},
+    "createdAt": "2026-10-25T10:42:58.289Z",
+    "updatedAt": "2026-10-25T10:42:58.295Z",
+    "iconShape": "none",
+    "documents": [
+     {
+      "id": "kvze94zt",
+      "name": "Overview",
+      "type": "page",
+      "rank": "A",
+      "isHidden": false,
+      "createdAt": "2026-10-25T10:42:58.297Z",
+      "updatedAt": "2026-10-25T10:42:58.297Z"
+     },
+     {
+      "id": "e8z1h19f",
+      "name": "Map",
+      "type": "map",
+      "rank": "B",
+      "isHidden": false,
+      "createdAt": "2026-10-25T10:42:58.641Z",
+      "updatedAt": "2026-10-25T10:42:58.641Z"
+     },
+     {
+      "id": "e05tvhgd",
+      "name": "History",
+      "type": "page",
+      "rank": "C",
+      "isHidden": true,
+      "createdAt": "2026-10-25T10:42:58.642Z",
+      "updatedAt": "2026-10-25T10:42:58.642Z"
+     }
+    ],
+    "ancestors": [],
+    "properties": []
+   }
+  },
+  "ips83vhi": {
+   "row": {
+    "id": "ips83vhi",
+    "name": "Board Bastion",
+    "parentId": "xc0y9nz3",
+    "iconGlyph": "shapes",
+    "iconColor": "#0079d3",
+    "tags": [],
+    "aliases": [],
+    "rank": "O",
+    "isHidden": false,
+    "createdAt": null,
+    "updatedAt": "2026-10-25T10:42:57.676Z",
+    "iconShape": "banner",
+    "iconSize": "medium",
+    "documents": [
+     {
+      "id": "p8hmt9kl",
+      "name": "Main",
+      "type": "board"
+     }
+    ],
+    "hasChildren": false
+   },
+   "full": {
+    "id": "ips83vhi",
+    "name": "Board Bastion",
+    "tags": [],
+    "aliases": [],
+    "iconGlyph": "shapes",
+    "iconColor": "#0079d3",
+    "parentId": "xc0y9nz3",
+    "rank": "O",
+    "pos": "O",
+    "isHidden": false,
+    "isLocked": false,
+    "showPropertyBar": false,
+    "imageUrl": "https://assets.legendkeeper.com/07298948-79f8-4d68-bbf8-848ea1606a74.png",
+    "banner": {
+     "enabled": false,
+     "url": "",
+     "yPosition": 50
+    },
+    "permissions": {},
+    "createdAt": "2026-10-25T10:42:57.676Z",
+    "updatedAt": "2026-10-25T10:42:57.676Z",
+    "iconShape": "banner",
+    "iconSize": "medium",
+    "documents": [
+     {
+      "id": "p8hmt9kl",
+      "name": "Main",
+      "type": "board",
+      "rank": "O",
+      "isHidden": false,
+      "createdAt": "2026-10-25T10:42:57.677Z",
+      "updatedAt": "2026-10-25T10:42:57.677Z"
+     }
+    ],
+    "ancestors": [
+     {
+      "id": "xc0y9nz3",
+      "name": "The Realm of Tutoria"
+     }
+    ],
+    "properties": []
+   }
+  },
+  "lgl2mj31": {
+   "row": {
+    "id": "lgl2mj31",
+    "name": "Mode Manor",
+    "parentId": "l2h55js2",
+    "iconGlyph": "fas fa-sun",
+    "iconColor": "#FFFFFF",
+    "tags": [],
+    "aliases": [],
+    "rank": "F",
+    "isHidden": false,
+    "createdAt": null,
+    "updatedAt": "2026-10-25T10:42:57.734Z",
+    "iconShape": "none",
+    "documents": [
+     {
+      "id": "hz4k5q5i",
+      "name": "Main",
+      "type": "page"
+     }
+    ],
+    "hasChildren": false
+   },
+   "full": {
+    "id": "lgl2mj31",
+    "name": "Mode Manor",
+    "tags": [],
+    "aliases": [],
+    "iconGlyph": "fas fa-sun",
+    "iconColor": "#FFFFFF",
+    "parentId": "l2h55js2",
+    "rank": "F",
+    "pos": "F",
+    "isHidden": false,
+    "isLocked": false,
+    "showPropertyBar": false,
+    "banner": {
+     "enabled": false,
+     "url": "",
+     "yPosition": 50
+    },
+    "permissions": {},
+    "createdAt": "2026-10-25T10:42:57.734Z",
+    "updatedAt": "2026-10-25T10:42:57.734Z",
+    "iconShape": "none",
+    "documents": [
+     {
+      "id": "hz4k5q5i",
+      "name": "Main",
+      "type": "page",
+      "rank": "O",
+      "isHidden": false,
+      "createdAt": "2026-10-25T10:42:57.734Z",
+      "updatedAt": "2026-10-25T10:42:57.734Z"
+     }
+    ],
+    "ancestors": [
+     {
+      "id": "xc0y9nz3",
+      "name": "The Realm of Tutoria"
+     },
+     {
+      "id": "l2h55js2",
+      "name": "Points of Interest"
+     }
+    ],
+    "properties": []
+   }
+  },
+  "r40gg2dl": {
+   "row": {
+    "id": "r40gg2dl",
+    "name": "Temple of Time",
+    "parentId": "xc0y9nz3",
+    "iconGlyph": "fas fa-clock",
+    "iconColor": "#c49454",
+    "tags": [],
+    "aliases": [],
+    "rank": "O7",
+    "isHidden": false,
+    "createdAt": null,
+    "updatedAt": "2026-10-25T10:42:57.705Z",
+    "iconShape": "diamond",
+    "iconSize": "medium",
+    "documents": [
+     {
+      "id": "oh3d55u6",
+      "name": "History",
+      "type": "time"
+     },
+     {
+      "id": "tpi7jyh5",
+      "name": "Overview",
+      "type": "page"
+     }
+    ],
+    "hasChildren": false
+   },
+   "full": {
+    "id": "r40gg2dl",
+    "name": "Temple of Time",
+    "tags": [],
+    "aliases": [],
+    "iconGlyph": "fas fa-clock",
+    "iconColor": "#c49454",
+    "parentId": "xc0y9nz3",
+    "rank": "O7",
+    "pos": "O7",
+    "isHidden": false,
+    "isLocked": false,
+    "showPropertyBar": true,
+    "banner": {
+     "enabled": false,
+     "url": "",
+     "yPosition": 50
+    },
+    "permissions": {},
+    "createdAt": "2026-10-25T10:42:57.704Z",
+    "updatedAt": "2026-10-25T10:42:57.705Z",
+    "iconShape": "diamond",
+    "iconSize": "medium",
+    "documents": [
+     {
+      "id": "oh3d55u6",
+      "name": "History",
+      "type": "time",
+      "rank": "9",
+      "isHidden": false,
+      "calendarId": "fhynh6n4",
+      "createdAt": "2026-10-25T10:42:57.706Z",
+      "updatedAt": "2026-10-25T10:42:57.706Z"
+     },
+     {
+      "id": "tpi7jyh5",
+      "name": "Overview",
+      "type": "page",
+      "rank": ":",
+      "isHidden": false,
+      "createdAt": "2026-10-25T10:42:57.951Z",
+      "updatedAt": "2026-10-25T10:42:57.951Z"
+     }
+    ],
+    "ancestors": [
+     {
+      "id": "xc0y9nz3",
+      "name": "The Realm of Tutoria"
+     }
+    ],
+    "properties": []
+   }
+  },
+  "t4gehemt": {
+   "row": {
+    "id": "t4gehemt",
+    "name": "Drag and Drop Den",
+    "parentId": "l2h55js2",
+    "iconGlyph": "fas fa-dragon",
+    "iconColor": "#FFFFFF",
+    "tags": [
+     "guide",
+     "point of interest"
+    ],
+    "aliases": [],
+    "rank": "C",
+    "isHidden": false,
+    "createdAt": null,
+    "updatedAt": "2026-10-25T10:42:57.697Z",
+    "iconShape": "none",
+    "documents": [
+     {
+      "id": "irnpo4pd",
+      "name": "Main",
+      "type": "page"
+     }
+    ],
+    "hasChildren": false
+   },
+   "full": {
+    "id": "t4gehemt",
+    "name": "Drag and Drop Den",
+    "tags": [
+     "guide",
+     "point of interest"
+    ],
+    "aliases": [],
+    "iconGlyph": "fas fa-dragon",
+    "iconColor": "#FFFFFF",
+    "parentId": "l2h55js2",
+    "rank": "C",
+    "pos": "C",
+    "isHidden": false,
+    "isLocked": false,
+    "showPropertyBar": false,
+    "imageUrl": "https://assets.legendkeeper.com/8d33c5f6-5c24-4d52-bc11-388f1e95c515.png",
+    "banner": {
+     "enabled": false,
+     "url": "",
+     "yPosition": 50
+    },
+    "permissions": {},
+    "createdAt": "2026-10-25T10:42:57.696Z",
+    "updatedAt": "2026-10-25T10:42:57.697Z",
+    "iconShape": "none",
+    "documents": [
+     {
+      "id": "irnpo4pd",
+      "name": "Main",
+      "type": "page",
+      "rank": "Q",
+      "isHidden": false,
+      "createdAt": "2026-10-25T10:42:57.699Z",
+      "updatedAt": "2026-10-25T10:42:57.699Z"
+     }
+    ],
+    "ancestors": [
+     {
+      "id": "xc0y9nz3",
+      "name": "The Realm of Tutoria"
+     },
+     {
+      "id": "l2h55js2",
+      "name": "Points of Interest"
+     }
+    ],
+    "properties": []
+   }
+  },
+  "tpouulbq": {
+   "row": {
+    "id": "tpouulbq",
+    "name": "Autolink Academy",
+    "parentId": "l2h55js2",
+    "iconGlyph": "fas fa-chart-network",
+    "iconColor": "#FFFFFF",
+    "tags": [],
+    "aliases": [],
+    "rank": "A",
+    "isHidden": false,
+    "createdAt": null,
+    "updatedAt": "2026-10-25T10:42:57.749Z",
+    "iconShape": "none",
+    "documents": [
+     {
+      "id": "vkql5ba0",
+      "name": "Main",
+      "type": "page"
+     }
+    ],
+    "hasChildren": false
+   },
+   "full": {
+    "id": "tpouulbq",
+    "name": "Autolink Academy",
+    "tags": [],
+    "aliases": [],
+    "iconGlyph": "fas fa-chart-network",
+    "iconColor": "#FFFFFF",
+    "parentId": "l2h55js2",
+    "rank": "A",
+    "pos": "A",
+    "isHidden": false,
+    "isLocked": false,
+    "showPropertyBar": false,
+    "banner": {
+     "enabled": false,
+     "url": "",
+     "yPosition": 50
+    },
+    "permissions": {},
+    "createdAt": "2026-10-25T10:42:57.748Z",
+    "updatedAt": "2026-10-25T10:42:57.749Z",
+    "iconShape": "none",
+    "documents": [
+     {
+      "id": "vkql5ba0",
+      "name": "Main",
+      "type": "page",
+      "rank": "O",
+      "isHidden": false,
+      "createdAt": "2026-10-25T10:42:57.749Z",
+      "updatedAt": "2026-10-25T10:42:57.749Z"
+     }
+    ],
+    "ancestors": [
+     {
+      "id": "xc0y9nz3",
+      "name": "The Realm of Tutoria"
+     },
+     {
+      "id": "l2h55js2",
+      "name": "Points of Interest"
+     }
+    ],
+    "properties": []
+   }
+  },
+  "uae3k4za": {
+   "row": {
+    "id": "uae3k4za",
+    "name": "Banner Bay",
+    "parentId": "l2h55js2",
+    "iconGlyph": "fas fa-tree-palm",
+    "iconColor": "#FFFFFF",
+    "tags": [],
+    "aliases": [],
+    "rank": "B",
+    "isHidden": false,
+    "createdAt": null,
+    "updatedAt": "2026-10-25T10:42:57.724Z",
+    "iconShape": "none",
+    "documents": [
+     {
+      "id": "dj42kio4",
+      "name": "Main",
+      "type": "page"
+     }
+    ],
+    "hasChildren": false
+   },
+   "full": {
+    "id": "uae3k4za",
+    "name": "Banner Bay",
+    "tags": [],
+    "aliases": [],
+    "iconGlyph": "fas fa-tree-palm",
+    "iconColor": "#FFFFFF",
+    "parentId": "l2h55js2",
+    "rank": "B",
+    "pos": "B",
+    "isHidden": false,
+    "isLocked": false,
+    "showPropertyBar": false,
+    "banner": {
+     "enabled": true,
+     "url": "https://assets.legendkeeper.com/b5ff3aa2-cdad-46ca-96db-bda4f94d6725.jpeg",
+     "yPosition": 50
+    },
+    "permissions": {},
+    "createdAt": "2026-10-25T10:42:57.724Z",
+    "updatedAt": "2026-10-25T10:42:57.724Z",
+    "iconShape": "none",
+    "documents": [
+     {
+      "id": "dj42kio4",
+      "name": "Main",
+      "type": "page",
+      "rank": "O",
+      "isHidden": false,
+      "createdAt": "2026-10-25T10:42:57.725Z",
+      "updatedAt": "2026-10-25T10:42:57.725Z"
+     }
+    ],
+    "ancestors": [
+     {
+      "id": "xc0y9nz3",
+      "name": "The Realm of Tutoria"
+     },
+     {
+      "id": "l2h55js2",
+      "name": "Points of Interest"
+     }
+    ],
+    "properties": []
+   }
+  },
+  "vfuvd1mg": {
+   "row": {
+    "id": "vfuvd1mg",
+    "name": "Template Tavern",
+    "parentId": "l2h55js2",
+    "iconGlyph": "fas fa-beer",
+    "iconColor": "#FFFFFF",
+    "tags": [],
+    "aliases": [],
+    "rank": "LN",
+    "isHidden": false,
+    "createdAt": null,
+    "updatedAt": "2026-10-25T10:42:57.693Z",
+    "iconShape": "none",
+    "documents": [
+     {
+      "id": "y6dm1m58",
+      "name": "Main",
+      "type": "page"
+     }
+    ],
+    "hasChildren": false
+   },
+   "full": {
+    "id": "vfuvd1mg",
+    "name": "Template Tavern",
+    "tags": [],
+    "aliases": [],
+    "iconGlyph": "fas fa-beer",
+    "iconColor": "#FFFFFF",
+    "parentId": "l2h55js2",
+    "rank": "LN",
+    "pos": "LN",
+    "isHidden": false,
+    "isLocked": false,
+    "showPropertyBar": false,
+    "banner": {
+     "enabled": false,
+     "url": "",
+     "yPosition": 50
+    },
+    "permissions": {},
+    "createdAt": "2026-10-25T10:42:57.692Z",
+    "updatedAt": "2026-10-25T10:42:57.693Z",
+    "iconShape": "none",
+    "documents": [
+     {
+      "id": "y6dm1m58",
+      "name": "Main",
+      "type": "page",
+      "rank": "O",
+      "isHidden": false,
+      "createdAt": "2026-10-25T10:42:57.694Z",
+      "updatedAt": "2026-10-25T10:42:57.694Z"
+     }
+    ],
+    "ancestors": [
+     {
+      "id": "xc0y9nz3",
+      "name": "The Realm of Tutoria"
+     },
+     {
+      "id": "l2h55js2",
+      "name": "Points of Interest"
+     }
+    ],
+    "properties": []
+   }
+  },
+  "vtz37yzr": {
+   "row": {
+    "id": "vtz37yzr",
+    "name": "Tab Tundra",
+    "parentId": "l2h55js2",
+    "iconGlyph": "fas fa-bookmark",
+    "iconColor": "#FFFFFF",
+    "tags": [],
+    "aliases": [],
+    "rank": "L",
+    "isHidden": false,
+    "createdAt": null,
+    "updatedAt": "2026-10-25T10:42:57.660Z",
+    "iconShape": "none",
+    "documents": [
+     {
+      "id": "o7s3sxw8",
+      "name": "Example",
+      "type": "page"
+     },
+     {
+      "id": "fhtz46nk",
+      "name": "Overview",
+      "type": "page"
+     }
+    ],
+    "hasChildren": false
+   },
+   "full": {
+    "id": "vtz37yzr",
+    "name": "Tab Tundra",
+    "tags": [],
+    "aliases": [],
+    "iconGlyph": "fas fa-bookmark",
+    "iconColor": "#FFFFFF",
+    "parentId": "l2h55js2",
+    "rank": "L",
+    "pos": "L",
+    "isHidden": false,
+    "isLocked": false,
+    "showPropertyBar": false,
+    "banner": {
+     "enabled": false,
+     "url": "",
+     "yPosition": 50
+    },
+    "permissions": {},
+    "createdAt": "2026-10-25T10:42:57.660Z",
+    "updatedAt": "2026-10-25T10:42:57.660Z",
+    "iconShape": "none",
+    "documents": [
+     {
+      "id": "fhtz46nk",
+      "name": "Overview",
+      "type": "page",
+      "rank": "O",
+      "isHidden": false,
+      "createdAt": "2026-10-25T10:42:57.661Z",
+      "updatedAt": "2026-10-25T10:42:57.661Z"
+     },
+     {
+      "id": "o7s3sxw8",
+      "name": "Example",
+      "type": "page",
+      "rank": "P",
+      "isHidden": false,
+      "createdAt": "2026-10-25T10:42:57.880Z",
+      "updatedAt": "2026-10-25T10:42:57.880Z"
+     }
+    ],
+    "ancestors": [
+     {
+      "id": "xc0y9nz3",
+      "name": "The Realm of Tutoria"
+     },
+     {
+      "id": "l2h55js2",
+      "name": "Points of Interest"
+     }
+    ],
+    "properties": []
+   }
+  },
+  "w66u2arc": {
+   "row": {
+    "id": "w66u2arc",
+    "name": "Offline Outpost",
+    "parentId": "l2h55js2",
+    "iconGlyph": "fas fa-cloud-upload-alt",
+    "iconColor": "#FFFFFF",
+    "tags": [],
+    "aliases": [],
+    "rank": "G",
+    "isHidden": false,
+    "createdAt": null,
+    "updatedAt": "2026-10-25T10:42:57.751Z",
+    "iconShape": "none",
+    "documents": [
+     {
+      "id": "psrhldmo",
+      "name": "Main",
+      "type": "page"
+     }
+    ],
+    "hasChildren": false
+   },
+   "full": {
+    "id": "w66u2arc",
+    "name": "Offline Outpost",
+    "tags": [],
+    "aliases": [],
+    "iconGlyph": "fas fa-cloud-upload-alt",
+    "iconColor": "#FFFFFF",
+    "parentId": "l2h55js2",
+    "rank": "G",
+    "pos": "G",
+    "isHidden": false,
+    "isLocked": false,
+    "showPropertyBar": false,
+    "banner": {
+     "enabled": false,
+     "url": "",
+     "yPosition": 50
+    },
+    "permissions": {},
+    "createdAt": "2026-10-25T10:42:57.751Z",
+    "updatedAt": "2026-10-25T10:42:57.751Z",
+    "iconShape": "none",
+    "documents": [
+     {
+      "id": "psrhldmo",
+      "name": "Main",
+      "type": "page",
+      "rank": "O",
+      "isHidden": false,
+      "createdAt": "2026-10-25T10:42:57.752Z",
+      "updatedAt": "2026-10-25T10:42:57.752Z"
+     }
+    ],
+    "ancestors": [
+     {
+      "id": "xc0y9nz3",
+      "name": "The Realm of Tutoria"
+     },
+     {
+      "id": "l2h55js2",
+      "name": "Points of Interest"
+     }
+    ],
+    "properties": []
+   }
+  },
+  "wes31svj": {
+   "row": {
+    "id": "wes31svj",
+    "name": "Export Expanse",
+    "parentId": "l2h55js2",
+    "iconGlyph": "fas fa-snowflake",
+    "iconColor": "#FFFFFF",
+    "tags": [],
+    "aliases": [],
+    "rank": "D",
+    "isHidden": false,
+    "createdAt": null,
+    "updatedAt": "2026-10-25T10:42:57.714Z",
+    "iconShape": "none",
+    "documents": [
+     {
+      "id": "vn9hqhef",
+      "name": "Main",
+      "type": "page"
+     }
+    ],
+    "hasChildren": false
+   },
+   "full": {
+    "id": "wes31svj",
+    "name": "Export Expanse",
+    "tags": [],
+    "aliases": [],
+    "iconGlyph": "fas fa-snowflake",
+    "iconColor": "#FFFFFF",
+    "parentId": "l2h55js2",
+    "rank": "D",
+    "pos": "D",
+    "isHidden": false,
+    "isLocked": false,
+    "showPropertyBar": false,
+    "banner": {
+     "enabled": false,
+     "url": "",
+     "yPosition": 50
+    },
+    "permissions": {},
+    "createdAt": "2026-10-25T10:42:57.714Z",
+    "updatedAt": "2026-10-25T10:42:57.714Z",
+    "iconShape": "none",
+    "documents": [
+     {
+      "id": "vn9hqhef",
+      "name": "Main",
+      "type": "page",
+      "rank": "O",
+      "isHidden": false,
+      "createdAt": "2026-10-25T10:42:57.715Z",
+      "updatedAt": "2026-10-25T10:42:57.715Z"
+     }
+    ],
+    "ancestors": [
+     {
+      "id": "xc0y9nz3",
+      "name": "The Realm of Tutoria"
+     },
+     {
+      "id": "l2h55js2",
+      "name": "Points of Interest"
+     }
+    ],
+    "properties": []
+   }
+  },
+  "x9c50azb": {
+   "row": {
+    "id": "x9c50azb",
+    "name": "Wiki City",
+    "parentId": "xc0y9nz3",
+    "iconGlyph": "fas fa-landmark",
+    "iconColor": "#d33e00",
+    "tags": [
+     "city",
+     "guide"
+    ],
+    "aliases": [],
+    "rank": "N",
+    "isHidden": false,
+    "createdAt": null,
+    "updatedAt": "2026-10-25T10:42:57.737Z",
+    "iconShape": "shield",
+    "iconSize": "medium",
+    "documents": [
+     {
+      "id": "utiisb4j",
+      "name": "Overview",
+      "type": "page"
+     }
+    ],
+    "hasChildren": false
+   },
+   "full": {
+    "id": "x9c50azb",
+    "name": "Wiki City",
+    "tags": [
+     "city",
+     "guide"
+    ],
+    "aliases": [],
+    "iconGlyph": "fas fa-landmark",
+    "iconColor": "#d33e00",
+    "parentId": "xc0y9nz3",
+    "rank": "N",
+    "pos": "N",
+    "isHidden": false,
+    "isLocked": false,
+    "showPropertyBar": true,
+    "imageUrl": "https://assets.legendkeeper.com/32012695-cd7c-4bd1-9676-b9f8633abb71.png",
+    "banner": {
+     "enabled": false,
+     "url": "",
+     "yPosition": 50
+    },
+    "permissions": {},
+    "createdAt": "2026-10-25T10:42:57.737Z",
+    "updatedAt": "2026-10-25T10:42:57.737Z",
+    "iconShape": "shield",
+    "iconSize": "medium",
+    "documents": [
+     {
+      "id": "utiisb4j",
+      "name": "Overview",
+      "type": "page",
+      "rank": "L",
+      "isHidden": false,
+      "createdAt": "2026-10-25T10:42:57.739Z",
+      "updatedAt": "2026-10-25T10:42:57.739Z"
+     }
+    ],
+    "ancestors": [
+     {
+      "id": "xc0y9nz3",
+      "name": "The Realm of Tutoria"
+     }
+    ],
+    "properties": []
+   }
+  },
+  "xc0y9nz3": {
+   "row": {
+    "id": "xc0y9nz3",
+    "name": "The Realm of Tutoria",
+    "parentId": null,
+    "iconGlyph": "fas fa-map-marked-alt",
+    "iconColor": "#FFFFFF",
+    "tags": [],
+    "aliases": [],
+    "rank": "NN",
+    "isHidden": false,
+    "createdAt": null,
+    "updatedAt": "2026-10-25T10:42:57.653Z",
+    "iconShape": "pin",
+    "iconSize": "medium",
+    "documents": [
+     {
+      "id": "zt44sv1p",
+      "name": "Main",
+      "type": "map"
+     }
+    ],
+    "hasChildren": true
+   },
+   "full": {
+    "id": "xc0y9nz3",
+    "name": "The Realm of Tutoria",
+    "tags": [],
+    "aliases": [],
+    "iconGlyph": "fas fa-map-marked-alt",
+    "iconColor": "#FFFFFF",
+    "rank": "NN",
+    "pos": "NN",
+    "isHidden": false,
+    "isLocked": false,
+    "showPropertyBar": false,
+    "imageUrl": "https://assets.legendkeeper.com/108a5bfb-9558-4153-86a2-29b60bc6414d.png",
+    "banner": {
+     "enabled": false,
+     "url": "",
+     "yPosition": 50
+    },
+    "permissions": {},
+    "createdAt": "2026-10-25T10:42:57.653Z",
+    "updatedAt": "2026-10-25T10:42:57.653Z",
+    "iconShape": "pin",
+    "iconSize": "medium",
+    "documents": [
+     {
+      "id": "zt44sv1p",
+      "name": "Main",
+      "type": "map",
+      "rank": "O",
+      "isHidden": false,
+      "createdAt": "2026-10-25T10:42:57.655Z",
+      "updatedAt": "2026-10-25T10:42:57.655Z"
+     }
+    ],
+    "ancestors": [],
+    "properties": []
+   }
+  },
+  "xcs94nz5": {
+   "row": {
+    "id": "xcs94nz5",
+    "name": "Icon Inn",
+    "parentId": "l2h55js2",
+    "iconGlyph": "fas fa-home-heart",
+    "iconColor": "#FFFFFF",
+    "tags": [],
+    "aliases": [],
+    "rank": "E",
+    "isHidden": false,
+    "createdAt": null,
+    "updatedAt": "2026-10-25T10:42:57.742Z",
+    "iconShape": "none",
+    "documents": [
+     {
+      "id": "n07k92kc",
+      "name": "Main",
+      "type": "page"
+     }
+    ],
+    "hasChildren": false
+   },
+   "full": {
+    "id": "xcs94nz5",
+    "name": "Icon Inn",
+    "tags": [],
+    "aliases": [],
+    "iconGlyph": "fas fa-home-heart",
+    "iconColor": "#FFFFFF",
+    "parentId": "l2h55js2",
+    "rank": "E",
+    "pos": "E",
+    "isHidden": false,
+    "isLocked": false,
+    "showPropertyBar": false,
+    "banner": {
+     "enabled": false,
+     "url": "",
+     "yPosition": 50
+    },
+    "permissions": {},
+    "createdAt": "2026-10-25T10:42:57.742Z",
+    "updatedAt": "2026-10-25T10:42:57.742Z",
+    "iconShape": "none",
+    "documents": [
+     {
+      "id": "n07k92kc",
+      "name": "Main",
+      "type": "page",
+      "rank": "O",
+      "isHidden": false,
+      "createdAt": "2026-10-25T10:42:57.743Z",
+      "updatedAt": "2026-10-25T10:42:57.743Z"
+     }
+    ],
+    "ancestors": [
+     {
+      "id": "xc0y9nz3",
+      "name": "The Realm of Tutoria"
+     },
+     {
+      "id": "l2h55js2",
+      "name": "Points of Interest"
+     }
+    ],
+    "properties": []
+   }
+  }
+ }
+}

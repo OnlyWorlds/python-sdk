@@ -53,9 +53,10 @@ by placeholders). ``FileSource`` adapts where its shape is not the API's:
   no ``sourceUri`` (the server computes those), so ``x_legendkeeper_start`` holds the minutes only.
 - a map document carries a ``map`` object (``mapId``, ``locatorId``, ``min_x``, ``max_x``,
   ``min_y``, ``max_y``, ``max_zoom``; none on a map with no image) and ``content.pins``; the pins
-  ride on the document as ``pins``, beside the ``map`` object. The API's map shape is not known
-  (a walk of it could neither make nor read a pin), so a map read through the API stays not
-  imported, named: only the file makes Maps.
+  ride on the document as ``pins``, beside the ``map`` object. The API serves the same map as the
+  document's ``mapImage`` (bounds in zoom-0 units) and its pins under ``/features``; ``read_project``
+  puts them on the document in this shape (``_api_map``), so both roads make the same Maps and Pins
+  (the tutorial map's 16 pins land on the same pixels from either, 2026-10-25).
 - not kept, named in the report: ``exportId``, ``exportedAt`` and ``hash`` (the report names the
   export; two exports of one project give one folder), ``createdBy`` (an account id),
   ``schemaVersion``, ``showPropertyBar``, ``isFullWidth``, document locators, ``transforms`` and
@@ -235,6 +236,7 @@ import sys
 import time
 import urllib.parse
 import uuid
+from collections import Counter
 from collections.abc import Callable, Iterable, Mapping
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -913,6 +915,51 @@ def _split_hidden(resources: Iterable[dict[str, Any]]) -> dict[str, str]:
     return state
 
 
+def _api_map(doc: dict[str, Any], image: Any, features: list[dict[str, Any]]) -> list[str]:
+    """Put the API's map document on ``doc`` in the export file's shape, so one converter reads both.
+
+    The API's ``mapImage`` is ``{assetId, url, width, height, bounds, tiles: {urlTemplate,
+    maxNativeZoom}}`` with ``bounds`` ``[[y0, x0], [y1, x1]]`` in zoom-0 units; the file's ``map`` is
+    ``{mapId, min_x, max_x, min_y, max_y, max_zoom}`` in image pixels, so each bound is scaled by
+    ``2^maxNativeZoom``. A pin is a feature of type ``pin``, its ``pos`` the file's (measured on
+    LegendKeeper's tutorial map, the same 16 pin ids and positions on both roads, 2026-10-25).
+    Returns the notes for what is not read: features of another type."""
+    pins = [f for f in features if f.get("type") == "pin"]
+    other = Counter(str(f.get("type")) for f in features if f.get("type") != "pin")
+    doc["pins"] = [{k: v for k, v in f.items() if k != "type"} for f in pins]
+    m: dict[str, Any] = {}
+    if isinstance(image, dict):
+        tiles = _obj(image.get("tiles"))
+        zoom = tiles.get("maxNativeZoom")
+        for key in ("url", "assetId"):
+            if isinstance(image.get(key), str) and image[key]:
+                m["mapId"] = image[key]
+                break
+        b = image.get("bounds")
+        pairs = [c for c in b if isinstance(c, list) and len(c) == 2] if isinstance(b, list) else []
+        corners = [[_number(v) for v in c] for c in pairs]
+        z = _number(zoom)
+        if z is not None and len(corners) == 2 and all(v is not None for c in corners for v in c):
+            s = 2.0**z
+
+            def px(v: float | None) -> int | float:
+                n = float(v or 0) * s
+                return int(n) if n.is_integer() else n
+
+            m.update(min_y=px(corners[0][0]), min_x=px(corners[0][1]), max_y=px(corners[1][0]), max_x=px(corners[1][1]))
+            m["max_zoom"] = zoom
+        said = ("url", "assetId", "bounds", "tiles", "width", "height")
+        rest = {k: v for k, v in image.items() if k not in said and v is not None}
+        if tiles.get("urlTemplate"):
+            rest["tiles"] = tiles.get("urlTemplate")
+        m.update(rest)
+    doc["map"] = m or None
+    return [
+        f"{n} map feature{'' if n == 1 else 's'} of type {kind!r} on {doc.get('name')!r}: not read (only pins are)"
+        for kind, n in sorted(other.items())
+    ]
+
+
 def read_project(source: Source, project_id: str) -> Snapshot:
     """Walk a project: the project, its whole tree, then each resource, its page blocks and its
     timelines, hidden ones too (the converter marks them hidden; nothing is left out).
@@ -955,9 +1002,13 @@ def read_project(source: Source, project_id: str) -> Snapshot:
                 elif dtype == "time":
                     snap.lanes[did] = _paged(source, f"{dpath}/lanes", sized=False)
                     snap.events[did] = _paged(source, f"{dpath}/events", sized=True)
+                elif dtype == "map" and "pins" not in doc:  # the export file's maps carry their pins already
+                    head = source.get(dpath)
+                    features = _paged(source, f"{dpath}/features", sized=False)
+                    snap.notes += _api_map(doc, _obj(head).get("mapImage"), features)
             except SourceError as exc:
                 snap.unread.append(f"{where}: {exc}")
-    snap.notes = list(getattr(source, "notes", None) or [])
+    snap.notes = list(getattr(source, "notes", None) or []) + snap.notes
     return snap
 
 
@@ -1040,7 +1091,7 @@ class Hidden:
 
 @dataclass(frozen=True)
 class MapMade:
-    """A map document made a Map (read from the export file; the API road does not read maps)."""
+    """A map document made a Map (from the export file or the API)."""
 
     #: the Map's name, ``<resource>: <document>``
     name: str
@@ -2144,9 +2195,9 @@ class _Converter:
             )
         if self.api_maps:
             n.append(
-                f"{self.api_maps} map document{'' if self.api_maps == 1 else 's'} read through the API, not imported:"
-                " the API's map shape (bounds, pins) is not known here, never read on the wire; LegendKeeper's export"
-                " file (--file) reads them"
+                f"{self.api_maps} map document{'' if self.api_maps == 1 else 's'} whose map and pins could not be read"
+                " through the API (the reason is under unread), not imported; LegendKeeper's export file (--file)"
+                " reads them"
             )
         if self.unsupported:
             n.append(

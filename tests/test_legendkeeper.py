@@ -13,7 +13,10 @@ walk, so ``answers()`` composes the walk the door makes from them and says what 
   ``properties: []`` and each document's recorded answer where there is one (the timeline, the
   map), else the listed document with ``isHidden: false``;
 - blocks were recorded for Aldric's page only; the other documents are ``blank`` (never read,
-  by the spec's definition empty), ``time`` (lanes and events recorded) or ``map``.
+  by the spec's definition empty), ``time`` (lanes and events recorded) or ``map``;
+- the map document's own answer was recorded (``mapImage`` null: no image yet); its features
+  were not read that day, so they are filled in as none (``{"data": []}``), what a map with no
+  pins answers (read live on 2026-10-25, ``api-maps.json``).
 
 No network: the API client is tested on the conftest's fake transport.
 """
@@ -88,6 +91,8 @@ def answers() -> dict[str, Any]:
     out[f"{P}/resources/{ALDRIC}/docs/z3kj5ubq/blocks"] = a["aldric_blocks"]
     out[f"{P}/resources/{ORDER}/docs/ke9g0py4/lanes"] = t["lanes"]
     out[f"{P}/resources/{ORDER}/docs/ke9g0py4/events"] = t["events"]
+    out[f"{P}/resources/{CASTLE}/docs/yrr58xqo"] = m["map_doc"]
+    out[f"{P}/resources/{CASTLE}/docs/yrr58xqo/features"] = {"data": []}
     return out
 
 
@@ -144,7 +149,7 @@ def test_namespace_is_pinned() -> None:
 
 def test_the_tree_converts_to_the_element_set(tmp_path: Path) -> None:
     out, report = run(tmp_path)
-    assert report.counts == {"character": 1, "event": 2, "narrative": 5, "relation": 3}
+    assert report.counts == {"character": 1, "event": 2, "map": 1, "narrative": 5, "relation": 3}
     els = by_name(out)
     aldric = els["Aldric Veyra"]
     assert aldric["id"] == eid(ALDRIC) and aldric["type"] == "character"
@@ -164,7 +169,15 @@ def test_the_tree_converts_to_the_element_set(tmp_path: Path) -> None:
 
 def test_map_adds_tag_types(tmp_path: Path) -> None:
     out, report = run(tmp_path, type_map=MAP)
-    assert report.counts == {"character": 1, "event": 2, "institution": 1, "location": 1, "narrative": 3, "relation": 3}
+    assert report.counts == {
+        "character": 1,
+        "event": 2,
+        "institution": 1,
+        "location": 1,
+        "map": 1,
+        "narrative": 3,
+        "relation": 3,
+    }
     els = by_name(out)
     assert els["Castle Veyra"]["type"] == "location" and "supertype" not in els["Castle Veyra"]
     assert "parent_location" not in els["Castle Veyra"]  # its parent is a Narrative
@@ -313,7 +326,7 @@ def test_a_hidden_resource_is_an_element_carrying_the_mark(tmp_path: Path) -> No
     report = import_legendkeeper(src, PID, out)
     assert any(ORDER in path for path in src.calls)  # read like any other: nothing is dropped
     assert report.hidden.resources == 1
-    assert report.counts == {"character": 1, "event": 2, "narrative": 5, "relation": 3}
+    assert report.counts == {"character": 1, "event": 2, "map": 1, "narrative": 5, "relation": 3}
     els = by_name(out)
     order = els["Order of the Ash"]
     assert order["hidden"] is True and list(order)[:4] == ["type", "id", "name", "hidden"]
@@ -331,7 +344,7 @@ def test_a_hidden_resource_is_an_element_carrying_the_mark(tmp_path: Path) -> No
 
 def test_a_hidden_parent_hides_its_subtree(tmp_path: Path) -> None:
     out, report = run(tmp_path, hide(answers(), BOSS))
-    assert report.counts == {"character": 1, "event": 2, "narrative": 4, "relation": 3}  # no secret Narrative
+    assert report.counts == {"character": 1, "event": 2, "map": 1, "narrative": 4, "relation": 3}  # no secret Narrative
     assert (report.hidden.resources, report.hidden.under_hidden) == (1, 3)
     shown = [b["name"] for b in bodies(out).values() if not b.get("hidden")]
     assert shown == ["Sikelia"]
@@ -386,7 +399,7 @@ def test_plan_writes_nothing(tmp_path: Path) -> None:
     out = tmp_path / "planned"
     report = import_legendkeeper(RecordedSource(answers()), PID, out, plan_only=True)
     assert not out.exists() and report.out is None
-    assert report.counts == {"character": 1, "event": 2, "narrative": 5, "relation": 3}
+    assert report.counts == {"character": 1, "event": 2, "map": 1, "narrative": 5, "relation": 3}
     text = report.render()
     assert "Plan only: nothing written." in text
     assert "'faction'" in text and "'place'" in text  # the tags --map could type
@@ -394,22 +407,24 @@ def test_plan_writes_nothing(tmp_path: Path) -> None:
 
 def test_the_report_names_everything_not_placed(tmp_path: Path) -> None:
     _, report = run(tmp_path)
-    assert {(n.kind, n.resource, n.document) for n in report.not_imported} == {("map", "Castle Veyra", "Region map")}
+    assert report.not_imported == []
     text = report.render()
     for needle in ("'Born'", "'Rank'", "'Alignment'", "'Home'", "'Member of'", "'Allies'", "Region map", "blank"):
         assert needle in text, needle
     assert "Wrote" in text
     assert report.unread == []
-    # the API's map shape is not known: the map stays not imported, and the report says why
-    assert report.maps == [] and report.counts.get("map") is None
-    assert any(n.startswith("1 map document read through the API, not imported") for n in report.notes)
+    # a map with no image yet: a Map with no size, no pins, and the report says so
+    assert [(m.name, m.mapless, m.pins) for m in report.maps] == [("Castle Veyra: Region map", True, 0)]
+    assert report.counts.get("map") == 1
 
 
 def test_ids_do_not_move_with_the_supertype(tmp_path: Path) -> None:
     """Untyped is supertype Article now (no tool name in a supertype, Skeld, OW Market h40 #11385);
-    the ids are those 0.41.0 gave: the sha256 of the sorted ids, one a line."""
+    the ids are those 0.41.0 gave: the sha256 of the sorted ids, one a line. The Region map's Map,
+    made since 0.53.0, is the one id added."""
     out, _ = run(tmp_path)
-    ids = sorted(bodies(out))
+    ids = sorted(i for i, b in bodies(out).items() if b["type"] != "map")
+    assert [b["name"] for b in bodies(out).values() if b["type"] == "map"] == ["Castle Veyra: Region map"]
     assert hashlib.sha256("\n".join(ids).encode()).hexdigest() == (
         "d5ffef3b277079ef64e225c9c91ada4d877292aae9ce06c6ff7392863a4a31e1"
     )
