@@ -2,15 +2,20 @@
   "_what": "The recorded pin for the vendored OnlyWorlds schema distribution (codegen/schema-dist/, copied byte-exact). Do not edit by hand; re-vendor from the pinned tag and review the diff. Kept equal to the npm SDK's pin (github.com/OnlyWorlds/sdk, codegen/schema-pin.json) on purpose: two clients, one schema.",
   "_why_manifest_sha256": "Verifying the tree against its own MANIFEST.json only proves internal consistency. If the tag moved, the manifest moved with it. The hash recorded here is the one first accepted, which is what makes a moved tag visible.",
   "repo": "https://github.com/OnlyWorlds/schema-dist",
-  "tag": "v0.33.0-dist.69",
-  "commit": "55247b0dc6fbe91d519e1ccf9abb6624ac61fc6a",
-  "manifest_sha256": "0b2b2c715c061de22c17e90b1723275571d67a010364b9681fe079e24448b241",
+  "tag": "v0.33.0-dist.71",
+  "commit": "a81b7bd4c838227370cd31dcc355742d59fbfa35",
+  "manifest_sha256": "aaffaa512bd266dae86c6b349be9c587d56b6caa130b97a334d2c021119ba5a8",
   "canonical_version": "00.33.00",
-  "dist_serial": 69,
+  "dist_serial": 71,
   "published": "2026-10-25",
   "pinned_at": "2026-10-25",
-  "pinned_by": "The maintainer: tree from `git archive` of the tag in a schema-dist checkout (189 files, every one the MANIFEST lists); files re-hashed against MANIFEST.json by generate_schema.py; MANIFEST self-hash matched against the raw file GitHub serves at the tag, whose ref resolves to the commit above. Equal to the npm SDK's pin (v0.33.0-dist.69).",
+  "pinned_by": "The maintainer: tree from `git archive` of the tag in a schema-dist checkout (189 files, every one the MANIFEST lists); files re-hashed against MANIFEST.json by generate_schema.py; MANIFEST self-hash matched against the raw file GitHub serves at the tag, whose ref resolves to the commit above. Equal to the npm SDK's pin (v0.33.0-dist.71).",
   "previous_pins": [
+    {
+      "tag": "v0.33.0-dist.69",
+      "manifest_sha256": "0b2b2c715c061de22c17e90b1723275571d67a010364b9681fe079e24448b241",
+      "note": "superseded by v0.33.0-dist.71 (same canonical 00.33.00; the room profile's trim: room.md says trimmed is Unicode White_Space at both ends and a byte order mark stays, and room.fixture.json gains three cases, 28 in all; no schema file moved. Serial 70, the same content with a manifest that did not match its files, was superseded within the hour and pinned in no release)"
+    },
     {
       "tag": "v0.33.0-dist.68",
       "manifest_sha256": "5ca5619f70a661100686ce2f692512fdaa64dc51fd3aa1be572b183060c5ed05",

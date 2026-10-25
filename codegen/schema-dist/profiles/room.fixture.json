@@ -147,6 +147,33 @@
       "in_room": true
     },
     {
+      "name": "trimmed-unicode-white-space",
+      "element": {
+        "type": "relation",
+        "supertype": "\tWork item\u3000",
+        "x_room_of": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f"
+      },
+      "in_room": true
+    },
+    {
+      "name": "byte-order-mark-not-trimmed",
+      "element": {
+        "type": "relation",
+        "supertype": "\ufeffWork item",
+        "x_room_of": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f"
+      },
+      "in_room": false
+    },
+    {
+      "name": "file-separator-not-trimmed",
+      "element": {
+        "type": "relation",
+        "supertype": "Work item\u001c",
+        "x_room_of": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f"
+      },
+      "in_room": false
+    },
+    {
       "name": "charter-stays-lore",
       "element": {
         "type": "law",

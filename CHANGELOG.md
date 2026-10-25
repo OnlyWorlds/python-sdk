@@ -4,6 +4,10 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+## 0.60.1 (2026-10-25)
+
+- **Schema repinned to schema-dist v0.33.0-dist.71** (from dist.69; same canonical 00.33.00). The room profile now says what trimmed means: Unicode White_Space removed at both ends, a byte order mark kept. Its fixture gains three cases, 28 in all: a tab and an ideographic space around the name still match, a leading U+FEFF and a trailing U+001C do not. `is_room_element` already read all 28, so no reader changed; the room test now asserts exactly 28 cases. No schema file moved. Serial 70 carried the same content with a manifest that did not match its files and is pinned in no release.
+
 ## 0.60.0 (2026-10-25)
 
 - **A LegendKeeper region of several polygons is drawn as its parts.** A region carrying `polygons` (several polygons, which LegendKeeper's API document offers beside `polygon`) instead of `polygon` made no Zone. It is now the region's Zone as before (the project's own Zone when the feature links one, else a new Zone, `x_legendkeeper_page` and the Location rule unchanged), shape `polygon` and no Markers, its `linked_zones` one part Zone per polygon in order, as the standard draws a Zone with no Markers: each part named `<zone>: part <n>`, shape `polygon`, hidden as the region's Zone is, with its polygon's Markers made as a single region's are (`order` from 0, the same conversion). A polygon with fewer than 3 points is named in the report and skipped, its place kept in the numbering of the others; a region with no polygon left makes nothing. One polygon given as `polygons` reads exactly as `polygon`. Written live, the API stored and answered `polygon` and `polygons` each as written, neither filled from the other, the rings not closed: a region carrying both reads `polygons`, its `polygon` kept in `x_legendkeeper_feature` and named. The report counts the part Zones per map and names the regions of several polygons. Ids are UUIDv5 with the part's number, so a second import finds the same parts and Markers.

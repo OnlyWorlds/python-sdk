@@ -38,7 +38,7 @@ def test_is_room_element_answers_every_fixture_case() -> None:
         if (got := is_room_element(c["element"])) is not c["in_room"]
     ]
     assert wrong == []
-    assert len(cases) >= 25, f"the fixture holds {len(cases)} cases"
+    assert len(cases) == 28, f"the fixture holds {len(cases)} cases, serial 71 has 28"
 
 
 def test_without_a_string_type_supertype_or_mark_it_is_not_in_the_room() -> None:
