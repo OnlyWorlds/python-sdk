@@ -2,15 +2,25 @@
   "_what": "The recorded pin for the vendored OnlyWorlds schema distribution (codegen/schema-dist/, copied byte-exact). Do not edit by hand; re-vendor from the pinned tag and review the diff. Kept equal to the npm SDK's pin (github.com/OnlyWorlds/sdk, codegen/schema-pin.json) on purpose: two clients, one schema.",
   "_why_manifest_sha256": "Verifying the tree against its own MANIFEST.json only proves internal consistency. If the tag moved, the manifest moved with it. The hash recorded here is the one first accepted, which is what makes a moved tag visible.",
   "repo": "https://github.com/OnlyWorlds/schema-dist",
-  "tag": "v0.33.0-dist.61",
-  "commit": "8701cd6f2e016c07c88490f21cfccd77f322c2d4",
-  "manifest_sha256": "99642c7d404ac59e8dfa7dffccb9b494e6b2f29af2f82bf803b0e25f41939b8e",
+  "tag": "v0.33.0-dist.63",
+  "commit": "6326386ecf02d7f70f5f5e8cf4ffd4eeb228265b",
+  "manifest_sha256": "8326836abd7738d3ce51923e9dad496f3cd8e662c9ed985a44fe61373af2071a",
   "canonical_version": "00.33.00",
-  "dist_serial": 61,
-  "published": "2026-10-24",
-  "pinned_at": "2026-10-24",
-  "pinned_by": "The maintainer: tree from `git archive` of the tag in a schema-dist checkout; files re-hashed against MANIFEST.json by generate_schema.py; MANIFEST self-hash matched against the raw file GitHub serves at the tag, whose ref resolves to the commit above. Ahead of the npm SDK's published pin, which is at v0.33.0-dist.59 (4.72.2) when this is pinned.",
+  "dist_serial": 63,
+  "published": "2026-10-25",
+  "pinned_at": "2026-10-25",
+  "pinned_by": "The maintainer: tree from `git archive` of the tag in a schema-dist checkout; files re-hashed against MANIFEST.json by generate_schema.py; MANIFEST self-hash matched against the raw file GitHub serves at the tag, whose ref resolves to the commit above. The npm SDK pins the same serial in 4.72.4.",
   "previous_pins": [
+    {
+      "tag": "v0.33.0-dist.62",
+      "manifest_sha256": "1f3adbe9f9454550e00894f8c487158f9ddd799d6d8ca617ca584c5cc2e42cf3",
+      "note": "superseded by v0.33.0-dist.63 (same canonical 00.33.00; walk/lint_folder.py's docstring names no person; VERSION; pinned in no release)"
+    },
+    {
+      "tag": "v0.33.0-dist.61",
+      "manifest_sha256": "99642c7d404ac59e8dfa7dffccb9b494e6b2f29af2f82bf803b0e25f41939b8e",
+      "note": "superseded by v0.33.0-dist.62 (same canonical 00.33.00; walk/lint_folder.py imports the walk only when run as a command, so importing it loads no PyYAML and leaves the import path alone, and names no person; VERSION; no schema file moved)"
+    },
     {
       "tag": "v0.33.0-dist.60",
       "manifest_sha256": "4517246eec6f34bc27f79cea644b8d828e4adf5745cdee7cb1c4ca455da0d5d3",

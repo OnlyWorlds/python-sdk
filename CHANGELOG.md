@@ -4,6 +4,10 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+## 0.51.0 (2026-10-25)
+
+- **Schema repinned to schema-dist `v0.33.0-dist.63`** (from dist.61; same canonical 00.33.00, no schema file moved). Serials 62 and 63 change `walk/lint_folder.py` alone: it imports the walk only when run as a command, so a program can load it and call `lint_folder()` with no YAML library and no change to its import path.
+- **`python -m onlyworlds.lint <folder>`: a world folder's shape against the schema, by schema-dist's own checker.** Files outside the 22 type folders, missing or duplicate ids, keys that are not fields of their type, values of the wrong shape, links that do not resolve or point at the wrong type; one line each, then the count checked; exit 0, 1 or 2 (not a world folder). The checker is the dist's `walk/lint_folder.py`, copied byte for byte with its `schema.json` into `onlyworlds/_walk/` by `codegen/generate_schema.py` (and held there by `--check`), and loaded by path: no PyYAML, nothing added to the import path. Its report equals the dist's command line for line (a test runs both). One line is the runner's own: a linked folder's git line is said to be unchecked when git is not installed, where the checker is silent.
 - **The Kanka import on a third real export** (`tests/fixtures/kanka/quay-export-world_20261025_011029.zip`, scrubbed of account identifiers): a public Character with three posts at Only me (`visibility_id` 4), Members of the campaign (5) and Admins (2) comes in visible, each post its own hidden Narrative linked to it, no post's text on the Character. The rule was built on planted data; no code changed.
 
 ## 0.50.0 (2026-10-24)

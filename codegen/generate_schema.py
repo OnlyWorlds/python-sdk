@@ -15,9 +15,13 @@ pin) and its contents verified (every file against MANIFEST.json) BEFORE the
 walk is imported, because importing unverified code to answer a question about
 the verified tree would be the complicit-manifest case.
 
+It also copies the dist's folder checker (walk/lint_folder.py) and schema.json, byte for
+byte, into src/onlyworlds/_walk/, which onlyworlds.lint runs; schema.json is first checked
+equal to the walk's own decode_schema output.
+
 Usage:
-  python codegen/generate_schema.py          write the module
-  python codegen/generate_schema.py --check  exit 1 if the committed module is stale
+  python codegen/generate_schema.py          write the module and the vendored checker
+  python codegen/generate_schema.py --check  exit 1 if either is stale
 """
 
 from __future__ import annotations
@@ -35,6 +39,12 @@ HERE = Path(__file__).resolve().parent
 DIST = HERE / "schema-dist"
 PIN = HERE / "schema-pin.json"
 OUT = HERE.parent / "src" / "onlyworlds" / "_schema.py"
+# The dist's own folder checker and the decoded schema it runs on, copied byte for byte into a folder of
+# their own (onlyworlds.lint runs them; nothing else sits beside them). Checked with the module.
+VENDORED = {
+    DIST / "walk" / "lint_folder.py": HERE.parent / "src" / "onlyworlds" / "_walk" / "lint_folder.py",
+    DIST / "schema.json": HERE.parent / "src" / "onlyworlds" / "_walk" / "schema.json",
+}
 
 NON_ELEMENT_SCHEMA_FILES = {"base_properties", "world"}
 
@@ -436,7 +446,12 @@ def main() -> int:
     walk = load_walk()
     types = element_types(walk)
     kinds, pairs = field_kinds(walk, types), generic_pairs(walk, types)
-    layout = layout_tables(decoded_schema(walk), types, kinds, pairs)
+    decoded = decoded_schema(walk)
+    if json.loads((DIST / "schema.json").read_text(encoding="utf-8")) != decoded:
+        raise SystemExit(
+            "the dist's schema.json is not the walk's decode_schema output: onlyworlds.lint would run on another schema"
+        )
+    layout = layout_tables(decoded, types, kinds, pairs)
     text = render(
         pin,
         types,
@@ -451,13 +466,19 @@ def main() -> int:
     )
     if args.check:
         current = OUT.read_bytes().decode("utf-8") if OUT.is_file() else ""
-        if current != text:
-            print(f"STALE: {OUT} does not match what the pinned dist generates", file=sys.stderr)
+        stale = [OUT] if current != text else []
+        stale += [dst for src, dst in VENDORED.items() if not dst.is_file() or dst.read_bytes() != src.read_bytes()]
+        for path in stale:
+            print(f"STALE: {path} does not match what the pinned dist generates", file=sys.stderr)
+        if stale:
             return 1
-        print(f"ok: {OUT.name} matches {pin['tag']}")
+        print(f"ok: {OUT.name} and the vendored checker match {pin['tag']}")
         return 0
     OUT.write_bytes(text.encode("utf-8"))  # bytes: LF on every platform
-    print(f"wrote {OUT} ({pin['tag']})")
+    for src, dst in VENDORED.items():
+        dst.parent.mkdir(exist_ok=True)
+        dst.write_bytes(src.read_bytes())
+    print(f"wrote {OUT} and the vendored checker ({pin['tag']})")
     return 0
 
 

@@ -251,6 +251,16 @@ It looks for links to elements that are not there, Events that end before they s
 
 The API door reads the key from `OW_API_KEY` and the PIN from `OW_API_PIN`, or from the toolkit's `ONLYWORLDS_API_KEY` and `ONLYWORLDS_API_PIN` when those are not set.
 
+## The lint
+
+The lint checks a world folder's shape against the schema: a file outside the 22 type folders, a missing or duplicate `id`, a key that is not a field of its type, a value of the wrong shape, a link that does not resolve inside the folder or points at the wrong type. The doctor reads what a world says; the lint reads how it is written down.
+
+```bash
+python -m onlyworlds.lint moppetopia
+```
+
+One line per problem, then the count it checked. Exit 0 when clean, 1 with problems, 2 when the folder is not a world folder. The checker is schema-dist's own `walk/lint_folder.py`, copied byte for byte at this package's schema pin and run on the dist's `schema.json`, so it gives the same report as the dist's command and needs no YAML library. From code: `onlyworlds.lint.lint(folder)` returns the report (`problems`, `warnings`, `summary`).
+
 ## Errors
 
 A failed call raises `ApiError` with the API's `code`, `param` (the field that failed) and `doc_url`, and flags for the cases you handle differently: `is_validation_error`, `is_auth_error`, `is_not_author`, `is_owner_only`, `is_id_conflict`, `is_resync_required`, `is_busy`, `is_precondition_failed`.

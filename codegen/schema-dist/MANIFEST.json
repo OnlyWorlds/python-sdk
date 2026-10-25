@@ -181,8 +181,8 @@
     "schema/zone.yaml": "9828429f3172b83b6277c0a71a75a3f4079b8b1eccb2135418a458f2fc80f2b7",
     "schema.json": "a0e4ec061a2b61c3c01eeef0e6993a962f393b6fdd4a3bfe5e4745e3fd2f923f",
     "SECURITY.md": "939ee364b06f0b749bdd4cbe66b2fe49322c95abe732650ec4ef062a0c03820a",
-    "VERSION": "8bf468672caf2fa26cc70f0c177f2a6a3e90be8896980c88dce941fd96b885f9",
-    "walk/lint_folder.py": "bde115bd096880f2c839a26e2167605f19bef5240762f4c3cdd98220ef661894",
+    "VERSION": "78786e19e3af07c179ba4c3a5a675d57be083dde73fc8c63754b41e436ea7ab8",
+    "walk/lint_folder.py": "0f3fb0a8b5143a0a2a24df6f7417c2b5659bee7ad63bd76387ea5239f0bc944f",
     "walk/rulings.yaml": "1fb87ce4012d160b809e0aac50688c62405d2a5e6e303a57df84b98c249374ca",
     "walk/schema_walk.py": "e4a490dda5133e3961252cd8675eb39e5b214df68f6a661fa8601ccd69e6aed0"
   }
