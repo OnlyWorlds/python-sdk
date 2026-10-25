@@ -233,6 +233,13 @@ What becomes what:
   linked to a place is that place's own area (ruled 2026-10-25); a ``zone`` already set is never
   overwritten and the report names it, and no other type's link is set. A region with fewer than 3
   points, a path with fewer than 2, or a point that is not ``[y, x]``: no Zone, named in the report.
+  A region of several polygons (``polygons``, a list of such point lists; the API keeps it and
+  ``polygon`` each as written, neither filled from the other, 2026-10-25) is drawn as its parts, the
+  standard's rule for a Zone with no Markers: the region's Zone as above, with no Markers and
+  ``linked_zones`` a part Zone per polygon in order, named ``<zone>: part <n>``, shape ``polygon``,
+  hidden as the region's Zone is, each with its polygon's Markers; a polygon with too few points is
+  named and skipped. One polygon given as ``polygons`` reads as ``polygon``; ``polygons`` is read
+  when a region carries both, ``polygon`` then kept in ``x_legendkeeper_feature``.
   Another feature type is named, not read.
 - **A board document becomes a Map with supertype Board** (ruled 2026-10-25), named
   ``<resource>: <document>``, with no image; ``location`` and ``x_legendkeeper_document`` as a
@@ -533,8 +540,9 @@ _PIN_SAID = frozenset({"id", "name", "pos", "uri", "isHidden", "rank", "createdA
 
 #: A map feature read as a Zone of Markers: its kind -> (its points' key, Zone's ``shape``, the fewest points)
 _ZONE_FEATURES = {"region": ("polygon", "polygon", 3), "path": ("polyline", "line", 2)}
-#: What a region or path carries that is said elsewhere
-_FEATURE_SAID = frozenset({"id", "name", "uri", "polygon", "polyline", "isHidden", "rank", "createdAt", "updatedAt"})
+#: What a region or path carries that is said elsewhere (and the points it is read from: its ``polygon``,
+#: ``polygons`` or ``polyline``, whichever is read; one not read is kept)
+_FEATURE_SAID = frozenset({"id", "name", "uri", "isHidden", "rank", "createdAt", "updatedAt"})
 
 #: The tldraw records a board carries, by ``typeName``: what rides on a board document as ``board``.
 _BOARD_RECORDS = (("shapes", "shape"), ("bindings", "binding"), ("assets", "asset"), ("pages", "page"))
@@ -1643,7 +1651,8 @@ def _api_map(doc: dict[str, Any], image: Any, features: list[dict[str, Any]]) ->
     ``2^maxNativeZoom``. A pin is a feature of type ``pin``, its ``pos`` the file's (measured on
     LegendKeeper's tutorial map, the same 16 pin ids and positions on both roads, 2026-10-25).
 
-    A ``region`` (its ``polygon``, a list of ``[y, x]`` points) and a ``path`` (its ``polyline``, the
+    A ``region`` (its ``polygon``, a list of ``[y, x]`` points, or ``polygons``, several such lists) and a
+    ``path`` (its ``polyline``, the
     same) ride on the document as ``regions`` and ``paths``, each feature as the API gives it but its
     ``type``, beside ``pins``. The export file's shape for them is unwitnessed: the exports read hold
     no region or path, so the file road's ``regions`` and ``paths`` keys are this door's choice.
@@ -1861,6 +1870,8 @@ class MapMade:
     zones: int = 0
     zones_own: int = 0
     markers: int = 0
+    #: the part Zones of regions of several polygons (each region's own Zone counted in ``zones``)
+    zone_parts: int = 0
 
 
 @dataclass
@@ -2056,8 +2067,14 @@ class ImportReport:
                     if m.zones:
                         what += (
                             f", {m.zones} {'region or path' if m.zones == 1 else 'regions and paths'} read as Zones"
-                            f" ({m.zones_own} on Zones of the project, {m.zones - m.zones_own} new) with"
-                            f" {m.markers} Marker{'' if m.markers == 1 else 's'}"
+                            f" ({m.zones_own} on Zones of the project, {m.zones - m.zones_own} new)"
+                            + (
+                                f" and {m.zone_parts} part Zone{'' if m.zone_parts == 1 else 's'} of regions of"
+                                " several polygons,"
+                                if m.zone_parts
+                                else ""
+                            )
+                            + f" with {m.markers} Marker{'' if m.markers == 1 else 's'}"
                         )
                     if (m.pins or m.markers) and m.width is not None and m.height is not None:
                         what += (
@@ -2243,6 +2260,10 @@ class _Converter:
         self._zone_places: list[tuple[str, str, str, str]] = []
         #: Locations whose empty ``zone`` took the Zone of a region or path linking them
         self.zoned_locations = 0
+        #: resource id of a Zone of the project -> the part Zones a region of several polygons linking it gives
+        self._zone_parts: dict[str, list[str]] = {}
+        #: regions of several polygons, each a Zone with no Markers whose linked_zones are its parts
+        self.parted_regions = 0
         self.marks: dict[str, int] = {}
         self.unsupported = 0
         self.unknown: dict[str, int] = {}
@@ -2350,6 +2371,12 @@ class _Converter:
                     f"Zone {zone.name!r}: its own shape {zone.fields['shape']!r} gives way to {shape!r}, from {where}"
                 )
             zone.fields["shape"] = shape
+        # a region of several polygons linking a Zone of the project: its parts join the Zone's linked_zones
+        for rid, part_ids in self._zone_parts.items():
+            zone = self.items[rid]
+            had = zone.fields.get("linked_zones")
+            held = [z for z in had if isinstance(z, str)] if isinstance(had, list) else []
+            zone.fields["linked_zones"] = held + [z for z in part_ids if z not in held]
         # a region or path linking a Location draws that place's own area (Location.zone, ruled
         # 2026-10-25): an empty zone takes the new Zone, one already set is never overwritten
         for rid, zone_id, zname, where in self._zone_places:
@@ -3124,12 +3151,12 @@ class _Converter:
         pins = [p for p in doc.get("pins") or [] if isinstance(p, dict)]
         for n, pin in enumerate(pins, 1):
             self._pin(pin, n, item, did, name, map_id, hidden, bounds, zoom)
-        zones = zones_own = markers = 0
+        zones = zones_own = markers = parts = 0
         for kind in _ZONE_FEATURES:
             for n, feature in enumerate((f for f in doc.get(f"{kind}s") or [] if isinstance(f, dict)), 1):
                 got = self._zone_feature(feature, kind, n, item, did, name, map_id, hidden, bounds, zoom)
                 if got is not None:
-                    zones, zones_own, markers = zones + 1, zones_own + got[1], markers + got[0]
+                    zones, zones_own, markers, parts = zones + 1, zones_own + got[1], markers + got[0], parts + got[2]
         self.report.maps.append(
             MapMade(
                 name,
@@ -3144,6 +3171,7 @@ class _Converter:
                 zones=zones,
                 zones_own=zones_own,
                 markers=markers,
+                zone_parts=parts,
             )
         )
 
@@ -3234,12 +3262,16 @@ class _Converter:
         map_hidden: bool,
         bounds: dict[str, float],
         zoom: float | None,
-    ) -> tuple[int, bool] | None:
+    ) -> tuple[int, bool, int] | None:
         """A region (``polygon``) or path (``polyline``) as a Zone and one Marker per point, in order.
         The Zone is the project's own when the feature's uri names a resource read as a Zone (a push
         from OnlyWorlds writes each Zone so), which then takes ``shape``; else a new Zone, linking the
-        page it names in ``x_legendkeeper_page``. Returns (Markers made, on a Zone of the project),
-        or None when the feature has too few points or a point that is not ``[y, x]`` (named)."""
+        page it names in ``x_legendkeeper_page``. A region of several polygons (``polygons``) is that
+        Zone with no Markers, its ``linked_zones`` a part Zone per polygon in order, each with its
+        ring's Markers (a Zone drawn as its parts, the standard's rule of 2026-09-28); one polygon
+        given as ``polygons`` reads as ``polygon``. Returns (Markers made, on a Zone of the project,
+        part Zones made), or None when the feature has too few points or a point that is not
+        ``[y, x]``, or no part that has enough (named)."""
         key, shape, least = _ZONE_FEATURES[kind]
         fid = str(feature.get("id") or f"{kind}#{n}")
         uri = feature.get("uri")
@@ -3247,27 +3279,47 @@ class _Converter:
         target = self.items.get(link["rid"]) if link is not None else None
         name = str(feature.get("name") or "").strip()
         label = name or (target.name if target is not None else f"Untitled {kind} ({fid})")
-        raw = feature.get(key)
-        points = [p for p in raw] if isinstance(raw, list) else []
-        if not all(isinstance(p, list) and len(p) == 2 and all(_number(v) is not None for v in p) for p in points):
-            self.report.notes.append(
-                f"{kind} {label!r} ({fid}) on {map_name!r}: a point that is not [y, x]; no Zone, no Markers"
-            )
-            return None
-        if len(points) < least:
-            self.report.notes.append(
-                f"{kind} {label!r} ({fid}) on {map_name!r}: {len(points)} point{'' if len(points) == 1 else 's'},"
-                f" fewer than a {kind}'s {least}; no Zone, no Markers"
-            )
-            return None
+        where = f"{kind} {label!r} ({fid}) on {map_name!r}"
+        raw, read = feature.get(key), key
+        rings: list[Any] = []  # a region's polygons, when it carries more than one
+        polys = feature.get("polygons") if kind == "region" else None
+        if isinstance(polys, list) and polys:
+            # The API stores and answers a region's polygon and polygons each as written, neither filled
+            # from the other: a region written with both reads back with both, unchanged (probed
+            # 2026-10-25). Which one the app draws then is not witnessed. polygons is read, as the one
+            # that can hold every polygon; a polygon beside it is kept in x_legendkeeper_feature, named.
+            read = "polygons"
+            if isinstance(raw, list) and raw:
+                self.report.notes.append(
+                    f"{where}: both polygon and polygons; polygons read, polygon kept in {EXT_PREFIX}feature"
+                )
+            raw, rings = (polys[0], []) if len(polys) == 1 else (None, polys)
+        parts: list[tuple[int, list[Any]]] = []  # (the polygon's place in polygons from 1, its points)
+        if rings:
+            for k, ring in enumerate(rings, 1):
+                got = self._feature_points(ring, kind, least, f"{where}, part {k}", "the part skipped")
+                if got is not None:
+                    parts.append((k, got))
+            if not parts:
+                self.report.notes.append(f"{where}: no polygon of {least} points or more; no Zone, no Markers")
+                return None
+            points: list[Any] = []
+        else:
+            got = self._feature_points(raw, kind, least, where, "no Zone, no Markers")
+            if got is None:
+                return None
+            points = got
         hidden = map_hidden or feature.get("isHidden") is True
         if hidden:
             self.report.hidden.map_zones += 1
         own = target is not None and target.etype == "zone" and (target.lk_id, map_id) not in self._zone_on_map
+        part_ids = [self._id("zone", item.lk_id, did, fid, "part", str(k)) for k, _ in parts]
         if target is not None and own:
             zone_id, zname = target.eid, target.name
             self._zone_on_map.add((target.lk_id, map_id))
             self._zone_shapes.setdefault(target.lk_id, []).append((shape, f"{kind} {fid} on {map_name!r}"))
+            if part_ids:
+                self._zone_parts.setdefault(target.lk_id, []).extend(part_ids)
         else:
             zone_id, zname = self._id("zone", item.lk_id, did, fid), label
             if not name:  # LegendKeeper shows the linked page's name on a feature that has none
@@ -3290,14 +3342,57 @@ class _Converter:
                     f"{kind} {label!r} ({fid}) on {map_name!r}: its uri names {link['rid']}, {self._MISSING};"
                     " a Zone with no page"
                 )
-            rest = {k: v for k, v in feature.items() if k not in _FEATURE_SAID}
+            rest = {k: v for k, v in feature.items() if k not in _FEATURE_SAID and k != read}
             if rest:
                 ext[f"{EXT_PREFIX}feature"] = rest
-            self.zones.append(self._body("zone", zone_id, zname, hidden, {"shape": shape}, ext))
+            zfields: dict[str, Any] = {"shape": shape, "linked_zones": part_ids} if part_ids else {"shape": shape}
+            self.zones.append(self._body("zone", zone_id, zname, hidden, zfields, ext))
         if target is not None and target.hidden and not hidden:
             note = f"{label!r}: a visible {kind} on {map_name!r} places the hidden {target.name!r}"
             if note not in self.report.notes:
                 self.report.notes.append(note)
+        made = self._feature_markers(points, (item.lk_id, did, fid), map_id, zone_id, zname, hidden, bounds, zoom)
+        if parts:
+            self.parted_regions += 1
+            # a part is hidden as its region's Zone is: the feature or its map hidden, or the project's Zone
+            part_hidden = hidden or (own and target is not None and target.hidden)
+            for (k, ring), part_id in zip(parts, part_ids, strict=True):
+                pname = f"{zname}: part {k}"
+                pext = {f"{EXT_PREFIX}id": fid}
+                self.zones.append(self._body("zone", part_id, pname, part_hidden, {"shape": shape}, pext))
+                made += self._feature_markers(
+                    ring, (item.lk_id, did, fid, "part", str(k)), map_id, part_id, pname, hidden, bounds, zoom
+                )
+        return made, own, len(parts)
+
+    def _feature_points(self, raw: Any, kind: str, least: int, where: str, then: str) -> list[Any] | None:
+        """A region's or path's points (a list of ``[y, x]``), or None when too few or one is not
+        ``[y, x]``: named in the report, ``where`` the feature and ``then`` what follows."""
+        points = [p for p in raw] if isinstance(raw, list) else []
+        if not all(isinstance(p, list) and len(p) == 2 and all(_number(v) is not None for v in p) for p in points):
+            self.report.notes.append(f"{where}: a point that is not [y, x]; {then}")
+            return None
+        if len(points) < least:
+            self.report.notes.append(
+                f"{where}: {len(points)} point{'' if len(points) == 1 else 's'}, fewer than a {kind}'s {least}; {then}"
+            )
+            return None
+        return points
+
+    def _feature_markers(
+        self,
+        points: list[Any],
+        id_parts: tuple[str, ...],
+        map_id: str,
+        zone_id: str,
+        zname: str,
+        hidden: bool,
+        bounds: dict[str, float],
+        zoom: float | None,
+    ) -> int:
+        """One Marker per point of a Zone, in order (``order`` from 0), placed as a pin is; their ids
+        derive from ``id_parts`` and the order. Returns how many."""
+        fid = id_parts[2]
         for order, pt in enumerate(points):
             fields: dict[str, Any] = {"map": map_id, "zone": zone_id, "order": order}
             at = self._pixel(pt, bounds, zoom)
@@ -3309,9 +3404,9 @@ class _Converter:
             else:
                 self.unplaced_markers += 1
             mext = {f"{EXT_PREFIX}id": fid, f"{EXT_PREFIX}pos": pt}
-            mid = self._id("marker", item.lk_id, did, fid, str(order))
+            mid = self._id("marker", *id_parts, str(order))
             self.markers.append(self._body("marker", mid, f"{zname}: point {order + 1}", hidden, fields, mext))
-        return len(points), own
+        return len(points)
 
     # -- boards ----------------------------------------------------------------
 
@@ -3654,13 +3749,22 @@ class _Converter:
             )
         drawn = [m for m in self.report.maps if m.zones]
         if drawn:
-            z, own, k = (sum(getattr(m, a) for m in drawn) for a in ("zones", "zones_own", "markers"))
+            counted = ("zones", "zones_own", "markers", "zone_parts")
+            z, own, k, parts = (sum(getattr(m, a) for m in drawn) for a in counted)
             n.append(
                 f"{z} map {'region or path' if z == 1 else 'regions and paths'} read as Zones ({own} on Zones of the"
                 " project, which"
                 f" take shape; {z - own} new, shape polygon for a region and line for a path, the page a feature links"
                 f" in {EXT_PREFIX}page), with {k} Marker{'' if k == 1 else 's'}, one per point in order: map, zone,"
                 f" order, and x, y as a pin's ({self.placed_markers} placed), the point kept as {EXT_PREFIX}pos"
+                + (
+                    f"; {self.parted_regions} region{'' if self.parted_regions == 1 else 's'} of several polygons"
+                    f" {'is a Zone' if self.parted_regions == 1 else 'are Zones'} with no Markers whose linked_zones"
+                    f" are {parts} part Zone{'' if parts == 1 else 's'}, one per polygon in order, named"
+                    " '<zone>: part <n>', each with its polygon's Markers"
+                    if self.parted_regions
+                    else ""
+                )
                 + (
                     f"; {self.zoned_locations} Location{'' if self.zoned_locations == 1 else 's'} take their Zone as"
                     " zone"

@@ -225,6 +225,119 @@ def test_a_region_linking_a_location_is_its_zone_and_a_set_zone_stays(tmp_path: 
     assert "1 Location take their Zone as zone" in " ".join(report.notes)
 
 
+# A region of several polygons, in the shape LegendKeeper's API stored and answered on 2026-10-25 for
+# a region written with `polygons` two triangles: `polygons` alone, no `polygon` filled, each ring as
+# written (not closed, [y, x]).
+RING_A = [WIKI_POS, [-30.0, 60.0], [-35.0, 50.0]]
+RING_B = [[-10.0, 10.0], [-20.0, 20.0], [-30.0, 25.0], [-15.0, 5.0]]
+
+
+def polygons(fid: str, rings: list[list[list[float]]], uri: str | None = None, name: str = "") -> dict[str, Any]:
+    f = feature(fid, "region", [], uri, name)
+    del f["polygon"]
+    f["polygons"] = rings
+    return f
+
+
+def test_a_region_of_several_polygons_is_a_zone_drawn_as_its_parts(tmp_path: Path) -> None:
+    """The standard's rule (2026-09-28): a Zone with no Markers whose linked_zones are its parts is
+    drawn as its parts. The region's Zone carries no Markers; each polygon is a part Zone of Markers."""
+    isles = polygons("isles1", [RING_A, RING_B], name="The Isles")
+    report = import_legendkeeper(RecordedSource(answers(drawn([isles]))), PID, tmp_path / "w")
+    zones = {z["name"]: z for z in of(tmp_path / "w", "zone")}
+    markers = of(tmp_path / "w", "marker")
+    main = maps_by_name(tmp_path / "w")["The Realm of Tutoria: Main"]
+    whole = zones["The Isles"]
+    part1, part2 = zones["The Isles: part 1"], zones["The Isles: part 2"]
+    assert whole["id"] == zid("zone", REALM_RID, MAIN, "isles1") and whole["shape"] == "polygon"
+    assert whole["linked_zones"] == [part1["id"], part2["id"]]
+    assert not any(m["zone"] == whole["id"] for m in markers)
+    assert "polygons" not in whole.get("x_legendkeeper_feature", {})  # read, so not kept again
+    assert part1["id"] == zid("zone", REALM_RID, MAIN, "isles1", "part", "1")
+    assert part2["id"] == zid("zone", REALM_RID, MAIN, "isles1", "part", "2")
+    assert (part1["shape"], part2["shape"]) == ("polygon", "polygon")
+    for part, ring, k in ((part1, RING_A, "1"), (part2, RING_B, "2")):
+        on = sorted((m for m in markers if m["zone"] == part["id"]), key=lambda m: m["order"])
+        assert [m["order"] for m in on] == list(range(len(ring))) and all(m["map"] == main["id"] for m in on)
+        assert [m["x_legendkeeper_pos"] for m in on] == ring
+        assert [m["name"] for m in on] == [f"{part['name']}: point {i}" for i in range(1, len(ring) + 1)]
+        assert on[0]["id"] == zid("marker", REALM_RID, MAIN, "isles1", "part", k, "0")
+    # one conversion: part 1's first point is Wiki City's pin pos, and lands on the pin's pixel
+    first = next(m for m in markers if m["zone"] == part1["id"] and m["order"] == 0)
+    wiki_pin = pins_by_lk_id(tmp_path / "w")["daeydntx"]
+    assert (first["x"], first["y"]) == (wiki_pin["x"], wiki_pin["y"]) == (3553, 5445)
+    assert len(markers) == 3 + 4 and report.counts["marker"] == 7
+    assert report.counts["zone"] == 1 + 3  # the Ward's page, the region's Zone and its two parts
+    made = next(m for m in report.maps if m.name.endswith("Main"))
+    assert (made.zones, made.zones_own, made.markers, made.zone_parts) == (1, 0, 7, 2)
+    text = report.render()
+    assert "1 region or path read as Zones (0 on Zones of the project, 1 new) and 2 part Zones" in text
+    said = "1 region of several polygons is a Zone with no Markers whose linked_zones are 2 part Zones"
+    assert any(said in n for n in report.notes)
+    # the same project read again: the same ids
+    import_legendkeeper(RecordedSource(answers(drawn([isles]))), PID, tmp_path / "again")
+    assert {e for e in read_folder(tmp_path / "w").elements} == {e for e in read_folder(tmp_path / "again").elements}
+
+
+def test_a_region_of_several_polygons_on_a_zone_of_the_project_links_its_parts(tmp_path: Path) -> None:
+    ward = polygons("reg1", [RING_A, RING_B], ZONE_RID, "The Ward")
+    report = import_legendkeeper(RecordedSource(answers(drawn([ward]))), PID, tmp_path / "w")
+    zones = {z["name"]: z for z in of(tmp_path / "w", "zone")}
+    own = zones["The Ward"]
+    assert own["id"] == zid(ZONE_RID) and own["shape"] == "polygon"
+    assert own["linked_zones"] == [zones["The Ward: part 1"]["id"], zones["The Ward: part 2"]["id"]]
+    assert not any(m["zone"] == own["id"] for m in of(tmp_path / "w", "marker"))
+    made = next(m for m in report.maps if m.name.endswith("Main"))
+    assert (made.zones, made.zones_own, made.markers, made.zone_parts) == (1, 1, 7, 2)
+
+
+def test_one_polygon_given_as_polygons_reads_as_polygon(tmp_path: Path) -> None:
+    lone = feature("lone1", "region", RING_B, name="The Lone Isle")  # no uri: a new Zone, its other keys kept
+    as_list = [
+        polygons("reg1", [REGION["polygon"]], ZONE_RID, "The Ward"),
+        polygons("lone1", [RING_B], name="The Lone Isle"),
+    ]
+    import_legendkeeper(RecordedSource(answers(drawn([REGION, lone]))), PID, tmp_path / "one")
+    import_legendkeeper(RecordedSource(answers(drawn(as_list))), PID, tmp_path / "list")
+    one = {i: e.body for i, e in read_folder(tmp_path / "one").elements.items()}
+    listed = {i: e.body for i, e in read_folder(tmp_path / "list").elements.items()}
+    assert one == listed
+    assert not any(b["name"].endswith(": part 1") for b in listed.values())
+
+
+def test_a_polygon_with_too_few_points_is_skipped_and_named(tmp_path: Path) -> None:
+    thin = [[-1.0, 1.0], [-2.0, 2.0]]
+    reef = polygons("reef1", [RING_A, thin, RING_B], name="The Reef")
+    gone = polygons("gone1", [thin, [[-3.0, 3.0]]], name="Nothing left")
+    report = import_legendkeeper(RecordedSource(answers(drawn([reef, gone]))), PID, tmp_path / "w")
+    zones = {z["name"]: z for z in of(tmp_path / "w", "zone")}
+    # the part keeps its place in polygons: parts 1 and 3, part 2 skipped
+    assert zones["The Reef"]["linked_zones"] == [zones["The Reef: part 1"]["id"], zones["The Reef: part 3"]["id"]]
+    assert "The Reef: part 2" not in zones
+    where = "region 'The Reef' (reef1) on 'The Realm of Tutoria: Main', part 2"
+    assert f"{where}: 2 points, fewer than a region's 3; the part skipped" in report.notes
+    # no part survives: nothing made, as for a region too thin
+    assert not any(n.startswith("Nothing left") for n in zones)
+    gone_at = "region 'Nothing left' (gone1) on 'The Realm of Tutoria: Main'"
+    assert f"{gone_at}: no polygon of 3 points or more; no Zone, no Markers" in report.notes
+    assert f"{gone_at}, part 2: 1 point, fewer than a region's 3; the part skipped" in report.notes
+    made = next(m for m in report.maps if m.name.endswith("Main"))
+    assert (made.zones, made.markers, made.zone_parts) == (1, 7, 2)
+
+
+def test_a_region_with_polygon_and_polygons_reads_polygons(tmp_path: Path) -> None:
+    """Probed 2026-10-25: the API stores and answers both as written, neither filled from the other."""
+    both = polygons("both1", [RING_A, RING_B], name="Both")
+    both["polygon"] = [[-50.0, 50.0], [-50.0, 60.0], [-60.0, 55.0]]
+    report = import_legendkeeper(RecordedSource(answers(drawn([both]))), PID, tmp_path / "w")
+    zones = {z["name"]: z for z in of(tmp_path / "w", "zone")}
+    assert len(zones["Both"]["linked_zones"]) == 2
+    assert zones["Both"]["x_legendkeeper_feature"]["polygon"] == both["polygon"]
+    assert "region 'Both' (both1) on 'The Realm of Tutoria: Main': both polygon and polygons; polygons read," in (
+        " ".join(report.notes)
+    )
+
+
 def test_hidden_regions_and_paths_follow_the_pins(tmp_path: Path) -> None:
     hidden_road = {**ROAD, "isHidden": True}
     report = import_legendkeeper(
