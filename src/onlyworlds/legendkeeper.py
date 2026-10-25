@@ -57,6 +57,13 @@ by placeholders). ``FileSource`` adapts where its shape is not the API's:
   document's ``mapImage`` (bounds in zoom-0 units) and its pins under ``/features``; ``read_project``
   puts them on the document in this shape (``_api_map``), so both roads make the same Maps and Pins
   (the tutorial map's 16 pins land on the same pixels from either, 2026-10-25).
+- a board document's ``content`` is ``{shapes, bindings, shapesV2}``, ``shapesV2`` a list of
+  ``{key, val}`` whose ``val`` is a tldraw record (``typeName`` shape, binding, asset, page or
+  document); the records ride on the document as ``board``, ``{shapes, bindings, assets, pages}``
+  split by ``typeName`` (``content.shapes`` and ``content.bindings`` when there is no ``shapesV2``).
+  The API serves the same records under ``/docs/<id>/board``; ``read_project`` puts them on the
+  document in this shape, so both roads make the same board (the tutorial's board, 154 shapes and
+  52 bindings, the same records from either but for the resource ids, which are each project's).
 - not kept, named in the report: ``exportId``, ``exportedAt`` and ``hash`` (the report names the
   export; two exports of one project give one folder), ``createdBy`` (an account id),
   ``schemaVersion``, ``showPropertyBar``, ``isFullWidth``, document locators, ``transforms`` and
@@ -138,7 +145,7 @@ What becomes what:
   ``x_legendkeeper_parent`` the resource it belongs to. ``start_date`` and ``end_date`` are left
   unset: the unit is the world's own time system, and converting minutes into it is a later step
   that needs the world's time settings named. Placeholders are layout and are counted.
-- **A map document** (read from the export file) **becomes a Map** (ruled
+- **A map document** (from either road) **becomes a Map** (ruled
   2026-10-23), named ``<resource>: <document>`` as a hidden page's Narrative is: ``width`` is
   ``max_x - min_x`` and ``height`` ``max_y - min_y`` from the document's ``map`` bounds (whole
   numbers), the bounds kept as ``x_legendkeeper_bounds`` and ``max_zoom`` as
@@ -171,8 +178,43 @@ What becomes what:
   ``labelVisibility``, ``isSynced`` and any other key but its id, name, pos, uri, hidden mark, rank
   and timestamps) are kept together as ``x_legendkeeper_pin``, its id as ``x_legendkeeper_id``,
   its uri as ``x_legendkeeper_uri``.
-- **Not imported**, named in the report with their resource: ``board`` documents, and ``map``
-  documents read through the API (the report says why). ``blank`` documents are empty and counted.
+- **A board document becomes a Map with supertype Board** (ruled 2026-10-25), named
+  ``<resource>: <document>``, with no image; ``location`` and ``x_legendkeeper_document`` as a
+  map's; the board's records kept whole, exactly as read, as ``x_legendkeeper_board`` (``{shapes,
+  bindings, assets, pages}``), so a push back can restore the canvas and nothing the elements below
+  do not carry (styles, rotation, the shapes that make nothing) is lost. A board is a tldraw
+  canvas: each shape's ``x``, ``y`` and ``rotation`` (radians) are in its parent's space (a frame
+  or a group; ``page:...`` is the canvas), so a shape's page-space origin is its parent's origin
+  plus the parent's page rotation applied to ``(x, y)``, and its page rotation the parent's plus
+  its own. The Map spans every point placed below and the corners
+  of every shape with a size: ``width`` and ``height`` that box's size, whole numbers, the box kept
+  as ``x_legendkeeper_board_extent`` (page space, y down). tldraw's y counts down, OnlyWorlds' up
+  from the bottom left: ``x`` is ``X - min_x`` and ``y`` ``max_y - Y``, a half rounded up, the
+  page-space pair kept as ``x_legendkeeper_board_pos``. Everything made from a board carries
+  ``x_legendkeeper_board_map`` (the board's Map) and ``x_legendkeeper_id`` (the shape's id):
+  - a page card (an ``element`` shape) is a Pin at the card's centre on the element of its
+    ``resourceId``. A card whose ``documentId`` names a board document of that resource is a Pin
+    on that board's Map, which takes ``parent_map`` this board's Map (unless it has one, or that
+    would close a loop; named in the report); a ``documentId`` naming a map document places that
+    Map, with no ``parent_map``. A card whose
+    resource is not in the project is a Pin with no element, named. A card on a hidden page (its
+    resource, its document or the board it shows hidden) is a hidden Pin.
+  - a frame is a Zone (its ``name``, else ``Frame``; subtype ``Frame``, ``shape`` ``polygon``) and
+    four Markers at its corners, ``order`` 0 to 3 from its top left, clockwise.
+  - an arrow whose two ends are both bound (tldraw's arrow bindings) to a page card whose resource
+    is an element, or to a frame (its Zone), is a Relation, supertype ``Board link``, named by the
+    arrow's label (else ``Board link``): the two elements linked as a titled link's Relation links
+    them (a Zone on ``zones``), ``x_legendkeeper_source``/``x_legendkeeper_target`` start and end,
+    ``x_legendkeeper_board_map`` so a reader draws it on that board only. Every other arrow is
+    counted, and kept in the board's records.
+  - a sticky note or a text is a Narrative, supertype ``Note``, subtype ``note`` or ``text``,
+    named by its first line (80 characters at most), its whole text its ``description``, and a
+    Pin placing it: a note's at its centre, a text's at its origin (a text shape has a width but
+    no height). An empty one is counted, not made.
+  - geo shapes, drawings, images, bookmarks and groups are counted per type, a geo's text and a
+    bookmark's URL named in the count.
+- **Not imported**, named in the report with their resource: a map or board document whose
+  content could not be read (the reason is under unread). ``blank`` documents are empty and counted.
   Not kept, named in the report: a resource's and an event's icons, sibling order, timestamps, lock
   state, permissions, banners, event colours, and the server's computed event dates (they follow
   from the minutes and calendar).
@@ -196,10 +238,12 @@ What becomes what:
 - a timeline event whose ``isHidden`` is true, or on a hidden document or resource: its Event;
 - a Relation either end of which is hidden;
 - a map document whose ``isHidden`` is true, or on a hidden resource: its Map and every Pin on it;
-- a pin whose ``isHidden`` is true: its Pin (no real file has one yet: the tests plant it).
+- a pin whose ``isHidden`` is true: its Pin (no real file has one yet: the tests plant it);
+- a board document whose ``isHidden`` is true, or on a hidden resource: its Map and everything
+  made from it; on a visible board, a card on a hidden page, and an arrow either end of which is.
 
 A visible text that mentions a hidden element by name, or a visible pin that places one, is named
-in the report. A hidden board or blank document is named or counted as a visible one is.
+in the report. A hidden blank document is counted as a visible one is.
 
 **Ids are UUIDv5** in ``LEGENDKEEPER_NAMESPACE``: of ``legendkeeper:<project id>:<resource id>`` for
 a resource, ``legendkeeper:<project id>:event:<event id>`` for an event,
@@ -210,7 +254,10 @@ Narrative, ``legendkeeper:<project id>:secret:<resource id>:<document id>:<n>`` 
 block of a page (the export gives a block no id, so both roads count them) and
 ``legendkeeper:<project id>:properties:<resource id>`` for a resource's hidden properties,
 ``legendkeeper:<project id>:map:<resource id>:<document id>`` for a Map and
-``legendkeeper:<project id>:pin:<resource id>:<document id>:<pin id>`` for a Pin. A second
+``legendkeeper:<project id>:pin:<resource id>:<document id>:<pin id>`` for a Pin;
+``legendkeeper:<project id>:board:<resource id>:<document id>`` for a board's Map, with ``:<shape
+id>`` for what a shape makes (a card's Pin, a frame's Zone, an arrow's Relation, a note's
+Narrative), its Pin ``:<shape id>:pin`` and a frame's Markers ``:<shape id>:<order>``. A second
 import of the same project finds the same elements. ``world.json``: ``id`` UUIDv5 of
 ``legendkeeper:<project id>``, ``name`` the project's name, ``producer`` ``{"tool": "onlyworlds",
 "version": ..., "input": ...}`` with ``legendkeeper-api`` (``PRODUCER_INPUT``) from the API and
@@ -221,7 +268,8 @@ The report (``ImportReport``, printed at the end of a run and by ``--plan``) nam
 with counts and how each type was decided, every key not placed (element, key, why, the extension
 it was kept as), every titled link kept as Relations (by title, with counts), every link or mention
 whose target is not in the folder, what is hidden and how, every Map (its size, pins and image) and
-every pin named or left with no element, the documents not imported, every answer
+every pin named or left with no element, every board (its size, what it made and what it
+counted), the documents not imported, every answer
 that could not be read, and anything else read past. Nothing from the source is dropped without a
 line in it.
 
@@ -265,6 +313,7 @@ __all__ = [
     "PRODUCER_INPUT",
     "PRODUCER_INPUT_FILE",
     "ApiSource",
+    "BoardMade",
     "FileSource",
     "Hidden",
     "ImportReport",
@@ -355,6 +404,10 @@ _OWN = (
     "map",
     "pos",
     "pin",
+    "board",
+    "board_map",
+    "board_pos",
+    "board_extent",
 )
 #: The door's own extension keys; a property's key never takes one of them.
 _RESERVED = frozenset(f"{EXT_PREFIX}{k}" for k in _OWN)
@@ -396,6 +449,19 @@ _BOUNDS = ("min_x", "max_x", "min_y", "max_y")
 #: What a pin carries that is said elsewhere (its own fields, or the report's not-kept line):
 #: everything else on it (icon, label, isSynced, ...) is kept together as ``x_legendkeeper_pin``.
 _PIN_SAID = frozenset({"id", "name", "pos", "uri", "isHidden", "rank", "createdAt", "updatedAt"})
+
+#: The tldraw records a board carries, by ``typeName``: what rides on a board document as ``board``.
+_BOARD_RECORDS = (("shapes", "shape"), ("bindings", "binding"), ("assets", "asset"), ("pages", "page"))
+
+#: An arrow's two terminals, start then end: the Relation's source and target.
+TERMINALS = ("start", "end")
+
+#: The supertype of a Relation made from a board's arrow, and its name when the arrow has no label.
+BOARD_LINK = "Board link"
+
+#: tldraw's sticky note is 200 by 200 (its ``growY`` added to the height), times its ``scale``: its
+#: props carry no ``w`` or ``h``.
+_NOTE_SIDE = 200.0
 _PLAIN_MARKS = ("underline", "sub", "sup", "color", "highlight")
 
 
@@ -596,6 +662,88 @@ def _obj(value: Any) -> dict[str, Any]:
     return value if isinstance(value, dict) else {}
 
 
+def _board_records(content: dict[str, Any]) -> dict[str, list[dict[str, Any]]]:
+    """A board document's tldraw records as ``{shapes, bindings, assets, pages}``: the export's
+    ``shapesV2`` (``{key, val}`` pairs) split by each ``val``'s ``typeName``, else its older
+    ``shapes`` and ``bindings`` lists."""
+    v2 = content.get("shapesV2")
+    if isinstance(v2, list):
+        recs = [_obj(_obj(pair).get("val")) for pair in v2]
+        return {key: [r for r in recs if r.get("typeName") == kind] for key, kind in _BOARD_RECORDS}
+    out: dict[str, list[dict[str, Any]]] = {key: [] for key, _ in _BOARD_RECORDS}
+    for key in ("shapes", "bindings"):
+        out[key] = [r for r in content.get(key) or [] if isinstance(r, dict)]
+    return out
+
+
+#: A shape's frame in page space: its origin's x and y, and its rotation in radians.
+_Frame = tuple[float, float, float]
+
+
+def _page_frames(shapes: Mapping[str, dict[str, Any]]) -> dict[str, _Frame]:
+    """shape id -> its frame in the board's page space. tldraw keeps a shape's ``x``, ``y`` and
+    ``rotation`` in its parent's space (a frame or a group; a ``page:...`` parent is the page), so
+    a child's origin is its parent's origin plus the parent's page rotation applied to ``(x, y)``,
+    and its rotation the parent's plus its own. A parent that is not a shape of the board, or a
+    loop, counts as the page."""
+    out: dict[str, _Frame] = {}
+
+    def frame(sid: str, seen: frozenset[str]) -> _Frame:
+        if sid in out:
+            return out[sid]
+        s = shapes[sid]
+        x, y, rot = (_number(s.get(k)) or 0.0 for k in ("x", "y", "rotation"))
+        parent = s.get("parentId")
+        seen = seen | {sid}
+        if isinstance(parent, str) and parent in shapes and parent not in seen:
+            px, py, prot = frame(parent, seen)
+            x, y = px + math.cos(prot) * x - math.sin(prot) * y, py + math.sin(prot) * x + math.cos(prot) * y
+            rot += prot
+        out[sid] = (x, y, rot)
+        return out[sid]
+
+    for sid in shapes:
+        frame(sid, frozenset())
+    return out
+
+
+def _at(f: _Frame, u: float, v: float) -> tuple[float, float]:
+    """The page-space point of a shape's local point ``(u, v)``: its origin plus its rotation applied."""
+    x, y, rot = f
+    return x + math.cos(rot) * u - math.sin(rot) * v, y + math.sin(rot) * u + math.cos(rot) * v
+
+
+def _shape_size(s: dict[str, Any]) -> tuple[float, float] | None:
+    """A shape's width and height in its own space: ``props.w`` and ``props.h``, a sticky note's
+    from tldraw's fixed note size; None for a shape with no size (a text, a drawing, an arrow, a group)."""
+    props = _obj(s.get("props"))
+    if s.get("type") == "note":
+        scale = _number(props.get("scale")) or 1.0
+        return _NOTE_SIDE * scale, (_NOTE_SIDE + (_number(props.get("growY")) or 0.0)) * scale
+    w, h = _number(props.get("w")), _number(props.get("h"))
+    return (w, h) if w is not None and h is not None else None
+
+
+def _shape_text(props: dict[str, Any]) -> str:
+    """A note's, text's, geo's or arrow's text: ``props.text``, or the plain text of a newer tldraw's
+    ``richText`` document (its paragraphs a line each)."""
+    text = props.get("text")
+    if isinstance(text, str):
+        return text
+    rich = props.get("richText")
+
+    def plain(n: Any) -> str:
+        if not isinstance(n, dict):
+            return ""
+        if n.get("type") == "text":
+            return str(n.get("text") or "")
+        if n.get("type") == "hardBreak":
+            return "\n"
+        return "".join(plain(c) for c in n.get("content") or [])
+
+    return "\n".join(plain(c) for c in _obj(rich).get("content") or [])
+
+
 def _export_bytes(path: Path) -> bytes:
     """The export's JSON bytes: ``.lk`` is gzip (told by its first two bytes), the JSON type plain."""
     try:
@@ -681,6 +829,8 @@ class FileSource:
                 if d.get("type") == "map":  # its pins ride on the document, beside its map object
                     pins = _obj(d.get("content")).get("pins")
                     head["pins"] = [p for p in pins if isinstance(p, dict)] if isinstance(pins, list) else []
+                elif d.get("type") == "board":  # its tldraw records ride on the document, split by kind
+                    head["board"] = _board_records(_obj(d.get("content")))
             row = {k: v for k, v in r.items() if k not in ("documents", "properties")}
             row["parentId"] = r.get("parentId") if isinstance(r.get("parentId"), str) else None
             listed.append(
@@ -991,8 +1141,8 @@ def _api_map(doc: dict[str, Any], image: Any, features: list[dict[str, Any]]) ->
 
 
 def read_project(source: Source, project_id: str) -> Snapshot:
-    """Walk a project: the project, its whole tree, then each resource, its page blocks and its
-    timelines, hidden ones too (the converter marks them hidden; nothing is left out).
+    """Walk a project: the project, its whole tree, then each resource, its page blocks, its
+    timelines, maps and boards, hidden ones too (the converter marks them hidden; nothing is left out).
 
     The project and the tree must answer (a ``SourceError`` otherwise); a resource, a page or a
     timeline that does not is listed in ``unread`` and the walk goes on.
@@ -1036,6 +1186,14 @@ def read_project(source: Source, project_id: str) -> Snapshot:
                     head = source.get(dpath)
                     features = _paged(source, f"{dpath}/features", sized=False)
                     snap.notes += _api_map(doc, _obj(head).get("mapImage"), features)
+                elif dtype == "board" and "board" not in doc:  # the export file's boards carry their records already
+                    answer = source.get(f"{dpath}/board")
+                    if isinstance(answer, dict):  # {shapes, bindings, assets, pages, schema, version}
+                        doc["board"] = {
+                            key: [r for r in answer.get(key) or [] if isinstance(r, dict)] for key, _ in _BOARD_RECORDS
+                        }
+                    else:
+                        snap.unread.append(f"{where}: the board answer is not a board")
             except SourceError as exc:
                 snap.unread.append(f"{where}: {exc}")
     snap.notes = list(getattr(source, "notes", None) or []) + snap.notes
@@ -1117,6 +1275,10 @@ class Hidden:
     maps: int = 0
     #: pins hidden, or on a hidden Map: hidden Pins
     pins: int = 0
+    #: board documents hidden, or of a hidden resource: hidden Maps, everything made from them hidden
+    boards: int = 0
+    #: cards on a visible board that show a hidden page: hidden Pins
+    board_pins: int = 0
 
 
 @dataclass(frozen=True)
@@ -1138,6 +1300,37 @@ class MapMade:
     hidden: bool = False
     #: the map's max_zoom: its pins' positions are scaled by 2^max_zoom; None when it gives none
     max_zoom: float | None = None
+
+
+@dataclass
+class BoardMade:
+    """A board document made a Map with supertype Board, and what its shapes made."""
+
+    #: the Map's name, ``<resource>: <document>``
+    name: str
+    resource: str
+    #: the size of the box over what the board places; None for a board with nothing on it
+    width: int | None
+    height: int | None
+    #: made: ``card pins``, ``note pins``, ``child maps``, ``zones``, ``markers``, ``relations``, ``narratives``
+    made: dict[str, int] = field(default_factory=dict)
+    #: shapes that made nothing, by type (``note`` and ``text`` when empty)
+    counted: dict[str, int] = field(default_factory=dict)
+    #: arrows whose two ends are not both bound to page cards (whose resources are elements) or frames
+    loose_arrows: int = 0
+    #: the geo shapes' texts and the bookmarks' URLs, in shape id order
+    geo_texts: list[str] = field(default_factory=list)
+    urls: list[str] = field(default_factory=list)
+    #: tldraw pages on the board (all placed on the one Map)
+    pages: int = 1
+    hidden: bool = False
+
+
+def _some(words: list[str], n: int = 4, width: int = 40) -> str:
+    """Up to ``n`` of ``words`` quoted (each cut to ``width`` characters), and how many more."""
+    cut = [" ".join(w.split()) for w in words[:n]]
+    said = ", ".join(repr(w if len(w) <= width else w[: width - 3] + "...") for w in cut)
+    return said + (f", {len(words) - n} more" if len(words) > n else "")
 
 
 def _scale_said(zoom: float) -> str:
@@ -1165,6 +1358,8 @@ class ImportReport:
     pins_named: list[str] = field(default_factory=list)
     #: pins with no element (no uri, or a uri naming no resource of the export), one line each
     pins_unlinked: list[str] = field(default_factory=list)
+    #: every board document made a Map
+    boards: list[BoardMade] = field(default_factory=list)
     unread: list[str] = field(default_factory=list)
     notes: list[str] = field(default_factory=list)
     #: tags on the resources kept untyped -> how many carry each: what ``--map`` could type
@@ -1238,6 +1433,16 @@ class ImportReport:
             (h.relations, "Relation with a hidden end", "Relations with a hidden end"),
             (h.maps, "hidden Map (its document or resource hidden)", "hidden Maps (their document or resource hidden)"),
             (h.pins, "hidden Pin (the pin or its Map hidden)", "hidden Pins (the pin or its Map hidden)"),
+            (
+                h.boards,
+                "hidden board (its document or resource hidden), its Map and everything on it",
+                "hidden boards (their document or resource hidden), each its Map and everything on it",
+            ),
+            (
+                h.board_pins,
+                "card on a visible board showing a hidden page, a hidden Pin",
+                "cards on a visible board showing a hidden page, each a hidden Pin",
+            ),
         ]
         said = [f"{n} {one if n == 1 else many}" for n, one, many in kinds if n]
         if h.properties:
@@ -1275,6 +1480,30 @@ class ImportReport:
                     "  A Map's image_url is LegendKeeper's own address, as given, never copied: the image lives on"
                     " LegendKeeper's host and loads only as long as that account's asset does."
                 )
+        if self.boards:
+            lines.append(
+                f"Board documents, each a Map (supertype Board) and what its shapes made ({len(self.boards)}):"
+            )
+            for b in self.boards:
+                got = b.made
+                size = f"{b.width} x {b.height}" if b.width is not None and b.height is not None else "nothing placed"
+                pages = f", its {b.pages} pages on the one Map" if b.pages > 1 else ""
+                lines.append(
+                    f"  - {b.name!r}{' (hidden)' if b.hidden else ''}: {size}{pages}; Pins {got['card pins']} for page"
+                    f" cards (child Maps {got['child maps']}) and {got['note pins']} for notes and texts, Zones"
+                    f" {got['zones']} for frames with Markers {got['markers']}, Relations {got['relations']} for arrows"
+                    f" between two cards or frames, Narratives {got['narratives']} for notes and texts"
+                )
+                said = [f"arrows not between two cards or frames {b.loose_arrows}"] if b.loose_arrows else []
+                for kind, n in sorted(b.counted.items()):
+                    if kind == "geo" and b.geo_texts:
+                        said.append(f"geo {n} ({len(b.geo_texts)} with text: {_some(b.geo_texts)})")
+                    elif kind == "bookmark" and b.urls:
+                        said.append(f"bookmark {n} ({_some(b.urls, 2, 60)})")
+                    else:
+                        said.append(f"{kind} {n}")
+                if said:
+                    lines.append("    not made, counted: " + "; ".join(said))
         if self.pins_named:
             lines.append(f"Pins with no name of their own, named as LegendKeeper shows them ({len(self.pins_named)}):")
             lines += [f"  - {p}" for p in self.pins_named]
@@ -1322,6 +1551,24 @@ class _Item:
     owner: _Item | None = None
 
 
+@dataclass
+class _Card:
+    """A page card that shows a map or board document: its Pin is made once every document is."""
+
+    #: the Pin's slot in the pins list (filled in place, so the order holds)
+    slot: dict[str, Any]
+    pin_id: str
+    #: the card's resource, and the document of it the card shows
+    target: _Item
+    doc: dict[str, Any]
+    #: the Pin's map and place, and its extension keys
+    fields: dict[str, Any]
+    ext: dict[str, Any]
+    board: BoardMade
+    board_map: dict[str, Any]
+    board_hidden: bool
+
+
 def _plain(runs: Any) -> str:
     """Runs as plain text, with no side effects (for comparing a heading to a name)."""
     out: list[str] = []
@@ -1356,6 +1603,14 @@ class _Converter:
         self.event_ids: set[str] = set()
         self.maps: list[dict[str, Any]] = []
         self.pins: list[dict[str, Any]] = []
+        #: what boards make beside their Maps and Pins
+        self.zones: list[dict[str, Any]] = []
+        self.markers: list[dict[str, Any]] = []
+        self.notes_made: list[dict[str, Any]] = []
+        #: (resource id, document id) -> the Map made from that map or board document
+        self._made: dict[tuple[str, str], dict[str, Any]] = {}
+        #: cards that show a map or board document, placed once every document is made
+        self._cards: list[_Card] = []
         #: map documents read through the API (no bounds or pins in its answers): not imported
         self.api_maps = 0
         self.placed_pins = 0
@@ -1459,6 +1714,8 @@ class _Converter:
     def fill(self) -> None:
         for item in self.items.values():
             self._fill(item)
+        for card in self._cards:
+            self._card_on_map(card)
 
     def _fill(self, item: _Item) -> None:
         row = item.row
@@ -1514,6 +1771,8 @@ class _Converter:
                 self._timeline(item, doc)
             elif dtype == "map" and isinstance(doc.get("pins"), list):
                 self._map(item, doc)
+            elif dtype == "board" and isinstance(doc.get("board"), dict):
+                self._board(item, doc)
             else:
                 if dtype == "map":
                     self.api_maps += 1
@@ -1943,7 +2202,9 @@ class _Converter:
         for x, target in hits:
             self._relation(item, title, list_id, x, target)
 
-    def _relation(self, item: _Item, title: str, list_id: str, x: dict[str, Any], target: _Item) -> None:
+    def _relation_ends(self, item: _Item, target: _Item, title: str) -> dict[str, Any]:
+        """A Relation's links to its two ends: a Character source on ``actor``, else each end on
+        Relation's field for its type; an end of a type Relation has no field for is noted."""
         fields: dict[str, Any] = {}
         if item.etype == "character":
             fields["actor"] = item.eid
@@ -1958,6 +2219,10 @@ class _Converter:
             links = fields.setdefault(fname, [])
             if end.eid not in links:
                 links.append(end.eid)
+        return fields
+
+    def _relation(self, item: _Item, title: str, list_id: str, x: dict[str, Any], target: _Item) -> None:
+        fields = self._relation_ends(item, target, title)
         body: dict[str, Any] = {
             "type": "relation",
             "id": self._id("link", item.lk_id, list_id, str(x.get("id") or target.lk_id)),
@@ -2113,6 +2378,7 @@ class _Converter:
                 body[fname] = fields[fname]
         body.update(ext)
         self.maps.append(body)
+        self._made[(item.lk_id, did)] = body
         pins = [p for p in doc.get("pins") or [] if isinstance(p, dict)]
         for n, pin in enumerate(pins, 1):
             self._pin(pin, n, item, did, name, map_id, hidden, bounds, zoom)
@@ -2195,6 +2461,244 @@ class _Converter:
             self.report.notes.append(note)
         self.pins.append(body)
 
+    # -- boards ----------------------------------------------------------------
+
+    @staticmethod
+    def _body(
+        etype: str, eid: str, name: str, hidden: bool, fields: dict[str, Any], ext: dict[str, Any]
+    ) -> dict[str, Any]:
+        """An element body: type, id, name, the hidden mark, its type's fields in schema order, then ``ext``."""
+        body: dict[str, Any] = {"type": etype, "id": eid, "name": name}
+        if hidden:
+            body["hidden"] = True
+        body.update({f: fields[f] for f in FIELD_KINDS[etype] if f in fields and f != "name"})
+        body.update(ext)
+        return body
+
+    def _card_item(self, shape: Any) -> _Item | None:
+        """The element a page card (an ``element`` shape) shows, when its resource is in the project."""
+        if not isinstance(shape, dict) or shape.get("type") != "element":
+            return None
+        rid = _obj(shape.get("props")).get("resourceId")
+        return self.items.get(rid) if isinstance(rid, str) else None
+
+    def _board(self, item: _Item, doc: dict[str, Any]) -> None:
+        """A board document (its tldraw records, from either road) as a Map with supertype Board,
+        the records kept whole on it: each page card a Pin, each frame a Zone and four Markers, each
+        arrow between two cards or frames a Relation, each note and text a Narrative and a Pin; the
+        rest counted (the module docstring)."""
+        did = str(doc.get("id"))
+        dname = str(doc.get("name") or "").strip()
+        name = f"{item.name}: {dname or 'Board'}"
+        hidden = item.hidden or bool(doc.get("isHidden"))
+        recs = _obj(doc.get("board"))
+        shapes = {s["id"]: s for s in recs.get("shapes") or [] if isinstance(s, dict) and isinstance(s.get("id"), str)}
+        frames = _page_frames(shapes)
+        map_id = self._id("board", item.lk_id, did)
+        made = BoardMade(name, item.name, None, None, hidden=hidden, pages=max(1, len(recs.get("pages") or [])))
+        made.made = dict.fromkeys(
+            ("card pins", "note pins", "child maps", "zones", "markers", "relations", "narratives"), 0
+        )
+        ends: dict[str, dict[str, str]] = {}  # arrow id -> {"start": shape id, "end": shape id}
+        for b in recs.get("bindings") or []:
+            term = _obj(b.get("props")).get("terminal") if isinstance(b, dict) else None
+            if term in ("start", "end") and b.get("type") == "arrow" and isinstance(b.get("toId"), str):
+                ends.setdefault(str(b.get("fromId")), {})[term] = b["toId"]
+        # what each shape places, in page space; the Map spans those points and every sized shape's corners
+        texts = {
+            sid: _shape_text(_obj(s.get("props"))) for sid, s in shapes.items() if s.get("type") in ("note", "text")
+        }
+        corners: dict[str, list[tuple[float, float]]] = {}
+        placed: dict[str, tuple[float, float]] = {}
+        for sid, s in shapes.items():
+            size = _shape_size(s)
+            if size is not None:
+                w, h = size
+                corners[sid] = [_at(frames[sid], u, v) for u, v in ((0.0, 0.0), (w, 0.0), (w, h), (0.0, h))]
+            if s.get("type") == "element" or (s.get("type") == "note" and texts[sid].strip()):
+                # a card's or a note's place is its centre
+                placed[sid] = _at(frames[sid], size[0] / 2, size[1] / 2) if size else _at(frames[sid], 0.0, 0.0)
+            elif s.get("type") == "text" and texts[sid].strip():
+                placed[sid] = _at(frames[sid], 0.0, 0.0)  # a text has a width but no height: its origin
+        points = [p for c in corners.values() for p in c] + list(placed.values())
+        box = (
+            (min(p[0] for p in points), min(p[1] for p in points), max(p[0] for p in points), max(p[1] for p in points))
+            if points
+            else None
+        )
+
+        def where(pt: tuple[float, float]) -> dict[str, int]:
+            # tldraw's y counts down the page; OnlyWorlds counts up from the bottom left of the Map
+            return {"x": _whole(pt[0] - box[0]), "y": _whole(box[3] - pt[1])} if box is not None else {}
+
+        fields: dict[str, Any] = {"supertype": "Board"}
+        # the board's records exactly as read, so a push back can restore the canvas
+        ext: dict[str, Any] = {f"{EXT_PREFIX}document": did, f"{EXT_PREFIX}board": recs}
+        if box is not None:
+            made.width, made.height = _whole(box[2] - box[0]), _whole(box[3] - box[1])
+            fields.update(width=made.width, height=made.height)
+            ext[f"{EXT_PREFIX}board_extent"] = dict(zip(("min_x", "min_y", "max_x", "max_y"), box, strict=True))
+        if item.etype == "location":
+            fields["location"] = item.eid
+        else:
+            ext[f"{EXT_PREFIX}resource"] = item.eid
+        board_map = self._body("map", map_id, name, hidden, fields, ext)
+        if hidden:
+            self.report.hidden.boards += 1
+        self.maps.append(board_map)
+        self._made[(item.lk_id, did)] = board_map
+        n = made.made
+        # a frame's Zone is an element an arrow can link: each frame's, before any arrow is read
+        zones = {
+            sid: _Item(
+                "zone",
+                self._id("board", item.lk_id, did, sid),
+                str(_obj(s.get("props")).get("name") or "").strip() or "Frame",
+                item.lk_id,
+                typed=True,
+                row={},
+                hidden=hidden,
+            )
+            for sid, s in shapes.items()
+            if s.get("type") == "frame"
+        }
+        for sid in sorted(shapes):  # shape id order: both roads list the same records, not always in one order
+            s = shapes[sid]
+            kind = str(s.get("type") or "unknown")
+            props = _obj(s.get("props"))
+            mine = {f"{EXT_PREFIX}id": sid, f"{EXT_PREFIX}board_map": map_id}
+            pos = {f"{EXT_PREFIX}board_pos": list(placed[sid])} if sid in placed else {}
+            if kind == "element":
+                n["card pins"] += 1
+                pin_id = self._id("board", item.lk_id, did, sid)
+                at = {"map": map_id, **where(placed[sid])}
+                card_ext = {**mine, **pos}
+                target = self._card_item(s)
+                docid = props.get("documentId")
+                shown: dict[str, Any] | None = None  # the document of its resource the card shows, when it names one
+                if target is not None and isinstance(docid, str) and docid:
+                    docs = _obj(self.snap.full.get(target.lk_id)).get("documents") or []
+                    shown = next((d for d in docs if isinstance(d, dict) and d.get("id") == docid), None)
+                if target is not None and shown is not None and shown.get("type") in ("map", "board"):
+                    slot: dict[str, Any] = {}  # made once every map and board is
+                    self.pins.append(slot)
+                    self._cards.append(_Card(slot, pin_id, target, shown, at, card_ext, made, board_map, hidden))
+                elif target is None:
+                    rid = props.get("resourceId")
+                    why = f"its resource {rid}, {self._MISSING}" if isinstance(rid, str) and rid else "no resource"
+                    self.report.pins_unlinked.append(f"card {sid} on {name!r}: {why}; a Pin with no element")
+                    self.pins.append(self._body("pin", pin_id, f"Untitled card ({sid})", hidden, at, card_ext))
+                else:
+                    # a card shows its page: a hidden page (its resource or the document shown) is a hidden Pin
+                    on_hidden = target.hidden or bool(shown is not None and shown.get("isHidden"))
+                    if on_hidden and not hidden:
+                        self.report.hidden.board_pins += 1
+                    at.update(element_type=target.etype, element_id=target.eid)
+                    self.pins.append(self._body("pin", pin_id, target.name, hidden or on_hidden, at, card_ext))
+            elif kind == "frame":
+                zname, zone_id = zones[sid].name, zones[sid].eid
+                zone = {"subtype": "Frame", "shape": "polygon"}
+                self.zones.append(self._body("zone", zone_id, zname, hidden, zone, mine))
+                n["zones"] += 1
+                for order, pt in enumerate(corners.get(sid, [])):  # top left, top right, bottom right, bottom left
+                    at = {"map": map_id, "zone": zone_id, **where(pt), "order": order}
+                    mid = self._id("board", item.lk_id, did, sid, str(order))
+                    marker_ext = {**mine, f"{EXT_PREFIX}board_pos": list(pt)}
+                    self.markers.append(
+                        self._body("marker", mid, f"{zname}: corner {order + 1}", hidden, at, marker_ext)
+                    )
+                    n["markers"] += 1
+            elif kind in ("note", "text"):
+                text = texts[sid]
+                if not text.strip():
+                    made.counted[f"{kind} (empty)"] = made.counted.get(f"{kind} (empty)", 0) + 1
+                    continue
+                title = next(line.strip() for line in text.splitlines() if line.strip())[:80].rstrip()
+                narr_id = self._id("board", item.lk_id, did, sid)
+                narr = {"description": text, "supertype": "Note", "subtype": kind}
+                self.notes_made.append(
+                    self._body("narrative", narr_id, title, hidden, narr, {**mine, f"{EXT_PREFIX}parent": item.eid})
+                )
+                at = {"map": map_id, "element_type": "narrative", "element_id": narr_id, **where(placed[sid])}
+                pin_id = self._id("board", item.lk_id, did, sid, "pin")
+                self.pins.append(self._body("pin", pin_id, title, hidden, at, {**mine, **pos}))
+                n["narratives"] += 1
+                n["note pins"] += 1
+            elif kind == "arrow":
+                bound = ends.get(sid, {})
+                src, dst = (
+                    zones.get(bound.get(t, "")) or self._card_item(shapes.get(bound.get(t, ""))) for t in TERMINALS
+                )
+                if src is None or dst is None:  # a free end, or an end on neither a page card nor a frame
+                    made.loose_arrows += 1
+                    continue
+                title = " ".join(_shape_text(props).split()) or BOARD_LINK
+                links = {**self._relation_ends(src, dst, title), "supertype": BOARD_LINK}
+                rel_hidden = hidden or src.hidden or dst.hidden
+                if rel_hidden and not hidden:
+                    self.report.hidden.relations += 1
+                rel_ext = {**mine, f"{EXT_PREFIX}source": src.eid, f"{EXT_PREFIX}target": dst.eid}
+                rel_id = self._id("board", item.lk_id, did, sid)
+                self.relations.append(self._body("relation", rel_id, title, rel_hidden, links, rel_ext))
+                n["relations"] += 1
+            else:
+                made.counted[kind] = made.counted.get(kind, 0) + 1
+                if kind == "geo" and _shape_text(props).strip():
+                    made.geo_texts.append(_shape_text(props).strip())
+                elif kind == "bookmark" and isinstance(props.get("url"), str) and props["url"]:
+                    made.urls.append(props["url"])
+        self.report.boards.append(made)
+
+    def _card_on_map(self, card: _Card) -> None:
+        """A card that shows a map or board document: a Pin placing that document's Map, and for a
+        board, that Map's ``parent_map`` this board's Map (its first, and never a loop)."""
+        child = self._made.get((card.target.lk_id, str(card.doc.get("id"))))
+        fields = dict(card.fields)
+        what = f"{card.doc.get('type')} {card.doc.get('name')!r} of {card.target.name!r}"
+        if child is None:  # its content was not read (named under unread): the card places its page
+            fields.update(element_type=card.target.etype, element_id=card.target.eid)
+            name, on_hidden = card.target.name, card.target.hidden or bool(card.doc.get("isHidden"))
+            self.report.notes.append(
+                f"a card on {card.board.name!r} shows the {what}, which was not made: its Pin places {name!r}"
+            )
+        else:
+            fields.update(element_type="map", element_id=child["id"])
+            name, on_hidden = child["name"], child.get("hidden") is True
+            if card.doc.get("type") == "board":
+                self._parent_map(child, card)
+        if on_hidden and not card.board_hidden:
+            self.report.hidden.board_pins += 1
+        card.slot.update(self._body("pin", card.pin_id, name, card.board_hidden or on_hidden, fields, card.ext))
+
+    def _parent_map(self, child: dict[str, Any], card: _Card) -> None:
+        parent = card.board_map
+        if child is parent:
+            self.report.notes.append(f"a card on {card.board.name!r} shows that board itself: no parent_map")
+            return
+        if "parent_map" in child:
+            if child["parent_map"] != parent["id"]:
+                self.report.notes.append(
+                    f"{child['name']!r} is shown on more than one board: its parent_map is the first, kept"
+                )
+            return
+        by_id = {m["id"]: m for m in self.maps}
+        cur: dict[str, Any] | None = parent
+        seen: set[str] = set()
+        while cur is not None and cur["id"] not in seen:
+            if cur is child:
+                self.report.notes.append(
+                    f"{child['name']!r} is shown on {card.board.name!r}, which sits under it: no parent_map (a loop)"
+                )
+                return
+            seen.add(cur["id"])
+            cur = by_id.get(str(cur.get("parent_map")))
+        child["parent_map"] = parent["id"]
+        ordered = self._body("map", child["id"], child["name"], child.get("hidden") is True, child, {})
+        ordered.update({k: v for k, v in child.items() if k not in ordered})
+        child.clear()
+        child.update(ordered)
+        card.board.made["child maps"] += 1
+
     # -- the bodies ----------------------------------------------------------
 
     def bodies(self) -> dict[str, list[dict[str, Any]]]:
@@ -2217,7 +2721,7 @@ class _Converter:
             if item.mentions:
                 body[f"{EXT_PREFIX}mentions"] = item.mentions
             out.setdefault(item.etype, []).append(body)
-        for body in self.relations + self.events + self.maps + self.pins:
+        for body in self.relations + self.events + self.maps + self.pins + self.zones + self.markers + self.notes_made:
             out.setdefault(body["type"], []).append(body)
         self.report.counts = {t: len(b) for t, b in sorted(out.items())}
         self._notes()
@@ -2274,6 +2778,20 @@ class _Converter:
                 f"{self.unscaled_pins} pin{'' if self.unscaled_pins == 1 else 's'} with no x, y on a map with no"
                 " max_zoom: LegendKeeper's pos is scaled by 2^max_zoom, so with none the place is not guessed (pos"
                 " kept as x_legendkeeper_pos)"
+            )
+        if self.report.boards:
+            n.append(
+                "board places: tldraw's page space (y down), each shape through its parent chain (a frame's or a"
+                " group's offset and rotation); a card's and a note's Pin at its centre, a text's at its origin (a"
+                " text has no height), a frame's four Markers at its corners; each board's Map spans those points and"
+                " the corners of every shape with a size, x = X - min_x and y = max_y - Y (OnlyWorlds counts from the"
+                " bottom left), whole numbers, the page-space pair kept as x_legendkeeper_board_pos and the box as"
+                " x_legendkeeper_board_extent"
+            )
+            n.append(
+                "a board's records (shapes, bindings, assets, pages) are kept whole as x_legendkeeper_board on its"
+                " Map, so what the elements do not carry (styles, rotation, order, lock state, an arrow's bend and"
+                " anchors, a card's view, the images, the arrows that made no Relation) is kept there"
             )
         if self.api_maps:
             n.append(

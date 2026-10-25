@@ -75,15 +75,20 @@ SECRET_OWNERS = {
     "Scene", "Technology", "Artifact", "Quest", "Creature", "Country", "Myth",
     "Ethnicity", "Character", "Organization", "Event", "Untitled", "Location",
 }  # fmt: skip
+# The tutorial board 'Main' adds a Map, 51 Pins (12 cards, 39 notes and texts), 39 Narratives, 4 Relations
+# (its arrows between two cards or frames), 14 Zones and 56 Markers (its frames): test_legendkeeper_boards.py
+# counts them.
 COUNTS = {
     "character": 2,
     "creature": 1,
     "event": 29,
     "location": 1,
-    "map": 4,
-    "narrative": 52,
-    "pin": 16,
-    "relation": 3,
+    "map": 4 + 1,
+    "marker": 56,
+    "narrative": 52 + 39,
+    "pin": 16 + 51,
+    "relation": 3 + 4,
+    "zone": 14,
 }
 
 # The first export's folder as 0.41.0 wrote it, before Maps and the Article supertype: the sha256 of
@@ -289,7 +294,7 @@ def test_the_editor_document_reads_as_the_api_blocks(tmp_path: Path) -> None:
     notes = "\n".join(report.notes)
     for needle in ("19 inline icons", "18 sidebar properties showing", "20 empty collection", "block-subpage-index"):
         assert needle in notes, needle
-    assert [(n.kind, n.resource) for n in report.not_imported].count(("board", "Board Bastion")) == 1
+    assert [(n.kind, n.resource) for n in report.not_imported].count(("board", "Board Bastion")) == 0  # a Map now
 
 
 def test_the_timeline_becomes_events_with_raw_minutes(tmp_path: Path) -> None:
@@ -365,15 +370,19 @@ def test_cli_reads_the_file(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> 
 
 
 def element_digests(out: Path) -> tuple[str, str]:
-    """(the folder, the ids) as OLD_FOLDER and OLD_IDS were taken: Maps and Pins aside, Article read
-    back as 0.41.0's supertype, so only the rule's own change is undone."""
+    """(the folder, the ids) as OLD_FOLDER and OLD_IDS were taken: Maps and Pins aside, and what a
+    board made (each carries x_legendkeeper_board_map), Article read back as 0.41.0's supertype, so only
+    the rule's own change is undone."""
     h = hashlib.sha256()
     for p in sorted(out.rglob("*")):
         rel = p.relative_to(out).as_posix()
         if p.is_file() and p.name != "world.json" and not rel.startswith(("elements/map/", "elements/pin/")):
             raw = p.read_bytes().replace(b'"supertype": "Article"', b'"supertype": "legendkeeper"')
-            h.update(rel.encode() + b"\0" + raw + b"\0")
-    ids = sorted(b["id"] for b in bodies(out).values() if b["type"] not in ("map", "pin"))
+            if b'"x_legendkeeper_board_map":' not in raw:
+                h.update(rel.encode() + b"\0" + raw + b"\0")
+    ids = sorted(
+        b["id"] for b in bodies(out).values() if b["type"] not in ("map", "pin") and "x_legendkeeper_board_map" not in b
+    )
     return h.hexdigest(), hashlib.sha256("\n".join(ids).encode()).hexdigest()
 
 
@@ -382,7 +391,13 @@ def test_the_first_export_gives_its_old_folder_but_for_the_supertype(tmp_path: P
     and nothing else of the first export's folder moved, its ids least of all; its maps are added."""
     out, report = run(tmp_path)
     assert element_digests(out) == (OLD_FOLDER, OLD_IDS)
-    untyped = [b for b in bodies(out).values() if b["type"] == "narrative" and "supertype" in b]
+    untyped = [
+        b
+        for b in bodies(out).values()
+        if b["type"] == "narrative"
+        and "supertype" in b
+        and "x_legendkeeper_board_map" not in b  # a board's notes: Note
+    ]
     assert untyped and {b["supertype"] for b in untyped} == {"Article"}
     assert not any(
         "legendkeeper" in str(b.get("supertype", "")) + str(b.get("subtype", "")) for b in bodies(out).values()
@@ -395,9 +410,17 @@ def test_the_first_export_gives_its_old_folder_but_for_the_supertype(tmp_path: P
 EXPORT3 = EXPORT.parent / "the-quay-world-3.json"
 SHA256_3 = "8d80c57e2aac45301a9d6cc1d76019dcf27bfd9ca249af9438463eeb1349ec29"
 COUNTS_3 = {
-    "character": 2, "creature": 1, "event": 29, "location": 1,
-    "map": 5, "narrative": 54, "pin": 18, "relation": 3,
-}  # fmt: skip
+    "character": 2,
+    "creature": 1,
+    "event": 29,
+    "location": 1,
+    "map": 5 + 1,
+    "marker": 56,
+    "narrative": 54 + 39,
+    "pin": 18 + 51,
+    "relation": 3 + 4,
+    "zone": 14,
+}  # the board's elements added, as in COUNTS
 QUAY_MAP, QUAY, TUTORIA, LOCATION = "ha7uu4sb", "sz2hbafh", "cdtsrn5b", "v1cjkvea"
 CORNER = "uhljd0gj"  # the second pin on the quay map: no name, no uri
 ASSET = re.compile(
@@ -475,7 +498,7 @@ def test_the_third_export_is_banked_with_no_account_asset_or_id() -> None:
 
 def test_the_third_export_becomes_the_element_set(tmp_path: Path) -> None:
     out, report = run(tmp_path, EXPORT3)
-    assert report.counts == COUNTS_3 and report.total == len(bodies(out)) == 113
+    assert report.counts == COUNTS_3 and report.total == len(bodies(out)) == 113 + 165  # 165 from the board
     assert [(m.name, m.width, m.height, m.pins, m.image, m.mapless, m.max_zoom) for m in report.maps] == [
         ("The Realm of Tutoria: Main", 10000, 7000, 16, "id", False, 6),
         ("Creature: Habitat Map", None, None, 0, "none", True, None),
