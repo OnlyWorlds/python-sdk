@@ -75,9 +75,9 @@ SECRET_OWNERS = {
     "Scene", "Technology", "Artifact", "Quest", "Creature", "Country", "Myth",
     "Ethnicity", "Character", "Organization", "Event", "Untitled", "Location",
 }  # fmt: skip
-# The tutorial board 'Main' adds a Map, 51 Pins (12 cards, 39 notes and texts), 39 Narratives, 4 Relations
-# (its arrows between two cards or frames), 14 Zones and 56 Markers (its frames): test_legendkeeper_boards.py
-# counts them.
+# The tutorial board 'Main' adds a Map, 51 Pins (12 cards, 39 notes and texts), 39 Narratives, 2 Relations
+# (its arrows between two cards or frames, not to themselves), 14 Zones and 56 Markers (its frames):
+# test_legendkeeper_boards.py counts them.
 COUNTS = {
     "character": 2,
     "creature": 1,
@@ -87,7 +87,7 @@ COUNTS = {
     "marker": 56,
     "narrative": 52 + 39,
     "pin": 16 + 51,
-    "relation": 3 + 4,
+    "relation": 3 + 2,
     "zone": 14,
 }
 
@@ -376,7 +376,8 @@ def element_digests(out: Path) -> tuple[str, str]:
     h = hashlib.sha256()
     for p in sorted(out.rglob("*")):
         rel = p.relative_to(out).as_posix()
-        if p.is_file() and p.name != "world.json" and not rel.startswith(("elements/map/", "elements/pin/")):
+        skip = ("elements/map/", "elements/pin/", "records/")  # the board's records are new, beside the elements
+        if p.is_file() and p.name != "world.json" and not rel.startswith(skip):
             raw = p.read_bytes().replace(b'"supertype": "Article"', b'"supertype": "legendkeeper"')
             if b'"x_legendkeeper_board_map":' not in raw:
                 h.update(rel.encode() + b"\0" + raw + b"\0")
@@ -418,7 +419,7 @@ COUNTS_3 = {
     "marker": 56,
     "narrative": 54 + 39,
     "pin": 18 + 51,
-    "relation": 3 + 4,
+    "relation": 3 + 2,
     "zone": 14,
 }  # the board's elements added, as in COUNTS
 QUAY_MAP, QUAY, TUTORIA, LOCATION = "ha7uu4sb", "sz2hbafh", "cdtsrn5b", "v1cjkvea"
@@ -498,7 +499,7 @@ def test_the_third_export_is_banked_with_no_account_asset_or_id() -> None:
 
 def test_the_third_export_becomes_the_element_set(tmp_path: Path) -> None:
     out, report = run(tmp_path, EXPORT3)
-    assert report.counts == COUNTS_3 and report.total == len(bodies(out)) == 113 + 165  # 165 from the board
+    assert report.counts == COUNTS_3 and report.total == len(bodies(out)) == 113 + 163  # 163 from the board
     assert [(m.name, m.width, m.height, m.pins, m.image, m.mapless, m.max_zoom) for m in report.maps] == [
         ("The Realm of Tutoria: Main", 10000, 7000, 16, "id", False, 6),
         ("Creature: Habitat Map", None, None, 0, "none", True, None),

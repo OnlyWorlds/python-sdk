@@ -20,6 +20,8 @@ from __future__ import annotations
 import copy
 import json
 import math
+import subprocess
+import sys
 import uuid
 from pathlib import Path
 from typing import Any
@@ -27,6 +29,7 @@ from typing import Any
 import pytest
 
 from onlyworlds import read_folder
+from onlyworlds._jsonfmt import encode
 from onlyworlds.legendkeeper import (
     LEGENDKEEPER_NAMESPACE,
     FileSource,
@@ -34,6 +37,7 @@ from onlyworlds.legendkeeper import (
     SourceError,
     import_legendkeeper,
 )
+from onlyworlds.worldfile import RECORDS_MANIFEST
 
 FIX = Path(__file__).resolve().parent / "fixtures" / "legendkeeper"
 EXPORT3 = FIX / "the-quay-world-3.json"
@@ -65,6 +69,25 @@ def board_doc(data: dict[str, Any]) -> dict[str, Any]:
     (doc,) = (d for d in resource(data, BASTION)["documents"] if d["id"] == MAIN)
     found: dict[str, Any] = doc
     return found
+
+
+RECORD = f"records/legendkeeper/boards/{MAIN}.json"
+
+
+def record(out: Path, rel: str = RECORD) -> dict[str, Any]:
+    found: dict[str, Any] = json.loads((out / rel).read_text(encoding="utf-8"))
+    return found
+
+
+def manifest(out: Path) -> list[dict[str, Any]]:
+    found: list[dict[str, Any]] = json.loads((out / RECORDS_MANIFEST).read_text(encoding="utf-8"))
+    return found
+
+
+def ext_bytes(body: dict[str, Any]) -> int:
+    """The size of a body's extension keys as JSON: what keel caps at 64 KB an element."""
+    ext = {k: v for k, v in body.items() if k.startswith(("x_", "atlas_", "shadow_"))}
+    return len(json.dumps(ext, ensure_ascii=False).encode("utf-8"))
 
 
 def board_shapes() -> dict[str, dict[str, Any]]:
@@ -141,11 +164,13 @@ def test_the_tutorial_board_becomes_a_map_and_what_its_shapes_make(tmp_path: Pat
         "child maps": 0,
         "zones": 14,  # the 14 frames
         "markers": 56,  # 14 frames x 4 corners
-        "relations": 4,  # 3 arrows bound at both ends to page cards (Wiki City to three), 1 frame to frame
+        "relations": 2,  # the 2 arrows between the cards of two pages (Wiki City to Board Bastion, to the Realm)
         "narratives": 39,
     }
-    # 26 arrows: 4 Relations, 22 with an end free or on neither a page card nor a frame (a geo, a bookmark, ...)
-    assert board.loose_arrows == 22
+    # 26 arrows: 2 Relations, 22 with an end free or on neither a page card nor a frame (a geo, a bookmark, ...),
+    # and 2 whose ends are one element: "resize" (the frame "Drag & Drop" to itself) and "resize to nest an
+    # article!" (one Wiki City card to another)
+    assert (board.loose_arrows, board.self_arrows) == (22, 2)
     assert board.counted == {"geo": 20, "draw": 11, "image": 13, "bookmark": 3, "group": 15, "text (empty)": 1}
     assert len(board.geo_texts) == 12 and "Press CMD/CTRL + G" in board.geo_texts  # 8 geo shapes have no text
     assert board.urls == [
@@ -154,19 +179,32 @@ def test_the_tutorial_board_becomes_a_map_and_what_its_shapes_make(tmp_path: Pat
         "https://legendkeeper.com",
     ]
     made = from_board(out)
-    # 1 Map + 51 Pins + 39 Narratives + 4 Relations + 14 Zones + 56 Markers
-    assert len(made) == 1 + 51 + 39 + 4 + 14 + 56 == 165
+    # 1 Map + 51 Pins + 39 Narratives + 2 Relations + 14 Zones + 56 Markers
+    assert len(made) == 1 + 51 + 39 + 2 + 14 + 56 == 163
     the_map = made[BOARD_MAP]
     assert the_map["name"] == "Board Bastion: Main" and the_map["supertype"] == "Board"
     assert (the_map["width"], the_map["height"]) == (board.width, board.height) == (4109, 4780)
     assert "image_url" not in the_map and "hidden" not in the_map and "parent_map" not in the_map
     assert the_map["x_legendkeeper_document"] == MAIN and the_map["x_legendkeeper_resource"] == uid(BASTION)
-    # the board's records, whole and as read (the shapesV2 records split by typeName), on its Map
-    raw = the_map["x_legendkeeper_board"]
+    # the board's records, whole and as read (the shapesV2 records split by typeName, in the order read), in
+    # the folder's records/, the Map naming the file; the Map's extension keys fit under keel's 64 KB
+    assert the_map["x_legendkeeper_board_record"] == RECORD and "x_legendkeeper_board" not in the_map
+    raw = record(out)
     v2 = [r["val"] for r in board_doc(export3())["content"]["shapesV2"]]
     for key, kind, count in (("shapes", "shape", 154), ("bindings", "binding", 52), ("assets", "asset", 35)):
         assert raw[key] == [r for r in v2 if r["typeName"] == kind] and len(raw[key]) == count
-    assert len(raw["pages"]) == 1
+    assert len(raw["pages"]) == 1 and (out / RECORD).read_bytes() == encode(raw)  # the folder's own JSON
+    assert len(json.dumps(raw).encode("utf-8")) > 65536  # why it is not on the Map
+    assert ext_bytes(the_map) < 65536
+    assert manifest(out) == [
+        {
+            "producer": "legendkeeper",
+            "format": "tldraw board records as LegendKeeper serves them",
+            "version": "1",
+            "deltas": False,
+        }
+    ]  # no "private": nothing on the board is hidden
+    assert not report.records_private
     # the box's top left is a top-level text's origin, "CTRL + Mousewheel to zoom in and out." at (-690, -830)
     assert (
         the_map["x_legendkeeper_board_extent"]["min_x"] == -690
@@ -175,7 +213,8 @@ def test_the_tutorial_board_becomes_a_map_and_what_its_shapes_make(tmp_path: Pat
     assert not any(n.kind == "board" for n in report.not_imported)
     text = report.render()
     assert "'Board Bastion: Main': 4109 x 4780; Pins 12 for page cards (child Maps 0) and 39 for notes" in text
-    assert "not made, counted: arrows not between two cards or frames 22; bookmark 3 (" in text
+    assert "not made, counted: arrows not between two cards or frames 22; arrows from a thing to itself 2;" in text
+    assert "Board records, each board's tldraw records whole, written under records/legendkeeper/boards/" in text
     assert "geo 20 (12 with text: 'Try pasting any url into this board', 'Press I'," in text
     assert any(n.startswith("board places: tldraw's page space") for n in report.notes)
     assert any(n.startswith("a board's records (shapes, bindings, assets, pages) are kept") for n in report.notes)
@@ -208,13 +247,13 @@ def test_the_cards_frames_notes_and_arrows(tmp_path: Path) -> None:
     assert (arrow["name"], arrow["supertype"]) == ("Nesting boards is currently unsupported", "Board link")
     assert (arrow["x_legendkeeper_source"], arrow["x_legendkeeper_target"]) == (uid(WIKI), uid(BASTION))
     assert arrow["narratives"] == [uid(WIKI), uid(BASTION)] and arrow["x_legendkeeper_board_map"] == BOARD_MAP
-    assert "x_legendkeeper_board" not in arrow  # that key is the raw board, on the Map only
-    # "resize": an arrow whose two ends are both bound to the frame "Drag & Drop": a Relation of its Zone
-    resize = relations["shape:sHHS6Uh5S7KthbIP2Z82F"]
-    drag = zones["shape:QFNNWnmxslotXVEBrSLQB"]
-    assert (resize["name"], resize["supertype"], drag["name"]) == ("resize", "Board link", "👉 Drag & Drop")
-    assert resize["zones"] == [drag["id"]]
-    assert (resize["x_legendkeeper_source"], resize["x_legendkeeper_target"]) == (drag["id"], drag["id"])
+    # "resize" (the frame "Drag & Drop" to itself) and "resize to nest an article!" (Wiki City to Wiki City)
+    # link a thing to itself: no Relation
+    assert "shape:sHHS6Uh5S7KthbIP2Z82F" not in relations and "shape:WgRHzlcW7RfC0VJfzRszM" not in relations
+    assert sorted(r["name"] for r in relations.values()) == [
+        "Nesting boards is currently unsupported",
+        "resize to nest a map!",
+    ]
     # an arrow from an image to a card ("drag from sidebar") and one from a text to a card make nothing
     assert "shape:u2911WGWl5IH48rDS_r0i" not in relations and "shape:qPwAgjq6i5igdxYVjH-oA" not in relations
 
@@ -354,14 +393,17 @@ def test_a_card_on_a_hidden_page_is_a_hidden_pin(tmp_path: Path) -> None:
     assert len(wiki) == 3 and all(p["hidden"] is True for p in wiki)  # Wiki City's three cards
     assert all("hidden" not in p for p in pins if p not in wiki)  # the other nine
     assert report.hidden.board_pins == 3 and report.hidden.boards == 0
-    # each of the three Relations between cards starts at a Wiki City card: hidden too; the frames' is not
+    # both Relations start at a Wiki City card: hidden too
     rels = by_shape(out, "relation")
-    assert [k for k, r in sorted(rels.items()) if not r.get("hidden")] == ["shape:sHHS6Uh5S7KthbIP2Z82F"]
+    assert len(rels) == 2 and all(r["hidden"] is True for r in rels.values())
     # and one of the 'Points of interest' Relations (a titled link, not the board's) ends at Wiki City
     links = [
         b for b in bodies(out) if b["type"] == "relation" and "x_legendkeeper_board_map" not in b and b.get("hidden")
     ]
-    assert len(links) == 1 and report.hidden.relations == 3 + 1
+    assert len(links) == 1 and report.hidden.relations == 2 + 1
+    # the board's records name a hidden page's resource: the producer's records are private
+    assert manifest(out)[0]["private"] is True and report.records_private
+    assert 'Marked "private": true in records/RECORDS.json' in report.render()
     assert "hidden" not in from_board(out)[BOARD_MAP]
     # nothing the board made names it in the open (a map pin's own rule is the map's: named in the report)
     visible = json.dumps([b for b in from_board(out).values() if b.get("hidden") is not True])
@@ -373,7 +415,8 @@ def test_a_hidden_board_hides_everything_made_from_it(tmp_path: Path) -> None:
     board_doc(data)["isHidden"] = True
     out, report = run(tmp_path, write(tmp_path, data))
     made = from_board(out)
-    assert len(made) == 165 and all(b["hidden"] is True for b in made.values())
+    assert len(made) == 163 and all(b["hidden"] is True for b in made.values())
+    assert manifest(out)[0]["private"] is True
     assert report.hidden.boards == 1 and report.hidden.board_pins == 0 and report.boards[0].hidden
 
 
@@ -476,12 +519,13 @@ def test_the_api_board_gives_the_same_elements_as_the_file(tmp_path: Path) -> No
     assert any(c.endswith(f"/resources/{BASTION}/docs/{MAIN}/board") for c in source.calls)
     assert a_report.unread == [] and len(a_report.boards) == len(f_report.boards) == 1
     a_made, f_made = from_board(a_out), from_board(f_out)
-    assert len(a_made) == 165 and sorted(a_made) == sorted(f_made)
-    # the raw board on the Map: the same records, listed in each road's own order
-    a_raw, f_raw = a_made[BOARD_MAP].pop("x_legendkeeper_board"), f_made[BOARD_MAP].pop("x_legendkeeper_board")
+    assert len(a_made) == 163 and sorted(a_made) == sorted(f_made)
+    assert a_made == f_made  # every body, field for field
+    # the board's records file: the same records by id, each road listing them in its own order
+    a_raw, f_raw = record(a_out), record(f_out)
     for key in ("shapes", "bindings", "assets", "pages"):
         assert sorted(a_raw[key], key=lambda r: r["id"]) == sorted(f_raw[key], key=lambda r: r["id"]), key
-    assert a_made == f_made  # every other body, field for field
+    assert manifest(a_out) == manifest(f_out)
     assert a_report.boards == f_report.boards
 
 
@@ -501,11 +545,9 @@ def test_the_older_content_lists_are_read_when_there_is_no_shapes_v2(tmp_path: P
     }
     out, report = run(tmp_path, write(tmp_path, data))
     f_out, _ = run(tmp_path, EXPORT3, name="file")
-    old, new = from_board(out), from_board(f_out)
-    raw = old[BOARD_MAP].pop("x_legendkeeper_board")  # as read: the two lists, no assets or pages
+    raw = record(out)  # as read: the two lists, no assets or pages
     assert {k: len(v) for k, v in raw.items()} == {"shapes": 154, "bindings": 52, "assets": 0, "pages": 0}
-    new[BOARD_MAP].pop("x_legendkeeper_board")
-    assert old == new and report.boards[0].made["card pins"] == 12
+    assert from_board(out) == from_board(f_out) and report.boards[0].made["card pins"] == 12
 
 
 def test_two_imports_give_the_same_ids(tmp_path: Path) -> None:
@@ -513,6 +555,30 @@ def test_two_imports_give_the_same_ids(tmp_path: Path) -> None:
     two, _ = run(tmp_path, name="two")
     assert from_board(one) == from_board(two)
     ids = sorted(from_board(one))
-    assert len(ids) == len(set(ids)) == 165 and BOARD_MAP in ids
+    assert len(ids) == len(set(ids)) == 163 and BOARD_MAP in ids
+    assert (one / RECORD).read_bytes() == (two / RECORD).read_bytes()
     assert uid("board", BASTION, MAIN, "shape:QyfZlqyyCFo1C4wgOzzkb", "0") in ids  # a frame's first Marker
     assert uid("board", BASTION, MAIN, "shape:66aJ-InZDrYHrFdB0vNnk", "pin") in ids  # a note's Pin
+
+
+def test_a_plan_writes_no_records_and_the_folder_reads_and_lints(tmp_path: Path) -> None:
+    report = import_legendkeeper(EXPORT3, out_dir=tmp_path / "planned", plan_only=True)
+    assert not (tmp_path / "planned").exists() and "to be written (a plan writes none)" in report.render()
+    out, _ = run(tmp_path)
+    assert sorted(p.relative_to(out).as_posix() for p in (out / "records").rglob("*") if p.is_file()) == [
+        "records/RECORDS.json",
+        RECORD,
+    ]
+    assert len(read_folder(out).elements) == 113 + 163  # the folder still opens, records beside its elements
+    r = subprocess.run([sys.executable, "-m", "onlyworlds.lint", str(out)], capture_output=True, text=True)
+    lines = r.stdout.strip().splitlines()
+    assert r.returncode == 0 and "276" in lines[-1], r.stdout + r.stderr
+    assert [line for line in lines[:-1] if not line.startswith("walk note:")] == [], r.stdout + r.stderr
+
+
+def test_the_map_carried_the_raw_board_over_keel_s_cap_before(tmp_path: Path) -> None:
+    """The size the records move saves: the Map's extension keys with the records on it, and now."""
+    out, _ = run(tmp_path)
+    the_map = from_board(out)[BOARD_MAP]
+    before = ext_bytes({**the_map, "x_legendkeeper_board": record(out)})
+    assert before > 65536 > ext_bytes(the_map)

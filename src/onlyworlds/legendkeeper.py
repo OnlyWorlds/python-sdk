@@ -180,9 +180,15 @@ What becomes what:
   its uri as ``x_legendkeeper_uri``.
 - **A board document becomes a Map with supertype Board** (ruled 2026-10-25), named
   ``<resource>: <document>``, with no image; ``location`` and ``x_legendkeeper_document`` as a
-  map's; the board's records kept whole, exactly as read, as ``x_legendkeeper_board`` (``{shapes,
-  bindings, assets, pages}``), so a push back can restore the canvas and nothing the elements below
-  do not carry (styles, rotation, the shapes that make nothing) is lost. A board is a tldraw
+  map's. **The board's records are kept whole** (``{shapes, bindings, assets, pages}``, each list
+  in the order read), so a push back can restore the canvas and nothing the elements below do not
+  carry (styles, rotation, the shapes that make nothing) is lost: not on the Map (the tutorial
+  board's are 110 KB, past what an element may carry online) but in the folder's records (folder
+  spec §4.5), one file per board, ``records/legendkeeper/boards/<document id>.json``, the Map's
+  ``x_legendkeeper_board_record`` that path, and an entry in ``records/RECORDS.json`` (producer
+  ``legendkeeper``, ``deltas`` false), ``"private": true`` when any board is hidden or shows a
+  hidden page, which marks the whole ``records/legendkeeper/`` (an export or a share leaves it out
+  unless asked). A plan writes none. A board is a tldraw
   canvas: each shape's ``x``, ``y`` and ``rotation`` (radians) are in its parent's space (a frame
   or a group; ``page:...`` is the canvas), so a shape's page-space origin is its parent's origin
   plus the parent's page rotation applied to ``(x, y)``, and its page rotation the parent's plus
@@ -205,8 +211,9 @@ What becomes what:
     is an element, or to a frame (its Zone), is a Relation, supertype ``Board link``, named by the
     arrow's label (else ``Board link``): the two elements linked as a titled link's Relation links
     them (a Zone on ``zones``), ``x_legendkeeper_source``/``x_legendkeeper_target`` start and end,
-    ``x_legendkeeper_board_map`` so a reader draws it on that board only. Every other arrow is
-    counted, and kept in the board's records.
+    ``x_legendkeeper_board_map`` so a reader draws it on that board only. An arrow whose two ends
+    are one element (a frame to itself, two cards of one page) is counted, not made, and so is
+    every other arrow; each stays in the board's records.
   - a sticky note or a text is a Narrative, supertype ``Note``, subtype ``note`` or ``text``,
     named by its first line (80 characters at most), its whole text its ``description``, and a
     Pin placing it: a note's at its centre, a text's at its origin (a text shape has a width but
@@ -299,11 +306,13 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Protocol
 
+from ._jsonfmt import encode
 from ._schema import ELEMENT_TYPES, FIELD_KINDS, LINK_TARGETS
 from ._version import __version__
 from .errors import parse_retry_after
 from .folder import FORMAT_VERSION, write_folder
 from .http import Response, Transport, UrllibTransport
+from .worldfile import RECORDS_MANIFEST
 
 __all__ = [
     "API_BASE",
@@ -404,7 +413,7 @@ _OWN = (
     "map",
     "pos",
     "pin",
-    "board",
+    "board_record",
     "board_map",
     "board_pos",
     "board_extent",
@@ -455,6 +464,17 @@ _BOARD_RECORDS = (("shapes", "shape"), ("bindings", "binding"), ("assets", "asse
 
 #: An arrow's two terminals, start then end: the Relation's source and target.
 TERMINALS = ("start", "end")
+
+#: The records producer this door writes (folder spec §4.5): its directory under ``records/``, and
+#: its entry in ``records/RECORDS.json``.
+RECORDS_PRODUCER = "legendkeeper"
+RECORDS_ENTRY = {
+    "producer": RECORDS_PRODUCER,
+    "format": "tldraw board records as LegendKeeper serves them",
+    "version": "1",
+    "deltas": False,
+}
+_SAFE_NAME = re.compile(r"[A-Za-z0-9_-]+")
 
 #: The supertype of a Relation made from a board's arrow, and its name when the arrow has no label.
 BOARD_LINK = "Board link"
@@ -1318,6 +1338,10 @@ class BoardMade:
     counted: dict[str, int] = field(default_factory=dict)
     #: arrows whose two ends are not both bound to page cards (whose resources are elements) or frames
     loose_arrows: int = 0
+    #: arrows whose two ends are one element (a frame to itself, two cards of one page)
+    self_arrows: int = 0
+    #: the folder path of the file holding the board's records whole
+    record: str = ""
     #: the geo shapes' texts and the bookmarks' URLs, in shape id order
     geo_texts: list[str] = field(default_factory=list)
     urls: list[str] = field(default_factory=list)
@@ -1360,6 +1384,8 @@ class ImportReport:
     pins_unlinked: list[str] = field(default_factory=list)
     #: every board document made a Map
     boards: list[BoardMade] = field(default_factory=list)
+    #: the boards' records are marked private in records/RECORDS.json (a board hidden, or showing a hidden page)
+    records_private: bool = False
     unread: list[str] = field(default_factory=list)
     notes: list[str] = field(default_factory=list)
     #: tags on the resources kept untyped -> how many carry each: what ``--map`` could type
@@ -1495,6 +1521,8 @@ class ImportReport:
                     f" between two cards or frames, Narratives {got['narratives']} for notes and texts"
                 )
                 said = [f"arrows not between two cards or frames {b.loose_arrows}"] if b.loose_arrows else []
+                if b.self_arrows:
+                    said.append(f"arrows from a thing to itself {b.self_arrows}")
                 for kind, n in sorted(b.counted.items()):
                     if kind == "geo" and b.geo_texts:
                         said.append(f"geo {n} ({len(b.geo_texts)} with text: {_some(b.geo_texts)})")
@@ -1504,6 +1532,20 @@ class ImportReport:
                         said.append(f"{kind} {n}")
                 if said:
                     lines.append("    not made, counted: " + "; ".join(said))
+        if self.boards:
+            where = f"records/{RECORDS_PRODUCER}/boards/"
+            done = "written" if self.out is not None else "to be written (a plan writes none)"
+            lines.append(
+                f"Board records, each board's tldraw records whole, {done} under {where}, one file a board"
+                f" ({len(self.boards)}), each named on its Map as x_legendkeeper_board_record, the producer"
+                f" {RECORDS_PRODUCER!r} entered in {RECORDS_MANIFEST}."
+            )
+            if self.records_private:
+                lines.append(
+                    f'  Marked "private": true in {RECORDS_MANIFEST}: a board is hidden or shows a hidden page, and'
+                    f" the mark covers the whole records/{RECORDS_PRODUCER}/ (an export or a share leaves it out"
+                    " unless asked)."
+                )
         if self.pins_named:
             lines.append(f"Pins with no name of their own, named as LegendKeeper shows them ({len(self.pins_named)}):")
             lines += [f"  - {p}" for p in self.pins_named]
@@ -1611,6 +1653,8 @@ class _Converter:
         self._made: dict[tuple[str, str], dict[str, Any]] = {}
         #: cards that show a map or board document, placed once every document is made
         self._cards: list[_Card] = []
+        #: records/ path -> a board's records, written whole beside the folder's elements
+        self.board_records: dict[str, dict[str, Any]] = {}
         #: map documents read through the API (no bounds or pins in its answers): not imported
         self.api_maps = 0
         self.placed_pins = 0
@@ -2532,8 +2576,14 @@ class _Converter:
             return {"x": _whole(pt[0] - box[0]), "y": _whole(box[3] - pt[1])} if box is not None else {}
 
         fields: dict[str, Any] = {"supertype": "Board"}
-        # the board's records exactly as read, so a push back can restore the canvas
-        ext: dict[str, Any] = {f"{EXT_PREFIX}document": did, f"{EXT_PREFIX}board": recs}
+        # the board's records exactly as read, so a push back can restore the canvas: a file of the
+        # folder's records/, named by the document's id (by the Map's when that is not a plain name)
+        stem = did if _SAFE_NAME.fullmatch(did) else map_id
+        made.record = f"records/{RECORDS_PRODUCER}/boards/{stem}.json"
+        self.board_records[made.record] = recs
+        if hidden:
+            self.report.records_private = True
+        ext: dict[str, Any] = {f"{EXT_PREFIX}document": did, f"{EXT_PREFIX}board_record": made.record}
         if box is not None:
             made.width, made.height = _whole(box[2] - box[0]), _whole(box[3] - box[1])
             fields.update(width=made.width, height=made.height)
@@ -2593,6 +2643,7 @@ class _Converter:
                     on_hidden = target.hidden or bool(shown is not None and shown.get("isHidden"))
                     if on_hidden and not hidden:
                         self.report.hidden.board_pins += 1
+                        self.report.records_private = True  # its records name a hidden page
                     at.update(element_type=target.etype, element_id=target.eid)
                     self.pins.append(self._body("pin", pin_id, target.name, hidden or on_hidden, at, card_ext))
             elif kind == "frame":
@@ -2632,6 +2683,9 @@ class _Converter:
                 if src is None or dst is None:  # a free end, or an end on neither a page card nor a frame
                     made.loose_arrows += 1
                     continue
+                if src.eid == dst.eid:  # a frame to itself, or two cards of one page: no Relation
+                    made.self_arrows += 1
+                    continue
                 title = " ".join(_shape_text(props).split()) or BOARD_LINK
                 links = {**self._relation_ends(src, dst, title), "supertype": BOARD_LINK}
                 rel_hidden = hidden or src.hidden or dst.hidden
@@ -2668,6 +2722,7 @@ class _Converter:
                 self._parent_map(child, card)
         if on_hidden and not card.board_hidden:
             self.report.hidden.board_pins += 1
+            self.report.records_private = True
         card.slot.update(self._body("pin", card.pin_id, name, card.board_hidden or on_hidden, fields, card.ext))
 
     def _parent_map(self, child: dict[str, Any], card: _Card) -> None:
@@ -2789,8 +2844,8 @@ class _Converter:
                 " x_legendkeeper_board_extent"
             )
             n.append(
-                "a board's records (shapes, bindings, assets, pages) are kept whole as x_legendkeeper_board on its"
-                " Map, so what the elements do not carry (styles, rotation, order, lock state, an arrow's bend and"
+                f"a board's records (shapes, bindings, assets, pages) are kept whole in records/{RECORDS_PRODUCER}/,"
+                " so what the elements do not carry (styles, rotation, order, lock state, an arrow's bend and"
                 " anchors, a card's view, the images, the arrows that made no Relation) is kept there"
             )
         if self.api_maps:
@@ -2884,8 +2939,25 @@ def import_legendkeeper(
         return report
     assert out is not None
     write_folder(out, report.world, elements)
+    _write_records(out, conv.board_records, private=report.records_private)
     report.out = out
     return report
+
+
+def _write_records(out: Path, boards: Mapping[str, dict[str, Any]], *, private: bool) -> None:
+    """The boards' records into the finished folder (folder spec §4.5): one file a board under
+    ``records/legendkeeper/``, in the folder's own JSON (UTF-8, LF, two-space indent), and the
+    producer's entry in ``records/RECORDS.json``. ``write_folder`` writes elements only."""
+    if not boards:
+        return
+    for rel, recs in boards.items():
+        path = out / rel
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_bytes(encode(recs))
+    entry: dict[str, Any] = dict(RECORDS_ENTRY)
+    if private:
+        entry["private"] = True
+    (out / RECORDS_MANIFEST).write_bytes(encode([entry]))
 
 
 def _read_key(key_file: Path | None) -> str:
