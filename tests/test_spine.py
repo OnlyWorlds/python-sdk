@@ -1,7 +1,7 @@
 """The spine profile (schema-dist ``profiles/spine.md``, serial 60): ``read_spine_element`` on every
 conformance case in ``codegen/schema-dist/profiles/spine.fixture.json``, vendored with the distribution;
-the closed lists against the page; the trim and the fold the room profile defines. The fixture's
-calendar steps are the npm SDK kernel's to check: this package has no calendar kernel."""
+the closed lists against the page; the trim and the fold the room profile defines; the fixture's
+calendar steps through the page's calendar config and ``onlyworlds.calendar``."""
 
 from __future__ import annotations
 
@@ -11,6 +11,7 @@ from pathlib import Path
 from typing import Any
 
 from onlyworlds import SPINE_KINDS, FolderElement, SpineRead, read_spine_element
+from onlyworlds.calendar import format_step, read_calendar_value, weekday_for_step
 from onlyworlds.spine import (
     SPINE_ACCESS,
     SPINE_AUDIENCE,
@@ -55,15 +56,33 @@ def test_read_spine_element_reads_every_fixture_case_as_its_read_block() -> None
     assert len(cases) >= 40, f"the fixture holds {len(cases)} cases"  # dist.56's count; a later serial adds cases
 
 
-def test_the_calendar_block_is_there_with_its_six_steps_and_is_not_checked_here() -> None:
-    """The steps read the page's calendar config through a calendar-profile kernel; the npm SDK's (4.70.0)
-    checks them. This package has none, so it only holds that the block it would hand on is whole."""
+def page_calendar() -> dict[str, Any]:
+    """The calendar config in the page's Time section: its one json block."""
+    text = PAGE.read_text(encoding="utf-8")
+    block = re.search(r"\*\*Time\.\*\*.*?```json\s(.*?)```", text, re.S)
+    assert block, "no json block in the page's Time section"
+    config: dict[str, Any] = json.loads(block.group(1))
+    return config
+
+
+def test_the_calendar_block_reads_through_the_page_config() -> None:
+    """Each of the fixture's calendar steps reads, through the page's config and the calendar kernel, as
+    written, with its weekday (the npm SDK's kernel, 4.70.0, checked the same steps)."""
     calendar = load_fixture()["calendar"]
     steps = calendar["steps"]
     assert len(steps) == 6
     assert all(set(s) == {"step", "reads", "weekday"} for s in steps)
     assert steps[0] == {"step": 0, "reads": "1 January 2012", "weekday": "Sunday"}
     assert {"step": 5410, "reads": "24 October 2026", "weekday": "Saturday"} in steps
+    config = read_calendar_value(page_calendar())
+    assert config is not None
+    got = [
+        {"step": s["step"], "reads": format_step(config, s["step"]), "weekday": weekday_for_step(config, s["step"])}
+        for s in steps
+    ]
+    assert got == steps
+    # The page's first drift: 29 February 2100 exists here (no century rule), as the fixture's note says.
+    assert format_step(config, 32201) == "29 February 2100"
 
 
 def test_spine_kinds_are_the_pages_table() -> None:

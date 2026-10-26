@@ -17,13 +17,13 @@ import json
 import subprocess
 import sys
 import uuid
-from itertools import pairwise
 from pathlib import Path
 from typing import Any
 
 import pytest
 
 from onlyworlds import read_folder
+from onlyworlds.calendar import read_calendar_value
 from onlyworlds.legendkeeper import (
     LEGENDKEEPER_NAMESPACE,
     ImportReport,
@@ -55,84 +55,7 @@ def eid(*parts: str) -> str:
     return str(uuid.uuid5(LEGENDKEEPER_NAMESPACE, ":".join(("legendkeeper", PID, *parts))))
 
 
-# --- the profile's "Not a calendar" rules (profiles/calendar.md), as a reader applies them ----------
-
-
-def whole(v: Any, least: int | None = None) -> bool:
-    return isinstance(v, int) and not isinstance(v, bool) and (least is None or v >= least)
-
-
-def at(value: Any, key: str) -> Any:
-    """``value[key]`` when value is an object, else None (a JavaScript reader's ``value?.key``)."""
-    return value.get(key) if isinstance(value, dict) else None
-
-
-def not_a_calendar(value: Any) -> list[str]:
-    """Every rule of the profile's "Not a calendar" list the value breaks (version 2, schema-dist
-    serial 68); [] when a reader takes it. Replayed against the vendored fixture's 64 cases."""
-    if isinstance(value, str):  # the same object as a JSON string, strict JSON only
-        try:
-            value = json.loads(value)
-        except ValueError:
-            return ["a string that is not JSON"]
-    if not isinstance(value, dict):
-        return ["not an object"]
-    out = []
-    if value.get("version") not in (1, 2):
-        out.append("version is not 1 or 2")
-    if not isinstance(value.get("grain"), str):
-        out.append("grain is not a string")
-    bundles = value.get("bundles")
-    months = at(bundles, "months")
-    if months not in (None, False, 0, ""):  # a falsy value reads as absent, as in the SDK's reader
-        names, lengths = at(months, "names"), at(months, "lengths")
-        if not isinstance(names, list) or not isinstance(lengths, list) or len(names) != len(lengths) or not names:
-            out.append("months' names and lengths are not lists of one non-zero length")
-        elif not all(isinstance(n, str) for n in names):
-            out.append("a month name is not a string")
-        elif not all(whole(n, 1) for n in lengths):
-            out.append("a month length is not a whole number from 1")
-    year = at(bundles, "year")
-    if year is not None and not whole(at(year, "steps"), 1):
-        out.append("bundles.year.steps is not a whole number from 1")
-    week = at(bundles, "week")
-    if week is not None:
-        if not whole(at(week, "length"), 1):
-            out.append("bundles.week.length is not a whole number from 1")
-        wnames = at(week, "names")
-        if not isinstance(wnames, list) or not all(isinstance(n, str) for n in wnames):
-            out.append("bundles.week.names is not a list of strings")
-    if "eras" in value and value["eras"] is not None:
-        eras = value["eras"]
-        if not isinstance(eras, list):
-            out.append("eras is not a list")
-        else:
-            for e in eras:
-                if not isinstance(e, dict) or not isinstance(e.get("name"), str) or not whole(e.get("start")):
-                    out.append("an era lacks a string name or a whole start")
-                elif any(e.get(k) is not None and not whole(e[k]) for k in ("end", "year_base")):
-                    out.append("an era's end or year_base is not a whole number")
-    if "intercalary" in value and value["intercalary"] is not None:
-        inter = value["intercalary"]
-        if not isinstance(inter, list):
-            out.append("intercalary is not a list")
-        else:
-            for i in inter:
-                if not isinstance(i, dict) or not isinstance(i.get("name"), str) or not whole(i.get("after_month")):
-                    out.append("an intercalary entry lacks a string name or a whole after_month")
-                elif i.get("every_years") is not None and not whole(i["every_years"], 1):
-                    out.append("an every_years is not a whole number from 1")
-                elif i.get("every_years") is None and (i.get("offset") is not None or i.get("except") is not None):
-                    out.append("an offset or except on an entry with no every_years")
-                elif i.get("offset") is not None and not whole(i["offset"]):
-                    out.append("an offset is not a whole number")
-                elif i.get("except") is not None:
-                    chain = [i.get("every_years"), *i["except"]] if isinstance(i["except"], list) else []
-                    if not chain[1:] or not all(whole(n, 1) for n in chain):
-                        out.append("an except is not a list of whole numbers")
-                    elif any(b <= a or b % a for a, b in pairwise(chain)):
-                        out.append("an except is not ascending, each a multiple of the one before")
-    return out
+# --- the profile's reader: onlyworlds.calendar, as the npm SDK's readCalendarValue ------------------
 
 
 def version_fits(value: dict[str, Any]) -> bool:
@@ -144,21 +67,22 @@ def version_fits(value: dict[str, Any]) -> bool:
     return value.get("version") == (2 if needs_2 else 1)
 
 
-def test_the_helper_reads_the_vendored_fixture_as_the_profile_does() -> None:
-    """The calendar fixture beside the profile (serial 69: 64 cases, 30 calendars and 34 refusals):
-    the helper refuses exactly the values the fixture marks not valid."""
+def test_the_reader_reads_the_vendored_fixture_as_the_profile_does() -> None:
+    """The calendar fixture beside the profile (64 cases, 30 calendars and 34 refusals): the package's
+    reader refuses exactly the values the fixture marks not valid (``tests/test_calendar.py`` replays
+    the steps too)."""
     fixture = json.loads((DIST / "profiles" / "calendar.fixture.json").read_text(encoding="utf-8"))
     cases = fixture["cases"]
     assert len(cases) == 64 and sum(not c["valid"] for c in cases) == 34
-    wrong = [c["name"] for c in cases if bool(not_a_calendar(c["value"])) == c["valid"]]
+    wrong = [c["name"] for c in cases if (read_calendar_value(c["value"]) is not None) != c["valid"]]
     assert wrong == []
 
 
-def test_the_helper_refuses_what_the_profile_refuses() -> None:
+def test_the_reader_refuses_what_the_profile_refuses() -> None:
     good: dict[str, Any] = {"version": 1, "grain": "day", "bundles": {"months": {"names": ["A"], "lengths": [3]}}}
-    assert not_a_calendar(good) == []
+    assert read_calendar_value(good) is not None
     four = {"name": "Leap", "after_month": 1, "every_years": 4}
-    assert not_a_calendar({**good, "version": 2, "intercalary": [{**four, "except": [100, 400], "offset": 1}]}) == []
+    assert read_calendar_value({**good, "version": 2, "intercalary": [{**four, "except": [100, 400], "offset": 1}]})
     assert version_fits(good) and not version_fits({**good, "version": 2})  # nothing that needs it
     assert not version_fits({**good, "intercalary": [{**four, "offset": 1}]})  # version 1 with a version 2 key
     bad = [
@@ -175,7 +99,7 @@ def test_the_helper_refuses_what_the_profile_refuses() -> None:
         {**good, "bundles": {**good["bundles"], "week": {"length": 7, "names": [1]}}},
     ]
     for value in bad:
-        assert not_a_calendar(value), value
+        assert read_calendar_value(value) is None, value
 
 
 # --- the six presets ---------------------------------------------------------------------------
@@ -372,7 +296,7 @@ def test_each_preset_is_exact_or_refused_with_its_reasons() -> None:
     ids=["Eberron", "Exandria", "Greyhawk", "Gregorian", "Harptos"],
 )
 def test_the_exact_configs_are_calendars_by_the_profile(config: dict[str, Any]) -> None:
-    assert not_a_calendar(config) == [] and version_fits(config)
+    assert read_calendar_value(config) is not None and version_fits(config)
 
 
 def test_the_week_turns_so_its_first_name_is_the_weekday_at_minute_0() -> None:
@@ -402,7 +326,7 @@ def test_a_negative_era_is_a_down_era_listed_first() -> None:
         {"name": "Before the Kingdom", "abbrev": "BK", "start": 0, "end": -33600, "direction": "down", "year_base": 1},
         {"name": "Year of the Kingdom", "abbrev": "YK", "start": 0, "year_base": 1},
     ]
-    assert not_a_calendar(cfg) == []
+    assert read_calendar_value(cfg) is not None
 
 
 def leap(interval: str, offset: int = 0) -> dict[str, Any]:

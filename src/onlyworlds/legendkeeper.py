@@ -381,6 +381,7 @@ from typing import Any, Protocol
 from ._jsonfmt import encode
 from ._schema import ELEMENT_TYPES, FIELD_KINDS, LINK_TARGETS
 from ._version import __version__
+from .calendar import CALENDAR_FIELD, CALENDAR_SUPERTYPE
 from .errors import parse_retry_after
 from .folder import FORMAT_VERSION, write_folder
 from .http import Response, Transport, UrllibTransport
@@ -1144,10 +1145,8 @@ class FileSource:
 # Calendars: a LegendKeeper calendar as the calendar profile's atlas_calendar
 # ---------------------------------------------------------------------------
 
-#: The calendar profile's key (schema-dist ``profiles/calendar.md``) and the supertype of the
-#: Construct that carries it, by the profile's convention.
-CALENDAR_FIELD = "atlas_calendar"
-CALENDAR_SUPERTYPE = "calendar"
+# The calendar profile's key and the supertype of the Construct that carries it (CALENDAR_FIELD and
+# CALENDAR_SUPERTYPE) are onlyworlds.calendar's, imported above.
 
 #: LegendKeeper's day-format tokens (each a run of one letter) and the profile's template tokens.
 _LK_FORMAT_TOKENS = {

@@ -32,9 +32,9 @@ name unique within its row type once folded, and a projection's three. Nor does 
 ``x_spine_probed`` (the probe gate's), ``x_spine_owner`` (a projection's only) or ``x_spine_projection`` (a
 projection's World's), and it never runs a probe. A spine counts days from
 day 0 (2012-01-01) through a Construct with supertype ``Calendar`` whose ``atlas_calendar`` the profile
-ships; this package has no calendar kernel, so the fixture's calendar steps are checked by the npm SDK's
-kernel (4.70.0), not here. The fixture (``codegen/schema-dist/profiles/spine.fixture.json``) is replayed
-whole by ``tests/test_spine.py``.
+ships; this package's calendar kernel, ``onlyworlds.calendar`` (a port of the npm SDK's), reads it, and
+this reader leaves dates to it. The fixture (``codegen/schema-dist/profiles/spine.fixture.json``) is replayed
+whole by ``tests/test_spine.py``, its calendar steps through ``onlyworlds.calendar``.
 """
 
 from __future__ import annotations
