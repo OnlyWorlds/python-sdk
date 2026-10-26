@@ -277,6 +277,16 @@ saved_cursor = walk.cursor  # opaque: keep it, don't parse it
 
 To poll for news, `client.head()` reads where the feed is now, `{head, cursor, epoch, unchanged}`, without a page. The client keeps the last answer's `ETag` and sends it back as `If-None-Match`, so a poll where nothing moved is a 304 that keel does not count against the request budget, and `head()` then answers what it last saw with `unchanged=True`. Walk when `head` or `epoch` differs from the ones you last applied, and sleep between polls yourself: the package never sleeps for you. The method's docstring has the loop.
 
+## A Character's context as text
+
+`onlyworlds.draught_text(draught)` gives one Character's context packet (`client.draught(character_id)`, full or compact) as plain text to paste into a prompt or a note. It reads the packet alone and calls nothing, and the npm SDK's `draughtText` gives the same bytes. The title claims only the read's horizon ("dated up to Year 300"), never what the Character knew, and the last line says only what the budget left out (`cut`).
+
+```python
+from onlyworlds import draught_text
+
+text = draught_text(client.draught(character_id))
+```
+
 ## Schema
 
 The 22 element types and each field's kind are generated from the published [schema distribution](https://github.com/OnlyWorlds/schema-dist); `onlyworlds.SCHEMA_VERSION` and `onlyworlds.SCHEMA_DIST_TAG` say which one. `onlyworlds.PUBLIC_FIELDS` names, per type, the fields OnlyWorlds shows on a known-of element (one a guest sees only one step out) beside its name and description. The package's own version doesn't track the schema's.

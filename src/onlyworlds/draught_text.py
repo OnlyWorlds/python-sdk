@@ -10,8 +10,9 @@ strings print exactly as served, with their line breaks read as LF.
 
 from __future__ import annotations
 
+import math
 from collections.abc import Mapping
-from typing import Any, TypeGuard
+from typing import Any
 
 from ._schema import FIELD_KINDS
 
@@ -74,8 +75,16 @@ _UNPRINTED_PREFIXES: tuple[str, ...] = ("x_", "atlas_", "shadow_")
 _LINK_KINDS: frozenset[str] = frozenset(("single_link", "multi_link"))
 
 
-def _is_int(v: Any) -> TypeGuard[int]:
-    return isinstance(v, int) and not isinstance(v, bool)
+def _int(v: Any) -> int | None:
+    """A number as an integer: an int (never a bool), or a finite float with an integral value (``249.0`` reads
+    as 249, as JavaScript reads it); anything else None."""
+    if isinstance(v, bool):
+        return None
+    if isinstance(v, int):
+        return v
+    if isinstance(v, float) and math.isfinite(v) and v.is_integer():
+        return int(v)
+    return None
 
 
 def _is_set(v: Any) -> bool:
@@ -89,12 +98,16 @@ def _is_set(v: Any) -> bool:
 
 def _text(v: Any) -> str | None:
     """A value as it prints: a string that is not "" with CRLF, then a lone CR, read as LF; an integer in
-    plain decimal; anything else None."""
+    plain decimal (an integral float as its integer); anything else None."""
     if isinstance(v, str):
-        return None if v == "" else v.replace("\r\n", "\n").replace("\r", "\n")
-    if _is_int(v):
-        return str(v)
-    return None
+        return None if v == "" else _lines(v)
+    n = _int(v)
+    return None if n is None else str(n)
+
+
+def _lines(s: str) -> str:
+    """CRLF, then a lone CR, read as LF."""
+    return s.replace("\r\n", "\n").replace("\r", "\n")
 
 
 def _type_word(t: Any) -> str:
@@ -117,9 +130,10 @@ def _kind_of(el: Mapping[str, Any]) -> str | None:
 
 
 def _marks(el: Mapping[str, Any]) -> str:
-    """`` · hidden`` and `` · proposed``, as they apply."""
+    """`` · hidden`` when ``hidden`` is true, `` · proposed`` when ``x_review_proposed`` is present and not None (as the
+    server counts it)."""
     return (" · hidden" if el.get("hidden") is True else "") + (
-        " · proposed" if _is_set(el.get("x_review_proposed")) else ""
+        " · proposed" if el.get("x_review_proposed") is not None else ""
     )
 
 
@@ -170,6 +184,8 @@ def draught_text(draught: Mapping[str, Any]) -> str:
             name = _text(el.get("name"))
             names[el_id] = "(unnamed)" if name is None else name
 
+    # An absent ``character`` is not a hidden one: absent, ``self`` was not asked and there is no block of her own.
+    asked = "character" in d
     character = d.get("character")
     her: Mapping[str, Any] | None = None
     if isinstance(character, Mapping) and isinstance(character.get("element"), Mapping):
@@ -192,30 +208,42 @@ def draught_text(draught: Mapping[str, Any]) -> str:
         named = _text(her.get("name"))
         her_name = "(unnamed)" if named is None else named
     world_name = _text(world.get("name"))
-    out: list[str] = [f"# {her_name}, in {'(unnamed)' if world_name is None else world_name}"]
+    out: list[str] = []
 
-    as_of, now, mode = d.get("as_of"), d.get("now"), d.get("mode")
+    def put(line: str, cont: str = "  ") -> None:
+        """One line of the text. A line break a value brought in starts a continuation line indented by ``cont``;
+        an empty one is the indent alone."""
+        first, *rest = _lines(line).split("\n")
+        out.append(first)
+        out.extend(cont + part for part in rest)
+
+    put(f"# {her_name}, in {'(unnamed)' if world_name is None else world_name}")
+
+    as_of, now, mode = _int(d.get("as_of")), _int(d.get("now")), d.get("mode")
     frame = f"What the record holds around {her_name}"
-    if _is_int(as_of):
+    if as_of is not None:
         frame += f", dated up to {moment(as_of)}"
-    if _is_int(now):
+    if now is not None:
         frame += f" (the world's now: {moment(now)})"
     frame += "."
     if mode == "voice":
         frame += " Read as the Character's own view."
     elif mode == "act":
         frame += " Read as the caller's view."
-    out.append(frame)
+    put(frame)
 
-    # Her block.
-    out += ["", f"## {her_name}"]
-    if her is None:
+    # Her block, when ``self`` was asked.
+    if asked:
+        out.append("")
+        put(f"## {her_name}")
+    if asked and her is None:
         out.append("Hidden from this reader.")
-    else:
+    elif her is not None:
         her_type = her.get("type")
         kind = _kind_of(her)
-        out.append(_type_word(her_type) + ("" if kind is None else f" · {kind}") + _marks(her))
-        out += _description_lines(her)
+        put(_type_word(her_type) + ("" if kind is None else f" · {kind}") + _marks(her))
+        for line in _description_lines(her):
+            put(line)
         fields = _fields_of(her_type)
         for key, v in her.items():
             if key in _UNPRINTED or key.startswith(_UNPRINTED_PREFIXES) or not _is_set(v):
@@ -242,7 +270,7 @@ def draught_text(draught: Mapping[str, Any]) -> str:
             else:
                 value = _text(v)
             if value is not None:
-                out.append(f"  {key.replace('_', ' ')}: {value}")
+                put(f"  {key.replace('_', ' ')}: {value}", "    ")
 
     # The roster's names by membership id, for ``recent``'s writers.
     roster = d.get("roster")
@@ -267,10 +295,10 @@ def draught_text(draught: Mapping[str, Any]) -> str:
         via = [f for f in map(_text, via_raw if isinstance(via_raw, list) else []) if f is not None]
         if via:
             line += " · via " + ", ".join(f.replace("_", " ") for f in via)
-        start = el.get("start_date")
+        start = _int(el.get("start_date"))
         if row.get("grade") == "known_of":
             line += " · known of"
-        elif _is_int(start):
+        elif start is not None:
             line += f" · {moment(start)}"
         elif "start_date" in _fields_of(el_type):
             line += " · undated"
@@ -313,34 +341,45 @@ def draught_text(draught: Mapping[str, Any]) -> str:
             line += " · removed"
         return line
 
+    # ``recent_more`` true makes Recent a section even with no rows.
+    recent_more = d.get("recent_more") is True
+
+    def section_set(key: str) -> bool:
+        return _is_set(d.get(key)) or (key == "recent" and recent_more)
+
     for key, heading in _SECTIONS:
         v = d.get(key)
-        if not _is_set(v):
+        if not section_set(key):
             continue
-        out += ["", f"## {heading}"]
+        out.append("")
+        put(f"## {heading}")
         for row in _rows_of(key, v):
             if not isinstance(row, Mapping):
                 continue
             if key == "recent":
-                out.append(recent_row(row))
+                put(recent_row(row))
             elif key == "roster":
-                out.append(member_row(row))
+                put(member_row(row))
             else:
-                out += element_row(row)
-        if key == "recent" and d.get("recent_more") is True:
+                for line in element_row(row):
+                    put(line)
+        if key == "recent" and recent_more:
             out.append("More changes than these; read on from recent_cursor.")
 
     # Nothing in: the components read whose sections hold nothing, as keel spells them.
     policy = d.get("policy")
     components = policy.get("components") if isinstance(policy, Mapping) else None
     if isinstance(components, list):
-        empty = [c for c in components if isinstance(c, str) and c != "self" and not _is_set(d.get(c))]
+        empty = [c for c in components if isinstance(c, str) and c != "self" and not section_set(c)]
         if empty:
-            out += ["", f"Nothing in: {', '.join(empty)}."]
+            out.append("")
+            put(f"Nothing in: {', '.join(empty)}.")
 
     # Left out: only what the budget dropped.
     cut = d.get("cut")
-    left = [f"{n} {k}" for k, n in cut.items() if _is_int(n)] if isinstance(cut, Mapping) else []
-    out += ["", f"Left out by the budget: {', '.join(left) if left else 'nothing'}."]
+    counts = [(k, _int(n)) for k, n in cut.items()] if isinstance(cut, Mapping) else []
+    left = [f"{n} {k}" for k, n in counts if n is not None]
+    out.append("")
+    put(f"Left out by the budget: {', '.join(left) if left else 'nothing'}.")
 
     return "\n".join(out) + "\n"

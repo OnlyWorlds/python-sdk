@@ -17,6 +17,9 @@ from onlyworlds import draught_text
 
 FIXTURE = Path(__file__).resolve().parent / "fixtures" / "draught-text"
 
+# The cases with no compact twin: compact drops "" and {} from a body, and the proposed mark with them.
+NO_TWIN = ("proposed-odd-values",)
+
 
 def _manifest() -> dict[str, str]:
     assert FIXTURE.is_dir(), f"no draught-text fixture at {FIXTURE}"
@@ -47,7 +50,7 @@ def test_every_file_is_in_the_manifest_and_matches_its_sha256() -> None:
 def test_every_case_gives_its_expected_text_byte_for_byte() -> None:
     test_every_file_is_in_the_manifest_and_matches_its_sha256()
     cases = _cases()
-    assert len(cases) >= 34
+    assert len(cases) >= 45
     for real in ("as-of-248", "as-of-300", "as-of-453"):
         assert real in cases and f"{real}-compact" in cases, real
     for name in cases:
@@ -57,12 +60,22 @@ def test_every_case_gives_its_expected_text_byte_for_byte() -> None:
 def test_a_full_packet_and_its_compact_twin_give_the_same_text() -> None:
     cases = _cases()
     twins = [n for n in cases if n.endswith("-compact")]
-    assert len(twins) * 2 == len(cases), "every case has its twin"
+    for name in NO_TWIN:
+        assert name in cases and f"{name}-compact" not in cases, name
+    assert len(twins) * 2 + len(NO_TWIN) == len(cases), "every other case has its twin"
     for twin in twins:
         full = twin[: -len("-compact")]
         assert full in cases, twin
         assert _expected(full) == _expected(twin), full
         assert draught_text(_draught(full)) == draught_text(_draught(twin)), full
+
+
+def test_the_float_case_holds_its_floats_as_a_file_writes_them() -> None:
+    for name in ("float-integral", "float-integral-compact"):
+        raw = (FIXTURE / name / "draught.json").read_text(encoding="utf-8")
+        for literal in ('"start_date": 249.0', '"as_of": 300.0', '"now": 453.0'):
+            assert literal in raw, (name, literal)
+        assert isinstance(_draught(name)["as_of"], float)
 
 
 @pytest.mark.parametrize("bad", [None, [], "draught", 1, True, {}, {"world": None}, {"world": []}, {"world": "W"}])

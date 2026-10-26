@@ -48,7 +48,7 @@ Character · Military / Admiral
 
 ## Members
 - owner
-- co_builder · Temper (Atlas) · plays a Character not in this draught · removed
+- co_builder · Atlas seat · plays a Character not in this draught · removed
 
 Nothing in: role, work, style, events, knowledge, recent.
 
