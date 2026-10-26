@@ -105,6 +105,7 @@ from .folder import KNOWN_OF, WORLD_FILE, Folder, is_hidden, is_known_of, read_f
 from .http import API_BASE, Client
 from .names import type_word
 from .push import NOT_SENT
+from .review import hands_on_as_proposed
 from .room import is_room_element
 
 __all__ = [
@@ -171,8 +172,8 @@ def hidden_line(left_out: int, kept: int) -> str | None:
 def is_proposed(body: Mapping[str, Any]) -> bool:
     """True when the element carries ``x_review_proposed`` with any value but null. A
     null mark is a settled one (an accept writes null); a malformed value still counts as marked,
-    so a doubt leaves the element out rather than handing it on as canon."""
-    return body.get(PROPOSED_MARK) is not None
+    so a doubt leaves the element out rather than handing it on as canon (``review.hands_on_as_proposed``)."""
+    return hands_on_as_proposed(body)
 
 
 def proposed_line(left_out: int, kept: int) -> str | None:

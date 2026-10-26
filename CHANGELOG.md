@@ -4,6 +4,10 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+## 0.66.0 (2026-10-26)
+
+- **The review profile's readers: `onlyworlds.review`** with `proposed_mark_of`, `hands_on_as_proposed`, `PROPOSED_MARK` and `ProposedMark`, exported from the package. `proposed_mark_of(element, today=None)` gives the mark as a reader that shows a world shows it, `{"by", "expires", "lapsed"}`, or None for a settled element (absent, None, or a value that is not an object); `by` and `expires` are trimmed of Unicode White_Space as the room profile trims, `expires` is read only as a day (YYYY-MM-DD, ASCII digits), and `lapsed` is true from that day on, in UTC as keel reads it (a `today` that is not a day is a TypeError). `hands_on_as_proposed(element)` is what a reader that hands a world on leaves out: `x_review_proposed` with any value but absent or None, so a malformed value (a doubt) is left out too (rule 4). `pack.is_proposed` now calls it. The profile has no fixture yet; `tests/test_review.py` holds the npm SDK's 17 cases, including one per language default that would read differently (a byte order mark, U+001C, Arabic-Indic digits).
+
 ## 0.65.1 (2026-10-26)
 
 - **`draught()`'s docstring follows keel's 2026-10-26 change.** With `compact=True` every element body in the packet leaves out each field whose value is null, "", [] or {} (`id`, `type` and `name` always stay; 0 and False are values and stay), so read a missing field as empty; and a Message without the room mark is placed as any Narrative unless `messages` is named, when it is in `messages` and no other section. The client already returned the packet as keel sent it; no code changed.

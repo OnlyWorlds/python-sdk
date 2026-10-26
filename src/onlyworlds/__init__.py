@@ -66,6 +66,7 @@ from .message import (
 )
 from .names import type_word
 from .push import Patch, PushPlan, PushResult, plan_push, push, verify_level
+from .review import PROPOSED_MARK, ProposedMark, hands_on_as_proposed, proposed_mark_of
 from .room import is_room_element
 from .spine import SPINE_KINDS, SpineRead, read_spine_element
 from .worldfile import (
@@ -86,6 +87,7 @@ __all__ = [
     "FORMAT_VERSION",
     "KNOWN_OF_KEEPS",
     "MESSAGE_PAIR",
+    "PROPOSED_MARK",
     "PUBLIC_FIELDS",
     "READ_MARK_PAIR",
     "READ_ONLY_FIELDS",
@@ -105,6 +107,7 @@ __all__ = [
     "Patch",
     "PreconditionFailed",
     "ProposedError",
+    "ProposedMark",
     "PushPlan",
     "PushResult",
     "Response",
@@ -124,6 +127,7 @@ __all__ = [
     "check_kinds",
     "element_filename",
     "export_world",
+    "hands_on_as_proposed",
     "is_addressed_to",
     "is_hidden",
     "is_known_of",
@@ -133,6 +137,7 @@ __all__ = [
     "is_to_everyone",
     "parse_retry_after",
     "plan_push",
+    "proposed_mark_of",
     "push",
     "read_folder",
     "read_mark_of",
