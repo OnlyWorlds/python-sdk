@@ -164,7 +164,8 @@ def test_namespace_and_producer_word_are_pinned() -> None:
     assert str(WORLDANVIL_NAMESPACE) == str(uuid.uuid5(uuid.NAMESPACE_URL, "https://onlyworlds.com/ns/worldanvil"))
     assert PRODUCER_INPUT == "worldanvil-export"  # folder spec §4.2's list
     assert set(TEMPLATE_TYPES) >= PROVEN_TEMPLATES
-    assert {TEMPLATE_TYPES[k] for k in PROVEN_TEMPLATES} == {"character", "species", "location"}
+    # Organization read on a real page 2026-10-26 (Boss, h40 #13660)
+    assert {TEMPLATE_TYPES[k] for k in PROVEN_TEMPLATES} == {"character", "species", "location", "institution"}
     assert UNTYPED_SUPERTYPE == "Article"  # what it is, never where it came from (h40 #11360)
 
 
@@ -532,6 +533,65 @@ def test_text_no_part_reads_is_kept_and_named(tmp_path: Path) -> None:
     out, report = run(tmp_path, planted(tmp_path, TWO, (eyes, eyes + stray)))
     assert by_name(out)["Ada Quay"]["x_worldanvil_unread"] == "Sails at dawn."
     assert ("Ada Quay", "unread") in {(u.element, u.key) for u in report.unplaced}
+
+
+EYES = '<div class="section-payload">\n            Grey\n        </div>\n    </div>'
+PORTRAIT = (
+    '<img class="character-article-portrait  img-fluid img-responsive m-b-20" src="https://cdn.example/{}.png" alt="">'
+)
+
+
+def sections(*pairs: tuple[str, str]) -> str:
+    return "".join(
+        f'<div class="visibility-toggler"><div class="section-title"><strong class="section-heading">{h}</strong>'
+        f'</div><div class="section-payload">{v}</div></div>'
+        for h, v in pairs
+    )
+
+
+def test_an_uploaded_portrait_is_the_picture(tmp_path: Path) -> None:
+    """Boss, h40 #13660: the Character template prints an uploaded portrait in the right column."""
+    two = PORTRAIT.format("face") + PORTRAIT.format("other")
+    out, report = run(tmp_path, planted(tmp_path, TWO, (EYES, EYES + two)))
+    ada = by_name(out)["Ada Quay"]
+    assert ada["image_url"] == "https://cdn.example/face.png"
+    assert ada["x_worldanvil_portrait"] == "https://cdn.example/other.png"
+    assert "x_worldanvil_unread_images" not in ada
+    assert ("Ada Quay", "portrait") in {(u.element, u.key) for u in report.unplaced}
+
+
+def test_a_picture_no_part_reads_is_kept_and_named(tmp_path: Path) -> None:
+    stray = '<div class="gallery"><img src="https://cdn.example/map.png"><img src="https://cdn.example/map.png"></div>'
+    out, report = run(tmp_path, planted(tmp_path, TWO, (EYES, EYES + stray)))
+    ada = by_name(out)["Ada Quay"]
+    assert ada["x_worldanvil_unread_images"] == ["https://cdn.example/map.png"]
+    assert "image_url" not in ada
+    assert ("Ada Quay", "unread images") in {(u.element, u.key) for u in report.unplaced}
+
+
+def test_a_link_field_given_as_a_name_links_the_one_element_named(tmp_path: Path) -> None:
+    """A place typed as text, not linked, is the one Location of that name (case aside)."""
+    ferry = (
+        f'<a data-article-privacy="public" data-article-id="{FERRY}" data-template-type="location"'
+        ' class="article-explorer-link" href="/w/x/a/the-ferry-crossing">The ferry crossing</a>'
+    )
+    fields = sections(("Birthplace", "the Ferry Crossing"), ("Current Location", ferry))
+    out, report = run(tmp_path, planted(tmp_path, TWO, (EYES, EYES + fields)))
+    ada = by_name(out)["Ada Quay"]
+    assert ada["birthplace"] == eid(FERRY) and ada["location"] == eid(FERRY)
+    assert report.by_name == [("Ada Quay", "Birthplace", "The ferry crossing")]
+    assert "'Ada Quay' / 'Birthplace': 'The ferry crossing'" in report.render()
+
+
+def test_a_name_that_matches_no_element_of_the_type_stays_kept(tmp_path: Path) -> None:
+    fields = sections(("Birthplace", "Riverfolk"), ("Current Location", "Somewhere else"))
+    out, report = run(tmp_path, planted(tmp_path, TWO, (EYES, EYES + fields)))
+    ada = by_name(out)["Ada Quay"]
+    assert "birthplace" not in ada and "location" not in ada
+    assert (ada["x_worldanvil_birthplace"], ada["x_worldanvil_current_location"]) == ("Riverfolk", "Somewhere else")
+    why = {u.key: u.why for u in report.unplaced}
+    assert why["Birthplace"] == "birthplace links a location; the value is text that names none in the folder"
+    assert report.by_name == []
 
 
 def test_an_article_printed_twice_folds(tmp_path: Path) -> None:

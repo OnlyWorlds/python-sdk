@@ -23,8 +23,9 @@ article is ``a.article-explorer-link`` carrying ``data-article-id``, ``data-temp
 Anvil did not resolve is plain text with an at sign (``@Ada``). The world's own uuid is in each
 article's "copy world block" button (``[worldblock:<uuid>]``).
 
-**Believed**, not yet seen in a file: every template but Character, Species and Geographic
-Location (``TEMPLATE_TYPES`` marks which); a template field holding links; a filled cover image;
+**Believed**, not yet seen in a file: every template but Character, Species, Geographic
+Location and Organization (``TEMPLATE_TYPES`` marks which; a template field holding links and
+an uploaded portrait were read on a real World Anvil page, 2026-10-26); a filled cover image;
 more than one category, or one inside another; an article that is not public; a Secret or a
 subscriber block (paid features); timelines.
 
@@ -64,10 +65,13 @@ What becomes what:
   is one platform username for the whole export, not a fact about an element: named in the
   report, never on an element (ruled 2026-10-23). The counters (Views, Favorites,
   Comments) are not kept, and the report says so.
-- **A cover image** of the article's own becomes ``image_url``; World Anvil's inherited default
-  (``img-inherited``) is counted and not kept.
+- **A picture**: an uploaded portrait (an ``img`` whose class ends ``-article-portrait``, as the
+  Character template prints it) becomes ``image_url``, and a cover image of the article's own when
+  there is no portrait; the other is kept as ``x_worldanvil_cover`` or ``x_worldanvil_portrait``.
+  World Anvil's inherited default cover (``img-inherited``) is counted and not kept.
 - **Nothing read past in silence**: text anywhere in an article outside the parts above and the
-  page's chrome is kept as ``x_worldanvil_unread`` and named in the report; text on the page
+  page's chrome is kept as ``x_worldanvil_unread``, a picture as ``x_worldanvil_unread_images``
+  (its addresses), each named in the report; text on the page
   outside the articles (a filled Timelines section) is named in the report.
 
 **What the source hides, the folder hides: never dropped, never public** (ruled
@@ -182,7 +186,7 @@ TEMPLATE_TYPES: dict[str, str] = {
     "vehicle": "object",
     "profession": "title",
 }
-PROVEN_TEMPLATES = frozenset({"character", "person", "species", "geographic location"})
+PROVEN_TEMPLATES = frozenset({"character", "person", "species", "geographic location", "organization"})
 
 #: The door's own extension keys; a template field never takes one of them.
 _OWN = (
@@ -198,6 +202,7 @@ _OWN = (
     "work_in_progress",
     "parent",
     "unread",
+    "unread_images",
 )
 
 #: The Metadata tab's dates, kept on the element under the owner's three names (ruled
@@ -268,6 +273,13 @@ _SECRET_CLASS = re.compile(r"secret|subscriber", re.IGNORECASE)
 
 #: type -> {lowercased field name: field name}, so a heading ``str`` finds ``STR``.
 _FIELD_BY_LOWER: dict[str, dict[str, str]] = {t: {f.lower(): f for f in kinds} for t, kinds in FIELD_KINDS.items()}
+
+#: type -> {a template field's heading, normalised: the field it names}, where World Anvil's word
+#: differs from the schema's (``Current Location`` is Character's ``location``, its present place).
+_LABEL_FIELDS: dict[str, dict[str, str]] = {"character": {"current_location": "location"}}
+
+#: An uploaded portrait's class (``character-article-portrait``).
+_PORTRAIT = re.compile(r"(^|\s)[\w-]*-article-portrait(\s|$)")
 
 #: target type -> Narrative's multi-link field for it: how a Secret's Narrative links its article.
 _NARRATIVE_FIELD_FOR: dict[str, str] = {}
@@ -416,6 +428,9 @@ class ImportReport:
     #: (article id, the Codex's name for it): listed in the World Codex, no article in the export
     codex_only: list[tuple[str, str]] = field(default_factory=list)
     folded: list[Folded] = field(default_factory=list)
+    #: (element, the template field, the element it names): a link field World Anvil gave as a
+    #: name typed as text, placed on the one element of the field's type with that name
+    by_name: list[tuple[str, str, str]] = field(default_factory=list)
     hidden: list[HiddenArticle] = field(default_factory=list)
     #: Secret blocks in visible articles, each its own hidden Narrative
     secret_blocks: int = 0
@@ -466,6 +481,9 @@ class ImportReport:
         if self.unplaced:
             lines.append(f"Fields not placed on an OnlyWorlds field ({len(self.unplaced)}), kept as extensions:")
             lines += [f"  - {u.element!r} / {u.key!r}: {u.why}; kept as {u.kept_as}" for u in self.unplaced]
+        if self.by_name:
+            lines.append(f"Links given as a name, placed on the one element with that name ({len(self.by_name)}):")
+            lines += [f"  - {e!r} / {k!r}: {t!r}" for e, k, t in self.by_name]
         if self.unresolved:
             lines.append(f"Links whose target is not in the folder ({len(self.unresolved)}), kept as text:")
             lines += [f"  - {u.element!r}, {u.where}: {u.target}: {u.why}" for u in self.unresolved]
@@ -817,6 +835,7 @@ class _Importer:
             item.fields["supertype"] = UNTYPED_SUPERTYPE
             if item.template:
                 item.fields["subtype"] = item.template
+        self._portrait(item)
         self._cover(item)
         left = _find(node, _has("article-content-left"))
         right = _find(node, _has("article-content-right"))
@@ -835,6 +854,16 @@ class _Importer:
         if item.unresolved:
             item.ext[f"{EXT_PREFIX}unresolved"] = item.unresolved
 
+    def _portrait(self, item: _Item) -> None:
+        """An uploaded portrait: the element's picture, before any cover."""
+        for img in (n for n in _walk(item.node) if n.tag == "img" and _PORTRAIT.search(n.attrs.get("class", ""))):
+            item.consumed.add(id(img))
+            src = img.attrs.get("src", "")
+            if src and "image_url" not in item.fields:
+                item.fields["image_url"] = src
+            elif src:
+                self._keep(item, "portrait", src, "image_url already holds a portrait")
+
     def _cover(self, item: _Item) -> None:
         cover = _find(item.node, lambda n: n.attrs.get("id") == "cover")
         if cover is None:
@@ -847,7 +876,7 @@ class _Importer:
             elif src and "image_url" not in item.fields:
                 item.fields["image_url"] = src
             elif src:
-                self._keep(item, "cover", src, "image_url already holds the cover")
+                self._keep(item, "cover", src, "image_url already holds the portrait or a cover")
 
     def _secrets(self, item: _Item, part: _Node) -> None:
         """A Secret (or subscriber) block: its own hidden Narrative, or kept in place in a hidden article."""
@@ -925,7 +954,8 @@ class _Importer:
 
     def _place(self, item: _Item, key: str, md: str) -> str:
         """Place the value and return '', or return why it was not placed."""
-        fname = _FIELD_BY_LOWER[item.etype].get(_norm(key))
+        label = _norm(key)
+        fname = _LABEL_FIELDS.get(item.etype, {}).get(label) or _FIELD_BY_LOWER[item.etype].get(label)
         if fname is None:
             return f"{item.etype} has no field {_norm(key)!r}"
         if fname in ("name", "supertype", "subtype", "description") or fname in item.fields:
@@ -943,6 +973,20 @@ class _Importer:
         ids = [int(m["n"]) for m in _TOKEN.finditer(md)]
         rest = _TOKEN.sub("", md).strip(" ,;\n")
         hits = [self.by_id.get(self.links[i].article) for i in ids]
+        if not ids and rest:
+            # A name typed as text, not linked: the one element of that type with that name.
+            named = [
+                o
+                for o in self.items
+                if o is not item and o.etype == target_type and o.name.casefold() == rest.casefold()
+            ]
+            if len(named) != 1:
+                return f"{fname} links a {target_type}; the value is text that names " + (
+                    f"{len(named)} of them in the folder" if named else "none in the folder"
+                )
+            item.fields[fname] = named[0].eid if kind == "single_link" else [named[0].eid]
+            self.report.by_name.append((item.name, key, named[0].name))
+            return ""
         if not ids or rest:
             return f"{fname} links a {target_type}; the value is not a list of links"
         if any(h is None or h.etype != target_type for h in hits):
@@ -1016,13 +1060,29 @@ class _Importer:
                 out += self._leftover(c, consumed)
         return out
 
+    def _images(self, node: _Node, consumed: set[int]) -> list[str]:
+        """The addresses of pictures no part above read, outside the chrome, in page order."""
+        out: list[str] = []
+        for c in node.children:
+            if not isinstance(c, _Node) or id(c) in consumed or self._is_chrome(c):
+                continue
+            if c.tag == "img" and "img-inherited" not in _classes(c) and c.attrs.get("src"):
+                out.append(c.attrs["src"])
+            out += self._images(c, consumed)
+        return out
+
     def _guard(self, item: _Item) -> None:
-        """Text in the article that no part above read: kept, and named."""
+        """Text and pictures in the article that no part above read: kept, and named."""
         rest = re.sub(r"\s+", " ", " ".join(self._leftover(item.node, item.consumed))).strip()
         if rest:
             ext = f"{EXT_PREFIX}unread"
             item.ext[ext] = self._text(item, rest)
             self._unplaced(item, "unread", "text outside the parts this door reads", ext)
+        images = list(dict.fromkeys(self._images(item.node, item.consumed)))
+        if images:
+            ext = f"{EXT_PREFIX}unread_images"
+            item.ext[ext] = images
+            self._unplaced(item, "unread images", "pictures outside the parts this door reads", ext)
 
     def _page_guard(self) -> None:
         heading = _find(self.root, _has("heading"))

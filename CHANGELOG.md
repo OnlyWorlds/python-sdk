@@ -4,6 +4,14 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+## 0.62.0 (2026-10-26)
+
+- **The World Anvil door keeps an uploaded portrait.** A Character's uploaded picture (World Anvil prints it beside the template fields, class `character-article-portrait`) was on no element and in no line of the report. It is now the element's `image_url`, ahead of a cover image of the article's own, which is then kept as `x_worldanvil_cover`; a second portrait is kept as `x_worldanvil_portrait`. Read on a real World Anvil page.
+- **No picture is read past in silence.** A picture in an article that no part of the door reads is kept as `x_worldanvil_unread_images` (its addresses, in page order, each once) and named in the report, as text already was with `x_worldanvil_unread`. World Anvil's inherited default cover is still counted and not kept.
+- **A link field given as a name is placed when one element has that name.** World Anvil lets a template field such as Birthplace hold a place's name as plain text. When exactly one element of the field's type has that name (case aside), the field links it, and the report lists each one placed this way; a name that matches none, or several, is kept as before, the report saying which.
+- **Current Location fills Character's `location`**, the character's present place, where it was kept as `x_worldanvil_current_location`.
+- **The Organization template has been read on a real page** (as an Institution); the report no longer calls it believed.
+
 ## 0.61.0 (2026-10-26)
 
 - **`ApiError.is_character_played`**: a delete (or a review's decline) of a Character someone plays on the roster, the world's `owner_character` or a live member's, an AI seat's or a player's, answers 422 `character_played` (`param` id) and deletes nothing. The flag tells it from a malformed id's 422, which carries the same `param`. The way out is to re-point that member to another Character, or remove the member, then delete.
