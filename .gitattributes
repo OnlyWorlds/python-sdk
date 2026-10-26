@@ -1,3 +1,6 @@
 # One line ending everywhere, so a Windows checkout does not turn the generated
 # src/onlyworlds/_schema.py into CRLF (codegen --check compares it byte for byte).
 * text=auto eol=lf
+
+# The draught_text fixture, vendored from the npm SDK byte for byte (its MANIFEST.json holds each sha256).
+tests/fixtures/draught-text/** -text

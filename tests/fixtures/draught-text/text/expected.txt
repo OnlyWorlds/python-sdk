@@ -1,0 +1,49 @@
+# Admiral Fluffington, in Moppetopia
+What the record holds around Admiral Fluffington, dated up to Year 453 (the world's now: Year 453). Read as the Character's own view.
+
+## Admiral Fluffington
+Character · Military / Admiral
+  First line.
+  Second line, after a CRLF.
+  Third line, after a lone CR.
+  
+  After a blank line: Ἀθήναι, 水たまり, 🦆, café.
+  physicality: Pink felt, immaculately kept. One googly eye, Splashworth's left, transplanted.
+  mentality: Dreams of 水たまり and 🦆.
+  background: Son of Admiral Stuffington. Naval Academy graduate, then Admiral. Carries Splashworth's eye, and possibly his guilt.
+  reputation: Respected commander. The establishment, personified.
+  birth date: 249
+  birthplace: Puddleton
+  location: Feltropolis 🦆
+  species: Moppet, Puddle Moppet
+  rivals: Captain Snoot
+
+## Events
+- The Incident (Event · Discovery / Revelation) · via characters · Year 370
+  café
+  Ἀθήναι
+
+## Names
+- We Sail Where the Puddles Flow (Construct · Society / Tradition) · via characters · undated
+  The Puddle Navy's motto, and Admiral Fluffington's catchphrase. Moppets say it at launches and at funerals, in the same voice.
+
+## Sheet
+- Puddleton (Location · Settlement / City) · via birthplace · known of
+  Two lines
+  and a trailing break
+  
+- Feltropolis 🦆 (Location · Settlement / Station) · via location · known of
+  Orbital space station and primary manufacturing hub for felt technology: a spindle of seven levels, from The Docks at the bottom to The Spire at the top.
+- Moppet (Species · People / Parent Species) · via species · known of
+  The people of Moppetopia: small felt creatures with googly eyes, who eat by absorbing moisture. Puddle Moppets, Dust Moppets, Space Moppets and Feral Moppets are its kinds.
+- Puddle Moppet (Species · People / Variant) · via species · known of
+  The standard moppet subtype. Water-absorbing, traditional, mostly found in Puddleton.
+- Captain Snoot (Character · Fringe / Smuggler) · via rivals · known of
+  Rogue explorer, smuggler, and the one who knows. Faded blue felt, one googly eye missing since the Snack Nebula crash; under the eyepatch there may be the Googly Eye of Truth. He left the Puddle Navy after The Incident (Year 120 YSL) with evidence of the Moistened Valley Massacre cover-up, and has kept it hidden ever since. He drinks at The Soggy Sock, trades with the Cookie Pirates, and buys information from Madame Threadbare at The Thread Market, playing both sides. In Year 203 YSL he found The Rolling Pin past the Crumblefields, a humming Bakerfolk ruin three kilometers long, and brought back a fragment that hums in time with the Eternal Drip's pump cycle.
+
+## Members
+- owner
+
+Nothing in: role, work, style, knowledge, recent.
+
+Left out by the budget: nothing.

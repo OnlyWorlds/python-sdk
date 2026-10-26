@@ -1,0 +1,55 @@
+# Admiral Fluffington, in Moppetopia
+What the record holds around Admiral Fluffington, dated up to Year 248 (the world's now: Year 453). Read as the Character's own view.
+
+## Admiral Fluffington
+Character · Military / Admiral
+  Admiral of the Puddle Navy and commander of the USS Fuzzball. Pink felt, immaculately kept, with one googly eye that was Admiral Splashworth's, and with it some of Splashworth's memories. Son of Admiral Stuffington and the last of House Stuffington. He and Captain Snoot were friends at the Naval Academy until The Incident. His catchphrase: "We sail where the puddles flow." The family crest, three water drops and a felt star, hangs on the Fuzzball's bridge.
+  physicality: Pink felt, immaculately kept. One googly eye, Splashworth's left, transplanted.
+  mentality: Does his job exactly as the Puddle Navy trained him to. Wakes some nights seeing things he didn't live through, and tasting oats, which nobody in Moppetopia eats. It is getting harder to tell where duty ends and denial begins.
+  background: Son of Admiral Stuffington. Naval Academy graduate, then Admiral. Carries Splashworth's eye, and possibly his guilt.
+  reputation: Respected commander. The establishment, personified.
+  birth date: 249
+  birthplace: Puddleton
+  location: Feltropolis
+  species: Moppet, Puddle Moppet
+  languages: Standard Moppet
+  objects: USS Fuzzball, Splashworth's Compass, Medal of Damp Valor
+  institutions: Puddle Navy
+  family: House Stuffington
+  rivals: Captain Snoot
+
+## Names
+- We Sail Where the Puddles Flow (Construct · Society / Tradition) · via characters · undated
+  The Puddle Navy's motto, and Admiral Fluffington's catchphrase. Moppets say it at launches and at funerals, in the same voice.
+
+## Sheet
+- Puddleton (Location · Settlement / City) · via birthplace · known of
+  Capital city of moppet civilization. A water-based metropolis built around the Eternal Drip.
+- Feltropolis (Location · Settlement / Station) · via location · known of
+  Orbital space station and primary manufacturing hub for felt technology: a spindle of seven levels, from The Docks at the bottom to The Spire at the top.
+- Moppet (Species · People / Parent Species) · via species · known of
+  The people of Moppetopia: small felt creatures with googly eyes, who eat by absorbing moisture. Puddle Moppets, Dust Moppets, Space Moppets and Feral Moppets are its kinds.
+- Puddle Moppet (Species · People / Variant) · via species · known of
+  The standard moppet subtype. Water-absorbing, traditional, mostly found in Puddleton.
+- Standard Moppet (Language · Living / Common) · via languages · known of
+  The common language of moppet space, written and spoken the same in Puddleton and on Feltropolis. The Crumbler's three-word message went out in plain Standard, and The Claw still spent six weeks looking for the encryption.
+- Medal of Damp Valor (Object · Insignia / Medal) · via objects · known of
+  Puddle Navy military decoration featuring a three-splash insignia. Worn by Admiral Fluffington.
+- Splashworth's Compass (Object · Artifact / Heirloom) · via objects · known of
+  Old compass that belonged to Admiral Splashworth, now carried by Admiral Fluffington as a keepsake. Nobody knows whether it works. Some say it points to the truth.
+- USS Fuzzball (Object · Vessel / Naval) · via objects · known of
+  Flagship of the Puddle Navy commanded by Admiral Fluffington.
+- Puddle Navy (Institution · Military / Navy) · via institutions · known of
+  The fleet of Puddleton, which fights in puddles and in space. Its Academy still teaches Splashworth's tactics from Damp Ridge.
+- House Stuffington (Family · Dynasty / Naval) · via family · known of
+  The preeminent naval dynasty of Puddleton. Three generations of Admirals, or two, depending on what you believe. Admiral Stuffington (the patriarch) is officially deceased, a war hero who gave everything for the Puddle Navy. Admiral Fluffington (his son) carries the name with pink-felted dignity and an inherited compass. The family crest features three water drops and a felt star, which adorns the USS Fuzzball's bridge. There are no other known Stuffingtons, which makes Fluffington the last of the line, a fact he drinks about more than he'd admit.
+- Captain Snoot (Character · Fringe / Smuggler) · via rivals · known of
+  Rogue explorer, smuggler, and the one who knows. Faded blue felt, one googly eye missing since the Snack Nebula crash; under the eyepatch there may be the Googly Eye of Truth. He left the Puddle Navy after The Incident (Year 120 YSL) with evidence of the Moistened Valley Massacre cover-up, and has kept it hidden ever since. He drinks at The Soggy Sock, trades with the Cookie Pirates, and buys information from Madame Threadbare at The Thread Market, playing both sides. In Year 203 YSL he found The Rolling Pin past the Crumblefields, a humming Bakerfolk ruin three kilometers long, and brought back a fragment that hums in time with the Eternal Drip's pump cycle.
+
+## Members
+- owner
+- co_builder · Temper (Atlas) · plays a Character not in this draught · removed
+
+Nothing in: role, work, style, events, knowledge, recent.
+
+Left out by the budget: nothing.

@@ -19,6 +19,7 @@ from ._schema import (
 )
 from ._version import __version__
 from .checks import CHECKS_FIELD, CheckRow, apply_checks
+from .draught_text import draught_text
 from .errors import PreconditionFailed, ProposedError, StaleProposal, parse_retry_after
 from .export import export_world
 from .folder import (
@@ -125,6 +126,7 @@ __all__ = [
     "__version__",
     "apply_checks",
     "check_kinds",
+    "draught_text",
     "element_filename",
     "export_world",
     "hands_on_as_proposed",
