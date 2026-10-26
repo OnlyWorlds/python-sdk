@@ -35,7 +35,7 @@ Python                     TypeScript (``@onlyworlds/sdk``)
 ``CALENDAR_SUPERTYPE``      ``CALENDAR_SUPERTYPE``
 ``read_calendar_value``     ``readCalendarValue``
 ``world_calendars``         ``worldCalendars``
-``resolve_calendar_lens``   ``resolveCalendarLens``
+``resolve_calendar``        ``resolveCalendar``
 ``read_calendar_config``    ``readCalendarConfig``
 ``validate_calendar_config`` ``validateCalendarConfig``
 ``floor_div``               ``floorDiv``
@@ -80,6 +80,7 @@ from __future__ import annotations
 import json
 import math
 import re
+import warnings
 from collections.abc import Callable, Iterable, Mapping
 from dataclasses import dataclass
 from decimal import Decimal
@@ -1583,7 +1584,7 @@ class _NotChosen:
 _NOT_CHOSEN: Final = _NotChosen()
 
 
-def resolve_calendar_lens(
+def resolve_calendar(
     elements: Iterable[Mapping[str, Any]],
     active_id: str | _NotChosen | None = _NOT_CHOSEN,
     *,
@@ -1601,3 +1602,21 @@ def resolve_calendar_lens(
     if isinstance(active_id, _NotChosen) or not _truthy(active_id):
         return None
     return next((c for c in world_calendars(elements) if _strict_eq(c.id, active_id)), None)
+
+
+def resolve_calendar_lens(
+    elements: Iterable[Mapping[str, Any]],
+    active_id: str | _NotChosen | None = _NOT_CHOSEN,
+    *,
+    fallback_to_only: bool = False,
+) -> WorldCalendar | None:
+    """Deprecated since 0.69.0: the old name of ``resolve_calendar``, with the same answers.
+
+    "Lens" now names a cut of a world, not a chosen calendar. Warns with ``DeprecationWarning``.
+    """
+    warnings.warn(
+        "resolve_calendar_lens is renamed resolve_calendar; the old name will be removed",
+        DeprecationWarning,
+        stacklevel=2,
+    )
+    return resolve_calendar(elements, active_id, fallback_to_only=fallback_to_only)

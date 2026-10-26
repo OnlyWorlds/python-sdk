@@ -35,6 +35,7 @@ from onlyworlds.calendar import (
     parse_date,
     read_calendar_config,
     read_calendar_value,
+    resolve_calendar,
     resolve_calendar_lens,
     validate_calendar_config,
     weekday_for_step,
@@ -679,21 +680,35 @@ def test_read_calendar_value_reads_objects_and_json_strings_alike() -> None:
         assert read_calendar_value(junk) is None
 
 
-def test_resolve_calendar_lens() -> None:
+def test_resolve_calendar() -> None:
     elements = [{"id": "c1", "type": "construct", "name": "Imperial", CALENDAR_FIELD: CONFIG}]
-    chosen_one = resolve_calendar_lens(elements, "c1")
+    chosen_one = resolve_calendar(elements, "c1")
     assert chosen_one is not None and chosen_one.name == "Imperial"
     for chosen in ("gone", None):
-        assert resolve_calendar_lens(elements, chosen) is None
-    assert resolve_calendar_lens([], "c1") is None
-    only = resolve_calendar_lens(elements, fallback_to_only=True)  # never chosen: the only one
+        assert resolve_calendar(elements, chosen) is None
+    assert resolve_calendar([], "c1") is None
+    only = resolve_calendar(elements, fallback_to_only=True)  # never chosen: the only one
     assert only is not None and only.name == "Imperial"
-    assert resolve_calendar_lens(elements, None, fallback_to_only=True) is None  # "no calendar" stays
+    assert resolve_calendar(elements, None, fallback_to_only=True) is None  # "no calendar" stays
     two = [*elements, {"id": "c2", "name": "Guild", CALENDAR_FIELD: CONFIG}]
-    assert resolve_calendar_lens(two, fallback_to_only=True) is None  # never a guess
-    assert resolve_calendar_lens(elements) is None  # opt-in
+    assert resolve_calendar(two, fallback_to_only=True) is None  # never a guess
+    assert resolve_calendar(elements) is None  # opt-in
     with pytest.raises(TypeError):
-        resolve_calendar_lens(elements, fallbackToOnly=True)  # type: ignore[call-arg]
+        resolve_calendar(elements, fallbackToOnly=True)  # type: ignore[call-arg]
+
+
+def test_resolve_calendar_lens_is_the_old_name() -> None:
+    elements = [{"id": "c1", "type": "construct", "name": "Imperial", CALENDAR_FIELD: CONFIG}]
+    two = [*elements, {"id": "c2", "name": "Guild", CALENDAR_FIELD: CONFIG}]
+    for els in (elements, two, []):
+        for flag in (True, False):
+            for chosen in ("c1", "c2", "gone", None):
+                with pytest.warns(DeprecationWarning, match="resolve_calendar"):
+                    old = resolve_calendar_lens(els, chosen, fallback_to_only=flag)
+                assert old == resolve_calendar(els, chosen, fallback_to_only=flag)
+            with pytest.warns(DeprecationWarning):
+                old = resolve_calendar_lens(els, fallback_to_only=flag)
+            assert old == resolve_calendar(els, fallback_to_only=flag)
 
 
 # ---- Where Python's default reading differs from JavaScript's: read as the SDK reads ----

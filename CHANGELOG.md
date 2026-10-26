@@ -2,6 +2,10 @@
 
 The package version runs on its own semver; the schema it is generated from is `SCHEMA_DIST_TAG`.
 
+## 0.69.0 (2026-10-26)
+
+- **`resolve_calendar` is the new name of `resolve_calendar_lens`**, with the same arguments and answers, as the TypeScript SDK's `resolveCalendar` from 4.85.0. "Lens" now names a cut of a world (what a reader is shown of it), so the function that picks a world's chosen calendar no longer uses the word. `resolve_calendar_lens` stays, deprecated: it warns with `DeprecationWarning` and answers as `resolve_calendar` does.
+
 ## 0.68.1 (2026-10-26)
 
 - **`validate_calendar_config` answers with its errors, never a TypeError, when `bundles.months` has no names list** (`0`, `""`, `False`, `{}`, or `names` that is not a list), as the TypeScript SDK does from 4.84.1. 0.68.0 mirrored that SDK's throw on purpose, so the two readers stay equal: compared again on the same 175,705 inputs, no disagreement. `read_calendar_value` was not affected.
