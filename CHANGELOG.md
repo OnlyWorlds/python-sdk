@@ -2,6 +2,10 @@
 
 The package version runs on its own semver; the schema it is generated from is `SCHEMA_DIST_TAG`.
 
+## 0.70.0 (2026-10-26)
+
+- **`draught_text(draught)`** (`onlyworlds.draught_text`): one Character's context packet (`client.draught(character_id)`, full or compact) as plain text to paste into a prompt or a note, the same bytes from both packages and held to them by one shared fixture (47 cases, the full and compact reads of each giving the same text). It reads the packet alone and calls nothing: a link the packet does not hold is counted, never looked up. The title claims only the read's horizon ("dated up to Year 300"), never what the Character knew; every row says how it was reached (`via`), its grade or date, and the marks hidden and proposed; the sections that hold nothing are named on one line, and the last line says only what the budget left out (`cut`). Nothing is trimmed or cut by length, so the two languages cannot disagree on where a string ends. One known difference between a full and a compact read: the server's compact form drops an empty `x_review_proposed` (`""`, `[]`, `{}`), which the full read counts as proposed. The npm SDK's `draughtText` (4.86.0) gives the same text.
+
 ## 0.69.0 (2026-10-26)
 
 - **`resolve_calendar` is the new name of `resolve_calendar_lens`**, with the same arguments and answers, as the TypeScript SDK's `resolveCalendar` from 4.85.0. "Lens" now names a cut of a world (what a reader is shown of it), so the function that picks a world's chosen calendar no longer uses the word. `resolve_calendar_lens` stays, deprecated: it warns with `DeprecationWarning` and answers as `resolve_calendar` does.
