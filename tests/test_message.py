@@ -19,6 +19,7 @@ from onlyworlds import (
     is_addressed_to,
     is_message,
     is_sent_by,
+    is_to_everyone,
     read_mark_of,
     recipients_of,
     sender_status,
@@ -124,6 +125,11 @@ def test_recipients_keep_their_order_and_a_malformed_list_is_not_everyone() -> N
         assert is_addressed_to({"characters": everyone}, ADA) is True, everyone
     assert is_addressed_to({}, ADA) is True
     assert is_addressed_to({"characters": []}, "") is False
+    for not_everyone in (ADA, [""], [5], [ADA]):
+        assert is_to_everyone({"characters": not_everyone}) is False, not_everyone
+    everyone_bodies: tuple[dict[str, Any], ...] = ({}, {"characters": None}, {"characters": []})
+    for m in everyone_bodies:
+        assert is_to_everyone(m) is True, m
 
 
 def test_the_read_mark_supertype_is_folded_and_a_mark_with_no_members_list_has_no_hand() -> None:

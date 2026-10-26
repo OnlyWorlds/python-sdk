@@ -106,10 +106,18 @@ def is_addressed_to(message: Mapping[str, Any], character_id: str) -> bool:
     a name or an id in ``story``, not ``protagonist`` or any other link."""
     if not isinstance(character_id, str) or not character_id:
         return False
-    value = message.get("characters")
-    if value is None or (isinstance(value, list | tuple) and len(value) == 0):
+    if is_to_everyone(message):
         return True
+    value = message.get("characters")
     return isinstance(value, list | tuple) and character_id in value
+
+
+def is_to_everyone(message: Mapping[str, Any]) -> bool:
+    """True when the message is addressed to every member: its ``characters`` is absent, ``None`` or
+    empty. A list that names no valid id (``[""]``) or a value that is not a list is addressed to nobody,
+    so it is False here, though ``recipients_of`` gives ``[]`` for both."""
+    value = message.get("characters")
+    return value is None or (isinstance(value, list | tuple) and len(value) == 0)
 
 
 def is_sent_by(message: Mapping[str, Any], character_id: str) -> bool:
