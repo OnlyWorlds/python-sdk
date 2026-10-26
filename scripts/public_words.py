@@ -58,14 +58,32 @@ WORDS: dict[str, str] = {
     "271c535631ff": "nothing: an internal surface",
     "4340fc2d9418": "nothing: an internal mailbox",
     **dict.fromkeys(
-        ["d97084040035", "b372644b8fec", "0c6874e447ef", "66ada4d485d7",
-         "3892e10346fd", "8899ecd1626d", "44e7d4b24846", "0aa91af2ec4c"],
+        [
+            "d97084040035",
+            "b372644b8fec",
+            "0c6874e447ef",
+            "66ada4d485d7",
+            "3892e10346fd",
+            "8899ecd1626d",
+            "44e7d4b24846",
+            "0aa91af2ec4c",
+        ],
         _FOLDER,
     ),
     **dict.fromkeys(
-        ["7d07b8e5c49d", "0ced2c75df2d", "9c2a44c4716d", "d3aaf0e63f73", "9067ae5c5374",
-         "fdfd7512f532", "fbee9d8f57c5", "6a6ac8386005", "d5ef0f0e059a", "c62063d665f3",
-         "06110f3dd13d"],
+        [
+            "7d07b8e5c49d",
+            "0ced2c75df2d",
+            "9c2a44c4716d",
+            "d3aaf0e63f73",
+            "9067ae5c5374",
+            "fdfd7512f532",
+            "fbee9d8f57c5",
+            "6a6ac8386005",
+            "d5ef0f0e059a",
+            "c62063d665f3",
+            "06110f3dd13d",
+        ],
         _NAME,
     ),
 }
@@ -89,7 +107,7 @@ def scan_text(text: str, where: str) -> list[str]:
         prev, prev_end = None, -1
         for m in _TOKEN.finditer(line):
             words = [m.group(0)]
-            if prev == "the" and line[prev_end:m.start()] == " ":
+            if prev == "the" and line[prev_end : m.start()] == " ":
                 words.append(f"the {m.group(0)}")
             for w in words:
                 instead = WORDS.get(_hash(w, 12))
