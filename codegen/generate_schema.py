@@ -267,6 +267,30 @@ def room_mark() -> str:
     return mark
 
 
+def message_pairs(types: list[str], room: list[tuple[str, str]]) -> tuple[tuple[str, str], tuple[str, str]]:
+    """The message profile's two pairs (dist serial 72 on, profiles/message.md): the message (``pair``) and
+    the reader's read mark (``read_mark``), each (type, supertype), from the fixture. The message's pair must
+    be one of the room profile's (the page: "the pair the room profile lists as a line in the room"), and
+    both supertypes must be named on the page, or generation fails."""
+    fixture_path, page_path = DIST / "profiles" / "message.fixture.json", DIST / "profiles" / "message.md"
+    fixture: dict[str, Any] = json.loads(fixture_path.read_text(encoding="utf-8"))
+    page = page_path.read_text(encoding="utf-8")
+    out: list[tuple[str, str]] = []
+    for key in ("pair", "read_mark"):
+        p = fixture.get(key)
+        if not isinstance(p, dict):
+            raise SystemExit(f"{fixture_path}: `{key}` is {p!r}, expected {{type, supertype, ...}}")
+        t, s = p.get("type"), p.get("supertype")
+        if t not in types or not isinstance(s, str) or not s or s != s.strip() or '"' in s or "\\" in s:
+            raise SystemExit(f"{fixture_path}: {key} {p!r}: not an element type, or a supertype this emitter refuses")
+        if f"supertype `{s}`" not in page:
+            raise SystemExit(f"message.md does not name the fixture's {key} supertype `{s}`")
+        out.append((t, s))
+    if out[0] not in room:
+        raise SystemExit(f"message.fixture.json's pair {out[0]} is not one of the room profile's pairs {room}")
+    return out[0], out[1]
+
+
 SPINE_ROW = re.compile(r"^\|\s*([A-Z][a-z]+)\s*\|((?:\s*`[^`]+`\s*,?)+)\|\s*$")
 SPINE_WORD = re.compile(r"`([^`]+)`")
 
@@ -318,6 +342,7 @@ def render(
     public: dict[str, list[str]],
     room: list[tuple[str, str]],
     mark: str,
+    message: tuple[tuple[str, str], tuple[str, str]],
     spine: dict[str, list[str]],
 ) -> str:
     def strs(names: list[str]) -> str:
@@ -429,6 +454,12 @@ def render(
         "# world or sitting the room belongs to (room.fixture.json's mark.field, checked against room.md).",
         f'ROOM_MARK = "{mark}"',
         "",
+        "# The message profile (profiles/message.md): the (type, supertype) pair of a message between a world's",
+        "# members, and of a reader's read mark, each matched trimmed and without regard to case as ROOM_PAIRS",
+        "# (message.is_message, message.read_mark_of). From message.fixture.json's pair and read_mark.",
+        f'MESSAGE_PAIR: tuple[str, str] = ("{message[0][0]}", "{message[0][1]}")',
+        f'READ_MARK_PAIR: tuple[str, str] = ("{message[1][0]}", "{message[1][1]}")',
+        "",
         "# The spine profile (profiles/spine.md): each listed type's closed list of supertypes (its kinds), in",
         "# the page's order and spelling, compared trimmed and without regard to case (spine.read_spine_element).",
         "# From the page's table, checked against spine.fixture.json's cases. A convention on the 22 types.",
@@ -454,6 +485,7 @@ def main() -> int:
             "the dist's schema.json is not the walk's decode_schema output: onlyworlds.lint would run on another schema"
         )
     layout = layout_tables(decoded, types, kinds, pairs)
+    room = room_pairs(types)
     text = render(
         pin,
         types,
@@ -462,8 +494,9 @@ def main() -> int:
         layout,
         extension_prefixes(),
         public_fields(types, layout),
-        room_pairs(types),
+        room,
         room_mark(),
+        message_pairs(types, room),
         spine_kinds(types),
     )
     if args.check:

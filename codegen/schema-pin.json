@@ -2,15 +2,20 @@
   "_what": "The recorded pin for the vendored OnlyWorlds schema distribution (codegen/schema-dist/, copied byte-exact). Do not edit by hand; re-vendor from the pinned tag and review the diff. Kept equal to the npm SDK's pin (github.com/OnlyWorlds/sdk, codegen/schema-pin.json) on purpose: two clients, one schema.",
   "_why_manifest_sha256": "Verifying the tree against its own MANIFEST.json only proves internal consistency. If the tag moved, the manifest moved with it. The hash recorded here is the one first accepted, which is what makes a moved tag visible.",
   "repo": "https://github.com/OnlyWorlds/schema-dist",
-  "tag": "v0.33.0-dist.71",
-  "commit": "a81b7bd4c838227370cd31dcc355742d59fbfa35",
-  "manifest_sha256": "aaffaa512bd266dae86c6b349be9c587d56b6caa130b97a334d2c021119ba5a8",
+  "tag": "v0.33.0-dist.73",
+  "commit": "22f5e0e02db600e8a04272a4e5b27de5127ed65d",
+  "manifest_sha256": "ea0402f70bfa445f890c17e563d216fead9c35e995585d009edadc05966ac9f1",
   "canonical_version": "00.33.00",
-  "dist_serial": 71,
-  "published": "2026-10-25",
-  "pinned_at": "2026-10-25",
-  "pinned_by": "The maintainer: tree from `git archive` of the tag in a schema-dist checkout (189 files, every one the MANIFEST lists); files re-hashed against MANIFEST.json by generate_schema.py; MANIFEST self-hash matched against the raw file GitHub serves at the tag, whose ref resolves to the commit above. Equal to the npm SDK's pin (v0.33.0-dist.71).",
+  "dist_serial": 73,
+  "published": "2026-10-26",
+  "pinned_at": "2026-10-26",
+  "pinned_by": "The maintainer: tree from `git archive` of the tag in a schema-dist checkout (191 files, every one the MANIFEST lists); files re-hashed against MANIFEST.json by generate_schema.py; MANIFEST self-hash matched against the raw file GitHub serves at the tag, whose ref resolves to the commit above. One serial ahead of the npm SDK's pin (v0.33.0-dist.71) until it repins.",
   "previous_pins": [
+    {
+      "tag": "v0.33.0-dist.71",
+      "manifest_sha256": "aaffaa512bd266dae86c6b349be9c587d56b6caa130b97a334d2c021119ba5a8",
+      "note": "superseded by v0.33.0-dist.73 (same canonical 00.33.00; two serials: 72 profiles/ gains message.md and message.fixture.json, the message profile: a Narrative with supertype Message, its recipients (an empty characters is every member), its sender checked against created_by and the members list, the reader's Read mark and a thread by parent_narrative, 43 cases, and README's profiles row; 73 the page's rule 1 rewritten (a message without the room mark stays lore, a message view is a second reading of it) and senderStatus(message, members) without the roster, the same 43 cases; no schema file moved. Serial 72 is pinned in no release)"
+    },
     {
       "tag": "v0.33.0-dist.69",
       "manifest_sha256": "0b2b2c715c061de22c17e90b1723275571d67a010364b9681fe079e24448b241",
