@@ -1191,7 +1191,10 @@ class Client:
 
         ``compact``: ``True`` leaves out every section that is an empty list or object,
         and ``cut`` when it is empty; the frame (``world``, ``calendar``, ``as_of``, ``now``,
-        ``mode``, ``policy``) and every null stay, since a null is an answer. Sent as ``true`` or
+        ``mode``, ``policy``) and every null stay, since a null is an answer; and each element body
+        leaves out its fields that are null, "", [] or {} (``id``, ``type`` and ``name`` always
+        stay), so read a missing field as empty. A Message without the room mark is placed as any
+        Narrative unless ``messages`` is named, when it is there and in no other section. Sent as ``true`` or
         ``false``; ``None`` sends nothing (keel's default, false). Anything but a bool is a
         TypeError before anything is sent."""
         if compact is not None and not isinstance(compact, bool):
