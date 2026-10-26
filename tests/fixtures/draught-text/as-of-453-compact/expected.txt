@@ -58,8 +58,9 @@ Character · Military / Admiral
 
 ## Members
 - owner
-- co_builder · Atlas seat · plays a Character not in this draught · removed
+- co_builder · Atlas seat · plays a Character not in this draught · removed from the world
 
 Nothing in: role, work, style, knowledge, recent.
 
+Not listed: rows dated after Year 453.
 Left out by the budget: nothing.

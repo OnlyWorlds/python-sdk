@@ -2,6 +2,11 @@
 
 The package version runs on its own semver; the schema it is generated from is `SCHEMA_DIST_TAG`.
 
+## 0.71.0 (2026-10-26)
+
+- **`draught_text` names what the date horizon left out**, as the TypeScript SDK's `draughtText` does from 4.87.0, byte for byte. When the draught has an `as_of`, a line above the budget line says it: `Not listed: rows dated after Year 300.` when the read was the Character's own view (`mode: voice`, where the horizon fences every section), and `Not listed: Events, Knowledge and proposed Events or Narratives dated after Year 300.` when it was the caller's (`act`, where it fences only those). The packet carries no count of those rows, so the line gives none. Before, only the title said the horizon, and `Left out by the budget: nothing.` could be read as a complete record when the text was pasted alone.
+- **A removed member reads `removed from the world`**, not `removed`, so the word cannot be read as part of the member's name. The shared fixture is the SDK's, regenerated (45 of 47 cases change; the two with no `as_of` are unchanged).
+
 ## 0.70.0 (2026-10-26)
 
 - **`draught_text(draught)`** (`onlyworlds.draught_text`): one Character's context packet (`client.draught(character_id)`, full or compact) as plain text to paste into a prompt or a note, the same bytes from both packages and held to them by one shared fixture (47 cases, the full and compact reads of each giving the same text). It reads the packet alone and calls nothing: a link the packet does not hold is counted, never looked up. The title claims only the read's horizon ("dated up to Year 300"), never what the Character knew; every row says how it was reached (`via`), its grade or date, and the marks hidden and proposed; the sections that hold nothing are named on one line, and the last line says only what the budget left out (`cut`). Nothing is trimmed or cut by length, so the two languages cannot disagree on where a string ends. One known difference between a full and a compact read: the server's compact form drops an empty `x_review_proposed` (`""`, `[]`, `{}`), which the full read counts as proposed. The npm SDK's `draughtText` (4.86.0) gives the same text.

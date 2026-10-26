@@ -38,9 +38,10 @@ Character · Military / Admiral
 - owner · plays Admiral Fluffington
 - co_builder · Harbor Scribe · plays Captain Snoot
 - guest · Tide Reader · plays a Character not in this draught
-- contributor · Old Hand · removed
+- contributor · Old Hand · removed from the world
 - contributor
 
 Nothing in: role, work, style, knowledge, recent.
 
+Not listed: rows dated after Year 453.
 Left out by the budget: nothing.

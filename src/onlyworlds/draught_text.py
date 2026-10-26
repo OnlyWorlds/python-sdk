@@ -161,8 +161,9 @@ def draught_text(draught: Mapping[str, Any]) -> str:
     The frame says what the packet does: the horizon (``as_of``), the world's now, and whose view it was
     read through (``mode``). Her own element prints whole; every other row prints its name, type and kind,
     how it reached her (``via``), its grade or date, the marks ``hidden`` and ``proposed``, and its
-    description. The sections that hold nothing are named on one line, and what the budget left out
-    (``cut``) is always said.
+    description. The sections that hold nothing are named on one line; what the date horizon left out
+    is named (never counted: the packet carries no count), and what the budget left out (``cut``) is
+    always said.
 
     A draught that is not a mapping, or has no ``world`` mapping, is a TypeError. Takes no options.
     """
@@ -338,7 +339,7 @@ def draught_text(draught: Mapping[str, Any]) -> str:
             held = names.get(plays) if isinstance(plays, str) else None
             line += " · plays a Character not in this draught" if held is None else f" · plays {held}"
         if row.get("status") == "removed":
-            line += " · removed"
+            line += " · removed from the world"
         return line
 
     # ``recent_more`` true makes Recent a section even with no rows.
@@ -375,11 +376,15 @@ def draught_text(draught: Mapping[str, Any]) -> str:
             out.append("")
             put(f"Nothing in: {', '.join(empty)}.")
 
-    # Left out: only what the budget dropped.
+    # Left out: what the horizon fenced, by mode (keel's ``_past_horizon``; uncounted), then what the budget dropped.
     cut = d.get("cut")
     counts = [(k, _int(n)) for k, n in cut.items()] if isinstance(cut, Mapping) else []
     left = [f"{n} {k}" for k, n in counts if n is not None]
     out.append("")
+    if as_of is not None and mode == "voice":
+        put(f"Not listed: rows dated after {moment(as_of)}.")
+    elif as_of is not None and mode == "act":
+        put(f"Not listed: Events, Knowledge and proposed Events or Narratives dated after {moment(as_of)}.")
     put(f"Left out by the budget: {', '.join(left) if left else 'nothing'}.")
 
     return "\n".join(out) + "\n"
