@@ -9,6 +9,7 @@ This script holds the patterns in one place. CI and the release workflow both ru
 Usage:
   python scripts/public_words.py            scan the published paths (below)
   python scripts/public_words.py PATH ...   scan these files or directories instead
+  python scripts/public_words.py --commits A..B   scan the messages of the commits B adds to A
 Exit 1 and one line per finding; exit 0 when the tree is clean.
 
 Not scanned: CHANGELOG.md (the dated record, kept as written), tests/ and their fixtures,
@@ -148,7 +149,37 @@ def files_for(args: list[str]) -> list[Path]:
     return out
 
 
+def scan_commits(spec: str) -> int:
+    """A commit message is published text too: the messages of the commits B adds to A (A..B), or
+    one commit's. CI runs it on the commits each push or pull request adds."""
+    args = [spec] if ".." in spec else ["-1", spec]
+    try:
+        log = subprocess.run(
+            ["git", "log", "--format=%h%x00%B%x01", *args],
+            cwd=ROOT,
+            capture_output=True,
+            check=True,
+        ).stdout.decode("utf-8")
+    except subprocess.CalledProcessError:
+        print(f"public words: git could not read the commits {spec} (a shallow clone, or a commit gone); not a pass")
+        return 2
+    commits = [c.strip() for c in log.split("\x01") if c.strip()]
+    findings: list[str] = []
+    for c in commits:
+        sha, _, message = c.partition("\0")
+        findings.extend(scan_text(message, f"commit {sha}"))
+    for line in findings:
+        print(line)
+    print(f"public words: {len(findings)} finding(s) in {len(commits)} commit message(s)")
+    return 1 if findings else 0
+
+
 def main(argv: list[str]) -> int:
+    if argv[:1] == ["--commits"]:
+        if len(argv) < 2:
+            print("public words: --commits needs a range (A..B) or one commit")
+            return 2
+        return scan_commits(argv[1])
     findings: list[str] = []
     files = files_for(argv)
     for f in files:

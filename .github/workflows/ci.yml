@@ -6,6 +6,18 @@ on:
   pull_request:
 
 jobs:
+  commits:
+    # A commit message is published text too: the commits this push or pull request adds name no one
+    # inside the team and point at no internal room or tracker, like the tree.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - run: python3 scripts/public_words.py --commits "$RANGE"
+        env:
+          RANGE: ${{ github.event_name == 'pull_request' && format('{0}..{1}', github.event.pull_request.base.sha, github.event.pull_request.head.sha) || (github.event.before && !startsWith(github.event.before, '0000000') && format('{0}..{1}', github.event.before, github.sha)) || github.sha }}
+
   gates:
     strategy:
       fail-fast: false
