@@ -144,6 +144,15 @@ class ApiError(Exception):
         return self.status == 403 and self.code == "hidden_not_allowed"
 
     @property
+    def is_character_played(self) -> bool:
+        """A delete (or a review's decline) named a Character someone plays on the roster, the
+        world's ``owner_character`` or a live member's, an AI seat's or a player's Character (422
+        ``character_played``, ``param`` id). Nothing was deleted; the message says who plays it,
+        never by email or username. Re-point that member to another Character, or remove the
+        member, then delete. Never true for a malformed id's 422, which carries the same ``param``."""
+        return self.status == 422 and self.code == "character_played"
+
+    @property
     def is_permission_error(self) -> bool:
         """The key is valid but lacks the scope (403 ``permission_error``): a read key on a write
         route, or a member key on a surface that refuses members. Retrying will not help."""

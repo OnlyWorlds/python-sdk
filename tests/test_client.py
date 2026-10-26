@@ -497,6 +497,7 @@ def test_each_error_has_its_own_flag_and_no_other(
         "is_auth_error",
         "is_validation_error",
         "is_known_of_not_writable",
+        "is_character_played",
     ]
     t = FakeTransport(script=[env(status, etype, code)])
     with pytest.raises(ApiError) as caught:
@@ -511,6 +512,17 @@ def test_known_of_not_writable_is_a_validation_error_with_its_own_flag() -> None
     assert (e.is_known_of_not_writable, e.is_validation_error, e.param) == (True, True, "known_of")
     other = ApiError("PATCH", "x", jresp(422, {"error": {"code": "invalid_field"}}))
     assert (other.is_known_of_not_writable, other.is_validation_error) == (False, True)
+
+
+def test_character_played_is_a_validation_error_with_its_own_flag(make_client: MakeClient) -> None:
+    t = FakeTransport(script=[env(422, "invalid_request", "character_played")])
+    with pytest.raises(ApiError) as caught:
+        make_client(t, attempts=1).delete("character", ID)
+    assert (caught.value.is_character_played, caught.value.is_validation_error) == (True, True)
+    malformed = ApiError("DELETE", "x", jresp(422, {"error": {"code": "invalid_request", "param": "id"}}))
+    assert (malformed.is_character_played, malformed.param) == (False, "id")
+    elsewhere = ApiError("DELETE", "x", jresp(409, {"error": {"code": "character_played"}}))
+    assert elsewhere.is_character_played is False
 
 
 def test_flat_and_unparseable_envelopes(make_client: MakeClient) -> None:

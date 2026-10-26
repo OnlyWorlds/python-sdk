@@ -4,6 +4,10 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+## 0.61.0 (2026-10-26)
+
+- **`ApiError.is_character_played`**: a delete (or a review's decline) of a Character someone plays on the roster, the world's `owner_character` or a live member's, an AI seat's or a player's, answers 422 `character_played` (`param` id) and deletes nothing. The flag tells it from a malformed id's 422, which carries the same `param`. The way out is to re-point that member to another Character, or remove the member, then delete.
+
 ## 0.60.1 (2026-10-25)
 
 - **Schema repinned to schema-dist v0.33.0-dist.71** (from dist.69; same canonical 00.33.00). The room profile now says what trimmed means: Unicode White_Space removed at both ends, a byte order mark kept. Its fixture gains three cases, 28 in all: a tab and an ideographic space around the name still match, a leading U+FEFF and a trailing U+001C do not. `is_room_element` already read all 28, so no reader changed; the room test now asserts exactly 28 cases. No schema file moved. Serial 70 carried the same content with a manifest that did not match its files and is pinned in no release.
