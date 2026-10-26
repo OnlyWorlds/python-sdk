@@ -286,6 +286,20 @@ def test_the_202_and_the_five_codes_are_what_the_client_reads(doc: dict[str, Any
         Client("ow_w_testkey", "1234", transport=t).patch("location", ID, {"name": "x"})
 
 
+def test_me_documents_the_front_door_keys_the_document_declares(doc: dict[str, Any]) -> None:
+    """``Client.me``'s docstring names the front door's keys and a ``my_seats`` row's keys, in the
+    document's order; a key keel adds or drops fails here until the docstring follows."""
+    me = doc["paths"]["/api/v2/me"]["get"]["responses"]["200"]["content"]["application/json"]["schema"]
+    door = me["properties"]["front_door"]
+    text = " ".join((Client.me.__doc__ or "").split())
+    named = re.search(r"``front_door`` is ``\{([^}]*)\}``", text)
+    assert named, "me's docstring lists no front_door keys"
+    assert [k.strip() for k in named.group(1).split(",")] == list(door["properties"])
+    row = re.search(r"``my_seats``.*?each ``\{([^}]*)\}``", text)
+    assert row, "me's docstring lists no my_seats row keys"
+    assert [k.strip() for k in row.group(1).split(",")] == list(door["properties"]["my_seats"]["items"]["properties"])
+
+
 def test_the_proposal_list_envelope_is_the_one_the_walk_follows(doc: dict[str, Any]) -> None:
     props = doc["components"]["schemas"]["ProposalList"]["properties"]
     assert set(props) == {"data", "has_more", "next_cursor"}

@@ -954,3 +954,45 @@ def test_client_name_outside_the_rule_is_refused_at_construction(bad: str) -> No
 def test_client_name_not_a_string_is_a_type_error(bad: Any) -> None:
     with pytest.raises(TypeError, match=r"client.*\[a-z0-9-\]\{1,32\}"):
         Client("ow_w_testkey", "1234", client=bad)
+
+
+def _me_body(kind: str, seats: list[dict[str, Any]]) -> dict[str, Any]:
+    return {
+        "world": {"id": ID, "name": "W"},
+        "scope": "write",
+        "kind": kind,
+        "role": "contributor",
+        "membership": "m2",
+        "character": "c2",
+        "front_door": {
+            "sponsor": None,
+            "sponsor_character": None,
+            "my_character": "c2",
+            "my_seats": seats,
+            "charter": None,
+            "charter_skill": [],
+        },
+    }
+
+
+def test_me_reads_front_door_my_seats_through_agent_seats_first() -> None:
+    seats: list[dict[str, Any]] = [
+        {"id": "m7", "kind": "agent", "name": "Quill", "character": "c7"},
+        {"id": "m8", "kind": "agent", "name": "Wren", "character": None},
+        {"id": "m9", "kind": "player", "name": None, "character": "c9"},
+    ]
+    body = _me_body("person", seats)
+    t = FakeTransport(script=[jresp(200, body)])
+    got = Client("ow_w_testkey", "1234", transport=t).me()
+    assert got == body
+    assert got["front_door"]["my_seats"] == seats
+    assert [s["kind"] for s in got["front_door"]["my_seats"]] == ["agent", "agent", "player"]
+    assert t.calls[0].method == "GET" and t.calls[0].url.rstrip("/").endswith("/api/v2/me")
+
+
+def test_me_keeps_an_empty_my_seats_for_a_seats_own_key() -> None:
+    body = _me_body("agent", [])
+    t = FakeTransport(script=[jresp(200, body)])
+    got = Client("ow_w_testkey", "1234", transport=t).me()
+    assert got["front_door"]["my_seats"] == []
+    assert got == body

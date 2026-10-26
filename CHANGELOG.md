@@ -4,6 +4,10 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+## 0.65.0 (2026-10-26)
+
+- **`front_door.my_seats` on `me()`** (keel's front door, live 2026-10-26). `GET /me`'s front door now lists the live AI and player seats the key's holder answers for, agent seats first, each `{id, kind, name, character}`: `id` the seat's membership id as `GET /members` lists it, `kind` `agent` or `player`, `name` `None` when the seat has none, and `character` the Character it plays (`None` when it plays none the key can read). The list is empty for an AI or a player seat's own key and for anyone who answers for none; a seat made from a link for an email address is never listed. The client already returned the body as keel sent it; `me()`'s docstring now names the sixth key and the row's four. Tests: `me()` reads a front door with seats and one with an empty list through unchanged, and the wire test holds the docstring's key lists to keel's document, so a key added or dropped there fails until the docstring follows.
+
 ## 0.64.1 (2026-10-26)
 
 - **Schema repinned to schema-dist `v0.33.0-dist.74`** (from dist.73; same canonical 00.33.00, so `SCHEMA_VERSION` stays `"00.33.00"`, no schema file moved). Serial 74 is text only: the dist's README ends on a maintainer line, and six profile pages (checks, names, packet, review, room, spine) no longer name people or point inside the project's own tracker. The walk's files this package carries (`lint_folder.py`, `schema.json`, `import-map.json`) are byte for byte the same; no reader and no fixture changed. `SCHEMA_DIST_TAG`, `SCHEMA_DIST_SERIAL` and `SCHEMA_MANIFEST_SHA256` name the new pin.

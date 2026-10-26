@@ -536,9 +536,15 @@ class Client:
         ``kind`` is ``owner`` for an owner-minted or classic key, else the membership's (``person``,
         ``agent``, ``player``); ``role`` is ``owner``, ``co_builder``, ``contributor`` or ``guest``;
         ``character`` is the member's Character id, or None. ``front_door`` is
-        ``{sponsor, sponsor_character, my_character, charter, charter_skill}``: who answers for a
-        seat, its Character, and the world's Charter (every member's to read; an agent reads it
-        first) with up to five Objects it names; anything hidden from the key is None or left out.
+        ``{sponsor, sponsor_character, my_character, my_seats, charter, charter_skill}``: who answers
+        for a seat, its Character, the seats you answer for, and the world's Charter (every member's
+        to read; an agent reads it first) with up to five Objects it names; anything hidden from the
+        key is None or left out. ``my_seats`` lists the live AI and player seats you answer for,
+        agent seats first, each ``{id, kind, name, character}``: ``id`` the seat's membership id as
+        ``GET /members`` lists it, ``kind`` ``agent`` or ``player``, ``name`` None when the seat has
+        none, ``character`` the Character it plays (None when it plays none you can read). It is
+        empty for an AI or a player seat's own key and for anyone who answers for none; a seat made
+        from a link for an email address is never listed.
         """
         data = self.call("GET", "me/")
         if not isinstance(data, dict):
