@@ -64,9 +64,9 @@ __all__ = [
 #: The spec version this module writes and reads against (§4.2 ``format_version``).
 FORMAT_VERSION = "0.3.18"
 
-#: §4.4 (v0.3.10; keel PR 113): the stub marker. keel hands a guest an element it reaches only
+#: §4.4 (v0.3.10): the stub marker. keel hands a guest an element it reaches only
 #: through its own Character's sheet as a stub, ``known_of: true``: these keys, its type's public
-#: fields with their values (keel PR 117: ``PUBLIC_FIELDS``), every other field unset.
+#: fields with their values (``PUBLIC_FIELDS``), every other field unset.
 KNOWN_OF = "known_of"
 #: The hidden mark's key (folder format §4.8, ``is_hidden``).
 HIDDEN = "hidden"
@@ -108,7 +108,7 @@ def known_of_for_disk(body: Mapping[str, Any]) -> dict[str, Any]:
     The unset fields keel serves (``""``, ``null``, ``[]``) are left out, never written:
     on disk they would read as a whole element with nothing filled in. Anything else it
     sent is kept, whatever the field (a Character's public ``physicality``, ``height``,
-    ``species``: keel PR 117), since a writer never drops data it has (§3). This reads the
+    ``species``), since a writer never drops data it has (§3). This reads the
     body, never ``PUBLIC_FIELDS``, so a type that gains public fields needs no change here.
     """
     out = {k: v for k, v in body.items() if k != KNOWN_OF and (k in KNOWN_OF_KEEPS or _is_set(v))}

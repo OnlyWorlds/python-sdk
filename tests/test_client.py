@@ -216,7 +216,7 @@ def test_rate_limited_429_is_never_retried(make_client: MakeClient, sleeps: list
 
 
 def test_a_timeout_then_in_flight_retries_to_the_replay(make_client: MakeClient, sleeps: list[float]) -> None:
-    """keel #307: a retry after a timeout can meet the first request still running (409
+    """A retry after a timeout can meet the first request still running (409
     idempotency_in_flight, Retry-After 1); the next try, same key and body, gets the replay."""
     in_flight = {"error": {"type": "idempotency_error", "code": "idempotency_in_flight"}}
     t = FakeTransport(
@@ -303,7 +303,7 @@ def test_draught_sends_the_seven_policy_keys_and_list_page_the_two_filters(make_
 
 
 def test_draught_compact_is_sent_as_true_or_false_and_absent_sends_nothing(make_client: MakeClient) -> None:
-    """keel #585, as the npm SDK's 'draught: compact' (4.69.0): a refused compact sends nothing."""
+    """As the npm SDK's 'draught: compact' (4.69.0): a refused compact sends nothing."""
     t = FakeTransport(handler=lambda *a: jresp(200, {"world": {"id": "w"}, "character": None}))
     client = make_client(t)
     client.draught("c1", compact=True)
@@ -344,7 +344,7 @@ def test_a_feed_that_says_more_without_moving_is_refused(make_client: MakeClient
         list(make_client(FakeTransport(script=[stuck])).walk_changes("C0"))
 
 
-# --- the conditional head poll (keel #518) ----------------------------------------
+# --- the conditional head poll ----------------------------------------------------
 
 
 def head_body(head: int, epoch: int | None = None, cursor: Any = None) -> dict[str, Any]:
@@ -542,7 +542,7 @@ def test_a_409_without_a_code_is_neither_conflict() -> None:
 
 
 def test_resync_reason_reads_the_409_envelope() -> None:
-    """keel #421, keel PR 103: with the hidden mark on, the 409 resync_required says why in ``reason``."""
+    """With the hidden mark on, the 409 resync_required says why in ``reason``."""
     for reason in ("role", "view"):
         body = {
             "error": {
@@ -631,7 +631,7 @@ def test_a_retried_create_that_already_landed_is_read_back(make_client: MakeClie
     assert len(t.calls) == 1
 
 
-# --- the hidden mark on a create (keel #587) ----------------------------------------
+# --- the hidden mark on a create ----------------------------------------------------
 
 
 def test_a_create_sends_hidden_as_the_element_has_it_and_an_update_never(make_client: MakeClient) -> None:
@@ -713,7 +713,7 @@ def test_permission_and_resync_predicates() -> None:
     assert err(409, "resync_required").is_resync_required and not err(409, "id_conflict").is_resync_required
 
 
-# --- only if unchanged (keel #210) ----------------------------------------
+# --- only if unchanged ----------------------------------------------------
 
 PRECONDITION_412 = {
     "error": {
@@ -778,9 +778,9 @@ def test_patch_world_takes_back_a_get_world_body_and_a_folder_spelling(make_clie
 
 
 def test_patch_world_drops_the_read_only_keys_keel_refuses(make_client: MakeClient) -> None:
-    # keel #471 (PR 173): slug and public_page ride every GET /world and PATCH answers them 422;
+    # slug and public_page ride every GET /world and PATCH answers them 422;
     # agent_narrator_rule is refused the same way (measured on staging), and agent_writes_proposed is readOnly in the
-    # document (keel #519); owner_character is accepted, so it is sent
+    # document; owner_character is accepted, so it is sent
     t = FakeTransport(handler=lambda *_: jresp(200, {"id": "w"}))
     body = {
         "id": "w",
@@ -788,11 +788,11 @@ def test_patch_world_drops_the_read_only_keys_keel_refuses(make_client: MakeClie
         "slug": "w-world",
         "public_page": {"on": True, "palette": "ink", "hero": None, "sections": [], "pin": None, "index": True},
         "agent_narrator_rule": False,
-        "agent_writes_proposed": False,  # keel #519: read-only on GET /world, set on the world page
+        "agent_writes_proposed": False,  # read-only on GET /world, set on the world page
         "owner_character": None,
-        # keel #571: served on every GET /world, an unknown key to PATCH (written as source and producer)
+        # served on every GET /world, an unknown key to PATCH (written as source and producer)
         "origin": {"source": {"server": "https://www.onlyworlds.com", "world": "w0", "at": "a"}, "producer": None},
-        # keel #421 PR 4: a keyless read's counts, an unknown key to PATCH (Quillon)
+        # a keyless read's counts, an unknown key to PATCH (Quillon)
         "counts": {"total": 1, "types": {"character": 1}},
     }
     make_client(t).patch_world(body)
@@ -800,7 +800,7 @@ def test_patch_world_drops_the_read_only_keys_keel_refuses(make_client: MakeClie
 
 
 def test_patch_world_sends_a_get_world_bodys_extension_keys(make_client: MakeClient) -> None:
-    # keel #571: the World's x_*, atlas_* and shadow_* keys are served at the top level and PATCH sets them
+    # The World's x_*, atlas_* and shadow_* keys are served at the top level and PATCH sets them
     # (null removes one), so a read body handed back sends them as given, beside the fields
     t = FakeTransport(handler=lambda *_: jresp(200, {"id": "w"}))
     names = {"version": 1, "types": {"character": {"one": "Employee", "many": "Employees"}}}
@@ -865,7 +865,7 @@ def test_patch_world_sends_source_and_producer_only_when_named(make_client: Make
     ]
 
 
-# --- keel #299: the agent declaration -------------------------------------
+# --- the agent declaration ------------------------------------------------
 
 
 def test_agent_header_on_the_six_element_writes_only(make_client: MakeClient) -> None:
@@ -898,7 +898,7 @@ def test_agent_header_on_the_six_element_writes_only(make_client: MakeClient) ->
     assert [c.headers.get("X-OW-Agent") for c in t.calls] == [None, None, None, None]
 
 
-# --- keel #520: the client's name ------------------------------------------
+# --- the client's name -----------------------------------------------------
 
 
 def _six_writes(c: Client) -> None:

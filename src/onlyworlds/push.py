@@ -27,7 +27,7 @@ in Atlas's ``src/core/constants.ts``). Atlas's other ``atlas_*`` fields
 Atlas-written pins and markers spell their links ``map_id`` / ``zone_id``; the diff reads
 them as the wire's ``map`` / ``zone`` (spec §5). ``known_of`` is never sent either.
 
-A stub is never pushed (folder spec v0.3.10 §4.4 rule 3; keel PR 113): an element that is
+A stub is never pushed (folder spec v0.3.10 §4.4 rule 3): an element that is
 ``known_of: true`` in the folder OR in the baseline is left out of the diff and listed in
 ``PushPlan.known_of`` (and ``PushResult.known_of``), not in the membership lists: its absent
 fields are unknown, not edits, and it is not the folder's to create or delete.

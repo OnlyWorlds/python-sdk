@@ -746,7 +746,7 @@ _OWNER_KEY = f"{SPINE_PREFIX}owner"
 _RETIRES_KEY = f"{SPINE_PREFIX}retires"
 #: A UUID as text: ``source`` is the projected-from world's id (serial 60).
 _UUID = re.compile("[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}")
-#: The roles whose keys are served hidden elements (keel PR 160): any other key's view leaves them out.
+#: The roles whose keys are served hidden elements: any other key's view leaves them out.
 _SEES_HIDDEN = frozenset({"owner", "co_builder"})
 _ON_A_SOURCE = "a source world's check: on a projection only its three run"
 #: What flag 13 does not check on a projection (serial 60: the source's checks run on a source world only).

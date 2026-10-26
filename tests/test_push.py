@@ -122,7 +122,7 @@ def test_created_by_is_never_sent(tmp_path: Path) -> None:
 
 
 def test_changed_by_and_changed_via_are_never_sent(tmp_path: Path) -> None:
-    """keel #299: the last write's author and door are read-only like created_by, and every push restamps them."""
+    """The last write's author and door are read-only like created_by, and every push restamps them."""
     base, edit = folders(
         tmp_path,
         {"character": [wire_char(C1, "A", changed_by="m-1", changed_via="api"), wire_char(C2, "B", changed_via="mcp")]},
@@ -133,7 +133,7 @@ def test_changed_by_and_changed_via_are_never_sent(tmp_path: Path) -> None:
 
 
 def test_changed_client_is_never_sent(tmp_path: Path) -> None:
-    """keel #520: the last write's client name is read-only like changed_via, and every push restamps it."""
+    """The last write's client name is read-only like changed_via, and every push restamps it."""
     base, edit = folders(
         tmp_path,
         {"character": [wire_char(C1, "A", changed_client="atlas"), wire_char(C2, "B", changed_client=None)]},
@@ -144,7 +144,7 @@ def test_changed_client_is_never_sent(tmp_path: Path) -> None:
 
 
 def test_push_patch_carries_the_write_headers(tmp_path: Path) -> None:
-    """The push's PATCH is an element write: it names the client (keel #520) and, for an agent, declares it."""
+    """The push's PATCH is an element write: it names the client and, for an agent, declares it."""
     base, edit = folders(tmp_path, {"character": [wire_char(C1, "A")]}, {"character": [wire_char(C1, "B")]})
     t = FakeTransport(handler=echo())
     push(base, edit, client=Client("ow_w_testkey", "1234", transport=t), log_path=tmp_path / "a.jsonl", workers=1)
@@ -314,7 +314,7 @@ def test_dry_run_and_key_pin_parameters(tmp_path: Path) -> None:
         push(base, edit, log_path=tmp_path / "log.jsonl")
 
 
-# keel #571: origin is a world's birth line, written once: a push sets it only on a first
+# origin is a world's birth line, written once: a push sets it only on a first
 # fill from a folder made elsewhere, never from a folder exported from the same world, and never over
 # a first import.
 NO_ORIGIN = {"source": None, "producer": None}
@@ -441,7 +441,7 @@ PROPOSAL_ID = "019a0000-0000-7000-8000-0000000000aa"
 
 
 def held(*ids: str) -> Callable[..., Response]:
-    """keel #519: a world that takes an agent seat's writes as proposals answers these ids 202."""
+    """A world that takes an agent seat's writes as proposals answers these ids 202."""
     stored = echo()
 
     def handler(method: str, url: str, headers: Mapping[str, str], body: bytes | None) -> Response:
@@ -525,7 +525,7 @@ def test_an_element_hidden_on_both_sides_patches_as_usual(tmp_path: Path) -> Non
 
 
 def test_a_patch_never_carries_the_mark_even_when_the_folder_unhid_it(tmp_path: Path) -> None:
-    """An update's ``hidden`` is dropped by keel (#587 kept it so): the mark moves only by its own route."""
+    """An update's ``hidden`` is dropped by keel (only a create takes it): the mark moves only by its own route."""
     base, edit = folders(
         tmp_path,
         {"character": [wire_char(C1, "Gelon", hidden=True)]},
@@ -537,7 +537,7 @@ def test_a_patch_never_carries_the_mark_even_when_the_folder_unhid_it(tmp_path: 
 
 
 def test_a_push_creates_nothing_so_a_hidden_element_new_to_the_server_is_never_sent(tmp_path: Path) -> None:
-    """keel #587 takes the mark on a create, but a push is a PATCH loop: an element only in the folder
+    """keel takes the mark on a create, but a push is a PATCH loop: an element only in the folder
     is ``only_in_folder``, never created (``Client.create``/``upsert``/``bulk`` send the mark)."""
     base, edit = folders(
         tmp_path,

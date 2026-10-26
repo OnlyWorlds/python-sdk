@@ -83,7 +83,7 @@ def test_the_pin_rides_only_where_keel_checks_it() -> None:
     assert {m for m, _ in writes.values()} == {"POST", "PATCH", "PUT", "DELETE"}
     assert me == {"me": ("GET", "1234")}
 
-    # A 10-digit legacy key with a PIN: on every call, reads included (keel #421).
+    # A 10-digit legacy key with a PIN: on every call, reads included.
     legacy = _sent("0123456789", "1234", READS + WRITES + ME)
     assert {n: pin for n, (_, pin) in legacy.items()} == dict.fromkeys(legacy, "1234")
 

@@ -36,7 +36,7 @@ pytestmark = pytest.mark.skipif(not SOURCE, reason="set OW_OPENAPI to keel's Ope
 
 ID = "018f0000-0000-7000-8000-000000000001"
 # The fields keel keeps that the schema does not carry, read from the package itself, never a list kept
-# here: the read-only fields it strips before a write (a hand list missed `known_of`, keel PR 113, the
+# here: the read-only fields it strips before a write (a hand list missed `known_of` the
 # hour it went live), plus the ones keel ignores on write and the id.
 SERVER_MANAGED = (set(_http.READ_ONLY_FIELDS) - {"world"}) | {
     "id",
@@ -52,7 +52,7 @@ def _load() -> dict[str, Any]:
     assert SOURCE
     if SOURCE.startswith(("http://", "https://")):
         # The document is 2 MB plain, 181 KB gzipped: ask for gzip (keel's bandwidth watch),
-        # and send the last ETag back as received (keel #538): an unchanged document is a 304 and 0 bytes,
+        # and send the last ETag back as received: an unchanged document is a 304 and 0 bytes,
         # served from a cache file beside the system's temp dir. CI has no cache, so it reads fresh once.
         cache = pathlib.Path(tempfile.gettempdir()) / "onlyworlds-wire-openapi.json"
         cached: dict[str, Any] | None = None
@@ -208,7 +208,7 @@ def test_every_header_the_client_sends_is_declared_on_its_operation(doc: dict[st
 
 
 def test_every_operation_that_takes_if_match_is_one_the_client_sends_it_on(doc: dict[str, Any]) -> None:
-    """keel #210, #563: the operations that read ``If-Match`` are the document's own list, never one kept
+    """The operations that read ``If-Match`` are the document's own list, never one kept
     here (a hand list of two missed DELETE the hour keel gave it the header). Each must be reached by a
     call that sends it, and the client sends it nowhere else (the test above)."""
     takes = {
@@ -227,7 +227,7 @@ def test_every_operation_that_takes_if_match_is_one_the_client_sends_it_on(doc: 
 
 
 def test_the_proposal_calls_send_only_declared_headers_and_bodies(doc: dict[str, Any]) -> None:
-    """keel #519: each proposal call's extra headers are parameters of its operation, and each body's
+    """Each proposal call's extra headers are parameters of its operation, and each body's
     keys are properties of its request schema (which allow no others)."""
     c, t = _recorder()
     c.propose("location", ID, {"name": "x"}, evidence="e", expires="2026-12-01T00:00:00Z")
@@ -294,7 +294,7 @@ def test_the_proposal_list_envelope_is_the_one_the_walk_follows(doc: dict[str, A
 
 
 def test_the_queue_rows_are_the_two_kinds_the_doctor_tells_apart(doc: dict[str, Any]) -> None:
-    """keel #565: the queue's rows are a oneOf told apart by ``kind``; the doctor reads ``new_element``
+    """The queue's rows are a oneOf told apart by ``kind``; the doctor reads ``new_element``
     as a marked new element and every other row as a proposal."""
     from onlyworlds import doctor
 
@@ -330,7 +330,7 @@ def test_every_proposal_and_review_operation_is_reached_and_answers_what_review_
 
 
 def test_the_head_poll_header_and_its_304_are_declared(doc: dict[str, Any]) -> None:
-    """keel #518: ``head()`` sends ``If-None-Match`` and reads a 304 with an ``ETag`` on GET /changes."""
+    """``head()`` sends ``If-None-Match`` and reads a 304 with an ``ETag`` on GET /changes."""
     t = FakeTransport(
         script=[jresp(200, {"head": 3, "cursor": 3, "epoch": None}, {"ETag": '"3:-"'}), _http.Response(304, b"", {})]
     )
@@ -376,7 +376,7 @@ def test_a_write_never_carries_what_the_write_schema_refuses(doc: dict[str, Any]
         "updated_at": "b",
         "change_seq": 1,
         "created_by": None,
-        "hidden": True,  # keel #587: a create takes it, so the write schema must name it
+        "hidden": True,  # a create takes it, so the write schema must name it
     }
     for ty in ELEMENT_TYPES:
         c.upsert(ty, ID, body)
@@ -390,7 +390,7 @@ def test_a_write_never_carries_what_the_write_schema_refuses(doc: dict[str, Any]
 def test_patch_world_takes_back_every_key_the_world_body_serves(doc: dict[str, Any]) -> None:
     """A ``GET /world`` body with every key the World schema serves, handed back to ``patch_world``,
     sends only what WorldPatch takes (its properties and its extension pattern): the next read-only
-    key keel adds to the World (``origin``, keel #571) fails here, not as a caller's 422."""
+    key keel adds to the World (like ``origin``) fails here, not as a caller's 422."""
     schemas = doc["components"]["schemas"]
     world, patch = schemas["World"], schemas["WorldPatch"]
     assert patch.get("additionalProperties") is False
@@ -425,7 +425,7 @@ def test_the_list_envelope_names_are_the_ones_iter_elements_follows(doc: dict[st
 def test_every_key_of_the_error_envelope_reaches_apierror(doc: dict[str, Any]) -> None:
     err = doc["components"]["schemas"]["Error"]["properties"]["error"]
     five = {"type", "code", "message", "param", "doc_url"}
-    # keel #421 PR 103: with the hidden mark on, a 409 resync_required's envelope also carries `reason`.
+    # With the hidden mark on, a 409 resync_required's envelope also carries `reason`.
     assert set(err["properties"]) in (five, five | {"reason"})
     if "reason" in err["properties"]:
         resync = {

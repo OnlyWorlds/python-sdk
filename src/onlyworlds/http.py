@@ -8,7 +8,7 @@ OpenAPI document, which ``tests/test_wire.py`` compares the client with):
   10-digit legacy key; a GET with any other key carries none;
 - a body never carries ``world`` (the key names the world) or the server-managed
   ``type`` / ``created_at`` / ``updated_at`` / ``change_seq``: the typed calls strip them;
-- a known-of stub (``known_of: true``, keel PR 113) is never written: the typed element
+- a known-of stub (``known_of: true``) is never written: the typed element
   writes refuse one before sending, and strip any other ``known_of``;
 - lists are ``{data, has_more, next_cursor}``, continued with ``?cursor=``;
 - ``Idempotency-Key`` on POST and ``/bulk`` replays the first successful answer for 24 h;
@@ -67,10 +67,10 @@ USER_AGENT = f"onlyworlds-py/{__version__}"
 #: namespaced extension fields (``atlas_*`` / ``shadow_*`` / ``x_*``) must pass through
 #: untouched, because tools round-trip their own state through other tools' writes.
 #: ``created_by``, ``changed_by``, ``changed_via`` and ``changed_client`` are not here: keel drops
-#: them silently on a write (spec §4), so a read body round-trips as it is. ``known_of`` (keel PR 113)
+#: them silently on a write (spec §4), so a read body round-trips as it is. ``known_of``
 #: is an unknown field to keel's writes (a 422): stripped too, and a body where it is ``true``
 #: is refused before it gets here (``_refuse_known_of``).
-#: ``hidden`` (keel PR 160) rides a body only for a reader who still sees a hidden element and is
+#: ``hidden`` rides a body only for a reader who still sees a hidden element and is
 #: ignored in an update: stripped from a PATCH so a read body round-trips as it is. A create takes it
 #: (``CREATE_FIELDS``).
 READ_ONLY_FIELDS: tuple[str, ...] = ("world", "type", "created_at", "updated_at", "change_seq", "known_of", "hidden")
@@ -115,7 +115,7 @@ def sanitize_payload(payload: Mapping[str, Any], *, create: bool = False) -> dic
 
 
 def _refuse_known_of(element: Mapping[str, Any], where: str) -> None:
-    """A known-of stub (``known_of: true``, keel PR 113) is a ValueError before anything is sent.
+    """A known-of stub (``known_of: true``) is a ValueError before anything is sent.
 
     Its empty fields are not the element's values: stripping the marker and sending the rest
     would turn keel's 422 into a write that blanks the element (a PUT replaces it whole, a PATCH
@@ -132,7 +132,7 @@ def _refuse_known_of(element: Mapping[str, Any], where: str) -> None:
 
 #: ``GET /world`` keys that ``PATCH /world`` refuses (keel's writable set has neither), dropped
 #: like ``READ_ONLY_FIELDS`` so a read body is writable. ``public_read`` changes through sharing;
-#: ``slug`` and ``public_page`` ride every body since keel PR 173 and are answered 422 like it;
+#: ``slug`` and ``public_page`` ride every body since keel's public page and are answered 422 like it;
 #: ``agent_narrator_rule`` is refused too (a 422 naming it, measured on staging 2026-10-22);
 #: ``agent_writes_proposed`` is ``readOnly`` in the document, set on the world page.
 #: ``origin`` is served on every body and is an unknown key to PATCH (422): it is written
@@ -342,7 +342,7 @@ class ChangeWalk:
     holds that the new walk does not name follows ``ApiError.resync_reason`` (while
     keel's hidden mark is on): ``role`` (the key's own role or membership moved), keep it;
     ``view`` (something left its view), drop it; no reason, keep it: a reset never empties a
-    copy (keel PR 104; sharing is forward-only). A guest never receives delete ops, so the
+    copy (sharing is forward-only). A guest never receives delete ops, so the
     409 is its only sign that something left. A delete op's ``reason`` (``deleted``,
     ``hidden``, ``out_of_view``) says why it left; remove it in every case. Never empty a
     copy on your own.
@@ -738,7 +738,7 @@ class Client:
     def upsert(self, element_type: str, element_id: str, element: Mapping[str, Any]) -> dict[str, Any]:
         """``PUT /{type}/{id}``: replace by client id, creating if absent. The local-first write.
 
-        A known-of stub (``known_of: true``, keel PR 113) is a ValueError before sending, here and
+        A known-of stub (``known_of: true``) is a ValueError before sending, here and
         on every element write: a PUT of one would blank every field it does not keep.
 
         On a world that takes an agent seat's writes as proposals, a seat's PUT of an
@@ -1175,7 +1175,7 @@ class Client:
         depth: int | None = None,
         compact: bool | None = None,
     ) -> dict[str, Any]:
-        """``GET /character/{id}/context``: the draught (keel PR 155), one Character's context in
+        """``GET /character/{id}/context``: the draught, one Character's context in
         one read as the recorded world holds it: her element, what she holds and sits in, her open
         work, how she works, her Events, the Narratives she knows, everything else that names her,
         her sheet, what changed around her (``since``: a feed cursor or an ISO time) and who plays

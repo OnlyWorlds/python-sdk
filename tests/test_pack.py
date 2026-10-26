@@ -604,7 +604,7 @@ def test_the_label_line_says_a_characters_view_in_the_worlds_word() -> None:
     assert "*Made as the Employee (Character) Ann:" in build_pack(mapped, world(), exported_as=named)[0]["00-world.md"]
 
 
-# --- proposed elements: not canon until a keeper settles them (keel #565; Skeld's ruling)
+# --- proposed elements: not canon until a keeper settles them (Skeld's ruling)
 
 C3 = "c0000000-0000-7000-8000-000000000003"
 C4 = "c0000000-0000-7000-8000-000000000004"

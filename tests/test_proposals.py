@@ -1,4 +1,4 @@
-"""The proposed change (keel #519, PR 180; round 2, keel #565, PR 188): the proposal calls, the review
+"""The proposed change (and its round 2): the proposal calls, the review
 of a marked new element, the 202 a held write answers, and the six error codes. Scripted HTTP, no network."""
 
 from __future__ import annotations
@@ -39,7 +39,7 @@ PROPOSAL: dict[str, Any] = {
     "updated_at": "2026-10-22T16:30:00Z",
 }
 NEW = "018f0000-0000-7000-8000-000000000002"
-#: A queue row for a new element marked for review (keel #565): the element is the record.
+#: A queue row for a new element marked for review: the element is the record.
 MARKED: dict[str, Any] = {
     "kind": "new_element",
     "id": NEW,
@@ -171,7 +171,7 @@ def test_walk_world_proposals_follows_the_cursor(make_client: MakeClient) -> Non
 
 
 def test_the_walk_yields_both_kinds_of_row_and_sends_the_cursor_back_as_it_came(make_client: MakeClient) -> None:
-    # keel #565: one order newest first, both kinds; the cursor is opaque (`<microseconds>.<id>`
+    # One order newest first, both kinds; the cursor is opaque (`<microseconds>.<id>`
     # today), never the last row's id.
     opaque = f"1729666800000000.{PID}"
     t = FakeTransport(
@@ -204,7 +204,7 @@ def test_proposal_path_segments_are_checked(make_client: MakeClient, bad: str) -
     assert t.calls == []
 
 
-# --- a new element marked for review (keel #565) -------------------------------------
+# --- a new element marked for review -------------------------------------------------
 
 
 def test_review_accept_posts_the_decision_and_returns_the_element(make_client: MakeClient) -> None:
@@ -307,7 +307,7 @@ CODES = [
     (409, "invalid_request", "stale_proposal", "is_stale_proposal"),
     (403, "permission_error", "proposed_only", "is_proposed_only"),
     (403, "permission_error", "own_proposal", "is_own_proposal"),
-    (422, "invalid_request", "not_proposed", "is_not_proposed"),  # keel #565: a review of an unmarked element
+    (422, "invalid_request", "not_proposed", "is_not_proposed"),  # a review of an unmarked element
 ]
 
 

@@ -180,7 +180,7 @@ def test_no_me_still_writes_the_producer_line(tmp_path: Path, make_client: Calla
 
 
 def test_an_export_is_a_birth_so_the_line_is_its_own(tmp_path: Path, make_client: Callable[..., Client]) -> None:
-    # A GET /world body carrying another folder's lines (keel keeps them at a folder upload, #477):
+    # A GET /world body carrying another folder's lines (keel keeps them at a folder upload):
     # they name the maker of THAT folder, so this folder's own are written, as for source.
     theirs = {"tool": "azgaar-converter", "version": "0.4.0", "input": "azgaar-map"}
     their_source = {"server": None, "world": "w0", "at": "2026-10-01T00:00:00.000Z"}

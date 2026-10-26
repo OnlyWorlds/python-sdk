@@ -662,7 +662,7 @@ def test_6a_through_the_api() -> None:
     assert found(api_report(FakeReader(elements)), "6a") == []
 
 
-# --- 12. proposals waiting (keel #519) --------------------------------------------------
+# --- 12. proposals waiting --------------------------------------------------------------
 
 
 def proposal(pid: int, created_at: str, state: str = "open") -> dict[str, Any]:
@@ -729,7 +729,7 @@ def test_12_only_lapsed_proposals_still_wait() -> None:
 
 
 def marked(eid: int, created_at: str, state: str = "open") -> dict[str, Any]:
-    """A queue row for a new element carrying ``x_review_proposed`` (keel #565): ``id`` is the element's."""
+    """A queue row for a new element carrying ``x_review_proposed``: ``id`` is the element's."""
     el = f"018f0000-0000-7000-8000-{eid:012d}"
     return {
         "kind": "new_element",
@@ -1282,7 +1282,7 @@ def test_11_brainboosts_three_rules_through_the_api() -> None:
     assert api_report(FakeReader(on_the_wire(bb_world()), role="guest")).compared[HR]["view"] == "guest"
 
 
-# D152 (keel #558): the Charter is the newest Law with supertype Charter made by the owner or a
+# The Charter is the newest Law with supertype Charter made by the owner or a
 # co-builder; its rules are the house rules, and every other such Law is a finding.
 SEAT = "seat-membership"
 LAW2 = "a0000000-0000-7000-8000-000000000002"

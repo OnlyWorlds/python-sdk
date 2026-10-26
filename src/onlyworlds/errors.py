@@ -129,8 +129,8 @@ class ApiError(Exception):
 
     @property
     def is_known_of_not_writable(self) -> bool:
-        """A write body carried ``known_of`` (422 ``known_of_not_writable``, ``param`` known_of; keel
-        PR 117): a stub is never written back. The client refuses a ``known_of: true`` body before
+        """A write body carried ``known_of`` (422 ``known_of_not_writable``, ``param`` known_of):
+        a stub is never written back. The client refuses a ``known_of: true`` body before
         sending and never sends another value of it, so this comes only from a body sent around it."""
         return self.status == 422 and self.code == "known_of_not_writable"
 
@@ -165,7 +165,7 @@ class ApiError(Exception):
         moved to or from guest or contributor, whose cursors have other shapes). Drop the
         cursor and walk again from the start. What to do with what the local copy holds that the new
         walk does not name is ``resync_reason``'s: ``role``, keep it; ``view``, drop it. Without a
-        reason (keel's hidden mark off), keep it: a reset never empties a copy (keel PR 104; sharing
+        reason (keel's hidden mark off), keep it: a reset never empties a copy (sharing
         is forward-only). Never empty the copy on your own."""
         return self.status == 409 and self.code == "resync_required"
 

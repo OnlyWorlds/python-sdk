@@ -1,4 +1,4 @@
-"""Known-of stubs (folder format v0.3.10 §4.4; keel PR 113, B16): written as they are, read as
+"""Known-of stubs (folder format v0.3.10 §4.4): written as they are, read as
 known of, never pushed or written back, and whole again once they arrive whole. Both ways each."""
 
 from __future__ import annotations
@@ -115,12 +115,12 @@ def test_export_writes_a_served_stub_as_a_stub(tmp_path: Path, make_client: Make
     assert f.known_of == [DEV] and not f.elements[MARA].known_of
 
 
-# keel PR 117: a stub also carries its type's public fields, with their values.
+# A stub also carries its type's public fields, with their values.
 SPECIES = "s0000000-0000-7000-8000-000000000001"
 
 
 def public_stub_dev(**kw: Any) -> dict[str, Any]:
-    """Dev as keel serves him since PR 117: the public fields in their wire place, every key sent."""
+    """Dev as keel serves him: the public fields in their wire place, every key sent."""
     body = stub_dev()
     body.pop("known_of")
     body.update({"physicality": "Tall", "height": 180, "weight": None, "species": [SPECIES], "reputation": "", **kw})

@@ -265,7 +265,7 @@ def test_unicode_and_the_extension_cap(owner: Client, made: list[tuple[str, str]
 
 
 def test_only_if_unchanged_lands_on_a_match_refuses_a_stale_one(owner: Client, made: list[tuple[str, str]]) -> None:
-    """keel #210: If-Match on PATCH and the links route; a stale token writes nothing and hands back ``current``."""
+    """If-Match on PATCH and the links route; a stale token writes nothing and hands back ``current``."""
     el = owner.create("character", {"name": "Only if unchanged"})
     sp = owner.create("species", {"name": "Only if unchanged, species"})
     made.extend([("character", el["id"]), ("species", sp["id"])])
@@ -287,7 +287,7 @@ def test_only_if_unchanged_lands_on_a_match_refuses_a_stale_one(owner: Client, m
 def test_a_create_takes_hidden_from_the_owner_and_refuses_a_contributor(
     owner: Client, contrib: Client, made: list[tuple[str, str]]
 ) -> None:
-    """keel #587: the owner's create with ``hidden: true`` is hidden from its first moment (the contributor
+    """The owner's create with ``hidden: true`` is hidden from its first moment (the contributor
     cannot read it); the contributor's is a 403 ``hidden_not_allowed`` and nothing is created. Needs the
     staging server's HIDDEN_MARK on (off, the owner's create is a 422, param hidden)."""
     secret = owner.create("narrative", {"name": "Hidden at birth", "hidden": True})

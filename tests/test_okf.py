@@ -586,7 +586,7 @@ def test_nit_an_ow_link_to_an_absent_id_stays_and_is_listed(world: World) -> Non
 
 # Frontmatter keys an OnlyWorlds field takes as `ow_<name>`, because OKF gives that name a meaning.
 # None today; a schema bump that adds one fails the test below until it is added here and the
-# CHANGELOG says how that field is written (#360: decided, not found by a reader).
+# CHANGELOG says how that field is written (decided, not found by a reader).
 OKF_RENAMED: frozenset[str] = frozenset()
 
 
