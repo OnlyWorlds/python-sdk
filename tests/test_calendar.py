@@ -805,3 +805,10 @@ def test_json_is_read_as_json_parse_reads_it() -> None:
     assert read_calendar_value(text[:-1] + ', "x": ' + "[" * 3000 + "1," + "]" * 3000 + "}") is None
     assert read_calendar_value(chr(0xFEFF) + text) is None and read_calendar_value(" \n" + text + "\r\n") is not None
     assert read_calendar_value(text.replace('"day"', "'day'")) is None
+
+
+def test_validate_answers_with_errors_when_months_has_no_names_list() -> None:
+    # `0`, `""`, `False` and `{}` have no names list: an error list back, never a TypeError (as the SDK, 4.84.1).
+    for months in (0, "", False, {}, {"names": "abc", "lengths": [1, 2, 3]}):
+        cfg = {**KIRROWMOSS, "bundles": {**KIRROWMOSS["bundles"], "months": months}}
+        assert isinstance(validate_calendar_config(cfg), list)

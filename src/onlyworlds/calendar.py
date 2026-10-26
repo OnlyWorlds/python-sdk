@@ -586,9 +586,10 @@ def validate_calendar_config(cfg: Mapping[str, Any]) -> list[str]:
     inter: Any = [] if _nullish(inter_raw) else inter_raw
     if _js_lt(0, _prop(inter, "length")) and not _truthy(months):
         errors.append("Festival days need months")
-    # ``months?.names.length ?? 0``: a months that is there but not an object throws, as it does there.
-    month_count: Any = 0 if _nullish(months) else _get(_get(months, "names"), "length")
-    month_count = 0 if _nullish(month_count) else month_count
+    # Months without a names list (``0``, ``""``, ``False``, ``{}``) count as none here; their error is
+    # appended above (``Array.isArray(months?.names) ? months.names.length : 0`` there).
+    names = None if _nullish(months) else _prop(months, "names")
+    month_count: Any = len(names) if isinstance(names, list) else 0
     for ic in _items(inter):
         name = _js_string(_get(ic, "name"))
         after = _get(ic, "after_month")

@@ -2,6 +2,10 @@
 
 The package version runs on its own semver; the schema it is generated from is `SCHEMA_DIST_TAG`.
 
+## 0.68.1 (2026-10-26)
+
+- **`validate_calendar_config` answers with its errors, never a TypeError, when `bundles.months` has no names list** (`0`, `""`, `False`, `{}`, or `names` that is not a list), as the TypeScript SDK does from 4.84.1. 0.68.0 mirrored that SDK's throw on purpose, so the two readers stay equal: compared again on the same 175,705 inputs, no disagreement. `read_calendar_value` was not affected.
+
 ## 0.68.0 (2026-10-26)
 
 - **The calendar profile's reader: `onlyworlds.calendar`**, a port of the npm SDK's calendar kernel (`src/calendar/`), for any tool that shows a world's dates; the toolkit's draw skill imports it in place of its own port. `read_calendar_value` reads `atlas_calendar` (an object, or the same object as a JSON string) and refuses exactly what the profile refuses; `world_calendars` and `resolve_calendar_lens` find a world's calendars by the field; `breakdown_step` and `format_step` read an integer step as the calendar's date (months, days outside the months, weeks, eras, version 2's `except` and `offset`), and `parse_date` reads written words back. Every SDK function is here under its snake_case name, and the module's docstring maps each name to the SDK's. Where Python and JavaScript read the same value differently, it reads as the SDK does: numbers as doubles (past 2**53 the nearest double, past the double range infinity, a sum added left to right, `Math.round`'s halves up), JavaScript's white space when trimming (U+FEFF trimmed, U+001C kept), ASCII digits only, string lengths in UTF-16 code units, JavaScript's truthiness, and a JSON string as `JSON.parse` reads it (no `NaN`, an integer of any length, any depth). Checked against the SDK's built package (4.84.0) on 175,705 calls, about a million answers, with no disagreement.
