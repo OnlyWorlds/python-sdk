@@ -50,7 +50,7 @@ def test_every_file_is_in_the_manifest_and_matches_its_sha256() -> None:
 def test_every_case_gives_its_expected_text_byte_for_byte() -> None:
     test_every_file_is_in_the_manifest_and_matches_its_sha256()
     cases = _cases()
-    assert len(cases) >= 45
+    assert len(cases) >= 47
     for real in ("as-of-248", "as-of-300", "as-of-453"):
         assert real in cases and f"{real}-compact" in cases, real
     for name in cases:

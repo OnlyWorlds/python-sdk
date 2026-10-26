@@ -89,6 +89,10 @@
     "text-compact/draught.json": "c772a3774d34d08e4ad0c8ececfed2373b28c911a0737fbdcf6f18bb275d4615",
     "text-compact/expected.txt": "218a9d2b2e9b89b34db5ca0689da895c104e049564a341d49ca8e9314d02fa84",
     "text/draught.json": "e11fefe1cf4755378926f64889a71699f32613cd18e8e7aab6c9bcb0a6d70a40",
-    "text/expected.txt": "218a9d2b2e9b89b34db5ca0689da895c104e049564a341d49ca8e9314d02fa84"
+    "text/expected.txt": "218a9d2b2e9b89b34db5ca0689da895c104e049564a341d49ca8e9314d02fa84",
+    "value-line-breaks-compact/draught.json": "137cb32e78eabffc642f0f8ad8d8f1ee8e3723b33d3427e3869f2c729b408014",
+    "value-line-breaks-compact/expected.txt": "129aa75ac964a923d7486698254473adac5a11de3dfa4e0714893d7145ab7bfb",
+    "value-line-breaks/draught.json": "c4851ab5fa88d85cafcceaa88e905d8b933f0b51870516e62bdade27c084ddb5",
+    "value-line-breaks/expected.txt": "129aa75ac964a923d7486698254473adac5a11de3dfa4e0714893d7145ab7bfb"
   }
 }
