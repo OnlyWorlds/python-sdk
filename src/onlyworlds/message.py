@@ -122,7 +122,10 @@ def is_to_everyone(message: Mapping[str, Any]) -> bool:
 
 def is_sent_by(message: Mapping[str, Any], character_id: str) -> bool:
     """True when the message's ``narrator`` is ``character_id``: the claim, whether or not
-    ``sender_status`` proves it."""
+    ``sender_status`` proves it. An id that is empty or not a string names no Character, so it sent
+    nothing, even a message with no ``narrator``."""
+    if not isinstance(character_id, str) or not character_id:
+        return False
     return message.get("narrator") == character_id
 
 
@@ -191,7 +194,9 @@ def read_mark_of[E: Mapping[str, Any]](
     Character. Where a relation carries no ``created_by`` key at all (a folder, an export) there is no
     hand to check and it counts. Of several that count, the one with the newest ``updated_at`` (equal
     times: the first in the list); a newer mark in another's hand is ignored and the reader's own older
-    mark stands."""
+    mark stands. A ``character_id`` that is empty or not a string names no reader: ``None``."""
+    if not isinstance(character_id, str) or not character_id:
+        return None
     best: E | None = None
     best_rank: tuple[int, datetime.datetime] | None = None
     for relation in relations:
@@ -232,7 +237,11 @@ def unread_for[E: Mapping[str, Any]](
 def thread_of[E: Mapping[str, Any]](messages: Iterable[E], root_id: str) -> list[E]:
     """The thread of ``root_id``: every message whose chain of ``parent_narrative`` reaches the root, the
     root included, in ``created_at`` order. A walk up the chain stops at an id it has already visited, so
-    a loop of parents ends; a parent not among ``messages`` ends the chain (unless it is the root)."""
+    a loop of parents ends; a parent not among ``messages`` ends the chain (unless it is the root). A
+    message whose id is not a string is in no thread, and a ``root_id`` that is empty or not a string
+    has none."""
+    if not isinstance(root_id, str) or not root_id:
+        return []
     listed = list(messages)
     by_id: dict[str, E] = {}
     for m in listed:
@@ -241,13 +250,13 @@ def thread_of[E: Mapping[str, Any]](messages: Iterable[E], root_id: str) -> list
             by_id.setdefault(mid, m)
 
     def reaches(message: E) -> bool:
-        seen: set[Any] = set()
+        seen: set[str] = set()
         current: E | None = message
         while current is not None:
             mid = current.get("id")
             if mid == root_id:
                 return True
-            if mid in seen:
+            if not isinstance(mid, str) or mid in seen:
                 return False
             seen.add(mid)
             parent = current.get("parent_narrative")

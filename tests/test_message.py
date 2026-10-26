@@ -159,3 +159,62 @@ def test_a_thread_whose_parents_loop_ends() -> None:
 def test_sender_read_carries_the_claim() -> None:
     got = sender_status({"narrator": WREN, "created_by": None}, load_fixture()["members"])
     assert got == SenderRead("mismatch", WREN, ADA)
+
+
+def test_the_newest_read_mark_wins_wherever_it_stands_in_the_list() -> None:
+    """The fixture's ``mark-newest-updated-at-wins`` lists the newer mark first, so a reader that kept the
+    first mark that counts would pass it. Here the newest stands last; a readable time beats an unreadable
+    one, and equal times keep the first in the list. The npm SDK asserts the same."""
+
+    def mark(mid: str, updated_at: str | None) -> dict[str, Any]:
+        body: dict[str, Any] = {"id": mid, "type": "relation", "supertype": "Read", "actor": ADA, "narratives": []}
+        if updated_at is not None:
+            body["updated_at"] = updated_at
+        return body
+
+    older, newer = mark("old", "2026-10-26T08:00:00Z"), mark("new", "2026-10-26T11:00:00Z")
+    undated, twin = mark("undated", None), mark("twin", "2026-10-26T11:00:00Z")
+    assert read_mark_of([older, newer], ADA, None) is newer
+    assert read_mark_of([undated, older, newer], ADA, None) is newer
+    assert read_mark_of([older, undated], ADA, None) is older
+    assert read_mark_of([newer, twin], ADA, None) is newer
+    # The fixture's own case, its relations reversed: the owner's hand, checked on the members list.
+    doc = load_fixture()
+    case = next(c for c in doc["cases"] if c["name"] == "mark-newest-updated-at-wins")
+    got = read_mark_of(list(reversed(case["relations"])), case["reader"], doc["members"])
+    assert got is not None and got["id"] == case["mark"]
+
+
+def test_no_character_is_no_sender_and_no_reader_as_in_the_npm_sdk() -> None:
+    """An id that is empty or not a string names no Character: no message is sent by it and no read mark
+    is its, even a message with no ``narrator`` or a folder's mark with no ``actor``. The npm SDK's
+    ``isSentBy`` and ``readMarkOf`` answer the same."""
+    nobody: Any = None
+    assert is_sent_by({"narrator": ADA}, ADA) is True
+    assert is_sent_by({}, nobody) is False
+    assert is_sent_by({"narrator": None}, nobody) is False
+    assert is_sent_by({"narrator": ""}, "") is False
+    assert is_sent_by({}, "") is False
+    blank: dict[str, Any] = {"id": "m1", "type": "relation", "supertype": "Read", "actor": "", "narratives": []}
+    no_actor: dict[str, Any] = {"id": "m2", "type": "relation", "supertype": "Read", "narratives": []}
+    assert read_mark_of([blank], "", None) is None
+    assert read_mark_of([no_actor], nobody, None) is None
+    assert read_mark_of([{**blank, "actor": ADA}], ADA, None) is not None
+
+
+def test_a_thread_walks_only_string_ids_as_in_the_npm_sdk() -> None:
+    """A message whose id is not a string is in no thread, even when its parent is the root, and a root
+    that is empty or not a string has no thread. The npm SDK's ``threadOf`` answers the same."""
+    root: dict[str, Any] = {"id": "r", "created_at": "2026-10-26T09:00:00Z"}
+    reply: dict[str, Any] = {"id": "s", "parent_narrative": "r", "created_at": "2026-10-26T09:01:00Z"}
+    odd: list[dict[str, Any]] = [
+        {"id": None, "parent_narrative": "r"},
+        {"parent_narrative": "r"},
+        {"id": 5, "parent_narrative": "r"},
+        {"id": ["x"], "parent_narrative": "r"},
+    ]
+    assert ids(thread_of([root, *odd, reply], "r")) == ["r", "s"]
+    nobody: Any = None
+    assert thread_of([{"id": "", "parent_narrative": "x"}], "") == []
+    no_ids: list[dict[str, Any]] = [{"parent_narrative": "x"}, {"id": None}]
+    assert thread_of(no_ids, nobody) == []
