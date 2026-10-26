@@ -4,6 +4,10 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+## 0.64.1 (2026-10-26)
+
+- **Schema repinned to schema-dist `v0.33.0-dist.74`** (from dist.73; same canonical 00.33.00, so `SCHEMA_VERSION` stays `"00.33.00"`, no schema file moved). Serial 74 is text only: the dist's README ends on a maintainer line, and six profile pages (checks, names, packet, review, room, spine) no longer name people or point inside the project's own tracker. The walk's files this package carries (`lint_folder.py`, `schema.json`, `import-map.json`) are byte for byte the same; no reader and no fixture changed. `SCHEMA_DIST_TAG`, `SCHEMA_DIST_SERIAL` and `SCHEMA_MANIFEST_SHA256` name the new pin.
+
 ## 0.64.0 (2026-10-26)
 
 - **`is_to_everyone(message)`**: true when a message is addressed to every member (its `characters` absent, `None` or empty). A list that names no valid id, or a value that is not a list, is addressed to nobody and False here, though `recipients_of` gives `[]` for both; this is the one call that tells them apart.

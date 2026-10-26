@@ -51,4 +51,4 @@
 }
 ```
 
-Readers today: none shipped; the parlor (OW Parlor), the world doctor (Kael) and Atlas's import by id list (Temper) are the first three, each named here as it ships. Ruled in the parlor design sheet (§1, draft 4) and the folder spec §4.6 (i); Kael's shape of 2026-10-21.
+Readers today: none shipped; the parlor, the world doctor in the Python package and Atlas's import by id list are the first three, each named here as it ships. Ruled in the folder spec §4.6 (i); the shape the doctor reads, 2026-10-21.

@@ -37,4 +37,4 @@ The word replaces the **type's display name** wherever the tool shows it: a card
 
 **Conformance.** `names.fixture.json`, beside this page: 23 cases of `{map, type, supertype?, many}` → the word a reader prints, or `null` for "the standard's name". **Every tool that implements the lookup runs the fixture as its own test** (two readers disagreeing on one case is the failure this profile exists to prevent): the TypeScript SDK's `typeWord(world, type, {supertype, many})`, the Python package's `type_word(world, element_type, supertype=, many=)`, the Unity SDK's `OWNames`, the plugin's own.
 
-Source: Titus's framing, a translation file and nothing more, and the reads of Kael, Boss, Quillon and Temper, 2026-10-22; the first readers the TypeScript SDK and the Python package.
+Source: Titus's framing, a translation file and nothing more, and the reads of the SDK and app maintainers, 2026-10-22; the first readers the TypeScript SDK and the Python package.
