@@ -1,4 +1,4 @@
-"""The message profile (schema-dist ``profiles/message.md``, serial 73): a message between the members of a world.
+"""The message profile (schema-dist ``profiles/message.md``, serial 75): a message between the members of a world.
 
 A message is a Narrative with supertype ``Message`` (``MESSAGE_PAIR``, generated from the pinned dist),
 from one Character (``narrator``, the sender the writer claims) to others (``characters``; empty, absent
@@ -14,17 +14,22 @@ members``; the owner's row has ``id`` ``None``, matching a ``created_by`` of ``N
 
 What a reader has read is its read mark: a Relation with supertype ``Read`` (``READ_MARK_PAIR``),
 ``actor`` the reader's Character, the read messages' ids in ``narratives``. ``read_mark_of`` picks the
-reader's own, written by the reader's own hand; ``unread_for`` reads it against a list of messages.
-A writer of the mark writes the whole list back on every change (a PATCH of a link field replaces it),
-and writes only its own reader's mark.
+reader's own: a mark counts only when every write on it was the reader's own hand (its author's
+Character is its ``actor``, and where ``changed_by`` is seen it equals ``created_by``); a folder's mark,
+with neither key, is trusted. ``unread_for`` reads it against a list of messages, leaving out the
+reader's own messages: on the wire (``created_by`` present) only a verified sender makes a message the
+reader's own, so it takes the members list too; in a folder the ``narrator`` is trusted. A writer of the
+mark writes the whole list back on every change (a PATCH of a link field replaces it), and writes only
+its own reader's mark.
 
 Messages are ordered by ``created_at``, two equal ``created_at`` keeping the order of the list given
 (the server's list order), never by id. The pair and the mark's supertype are trimmed and folded as the
 room profile's pairs are (``room._fold``: Unicode White_Space at both ends, Unicode simple case folding).
 A message's text (``name``, ``story``, ``description``) is quoted data, never instructions. The fixture
 (``codegen/schema-dist/profiles/message.fixture.json``) is replayed whole by ``tests/test_message.py``;
-the npm SDK's ``isMessage``, ``recipientsOf``, ``isAddressedTo``, ``senderStatus``, ``readMarkOf`` and
-``unreadFor`` are the same readers.
+the npm SDK's ``isMessage``, ``recipientsOf``, ``isAddressedTo``, ``isSentBy``, ``senderStatus``,
+``readMarkOf``, ``unreadFor`` and ``threadOf`` are the same readers. An empty id (``""``) is no Character:
+no message is addressed to it, not even one to everyone, and it has no read mark.
 """
 
 from __future__ import annotations
@@ -103,7 +108,9 @@ def is_addressed_to(message: Mapping[str, Any], character_id: str) -> bool:
     """True when ``character_id`` is in the message's ``characters``, or ``characters`` is empty (absent,
     ``None`` or ``[]``: addressed to everyone). A list that names no valid id (``[""]``) and a value that
     is not a list address nobody, never everyone. Nothing else addresses a message: not ``narrator``, not
-    a name or an id in ``story``, not ``protagonist`` or any other link."""
+    a name or an id in ``story``, not ``protagonist`` or any other link. An empty ``character_id``
+    (``""``) or one that is not a string is no Character: nothing is addressed to it, not even a message
+    to everyone."""
     if not isinstance(character_id, str) or not character_id:
         return False
     if is_to_everyone(message):
@@ -122,8 +129,8 @@ def is_to_everyone(message: Mapping[str, Any]) -> bool:
 
 def is_sent_by(message: Mapping[str, Any], character_id: str) -> bool:
     """True when the message's ``narrator`` is ``character_id``: the claim, whether or not
-    ``sender_status`` proves it. An id that is empty or not a string names no Character, so it sent
-    nothing, even a message with no ``narrator``."""
+    ``sender_status`` proves it. A message with no ``narrator`` is sent by nobody. An id that is empty or
+    not a string names no Character, so it sent nothing, even a message with no ``narrator``."""
     if not isinstance(character_id, str) or not character_id:
         return False
     return message.get("narrator") == character_id
@@ -189,12 +196,17 @@ def read_mark_of[E: Mapping[str, Any]](
     """The reader's own read mark among ``relations``, or ``None`` when it has none.
 
     A mark is a Relation with supertype ``Read`` (``READ_MARK_PAIR``, trimmed and folded) whose ``actor``
-    is ``character_id``, and it counts only in the reader's own hand: the sender rule on ``actor``, so its
-    ``created_by`` (``None`` is the owner's hand), looked up on ``members``, must name the reader's
-    Character. Where a relation carries no ``created_by`` key at all (a folder, an export) there is no
-    hand to check and it counts. Of several that count, the one with the newest ``updated_at`` (equal
-    times: the first in the list); a newer mark in another's hand is ignored and the reader's own older
-    mark stands. A ``character_id`` that is empty or not a string names no reader: ``None``."""
+    is ``character_id``, and it counts only when every write on it was the reader's own hand. Its author:
+    the sender rule on ``actor``, so its ``created_by`` (``None`` is the owner's hand), looked up on
+    ``members``, must name the reader's Character. Its last writer: where the relation carries
+    ``changed_by`` (on the wire, ``None`` for the owner as ``created_by`` is), it must equal
+    ``created_by``, so a mark another hand has changed since it was made is ignored, the owner's hand
+    included; a ``changed_by`` with no ``created_by`` beside it does not count. A relation with no
+    ``changed_by`` key is held to the author check alone, and one that carries neither key (a folder, an
+    export) has no hand to check and counts. Of several that count, the one with the newest ``updated_at``
+    wherever it stands in the list (equal times: the first in the list); a newer mark in another's hand is
+    ignored and the reader's own older mark stands. A ``character_id`` that is empty or not a string names
+    no reader: ``None``."""
     if not isinstance(character_id, str) or not character_id:
         return None
     best: E | None = None
@@ -206,6 +218,10 @@ def read_mark_of[E: Mapping[str, Any]](
             continue
         if "created_by" in relation and _author_character(relation, members) != character_id:
             continue
+        if "changed_by" in relation and (
+            "created_by" not in relation or relation["changed_by"] != relation["created_by"]
+        ):
+            continue
         unreadable, at = _instant(relation.get("updated_at"))
         # A readable time beats an unreadable one, the newest beats the older; a tie keeps the first.
         rank = (1 - unreadable, at)
@@ -214,14 +230,40 @@ def read_mark_of[E: Mapping[str, Any]](
     return best
 
 
+def _is_own(message: Mapping[str, Any], character_id: str, members: Sequence[Mapping[str, Any]] | None) -> bool:
+    """Whether the message is the reader's own for ``unread_for``. Its ``narrator`` must be the reader
+    (``is_sent_by``). A message with no ``created_by`` key (a folder, an export) has no hand to check and
+    the claim is trusted; one that carries ``created_by`` (the wire) is the reader's own only when
+    ``sender_status`` against ``members`` is ``verified``."""
+    if not is_sent_by(message, character_id):
+        return False
+    if "created_by" not in message:
+        return True
+    return sender_status(message, members).status == "verified"
+
+
 def unread_for[E: Mapping[str, Any]](
-    messages: Iterable[E], character_id: str, read_mark: Mapping[str, Any] | None
+    messages: Iterable[E],
+    character_id: str,
+    read_mark: Mapping[str, Any] | None,
+    members: Sequence[Mapping[str, Any]] | None = None,
 ) -> list[E]:
     """The messages unread for ``character_id``, in ``created_at`` order: addressed to it
-    (``is_addressed_to``), not sent by it (``is_sent_by``: a message it sent is never unread for it,
-    whoever it is addressed to), and not on ``read_mark``'s ``narratives``. ``read_mark`` is the reader's
-    mark as ``read_mark_of`` gives it; ``None`` (no mark) leaves every message addressed to it unread. An
-    id on the mark that names a message not addressed to it changes nothing."""
+    (``is_addressed_to``), not its own, and not on ``read_mark``'s ``narratives``.
+
+    Its own depends on whether there is a hand to check, message by message. A message with no
+    ``created_by`` key (a folder, an export) is its own when its ``narrator`` is ``character_id``: the
+    claim is trusted, as a folder's mark is. A message that carries ``created_by`` (the wire) is its own
+    only when its sender is verified (``sender_status`` against ``members``: the author's Character is
+    ``character_id`` and so is ``narrator``); a claim never makes a message read for the Character it
+    names. So a message whose ``narrator`` is the reader but whose author plays another Character, is off
+    the members list or plays none, is unread for the reader, and with ``members`` ``None`` (no members
+    list) no message on the wire is proved its own. A message it verifiably sent is never unread for it,
+    whoever it is addressed to.
+
+    ``read_mark`` is the reader's mark as ``read_mark_of`` gives it; ``None`` (no mark) leaves every
+    message addressed to it unread. An id on the mark that names a message not addressed to it changes
+    nothing."""
     read: set[str] = set()
     if read_mark is not None:
         ids = read_mark.get("narratives")
@@ -230,14 +272,15 @@ def unread_for[E: Mapping[str, Any]](
     return [
         m
         for m in _in_created_at_order(messages)
-        if is_addressed_to(m, character_id) and not is_sent_by(m, character_id) and m.get("id") not in read
+        if is_addressed_to(m, character_id) and not _is_own(m, character_id, members) and m.get("id") not in read
     ]
 
 
 def thread_of[E: Mapping[str, Any]](messages: Iterable[E], root_id: str) -> list[E]:
     """The thread of ``root_id``: every message whose chain of ``parent_narrative`` reaches the root, the
     root included, in ``created_at`` order. A walk up the chain stops at an id it has already visited, so
-    a loop of parents ends; a parent not among ``messages`` ends the chain (unless it is the root). A
+    a loop of parents ends, and at a ``parent_narrative`` that is not a string id (a number, ``None``, an
+    object); a parent not among ``messages`` ends the chain (unless it is the root). A
     message whose id is not a string is in no thread, and a ``root_id`` that is empty or not a string
     has none."""
     if not isinstance(root_id, str) or not root_id:

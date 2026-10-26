@@ -2,15 +2,20 @@
   "_what": "The recorded pin for the vendored OnlyWorlds schema distribution (codegen/schema-dist/, copied byte-exact). Do not edit by hand; re-vendor from the pinned tag and review the diff. Kept equal to the npm SDK's pin (github.com/OnlyWorlds/sdk, codegen/schema-pin.json) on purpose: two clients, one schema.",
   "_why_manifest_sha256": "Verifying the tree against its own MANIFEST.json only proves internal consistency. If the tag moved, the manifest moved with it. The hash recorded here is the one first accepted, which is what makes a moved tag visible.",
   "repo": "https://github.com/OnlyWorlds/schema-dist",
-  "tag": "v0.33.0-dist.74",
-  "commit": "a38647e8e5a5ab8856c03a8db4c5b0a84917618a",
-  "manifest_sha256": "e12f7c758758f986000edce7b607d98734d480de8fa4937d005e362cdf209230",
+  "tag": "v0.33.0-dist.75",
+  "commit": "889fa3b492e01428d6723ae169b1f8013bf7f2d7",
+  "manifest_sha256": "6f0150dfa47849453676c5c6a33ab43bdf3c3791dd0b3b42b56f4b138cb80e82",
   "canonical_version": "00.33.00",
-  "dist_serial": 74,
+  "dist_serial": 75,
   "published": "2026-10-26",
   "pinned_at": "2026-10-26",
   "pinned_by": "The maintainer: tree from `git archive` of the tag in a schema-dist checkout (191 files, every one the MANIFEST lists); files re-hashed against MANIFEST.json by generate_schema.py; MANIFEST self-hash matched against the raw file GitHub serves at the tag, whose ref resolves to the commit above.",
   "previous_pins": [
+    {
+      "tag": "v0.33.0-dist.74",
+      "manifest_sha256": "e12f7c758758f986000edce7b607d98734d480de8fa4937d005e362cdf209230",
+      "note": "superseded by v0.33.0-dist.75 (same canonical 00.33.00; the message profile: unread reads the verified sender on the wire and trusts narrator in a folder, a read mark counts only when every write on it was its reader's own hand (changed_by equal to created_by where it is seen), the newest mark by updated_at wherever it stands, three edge rulings (a message with no narrator is sent by nobody, an empty character id is addressed by nothing and has no mark, a thread walk ends at a parent_narrative that is not a string), message.fixture.json at 55 cases; text in calendar.md, the why lines of calendar.fixture.json's two LegendKeeper cases (no step moved), import-map.md and names.md; no schema file moved)"
+    },
     {
       "tag": "v0.33.0-dist.73",
       "manifest_sha256": "ea0402f70bfa445f890c17e563d216fead9c35e995585d009edadc05966ac9f1",

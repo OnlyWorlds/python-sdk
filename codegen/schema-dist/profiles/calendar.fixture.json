@@ -2881,7 +2881,7 @@
     },
     {
       "name": "v2-except-chain-gregorian",
-      "why": "version 2: every_years 4, except [100, 400], offset 1 (no year 0): LegendKeeper's Gregorian; every step read back from LegendKeeper as it shows it (its leap day is the 29th of February, ours the day named Leap Day after February)",
+      "why": "version 2: every_years 4, except [100, 400], offset 1 (no year 0): the Gregorian calendar; every step matches what LegendKeeper's API answered for a user's own project on 2026-10-25 (its answer puts the leap day on the 29th of February, ours on the day named Leap Day after February)",
       "value": {
         "version": 2,
         "grain": "day",
@@ -3373,7 +3373,7 @@
     },
     {
       "name": "v2-offset-harptos",
-      "why": "version 2: every_years 4, offset 1 (no year 0): Shieldsmeet in displayed years 4, 8, ... (year index 3, 7, ...), after Midsummer; every step read back from LegendKeeper",
+      "why": "version 2: every_years 4, offset 1 (no year 0): Shieldsmeet in displayed years 4, 8, ... (year index 3, 7, ...), after Midsummer; every step matches what LegendKeeper's API answered for a user's own project on 2026-10-25",
       "value": {
         "version": 2,
         "grain": "day",

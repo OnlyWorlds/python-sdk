@@ -4,12 +4,12 @@
   "notes": [
     "pair: narrative + supertype Message, each trimmed and folded like the room profile's pairs; is_message is what isMessage must answer.",
     "characters and members: the world every case reads. characters is the world's Characters (id to name), the names a reader shows; members is the members list as GET members returns its rows (the owner's row has id null, matching a created_by of null).",
-    "addressed: isAddressedTo(message, character); sent_by: whether narrator is the character.",
+    "addressed: isAddressedTo(message, character); an empty character id (\"\") is never addressed, not even by an empty characters. sent_by: isSentBy(message, character), whether narrator is the character; a message with no narrator is sent by nobody.",
     "sender: senderStatus(message, members) is status; a case with members null is a world whose members list the reader cannot read. claimed is the narrator (null: none, shown as from nobody); written_by, on a mismatch, is the author's Character.",
-    "mark: readMarkOf(relations, character, members): of the Read relations given, the id of the reader's mark: actor the reader, written by the reader's own hand (the sender rule on actor: verified) or carrying no created_by at all (a folder, an export: no hand to check), the newest updated_at when there are several; null when the reader has none.",
+    "mark: readMarkOf(relations, character, members): of the Read relations given, the id of the reader's mark: actor the reader, written by the reader's own hand (the sender rule on actor: verified) or carrying no created_by at all (a folder, an export: no hand to check), and, where it carries changed_by, last changed by its creator (changed_by equal to created_by); the newest updated_at when there are several, whatever their order in the list; null when the reader has none, and always null for an empty character id.",
     "order: created_at, and two equal created_at keep the order of the list given (the server's list order).",
-    "unread: unreadFor(messages, read_mark) for reader: addressed to the reader, not sent by the reader, not on the mark; as ids in created_at order; read_mark null is a reader with no mark.",
-    "thread: every message whose chain of parent_narrative reaches root, the root included, as ids in created_at order.",
+    "unread: unreadFor(messages, reader, read_mark, members) for reader: addressed to the reader, not sent by the reader, not on the mark; as ids in created_at order; read_mark null is a reader with no mark. Sent by the reader: a message with no created_by key (a folder, an export) is the reader's own when its narrator is the reader; one with created_by is the reader's own only when senderStatus against members is verified (a mismatch, an author off the list, no members list: unread for the Character it claims). A case without members reads the world's members.",
+    "thread: every message whose chain of parent_narrative reaches root, the root included, as ids in created_at order; a parent_narrative that is not a string (a number, null, an object) ends the chain there.",
     "Every case has a kind and a name; a reader dispatches on kind."
   ],
   "pair": {
@@ -301,6 +301,23 @@
       "addressed": false
     },
     {
+      "kind": "addressed",
+      "name": "empty-character-id-is-never-addressed",
+      "message": {
+        "id": "019a3b10-0000-7000-8000-000000000c56",
+        "type": "narrative",
+        "supertype": "Message",
+        "name": "Message 56",
+        "story": "",
+        "narrator": "019a3b10-0000-7000-8000-0000000000a3",
+        "characters": [],
+        "parent_narrative": null,
+        "created_at": "2026-10-26T09:56:00Z"
+      },
+      "character": "",
+      "addressed": false
+    },
+    {
       "kind": "sent_by",
       "name": "sent-by-narrator",
       "message": {
@@ -338,6 +355,25 @@
         "created_at": "2026-10-26T09:01:00Z"
       },
       "character": "019a3b10-0000-7000-8000-0000000000a1",
+      "sent_by": false
+    },
+    {
+      "kind": "sent_by",
+      "name": "no-narrator-is-sent-by-nobody",
+      "message": {
+        "id": "019a3b10-0000-7000-8000-000000000c55",
+        "type": "narrative",
+        "supertype": "Message",
+        "name": "Message 55",
+        "story": "",
+        "created_by": "019a3b10-0000-7000-8000-0000000000b2",
+        "characters": [
+          "019a3b10-0000-7000-8000-0000000000a1"
+        ],
+        "parent_narrative": null,
+        "created_at": "2026-10-26T09:55:00Z"
+      },
+      "character": "019a3b10-0000-7000-8000-0000000000a2",
       "sent_by": false
     },
     {
@@ -428,6 +464,25 @@
     },
     {
       "kind": "sender",
+      "name": "unverifiable-narrator-absent",
+      "message": {
+        "id": "019a3b10-0000-7000-8000-000000000c55",
+        "type": "narrative",
+        "supertype": "Message",
+        "name": "Message 55",
+        "story": "",
+        "created_by": "019a3b10-0000-7000-8000-0000000000b2",
+        "characters": [
+          "019a3b10-0000-7000-8000-0000000000a1"
+        ],
+        "parent_narrative": null,
+        "created_at": "2026-10-26T09:55:00Z"
+      },
+      "status": "unverifiable",
+      "claimed": null
+    },
+    {
+      "kind": "sender",
       "name": "unverifiable-created-by-absent",
       "message": {
         "id": "019a3b10-0000-7000-8000-000000000c20",
@@ -505,6 +560,7 @@
           "name": "Message 11",
           "story": "",
           "narrator": "019a3b10-0000-7000-8000-0000000000a3",
+          "created_by": "019a3b10-0000-7000-8000-0000000000b3",
           "characters": [
             "019a3b10-0000-7000-8000-0000000000a1"
           ],
@@ -518,6 +574,7 @@
           "name": "Message 12",
           "story": "",
           "narrator": "019a3b10-0000-7000-8000-0000000000a3",
+          "created_by": "019a3b10-0000-7000-8000-0000000000b3",
           "characters": [],
           "parent_narrative": null,
           "created_at": "2026-10-26T09:12:00Z"
@@ -529,6 +586,7 @@
           "name": "Message 13",
           "story": "",
           "narrator": "019a3b10-0000-7000-8000-0000000000a3",
+          "created_by": "019a3b10-0000-7000-8000-0000000000b3",
           "characters": [
             "019a3b10-0000-7000-8000-0000000000a2"
           ],
@@ -542,6 +600,7 @@
           "name": "Message 14",
           "story": "",
           "narrator": "019a3b10-0000-7000-8000-0000000000a2",
+          "created_by": "019a3b10-0000-7000-8000-0000000000b2",
           "characters": [
             "019a3b10-0000-7000-8000-0000000000a1",
             "019a3b10-0000-7000-8000-0000000000a3"
@@ -556,6 +615,7 @@
           "name": "Message 15",
           "story": "",
           "narrator": "019a3b10-0000-7000-8000-0000000000a1",
+          "created_by": null,
           "characters": [],
           "parent_narrative": null,
           "created_at": "2026-10-26T09:15:00Z"
@@ -567,6 +627,7 @@
           "name": "Message 16",
           "story": "",
           "narrator": "019a3b10-0000-7000-8000-0000000000a1",
+          "created_by": null,
           "characters": [
             "019a3b10-0000-7000-8000-0000000000a1",
             "019a3b10-0000-7000-8000-0000000000a2"
@@ -604,6 +665,7 @@
           "name": "Message 11",
           "story": "",
           "narrator": "019a3b10-0000-7000-8000-0000000000a3",
+          "created_by": "019a3b10-0000-7000-8000-0000000000b3",
           "characters": [
             "019a3b10-0000-7000-8000-0000000000a1"
           ],
@@ -617,6 +679,7 @@
           "name": "Message 12",
           "story": "",
           "narrator": "019a3b10-0000-7000-8000-0000000000a3",
+          "created_by": "019a3b10-0000-7000-8000-0000000000b3",
           "characters": [],
           "parent_narrative": null,
           "created_at": "2026-10-26T09:12:00Z"
@@ -628,6 +691,7 @@
           "name": "Message 13",
           "story": "",
           "narrator": "019a3b10-0000-7000-8000-0000000000a3",
+          "created_by": "019a3b10-0000-7000-8000-0000000000b3",
           "characters": [
             "019a3b10-0000-7000-8000-0000000000a2"
           ],
@@ -641,6 +705,7 @@
           "name": "Message 14",
           "story": "",
           "narrator": "019a3b10-0000-7000-8000-0000000000a2",
+          "created_by": "019a3b10-0000-7000-8000-0000000000b2",
           "characters": [
             "019a3b10-0000-7000-8000-0000000000a1",
             "019a3b10-0000-7000-8000-0000000000a3"
@@ -655,6 +720,7 @@
           "name": "Message 15",
           "story": "",
           "narrator": "019a3b10-0000-7000-8000-0000000000a1",
+          "created_by": null,
           "characters": [],
           "parent_narrative": null,
           "created_at": "2026-10-26T09:15:00Z"
@@ -666,6 +732,7 @@
           "name": "Message 16",
           "story": "",
           "narrator": "019a3b10-0000-7000-8000-0000000000a1",
+          "created_by": null,
           "characters": [
             "019a3b10-0000-7000-8000-0000000000a1",
             "019a3b10-0000-7000-8000-0000000000a2"
@@ -693,6 +760,7 @@
           "name": "Message 11",
           "story": "",
           "narrator": "019a3b10-0000-7000-8000-0000000000a3",
+          "created_by": "019a3b10-0000-7000-8000-0000000000b3",
           "characters": [
             "019a3b10-0000-7000-8000-0000000000a1"
           ],
@@ -706,6 +774,7 @@
           "name": "Message 12",
           "story": "",
           "narrator": "019a3b10-0000-7000-8000-0000000000a3",
+          "created_by": "019a3b10-0000-7000-8000-0000000000b3",
           "characters": [],
           "parent_narrative": null,
           "created_at": "2026-10-26T09:12:00Z"
@@ -717,6 +786,7 @@
           "name": "Message 13",
           "story": "",
           "narrator": "019a3b10-0000-7000-8000-0000000000a3",
+          "created_by": "019a3b10-0000-7000-8000-0000000000b3",
           "characters": [
             "019a3b10-0000-7000-8000-0000000000a2"
           ],
@@ -730,6 +800,7 @@
           "name": "Message 14",
           "story": "",
           "narrator": "019a3b10-0000-7000-8000-0000000000a2",
+          "created_by": "019a3b10-0000-7000-8000-0000000000b2",
           "characters": [
             "019a3b10-0000-7000-8000-0000000000a1",
             "019a3b10-0000-7000-8000-0000000000a3"
@@ -744,6 +815,7 @@
           "name": "Message 15",
           "story": "",
           "narrator": "019a3b10-0000-7000-8000-0000000000a1",
+          "created_by": null,
           "characters": [],
           "parent_narrative": null,
           "created_at": "2026-10-26T09:15:00Z"
@@ -755,6 +827,7 @@
           "name": "Message 16",
           "story": "",
           "narrator": "019a3b10-0000-7000-8000-0000000000a1",
+          "created_by": null,
           "characters": [
             "019a3b10-0000-7000-8000-0000000000a1",
             "019a3b10-0000-7000-8000-0000000000a2"
@@ -793,6 +866,7 @@
           "name": "Message 16",
           "story": "",
           "narrator": "019a3b10-0000-7000-8000-0000000000a1",
+          "created_by": null,
           "characters": [
             "019a3b10-0000-7000-8000-0000000000a1",
             "019a3b10-0000-7000-8000-0000000000a2"
@@ -807,6 +881,7 @@
           "name": "Message 15",
           "story": "",
           "narrator": "019a3b10-0000-7000-8000-0000000000a1",
+          "created_by": null,
           "characters": [],
           "parent_narrative": null,
           "created_at": "2026-10-26T09:15:00Z"
@@ -818,6 +893,7 @@
           "name": "Message 14",
           "story": "",
           "narrator": "019a3b10-0000-7000-8000-0000000000a2",
+          "created_by": "019a3b10-0000-7000-8000-0000000000b2",
           "characters": [
             "019a3b10-0000-7000-8000-0000000000a1",
             "019a3b10-0000-7000-8000-0000000000a3"
@@ -832,6 +908,7 @@
           "name": "Message 13",
           "story": "",
           "narrator": "019a3b10-0000-7000-8000-0000000000a3",
+          "created_by": "019a3b10-0000-7000-8000-0000000000b3",
           "characters": [
             "019a3b10-0000-7000-8000-0000000000a2"
           ],
@@ -845,6 +922,7 @@
           "name": "Message 12",
           "story": "",
           "narrator": "019a3b10-0000-7000-8000-0000000000a3",
+          "created_by": "019a3b10-0000-7000-8000-0000000000b3",
           "characters": [],
           "parent_narrative": null,
           "created_at": "2026-10-26T09:12:00Z"
@@ -856,6 +934,7 @@
           "name": "Message 11",
           "story": "",
           "narrator": "019a3b10-0000-7000-8000-0000000000a3",
+          "created_by": "019a3b10-0000-7000-8000-0000000000b3",
           "characters": [
             "019a3b10-0000-7000-8000-0000000000a1"
           ],
@@ -891,6 +970,7 @@
           "name": "Message 11",
           "story": "",
           "narrator": "019a3b10-0000-7000-8000-0000000000a3",
+          "created_by": "019a3b10-0000-7000-8000-0000000000b3",
           "characters": [
             "019a3b10-0000-7000-8000-0000000000a1"
           ],
@@ -904,6 +984,7 @@
           "name": "Message 12",
           "story": "",
           "narrator": "019a3b10-0000-7000-8000-0000000000a3",
+          "created_by": "019a3b10-0000-7000-8000-0000000000b3",
           "characters": [],
           "parent_narrative": null,
           "created_at": "2026-10-26T09:12:00Z"
@@ -915,6 +996,7 @@
           "name": "Message 13",
           "story": "",
           "narrator": "019a3b10-0000-7000-8000-0000000000a3",
+          "created_by": "019a3b10-0000-7000-8000-0000000000b3",
           "characters": [
             "019a3b10-0000-7000-8000-0000000000a2"
           ],
@@ -928,6 +1010,7 @@
           "name": "Message 14",
           "story": "",
           "narrator": "019a3b10-0000-7000-8000-0000000000a2",
+          "created_by": "019a3b10-0000-7000-8000-0000000000b2",
           "characters": [
             "019a3b10-0000-7000-8000-0000000000a1",
             "019a3b10-0000-7000-8000-0000000000a3"
@@ -942,6 +1025,7 @@
           "name": "Message 15",
           "story": "",
           "narrator": "019a3b10-0000-7000-8000-0000000000a1",
+          "created_by": null,
           "characters": [],
           "parent_narrative": null,
           "created_at": "2026-10-26T09:15:00Z"
@@ -953,6 +1037,7 @@
           "name": "Message 16",
           "story": "",
           "narrator": "019a3b10-0000-7000-8000-0000000000a1",
+          "created_by": null,
           "characters": [
             "019a3b10-0000-7000-8000-0000000000a1",
             "019a3b10-0000-7000-8000-0000000000a2"
@@ -980,6 +1065,7 @@
           "name": "Message 11",
           "story": "",
           "narrator": "019a3b10-0000-7000-8000-0000000000a3",
+          "created_by": "019a3b10-0000-7000-8000-0000000000b3",
           "characters": [
             "019a3b10-0000-7000-8000-0000000000a1"
           ],
@@ -993,6 +1079,7 @@
           "name": "Message 12",
           "story": "",
           "narrator": "019a3b10-0000-7000-8000-0000000000a3",
+          "created_by": "019a3b10-0000-7000-8000-0000000000b3",
           "characters": [],
           "parent_narrative": null,
           "created_at": "2026-10-26T09:12:00Z"
@@ -1004,6 +1091,7 @@
           "name": "Message 13",
           "story": "",
           "narrator": "019a3b10-0000-7000-8000-0000000000a3",
+          "created_by": "019a3b10-0000-7000-8000-0000000000b3",
           "characters": [
             "019a3b10-0000-7000-8000-0000000000a2"
           ],
@@ -1017,6 +1105,7 @@
           "name": "Message 14",
           "story": "",
           "narrator": "019a3b10-0000-7000-8000-0000000000a2",
+          "created_by": "019a3b10-0000-7000-8000-0000000000b2",
           "characters": [
             "019a3b10-0000-7000-8000-0000000000a1",
             "019a3b10-0000-7000-8000-0000000000a3"
@@ -1031,6 +1120,7 @@
           "name": "Message 15",
           "story": "",
           "narrator": "019a3b10-0000-7000-8000-0000000000a1",
+          "created_by": null,
           "characters": [],
           "parent_narrative": null,
           "created_at": "2026-10-26T09:15:00Z"
@@ -1042,6 +1132,7 @@
           "name": "Message 16",
           "story": "",
           "narrator": "019a3b10-0000-7000-8000-0000000000a1",
+          "created_by": null,
           "characters": [
             "019a3b10-0000-7000-8000-0000000000a1",
             "019a3b10-0000-7000-8000-0000000000a2"
@@ -1055,6 +1146,107 @@
       "unread": [
         "019a3b10-0000-7000-8000-000000000c14",
         "019a3b10-0000-7000-8000-000000000c15"
+      ]
+    },
+    {
+      "kind": "unread",
+      "name": "own-message-verified-is-not-unread",
+      "messages": [
+        {
+          "id": "019a3b10-0000-7000-8000-000000000c51",
+          "type": "narrative",
+          "supertype": "Message",
+          "name": "Message 51",
+          "story": "",
+          "narrator": "019a3b10-0000-7000-8000-0000000000a2",
+          "created_by": "019a3b10-0000-7000-8000-0000000000b2",
+          "characters": [],
+          "parent_narrative": null,
+          "created_at": "2026-10-26T09:51:00Z"
+        },
+        {
+          "id": "019a3b10-0000-7000-8000-000000000c52",
+          "type": "narrative",
+          "supertype": "Message",
+          "name": "Message 52",
+          "story": "",
+          "narrator": "019a3b10-0000-7000-8000-0000000000a3",
+          "created_by": "019a3b10-0000-7000-8000-0000000000b3",
+          "characters": [],
+          "parent_narrative": null,
+          "created_at": "2026-10-26T09:52:00Z"
+        }
+      ],
+      "reader": "019a3b10-0000-7000-8000-0000000000a2",
+      "read_mark": null,
+      "unread": [
+        "019a3b10-0000-7000-8000-000000000c52"
+      ]
+    },
+    {
+      "kind": "unread",
+      "name": "own-message-mismatch-is-unread-for-the-claimed-sender",
+      "messages": [
+        {
+          "id": "019a3b10-0000-7000-8000-000000000c53",
+          "type": "narrative",
+          "supertype": "Message",
+          "name": "Message 53",
+          "story": "",
+          "narrator": "019a3b10-0000-7000-8000-0000000000a1",
+          "created_by": "019a3b10-0000-7000-8000-0000000000b2",
+          "characters": [],
+          "parent_narrative": null,
+          "created_at": "2026-10-26T09:53:00Z"
+        }
+      ],
+      "reader": "019a3b10-0000-7000-8000-0000000000a1",
+      "read_mark": null,
+      "unread": [
+        "019a3b10-0000-7000-8000-000000000c53"
+      ]
+    },
+    {
+      "kind": "unread",
+      "name": "own-message-in-a-folder-is-not-unread",
+      "messages": [
+        {
+          "id": "019a3b10-0000-7000-8000-000000000c53",
+          "type": "narrative",
+          "supertype": "Message",
+          "name": "Message 53",
+          "story": "",
+          "narrator": "019a3b10-0000-7000-8000-0000000000a1",
+          "characters": [],
+          "parent_narrative": null,
+          "created_at": "2026-10-26T09:53:00Z"
+        }
+      ],
+      "reader": "019a3b10-0000-7000-8000-0000000000a1",
+      "read_mark": null,
+      "unread": []
+    },
+    {
+      "kind": "unread",
+      "name": "own-message-author-off-the-list-is-unread",
+      "messages": [
+        {
+          "id": "019a3b10-0000-7000-8000-000000000c57",
+          "type": "narrative",
+          "supertype": "Message",
+          "name": "Message 57",
+          "story": "",
+          "narrator": "019a3b10-0000-7000-8000-0000000000a1",
+          "created_by": "019a3b10-0000-7000-8000-0000000000b9",
+          "characters": [],
+          "parent_narrative": null,
+          "created_at": "2026-10-26T09:57:00Z"
+        }
+      ],
+      "reader": "019a3b10-0000-7000-8000-0000000000a1",
+      "read_mark": null,
+      "unread": [
+        "019a3b10-0000-7000-8000-000000000c57"
       ]
     },
     {
@@ -1220,6 +1412,99 @@
       "mark": "019a3b10-0000-7000-8000-0000000000d6"
     },
     {
+      "kind": "mark",
+      "name": "mark-changed-by-another-hand-is-ignored",
+      "relations": [
+        {
+          "id": "019a3b10-0000-7000-8000-0000000000d7",
+          "type": "relation",
+          "supertype": "Read",
+          "name": "Read: Mara",
+          "actor": "019a3b10-0000-7000-8000-0000000000a2",
+          "narratives": [
+            "019a3b10-0000-7000-8000-000000000c13"
+          ],
+          "updated_at": "2026-10-26T14:00:00Z",
+          "created_by": "019a3b10-0000-7000-8000-0000000000b2",
+          "changed_by": null
+        }
+      ],
+      "reader": "019a3b10-0000-7000-8000-0000000000a2",
+      "mark": null
+    },
+    {
+      "kind": "mark",
+      "name": "mark-changed-by-its-creator-counts",
+      "relations": [
+        {
+          "id": "019a3b10-0000-7000-8000-0000000000d7",
+          "type": "relation",
+          "supertype": "Read",
+          "name": "Read: Mara",
+          "actor": "019a3b10-0000-7000-8000-0000000000a2",
+          "narratives": [
+            "019a3b10-0000-7000-8000-000000000c13"
+          ],
+          "updated_at": "2026-10-26T14:00:00Z",
+          "created_by": "019a3b10-0000-7000-8000-0000000000b2",
+          "changed_by": "019a3b10-0000-7000-8000-0000000000b2"
+        }
+      ],
+      "reader": "019a3b10-0000-7000-8000-0000000000a2",
+      "mark": "019a3b10-0000-7000-8000-0000000000d7"
+    },
+    {
+      "kind": "mark",
+      "name": "mark-newest-listed-last-wins",
+      "relations": [
+        {
+          "id": "019a3b10-0000-7000-8000-0000000000d2",
+          "type": "relation",
+          "supertype": "Read",
+          "name": "Read: Ada",
+          "actor": "019a3b10-0000-7000-8000-0000000000a1",
+          "narratives": [
+            "019a3b10-0000-7000-8000-000000000c13"
+          ],
+          "updated_at": "2026-10-26T08:00:00Z",
+          "created_by": null
+        },
+        {
+          "id": "019a3b10-0000-7000-8000-0000000000d3",
+          "type": "relation",
+          "supertype": "Read",
+          "name": "Read: Ada",
+          "actor": "019a3b10-0000-7000-8000-0000000000a1",
+          "narratives": [
+            "019a3b10-0000-7000-8000-000000000c13"
+          ],
+          "updated_at": "2026-10-26T11:00:00Z",
+          "created_by": null
+        }
+      ],
+      "reader": "019a3b10-0000-7000-8000-0000000000a1",
+      "mark": "019a3b10-0000-7000-8000-0000000000d3"
+    },
+    {
+      "kind": "mark",
+      "name": "mark-empty-character-id-has-none",
+      "relations": [
+        {
+          "id": "019a3b10-0000-7000-8000-0000000000d8",
+          "type": "relation",
+          "supertype": "Read",
+          "name": "Read: ",
+          "actor": "",
+          "narratives": [
+            "019a3b10-0000-7000-8000-000000000c13"
+          ],
+          "updated_at": "2026-10-26T10:00:00Z"
+        }
+      ],
+      "reader": "",
+      "mark": null
+    },
+    {
       "kind": "unread",
       "name": "unread-by-the-newest-mark",
       "messages": [
@@ -1230,6 +1515,7 @@
           "name": "Message 11",
           "story": "",
           "narrator": "019a3b10-0000-7000-8000-0000000000a3",
+          "created_by": "019a3b10-0000-7000-8000-0000000000b3",
           "characters": [
             "019a3b10-0000-7000-8000-0000000000a1"
           ],
@@ -1243,6 +1529,7 @@
           "name": "Message 12",
           "story": "",
           "narrator": "019a3b10-0000-7000-8000-0000000000a3",
+          "created_by": "019a3b10-0000-7000-8000-0000000000b3",
           "characters": [],
           "parent_narrative": null,
           "created_at": "2026-10-26T09:12:00Z"
@@ -1254,6 +1541,7 @@
           "name": "Message 13",
           "story": "",
           "narrator": "019a3b10-0000-7000-8000-0000000000a3",
+          "created_by": "019a3b10-0000-7000-8000-0000000000b3",
           "characters": [
             "019a3b10-0000-7000-8000-0000000000a2"
           ],
@@ -1267,6 +1555,7 @@
           "name": "Message 14",
           "story": "",
           "narrator": "019a3b10-0000-7000-8000-0000000000a2",
+          "created_by": "019a3b10-0000-7000-8000-0000000000b2",
           "characters": [
             "019a3b10-0000-7000-8000-0000000000a1",
             "019a3b10-0000-7000-8000-0000000000a3"
@@ -1281,6 +1570,7 @@
           "name": "Message 15",
           "story": "",
           "narrator": "019a3b10-0000-7000-8000-0000000000a1",
+          "created_by": null,
           "characters": [],
           "parent_narrative": null,
           "created_at": "2026-10-26T09:15:00Z"
@@ -1292,6 +1582,7 @@
           "name": "Message 16",
           "story": "",
           "narrator": "019a3b10-0000-7000-8000-0000000000a1",
+          "created_by": null,
           "characters": [
             "019a3b10-0000-7000-8000-0000000000a1",
             "019a3b10-0000-7000-8000-0000000000a2"
@@ -1329,6 +1620,7 @@
           "name": "First in the list",
           "story": "",
           "narrator": "019a3b10-0000-7000-8000-0000000000a3",
+          "created_by": "019a3b10-0000-7000-8000-0000000000b3",
           "characters": [
             "019a3b10-0000-7000-8000-0000000000a1"
           ],
@@ -1342,6 +1634,7 @@
           "name": "Second in the list",
           "story": "",
           "narrator": "019a3b10-0000-7000-8000-0000000000a3",
+          "created_by": "019a3b10-0000-7000-8000-0000000000b3",
           "characters": [
             "019a3b10-0000-7000-8000-0000000000a1"
           ],
@@ -1481,6 +1774,84 @@
       "thread": [
         "019a3b10-0000-7000-8000-000000000c32",
         "019a3b10-0000-7000-8000-000000000c33"
+      ]
+    },
+    {
+      "kind": "thread",
+      "name": "thread-ignores-a-parent-that-is-not-a-string",
+      "messages": [
+        {
+          "id": "019a3b10-0000-7000-8000-000000000c61",
+          "type": "narrative",
+          "supertype": "Message",
+          "name": "Message 61",
+          "story": "",
+          "narrator": "019a3b10-0000-7000-8000-0000000000a1",
+          "characters": [
+            "019a3b10-0000-7000-8000-0000000000a2"
+          ],
+          "parent_narrative": null,
+          "created_at": "2026-10-26T09:61:00Z"
+        },
+        {
+          "id": "019a3b10-0000-7000-8000-000000000c62",
+          "type": "narrative",
+          "supertype": "Message",
+          "name": "Message 62",
+          "story": "",
+          "narrator": "019a3b10-0000-7000-8000-0000000000a2",
+          "characters": [
+            "019a3b10-0000-7000-8000-0000000000a1"
+          ],
+          "parent_narrative": "019a3b10-0000-7000-8000-000000000c61",
+          "created_at": "2026-10-26T09:62:00Z"
+        },
+        {
+          "id": "019a3b10-0000-7000-8000-000000000c63",
+          "type": "narrative",
+          "supertype": "Message",
+          "name": "Message 63",
+          "story": "",
+          "narrator": "019a3b10-0000-7000-8000-0000000000a1",
+          "characters": [
+            "019a3b10-0000-7000-8000-0000000000a2"
+          ],
+          "parent_narrative": 61,
+          "created_at": "2026-10-26T09:63:00Z"
+        },
+        {
+          "id": "019a3b10-0000-7000-8000-000000000c64",
+          "type": "narrative",
+          "supertype": "Message",
+          "name": "Message 64",
+          "story": "",
+          "narrator": "019a3b10-0000-7000-8000-0000000000a3",
+          "characters": [
+            "019a3b10-0000-7000-8000-0000000000a1"
+          ],
+          "parent_narrative": {
+            "id": "019a3b10-0000-7000-8000-000000000c61"
+          },
+          "created_at": "2026-10-26T09:64:00Z"
+        },
+        {
+          "id": "019a3b10-0000-7000-8000-000000000c65",
+          "type": "narrative",
+          "supertype": "Message",
+          "name": "Message 65",
+          "story": "",
+          "narrator": "019a3b10-0000-7000-8000-0000000000a1",
+          "characters": [
+            "019a3b10-0000-7000-8000-0000000000a3"
+          ],
+          "parent_narrative": "019a3b10-0000-7000-8000-000000000c64",
+          "created_at": "2026-10-26T09:65:00Z"
+        }
+      ],
+      "root": "019a3b10-0000-7000-8000-000000000c61",
+      "thread": [
+        "019a3b10-0000-7000-8000-000000000c61",
+        "019a3b10-0000-7000-8000-000000000c62"
       ]
     }
   ]

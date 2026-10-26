@@ -1,5 +1,7 @@
 # Import profile: the import map — another tool's words for the 22 types
 
+**The doors.** Doors exist for Kanka, World Anvil, Campfire, Notion and Azgaar's map generator; this table covers the tools where people write their own category words, [LegendKeeper](https://www.legendkeeper.com/) first, because its door is the first built to read one.
+
 **What it is.** One shared table, per source tool, **from the words that tool's users write to one of the 22 types**: in LegendKeeper people tag a page `city`, `organization` or `artifact`, not `location`, `institution` or `object`. A door that brings a project in from that tool (the Python package `onlyworlds`'s `onlyworlds.legendkeeper` is the first) offers the table as its default map, so two doors never type the same tag two ways. **The table is offered and applied only on the user's yes; it never types anything silently.** A door that never read this page types a resource the way it always did: from a tag that equals a type name, or from a map the user typed.
 
 What it is not: a guess (every row was ruled from the type's definition, and a word nobody ruled has no row); a rename (the resource keeps its own tags, and the tool's own word for the type is not written anywhere as a type); anything that changes a type, a field, a link or the standard.
@@ -60,4 +62,4 @@ What it is not: a guess (every row was ruled from the type's definition, and a w
 
 **Conformance.** `import-map.fixture.json`, beside this page: cases of `{source, tags, map?, template?, file?}` → the type a door that applied the table gives (or `null`, untyped), why (`table`, `tag`, `user map`, `untyped`, `ambiguous`, `no type`, `template`), and the tags it offers as mappable (each folded, once, sorted; none on a typed resource). `no type` is an untyped resource whose every tag is a `no_type` word; `template` is a template left untyped that carries a tag the table has. A case with `file` reads that value in place of `import-map.json`; a declined offer reads as no file. **Every door that reads the table runs the fixture as its own test**: the Python package's `onlyworlds.legendkeeper` first.
 
-Source: Titus's focus on LegendKeeper and the reads of the door's author and the converter lane, 2026-10-25; the first reader the Python package.
+Source: the Python package's LegendKeeper door, the first reader of this table.

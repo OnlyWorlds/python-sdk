@@ -1,4 +1,4 @@
-"""The message profile (schema-dist ``profiles/message.md``, serial 73): every conformance case in
+"""The message profile (schema-dist ``profiles/message.md``, serial 75): every conformance case in
 ``codegen/schema-dist/profiles/message.fixture.json``, vendored with the distribution, replayed through the
 package's readers, dispatched on the case's kind. The npm SDK's readers run the same cases."""
 
@@ -29,7 +29,7 @@ from onlyworlds import (
 
 REPO = Path(__file__).resolve().parent.parent
 FIXTURE = REPO / "codegen" / "schema-dist" / "profiles" / "message.fixture.json"
-KINDS = {"pair": 9, "addressed": 8, "sent_by": 2, "sender": 9, "unread": 8, "mark": 5, "thread": 2}
+KINDS = {"pair": 9, "addressed": 9, "sent_by": 3, "sender": 10, "unread": 12, "mark": 9, "thread": 3}
 
 ADA = "019a3b10-0000-7000-8000-0000000000a1"
 MARA = "019a3b10-0000-7000-8000-0000000000a2"
@@ -72,7 +72,8 @@ def replay(case: dict[str, Any], doc: dict[str, Any]) -> list[str]:
         mark = read_mark_of(case["relations"], case["reader"], members)
         expect("read_mark_of", None if mark is None else mark["id"], case["mark"])
     elif kind == "unread":
-        expect("unread_for", ids(unread_for(case["messages"], case["reader"], case["read_mark"])), case["unread"])
+        got_unread = unread_for(case["messages"], case["reader"], case["read_mark"], members)
+        expect("unread_for", ids(got_unread), case["unread"])
     elif kind == "thread":
         expect("thread_of", ids(thread_of(case["messages"], case["root"])), case["thread"])
     else:
@@ -85,7 +86,7 @@ def test_every_fixture_case_is_answered_as_the_fixture_says() -> None:
     cases = doc["cases"]
     wrong = [line for case in cases for line in replay(case, doc)]
     assert wrong == []
-    assert len(cases) == 43, f"the fixture holds {len(cases)} cases, serial 73 has 43"
+    assert len(cases) == 55, f"the fixture holds {len(cases)} cases, serial 75 has 55"
     assert Counter(c["kind"] for c in cases) == KINDS
 
 
@@ -218,3 +219,74 @@ def test_a_thread_walks_only_string_ids_as_in_the_npm_sdk() -> None:
     assert thread_of([{"id": "", "parent_narrative": "x"}], "") == []
     no_ids: list[dict[str, Any]] = [{"parent_narrative": "x"}, {"id": None}]
     assert thread_of(no_ids, nobody) == []
+
+
+MEMBERS: list[dict[str, Any]] = [
+    {"id": None, "character": ADA},
+    {"id": "b2", "character": MARA},
+    {"id": "b3", "character": WREN},
+    {"id": "b5", "character": None},
+]
+
+
+def read_mark(mid: str, **hands: Any) -> dict[str, Any]:
+    body: dict[str, Any] = {"id": mid, "type": "relation", "supertype": "Read", "actor": MARA, "narratives": []}
+    return {**body, "updated_at": "2026-10-26T10:00:00Z", **hands}
+
+
+def test_a_mark_counts_only_when_every_write_on_it_was_its_readers_hand() -> None:
+    """What the fixture does not settle about ``changed_by``. The npm SDK's ``readMarkOf`` answers alike."""
+    # No changed_by key: the reader cannot see the last writer, so the author check alone decides.
+    assert read_mark_of([read_mark("m", created_by="b2")], MARA, MEMBERS) is not None
+    # changed_by None is the owner's hand: on a member's mark it is another hand, ignored.
+    assert read_mark_of([read_mark("m", created_by="b2", changed_by=None)], MARA, MEMBERS) is None
+    # The owner's own mark, made and changed by the owner: None on both, equal.
+    owners = {**read_mark("o", created_by=None, changed_by=None), "actor": ADA}
+    assert read_mark_of([owners], ADA, MEMBERS) is owners
+    assert read_mark_of([{**owners, "changed_by": "b2"}], ADA, MEMBERS) is None
+    # changed_by with no created_by beside it does not count, even equal to nothing.
+    assert read_mark_of([read_mark("m", changed_by="b2")], MARA, MEMBERS) is None
+    assert read_mark_of([read_mark("m", changed_by=None)], MARA, None) is None
+    # Equal hands are not enough: the author must still play the reader's Character.
+    assert read_mark_of([read_mark("m", created_by="b3", changed_by="b3")], MARA, MEMBERS) is None
+    # A folder's mark, with neither key, has no hand to check and counts.
+    assert read_mark_of([read_mark("m")], MARA, None) is not None
+    # A newer mark another hand changed is ignored, and the reader's own older mark stands.
+    own = read_mark("own", created_by="b2", changed_by="b2", updated_at="2026-10-26T08:00:00Z")
+    touched = read_mark("touched", created_by="b2", changed_by=None, updated_at="2026-10-26T12:00:00Z")
+    assert read_mark_of([touched, own], MARA, MEMBERS) is own
+    assert read_mark_of([own, touched], MARA, MEMBERS) is own
+
+
+def message(mid: str, narrator: str | None, minute: int, **extra: Any) -> dict[str, Any]:
+    body: dict[str, Any] = {"id": mid, "type": "narrative", "supertype": "Message", "characters": []}
+    if narrator is not None:
+        body["narrator"] = narrator
+    return {**body, "created_at": f"2026-10-26T09:{minute:02d}:00Z", **extra}
+
+
+def test_unread_proves_the_readers_own_messages_on_the_wire_and_trusts_a_folder() -> None:
+    """What the fixture does not settle about ``members``. The npm SDK's ``unreadFor`` answers alike."""
+    wire = message("w", MARA, 1, created_by="b2")
+    # On the wire, a verified own message is read; with no members list, or an empty one, none is proved.
+    assert ids(unread_for([wire], MARA, None, MEMBERS)) == []
+    assert ids(unread_for([wire], MARA, None)) == ["w"]
+    assert ids(unread_for([wire], MARA, None, None)) == ["w"]
+    assert ids(unread_for([wire], MARA, None, [])) == ["w"]
+    # The author's row plays no Character: unverifiable, so unread for the Character it claims.
+    assert ids(unread_for([message("g", MARA, 1, created_by="b5")], MARA, None, MEMBERS)) == ["g"]
+    # The owner's hand (created_by None) proves the owner's Character's own message.
+    assert ids(unread_for([message("o", ADA, 1, created_by=None)], ADA, None, MEMBERS)) == []
+    # Written by Mara's hand under Wren's name: not Mara's own (the claim is Wren's), unread for both.
+    forged = message("f", WREN, 1, created_by="b2")
+    assert ids(unread_for([forged], MARA, None, MEMBERS)) == ["f"]
+    assert ids(unread_for([forged], WREN, None, MEMBERS)) == ["f"]
+    # Message by message: one without created_by is trusted even beside others that carry it.
+    folder_like = message("x", MARA, 2)
+    forged_own = message("y", MARA, 3, created_by="b3")
+    assert ids(unread_for([wire, folder_like, forged_own], MARA, None, MEMBERS)) == ["y"]
+    assert ids(unread_for([wire, folder_like, forged_own], MARA, None)) == ["w", "y"]
+    # A message with no narrator is sent by nobody, so it is unread for every Character it addresses.
+    assert ids(unread_for([message("n", None, 1)], MARA, None)) == ["n"]
+    # An empty id is no Character: nothing is unread for it, not even a message to everyone.
+    assert unread_for([message("e", None, 1)], "", None) == []
