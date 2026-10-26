@@ -631,7 +631,7 @@ def test_8_a_charter_untouched_after_n_changes() -> None:
 
 
 def test_8_a_charter_filed_as_a_construct_is_found_and_named() -> None:
-    # BrainBoost's case (TC, h67 #9814): the charter is a Construct with supertype Charter, no Law.
+    # BrainBoost's case (TC): the charter is a Construct with supertype Charter, no Law.
     con1 = "d0000000-0000-7000-8000-000000000001"
     base = edit(clean(), "law", LAW1, supertype="Decree")
     base["construct"] = [{"id": con1, "name": "Charter", "supertype": "Charter", "description": "Our rules."}]
@@ -1490,7 +1490,7 @@ def spine() -> Elements:
         "title": [
             {
                 "id": SEAT1,
-                "name": "Assembly",
+                "name": "Harbour",
                 "supertype": "Seat",
                 "authority": "Keeps the SDK.",
                 "holders": [KAEL],
@@ -1630,11 +1630,11 @@ def test_13_a_seat_keeps_a_row_only_through_the_rows_own_field(tmp_path: Path) -
 
 
 def test_13_two_seats_keeping_one_row(tmp_path: Path) -> None:
-    second = {"id": SEAT2, "name": "Forge", "supertype": "Seat", "objects": [PKG, PKG]}
+    second = {"id": SEAT2, "name": "Lighthouse", "supertype": "Seat", "objects": [PKG, PKG]}
     r = folder_report(tmp_path, with_(spine(), "title", second))
     (f,) = spine_found(r)
     assert f["element"]["id"] == PKG
-    assert f["reason"] == "2 seats keep it (Assembly, Forge): a row has one owner"
+    assert f["reason"] == "2 seats keep it (Harbour, Lighthouse): a row has one owner"
     assert [s["id"] for s in f["evidence"]["seats"]] == [SEAT1, SEAT2]
     assert r.compared[SP]["seats"] == 2
 

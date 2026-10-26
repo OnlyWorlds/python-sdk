@@ -475,7 +475,7 @@ def test_the_api_command_line_when_nothing_can_be_read(tmp_path: Path, monkeypat
     assert not (tmp_path / "out").exists()
 
 
-# --- the label line: which kind of key made the pack (h58 #10628, #10631)
+# --- the label line: which kind of key made the pack
 
 
 def test_the_world_file_says_which_kind_of_key_made_the_pack() -> None:
@@ -604,7 +604,7 @@ def test_the_label_line_says_a_characters_view_in_the_worlds_word() -> None:
     assert "*Made as the Employee (Character) Ann:" in build_pack(mapped, world(), exported_as=named)[0]["00-world.md"]
 
 
-# --- proposed elements: not canon until a keeper settles them (keel #565; Skeld, h29 #11116)
+# --- proposed elements: not canon until a keeper settles them (keel #565; Skeld's ruling)
 
 C3 = "c0000000-0000-7000-8000-000000000003"
 C4 = "c0000000-0000-7000-8000-000000000004"
@@ -692,7 +692,7 @@ def test_the_command_line_leaves_proposed_elements_out_unless_asked(tmp_path: Pa
     assert pack.PROPOSED_LINE in (tmp_path / "out-p" / "01-character.md").read_text(encoding="utf-8")
 
 
-# --- hidden elements: hidden from whoever the world is handed to (folder format §4.8; Skeld, h58 #11461)
+# --- hidden elements: hidden from whoever the world is handed to (folder format §4.8; Skeld's ruling)
 
 
 def with_hidden() -> Elements:

@@ -1,15 +1,14 @@
 """The LegendKeeper door's file source (onlyworlds.legendkeeper.FileSource) on a real export.
 
 ``fixtures/legendkeeper/the-quay-world.lk`` is the file LegendKeeper gave on 2026-10-23 (export
-version 1) for a project Seethe made on a crew account's 14-day Pro trial, nothing paid (her
-receipt: ``Carrier/Studio/desk/current/2026-10-23-exports/receipts/legendkeeper.md``; Boss read it
-for secrets and found none, OW Market h40 #11227). What she typed: six pages, Ada Okafor, Mara
+version 1) for a project Seethe made on a 14-day Pro trial, nothing paid (Boss read it
+for secrets and found none). What she typed: six pages, Ada Okafor, Mara
 Voss, The quay, The ferry crossing, The Ferry Guild and The ledger of the first crossing, with no
 tags, properties or links; she renamed the project home "The quay world", and left three
 "Untitled" pages (two empty strays, one made from the Character template). The rest is the
 tutorial and templates LegendKeeper seeds a new project with: 3 hidden tabs, 13 Secret blocks,
 maps, a board and a timeline. Nothing in the project is a hidden page. Banked as Boss's scrubbed
-copy (OW Market h40 #11420, #11430): the account's ``createdBy`` id a placeholder of the same
+copy: the account's ``createdBy`` id a placeholder of the same
 length, every other byte as exported; the door's folder from it is the unscrubbed file's.
 
 The JSON type of the same export (a minute later; Boss found it equal but for ``exportId``,
@@ -18,12 +17,12 @@ the ``.lk`` the same way. The real twin was checked to give a byte-identical fol
 door was built.
 
 ``fixtures/legendkeeper/the-quay-world-3.json`` is her third export of the same project, the JSON
-type, a few hours on (Seethe, OW Market h40 #11387, #11426): Ada Okafor now mentions Mara Voss and
+type, a few hours on: Ada Okafor now mentions Mara Voss and
 carries a tag, and "The quay map" is a map of her own with two pins: "The quay", on her page The
 quay, and one near the map's right edge with no name and no uri (the name she typed was not kept).
 Five map documents in three cases: her map (an image address and bounds), the tutorial's Realm of
 Tutoria (a bare asset id, bounds, 16 pins with no name of their own) and three templates' maps
-with no ``map`` object at all. Banked as Boss's scrubbed copy (h40 #11434): the account's
+with no ``map`` object at all. Banked as Boss's scrubbed copy: the account's
 ``createdBy`` id and her map image's asset id each a placeholder of the same length; LegendKeeper's
 tutorial asset ids and its authors' ids as exported, and every other byte.
 """
@@ -390,7 +389,7 @@ def element_digests(out: Path) -> tuple[str, str]:
 
 
 def test_the_first_export_gives_its_old_folder_but_for_the_supertype(tmp_path: Path) -> None:
-    """No tool name in a supertype (Skeld's lane rule, OW Market h40 #11385): untyped is Article now,
+    """No tool name in a supertype (Skeld's lane rule): untyped is Article now,
     and nothing else of the first export's folder moved, its ids least of all; its maps are added."""
     out, report = run(tmp_path)
     assert element_digests(out) == (OLD_FOLDER, OLD_IDS)
@@ -430,7 +429,7 @@ CORNER = "uhljd0gj"  # the second pin on the quay map: no name, no uri
 ASSET = re.compile(
     r"https://(?:dev-)?assets\.legendkeeper\.com/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})"
 )
-#: Boss's same-length placeholder for her map image's asset id (h40 #11434)
+#: Boss's same-length placeholder for her map image's asset id
 MAP_ASSET = "00000000-0000-4000-8000-000000000001"
 #: her map image's real asset id and the account's id, by hash (sha256), so neither is in the package
 MAP_ASSET_SHA256 = "d04851f3065f8a3cc2d7624db15d65a8ca528f0d1978dd5f2af89c3cb21e27fe"

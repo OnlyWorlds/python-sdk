@@ -181,7 +181,7 @@ def test_untyped_rows_are_narratives(imported: tuple[Path, ImportReport]) -> Non
 
 
 def test_ids_do_not_move_with_the_supertype(imported: tuple[Path, ImportReport]) -> None:
-    """No tool name in a supertype (Skeld, OW Market h40 #11385): the fixture's ids are those 0.41.0
+    """No tool name in a supertype (Skeld's ruling): the fixture's ids are those 0.41.0
     gave (the sha256 of the sorted ids, one a line), on the fixture built here."""
     out, _ = imported
     ids = sorted(bodies(out))

@@ -1,7 +1,7 @@
 """Where ``API-Pin`` rides: every method but GET, ``GET /me``, and every request of a 10-digit legacy key.
 
 keel verifies a PIN wherever one is sent (argon2, 64 MiB each); a PIN on every read OOM-killed
-staging after a restart (2026-10-22; Skeld's rule, OW Keel h29 #10663). Scripted HTTP, no network.
+staging after a restart (2026-10-22; Skeld's rule). Scripted HTTP, no network.
 """
 
 from __future__ import annotations

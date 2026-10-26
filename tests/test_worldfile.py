@@ -298,7 +298,7 @@ def test_the_nfc_is_unicode_15_1_on_every_line_of_normalization_test() -> None:
 
 
 # The 20 code points Unicode 16.0 assigns with a canonical decomposition and 15.1 leaves unassigned
-# (Quillon's measurement, Armature/Notes/lane-nfc-data.md): Todhri, Tulu-Tigalari, Gurung Khema, Kirat Rai.
+# (Quillon's measurement): Todhri, Tulu-Tigalari, Gurung Khema, Kirat Rai.
 UNASSIGNED_IN_15_1 = {
     0x105C9: (0x105D2, 0x0307),
     0x105E4: (0x105DA, 0x0307),
@@ -579,7 +579,7 @@ def test_the_writer_refuses_a_link_where_a_carried_file_would_be(tmp_path: Path)
     assert info.value.reason == "link"
 
 
-# --- hidden elements: kept in a copy, left out of a share (folder format §4.8; Skeld, OW Atlas h20 #11469)
+# --- hidden elements: kept in a copy, left out of a share (folder format §4.8; Skeld's ruling)
 
 
 def test_a_hidden_element_travels_byte_for_byte_unless_the_file_is_a_share(tmp_path: Path) -> None:

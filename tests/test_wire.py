@@ -51,7 +51,7 @@ KIND = {"text": "string", "integer": "integer", "multi_link": "array", "single_l
 def _load() -> dict[str, Any]:
     assert SOURCE
     if SOURCE.startswith(("http://", "https://")):
-        # The document is 2 MB plain, 181 KB gzipped: ask for gzip (keel's bandwidth watch, h29 #9808),
+        # The document is 2 MB plain, 181 KB gzipped: ask for gzip (keel's bandwidth watch),
         # and send the last ETag back as received (keel #538): an unchanged document is a 304 and 0 bytes,
         # served from a cache file beside the system's temp dir. CI has no cache, so it reads fresh once.
         cache = pathlib.Path(tempfile.gettempdir()) / "onlyworlds-wire-openapi.json"
@@ -401,7 +401,7 @@ def test_patch_world_takes_back_every_key_the_world_body_serves(doc: dict[str, A
     leaked = {k for k in sent - set(patch["properties"]) if not re.match(pattern, k)}
     assert not leaked, f"patch_world still sends {sorted(leaked)}"
     assert "x_names" in sent
-    # h29 #11077: the named pair goes under WorldPatch's own keys, each nullable there.
+    # The named pair goes under WorldPatch's own keys, each nullable there.
     c.patch_world({"name": "x"}, source={"world": "w0"}, producer=None)
     assert set(t.calls[-1].body) == {"name", "source", "producer"}
     assert all("null" in patch["properties"][k]["type"] for k in ("source", "producer"))

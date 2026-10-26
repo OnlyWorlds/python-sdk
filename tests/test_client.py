@@ -792,7 +792,7 @@ def test_patch_world_drops_the_read_only_keys_keel_refuses(make_client: MakeClie
         "owner_character": None,
         # keel #571: served on every GET /world, an unknown key to PATCH (written as source and producer)
         "origin": {"source": {"server": "https://www.onlyworlds.com", "world": "w0", "at": "a"}, "producer": None},
-        # keel #421 PR 4: a keyless read's counts, an unknown key to PATCH (Quillon h29 #11241)
+        # keel #421 PR 4: a keyless read's counts, an unknown key to PATCH (Quillon)
         "counts": {"total": 1, "types": {"character": 1}},
     }
     make_client(t).patch_world(body)
@@ -846,7 +846,7 @@ def test_patch_world_never_sends_what_only_a_folder_carries(make_client: MakeCli
 
 
 def test_patch_world_sends_source_and_producer_only_when_named(make_client: MakeClient) -> None:
-    # h29 #11077: a client's world patch passes the pair through as given; a folder world.json's own
+    # A client's world patch passes the pair through as given; a folder world.json's own
     # pair (in the partial) names the folder's maker and is still left out.
     t = FakeTransport(handler=lambda *_: jresp(200, {"id": "w"}))
     c = make_client(t)

@@ -314,7 +314,7 @@ def test_dry_run_and_key_pin_parameters(tmp_path: Path) -> None:
         push(base, edit, log_path=tmp_path / "log.jsonl")
 
 
-# keel #571, h58 #11038: origin is a world's birth line, written once: a push sets it only on a first
+# keel #571: origin is a world's birth line, written once: a push sets it only on a first
 # fill from a folder made elsewhere, never from a folder exported from the same world, and never over
 # a first import.
 NO_ORIGIN = {"source": None, "producer": None}
@@ -487,7 +487,7 @@ def test_a_rerun_never_proposes_the_same_patch_twice(tmp_path: Path, make_client
 
 def test_an_element_hidden_only_in_the_folder_is_withheld(tmp_path: Path, make_client: MakeClient) -> None:
     # keel takes the hidden mark only by its own route: a patch would edit a visible element
-    # (Skeld's ruling, OW Market h40 #11232)
+    # (Skeld's ruling)
     base, edit = folders(
         tmp_path,
         {"character": [wire_char(C1, "Gelon"), wire_char(C2, "Hieron")]},

@@ -115,7 +115,7 @@ def test_export_writes_a_served_stub_as_a_stub(tmp_path: Path, make_client: Make
     assert f.known_of == [DEV] and not f.elements[MARA].known_of
 
 
-# keel PR 117 (Keel #448): a stub also carries its type's public fields, with their values.
+# keel PR 117: a stub also carries its type's public fields, with their values.
 SPECIES = "s0000000-0000-7000-8000-000000000001"
 
 

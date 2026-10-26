@@ -1,9 +1,8 @@
 """The LegendKeeper door (onlyworlds.legendkeeper) on Boss's recorded wire answers.
 
 The three files in ``fixtures/legendkeeper/`` are real answers of the LegendKeeper API v3, read
-live on 2026-10-22 on the Captain's project (made-up content, no key, no email; Boss's findings,
-``Orrery/market/2026-10-22-legendkeeper-wire/findings.md``). They are specimens, not a whole
-walk, so ``answers()`` composes the walk the door makes from them and says what it fills in:
+live on 2026-10-22 on Titus's project (made-up content, no key, no email; Boss's findings). They
+are specimens, not a whole walk, so ``answers()`` composes the walk the door makes from them and says what it fills in:
 
 - the project answer (``getProject``) was not recorded: ``{"id": PID, "name": "Sikelia"}``, the
   name of the project's root page; ``PID`` is made up (the fixtures carry no project id);
@@ -342,7 +341,7 @@ def visible(out: Path) -> str:
 
 
 def test_a_secret_block_becomes_its_own_hidden_narrative(tmp_path: Path) -> None:
-    """Skeld's rule (OW Market h40 #11228): what the source hides, we hide, never drop and never publish."""
+    """Skeld's rule: what the source hides, we hide, never drop and never publish."""
     out, report = run(tmp_path)
     els = by_name(out)
     secret = els["Aldric Veyra: Secret"]
@@ -463,7 +462,7 @@ def test_the_report_names_everything_not_placed(tmp_path: Path) -> None:
 
 
 def test_ids_do_not_move_with_the_supertype(tmp_path: Path) -> None:
-    """Untyped is supertype Article now (no tool name in a supertype, Skeld, OW Market h40 #11385);
+    """Untyped is supertype Article now (no tool name in a supertype, Skeld's ruling);
     the ids are those 0.41.0 gave: the sha256 of the sorted ids, one a line. The Region map's Map,
     made since 0.53.0, the timeline's Narrative and its lane's, since 0.56.0, and the Gregorian
     calendar's Construct, since 0.57.0, are the ids added."""
