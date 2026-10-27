@@ -4,6 +4,9 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+## 0.76.0 (2026-10-27)
+
+- **Schema repinned to schema-dist `v0.33.0-dist.80`** (from dist.79; the same canonical 00.33.00, so `SCHEMA_VERSION` stays `00.33.00` and no element field moved). Serial 80 writes the lens profile's five rulings into its page and adds four lens cases, 88 in all; `resolve_lens` already answers every one, so the reader is unchanged.
 - **The server's lens routes**: `Client.set_my_lenses(lens_ids)` is `PUT /me/lenses`, the lenses this key's holder starts with, lens ids in order (0 to 20, `[]` for none, which is a choice); a world write key with its PIN, answering `GET /me`'s body; no `X-OW-Agent` or `X-OW-Client`, which the document declares on neither; a string or anything but a list or tuple is a `TypeError` before sending. `Client.world_lenses(world_id, resolve=..., read_as=...)` is `GET /world/{world_id}/lenses`, `{data, read_as}`: every lens in the world this key can see, with its recipe echoed, the Titles it is the default for and whether this key chose it; `resolve=True` adds each lens's `reading`, and `read_as` (the owner only, with `resolve`) reads as another reader; a read, so no PIN; `resolve` is a bool or nothing. As the npm SDK's `setMyLenses` and `worldLenses`.
 - **`Client.draught(..., lens=...)`**: a lens id, sent as `lens`; the packet then carries `lenses`, one frame with that lens read for this key's own view. With no lens and no policy key but `compact`, keel adds one frame per lens chosen with `set_my_lenses`. `lens` beside `depth` or `budget` is keel's 422.
 - **`GET /me` names `lenses`**: `Client.me`'s docstring lists the key, which the server now serves.
