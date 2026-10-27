@@ -88,6 +88,97 @@
   }
  },
  {
+  "name": "the-worlds-now-is-its-time-current",
+  "world": {
+   "time_current": 10,
+   "elements": [
+    {
+     "id": "e1",
+     "type": "event",
+     "name": "E1",
+     "start_date": 7
+    },
+    {
+     "id": "e2",
+     "type": "event",
+     "name": "E2",
+     "start_date": 6
+    },
+    {
+     "id": "e3",
+     "type": "event",
+     "name": "E3",
+     "start_date": 12
+    }
+   ]
+  },
+  "lens": {
+   "id": "L",
+   "type": "construct",
+   "name": "L",
+   "supertype": "Lens",
+   "x_lens": {
+    "types": [
+     "event"
+    ],
+    "window": 3
+   }
+  },
+  "reader": {
+   "rung": "owner"
+  },
+  "want": {
+   "kept": [
+    "e1"
+   ],
+   "cut": {
+    "window": 1,
+    "after_as_of": 1
+   }
+  }
+ },
+ {
+  "name": "with-no-as-of-and-no-now-the-window-cuts-nothing",
+  "world": {
+   "elements": [
+    {
+     "id": "e1",
+     "type": "event",
+     "name": "E1",
+     "start_date": -10
+    },
+    {
+     "id": "e2",
+     "type": "event",
+     "name": "E2",
+     "start_date": 5
+    }
+   ]
+  },
+  "lens": {
+   "id": "L",
+   "type": "construct",
+   "name": "L",
+   "supertype": "Lens",
+   "x_lens": {
+    "types": [
+     "event"
+    ],
+    "window": 3
+   }
+  },
+  "reader": {
+   "rung": "owner"
+  },
+  "want": {
+   "kept": [
+    "e1",
+    "e2"
+   ],
+   "cut": {}
+  }
+ },
+ {
   "name": "a-to-after-as-of-keeps-an-element-dated-as-of",
   "world": {
    "now": 10,

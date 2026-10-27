@@ -694,12 +694,13 @@ def resolve_lens(
     it never writes, and nothing in the world moves.
 
     ``world`` holds the elements as the owner is served them (``elements``), the ids its hidden mark keeps
-    (``hidden``, beside each element's own ``hidden``), its ``members`` for the mail rule and its ``now``. ``lens``
-    is a lens body or the id of a lens in the world the reader can see. ``reader`` is a mapping: ``rung``
-    (``owner``, ``contributor``, ``guest`` with its ``whole`` and ``known_of`` ids, or ``public``), ``character``
-    (for the mail rule), and on an owner ``as``, the reader it reads as (that reader's view, the owner's two
-    counts). ``as_of`` is the reading's date (absent: the world's ``now``), ``clock`` its time for the mail rule
-    (absent: now).
+    (``hidden``, beside each element's own ``hidden``), its ``members`` for the mail rule and its now (``now``,
+    else the World's ``time_current``). ``lens`` is a lens body or the id of a lens in the world the reader can
+    see. ``reader`` is a mapping: ``rung`` (``owner``, ``contributor``, ``guest`` with its ``whole`` and
+    ``known_of`` ids, or ``public``), ``character`` (for the mail rule), and on an owner ``as``, the reader it
+    reads as (that reader's view, the owner's two counts). ``as_of`` is the reading's date (absent: the world's
+    now; none at all: no fence, and the window cuts nothing), ``clock`` the reading's wall-clock time for the mail
+    rule's thirty days (absent: the machine's time), never the world's now.
 
     The rules, in short: visibility first (a hidden or proposed element is not there to hop through; a known-of
     stub is kept as served and nothing hops out of it); a hop reaches both ways, and on through a Relation to its
@@ -718,7 +719,11 @@ def resolve_lens(
     if not isinstance(lens, str | Mapping):
         raise TypeError("resolve_lens: lens is a lens body or its id.")
 
+    # The reading's date: as_of, else the world's now (the fixture's ``now``, else the World's ``time_current``).
+    # With none of them there is no fence, and the window cuts nothing.
     when = _whole(as_of) if as_of is not None else _whole(world.get("now"))
+    if when is None:
+        when = _whole(world.get("time_current"))
     r = _Reading(world, reader, when)
     # An id is read only when the reader can see that element; a body is read as given.
     body: Mapping[str, Any] | None = (r.by_id[lens] if lens in r.view else None) if isinstance(lens, str) else lens

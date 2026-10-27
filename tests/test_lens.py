@@ -224,12 +224,13 @@ def test_the_fixtures_tables_read_back_through_the_reader() -> None:
     assert resolve_lens({"elements": chain}, {**LENS, "objects": [_id(1)]}, OWNER)["kept"] == [_id(1), _id(2)]
 
 
-# The shared edge cases: inputs the fixture leaves open (a stub's links, the window's edge, a to after as_of, the
+# The shared edge cases: inputs the fixture leaves open (a stub's links, the window's edge, the World's time_current
+# as its now, no window without a now, a to after as_of, the
 # fence on anchors, the members list in the mail rule, a message not repeated among the kept, the thirty days' edge,
 # ties by id by code point), the same file byte for byte as the npm SDK's test/fixtures/lens-edges.json (both suites
 # hold its sha256), answers written by hand.
 EDGES_FILE = REPO / "tests" / "fixtures" / "lens-edges.json"
-EDGES_SHA256 = "79d1fd0de778b574eed82745e9b5fc013ad788b5ec4c73daec9125081febaa28"
+EDGES_SHA256 = "ee28a59302c6dd055bc9bfeac2f950233eb97e5eade67b3a3a2efbc53e560187"
 
 
 def test_the_shared_edge_cases() -> None:
@@ -253,7 +254,7 @@ def test_the_shared_edge_cases() -> None:
     for line in wrong:
         print(line)
     assert wrong == []
-    assert len(edges) == 8
+    assert len(edges) == 10
 
 
 def test_resolve_lens_refuses_what_is_not_a_reading() -> None:
