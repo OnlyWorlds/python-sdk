@@ -16,7 +16,7 @@ from onlyworlds import FIELD_KINDS, WorldGraph, resolve_lens, world_graph
 
 REPO = Path(__file__).resolve().parent.parent
 EDGES_FILE = REPO / "tests" / "fixtures" / "graph-edges.json"
-EDGES_SHA256 = "14a4c008fb99f8046417c70ff4497ab1a1563496cfc7b6959c0740de411bf334"
+EDGES_SHA256 = "f114dadebff07167f999ea60bef1245eeaf20d8c8cdcc6d4d388a0be45050f45"
 
 
 def load_cases() -> list[dict[str, Any]]:
@@ -127,7 +127,7 @@ def test_the_shared_graph_cases() -> None:
     for line in wrong:
         print(line)
     assert wrong == []
-    assert len(cases) == 32
+    assert len(cases) == 34
 
 
 class _Unread(list[Any]):

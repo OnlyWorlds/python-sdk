@@ -3048,5 +3048,161 @@
    "cut": {},
    "unreadable": null
   }
+ },
+ {
+  "name": "a link to the lens element itself is outside_lens: the lens read is never in its own result",
+  "world": {
+   "elements": [
+    {
+     "id": "LR",
+     "type": "construct",
+     "supertype": "Lens",
+     "name": "Bonds and charters",
+     "x_lens": {
+      "types": [
+       "relation",
+       "construct"
+      ]
+     }
+    },
+    {
+     "id": "k1",
+     "type": "construct",
+     "name": "Charter"
+    },
+    {
+     "id": "r1",
+     "type": "relation",
+     "name": "Pact",
+     "constructs": [
+      "LR",
+      "k1"
+     ]
+    }
+   ]
+  },
+  "reader": {
+   "rung": "owner"
+  },
+  "options": {
+   "lens": "LR"
+  },
+  "want": {
+   "nodes": [
+    {
+     "id": "k1",
+     "type": "construct",
+     "name": "Charter",
+     "family": "world",
+     "icon": "api"
+    },
+    {
+     "id": "r1",
+     "type": "relation",
+     "name": "Pact",
+     "family": "temporal",
+     "icon": "link"
+    }
+   ],
+   "edges": [
+    {
+     "source": "r1",
+     "field": "constructs",
+     "target": "k1",
+     "index": 1
+    }
+   ],
+   "edges_cut": {
+    "outside_lens": 1
+   },
+   "cut": {},
+   "unreadable": null
+  }
+ },
+ {
+  "name": "a link to a message the mail part took is outside_lens: the mail part is not kept",
+  "world": {
+   "members": [
+    {
+     "id": "u-ada",
+     "character": "ada"
+    },
+    {
+     "id": "u-bo",
+     "character": "bo"
+    }
+   ],
+   "elements": [
+    {
+     "id": "LM",
+     "type": "construct",
+     "supertype": "Lens",
+     "name": "Rota and post",
+     "x_lens": {
+      "types": [
+       "relation",
+       "narrative/message"
+      ],
+      "mail": "unread_full_read_titles"
+     }
+    },
+    {
+     "id": "ada",
+     "type": "character",
+     "name": "Ada"
+    },
+    {
+     "id": "bo",
+     "type": "character",
+     "name": "Bo"
+    },
+    {
+     "id": "m1",
+     "type": "narrative",
+     "supertype": "Message",
+     "name": "Thursday",
+     "narrator": "bo",
+     "characters": [
+      "ada"
+     ],
+     "story": "Can you take Thursday?",
+     "created_by": "u-bo",
+     "created_at": "2026-10-25T12:00:00Z"
+    },
+    {
+     "id": "r1",
+     "type": "relation",
+     "name": "Watch rota",
+     "narratives": [
+      "m1"
+     ]
+    }
+   ]
+  },
+  "reader": {
+   "rung": "contributor",
+   "character": "ada"
+  },
+  "options": {
+   "lens": "LM",
+   "clock": "2026-10-27T12:00:00Z"
+  },
+  "want": {
+   "nodes": [
+    {
+     "id": "r1",
+     "type": "relation",
+     "name": "Watch rota",
+     "family": "temporal",
+     "icon": "link"
+    }
+   ],
+   "edges": [],
+   "edges_cut": {
+    "outside_lens": 1
+   },
+   "cut": {},
+   "unreadable": null
+  }
  }
 ]
