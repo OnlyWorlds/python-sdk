@@ -2599,6 +2599,146 @@
       ],
       "character": "019a3b10-0000-7000-8000-0000000000a2",
       "line": "019a3b10-0000-7000-8000-000000000c97"
+    },
+    {
+      "kind": "addressed",
+      "name": "note-is-addressed-to-nobody-even-when-its-characters-names-the-reader",
+      "note": "A Note has no recipients whatever its characters holds: isAddressedTo is false for an id its characters names, the same as recipientsOf being empty.",
+      "message": {
+        "id": "019a3b10-0000-7000-8000-000000000c99",
+        "type": "narrative",
+        "supertype": "Note",
+        "name": "Note 99",
+        "story": "",
+        "narrator": "019a3b10-0000-7000-8000-0000000000a2",
+        "created_by": "019a3b10-0000-7000-8000-0000000000b2",
+        "characters": [
+          "019a3b10-0000-7000-8000-0000000000a1"
+        ],
+        "created_at": "2026-10-26T09:00:00Z"
+      },
+      "character": "019a3b10-0000-7000-8000-0000000000a1",
+      "addressed": false
+    },
+    {
+      "kind": "thread",
+      "name": "note-is-never-in-a-thread",
+      "note": "threadOf leaves a Note out even when its parent_narrative names the root: only a message belongs to the chain.",
+      "messages": [
+        {
+          "id": "019a3b10-0000-7000-8000-000000000ca0",
+          "type": "narrative",
+          "supertype": "Message",
+          "name": "Message a0",
+          "story": "",
+          "narrator": "019a3b10-0000-7000-8000-0000000000a1",
+          "characters": [
+            "019a3b10-0000-7000-8000-0000000000a2"
+          ],
+          "parent_narrative": null,
+          "created_at": "2026-10-26T09:40:00Z"
+        },
+        {
+          "id": "019a3b10-0000-7000-8000-000000000ca1",
+          "type": "narrative",
+          "supertype": "Message",
+          "name": "Message a1",
+          "story": "",
+          "narrator": "019a3b10-0000-7000-8000-0000000000a2",
+          "characters": [
+            "019a3b10-0000-7000-8000-0000000000a1"
+          ],
+          "parent_narrative": "019a3b10-0000-7000-8000-000000000ca0",
+          "created_at": "2026-10-26T09:41:00Z"
+        },
+        {
+          "id": "019a3b10-0000-7000-8000-000000000ca2",
+          "type": "narrative",
+          "supertype": "Note",
+          "name": "Note a2",
+          "story": "",
+          "narrator": "019a3b10-0000-7000-8000-0000000000a1",
+          "characters": [],
+          "parent_narrative": "019a3b10-0000-7000-8000-000000000ca0",
+          "created_at": "2026-10-26T09:42:00Z"
+        }
+      ],
+      "root": "019a3b10-0000-7000-8000-000000000ca0",
+      "thread": [
+        "019a3b10-0000-7000-8000-000000000ca0",
+        "019a3b10-0000-7000-8000-000000000ca1"
+      ]
+    },
+    {
+      "kind": "unread",
+      "name": "note-is-never-unread-even-when-its-characters-names-the-reader",
+      "note": "A Note is never unread, even when its characters names the reader; the message beside it is.",
+      "messages": [
+        {
+          "id": "019a3b10-0000-7000-8000-000000000ca3",
+          "type": "narrative",
+          "supertype": "Note",
+          "name": "Note a3",
+          "story": "",
+          "narrator": "019a3b10-0000-7000-8000-0000000000a2",
+          "created_by": "019a3b10-0000-7000-8000-0000000000b2",
+          "characters": [
+            "019a3b10-0000-7000-8000-0000000000a1"
+          ],
+          "created_at": "2026-10-26T09:50:00Z"
+        },
+        {
+          "id": "019a3b10-0000-7000-8000-000000000ca4",
+          "type": "narrative",
+          "supertype": "Message",
+          "name": "Message a4",
+          "story": "",
+          "narrator": "019a3b10-0000-7000-8000-0000000000a2",
+          "created_by": "019a3b10-0000-7000-8000-0000000000b2",
+          "characters": [
+            "019a3b10-0000-7000-8000-0000000000a1"
+          ],
+          "parent_narrative": null,
+          "created_at": "2026-10-26T09:51:00Z"
+        }
+      ],
+      "reader": "019a3b10-0000-7000-8000-0000000000a1",
+      "read_mark": null,
+      "unread": [
+        "019a3b10-0000-7000-8000-000000000ca4"
+      ]
+    },
+    {
+      "kind": "note",
+      "name": "note-hidden-is-any-mark-not-only-true",
+      "note": "The hidden mark reads as hidden for any value but absent, null or false: a Note with hidden 'yes' is left out the same as hidden true; the newest that is not hidden stands.",
+      "notes": [
+        {
+          "id": "019a3b10-0000-7000-8000-000000000ca5",
+          "type": "narrative",
+          "supertype": "Note",
+          "name": "Note a5",
+          "story": "",
+          "narrator": "019a3b10-0000-7000-8000-0000000000a2",
+          "created_by": "019a3b10-0000-7000-8000-0000000000b2",
+          "characters": [],
+          "created_at": "2026-10-26T09:00:00Z"
+        },
+        {
+          "id": "019a3b10-0000-7000-8000-000000000ca6",
+          "type": "narrative",
+          "supertype": "Note",
+          "name": "Note a6",
+          "story": "",
+          "narrator": "019a3b10-0000-7000-8000-0000000000a2",
+          "created_by": "019a3b10-0000-7000-8000-0000000000b2",
+          "characters": [],
+          "created_at": "2026-10-26T11:00:00Z",
+          "hidden": "yes"
+        }
+      ],
+      "character": "019a3b10-0000-7000-8000-0000000000a2",
+      "line": "019a3b10-0000-7000-8000-000000000ca5"
     }
   ]
 }

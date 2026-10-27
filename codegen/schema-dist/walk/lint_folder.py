@@ -40,7 +40,7 @@ from pathlib import Path
 # The folder format's version this lint was written against: the folder spec's
 # own version line, the one source. It moves when the spec's version moves, and
 # publish_dist.py writes the dist README's version sentence from it.
-FORMAT_VERSION = "0.3.18"
+FORMAT_VERSION = "0.3.19"
 
 # Keys an element body carries that the schema does not declare: the type
 # slug and the server-managed fields (elements/serialize.py READONLY_FIELDS
@@ -94,7 +94,7 @@ def is_uuid(value) -> bool:
 
 
 def version_tuple(value) -> tuple[int, ...] | None:
-    """`"0.3.18"` -> (0, 3, 18); None for anything that is not dotted integers."""
+    """`"0.3.19"` -> (0, 3, 19); None for anything that is not dotted integers."""
     if not isinstance(value, str):
         return None
     try:
@@ -187,6 +187,13 @@ def lint_folder(src: Path, decoded: dict) -> Report:
         for key, value in body.items():
             if key == "hidden" and not isinstance(value, bool):
                 report.add(f"{rel}: `hidden` must be true or false, not {value!r}")
+                continue
+            # `x_served_trimmed` (folder spec 4.4 rule 6) is kept exactly as served, like
+            # `known_of`: the names of the fields keel trimmed for the reader. A folder keeps
+            # it and never sends it up; here it must be a list. It starts `x_`, so the
+            # extension pass below would wave any shape through: check it first.
+            if key == "x_served_trimmed" and not isinstance(value, list):
+                report.add(f"{rel}: `x_served_trimmed` must be an array of field names, not {value!r}")
                 continue
             if key in BODY_EXTRA_KEYS or key in FOLDER_KEYS \
                     or key.startswith(EXTENSION_PREFIXES):

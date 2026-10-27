@@ -4,6 +4,11 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+## 0.75.0 (2026-10-27)
+
+- **Folder format v0.3.19**: every folder the package writes says `"format_version": "0.3.19"` (`FORMAT_VERSION`), and `onlyworlds.lint` is schema-dist's checker at serial 79, which reads 0.3.19 and checks `x_served_trimmed` as an array. v0.3.19 adds the served-trimmed rule: a file keeps `x_served_trimmed` exactly as served, a reader reads a field it names as trimmed, never as empty, and a writer never sends it up. The folder module already wrote the mark as served and the push already left it out, so only the version moves.
+- **Schema repinned to schema-dist `v0.33.0-dist.79`** (from dist.78; the same canonical 00.33.00, so `SCHEMA_VERSION` stays `00.33.00` and no element field moved). Serial 79 adds four message cases on Notes (addressed to nobody, never in a thread and never unread, even when `characters` names the reader; any hidden mark leaves one out), 85 in all; the readers answer every one unchanged. `note_of` still returns the Note's id.
+
 ## 0.74.1 (2026-10-27)
 
 - **The pack and the OKF export read every address form of an in-prose reference**: a link with a moment (`ow://character/<id>@3`), a lens (`?lens=<id>`) or the cross-world form with the world's own id (`ow://<world>/character/<id>`) names its element as `ow://<type>/<id>` does, read by `parse_ow_link`. Before, only the in-world form was read, so a reference in another form to a hidden element kept its label and its id in the output. One to another world's element, or that the address profile refuses, stays as written and is not listed as unresolved. The in-world form still takes its type word in any case, as the folder format's in-prose rule says.

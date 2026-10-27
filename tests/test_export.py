@@ -106,7 +106,7 @@ def test_an_export_carries_the_servers_origin_beside_its_own_lines(
 
 def test_world_json_says_where_it_came_from(tmp_path: Path, make_client: Callable[..., Client]) -> None:
     w, _ = _export(tmp_path, make_client, jresp(200, _me("owner", "owner")))
-    assert w["format_version"] == "0.3.18" == FORMAT_VERSION
+    assert w["format_version"] == "0.3.19" == FORMAT_VERSION
     src = w["source"]
     assert isinstance(src, dict) and list(src) == ["server", "world", "at"]
     assert src["server"] == "https://www.onlyworlds.com"  # the API origin, not the /api/v2 base

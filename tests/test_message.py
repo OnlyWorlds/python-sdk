@@ -40,16 +40,16 @@ REPO = Path(__file__).resolve().parent.parent
 FIXTURE = REPO / "codegen" / "schema-dist" / "profiles" / "message.fixture.json"
 KINDS = {
     "pair": 10,
-    "addressed": 10,
+    "addressed": 11,
     "sent_by": 3,
     "sender": 14,
-    "unread": 15,
+    "unread": 16,
     "mark": 10,
-    "thread": 3,
+    "thread": 4,
     "unseen": 3,
     "everyone": 3,
     "edited": 4,
-    "note": 6,
+    "note": 7,
 }
 
 ADA = "019a3b10-0000-7000-8000-0000000000a1"
@@ -122,7 +122,7 @@ def test_every_fixture_case_is_answered_as_the_fixture_says() -> None:
     cases = doc["cases"]
     wrong = [line for case in cases for line in replay(case, doc)]
     assert wrong == []
-    assert len(cases) == 81, f"the fixture holds {len(cases)} cases, serial 76 has 81"
+    assert len(cases) == 85, f"the fixture holds {len(cases)} cases, serial 79 has 85"
     assert Counter(c["kind"] for c in cases) == KINDS
 
 
