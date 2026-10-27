@@ -731,7 +731,8 @@ def resolve_lens(
 
     ``world`` holds the elements as the owner is served them (``elements``), the ids its hidden mark keeps
     (``hidden``, beside each element's own ``hidden``), its ``members`` for the mail rule and its now (``now``,
-    else the World's ``time_current``). ``lens`` is a lens body or the id of a lens in the world the reader can
+    else the World's ``time_current`` as a folder spells it, else ``time_range_current`` as the API serves it).
+    ``lens`` is a lens body or the id of a lens in the world the reader can
     see. ``reader`` is a mapping: ``rung`` (``owner``, ``contributor``, ``guest`` with its ``whole`` and
     ``known_of`` ids, or ``public``), ``character`` (for the mail rule), and on an owner ``as``, the reader it
     reads as (that reader's view, the owner's two counts). ``as_of`` is the reading's date (absent: the world's
@@ -763,6 +764,8 @@ def _reading_date(world: Mapping[str, Any], as_of: int | None) -> int | None:
     when = _whole(as_of) if as_of is not None else _whole(world.get("now"))
     if when is None:
         when = _whole(world.get("time_current"))
+    if when is None:
+        when = _whole(world.get("time_range_current"))
     return when
 
 

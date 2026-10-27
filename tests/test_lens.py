@@ -232,7 +232,7 @@ def test_the_fixtures_tables_read_back_through_the_reader() -> None:
 # ties by id by code point), the same file byte for byte as the npm SDK's test/fixtures/lens-edges.json (both suites
 # hold its sha256), answers written by hand.
 EDGES_FILE = REPO / "tests" / "fixtures" / "lens-edges.json"
-EDGES_SHA256 = "ee28a59302c6dd055bc9bfeac2f950233eb97e5eade67b3a3a2efbc53e560187"
+EDGES_SHA256 = "5ee70fe31868a36e1a97b516d8e65700a385fbc7212bbc87f5955e4441b038f6"
 
 
 def test_the_shared_edge_cases() -> None:
@@ -256,7 +256,7 @@ def test_the_shared_edge_cases() -> None:
     for line in wrong:
         print(line)
     assert wrong == []
-    assert len(edges) == 10
+    assert len(edges) == 11
 
 
 def test_a_lens_a_guest_knows_only_as_a_stub_reads_as_nothing() -> None:

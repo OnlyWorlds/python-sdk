@@ -4,6 +4,10 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+## 0.79.1 (2026-10-27)
+
+- **The lens and graph readers read the world's now as the API serves it.** `GET /world` names the world's now `time_range_current`, and a world folder names it `time_current`; `resolve_lens` and `world_graph` read only `now` and `time_current`, so a World body passed straight from the API had no now: no fence, and a `window` that cut nothing. They now read `now`, else `time_current`, else `time_range_current`. A shared edge case holds it in both packages; the npm SDK's `resolveLens` and `worldGraph` read the same.
+
 ## 0.79.0 (2026-10-27)
 
 - **`DATE_FIELD`** and **`date_of(element)`**: the lens profile's date table, exported (each dated type's date field by the type's lowercase name; the ten timeless types are not in it; read-only), and an element's date as that table reads it: the whole number in its type's date field, or `None` for a timeless type, a body with no known `type`, and a date field that is absent, null or not a whole number. It reads the body it is given, so a known-of stub reads `None`. A timeline or a horizon can now date elements exactly as the lens reader's fence does, from one table. The npm SDK's `DATE_FIELD` and `dateOf` give the same answers.
