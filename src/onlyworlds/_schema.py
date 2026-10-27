@@ -995,6 +995,57 @@ PUBLIC_FIELDS: dict[str, tuple[str, ...]] = {
     "zone": (),
 }
 
+# type -> its family and its icon name: presentation.json ``types.<type>.family`` and ``.icon``, the
+# first-party presentation defaults (not the standard; a tool may override them). Colour stays the tool's.
+ELEMENT_FAMILIES: dict[str, str] = {
+    "ability": "abstract",
+    "collective": "agents",
+    "character": "agents",
+    "construct": "world",
+    "creature": "agents",
+    "event": "temporal",
+    "family": "agents",
+    "institution": "agents",
+    "language": "abstract",
+    "law": "abstract",
+    "location": "world",
+    "map": "world",
+    "marker": "world",
+    "narrative": "temporal",
+    "object": "world",
+    "phenomenon": "temporal",
+    "pin": "world",
+    "relation": "temporal",
+    "species": "agents",
+    "title": "abstract",
+    "trait": "abstract",
+    "zone": "world",
+}
+ELEMENT_ICONS: dict[str, str] = {
+    "ability": "auto_fix_normal",
+    "collective": "groups_3",
+    "character": "person",
+    "construct": "api",
+    "creature": "bug_report",
+    "event": "saved_search",
+    "family": "supervisor_account",
+    "institution": "account_balance",
+    "language": "edit_road",
+    "law": "gpp_bad",
+    "location": "castle",
+    "map": "map",
+    "marker": "polyline",
+    "narrative": "menu_book",
+    "object": "webhook",
+    "phenomenon": "thunderstorm",
+    "pin": "push_pin",
+    "relation": "link",
+    "species": "crib",
+    "title": "military_tech",
+    "trait": "flaky",
+    "zone": "pentagon",
+}
+
 # Prefixes of the extension keys a tool may add to any element (dist walk/lint_folder.py).
 EXTENSION_PREFIXES: tuple[str, ...] = ("x_", "atlas_", "shadow_")
 

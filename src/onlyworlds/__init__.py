@@ -46,6 +46,7 @@ from .folder import (
     slugify,
     write_folder,
 )
+from .graph import GraphEdge, GraphNode, WorldGraph, world_graph
 from .http import (
     API_BASE,
     CREATE_FIELDS,
@@ -126,6 +127,8 @@ __all__ = [
     "EditRead",
     "Folder",
     "FolderElement",
+    "GraphEdge",
+    "GraphNode",
     "LensMail",
     "LensReading",
     "Patch",
@@ -145,6 +148,7 @@ __all__ = [
     "UrllibTransport",
     "WorldFile",
     "WorldFileError",
+    "WorldGraph",
     "WriteReport",
     "__version__",
     "apply_checks",
@@ -189,6 +193,7 @@ __all__ = [
     "uuid7",
     "verify_level",
     "world_file_bytes",
+    "world_graph",
     "write_folder",
     "write_world_file",
 ]

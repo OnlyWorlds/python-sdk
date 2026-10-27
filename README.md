@@ -320,6 +320,15 @@ r["kept"], r["rows"], r["cut"]  # ids in order, rows as show makes them, e.g. {"
 
 The world holds the elements as the owner is served them; the reader's `rung` (`owner`, `contributor`, `guest` with its `whole` and `known_of` ids, `public`) decides what it sees, and an owner reading `as` another reader keeps the owner's two counts (`anchor_not_visible`, `not_visible`), which no other reader ever carries. A value outside the profile's table makes the lens unreadable: `r["unreadable"]` names the key. The profile: [`profiles/lens.md`](https://github.com/OnlyWorlds/schema-dist/blob/main/profiles/lens.md).
 
+`world_graph(world, reader, lens=None, rooms=False, hidden=False, proposed=False, map_space=False)` reads the same snapshot, for the same reader, as nodes and edges: `nodes` (`{id, type, name, family, icon}`, by id), `edges` (`{source, field, target, index}`, one per link, by source, field and index), `edges_cut` (links to elements that are not nodes, by reason) and `cut`. Room elements, hidden and proposed ones and map space are out unless a flag brings them back (`hidden` and `proposed` are the owner's alone, and a public reader takes no flag); with `lens` the nodes are exactly what the lens kept.
+
+```python
+from onlyworlds import world_graph
+
+g = world_graph({"elements": elements}, {"rung": "owner"}, rooms=True)
+g["nodes"], g["edges"], g["edges_cut"]  # e.g. {"map_space": 2, "hidden": 1}
+```
+
 ### A world's own words
 
 A world may name its types in its own words: in a work world a Character is an *Employee*. The map is `x_names` on the World (`world.json` in a folder), and only what a person reads changes; the API, the folder and every id keep the standard's names. `onlyworlds.type_word(world, element_type, supertype=None, many=False)` gives the word to print, or `None` for the standard's name:

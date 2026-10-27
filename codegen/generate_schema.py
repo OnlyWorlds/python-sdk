@@ -228,6 +228,26 @@ def public_fields(types: list[str], layout: dict[str, Any]) -> dict[str, list[st
     return out
 
 
+def presentation_keys(types: list[str]) -> dict[str, tuple[str, str]]:
+    """type -> (family, icon), the dist's presentation.json ``types.<type>.family`` and ``.icon``: the
+    first-party presentation defaults a reader hands a tool (the graph's nodes carry them). Every type must
+    have both, each a non-empty string, and each family one of ``colors.order``."""
+    presentation: dict[str, Any] = json.loads((DIST / "presentation.json").read_text(encoding="utf-8"))
+    by_type = presentation.get("types")
+    if not isinstance(by_type, dict) or sorted(by_type) != sorted(types):
+        raise SystemExit(f"presentation.json types {sorted(by_type or {})} disagree with ELEMENT_TYPES {types}")
+    families = (presentation.get("colors") or {}).get("order")
+    if not isinstance(families, list) or not families:
+        raise SystemExit(f"presentation.json colors.order is not a list of families: {families!r}")
+    out: dict[str, tuple[str, str]] = {}
+    for t in types:
+        family, icon = by_type[t].get("family"), by_type[t].get("icon")
+        if family not in families or not isinstance(icon, str) or not icon:
+            raise SystemExit(f"presentation.json types.{t}: family {family!r} or icon {icon!r} is not one")
+        out[t] = (family, icon)
+    return out
+
+
 ROOM_ROW = re.compile(r"^\|\s*`([^`]+)`\s*\|\s*`([^`]+)`\s*\|")
 
 
@@ -346,6 +366,7 @@ def render(
     layout: dict[str, Any],
     prefixes: tuple[str, ...],
     public: dict[str, list[str]],
+    shown: dict[str, tuple[str, str]],
     room: list[tuple[str, str]],
     mark: str,
     message: tuple[tuple[str, str], tuple[str, str], tuple[str, str]],
@@ -446,6 +467,15 @@ def render(
         *[line for t in types for line in wrapped(f'    "{t}": ', public[t], ",")],
         "}",
         "",
+        "# type -> its family and its icon name: presentation.json ``types.<type>.family`` and ``.icon``, the",
+        "# first-party presentation defaults (not the standard; a tool may override them). Colour stays the tool's.",
+        "ELEMENT_FAMILIES: dict[str, str] = {",
+        *[f'    "{t}": "{shown[t][0]}",' for t in types],
+        "}",
+        "ELEMENT_ICONS: dict[str, str] = {",
+        *[f'    "{t}": "{shown[t][1]}",' for t in types],
+        "}",
+        "",
         "# Prefixes of the extension keys a tool may add to any element (dist walk/lint_folder.py).",
         f"EXTENSION_PREFIXES: tuple[str, ...] = {strs(list(prefixes))}",
         "",
@@ -503,6 +533,7 @@ def main() -> int:
         layout,
         extension_prefixes(),
         public_fields(types, layout),
+        presentation_keys(types),
         room,
         room_mark(),
         message_pairs(types, room),

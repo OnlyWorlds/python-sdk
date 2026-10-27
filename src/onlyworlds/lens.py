@@ -315,6 +315,10 @@ class _Reading:
         self._in_full: dict[str, list[str]] = {}
         hidden_v = world.get("hidden")
         hidden: set[str] = {i for i in hidden_v if isinstance(i, str)} if isinstance(hidden_v, list) else set()
+        #: The ids under the hidden mark: the world's ``hidden`` list and each element's own ``hidden``.
+        self.hidden = hidden
+        #: The ids written as proposed, which no reader's view holds.
+        self.proposed: set[str] = set()
         for el in world["elements"]:
             if not isinstance(el, dict):
                 continue
@@ -334,6 +338,8 @@ class _Reading:
                 self.room.add(eid)
         self.owner = reader["rung"] == "owner"
         seen: Mapping[str, Any] = reader["as"] if self.owner and reader.get("as") is not None else reader
+        #: The rung whose view is read: the reader's own, or on an owner the rung of the reader it reads ``as``.
+        self.seen_rung: str = seen["rung"]
         char = seen.get("character")
         self.character: str | None = char if isinstance(char, str) and char != "" else None
 
@@ -345,6 +351,7 @@ class _Reading:
         for eid in self.order:
             el = self.by_id[eid]
             if hands_on_as_proposed(el):
+                self.proposed.add(eid)
                 continue
             if rung == "owner":
                 sees = True
@@ -718,22 +725,32 @@ def resolve_lens(
         raise TypeError(f"resolve_lens: clock is a date-time; got {clock!r}.")
     if not isinstance(lens, str | Mapping):
         raise TypeError("resolve_lens: lens is a lens body or its id.")
+    return _lens_reading(_Reading(world, reader, _reading_date(world, as_of)), lens, clock)[0]
 
-    # The reading's date: as_of, else the world's now (the fixture's ``now``, else the World's ``time_current``).
-    # With none of them there is no fence, and the window cuts nothing.
+
+def _reading_date(world: Mapping[str, Any], as_of: int | None) -> int | None:
+    """The reading's date: ``as_of``, else the world's now (the fixture's ``now``, else the World's
+    ``time_current``). With none of them there is no fence, and the window cuts nothing."""
     when = _whole(as_of) if as_of is not None else _whole(world.get("now"))
     if when is None:
         when = _whole(world.get("time_current"))
-    r = _Reading(world, reader, when)
+    return when
+
+
+def _lens_reading(
+    r: _Reading, lens: Mapping[str, Any] | str, clock: str | None
+) -> tuple[LensReading, dict[str, CutReason]]:
+    """A lens read over one reading's world: the reading ``resolve_lens`` answers, and the reason each element
+    it left out was cut, by id, before the counts drop the owner's two."""
     # An id is read only when the reader can see that element; a body is read as given.
     body: Mapping[str, Any] | None = (r.by_id[lens] if lens in r.view else None) if isinstance(lens, str) else lens
     if body is None or not is_lens(body):
-        return _nothing()
+        return _nothing(), {}
     recipe = _read_recipe(body.get("x_lens"))
     if isinstance(recipe, str):
-        return _nothing(recipe)
+        return _nothing(recipe), {}
     if is_template(body):
-        return _nothing()
+        return _nothing(), {}
 
     visited: set[str] = set()
     if isinstance(body.get("id"), str):
@@ -768,7 +785,7 @@ def resolve_lens(
             counts[why] = n
     anchors, _, _ = _anchors_of(body, r)
     notes_ignored = sum(1 for k in recipe.notes if k not in anchors)
-    return {
+    reading: LensReading = {
         "kept": [e for e, _ in keep],
         "rows": [row for _, row in keep],
         "cut": counts,
@@ -776,3 +793,4 @@ def resolve_lens(
         "mail": mail,
         "unreadable": None,
     }
+    return reading, cut

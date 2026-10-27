@@ -8,3 +8,5 @@ tests/fixtures/draught-text/** -text
 tests/fixtures/message-edges.json -text
 # The lens reader's shared edge cases, the same bytes as the npm SDK's copy (both tests hold its sha256).
 tests/fixtures/lens-edges.json -text
+# The graph reader's shared edge cases, the same bytes as the npm SDK's copy (both tests hold its sha256).
+tests/fixtures/graph-edges.json -text
