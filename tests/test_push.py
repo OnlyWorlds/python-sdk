@@ -121,6 +121,22 @@ def test_created_by_is_never_sent(tmp_path: Path) -> None:
     assert [(p.id, p.fields) for p in plan.patches] == [(C2, {"name": "B2"})]
 
 
+def test_the_served_trimmed_mark_is_never_sent(tmp_path: Path) -> None:
+    """keel #746: a file keeps x_served_trimmed as served, and keel refuses a write that carries it."""
+    base, edit = folders(
+        tmp_path,
+        {"character": [wire_char(C1, "A"), wire_char(C2, "B")]},
+        {
+            "character": [
+                wire_char(C1, "A", x_served_trimmed=["characters"]),
+                wire_char(C2, "B2", x_served_trimmed=["narrator"]),
+            ]
+        },
+    )
+    plan = plan_push(base, edit)
+    assert [(p.id, p.fields) for p in plan.patches] == [(C2, {"name": "B2"})]
+
+
 def test_changed_by_and_changed_via_are_never_sent(tmp_path: Path) -> None:
     """The last write's author and door are read-only like created_by, and every push restamps them."""
     base, edit = folders(

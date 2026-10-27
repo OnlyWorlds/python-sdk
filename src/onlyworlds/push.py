@@ -112,6 +112,7 @@ NOT_SENT = frozenset(
         "changed_via",
         "changed_client",
         "known_of",
+        "x_served_trimmed",  # keel #746: served only, kept in the file, never sent
         "hidden",
         "local_updated_at",
         "server_updated_at",
