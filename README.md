@@ -316,6 +316,20 @@ word = type_word(folder.world, "character", many=True) or "Characters"
 
 The profile: [`profiles/names.md`](https://github.com/OnlyWorlds/schema-dist/blob/main/profiles/names.md).
 
+### Addresses
+
+An element has one address in three spellings: the site's `https://www.onlyworlds.com/w/<world id>/<type>/<id>`, `ow://<type>/<id>` inside a world, and `ow://<world id>/<type>/<id>` across worlds. A world by itself is `https://www.onlyworlds.com/w/<world id>` or `ow://<world id>`. Any of them may carry a moment, `@<step>` on the world's time line, and a lens, `?lens=<id>`.
+
+```python
+from onlyworlds import AddressError, element_address, parse_ow_link
+
+link = element_address({"form": "text", "type": "character", "id": element_id})
+reading = parse_ow_link(text)  # AddressReading: form, world, world_is_slug, type, id, lens, moment, canonical
+# a refusal raises AddressError: err.reason is the profile's name ("bad_id", "uppercase", ...)
+```
+
+A field that holds an address is text: never fetch or resolve it on the server. `parse_ow_link` reads one string whole; finding a link inside other text is yours. The profile: [`profiles/address.md`](https://github.com/OnlyWorlds/schema-dist/blob/main/profiles/address.md), with its 133-case fixture, which is this module's test.
+
 ### The spine
 
 A world may map a software ecosystem: what is built, where each thing lives, who keeps it and what it depends on. Each kind is a type with a supertype from a closed list (`onlyworlds.SPINE_KINDS`: a `Tool` or a `Package` is an Object, a `Repo` a Location, a `Seat` a Title), and `x_spine_*` keys carry the rest. `onlyworlds.read_spine_element(type, element)` reads one element as the profile does: its kind (or `off-list`), each key as read or `None`, and every value it left out, named in `dropped`.

@@ -19,6 +19,14 @@ from ._schema import (
     SCHEMA_VERSION,
 )
 from ._version import __version__
+from .address import (
+    AddressError,
+    AddressForm,
+    AddressReading,
+    AddressReason,
+    element_address,
+    parse_ow_link,
+)
 from .checks import CHECKS_FIELD, CheckRow, apply_checks
 from .draught_text import draught_text
 from .errors import PreconditionFailed, ProposedError, StaleProposal, parse_retry_after
@@ -105,6 +113,10 @@ __all__ = [
     "SCHEMA_VERSION",
     "SPINE_KINDS",
     "WORLD_FILE_MEDIA_TYPE",
+    "AddressError",
+    "AddressForm",
+    "AddressReading",
+    "AddressReason",
     "ApiError",
     "BulkResult",
     "ChangeWalk",
@@ -136,6 +148,7 @@ __all__ = [
     "check_kinds",
     "draught_text",
     "edited_by",
+    "element_address",
     "element_filename",
     "export_world",
     "hands_on_as_proposed",
@@ -149,6 +162,7 @@ __all__ = [
     "is_sent_by",
     "is_to_everyone",
     "note_of",
+    "parse_ow_link",
     "parse_retry_after",
     "plan_push",
     "proposed_mark_of",
