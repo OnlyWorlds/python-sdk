@@ -16,6 +16,7 @@ from onlyworlds import (
     ROOM_PAIRS,
     FolderElement,
     SenderRead,
+    has_unseen_recipients,
     is_addressed_to,
     is_message,
     is_sent_by,
@@ -131,6 +132,29 @@ def test_recipients_keep_their_order_and_a_malformed_list_is_not_everyone() -> N
     everyone_bodies: tuple[dict[str, Any], ...] = ({}, {"characters": None}, {"characters": []})
     for m in everyone_bodies:
         assert is_to_everyone(m) is True, m
+
+
+def test_a_list_the_server_trimmed_is_never_everyone_and_says_someone_unseen_is_addressed() -> None:
+    """keel #746: every recipient hidden arrives as an empty list with the mark, never everyone."""
+
+    def trimmed(characters: list[str], mark: list[str] | None = None) -> dict[str, Any]:
+        return {"characters": characters, "x_served_trimmed": ["characters"] if mark is None else mark}
+
+    assert is_to_everyone(trimmed([])) is False
+    assert has_unseen_recipients(trimmed([])) is True
+    assert is_addressed_to(trimmed([]), ADA) is False
+    assert has_unseen_recipients(trimmed([ADA])) is True
+    assert is_addressed_to(trimmed([ADA]), ADA) is True
+    assert has_unseen_recipients(trimmed([], ["narrator"])) is False
+    assert is_to_everyone(trimmed([], ["narrator"])) is True
+    no_mark: tuple[dict[str, Any], ...] = (
+        {},
+        {"characters": []},
+        {"x_served_trimmed": "characters"},
+        {"x_served_trimmed": None},
+    )
+    for m in no_mark:
+        assert has_unseen_recipients(m) is False, m
 
 
 def test_the_read_mark_supertype_is_folded_and_a_mark_with_no_members_list_has_no_hand() -> None:

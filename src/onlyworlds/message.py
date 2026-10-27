@@ -48,9 +48,11 @@ __all__ = [
     "READ_MARK_PAIR",
     "SenderRead",
     "SenderStatus",
+    "has_unseen_recipients",
     "is_addressed_to",
     "is_message",
     "is_sent_by",
+    "is_to_everyone",
     "read_mark_of",
     "recipients_of",
     "sender_status",
@@ -122,9 +124,21 @@ def is_addressed_to(message: Mapping[str, Any], character_id: str) -> bool:
 def is_to_everyone(message: Mapping[str, Any]) -> bool:
     """True when the message is addressed to every member: its ``characters`` is absent, ``None`` or
     empty. A list that names no valid id (``[""]``) or a value that is not a list is addressed to nobody,
-    so it is False here, though ``recipients_of`` gives ``[]`` for both."""
+    so it is False here, though ``recipients_of`` gives ``[]`` for both. A list the server trimmed for this
+    reader (``x_served_trimmed`` names ``characters``) is never everyone, even when it arrives empty: see
+    ``has_unseen_recipients``."""
+    if has_unseen_recipients(message):
+        return False
     value = message.get("characters")
     return value is None or (isinstance(value, list | tuple) and len(value) == 0)
+
+
+def has_unseen_recipients(message: Mapping[str, Any]) -> bool:
+    """True when the message is addressed to someone this reader cannot see: the server served it with
+    ``characters`` trimmed (its ``x_served_trimmed`` list names ``characters``), whatever is left in the
+    list. It says that such a recipient exists, never who or how many."""
+    mark = message.get("x_served_trimmed") if isinstance(message, Mapping) else None
+    return isinstance(mark, list) and "characters" in mark
 
 
 def is_sent_by(message: Mapping[str, Any], character_id: str) -> bool:

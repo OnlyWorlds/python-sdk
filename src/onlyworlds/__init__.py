@@ -55,6 +55,7 @@ from .http import (
 from .message import (
     SenderRead,
     SenderStatus,
+    has_unseen_recipients,
     is_addressed_to,
     is_message,
     is_sent_by,
@@ -130,6 +131,7 @@ __all__ = [
     "element_filename",
     "export_world",
     "hands_on_as_proposed",
+    "has_unseen_recipients",
     "is_addressed_to",
     "is_hidden",
     "is_known_of",
