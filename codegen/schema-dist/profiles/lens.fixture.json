@@ -4,8 +4,8 @@
   "notes": [
     "pair: construct + supertype Lens, each trimmed and folded like the room profile's pairs; a template is a lens whose subtype, trimmed and folded, is Template.",
     "keys: the legal values of x_lens; a case's legal is what a reader's check answers, and bad names the first key refused (x_lens itself when the value is not an object).",
-    "worlds: each world's elements as its owner is served them, the ids its hidden mark keeps from every reader but the owner, and its readers. A reader's rung is owner (the whole world), contributor (the world less the hidden), guest (exactly the whole and known_of ids it lists; known_of is a stub) or public (the world less the hidden and the room elements). An element carrying x_review_proposed as an object is in no reader's view. A reader with as is the owner reading as that reader: the reader's view, and the owner's two counts (anchor_not_visible, not_visible).",
-    "resolve: lens is the lens read, a body or the id of a lens in the world; as_of is the reading's date (absent: the world's now); clock is the reading's time for the mail rule. kept is the resolved set in order, cut the count by reason (a reason with no count is absent). rows, where given, are the kept rows as show makes them; mail, where given, is the mail rule's part; notes_ignored counts notes on ids that are not anchors.",
+    "worlds: each world's elements as its owner is served them, the ids its hidden mark keeps from every reader but the owner, and its readers. A reader's rung is owner (the whole world), contributor (the world less the hidden), guest (exactly the whole and known_of ids it lists; known_of is a stub) or public (the world less the hidden and the room elements). An element whose x_review_proposed holds any value but null is in no reader's view (the review profile's rule for a reader that hands a world on). A reader with as is the owner reading as that reader: the reader's view, and the owner's two counts (anchor_not_visible, not_visible).",
+    "resolve: lens is the lens read, a body or the id of a lens in the world; as_of is the reading's date (absent: the world's now; with neither, no fence and the window cuts nothing); clock is the reading's time for the mail rule. kept is the resolved set in order, cut the count by reason (a reason with no count is absent). rows, where given, are the kept rows as show makes them; mail, where given, is the mail rule's part; notes_ignored counts notes on ids that are not anchors.",
     "invariant: subset (each reader's kept is a subset of the owner's, and no secret's id or name appears anywhere in a non-owner result), same_without (each reader's result is identical with the without ids removed from the world), unchanged (the world is identical before and after every reader's reading).",
     "uses: which lenses a seat reads, from its membership's choice (null: none made) and its Character's x_lens_uses."
   ],
@@ -667,6 +667,42 @@
           "character": "019a7f00-0000-7000-8000-000000000030"
         }
       }
+    },
+    "dawn": {
+      "id": "019a7f00-0000-7000-8000-00000000f005",
+      "name": "Dawn",
+      "time_basic_unit": "year",
+      "now": null,
+      "elements": [
+        {
+          "id": "019a7f00-0000-7000-8000-000000000073",
+          "type": "event",
+          "name": "The Old Feast",
+          "start_date": 100,
+          "updated_at": "2026-10-01T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000074",
+          "type": "event",
+          "name": "The Last Feast",
+          "start_date": 900,
+          "updated_at": "2026-10-02T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000075",
+          "type": "event",
+          "name": "A Feast",
+          "start_date": null,
+          "updated_at": "2026-10-03T12:00:00Z"
+        }
+      ],
+      "hidden": [],
+      "readers": {
+        "owner": {
+          "rung": "owner",
+          "character": null
+        }
+      }
     }
   },
   "cases": [
@@ -798,6 +834,16 @@
       },
       "legal": true,
       "bad": null
+    },
+    {
+      "name": "keys-empty-string-is-refused",
+      "kind": "keys",
+      "x_lens": {
+        "show": ""
+      },
+      "legal": false,
+      "bad": "show",
+      "note": "An empty string is present, never absent: \"\" is outside the table."
     },
     {
       "name": "keys-depth-three-is-refused",
@@ -1573,6 +1619,85 @@
         "window": 1
       },
       "note": "A year world: a window of 10 is ten years before as_of 1200, 1190 included."
+    },
+    {
+      "name": "window-lower-edge-is-inclusive",
+      "kind": "resolve",
+      "world": "vale",
+      "reader": "contributor",
+      "lens": {
+        "id": "019a7f00-0000-7000-8000-000000000076",
+        "type": "construct",
+        "name": "A lens",
+        "supertype": "Lens",
+        "subtype": "",
+        "x_lens": {
+          "types": [
+            "event"
+          ],
+          "window": 5
+        }
+      },
+      "kept": [
+        "019a7f00-0000-7000-8000-000000000009",
+        "019a7f00-0000-7000-8000-000000000008"
+      ],
+      "cut": {
+        "window": 1
+      },
+      "note": "as_of 1200 less a window of 5 is 1195: the Harbour Fire, dated 1195, is at the edge and inside (at or after); the First Lamp (1150) is cut."
+    },
+    {
+      "name": "window-one-unit-past-the-edge-is-cut",
+      "kind": "resolve",
+      "world": "vale",
+      "reader": "contributor",
+      "lens": {
+        "id": "019a7f00-0000-7000-8000-000000000077",
+        "type": "construct",
+        "name": "A lens",
+        "supertype": "Lens",
+        "subtype": "",
+        "x_lens": {
+          "types": [
+            "event"
+          ],
+          "window": 4
+        }
+      },
+      "kept": [
+        "019a7f00-0000-7000-8000-000000000009"
+      ],
+      "cut": {
+        "window": 2
+      },
+      "note": "A window of 4 puts the edge at 1196: the Harbour Fire (1195), one unit before it, is cut with the First Lamp; the undated Flood is kept."
+    },
+    {
+      "name": "no-as-of-and-no-now-the-window-cuts-nothing",
+      "kind": "resolve",
+      "world": "dawn",
+      "reader": "owner",
+      "lens": {
+        "id": "019a7f00-0000-7000-8000-000000000078",
+        "type": "construct",
+        "name": "A lens",
+        "supertype": "Lens",
+        "subtype": "",
+        "x_lens": {
+          "types": [
+            "event"
+          ],
+          "window": 1
+        }
+      },
+      "kept": [
+        "019a7f00-0000-7000-8000-000000000075",
+        "019a7f00-0000-7000-8000-000000000074",
+        "019a7f00-0000-7000-8000-000000000073"
+      ],
+      "cut": {},
+      "note": "The reading sends no as_of and the world has no now: there is no fence, and a window has nothing to measure from, so it cuts nothing."
     },
     {
       "name": "from-to-is-closed-open",

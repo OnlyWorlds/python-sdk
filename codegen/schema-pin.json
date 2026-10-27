@@ -2,15 +2,20 @@
   "_what": "The recorded pin for the vendored OnlyWorlds schema distribution (codegen/schema-dist/, copied byte-exact). Do not edit by hand; re-vendor from the pinned tag and review the diff. Kept equal to the npm SDK's pin (github.com/OnlyWorlds/sdk, codegen/schema-pin.json) on purpose: two clients, one schema.",
   "_why_manifest_sha256": "Verifying the tree against its own MANIFEST.json only proves internal consistency. If the tag moved, the manifest moved with it. The hash recorded here is the one first accepted, which is what makes a moved tag visible.",
   "repo": "https://github.com/OnlyWorlds/schema-dist",
-  "tag": "v0.33.0-dist.79",
-  "commit": "44b805fd952ca399ca378d680a6690d07622622c",
-  "manifest_sha256": "d56afbcfd827d7576bb290da6f3f4bd8ac72b7c6ec3363dd16448aef061ce1fa",
+  "tag": "v0.33.0-dist.80",
+  "commit": "4b56670f9584dec36d3a176087f87f54964b58bf",
+  "manifest_sha256": "535f0ad756df24118725757b0fc187a1881576338519add520232404ce8a1813",
   "canonical_version": "00.33.00",
-  "dist_serial": 79,
+  "dist_serial": 80,
   "published": "2026-10-27",
   "pinned_at": "2026-10-27",
   "pinned_by": "The maintainer: tree from `git archive` of the tag in a schema-dist checkout (195 files, every one the MANIFEST lists); files re-hashed against MANIFEST.json by generate_schema.py; MANIFEST self-hash matched against the raw file GitHub serves at the tag, whose ref resolves to the commit above.",
   "previous_pins": [
+    {
+      "tag": "v0.33.0-dist.79",
+      "manifest_sha256": "d56afbcfd827d7576bb290da6f3f4bd8ac72b7c6ec3363dd16448aef061ce1fa",
+      "note": "superseded by v0.33.0-dist.80 (same canonical 00.33.00; the lens profile's five rulings (the window's lower edge inclusive, a reading with no date fences nothing, a hidden anchor's note trimmed and an unseen id's note not counted, an empty string in x_lens refused, the reader's signature), lens.fixture.json 84 cases to 88; no schema file moved)"
+    },
     {
       "tag": "v0.33.0-dist.78",
       "manifest_sha256": "8c0c83b90c88ad70b5e03e1d44bf7fd4d43f554f8a449bf842dbcfe54a8a177b",

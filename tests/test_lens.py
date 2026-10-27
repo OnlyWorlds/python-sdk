@@ -19,7 +19,7 @@ from onlyworlds import ROOM_PAIRS, LensReading, is_lens, is_template, lenses_in_
 
 REPO = Path(__file__).resolve().parent.parent
 FIXTURE = REPO / "codegen" / "schema-dist" / "profiles" / "lens.fixture.json"
-KINDS = {"shape": 6, "keys": 22, "resolve": 48, "invariant": 4, "uses": 4}
+KINDS = {"shape": 6, "keys": 23, "resolve": 51, "invariant": 4, "uses": 4}
 OWNER = {"rung": "owner"}
 
 
@@ -144,7 +144,7 @@ def test_every_fixture_case_is_answered_as_the_fixture_says() -> None:
     for line in wrong:
         print(line)
     assert wrong == []
-    assert len(cases) == 84, f"the fixture holds {len(cases)} cases, serial 78 has 84"
+    assert len(cases) == 88, f"the fixture holds {len(cases)} cases, serial 80 has 88"
     assert Counter(c["kind"] for c in cases) == KINDS
 
 
