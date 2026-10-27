@@ -1,0 +1,1557 @@
+{
+  "profile": "address",
+  "profile_page": "profiles/address.md",
+  "notes": [
+    "types: the 22 type words as the site and the API spell them, lowercase and singular.",
+    "refusals: every reason a reader or a writer refuses by, in the order a parser checks them (no_world and bad_form are the writer's only).",
+    "format cases: address gives form (human or text), world (absent for the in-world text form), type and id (both absent for a world's own address), and optionally lens and moment; expect is the exact string a writer writes, or refuse the reason.",
+    "parse cases: text is the string as a reader receives it; expect is the reading (form, world, world_is_slug, type, id, lens, moment, canonical; type and id null for a world's own address), or refuse the reason. canonical is true when the string as received is exactly what a writer writes for that reading.",
+    "ids: any UUID version, in the hyphenated 8-4-4-4-12 form; read in either case of hex, always written lowercase."
+  ],
+  "types": [
+    "character",
+    "creature",
+    "species",
+    "family",
+    "collective",
+    "institution",
+    "location",
+    "object",
+    "construct",
+    "ability",
+    "trait",
+    "title",
+    "language",
+    "law",
+    "event",
+    "narrative",
+    "phenomenon",
+    "relation",
+    "map",
+    "pin",
+    "marker",
+    "zone"
+  ],
+  "refusals": [
+    "not_an_address",
+    "uppercase",
+    "segments",
+    "bad_world",
+    "unknown_type",
+    "bad_id",
+    "bad_moment",
+    "bad_lens",
+    "no_world",
+    "bad_form"
+  ],
+  "cases": [
+    {
+      "name": "format-human",
+      "claim": "the human address: the world's id, the type word, the element's id",
+      "kind": "format",
+      "address": {
+        "form": "human",
+        "world": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+        "type": "character",
+        "id": "019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71"
+      },
+      "expect": "https://www.onlyworlds.com/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/character/019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71"
+    },
+    {
+      "name": "format-human-lens",
+      "claim": "a lens rides as the one query key lens",
+      "kind": "format",
+      "address": {
+        "form": "human",
+        "world": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+        "type": "character",
+        "id": "019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71",
+        "lens": "019a2b7e-4c1d-7f20-9b3e-1a2c3d4e5f60"
+      },
+      "expect": "https://www.onlyworlds.com/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/character/019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71?lens=019a2b7e-4c1d-7f20-9b3e-1a2c3d4e5f60"
+    },
+    {
+      "name": "format-human-moment",
+      "claim": "a moment is @ and the step, at the end of the path",
+      "kind": "format",
+      "address": {
+        "form": "human",
+        "world": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+        "type": "event",
+        "id": "019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71",
+        "moment": 302
+      },
+      "expect": "https://www.onlyworlds.com/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/event/019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71@302"
+    },
+    {
+      "name": "format-human-moment-negative",
+      "claim": "a step before the world's step 0 keeps its minus sign",
+      "kind": "format",
+      "address": {
+        "form": "human",
+        "world": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+        "type": "event",
+        "id": "019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71",
+        "moment": -120
+      },
+      "expect": "https://www.onlyworlds.com/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/event/019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71@-120"
+    },
+    {
+      "name": "format-human-moment-zero",
+      "claim": "step 0 is a moment like any other",
+      "kind": "format",
+      "address": {
+        "form": "human",
+        "world": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+        "type": "event",
+        "id": "019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71",
+        "moment": 0
+      },
+      "expect": "https://www.onlyworlds.com/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/event/019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71@0"
+    },
+    {
+      "name": "format-human-lens-and-moment",
+      "claim": "the moment comes before the query",
+      "kind": "format",
+      "address": {
+        "form": "human",
+        "world": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+        "type": "character",
+        "id": "019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71",
+        "lens": "019a2b7e-4c1d-7f20-9b3e-1a2c3d4e5f60",
+        "moment": 302
+      },
+      "expect": "https://www.onlyworlds.com/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/character/019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71@302?lens=019a2b7e-4c1d-7f20-9b3e-1a2c3d4e5f60"
+    },
+    {
+      "name": "format-text-in-world",
+      "claim": "with no world the text form is the in-world one",
+      "kind": "format",
+      "address": {
+        "form": "text",
+        "type": "object",
+        "id": "019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71"
+      },
+      "expect": "ow://object/019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71"
+    },
+    {
+      "name": "format-text-in-world-lens-and-moment",
+      "claim": "the text form carries the same moment and lens",
+      "kind": "format",
+      "address": {
+        "form": "text",
+        "type": "object",
+        "id": "019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71",
+        "lens": "019a2b7e-4c1d-7f20-9b3e-1a2c3d4e5f60",
+        "moment": -7
+      },
+      "expect": "ow://object/019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71@-7?lens=019a2b7e-4c1d-7f20-9b3e-1a2c3d4e5f60"
+    },
+    {
+      "name": "format-text-across-worlds",
+      "claim": "with a world the text form names it first",
+      "kind": "format",
+      "address": {
+        "form": "text",
+        "world": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+        "type": "location",
+        "id": "019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71"
+      },
+      "expect": "ow://0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/location/019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71"
+    },
+    {
+      "name": "format-text-across-worlds-lens-and-moment",
+      "claim": "the cross-world text form with both options",
+      "kind": "format",
+      "address": {
+        "form": "text",
+        "world": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+        "type": "location",
+        "id": "019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71",
+        "lens": "019a2b7e-4c1d-7f20-9b3e-1a2c3d4e5f60",
+        "moment": 302
+      },
+      "expect": "ow://0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/location/019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71@302?lens=019a2b7e-4c1d-7f20-9b3e-1a2c3d4e5f60"
+    },
+    {
+      "name": "format-v4-id",
+      "claim": "any UUID version is an id (older clients mint v4)",
+      "kind": "format",
+      "address": {
+        "form": "human",
+        "world": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+        "type": "character",
+        "id": "3f2b8c1e-9d4a-4e7b-a1c5-6d8e2f0b7a93"
+      },
+      "expect": "https://www.onlyworlds.com/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/character/3f2b8c1e-9d4a-4e7b-a1c5-6d8e2f0b7a93"
+    },
+    {
+      "name": "format-uppercase-ids-written-lowercase",
+      "claim": "a writer writes every id in lowercase",
+      "kind": "format",
+      "address": {
+        "form": "human",
+        "world": "0199C3A1-7B2E-7C3D-8E4F-5A6B7C8D9E0F",
+        "type": "character",
+        "id": "019A1F3C-2B4E-7D10-8C3A-6F2E9B0D4A71",
+        "lens": "019A2B7E-4C1D-7F20-9B3E-1A2C3D4E5F60"
+      },
+      "expect": "https://www.onlyworlds.com/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/character/019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71?lens=019a2b7e-4c1d-7f20-9b3e-1a2c3d4e5f60"
+    },
+    {
+      "name": "format-refuse-human-without-world",
+      "claim": "the human address needs the world",
+      "kind": "format",
+      "address": {
+        "form": "human",
+        "type": "character",
+        "id": "019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71"
+      },
+      "refuse": "no_world"
+    },
+    {
+      "name": "format-refuse-slug",
+      "claim": "a link carries the world's id, never its slug",
+      "kind": "format",
+      "address": {
+        "form": "human",
+        "world": "hyperion",
+        "type": "character",
+        "id": "019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71"
+      },
+      "refuse": "bad_world"
+    },
+    {
+      "name": "format-refuse-slug-in-text",
+      "claim": "the cross-world text form takes the world's id only",
+      "kind": "format",
+      "address": {
+        "form": "text",
+        "world": "hyperion",
+        "type": "character",
+        "id": "019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71"
+      },
+      "refuse": "bad_world"
+    },
+    {
+      "name": "format-refuse-unknown-type",
+      "claim": "the type is one of the 22 words",
+      "kind": "format",
+      "address": {
+        "form": "text",
+        "type": "dragon",
+        "id": "019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71"
+      },
+      "refuse": "unknown_type"
+    },
+    {
+      "name": "format-refuse-plural-type",
+      "claim": "the type word is singular, as the site spells it",
+      "kind": "format",
+      "address": {
+        "form": "text",
+        "type": "characters",
+        "id": "019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71"
+      },
+      "refuse": "unknown_type"
+    },
+    {
+      "name": "format-refuse-uppercase-type",
+      "claim": "a writer writes the type word in lowercase",
+      "kind": "format",
+      "address": {
+        "form": "text",
+        "type": "Character",
+        "id": "019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71"
+      },
+      "refuse": "uppercase"
+    },
+    {
+      "name": "format-refuse-bad-id",
+      "claim": "the element id is a UUID in its hyphenated form",
+      "kind": "format",
+      "address": {
+        "form": "text",
+        "type": "character",
+        "id": "019a1f3c2b4e7d108c3a6f2e9b0d4a71"
+      },
+      "refuse": "bad_id"
+    },
+    {
+      "name": "format-refuse-bad-lens",
+      "claim": "a lens is an element id",
+      "kind": "format",
+      "address": {
+        "form": "text",
+        "type": "character",
+        "id": "019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71",
+        "lens": "noir"
+      },
+      "refuse": "bad_lens"
+    },
+    {
+      "name": "format-refuse-moment-fraction",
+      "claim": "a moment is a whole step",
+      "kind": "format",
+      "address": {
+        "form": "text",
+        "type": "event",
+        "id": "019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71",
+        "moment": 1.5
+      },
+      "refuse": "bad_moment"
+    },
+    {
+      "name": "format-refuse-moment-string",
+      "claim": "a moment is a number, never calendar words",
+      "kind": "format",
+      "address": {
+        "form": "text",
+        "type": "event",
+        "id": "019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71",
+        "moment": "12 Frost"
+      },
+      "refuse": "bad_moment"
+    },
+    {
+      "name": "format-refuse-moment-boolean",
+      "claim": "true is not a step",
+      "kind": "format",
+      "address": {
+        "form": "text",
+        "type": "event",
+        "id": "019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71",
+        "moment": true
+      },
+      "refuse": "bad_moment"
+    },
+    {
+      "name": "format-refuse-moment-out-of-range",
+      "claim": "a moment is a 32-bit step, as a date field is",
+      "kind": "format",
+      "address": {
+        "form": "text",
+        "type": "event",
+        "id": "019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71",
+        "moment": 2147483648
+      },
+      "refuse": "bad_moment"
+    },
+    {
+      "name": "format-world-human",
+      "claim": "a world's own address: the world's id alone",
+      "kind": "format",
+      "address": {
+        "form": "human",
+        "world": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f"
+      },
+      "expect": "https://www.onlyworlds.com/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f"
+    },
+    {
+      "name": "format-world-human-moment-and-lens",
+      "claim": "a world's address with both options",
+      "kind": "format",
+      "address": {
+        "form": "human",
+        "world": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+        "lens": "019a2b7e-4c1d-7f20-9b3e-1a2c3d4e5f60",
+        "moment": 302
+      },
+      "expect": "https://www.onlyworlds.com/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f@302?lens=019a2b7e-4c1d-7f20-9b3e-1a2c3d4e5f60"
+    },
+    {
+      "name": "format-world-text",
+      "claim": "a world's text form: ow:// and the world's id",
+      "kind": "format",
+      "address": {
+        "form": "text",
+        "world": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f"
+      },
+      "expect": "ow://0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f"
+    },
+    {
+      "name": "format-world-text-moment",
+      "claim": "a world's text form with a moment",
+      "kind": "format",
+      "address": {
+        "form": "text",
+        "world": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+        "moment": 0
+      },
+      "expect": "ow://0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f@0"
+    },
+    {
+      "name": "format-refuse-world-text-without-world",
+      "claim": "a text form names an element or a world",
+      "kind": "format",
+      "address": {
+        "form": "text"
+      },
+      "refuse": "no_world"
+    },
+    {
+      "name": "format-refuse-type-without-id",
+      "claim": "a type with no id refuses",
+      "kind": "format",
+      "address": {
+        "form": "human",
+        "world": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+        "type": "character"
+      },
+      "refuse": "segments"
+    },
+    {
+      "name": "format-refuse-id-without-type",
+      "claim": "an id with no type refuses",
+      "kind": "format",
+      "address": {
+        "form": "text",
+        "world": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+        "id": "019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71"
+      },
+      "refuse": "segments"
+    },
+    {
+      "name": "format-refuse-unknown-form",
+      "claim": "the form is human or text",
+      "kind": "format",
+      "address": {
+        "form": "url",
+        "world": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+        "type": "character",
+        "id": "019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71"
+      },
+      "refuse": "bad_form"
+    },
+    {
+      "name": "human",
+      "claim": "the human address reads to its triple",
+      "kind": "parse",
+      "text": "https://www.onlyworlds.com/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/character/019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71",
+      "expect": {
+        "form": "human",
+        "world": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+        "world_is_slug": false,
+        "type": "character",
+        "id": "019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71",
+        "lens": null,
+        "moment": null,
+        "canonical": true
+      }
+    },
+    {
+      "name": "human-lens",
+      "claim": "a lens reads from the query",
+      "kind": "parse",
+      "text": "https://www.onlyworlds.com/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/character/019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71?lens=019a2b7e-4c1d-7f20-9b3e-1a2c3d4e5f60",
+      "expect": {
+        "form": "human",
+        "world": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+        "world_is_slug": false,
+        "type": "character",
+        "id": "019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71",
+        "lens": "019a2b7e-4c1d-7f20-9b3e-1a2c3d4e5f60",
+        "moment": null,
+        "canonical": true
+      }
+    },
+    {
+      "name": "human-moment",
+      "claim": "a moment reads from @ at the end of the path",
+      "kind": "parse",
+      "text": "https://www.onlyworlds.com/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/event/019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71@302",
+      "expect": {
+        "form": "human",
+        "world": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+        "world_is_slug": false,
+        "type": "event",
+        "id": "019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71",
+        "lens": null,
+        "moment": 302,
+        "canonical": true
+      }
+    },
+    {
+      "name": "human-moment-negative",
+      "claim": "a negative step reads as one",
+      "kind": "parse",
+      "text": "https://www.onlyworlds.com/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/event/019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71@-120",
+      "expect": {
+        "form": "human",
+        "world": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+        "world_is_slug": false,
+        "type": "event",
+        "id": "019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71",
+        "lens": null,
+        "moment": -120,
+        "canonical": true
+      }
+    },
+    {
+      "name": "human-moment-zero",
+      "claim": "step 0 reads as 0, never as absent",
+      "kind": "parse",
+      "text": "https://www.onlyworlds.com/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/event/019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71@0",
+      "expect": {
+        "form": "human",
+        "world": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+        "world_is_slug": false,
+        "type": "event",
+        "id": "019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71",
+        "lens": null,
+        "moment": 0,
+        "canonical": true
+      }
+    },
+    {
+      "name": "human-lens-and-moment",
+      "claim": "both options together, the moment first",
+      "kind": "parse",
+      "text": "https://www.onlyworlds.com/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/character/019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71@302?lens=019a2b7e-4c1d-7f20-9b3e-1a2c3d4e5f60",
+      "expect": {
+        "form": "human",
+        "world": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+        "world_is_slug": false,
+        "type": "character",
+        "id": "019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71",
+        "lens": "019a2b7e-4c1d-7f20-9b3e-1a2c3d4e5f60",
+        "moment": 302,
+        "canonical": true
+      }
+    },
+    {
+      "name": "human-slug",
+      "claim": "a slug in the human form reads as a slug, never canonical",
+      "kind": "parse",
+      "text": "https://www.onlyworlds.com/w/hyperion/character/019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71",
+      "expect": {
+        "form": "human",
+        "world": "hyperion",
+        "world_is_slug": true,
+        "type": "character",
+        "id": "019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71",
+        "lens": null,
+        "moment": null,
+        "canonical": false
+      }
+    },
+    {
+      "name": "human-slug-with-hyphens",
+      "claim": "a slug is lowercase letters, numbers and single hyphens",
+      "kind": "parse",
+      "text": "https://www.onlyworlds.com/w/the-hollow-isles/location/019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71",
+      "expect": {
+        "form": "human",
+        "world": "the-hollow-isles",
+        "world_is_slug": true,
+        "type": "location",
+        "id": "019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71",
+        "lens": null,
+        "moment": null,
+        "canonical": false
+      }
+    },
+    {
+      "name": "human-uppercase-id",
+      "claim": "an id in uppercase hex reads in lowercase, not canonical",
+      "kind": "parse",
+      "text": "https://www.onlyworlds.com/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/character/019A1F3C-2B4E-7D10-8C3A-6F2E9B0D4A71",
+      "expect": {
+        "form": "human",
+        "world": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+        "world_is_slug": false,
+        "type": "character",
+        "id": "019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71",
+        "lens": null,
+        "moment": null,
+        "canonical": false
+      }
+    },
+    {
+      "name": "human-other-query-key",
+      "claim": "a query key other than lens is ignored, not canonical",
+      "kind": "parse",
+      "text": "https://www.onlyworlds.com/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/character/019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71?lens=019a2b7e-4c1d-7f20-9b3e-1a2c3d4e5f60&utm_source=share",
+      "expect": {
+        "form": "human",
+        "world": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+        "world_is_slug": false,
+        "type": "character",
+        "id": "019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71",
+        "lens": "019a2b7e-4c1d-7f20-9b3e-1a2c3d4e5f60",
+        "moment": null,
+        "canonical": false
+      }
+    },
+    {
+      "name": "human-fragment",
+      "claim": "a fragment is no part of the address, not canonical",
+      "kind": "parse",
+      "text": "https://www.onlyworlds.com/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/character/019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71#family",
+      "expect": {
+        "form": "human",
+        "world": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+        "world_is_slug": false,
+        "type": "character",
+        "id": "019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71",
+        "lens": null,
+        "moment": null,
+        "canonical": false
+      }
+    },
+    {
+      "name": "human-trimmed",
+      "claim": "whitespace at either end is trimmed, not canonical",
+      "kind": "parse",
+      "text": "  https://www.onlyworlds.com/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/character/019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71\n",
+      "expect": {
+        "form": "human",
+        "world": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+        "world_is_slug": false,
+        "type": "character",
+        "id": "019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71",
+        "lens": null,
+        "moment": null,
+        "canonical": false
+      }
+    },
+    {
+      "name": "human-refuse-moment-after-query",
+      "claim": "the moment sits before the query, never in it",
+      "kind": "parse",
+      "text": "https://www.onlyworlds.com/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/character/019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71?lens=019a2b7e-4c1d-7f20-9b3e-1a2c3d4e5f60@302",
+      "refuse": "bad_lens"
+    },
+    {
+      "name": "world-human",
+      "claim": "the world's own human address: the world's id alone",
+      "kind": "parse",
+      "text": "https://www.onlyworlds.com/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+      "expect": {
+        "form": "human",
+        "world": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+        "world_is_slug": false,
+        "type": null,
+        "id": null,
+        "lens": null,
+        "moment": null,
+        "canonical": true
+      }
+    },
+    {
+      "name": "world-human-moment-and-lens",
+      "claim": "a world's address carries the same moment and lens",
+      "kind": "parse",
+      "text": "https://www.onlyworlds.com/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f@302?lens=019a2b7e-4c1d-7f20-9b3e-1a2c3d4e5f60",
+      "expect": {
+        "form": "human",
+        "world": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+        "world_is_slug": false,
+        "type": null,
+        "id": null,
+        "lens": "019a2b7e-4c1d-7f20-9b3e-1a2c3d4e5f60",
+        "moment": 302,
+        "canonical": true
+      }
+    },
+    {
+      "name": "world-human-slug",
+      "claim": "a slug in a world's human address reads as a slug, not canonical",
+      "kind": "parse",
+      "text": "https://www.onlyworlds.com/w/hyperion",
+      "expect": {
+        "form": "human",
+        "world": "hyperion",
+        "world_is_slug": true,
+        "type": null,
+        "id": null,
+        "lens": null,
+        "moment": null,
+        "canonical": false
+      }
+    },
+    {
+      "name": "world-text",
+      "claim": "the world's text form: ow:// and the world's id alone",
+      "kind": "parse",
+      "text": "ow://0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+      "expect": {
+        "form": "text",
+        "world": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+        "world_is_slug": false,
+        "type": null,
+        "id": null,
+        "lens": null,
+        "moment": null,
+        "canonical": true
+      }
+    },
+    {
+      "name": "world-text-moment-and-lens",
+      "claim": "the world's text form with both options",
+      "kind": "parse",
+      "text": "ow://0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f@-120?lens=019a2b7e-4c1d-7f20-9b3e-1a2c3d4e5f60",
+      "expect": {
+        "form": "text",
+        "world": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+        "world_is_slug": false,
+        "type": null,
+        "id": null,
+        "lens": "019a2b7e-4c1d-7f20-9b3e-1a2c3d4e5f60",
+        "moment": -120,
+        "canonical": true
+      }
+    },
+    {
+      "name": "world-refuse-human-type-without-id",
+      "claim": "a type with no id refuses",
+      "kind": "parse",
+      "text": "https://www.onlyworlds.com/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/character",
+      "refuse": "segments"
+    },
+    {
+      "name": "world-refuse-human-id-without-type",
+      "claim": "an id with no type refuses",
+      "kind": "parse",
+      "text": "https://www.onlyworlds.com/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71",
+      "refuse": "segments"
+    },
+    {
+      "name": "world-refuse-human-type-alone",
+      "claim": "a type word is never a world",
+      "kind": "parse",
+      "text": "https://www.onlyworlds.com/w/character",
+      "refuse": "segments"
+    },
+    {
+      "name": "world-refuse-text-type-without-id",
+      "claim": "a type with no id refuses",
+      "kind": "parse",
+      "text": "ow://character",
+      "refuse": "segments"
+    },
+    {
+      "name": "world-refuse-text-slug",
+      "claim": "the world's text form takes the world's id, never a slug",
+      "kind": "parse",
+      "text": "ow://hyperion",
+      "refuse": "bad_world"
+    },
+    {
+      "name": "world-refuse-trailing-slash",
+      "claim": "no slash follows the world's id",
+      "kind": "parse",
+      "text": "https://www.onlyworlds.com/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/",
+      "refuse": "segments"
+    },
+    {
+      "name": "human-refuse-trailing-slash",
+      "claim": "no slash follows the id",
+      "kind": "parse",
+      "text": "https://www.onlyworlds.com/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/character/019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71/",
+      "refuse": "segments"
+    },
+    {
+      "name": "human-refuse-extra-segment",
+      "claim": "nothing follows the id in the path",
+      "kind": "parse",
+      "text": "https://www.onlyworlds.com/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/character/019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71/graph",
+      "refuse": "segments"
+    },
+    {
+      "name": "human-refuse-slug-uppercase",
+      "claim": "a slug is lowercase",
+      "kind": "parse",
+      "text": "https://www.onlyworlds.com/w/Hyperion/character/019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71",
+      "refuse": "bad_world"
+    },
+    {
+      "name": "human-refuse-slug-too-short",
+      "claim": "a slug is 3 to 40 characters",
+      "kind": "parse",
+      "text": "https://www.onlyworlds.com/w/hy/character/019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71",
+      "refuse": "bad_world"
+    },
+    {
+      "name": "human-refuse-unknown-type",
+      "claim": "an unknown type word refuses",
+      "kind": "parse",
+      "text": "https://www.onlyworlds.com/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/dragon/019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71",
+      "refuse": "unknown_type"
+    },
+    {
+      "name": "human-refuse-plural-type",
+      "claim": "the plural is not the type word",
+      "kind": "parse",
+      "text": "https://www.onlyworlds.com/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/characters/019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71",
+      "refuse": "unknown_type"
+    },
+    {
+      "name": "human-refuse-uppercase-type",
+      "claim": "an uppercase type word refuses by name",
+      "kind": "parse",
+      "text": "https://www.onlyworlds.com/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/Character/019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71",
+      "refuse": "uppercase"
+    },
+    {
+      "name": "human-refuse-uppercase-scheme",
+      "claim": "an uppercase scheme refuses by name",
+      "kind": "parse",
+      "text": "HTTPS://www.onlyworlds.com/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/character/019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71",
+      "refuse": "uppercase"
+    },
+    {
+      "name": "human-refuse-uppercase-host",
+      "claim": "an uppercase host refuses by name",
+      "kind": "parse",
+      "text": "https://WWW.OnlyWorlds.com/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/character/019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71",
+      "refuse": "uppercase"
+    },
+    {
+      "name": "human-refuse-other-host",
+      "claim": "only the site's own host is the human address",
+      "kind": "parse",
+      "text": "https://example.com/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/character/019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71",
+      "refuse": "not_an_address"
+    },
+    {
+      "name": "human-refuse-http",
+      "claim": "the human address is https",
+      "kind": "parse",
+      "text": "http://www.onlyworlds.com/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/character/019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71",
+      "refuse": "not_an_address"
+    },
+    {
+      "name": "human-refuse-bare-host",
+      "claim": "the human address names the www host",
+      "kind": "parse",
+      "text": "https://onlyworlds.com/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/character/019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71",
+      "refuse": "not_an_address"
+    },
+    {
+      "name": "human-refuse-member-page",
+      "claim": "the member's page is not the human address",
+      "kind": "parse",
+      "text": "https://www.onlyworlds.com/account/worlds/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/elements/character/019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71",
+      "refuse": "not_an_address"
+    },
+    {
+      "name": "human-refuse-short-id",
+      "claim": "a malformed id refuses",
+      "kind": "parse",
+      "text": "https://www.onlyworlds.com/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/character/019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a7",
+      "refuse": "bad_id"
+    },
+    {
+      "name": "human-refuse-id-without-hyphens",
+      "claim": "the id is written with its hyphens",
+      "kind": "parse",
+      "text": "https://www.onlyworlds.com/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/character/019a1f3c2b4e7d108c3a6f2e9b0d4a71",
+      "refuse": "bad_id"
+    },
+    {
+      "name": "human-refuse-id-in-braces",
+      "claim": "the id is written bare",
+      "kind": "parse",
+      "text": "https://www.onlyworlds.com/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/character/{019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71}",
+      "refuse": "bad_id"
+    },
+    {
+      "name": "human-refuse-encoded-at",
+      "claim": "the @ is written raw; %40 is no moment",
+      "kind": "parse",
+      "text": "https://www.onlyworlds.com/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/event/019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71%40302",
+      "refuse": "bad_id"
+    },
+    {
+      "name": "human-refuse-lens-not-id",
+      "claim": "a lens that is not an id refuses",
+      "kind": "parse",
+      "text": "https://www.onlyworlds.com/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/character/019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71?lens=noir",
+      "refuse": "bad_lens"
+    },
+    {
+      "name": "human-refuse-lens-empty",
+      "claim": "an empty lens refuses",
+      "kind": "parse",
+      "text": "https://www.onlyworlds.com/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/character/019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71?lens=",
+      "refuse": "bad_lens"
+    },
+    {
+      "name": "human-refuse-lens-twice",
+      "claim": "one lens at most",
+      "kind": "parse",
+      "text": "https://www.onlyworlds.com/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/character/019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71?lens=019a2b7e-4c1d-7f20-9b3e-1a2c3d4e5f60&lens=019a2b7e-4c1d-7f20-9b3e-1a2c3d4e5f60",
+      "refuse": "bad_lens"
+    },
+    {
+      "name": "human-refuse-lens-key-uppercase",
+      "claim": "the key is lens, in lowercase",
+      "kind": "parse",
+      "text": "https://www.onlyworlds.com/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/character/019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71?LENS=019a2b7e-4c1d-7f20-9b3e-1a2c3d4e5f60",
+      "refuse": "bad_lens"
+    },
+    {
+      "name": "moment-refuse-empty",
+      "claim": "an @ with nothing after it refuses",
+      "kind": "parse",
+      "text": "ow://event/019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71@",
+      "refuse": "bad_moment"
+    },
+    {
+      "name": "moment-refuse-calendar-words",
+      "claim": "calendar words are no moment: a moment is the step",
+      "kind": "parse",
+      "text": "ow://event/019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71@12%20Frost",
+      "refuse": "bad_moment"
+    },
+    {
+      "name": "moment-refuse-date",
+      "claim": "a date in another calendar is no moment",
+      "kind": "parse",
+      "text": "ow://event/019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71@2026-10-26",
+      "refuse": "bad_moment"
+    },
+    {
+      "name": "moment-refuse-fraction",
+      "claim": "a moment is a whole step",
+      "kind": "parse",
+      "text": "ow://event/019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71@12.5",
+      "refuse": "bad_moment"
+    },
+    {
+      "name": "moment-refuse-plus",
+      "claim": "a step is written without a plus sign",
+      "kind": "parse",
+      "text": "ow://event/019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71@+3",
+      "refuse": "bad_moment"
+    },
+    {
+      "name": "moment-refuse-minus-zero",
+      "claim": "zero has no sign",
+      "kind": "parse",
+      "text": "ow://event/019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71@-0",
+      "refuse": "bad_moment"
+    },
+    {
+      "name": "moment-refuse-leading-zero",
+      "claim": "a step has no leading zero",
+      "kind": "parse",
+      "text": "ow://event/019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71@007",
+      "refuse": "bad_moment"
+    },
+    {
+      "name": "moment-refuse-out-of-range",
+      "claim": "a moment is a 32-bit step",
+      "kind": "parse",
+      "text": "ow://event/019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71@2147483648",
+      "refuse": "bad_moment"
+    },
+    {
+      "name": "moment-refuse-twice",
+      "claim": "one moment at most",
+      "kind": "parse",
+      "text": "ow://event/019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71@1@2",
+      "refuse": "bad_moment"
+    },
+    {
+      "name": "moment-lowest",
+      "claim": "the lowest 32-bit step is a moment",
+      "kind": "parse",
+      "text": "ow://event/019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71@-2147483648",
+      "expect": {
+        "form": "text",
+        "world": null,
+        "world_is_slug": false,
+        "type": "event",
+        "id": "019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71",
+        "lens": null,
+        "moment": -2147483648,
+        "canonical": true
+      }
+    },
+    {
+      "name": "text-in-world",
+      "claim": "the in-world text form: the type word, then the id",
+      "kind": "parse",
+      "text": "ow://object/019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71",
+      "expect": {
+        "form": "text",
+        "world": null,
+        "world_is_slug": false,
+        "type": "object",
+        "id": "019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71",
+        "lens": null,
+        "moment": null,
+        "canonical": true
+      }
+    },
+    {
+      "name": "text-in-world-lens",
+      "claim": "the in-world text form with a lens",
+      "kind": "parse",
+      "text": "ow://object/019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71?lens=019a2b7e-4c1d-7f20-9b3e-1a2c3d4e5f60",
+      "expect": {
+        "form": "text",
+        "world": null,
+        "world_is_slug": false,
+        "type": "object",
+        "id": "019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71",
+        "lens": "019a2b7e-4c1d-7f20-9b3e-1a2c3d4e5f60",
+        "moment": null,
+        "canonical": true
+      }
+    },
+    {
+      "name": "text-in-world-moment",
+      "claim": "the in-world text form with a moment",
+      "kind": "parse",
+      "text": "ow://event/019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71@302",
+      "expect": {
+        "form": "text",
+        "world": null,
+        "world_is_slug": false,
+        "type": "event",
+        "id": "019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71",
+        "lens": null,
+        "moment": 302,
+        "canonical": true
+      }
+    },
+    {
+      "name": "text-in-world-lens-and-moment",
+      "claim": "the in-world text form with both",
+      "kind": "parse",
+      "text": "ow://event/019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71@302?lens=019a2b7e-4c1d-7f20-9b3e-1a2c3d4e5f60",
+      "expect": {
+        "form": "text",
+        "world": null,
+        "world_is_slug": false,
+        "type": "event",
+        "id": "019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71",
+        "lens": "019a2b7e-4c1d-7f20-9b3e-1a2c3d4e5f60",
+        "moment": 302,
+        "canonical": true
+      }
+    },
+    {
+      "name": "text-across-worlds",
+      "claim": "the cross-world text form: the world's id first",
+      "kind": "parse",
+      "text": "ow://0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/location/019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71",
+      "expect": {
+        "form": "text",
+        "world": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+        "world_is_slug": false,
+        "type": "location",
+        "id": "019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71",
+        "lens": null,
+        "moment": null,
+        "canonical": true
+      }
+    },
+    {
+      "name": "text-across-worlds-lens-and-moment",
+      "claim": "the cross-world text form with both",
+      "kind": "parse",
+      "text": "ow://0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/location/019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71@-120?lens=019a2b7e-4c1d-7f20-9b3e-1a2c3d4e5f60",
+      "expect": {
+        "form": "text",
+        "world": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+        "world_is_slug": false,
+        "type": "location",
+        "id": "019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71",
+        "lens": "019a2b7e-4c1d-7f20-9b3e-1a2c3d4e5f60",
+        "moment": -120,
+        "canonical": true
+      }
+    },
+    {
+      "name": "text-across-worlds-uppercase-world",
+      "claim": "a world id in uppercase hex reads in lowercase",
+      "kind": "parse",
+      "text": "ow://0199C3A1-7B2E-7C3D-8E4F-5A6B7C8D9E0F/location/019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71",
+      "expect": {
+        "form": "text",
+        "world": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+        "world_is_slug": false,
+        "type": "location",
+        "id": "019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71",
+        "lens": null,
+        "moment": null,
+        "canonical": false
+      }
+    },
+    {
+      "name": "text-refuse-four-segments",
+      "claim": "an ow:// with four segments refuses",
+      "kind": "parse",
+      "text": "ow://0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/location/019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71/extra",
+      "refuse": "segments"
+    },
+    {
+      "name": "text-refuse-trailing-slash",
+      "claim": "no slash follows the id",
+      "kind": "parse",
+      "text": "ow://object/019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71/",
+      "refuse": "segments"
+    },
+    {
+      "name": "text-refuse-slug-world",
+      "claim": "the cross-world text form takes the world's id, never a slug",
+      "kind": "parse",
+      "text": "ow://hyperion/location/019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71",
+      "refuse": "bad_world"
+    },
+    {
+      "name": "text-refuse-world-then-id",
+      "claim": "two segments are a type word and an id",
+      "kind": "parse",
+      "text": "ow://0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71",
+      "refuse": "unknown_type"
+    },
+    {
+      "name": "text-refuse-unknown-type",
+      "claim": "an unknown type word refuses",
+      "kind": "parse",
+      "text": "ow://dragon/019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71",
+      "refuse": "unknown_type"
+    },
+    {
+      "name": "text-refuse-type-prefix",
+      "claim": "the type is the whole word",
+      "kind": "parse",
+      "text": "ow://char/019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71",
+      "refuse": "unknown_type"
+    },
+    {
+      "name": "text-refuse-cross-world-unknown-type",
+      "claim": "the cross-world form's type is one of the 22",
+      "kind": "parse",
+      "text": "ow://0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/dragon/019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71",
+      "refuse": "unknown_type"
+    },
+    {
+      "name": "text-refuse-uppercase-type",
+      "claim": "an uppercase type word refuses by name",
+      "kind": "parse",
+      "text": "ow://Character/019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71",
+      "refuse": "uppercase"
+    },
+    {
+      "name": "text-refuse-uppercase-scheme",
+      "claim": "an uppercase scheme refuses by name",
+      "kind": "parse",
+      "text": "OW://character/019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71",
+      "refuse": "uppercase"
+    },
+    {
+      "name": "text-refuse-mixed-case-scheme",
+      "claim": "the scheme is lowercase",
+      "kind": "parse",
+      "text": "Ow://character/019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71",
+      "refuse": "uppercase"
+    },
+    {
+      "name": "text-refuse-one-slash",
+      "claim": "the scheme is followed by two slashes",
+      "kind": "parse",
+      "text": "ow:/character/019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71",
+      "refuse": "not_an_address"
+    },
+    {
+      "name": "text-refuse-other-scheme",
+      "claim": "only ow:// is the text form",
+      "kind": "parse",
+      "text": "onlyworlds://element/character/019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71",
+      "refuse": "not_an_address"
+    },
+    {
+      "name": "text-refuse-missing-id",
+      "claim": "no segment is empty",
+      "kind": "parse",
+      "text": "ow://character/",
+      "refuse": "segments"
+    },
+    {
+      "name": "text-refuse-bad-id",
+      "claim": "a malformed id refuses",
+      "kind": "parse",
+      "text": "ow://character/not-an-id",
+      "refuse": "bad_id"
+    },
+    {
+      "name": "refuse-empty",
+      "claim": "an empty string is not an address",
+      "kind": "parse",
+      "text": "",
+      "refuse": "not_an_address"
+    },
+    {
+      "name": "refuse-bare-id",
+      "claim": "a bare id is not an address",
+      "kind": "parse",
+      "text": "019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71",
+      "refuse": "not_an_address"
+    },
+    {
+      "name": "refuse-markdown-link",
+      "claim": "a reader parses the address, not the text around it",
+      "kind": "parse",
+      "text": "[the Consul](ow://character/019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71)",
+      "refuse": "not_an_address"
+    },
+    {
+      "name": "type-character",
+      "claim": "character is one of the 22 type words",
+      "kind": "parse",
+      "text": "ow://character/019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71",
+      "expect": {
+        "form": "text",
+        "world": null,
+        "world_is_slug": false,
+        "type": "character",
+        "id": "019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71",
+        "lens": null,
+        "moment": null,
+        "canonical": true
+      }
+    },
+    {
+      "name": "type-creature",
+      "claim": "creature is one of the 22 type words",
+      "kind": "parse",
+      "text": "ow://creature/019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71",
+      "expect": {
+        "form": "text",
+        "world": null,
+        "world_is_slug": false,
+        "type": "creature",
+        "id": "019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71",
+        "lens": null,
+        "moment": null,
+        "canonical": true
+      }
+    },
+    {
+      "name": "type-species",
+      "claim": "species is one of the 22 type words",
+      "kind": "parse",
+      "text": "ow://species/019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71",
+      "expect": {
+        "form": "text",
+        "world": null,
+        "world_is_slug": false,
+        "type": "species",
+        "id": "019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71",
+        "lens": null,
+        "moment": null,
+        "canonical": true
+      }
+    },
+    {
+      "name": "type-family",
+      "claim": "family is one of the 22 type words",
+      "kind": "parse",
+      "text": "ow://family/019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71",
+      "expect": {
+        "form": "text",
+        "world": null,
+        "world_is_slug": false,
+        "type": "family",
+        "id": "019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71",
+        "lens": null,
+        "moment": null,
+        "canonical": true
+      }
+    },
+    {
+      "name": "type-collective",
+      "claim": "collective is one of the 22 type words",
+      "kind": "parse",
+      "text": "ow://collective/019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71",
+      "expect": {
+        "form": "text",
+        "world": null,
+        "world_is_slug": false,
+        "type": "collective",
+        "id": "019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71",
+        "lens": null,
+        "moment": null,
+        "canonical": true
+      }
+    },
+    {
+      "name": "type-institution",
+      "claim": "institution is one of the 22 type words",
+      "kind": "parse",
+      "text": "ow://institution/019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71",
+      "expect": {
+        "form": "text",
+        "world": null,
+        "world_is_slug": false,
+        "type": "institution",
+        "id": "019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71",
+        "lens": null,
+        "moment": null,
+        "canonical": true
+      }
+    },
+    {
+      "name": "type-location",
+      "claim": "location is one of the 22 type words",
+      "kind": "parse",
+      "text": "ow://location/019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71",
+      "expect": {
+        "form": "text",
+        "world": null,
+        "world_is_slug": false,
+        "type": "location",
+        "id": "019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71",
+        "lens": null,
+        "moment": null,
+        "canonical": true
+      }
+    },
+    {
+      "name": "type-object",
+      "claim": "object is one of the 22 type words",
+      "kind": "parse",
+      "text": "ow://object/019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71",
+      "expect": {
+        "form": "text",
+        "world": null,
+        "world_is_slug": false,
+        "type": "object",
+        "id": "019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71",
+        "lens": null,
+        "moment": null,
+        "canonical": true
+      }
+    },
+    {
+      "name": "type-construct",
+      "claim": "construct is one of the 22 type words",
+      "kind": "parse",
+      "text": "ow://construct/019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71",
+      "expect": {
+        "form": "text",
+        "world": null,
+        "world_is_slug": false,
+        "type": "construct",
+        "id": "019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71",
+        "lens": null,
+        "moment": null,
+        "canonical": true
+      }
+    },
+    {
+      "name": "type-ability",
+      "claim": "ability is one of the 22 type words",
+      "kind": "parse",
+      "text": "ow://ability/019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71",
+      "expect": {
+        "form": "text",
+        "world": null,
+        "world_is_slug": false,
+        "type": "ability",
+        "id": "019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71",
+        "lens": null,
+        "moment": null,
+        "canonical": true
+      }
+    },
+    {
+      "name": "type-trait",
+      "claim": "trait is one of the 22 type words",
+      "kind": "parse",
+      "text": "ow://trait/019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71",
+      "expect": {
+        "form": "text",
+        "world": null,
+        "world_is_slug": false,
+        "type": "trait",
+        "id": "019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71",
+        "lens": null,
+        "moment": null,
+        "canonical": true
+      }
+    },
+    {
+      "name": "type-title",
+      "claim": "title is one of the 22 type words",
+      "kind": "parse",
+      "text": "ow://title/019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71",
+      "expect": {
+        "form": "text",
+        "world": null,
+        "world_is_slug": false,
+        "type": "title",
+        "id": "019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71",
+        "lens": null,
+        "moment": null,
+        "canonical": true
+      }
+    },
+    {
+      "name": "type-language",
+      "claim": "language is one of the 22 type words",
+      "kind": "parse",
+      "text": "ow://language/019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71",
+      "expect": {
+        "form": "text",
+        "world": null,
+        "world_is_slug": false,
+        "type": "language",
+        "id": "019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71",
+        "lens": null,
+        "moment": null,
+        "canonical": true
+      }
+    },
+    {
+      "name": "type-law",
+      "claim": "law is one of the 22 type words",
+      "kind": "parse",
+      "text": "ow://law/019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71",
+      "expect": {
+        "form": "text",
+        "world": null,
+        "world_is_slug": false,
+        "type": "law",
+        "id": "019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71",
+        "lens": null,
+        "moment": null,
+        "canonical": true
+      }
+    },
+    {
+      "name": "type-event",
+      "claim": "event is one of the 22 type words",
+      "kind": "parse",
+      "text": "ow://event/019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71",
+      "expect": {
+        "form": "text",
+        "world": null,
+        "world_is_slug": false,
+        "type": "event",
+        "id": "019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71",
+        "lens": null,
+        "moment": null,
+        "canonical": true
+      }
+    },
+    {
+      "name": "type-narrative",
+      "claim": "narrative is one of the 22 type words",
+      "kind": "parse",
+      "text": "ow://narrative/019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71",
+      "expect": {
+        "form": "text",
+        "world": null,
+        "world_is_slug": false,
+        "type": "narrative",
+        "id": "019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71",
+        "lens": null,
+        "moment": null,
+        "canonical": true
+      }
+    },
+    {
+      "name": "type-phenomenon",
+      "claim": "phenomenon is one of the 22 type words",
+      "kind": "parse",
+      "text": "ow://phenomenon/019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71",
+      "expect": {
+        "form": "text",
+        "world": null,
+        "world_is_slug": false,
+        "type": "phenomenon",
+        "id": "019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71",
+        "lens": null,
+        "moment": null,
+        "canonical": true
+      }
+    },
+    {
+      "name": "type-relation",
+      "claim": "relation is one of the 22 type words",
+      "kind": "parse",
+      "text": "ow://relation/019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71",
+      "expect": {
+        "form": "text",
+        "world": null,
+        "world_is_slug": false,
+        "type": "relation",
+        "id": "019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71",
+        "lens": null,
+        "moment": null,
+        "canonical": true
+      }
+    },
+    {
+      "name": "type-map",
+      "claim": "map is one of the 22 type words",
+      "kind": "parse",
+      "text": "ow://map/019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71",
+      "expect": {
+        "form": "text",
+        "world": null,
+        "world_is_slug": false,
+        "type": "map",
+        "id": "019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71",
+        "lens": null,
+        "moment": null,
+        "canonical": true
+      }
+    },
+    {
+      "name": "type-pin",
+      "claim": "pin is one of the 22 type words",
+      "kind": "parse",
+      "text": "ow://pin/019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71",
+      "expect": {
+        "form": "text",
+        "world": null,
+        "world_is_slug": false,
+        "type": "pin",
+        "id": "019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71",
+        "lens": null,
+        "moment": null,
+        "canonical": true
+      }
+    },
+    {
+      "name": "type-marker",
+      "claim": "marker is one of the 22 type words",
+      "kind": "parse",
+      "text": "ow://marker/019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71",
+      "expect": {
+        "form": "text",
+        "world": null,
+        "world_is_slug": false,
+        "type": "marker",
+        "id": "019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71",
+        "lens": null,
+        "moment": null,
+        "canonical": true
+      }
+    },
+    {
+      "name": "type-zone",
+      "claim": "zone is one of the 22 type words",
+      "kind": "parse",
+      "text": "ow://zone/019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71",
+      "expect": {
+        "form": "text",
+        "world": null,
+        "world_is_slug": false,
+        "type": "zone",
+        "id": "019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71",
+        "lens": null,
+        "moment": null,
+        "canonical": true
+      }
+    }
+  ]
+}

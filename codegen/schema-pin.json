@@ -2,15 +2,20 @@
   "_what": "The recorded pin for the vendored OnlyWorlds schema distribution (codegen/schema-dist/, copied byte-exact). Do not edit by hand; re-vendor from the pinned tag and review the diff. Kept equal to the npm SDK's pin (github.com/OnlyWorlds/sdk, codegen/schema-pin.json) on purpose: two clients, one schema.",
   "_why_manifest_sha256": "Verifying the tree against its own MANIFEST.json only proves internal consistency. If the tag moved, the manifest moved with it. The hash recorded here is the one first accepted, which is what makes a moved tag visible.",
   "repo": "https://github.com/OnlyWorlds/schema-dist",
-  "tag": "v0.33.0-dist.76",
-  "commit": "afe869681638eef312fe9309c6e0aec8729bc2f2",
-  "manifest_sha256": "4f8e04035bdc8a5f3c233ef01646ab921f78cd220b7799619a497e958f5a4b34",
+  "tag": "v0.33.0-dist.77",
+  "commit": "1461d3be7d36bbf2f1f881a5f7004e82494fa466",
+  "manifest_sha256": "7224f5f1d01d9dff1be5efe7ddcd9844bc3c69811b8bed4037faa147474b5729",
   "canonical_version": "00.33.00",
-  "dist_serial": 76,
+  "dist_serial": 77,
   "published": "2026-10-27",
   "pinned_at": "2026-10-27",
-  "pinned_by": "The maintainer: tree from `git archive` of the tag in a schema-dist checkout (191 files, every one the MANIFEST lists); files re-hashed against MANIFEST.json by generate_schema.py; MANIFEST self-hash matched against the raw file GitHub serves at the tag, whose ref resolves to the commit above.",
+  "pinned_by": "The maintainer: tree from `git archive` of the tag in a schema-dist checkout (193 files, every one the MANIFEST lists); files re-hashed against MANIFEST.json by generate_schema.py; MANIFEST self-hash matched against the raw file GitHub serves at the tag, whose ref resolves to the commit above.",
   "previous_pins": [
+    {
+      "tag": "v0.33.0-dist.76",
+      "manifest_sha256": "4f8e04035bdc8a5f3c233ef01646ab921f78cd220b7799619a497e958f5a4b34",
+      "note": "superseded by v0.33.0-dist.77 (same canonical 00.33.00; profiles/ gains address.md and address.fixture.json, the address profile: one element's three spellings (the site address with the world's id, ow://<type>/<id> inside a world, ow://<world id>/<type>/<id> across worlds), the world's own address, an optional moment and lens, the field convention, 133 cases; the README's profiles row names it; no schema file moved)"
+    },
     {
       "tag": "v0.33.0-dist.75",
       "manifest_sha256": "6f0150dfa47849453676c5c6a33ab43bdf3c3791dd0b3b42b56f4b138cb80e82",
