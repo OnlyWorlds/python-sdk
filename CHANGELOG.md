@@ -4,6 +4,10 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+## 0.78.0 (2026-10-27)
+
+- **`degree_of(graph)`**: each node's degree in a graph the graph reader answered: its edges in or out, each counted once for every node it touches (a mirror pair counts 2 at each end, a link to itself once), every node a key with 0 included, in the graph's node order. It is "most linked" as a finder ranks it: the reader's own count, since what the reading left out has no edge. The npm SDK's `degreeOf` gives the same answer on the same graph.
+
 ## 0.77.1 (2026-10-27)
 
 - **A lens a guest knows only as a stub reads as nothing when named by id**, in `resolve_lens` and so in `world_graph`, as keel's own reader answers it. The reader took the stored body whenever the id was in the guest's view, a known-of stub included, so it followed anchors and a recipe the guest is never served: the kept rows stayed inside the guest's view, but which of them the lens kept said something about anchors the guest cannot see. A lens body passed in is read as given, as before.

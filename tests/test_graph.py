@@ -12,7 +12,7 @@ from typing import Any
 
 import pytest
 
-from onlyworlds import FIELD_KINDS, WorldGraph, resolve_lens, world_graph
+from onlyworlds import FIELD_KINDS, WorldGraph, degree_of, resolve_lens, world_graph
 
 REPO = Path(__file__).resolve().parent.parent
 FIXTURE = REPO / "codegen" / "schema-dist" / "profiles" / "lens.fixture.json"
@@ -204,3 +204,34 @@ def test_world_graph_refuses_what_is_not_a_reading() -> None:
         world_graph({"elements": []}, {"rung": "owner"}, as_of=1.5)  # type: ignore[arg-type]
     empty = world_graph({"elements": []}, {"rung": "public"}, rooms=False)
     assert empty == {"nodes": [], "edges": [], "edges_cut": {}, "cut": {}, "unreadable": None}
+
+
+def test_degree_of_counts_each_node_s_edges_a_self_link_once() -> None:
+    world: dict[str, Any] = {
+        "elements": [
+            {"id": "c1", "type": "character", "name": "Ada", "friends": ["c2", "c1"]},
+            {"id": "c2", "type": "character", "name": "Bo", "friends": ["c1"]},
+            {"id": "r1", "type": "relation", "name": "Pact", "characters": ["c1", "c2", "c3"]},
+            {"id": "c3", "type": "character", "name": "Cy"},
+            {"id": "o1", "type": "object", "name": "Lamp"},
+            {"id": "constructor", "type": "object", "name": "An id like an inherited key"},
+            {"id": "__proto__", "type": "character", "name": "Another", "objects": ["constructor"]},
+        ]
+    }
+    g = world_graph(world, {"rung": "owner"})
+    d = degree_of(g)
+    assert list(d) == [n["id"] for n in g["nodes"]]
+    assert (d["c1"], d["c2"], d["r1"], d["c3"], d["o1"], d["constructor"], d["__proto__"]) == (4, 3, 3, 1, 0, 1, 1)
+    with pytest.raises(TypeError):
+        degree_of({"nodes": []})
+
+
+def test_degree_of_on_every_fixture_graph_case_equals_a_direct_count() -> None:
+    for c in load_cases():
+        want = c["want"]
+        if "nodes" not in want:
+            continue
+        d = degree_of({"nodes": want["nodes"], "edges": want["edges"]})
+        for n in want["nodes"]:
+            direct = sum(1 for e in want["edges"] if n["id"] in (e["source"], e["target"]))
+            assert d[n["id"]] == direct, (c["name"], n["id"])

@@ -24,7 +24,7 @@ from .lens import (
 )
 from .message import _instant
 
-__all__ = ["GraphEdge", "GraphNode", "WorldGraph", "world_graph"]
+__all__ = ["GraphEdge", "GraphNode", "WorldGraph", "degree_of", "world_graph"]
 
 GraphMark = Literal["room", "hidden", "proposed"]
 
@@ -273,3 +273,25 @@ def world_graph(
         "cut": cut,
         "unreadable": unreadable,
     }
+
+
+def degree_of(graph: Mapping[str, Any]) -> dict[str, int]:
+    """Each node's degree in a graph ``world_graph`` answered: the number of its edges, in or out, each edge
+    counted once for every node it touches (a mirror pair is two edges, so each end counts 2; a link to itself
+    counts once). Every node is a key, 0 included, in the graph's node order. Edges join nodes only, so the count
+    is the reader's: what the reading left out (hidden, room, proposed, map space, past a lens) is never counted.
+    This is "most linked" for a finder: rank by it, highest first. A graph that is not one is a TypeError. The
+    npm SDK's ``degreeOf`` gives the same answer on the same graph."""
+    if (
+        not isinstance(graph, Mapping)
+        or not isinstance(graph.get("nodes"), list)
+        or not isinstance(graph.get("edges"), list)
+    ):
+        raise TypeError("degree_of: graph is what world_graph answers, a mapping with nodes and edges lists.")
+    count: dict[str, int] = {n["id"]: 0 for n in graph["nodes"]}
+    for e in graph["edges"]:
+        if e["source"] in count:
+            count[e["source"]] += 1
+        if e["target"] != e["source"] and e["target"] in count:
+            count[e["target"]] += 1
+    return count

@@ -46,7 +46,7 @@ from .folder import (
     slugify,
     write_folder,
 )
-from .graph import GraphEdge, GraphNode, WorldGraph, world_graph
+from .graph import GraphEdge, GraphNode, WorldGraph, degree_of, world_graph
 from .http import (
     API_BASE,
     CREATE_FIELDS,
@@ -153,6 +153,7 @@ __all__ = [
     "__version__",
     "apply_checks",
     "check_kinds",
+    "degree_of",
     "draught_text",
     "edited_by",
     "element_address",

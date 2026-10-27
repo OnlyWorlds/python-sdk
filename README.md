@@ -323,10 +323,11 @@ The world holds the elements as the owner is served them; the reader's `rung` (`
 `world_graph(world, reader, *, lens=None, as_of=None, clock=None, rooms=False, hidden=False, proposed=False, map_space=False)` reads the same snapshot, for the same reader, as nodes and edges: `nodes` (`{id, type, name, family, icon}`, by id), `edges` (`{source, field, target, index}`, one per link, by source, field and index), `edges_cut` (links to elements that are not nodes, by reason; with a lens, `outside_lens` counts links to elements the reader sees that the lens left out), `cut` and `unreadable` (the `x_lens` key a lens could not be read by, else `None`). Room elements, hidden and proposed ones and map space are out unless a flag brings them back (`hidden` and `proposed` are the owner's alone, and a public reader takes no flag); with `lens` the nodes are exactly what the lens kept.
 
 ```python
-from onlyworlds import world_graph
+from onlyworlds import degree_of, world_graph
 
 g = world_graph({"elements": elements}, {"rung": "owner"}, rooms=True)
 g["nodes"], g["edges"], g["edges_cut"]  # e.g. {"map_space": 2, "hidden": 1}
+degree_of(g)  # each node's edges, in or out: {id: count}, "most linked" for a finder
 ```
 
 ### A world's own words
