@@ -26,7 +26,9 @@ heading is escaped, as okf escapes it), an integer and a link on one line. A lin
 the target's name and type, ``Ann (character)``, resolved against the whole world read; an id the
 world does not hold is written ``<id> (unresolved)`` and listed in ``PackReport.unresolved``. An
 in-prose reference, ``[Label](ow://<type>/<id>)``, becomes the label, with the target's name
-after it in brackets when the two differ. A known-of stub (folder format §4.4) says so under its
+after it in brackets when the two differ; so does any other address the address profile reads as
+one of this world's elements (with a moment or a lens, or the cross-world form with this world's
+own id), and one to another world stays as written. A known-of stub (folder format §4.4) says so under its
 id line: its missing fields are unknown, not empty. Nothing is invented and an unset field is
 left out.
 
@@ -87,7 +89,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
-from ._markdown import escape_text, heading, one_line
+from ._markdown import OW_REF, escape_text, heading, one_line, prose_target
 from ._schema import (
     BASE_FIELDS,
     ELEMENT_TYPES,
@@ -302,8 +304,6 @@ def _kind(body: Mapping[str, Any]) -> str:
     return " / ".join(one_line(body[k]) for k in ("supertype", "subtype") if _set(body.get(k)))
 
 
-# An in-prose element reference (folder format, in-prose references; atlas `src/core/ow-links.ts`).
-_OW_REF = re.compile(r"\[([^\]\n]*)\]\(ow://([A-Za-z_]+)/([\w-]+)\)")
 _SENTENCE_END = re.compile(r"(?<=[.!?])\s")
 
 
@@ -369,8 +369,12 @@ class _World:
     def prose(self, text: str, here: str | None = None, name: str = "") -> str:
         """In-prose references as words. ``here`` None (the index) reports nothing."""
 
+        world_id = self.world.get("id") if isinstance(self.world, Mapping) else None
+
         def swap(m: re.Match[str]) -> str:
-            label, eid = one_line(m.group(1)), m.group(3)
+            label, eid = one_line(m.group(1)), prose_target(m.group(2), world_id)
+            if eid is None:  # another world's element, or not an address the profile reads
+                return m.group(0)
             if eid in self.hidden and not self.keep_hidden:
                 if here is not None:
                     self.report.hidden_links_left_out += 1
@@ -390,7 +394,7 @@ class _World:
                 return title if not label else m.group(1)
             return f"{m.group(1)} ({title})"
 
-        return _OW_REF.sub(swap, text)
+        return OW_REF.sub(swap, text)
 
     def first_sentence(self, text: Any) -> str:
         line = one_line(self.prose(str(text)))

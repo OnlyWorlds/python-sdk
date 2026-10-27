@@ -57,9 +57,11 @@ Each element concept:
     rather than empty (``OkfReport.known_of`` counts them).
   - an in-prose element reference in a text field, `[Label](ow://<type>/<id>)`
     (folder format, in-prose references), becomes a relative link to that
-    element's concept, so a markdown viewer can follow it; one to an id the
-    folder does not hold stays as written and is listed in
-    ``OkfReport.unresolved``.
+    element's concept, so a markdown viewer can follow it; so does any other
+    address the address profile reads as one of this world's elements (with a
+    moment or a lens, or the cross-world form with this world's own id). One
+    to an id the folder does not hold stays as written and is listed in
+    ``OkfReport.unresolved``; one to another world stays as written.
 
 Hidden elements (``folder.is_hidden``: ``hidden: true`` at the top level, folder format §4.8) are
 hidden from whoever the world is handed to, never from its holder (ruled
@@ -121,7 +123,7 @@ try:
 except ImportError as exc:  # pragma: no cover - exercised only without the extra
     raise ImportError('onlyworlds.okf needs PyYAML: pip install "onlyworlds[okf]"') from exc
 
-from ._markdown import escape_text
+from ._markdown import OW_REF, escape_text, prose_target
 from ._markdown import heading as _heading
 from ._markdown import one_line as _one_line
 from ._schema import (
@@ -304,10 +306,9 @@ def _fm_key(name: str) -> str:
     return f"ow_{name}" if name in OKF_KEYS else name
 
 
-# An in-prose reference as a markdown link target (atlas `src/core/ow-links.ts`, OW_LINK_HREF_RE).
-_OW_LINK = re.compile(r"\]\(ow://([A-Za-z_]+)/([\w-]+)\)")
-# The whole reference, label and target, for one to a hidden element left out (only the label stays).
-_OW_REF = re.compile(r"\[([^\]\n]*)\]\(ow://([A-Za-z_]+)/([\w-]+)\)")
+# An in-prose reference's target alone (a label holding brackets still has its target swapped); the
+# whole reference, label and target, is OW_REF, for one to a hidden element left out (only the label stays).
+_OW_LINK = re.compile(r"\]\((ow://[^)\s]*)\)")
 HIDDEN_LABEL = " (hidden)"
 
 
@@ -323,11 +324,13 @@ class _Links:
         report: OkfReport,
         note: Note,
         hidden: frozenset[str] = frozenset(),
+        world_id: Any = None,
     ):
         self.here, self.paths, self.names = here, paths, names
         self.report, self.note = report, note
         #: every hidden id: one in ``paths`` was kept (labelled), one not in it was left out (never named)
         self.hidden = hidden
+        self.world_id = world_id
 
     def one(self, name: str, eid: Any, target: str | None) -> tuple[str, str] | None:
         if not isinstance(eid, str) or not eid:
@@ -351,23 +354,28 @@ class _Links:
         return "../" + self.paths[eid] if "/" in self.here else self.paths[eid]
 
     def prose(self, name: str, text: str) -> str:
-        """A text field's `](ow://<type>/<id>)` link targets as relative bundle paths; one to an
-        id the folder does not hold stays as written and is listed as unresolved."""
+        """A text field's `](ow://...)` link targets that name an element of this world (the in-world
+        form, or with a moment, a lens or this world's own id) as relative bundle paths; one to an id
+        the folder does not hold stays as written and is listed as unresolved. One to another world,
+        or that the address profile refuses, stays as written."""
 
         def drop(m: re.Match[str]) -> str:
-            if m.group(3) in self.hidden and m.group(3) not in self.paths:
+            eid = prose_target(m.group(2), self.world_id)
+            if eid is not None and eid in self.hidden and eid not in self.paths:
                 self.report.hidden_links_left_out += 1
                 return m.group(1)
             return m.group(0)
 
         def swap(m: re.Match[str]) -> str:
-            eid = m.group(2)
+            eid = prose_target(m.group(1), self.world_id)
+            if eid is None:
+                return m.group(0)
             if eid not in self.paths:
                 self.report.unresolved.append(f"{self.here}: `{name}` (prose) -> {eid}")
                 return m.group(0)
             return f"]({self._rel(eid)})" + (HIDDEN_LABEL if eid in self.hidden else "")
 
-        return _OW_LINK.sub(swap, _OW_REF.sub(drop, text))
+        return _OW_LINK.sub(swap, OW_REF.sub(drop, text))
 
 
 # --- one element
@@ -384,11 +392,13 @@ def element_doc(
     kinds: Mapping[str, Mapping[str, str]] = FIELD_KINDS,
     sections: Mapping[str, tuple[tuple[str, tuple[str, ...]], ...]] = SECTIONS,
     hidden: frozenset[str] = frozenset(),
+    world_id: Any = None,
 ) -> str:
     """One element as an OKF concept. ``kinds`` and ``sections`` default to the generated schema;
-    ``hidden`` is every hidden id of the world (one not in ``paths`` was left out)."""
+    ``hidden`` is every hidden id of the world (one not in ``paths`` was left out); ``world_id`` is the
+    world's own, so a cross-world in-prose link to one of its elements resolves like one inside it."""
     here = paths[body["id"]]
-    links = _Links(here, paths, names, report, note, hidden)
+    links = _Links(here, paths, names, report, note, hidden, world_id)
     fm: dict[str, Any] = {"type": _type_name(slug)}
     if not _unset(body.get("name")):
         fm["title"] = str(body["name"])
@@ -490,7 +500,7 @@ def world_doc(
     hidden: frozenset[str] = frozenset(),
 ) -> str:
     """world.md. ``time_current`` is the folder's (``Folder.time_current``: either spelling, §5)."""
-    links = _Links("world.md", paths, names, report, note, hidden)
+    links = _Links("world.md", paths, names, report, note, hidden, world.get("id"))
     world = dict(world)
     if time_current is not None:
         world["time_current"] = time_current
@@ -566,7 +576,9 @@ def build_bundle(
     by_type: dict[str, list[tuple[str, str, str, bool]]] = {}
     for slug, body in elements:
         path = paths[body["id"]]
-        files[path] = element_doc(slug, body, paths, names, report, noted, hidden=hidden_ids)
+        files[path] = element_doc(
+            slug, body, paths, names, report, noted, hidden=hidden_ids, world_id=folder.world.get("id")
+        )
         by_type.setdefault(slug, []).append(
             (names[body["id"]], path.split("/", 1)[1], str(body.get("description") or ""), body["id"] in hidden_ids)
         )

@@ -725,6 +725,41 @@ def test_hidden_elements_are_left_out_counted_and_never_named() -> None:
     assert is_hidden({"hidden": "yes"}) and not is_hidden({"hidden": False})  # a doubt leaves it out
 
 
+HEX_WORLD = "0a0a0a0a-0000-7000-8000-000000000000"
+OTHER_WORLD = "0b0b0b0b-0000-7000-8000-000000000000"
+LENS = "0e0e0e0e-0000-7000-8000-000000000000"
+
+
+def prose_forms(eid: str) -> str:
+    """One reference to ``eid`` in each form the address profile reads, then two that name no element
+    of this world: another world's, and this world's own address."""
+    return (
+        f"[f1](ow://character/{eid}@3) [f2](ow://character/{eid}?lens={LENS}) [f3](ow://{HEX_WORLD}/character/{eid})"
+        f" [f4](ow://Character/{eid}) [f5](ow://{OTHER_WORLD}/character/{eid}) [f6](ow://{HEX_WORLD})."
+    )
+
+
+def test_every_address_form_of_one_of_its_elements_becomes_words() -> None:
+    elements = [
+        ("character", {"id": C1, "name": "Ann"}),
+        ("character", {"id": C2, "name": "Bo", "background": prose_forms(C1)}),
+    ]
+    files, report = build_pack({**WORLD, "id": HEX_WORLD}, elements)
+    assert (
+        f"f1 (Ann) f2 (Ann) f3 (Ann) f4 (Ann) [f5](ow://{OTHER_WORLD}/character/{C1}) [f6](ow://{HEX_WORLD}).\n"
+        in files["01-character.md"]
+    )
+    assert report.unresolved == []  # another world's element is not this one's to resolve
+
+
+def test_every_address_form_of_a_hidden_element_is_left_out() -> None:
+    elements = [*with_hidden(), ("character", {"id": C2, "name": "Bo", "background": prose_forms(C3)})]
+    elements = [(t, b) for t, b in elements if b["id"] != C2 or "background" in b]
+    files, report = build_pack({**WORLD, "id": HEX_WORLD}, elements)
+    assert report.hidden_links_left_out == 2 + 4  # the hidden test's two, and four forms here
+    assert f"f1 f2 f3 f4 [f5](ow://{OTHER_WORLD}/character/{C3}) [f6](ow://{HEX_WORLD}).\n" in files["01-character.md"]
+
+
 def test_a_kept_hidden_element_is_labelled_and_so_is_every_link_to_it() -> None:
     files, report = built(with_hidden(), hidden=True)
     assert (report.hidden_kept, report.hidden_left_out, report.hidden_links_left_out) == (1, 0, 0)

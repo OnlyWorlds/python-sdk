@@ -663,6 +663,43 @@ def test_a_hidden_element_is_left_out_counted_and_never_named(world: World) -> N
     assert meta["onlyworlds_export"]["hidden_left_out"] == 1
 
 
+SENTENCE = "elements/narrative/a-world-in-a-sentence--*.json"
+OTHER_WORLD = "0b0b0b0b-0000-7000-8000-000000000000"
+LENS = "0e0e0e0e-0000-7000-8000-000000000000"
+
+
+def prose_forms(wid: str) -> str:
+    """One reference to the consul in each form the address profile reads, then two that name no
+    element of this world: another world's, and this world's own address."""
+    return (
+        f" [f1](ow://character/{CONSUL}@3) [f2](ow://character/{CONSUL}?lens={LENS}) [f3](ow://{wid}/character/{CONSUL})"
+        f" [f4](ow://Character/{CONSUL}) [f5](ow://{OTHER_WORLD}/character/{CONSUL}) [f6](ow://{wid})."
+    )
+
+
+def test_every_address_form_of_one_of_its_elements_points_into_the_bundle(world: World) -> None:
+    wid = world.edit("world.json", lambda b: None)["id"]
+    world.edit(SENTENCE, lambda b: b.update(story=b["story"] + prose_forms(wid)))
+    code, err = world.run()
+    assert code == 0, err
+    _, body = world.doc("narrative/a-world-in-a-sentence--*.md")
+    targets = re.findall(r"\[f\d\]\(([^)]+)\)", body)
+    assert targets[:4] == [targets[0]] * 4 and targets[0].startswith("../character/the-consul--")
+    assert targets[4:] == [f"ow://{OTHER_WORLD}/character/{CONSUL}", f"ow://{wid}"]  # as written
+    report = okf.export_okf(world.src, world.out.with_name("again"))
+    assert report.unresolved == []  # another world's element is not this one's to resolve
+
+
+def test_every_address_form_of_a_hidden_element_is_left_out(world: World) -> None:
+    wid = world.edit("world.json", lambda b: None)["id"]
+    world.edit(SENTENCE, lambda b: b.update(story=b["story"] + prose_forms(wid)))
+    world.edit("elements/character/the-consul--*.json", lambda b: b.update(hidden=True))
+    report = okf.export_okf(world.src, world.out)
+    assert report.hidden_links_left_out == 5 + 4  # the hidden test's five, and four forms here
+    _, body = world.doc("narrative/a-world-in-a-sentence--*.md")
+    assert re.findall(r"\[f\d\]\(([^)]+)\)", body) == [f"ow://{OTHER_WORLD}/character/{CONSUL}", f"ow://{wid}"]
+
+
 def test_a_kept_hidden_element_carries_its_mark_and_every_link_to_it_says_hidden(world: World) -> None:
     world.edit("elements/character/the-consul--*.json", lambda b: b.update(hidden=True))
     report = okf.export_okf(world.src, world.out, hidden=True)
