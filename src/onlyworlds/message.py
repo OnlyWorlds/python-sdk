@@ -49,7 +49,7 @@ from dataclasses import dataclass
 from typing import Any, Literal
 
 from ._schema import MESSAGE_PAIR, NOTE_PAIR, READ_MARK_PAIR
-from .folder import FolderElement
+from .folder import FolderElement, is_hidden
 from .review import proposed_mark_of
 from .room import _fold
 
@@ -457,7 +457,8 @@ def note_of(
     when it has none (always ``None`` for an empty id). A Note (``is_note``) counts when its ``narrator`` is
     ``character_id``, it is in its author's hand (no ``created_by`` key, a folder: the narrator is trusted;
     with ``created_by``, the wire: ``sender_status`` against ``members`` is ``verified``, so a mismatch or an
-    unverifiable Note is nobody's), it is not hidden (``hidden: true``) and not proposed
+    unverifiable Note is nobody's), it is not hidden (the platform's hidden mark, read as ``is_hidden`` reads it:
+    any value but absent, null and ``false``) and not proposed
     (``x_review_proposed`` an object, the review profile), and its id is a string. Of those, the newest by
     ``created_at`` (the last in ``created_at`` order among those whose time can be read; equal times: the
     later in the list), or the last in the list when none can be read. A Note is never a message: never
@@ -470,7 +471,7 @@ def note_of(
         nid = note.get("id")
         if not is_note(note) or not isinstance(nid, str) or not nid or note.get("narrator") != character_id:
             continue
-        if note.get("hidden") is True or proposed_mark_of(note) is not None or not _is_own(note, character_id, members):
+        if is_hidden(note) or proposed_mark_of(note) is not None or not _is_own(note, character_id, members):
             continue
         key = _instant(note.get("created_at"))
         # A readable time beats an unreadable one; the newer, or the later of two equal, wins.
