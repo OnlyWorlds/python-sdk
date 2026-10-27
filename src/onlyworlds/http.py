@@ -581,7 +581,10 @@ class Client:
         ``{rows, cut, cut_rows, reached, notes_ignored, mail?}``. The owner also gets ``chosen_by``,
         ``health`` and the two counts of what a reader cannot see; with ``resolve``, the owner may
         ``read_as`` another reader (``guest``, ``contributor``, ``co-builder``, ``public``, or a membership
-        id of this world): 403 ``read_as_owner_only`` from any other key, 422 without ``resolve``.
+        id of this world). A co-builder, or the account that sponsors an agent's or a player's seat, may
+        ``read_as`` that seat by its membership id, judged by the narrower view: the seat's rows within
+        the caller's own view, and what the caller cannot see counted under ``not_visible``, never named.
+        403 ``read_as_owner_only`` from any other key, 422 without ``resolve``.
         ``world_id`` is the key's own world (another is a 404). A read: no PIN. ``resolve`` is sent as
         ``true`` or ``false``; ``None`` sends nothing; anything but a bool is a TypeError before
         anything is sent. Served ``Cache-Control: private, no-store``."""

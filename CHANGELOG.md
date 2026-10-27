@@ -5,6 +5,7 @@ The package version runs on its own semver; the schema it is generated from is `
 ## Unreleased
 
 - **`out_degree_of(graph)`**: each node's out-degree in a graph `world_graph` answered, the number of distinct nodes its own link fields point at: a target listed in two fields counts once, a link to itself does not count, and a mirror pair counts 1 at each end. Every node is a key, 0 included. Beside `degree_of` ("most linked"), it says how far an element reaches out. Held to a direct count on every graph case of the lens profile's fixture, and equal to the npm SDK's `outDegreeOf` on 3,000 random graphs (38,969 nodes).
+- **`world_lenses`' words follow the server's wider `read_as`**: a co-builder, or the account that sponsors an agent's or a player's seat, may read a lens as that seat by its membership id, judged by the narrower view. The call already sent `read_as` as given; only the words moved.
 
 ## 0.79.3 (2026-10-28)
 
