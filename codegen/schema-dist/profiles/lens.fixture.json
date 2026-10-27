@@ -1,0 +1,2573 @@
+{
+  "profile": "lens",
+  "profile_page": "profiles/lens.md",
+  "notes": [
+    "pair: construct + supertype Lens, each trimmed and folded like the room profile's pairs; a template is a lens whose subtype, trimmed and folded, is Template.",
+    "keys: the legal values of x_lens; a case's legal is what a reader's check answers, and bad names the first key refused (x_lens itself when the value is not an object).",
+    "worlds: each world's elements as its owner is served them, the ids its hidden mark keeps from every reader but the owner, and its readers. A reader's rung is owner (the whole world), contributor (the world less the hidden), guest (exactly the whole and known_of ids it lists; known_of is a stub) or public (the world less the hidden and the room elements). An element carrying x_review_proposed as an object is in no reader's view. A reader with as is the owner reading as that reader: the reader's view, and the owner's two counts (anchor_not_visible, not_visible).",
+    "resolve: lens is the lens read, a body or the id of a lens in the world; as_of is the reading's date (absent: the world's now); clock is the reading's time for the mail rule. kept is the resolved set in order, cut the count by reason (a reason with no count is absent). rows, where given, are the kept rows as show makes them; mail, where given, is the mail rule's part; notes_ignored counts notes on ids that are not anchors.",
+    "invariant: subset (each reader's kept is a subset of the owner's, and no secret's id or name appears anywhere in a non-owner result), same_without (each reader's result is identical with the without ids removed from the world), unchanged (the world is identical before and after every reader's reading).",
+    "uses: which lenses a seat reads, from its membership's choice (null: none made) and its Character's x_lens_uses."
+  ],
+  "pair": {
+    "type": "construct",
+    "supertype": "Lens"
+  },
+  "template_subtype": "Template",
+  "field": "x_lens",
+  "uses_field": "x_lens_uses",
+  "anchor_fields": [
+    "characters",
+    "objects",
+    "locations",
+    "species",
+    "creatures",
+    "institutions",
+    "traits",
+    "collectives",
+    "zones",
+    "abilities",
+    "phenomena",
+    "languages",
+    "families",
+    "relations",
+    "constructs",
+    "events",
+    "narratives"
+  ],
+  "type_order": [
+    "ability",
+    "collective",
+    "character",
+    "construct",
+    "creature",
+    "event",
+    "family",
+    "institution",
+    "language",
+    "law",
+    "location",
+    "map",
+    "marker",
+    "narrative",
+    "object",
+    "phenomenon",
+    "pin",
+    "relation",
+    "species",
+    "title",
+    "trait",
+    "zone"
+  ],
+  "date_table": {
+    "character": "birth_date",
+    "creature": "birth_date",
+    "institution": "founding_date",
+    "location": "founding_date",
+    "collective": "formation_date",
+    "law": "date",
+    "title": "grant_date",
+    "construct": "start_date",
+    "event": "start_date",
+    "narrative": "start_date",
+    "relation": "start_date",
+    "zone": "start_date"
+  },
+  "room_pairs": [
+    "narrative/message",
+    "narrative/board",
+    "relation/work item",
+    "construct/spec",
+    "relation/heart",
+    "relation/take",
+    "relation/vote",
+    "event/sitting",
+    "character/member"
+  ],
+  "cut_reasons": [
+    "budget",
+    "types",
+    "window",
+    "undated",
+    "after_as_of",
+    "anchor_not_visible",
+    "not_visible",
+    "hops_not_served"
+  ],
+  "owner_only_reasons": [
+    "anchor_not_visible",
+    "not_visible"
+  ],
+  "defaults": {
+    "depth": 1,
+    "budget": 50,
+    "undated": "include",
+    "show": "full",
+    "mail": "none",
+    "mail_days": 30
+  },
+  "worlds": {
+    "vale": {
+      "id": "019a7f00-0000-7000-8000-00000000f001",
+      "name": "Harrow Vale",
+      "time_basic_unit": "year",
+      "now": 1200,
+      "elements": [
+        {
+          "id": "019a7f00-0000-7000-8000-000000000001",
+          "type": "character",
+          "name": "Ada Venn",
+          "birth_date": 1170,
+          "birthplace": "019a7f00-0000-7000-8000-000000000002",
+          "institutions": [
+            "019a7f00-0000-7000-8000-000000000003"
+          ],
+          "friends": [
+            "019a7f00-0000-7000-8000-000000000004"
+          ],
+          "updated_at": "2026-10-01T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000004",
+          "type": "character",
+          "name": "Brin Hale",
+          "birth_date": null,
+          "location": "019a7f00-0000-7000-8000-000000000002",
+          "institutions": [
+            "019a7f00-0000-7000-8000-000000000005"
+          ],
+          "updated_at": "2026-10-03T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000006",
+          "type": "character",
+          "name": "Cass Orr",
+          "birth_date": 1175,
+          "friends": [
+            "019a7f00-0000-7000-8000-000000000001"
+          ],
+          "updated_at": "2026-10-05T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000007",
+          "type": "character",
+          "name": "Dov Marr",
+          "birth_date": 1160,
+          "updated_at": "2026-10-02T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000002",
+          "type": "location",
+          "name": "Harrowgate",
+          "founding_date": 1020,
+          "primary_power": "019a7f00-0000-7000-8000-000000000003",
+          "description": "A harbour town on the grey coast.",
+          "updated_at": "2026-09-20T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000003",
+          "type": "institution",
+          "name": "Lamplighters' Guild",
+          "founding_date": 1150,
+          "description": "Keepers of the harbour lamps.\nFounded after the first great fire.",
+          "updated_at": "2026-09-21T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000005",
+          "type": "institution",
+          "name": "Tower of Tides",
+          "founding_date": 1205,
+          "updated_at": "2026-09-22T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000008",
+          "type": "event",
+          "name": "The Harbour Fire",
+          "start_date": 1195,
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000001",
+            "019a7f00-0000-7000-8000-000000000004"
+          ],
+          "locations": [
+            "019a7f00-0000-7000-8000-000000000002"
+          ],
+          "updated_at": "2026-10-04T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000009",
+          "type": "event",
+          "name": "The Long Flood",
+          "start_date": null,
+          "locations": [
+            "019a7f00-0000-7000-8000-000000000002"
+          ],
+          "updated_at": "2026-10-06T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000010",
+          "type": "event",
+          "name": "The First Lamp",
+          "start_date": 1150,
+          "locations": [
+            "019a7f00-0000-7000-8000-000000000002"
+          ],
+          "updated_at": "2026-09-25T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000011",
+          "type": "narrative",
+          "name": "The Harbour Ledger",
+          "start_date": 1190,
+          "narrator": "019a7f00-0000-7000-8000-000000000001",
+          "events": [
+            "019a7f00-0000-7000-8000-000000000008"
+          ],
+          "updated_at": "2026-10-07T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000012",
+          "type": "narrative",
+          "name": "A Rumour of Cass",
+          "start_date": 1196,
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000001"
+          ],
+          "x_review_proposed": {
+            "by": null,
+            "at": "2026-10-08T12:00:00Z"
+          },
+          "updated_at": "2026-10-08T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000013",
+          "type": "narrative",
+          "name": "Shift swap",
+          "supertype": "Message",
+          "start_date": null,
+          "narrator": "019a7f00-0000-7000-8000-000000000004",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000001"
+          ],
+          "x_room_of": "019a7f00-0000-7000-8000-00000000f001",
+          "updated_at": "2026-10-09T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000014",
+          "type": "relation",
+          "name": "Oath of the Lamps",
+          "supertype": "Oath",
+          "start_date": 1180,
+          "actor": "019a7f00-0000-7000-8000-000000000007",
+          "institutions": [
+            "019a7f00-0000-7000-8000-000000000003"
+          ],
+          "updated_at": "2026-10-10T12:00:00Z"
+        }
+      ],
+      "hidden": [
+        "019a7f00-0000-7000-8000-000000000006"
+      ],
+      "readers": {
+        "owner": {
+          "rung": "owner",
+          "character": null
+        },
+        "contributor": {
+          "rung": "contributor",
+          "character": "019a7f00-0000-7000-8000-000000000007"
+        },
+        "guest": {
+          "rung": "guest",
+          "character": "019a7f00-0000-7000-8000-000000000004",
+          "whole": [
+            "019a7f00-0000-7000-8000-000000000004",
+            "019a7f00-0000-7000-8000-000000000001",
+            "019a7f00-0000-7000-8000-000000000007",
+            "019a7f00-0000-7000-8000-000000000008",
+            "019a7f00-0000-7000-8000-000000000013"
+          ],
+          "known_of": [
+            "019a7f00-0000-7000-8000-000000000002",
+            "019a7f00-0000-7000-8000-000000000005"
+          ]
+        },
+        "public": {
+          "rung": "public",
+          "character": null
+        },
+        "owner-as-guest": {
+          "rung": "owner",
+          "as": "guest",
+          "character": null
+        }
+      }
+    },
+    "office": {
+      "id": "019a7f00-0000-7000-8000-00000000f002",
+      "name": "The Press Office",
+      "time_basic_unit": "day",
+      "now": 100,
+      "elements": [
+        {
+          "id": "019a7f00-0000-7000-8000-000000000015",
+          "type": "character",
+          "name": "Mira Sol",
+          "updated_at": "2026-10-01T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000016",
+          "type": "character",
+          "name": "Tobin Reed",
+          "updated_at": "2026-10-02T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000017",
+          "type": "institution",
+          "name": "The Press",
+          "updated_at": "2026-10-03T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000018",
+          "type": "construct",
+          "name": "Roadmap",
+          "supertype": "Plan",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000015"
+          ],
+          "updated_at": "2026-10-05T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000019",
+          "type": "construct",
+          "name": "People",
+          "supertype": "Lens",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000015",
+            "019a7f00-0000-7000-8000-000000000016"
+          ],
+          "x_lens": {
+            "depth": 0
+          },
+          "updated_at": "2026-10-04T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000020",
+          "type": "construct",
+          "name": "House",
+          "supertype": "Lens",
+          "institutions": [
+            "019a7f00-0000-7000-8000-000000000017"
+          ],
+          "constructs": [
+            "019a7f00-0000-7000-8000-000000000021"
+          ],
+          "x_lens": {
+            "depth": 0
+          },
+          "updated_at": "2026-09-01T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000021",
+          "type": "construct",
+          "name": "Office",
+          "supertype": "Lens",
+          "constructs": [
+            "019a7f00-0000-7000-8000-000000000019",
+            "019a7f00-0000-7000-8000-000000000020",
+            "019a7f00-0000-7000-8000-000000000021"
+          ],
+          "x_lens": {
+            "depth": 0
+          },
+          "updated_at": "2026-09-02T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000022",
+          "type": "construct",
+          "name": "Solo",
+          "supertype": "Lens",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000016"
+          ],
+          "constructs": [
+            "019a7f00-0000-7000-8000-000000000022"
+          ],
+          "x_lens": {
+            "depth": 0
+          },
+          "updated_at": "2026-09-03T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000023",
+          "type": "construct",
+          "name": "Plan",
+          "supertype": "Lens",
+          "constructs": [
+            "019a7f00-0000-7000-8000-000000000018"
+          ],
+          "x_lens": {
+            "depth": 1
+          },
+          "updated_at": "2026-09-04T12:00:00Z"
+        }
+      ],
+      "hidden": [],
+      "readers": {
+        "owner": {
+          "rung": "owner",
+          "character": null
+        },
+        "contributor": {
+          "rung": "contributor",
+          "character": "019a7f00-0000-7000-8000-000000000015"
+        }
+      }
+    },
+    "planted": {
+      "id": "019a7f00-0000-7000-8000-00000000f003",
+      "name": "Planted",
+      "time_basic_unit": "day",
+      "now": 100,
+      "elements": [
+        {
+          "id": "019a7f00-0000-7000-8000-000000000024",
+          "type": "character",
+          "name": "Ada",
+          "location": "019a7f00-0000-7000-8000-000000000025",
+          "friends": [
+            "019a7f00-0000-7000-8000-000000000026"
+          ],
+          "updated_at": "2026-10-01T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000027",
+          "type": "character",
+          "name": "Brin",
+          "updated_at": "2026-10-02T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000026",
+          "type": "character",
+          "name": "Secret Heir",
+          "friends": [
+            "019a7f00-0000-7000-8000-000000000027"
+          ],
+          "updated_at": "2026-10-03T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000025",
+          "type": "location",
+          "name": "Hollow Keep",
+          "buildings": [
+            "019a7f00-0000-7000-8000-000000000028"
+          ],
+          "updated_at": "2026-10-04T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000028",
+          "type": "object",
+          "name": "Vault Ledger",
+          "updated_at": "2026-10-05T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000029",
+          "type": "relation",
+          "name": "Ada's ward",
+          "supertype": "Ward",
+          "actor": "019a7f00-0000-7000-8000-000000000024",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000026"
+          ],
+          "updated_at": "2026-10-06T12:00:00Z"
+        }
+      ],
+      "hidden": [
+        "019a7f00-0000-7000-8000-000000000026",
+        "019a7f00-0000-7000-8000-000000000028"
+      ],
+      "readers": {
+        "owner": {
+          "rung": "owner",
+          "character": null
+        },
+        "contributor": {
+          "rung": "contributor",
+          "character": null
+        },
+        "seat": {
+          "rung": "contributor",
+          "character": "019a7f00-0000-7000-8000-000000000027"
+        },
+        "guest": {
+          "rung": "guest",
+          "character": "019a7f00-0000-7000-8000-000000000027",
+          "whole": [
+            "019a7f00-0000-7000-8000-000000000024",
+            "019a7f00-0000-7000-8000-000000000027",
+            "019a7f00-0000-7000-8000-000000000025",
+            "019a7f00-0000-7000-8000-000000000029"
+          ],
+          "known_of": []
+        },
+        "public": {
+          "rung": "public",
+          "character": null
+        },
+        "owner-as-guest": {
+          "rung": "owner",
+          "as": "guest",
+          "character": null
+        }
+      }
+    },
+    "post": {
+      "id": "019a7f00-0000-7000-8000-00000000f004",
+      "name": "The Post",
+      "time_basic_unit": "day",
+      "now": 100,
+      "elements": [
+        {
+          "id": "019a7f00-0000-7000-8000-000000000030",
+          "type": "character",
+          "name": "Ada Venn",
+          "updated_at": "2026-09-01T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000031",
+          "type": "character",
+          "name": "Brin Hale",
+          "updated_at": "2026-09-02T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000032",
+          "type": "character",
+          "name": "Dov Marr",
+          "updated_at": "2026-09-03T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000033",
+          "type": "narrative",
+          "name": "On the lamps",
+          "supertype": "Message",
+          "narrator": "019a7f00-0000-7000-8000-000000000032",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000030"
+          ],
+          "story": "The east lamp is out.",
+          "created_by": "019a7f00-0000-7000-8000-000000000042",
+          "created_at": "2026-10-20T12:00:00Z",
+          "updated_at": "2026-10-20T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000034",
+          "type": "narrative",
+          "name": "Notes to self",
+          "supertype": "Message",
+          "narrator": "019a7f00-0000-7000-8000-000000000030",
+          "characters": [],
+          "story": "A line that claims Ada wrote it.",
+          "created_by": "019a7f00-0000-7000-8000-000000000042",
+          "created_at": "2026-10-22T12:00:00Z",
+          "updated_at": "2026-10-22T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000035",
+          "type": "narrative",
+          "name": "Night shift",
+          "supertype": "Message",
+          "narrator": "019a7f00-0000-7000-8000-000000000031",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000030"
+          ],
+          "story": "Can you take Thursday?",
+          "created_by": "019a7f00-0000-7000-8000-000000000041",
+          "created_at": "2026-10-25T12:00:00Z",
+          "updated_at": "2026-10-25T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000036",
+          "type": "narrative",
+          "name": "Old news",
+          "supertype": "Message",
+          "narrator": "019a7f00-0000-7000-8000-000000000032",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000030"
+          ],
+          "story": "From the summer.",
+          "created_by": "019a7f00-0000-7000-8000-000000000042",
+          "created_at": "2026-08-01T12:00:00Z",
+          "updated_at": "2026-08-01T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000037",
+          "type": "narrative",
+          "name": "My reply",
+          "supertype": "Message",
+          "narrator": "019a7f00-0000-7000-8000-000000000030",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000032"
+          ],
+          "story": "Yes.",
+          "created_by": "019a7f00-0000-7000-8000-000000000040",
+          "created_at": "2026-10-21T12:00:00Z",
+          "updated_at": "2026-10-21T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000038",
+          "type": "narrative",
+          "name": "Sealed",
+          "supertype": "Message",
+          "narrator": null,
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000030"
+          ],
+          "story": "Kept back.",
+          "created_by": null,
+          "created_at": "2026-10-24T12:00:00Z",
+          "updated_at": "2026-10-24T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000039",
+          "type": "relation",
+          "name": "Read: Ada Venn",
+          "supertype": "Read",
+          "actor": "019a7f00-0000-7000-8000-000000000030",
+          "narratives": [
+            "019a7f00-0000-7000-8000-000000000033"
+          ],
+          "created_by": "019a7f00-0000-7000-8000-000000000040",
+          "created_at": "2026-10-21T12:00:00Z",
+          "updated_at": "2026-10-21T12:00:00Z"
+        }
+      ],
+      "hidden": [
+        "019a7f00-0000-7000-8000-000000000038"
+      ],
+      "members": [
+        {
+          "id": null,
+          "character": null
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000040",
+          "character": "019a7f00-0000-7000-8000-000000000030"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000041",
+          "character": "019a7f00-0000-7000-8000-000000000031"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000042",
+          "character": "019a7f00-0000-7000-8000-000000000032"
+        }
+      ],
+      "readers": {
+        "seat": {
+          "rung": "contributor",
+          "character": "019a7f00-0000-7000-8000-000000000030"
+        }
+      }
+    }
+  },
+  "cases": [
+    {
+      "name": "lens-is-a-construct-with-supertype-lens",
+      "kind": "shape",
+      "element": {
+        "type": "construct",
+        "supertype": "Lens",
+        "subtype": "Mail"
+      },
+      "is_lens": true,
+      "is_template": false
+    },
+    {
+      "name": "lens-pair-trimmed-and-folded",
+      "kind": "shape",
+      "element": {
+        "type": " Construct ",
+        "supertype": " lens "
+      },
+      "is_lens": true,
+      "is_template": false
+    },
+    {
+      "name": "lens-pair-not-whole-word",
+      "kind": "shape",
+      "element": {
+        "type": "construct",
+        "supertype": "Lenses"
+      },
+      "is_lens": false,
+      "is_template": false
+    },
+    {
+      "name": "lens-pair-wrong-type",
+      "kind": "shape",
+      "element": {
+        "type": "narrative",
+        "supertype": "Lens"
+      },
+      "is_lens": false,
+      "is_template": false
+    },
+    {
+      "name": "template-is-subtype-template",
+      "kind": "shape",
+      "element": {
+        "type": "construct",
+        "supertype": "Lens",
+        "subtype": " template "
+      },
+      "is_lens": true,
+      "is_template": true
+    },
+    {
+      "name": "template-subtype-on-another-construct-is-no-template",
+      "kind": "shape",
+      "element": {
+        "type": "construct",
+        "supertype": "Plan",
+        "subtype": "Template"
+      },
+      "is_lens": false,
+      "is_template": false
+    },
+    {
+      "name": "keys-empty-is-legal",
+      "kind": "keys",
+      "x_lens": {},
+      "legal": true,
+      "bad": null
+    },
+    {
+      "name": "keys-every-key-legal",
+      "kind": "keys",
+      "x_lens": {
+        "depth": 1,
+        "types": [
+          "character",
+          "narrative/message"
+        ],
+        "window": 30,
+        "undated": "exclude",
+        "show": "first_line",
+        "budget": 1000,
+        "mail": "unread_full_read_titles",
+        "notes": {
+          "019a7f00-0000-7000-8000-000000000003": "Who keeps the lamps."
+        }
+      },
+      "legal": true,
+      "bad": null
+    },
+    {
+      "name": "keys-depth-two-is-legal",
+      "kind": "keys",
+      "x_lens": {
+        "depth": 2
+      },
+      "legal": true,
+      "bad": null
+    },
+    {
+      "name": "keys-from-and-to-is-legal",
+      "kind": "keys",
+      "x_lens": {
+        "from": 1190,
+        "to": 1195
+      },
+      "legal": true,
+      "bad": null
+    },
+    {
+      "name": "keys-null-is-absent",
+      "kind": "keys",
+      "x_lens": {
+        "window": null,
+        "mail": null
+      },
+      "legal": true,
+      "bad": null
+    },
+    {
+      "name": "keys-unknown-key-is-ignored",
+      "kind": "keys",
+      "x_lens": {
+        "show_reach": "name"
+      },
+      "legal": true,
+      "bad": null
+    },
+    {
+      "name": "keys-depth-three-is-refused",
+      "kind": "keys",
+      "x_lens": {
+        "depth": 3
+      },
+      "legal": false,
+      "bad": "depth"
+    },
+    {
+      "name": "keys-depth-boolean-is-refused",
+      "kind": "keys",
+      "x_lens": {
+        "depth": true
+      },
+      "legal": false,
+      "bad": "depth"
+    },
+    {
+      "name": "keys-budget-zero-is-refused",
+      "kind": "keys",
+      "x_lens": {
+        "budget": 0
+      },
+      "legal": false,
+      "bad": "budget"
+    },
+    {
+      "name": "keys-budget-over-1000-is-refused",
+      "kind": "keys",
+      "x_lens": {
+        "budget": 1001
+      },
+      "legal": false,
+      "bad": "budget"
+    },
+    {
+      "name": "keys-undated-cut-is-refused",
+      "kind": "keys",
+      "x_lens": {
+        "undated": "cut"
+      },
+      "legal": false,
+      "bad": "undated",
+      "note": "The draught's words are include and exclude."
+    },
+    {
+      "name": "keys-show-other-is-refused",
+      "kind": "keys",
+      "x_lens": {
+        "show": "all"
+      },
+      "legal": false,
+      "bad": "show"
+    },
+    {
+      "name": "keys-mail-other-is-refused",
+      "kind": "keys",
+      "x_lens": {
+        "mail": "unread"
+      },
+      "legal": false,
+      "bad": "mail"
+    },
+    {
+      "name": "keys-types-plural-is-refused",
+      "kind": "keys",
+      "x_lens": {
+        "types": [
+          "characters"
+        ]
+      },
+      "legal": false,
+      "bad": "types"
+    },
+    {
+      "name": "keys-types-not-a-room-pair-is-refused",
+      "kind": "keys",
+      "x_lens": {
+        "types": [
+          "narrative/messages"
+        ]
+      },
+      "legal": false,
+      "bad": "types"
+    },
+    {
+      "name": "keys-types-not-a-list-is-refused",
+      "kind": "keys",
+      "x_lens": {
+        "types": "character"
+      },
+      "legal": false,
+      "bad": "types"
+    },
+    {
+      "name": "keys-window-negative-is-refused",
+      "kind": "keys",
+      "x_lens": {
+        "window": -1
+      },
+      "legal": false,
+      "bad": "window"
+    },
+    {
+      "name": "keys-window-beside-from-is-refused",
+      "kind": "keys",
+      "x_lens": {
+        "window": 10,
+        "from": 1190
+      },
+      "legal": false,
+      "bad": "window"
+    },
+    {
+      "name": "keys-to-alone-is-refused",
+      "kind": "keys",
+      "x_lens": {
+        "to": 1195
+      },
+      "legal": false,
+      "bad": "to"
+    },
+    {
+      "name": "keys-from-not-before-to-is-refused",
+      "kind": "keys",
+      "x_lens": {
+        "from": 1195,
+        "to": 1195
+      },
+      "legal": false,
+      "bad": "to"
+    },
+    {
+      "name": "keys-notes-not-strings-is-refused",
+      "kind": "keys",
+      "x_lens": {
+        "notes": {
+          "019a7f00-0000-7000-8000-000000000003": 3
+        }
+      },
+      "legal": false,
+      "bad": "notes"
+    },
+    {
+      "name": "keys-not-an-object-is-refused",
+      "kind": "keys",
+      "x_lens": [
+        1
+      ],
+      "legal": false,
+      "bad": "x_lens"
+    },
+    {
+      "name": "visibility-first-hidden-is-not-there",
+      "kind": "resolve",
+      "world": "vale",
+      "reader": "contributor",
+      "lens": {
+        "id": "019a7f00-0000-7000-8000-000000000043",
+        "type": "construct",
+        "name": "A lens",
+        "supertype": "Lens",
+        "subtype": "",
+        "characters": [
+          "019a7f00-0000-7000-8000-000000000001"
+        ]
+      },
+      "kept": [
+        "019a7f00-0000-7000-8000-000000000001",
+        "019a7f00-0000-7000-8000-000000000004",
+        "019a7f00-0000-7000-8000-000000000008",
+        "019a7f00-0000-7000-8000-000000000003",
+        "019a7f00-0000-7000-8000-000000000002",
+        "019a7f00-0000-7000-8000-000000000011"
+      ],
+      "cut": {
+        "types": 1
+      },
+      "note": "Cass (hidden) links to Ada and is not there; the proposed rumour is not there; the room line is a room element the lens's types do not name."
+    },
+    {
+      "name": "owner-reads-hidden-and-counts-what-it-cannot-reach",
+      "kind": "resolve",
+      "world": "vale",
+      "reader": "owner",
+      "lens": {
+        "id": "019a7f00-0000-7000-8000-000000000043",
+        "type": "construct",
+        "name": "A lens",
+        "supertype": "Lens",
+        "subtype": "",
+        "characters": [
+          "019a7f00-0000-7000-8000-000000000001"
+        ]
+      },
+      "kept": [
+        "019a7f00-0000-7000-8000-000000000001",
+        "019a7f00-0000-7000-8000-000000000006",
+        "019a7f00-0000-7000-8000-000000000004",
+        "019a7f00-0000-7000-8000-000000000008",
+        "019a7f00-0000-7000-8000-000000000003",
+        "019a7f00-0000-7000-8000-000000000002",
+        "019a7f00-0000-7000-8000-000000000011"
+      ],
+      "cut": {
+        "types": 1,
+        "not_visible": 1
+      },
+      "note": "The owner reads hidden Cass; the proposed rumour is counted not_visible, the owner's count only."
+    },
+    {
+      "name": "hop-reaches-both-ways",
+      "kind": "resolve",
+      "world": "vale",
+      "reader": "contributor",
+      "lens": {
+        "id": "019a7f00-0000-7000-8000-000000000044",
+        "type": "construct",
+        "name": "A lens",
+        "supertype": "Lens",
+        "subtype": "",
+        "locations": [
+          "019a7f00-0000-7000-8000-000000000002"
+        ]
+      },
+      "kept": [
+        "019a7f00-0000-7000-8000-000000000002",
+        "019a7f00-0000-7000-8000-000000000004",
+        "019a7f00-0000-7000-8000-000000000001",
+        "019a7f00-0000-7000-8000-000000000009",
+        "019a7f00-0000-7000-8000-000000000008",
+        "019a7f00-0000-7000-8000-000000000010",
+        "019a7f00-0000-7000-8000-000000000003"
+      ],
+      "cut": {},
+      "note": "Out: the Guild (primary_power). In: Ada, Brin, three Events. By type in the schema's order, newest first within a type."
+    },
+    {
+      "name": "relation-is-an-edge",
+      "kind": "resolve",
+      "world": "vale",
+      "reader": "contributor",
+      "lens": {
+        "id": "019a7f00-0000-7000-8000-000000000045",
+        "type": "construct",
+        "name": "A lens",
+        "supertype": "Lens",
+        "subtype": "",
+        "institutions": [
+          "019a7f00-0000-7000-8000-000000000003"
+        ]
+      },
+      "kept": [
+        "019a7f00-0000-7000-8000-000000000003",
+        "019a7f00-0000-7000-8000-000000000007",
+        "019a7f00-0000-7000-8000-000000000001",
+        "019a7f00-0000-7000-8000-000000000002",
+        "019a7f00-0000-7000-8000-000000000014"
+      ],
+      "cut": {},
+      "note": "The Oath links the Guild; landing on it reaches Dov, its actor, in the same hop."
+    },
+    {
+      "name": "relation-is-an-edge-when-types-cut-it",
+      "kind": "resolve",
+      "world": "vale",
+      "reader": "contributor",
+      "lens": {
+        "id": "019a7f00-0000-7000-8000-000000000045",
+        "type": "construct",
+        "name": "A lens",
+        "supertype": "Lens",
+        "subtype": "",
+        "institutions": [
+          "019a7f00-0000-7000-8000-000000000003"
+        ],
+        "x_lens": {
+          "types": [
+            "character"
+          ]
+        }
+      },
+      "kept": [
+        "019a7f00-0000-7000-8000-000000000003",
+        "019a7f00-0000-7000-8000-000000000007",
+        "019a7f00-0000-7000-8000-000000000001"
+      ],
+      "cut": {
+        "types": 2
+      },
+      "note": "The Oath is cut by types and still carries the hop to Dov; Harrowgate is cut."
+    },
+    {
+      "name": "relation-anchor-reaches-its-parties-at-hop-1",
+      "kind": "resolve",
+      "world": "vale",
+      "reader": "contributor",
+      "lens": {
+        "id": "019a7f00-0000-7000-8000-000000000046",
+        "type": "construct",
+        "name": "A lens",
+        "supertype": "Lens",
+        "subtype": "",
+        "relations": [
+          "019a7f00-0000-7000-8000-000000000014"
+        ]
+      },
+      "kept": [
+        "019a7f00-0000-7000-8000-000000000014",
+        "019a7f00-0000-7000-8000-000000000007",
+        "019a7f00-0000-7000-8000-000000000003"
+      ],
+      "cut": {}
+    },
+    {
+      "name": "depth-0-keeps-the-anchors-only",
+      "kind": "resolve",
+      "world": "vale",
+      "reader": "contributor",
+      "lens": {
+        "id": "019a7f00-0000-7000-8000-000000000047",
+        "type": "construct",
+        "name": "A lens",
+        "supertype": "Lens",
+        "subtype": "",
+        "characters": [
+          "019a7f00-0000-7000-8000-000000000001"
+        ],
+        "relations": [
+          "019a7f00-0000-7000-8000-000000000014"
+        ],
+        "x_lens": {
+          "depth": 0
+        }
+      },
+      "kept": [
+        "019a7f00-0000-7000-8000-000000000001",
+        "019a7f00-0000-7000-8000-000000000014"
+      ],
+      "cut": {},
+      "note": "Anchors in the lens's link order: characters before relations."
+    },
+    {
+      "name": "depth-2-is-counted-hops-not-served",
+      "kind": "resolve",
+      "world": "vale",
+      "reader": "contributor",
+      "lens": {
+        "id": "019a7f00-0000-7000-8000-000000000048",
+        "type": "construct",
+        "name": "A lens",
+        "supertype": "Lens",
+        "subtype": "",
+        "characters": [
+          "019a7f00-0000-7000-8000-000000000007"
+        ],
+        "x_lens": {
+          "depth": 2
+        }
+      },
+      "kept": [
+        "019a7f00-0000-7000-8000-000000000007",
+        "019a7f00-0000-7000-8000-000000000003",
+        "019a7f00-0000-7000-8000-000000000014"
+      ],
+      "cut": {
+        "hops_not_served": 2
+      },
+      "note": "Hop 1: the Oath (and through it the Guild). Hop 2 would reach Ada and Harrowgate."
+    },
+    {
+      "name": "room-element-is-never-hopped-through",
+      "kind": "resolve",
+      "world": "vale",
+      "reader": "contributor",
+      "lens": {
+        "id": "019a7f00-0000-7000-8000-000000000049",
+        "type": "construct",
+        "name": "A lens",
+        "supertype": "Lens",
+        "subtype": "",
+        "characters": [
+          "019a7f00-0000-7000-8000-000000000004"
+        ]
+      },
+      "kept": [
+        "019a7f00-0000-7000-8000-000000000004",
+        "019a7f00-0000-7000-8000-000000000001",
+        "019a7f00-0000-7000-8000-000000000008",
+        "019a7f00-0000-7000-8000-000000000002"
+      ],
+      "cut": {
+        "types": 1,
+        "after_as_of": 1
+      },
+      "note": "The room line names Brin and is left out; the Tower of Tides is founded after as_of."
+    },
+    {
+      "name": "types-names-a-room-pair",
+      "kind": "resolve",
+      "world": "vale",
+      "reader": "contributor",
+      "lens": {
+        "id": "019a7f00-0000-7000-8000-000000000049",
+        "type": "construct",
+        "name": "A lens",
+        "supertype": "Lens",
+        "subtype": "",
+        "characters": [
+          "019a7f00-0000-7000-8000-000000000004"
+        ],
+        "x_lens": {
+          "types": [
+            "character",
+            "narrative/message"
+          ]
+        }
+      },
+      "kept": [
+        "019a7f00-0000-7000-8000-000000000004",
+        "019a7f00-0000-7000-8000-000000000001",
+        "019a7f00-0000-7000-8000-000000000013"
+      ],
+      "cut": {
+        "types": 2,
+        "after_as_of": 1
+      }
+    },
+    {
+      "name": "room-anchor-is-kept-and-nothing-hops-out",
+      "kind": "resolve",
+      "world": "vale",
+      "reader": "contributor",
+      "lens": {
+        "id": "019a7f00-0000-7000-8000-000000000050",
+        "type": "construct",
+        "name": "A lens",
+        "supertype": "Lens",
+        "subtype": "",
+        "narratives": [
+          "019a7f00-0000-7000-8000-000000000013"
+        ]
+      },
+      "kept": [
+        "019a7f00-0000-7000-8000-000000000013"
+      ],
+      "cut": {}
+    },
+    {
+      "name": "budget-keeps-the-order-and-counts-the-cut",
+      "kind": "resolve",
+      "world": "vale",
+      "reader": "contributor",
+      "lens": {
+        "id": "019a7f00-0000-7000-8000-000000000044",
+        "type": "construct",
+        "name": "A lens",
+        "supertype": "Lens",
+        "subtype": "",
+        "locations": [
+          "019a7f00-0000-7000-8000-000000000002"
+        ],
+        "x_lens": {
+          "budget": 4
+        }
+      },
+      "kept": [
+        "019a7f00-0000-7000-8000-000000000002",
+        "019a7f00-0000-7000-8000-000000000004",
+        "019a7f00-0000-7000-8000-000000000001",
+        "019a7f00-0000-7000-8000-000000000009"
+      ],
+      "cut": {
+        "budget": 3
+      }
+    },
+    {
+      "name": "anchor-not-visible-is-skipped-for-a-guest",
+      "kind": "resolve",
+      "world": "vale",
+      "reader": "guest",
+      "lens": {
+        "id": "019a7f00-0000-7000-8000-000000000051",
+        "type": "construct",
+        "name": "A lens",
+        "supertype": "Lens",
+        "subtype": "",
+        "characters": [
+          "019a7f00-0000-7000-8000-000000000006",
+          "019a7f00-0000-7000-8000-000000000004"
+        ],
+        "x_lens": {
+          "depth": 0
+        }
+      },
+      "kept": [
+        "019a7f00-0000-7000-8000-000000000004"
+      ],
+      "cut": {}
+    },
+    {
+      "name": "anchor-not-visible-is-counted-on-the-owners-bench",
+      "kind": "resolve",
+      "world": "vale",
+      "reader": "owner-as-guest",
+      "lens": {
+        "id": "019a7f00-0000-7000-8000-000000000051",
+        "type": "construct",
+        "name": "A lens",
+        "supertype": "Lens",
+        "subtype": "",
+        "characters": [
+          "019a7f00-0000-7000-8000-000000000006",
+          "019a7f00-0000-7000-8000-000000000004"
+        ],
+        "x_lens": {
+          "depth": 0
+        }
+      },
+      "kept": [
+        "019a7f00-0000-7000-8000-000000000004"
+      ],
+      "cut": {
+        "anchor_not_visible": 1
+      }
+    },
+    {
+      "name": "lens-whose-only-anchor-is-hidden-resolves-to-nothing",
+      "kind": "resolve",
+      "world": "vale",
+      "reader": "guest",
+      "lens": {
+        "id": "019a7f00-0000-7000-8000-000000000052",
+        "type": "construct",
+        "name": "A lens",
+        "supertype": "Lens",
+        "subtype": "",
+        "characters": [
+          "019a7f00-0000-7000-8000-000000000006"
+        ],
+        "x_lens": {
+          "types": [
+            "character"
+          ]
+        }
+      },
+      "kept": [],
+      "cut": {},
+      "note": "It names an anchor, so it is never a filter, whoever reads it: the guest gets nothing, never every Character it can see."
+    },
+    {
+      "name": "lens-served-with-its-anchors-trimmed-is-not-a-filter",
+      "kind": "resolve",
+      "world": "vale",
+      "reader": "guest",
+      "lens": {
+        "id": "019a7f00-0000-7000-8000-000000000053",
+        "type": "construct",
+        "name": "A lens",
+        "supertype": "Lens",
+        "subtype": "",
+        "x_lens": {
+          "types": [
+            "character"
+          ]
+        },
+        "characters": [],
+        "x_served_trimmed": [
+          "characters"
+        ]
+      },
+      "kept": [],
+      "cut": {},
+      "note": "The same lens as keel serves it to the guest: the hidden id left out and the field named in x_served_trimmed. A reader holding only the served body reads it as anchored."
+    },
+    {
+      "name": "filter-lens-with-no-anchors",
+      "kind": "resolve",
+      "world": "vale",
+      "reader": "contributor",
+      "lens": {
+        "id": "019a7f00-0000-7000-8000-000000000054",
+        "type": "construct",
+        "name": "A lens",
+        "supertype": "Lens",
+        "subtype": "",
+        "x_lens": {
+          "types": [
+            "event"
+          ]
+        }
+      },
+      "kept": [
+        "019a7f00-0000-7000-8000-000000000009",
+        "019a7f00-0000-7000-8000-000000000008",
+        "019a7f00-0000-7000-8000-000000000010"
+      ],
+      "cut": {}
+    },
+    {
+      "name": "template-resolves-to-nothing",
+      "kind": "resolve",
+      "world": "vale",
+      "reader": "contributor",
+      "lens": {
+        "id": "019a7f00-0000-7000-8000-000000000055",
+        "type": "construct",
+        "name": "A lens",
+        "supertype": "Lens",
+        "subtype": "Template",
+        "x_lens": {
+          "types": [
+            "event"
+          ],
+          "depth": 1
+        }
+      },
+      "kept": [],
+      "cut": {}
+    },
+    {
+      "name": "template-with-anchors-still-resolves-to-nothing",
+      "kind": "resolve",
+      "world": "vale",
+      "reader": "contributor",
+      "lens": {
+        "id": "019a7f00-0000-7000-8000-000000000056",
+        "type": "construct",
+        "name": "A lens",
+        "supertype": "Lens",
+        "subtype": "Template",
+        "characters": [
+          "019a7f00-0000-7000-8000-000000000001"
+        ]
+      },
+      "kept": [],
+      "cut": {}
+    },
+    {
+      "name": "as-of-fence-cuts-what-is-after",
+      "kind": "resolve",
+      "world": "vale",
+      "reader": "contributor",
+      "lens": {
+        "id": "019a7f00-0000-7000-8000-000000000057",
+        "type": "construct",
+        "name": "A lens",
+        "supertype": "Lens",
+        "subtype": "",
+        "x_lens": {
+          "types": [
+            "event",
+            "institution"
+          ]
+        }
+      },
+      "as_of": 1194,
+      "kept": [
+        "019a7f00-0000-7000-8000-000000000009",
+        "019a7f00-0000-7000-8000-000000000010",
+        "019a7f00-0000-7000-8000-000000000003"
+      ],
+      "cut": {
+        "after_as_of": 2
+      }
+    },
+    {
+      "name": "as-of-fence-undated-exclude-is-counted",
+      "kind": "resolve",
+      "world": "vale",
+      "reader": "contributor",
+      "lens": {
+        "id": "019a7f00-0000-7000-8000-000000000058",
+        "type": "construct",
+        "name": "A lens",
+        "supertype": "Lens",
+        "subtype": "",
+        "x_lens": {
+          "types": [
+            "event",
+            "institution"
+          ],
+          "undated": "exclude"
+        }
+      },
+      "as_of": 1194,
+      "kept": [
+        "019a7f00-0000-7000-8000-000000000010",
+        "019a7f00-0000-7000-8000-000000000003"
+      ],
+      "cut": {
+        "after_as_of": 2,
+        "undated": 1
+      }
+    },
+    {
+      "name": "as-of-fence-reads-a-stubs-own-date",
+      "kind": "resolve",
+      "world": "vale",
+      "reader": "guest",
+      "lens": {
+        "id": "019a7f00-0000-7000-8000-000000000049",
+        "type": "construct",
+        "name": "A lens",
+        "supertype": "Lens",
+        "subtype": "",
+        "characters": [
+          "019a7f00-0000-7000-8000-000000000004"
+        ],
+        "x_lens": {
+          "show": "name"
+        }
+      },
+      "kept": [
+        "019a7f00-0000-7000-8000-000000000004",
+        "019a7f00-0000-7000-8000-000000000001",
+        "019a7f00-0000-7000-8000-000000000008",
+        "019a7f00-0000-7000-8000-000000000002"
+      ],
+      "cut": {
+        "after_as_of": 1,
+        "types": 1
+      },
+      "rows": [
+        {
+          "id": "019a7f00-0000-7000-8000-000000000004",
+          "type": "character",
+          "name": "Brin Hale"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000001",
+          "type": "character",
+          "name": "Ada Venn"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000008",
+          "type": "event",
+          "name": "The Harbour Fire"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000002",
+          "type": "location",
+          "name": "Harrowgate"
+        }
+      ],
+      "note": "The guest knows of Harrowgate and the Tower only as stubs; the Tower's own founding_date (1205) is after as_of, so it is cut although its stub serves no date. show is name here (x_lens says so)."
+    },
+    {
+      "name": "window-in-the-worlds-unit",
+      "kind": "resolve",
+      "world": "vale",
+      "reader": "contributor",
+      "lens": {
+        "id": "019a7f00-0000-7000-8000-000000000059",
+        "type": "construct",
+        "name": "A lens",
+        "supertype": "Lens",
+        "subtype": "",
+        "x_lens": {
+          "types": [
+            "event"
+          ],
+          "window": 10
+        }
+      },
+      "kept": [
+        "019a7f00-0000-7000-8000-000000000009",
+        "019a7f00-0000-7000-8000-000000000008"
+      ],
+      "cut": {
+        "window": 1
+      },
+      "note": "A year world: a window of 10 is ten years before as_of 1200, 1190 included."
+    },
+    {
+      "name": "from-to-is-closed-open",
+      "kind": "resolve",
+      "world": "vale",
+      "reader": "contributor",
+      "lens": {
+        "id": "019a7f00-0000-7000-8000-000000000060",
+        "type": "construct",
+        "name": "A lens",
+        "supertype": "Lens",
+        "subtype": "",
+        "x_lens": {
+          "types": [
+            "event",
+            "narrative"
+          ],
+          "from": 1190,
+          "to": 1195
+        }
+      },
+      "kept": [
+        "019a7f00-0000-7000-8000-000000000009",
+        "019a7f00-0000-7000-8000-000000000011"
+      ],
+      "cut": {
+        "window": 2
+      },
+      "note": "1190 is inside (from is inclusive), 1195 is outside (to is exclusive)."
+    },
+    {
+      "name": "from-alone-runs-to-as-of",
+      "kind": "resolve",
+      "world": "vale",
+      "reader": "contributor",
+      "lens": {
+        "id": "019a7f00-0000-7000-8000-000000000061",
+        "type": "construct",
+        "name": "A lens",
+        "supertype": "Lens",
+        "subtype": "",
+        "x_lens": {
+          "types": [
+            "event"
+          ],
+          "from": 1190
+        }
+      },
+      "kept": [
+        "019a7f00-0000-7000-8000-000000000009",
+        "019a7f00-0000-7000-8000-000000000008"
+      ],
+      "cut": {
+        "window": 1
+      }
+    },
+    {
+      "name": "to-after-as-of-is-clipped",
+      "kind": "resolve",
+      "world": "vale",
+      "reader": "contributor",
+      "lens": {
+        "id": "019a7f00-0000-7000-8000-000000000062",
+        "type": "construct",
+        "name": "A lens",
+        "supertype": "Lens",
+        "subtype": "",
+        "x_lens": {
+          "types": [
+            "event",
+            "institution"
+          ],
+          "from": 1100,
+          "to": 1300
+        }
+      },
+      "as_of": 1194,
+      "kept": [
+        "019a7f00-0000-7000-8000-000000000009",
+        "019a7f00-0000-7000-8000-000000000010",
+        "019a7f00-0000-7000-8000-000000000003"
+      ],
+      "cut": {
+        "after_as_of": 2
+      }
+    },
+    {
+      "name": "budget-cut-by-reason",
+      "kind": "resolve",
+      "world": "vale",
+      "reader": "contributor",
+      "lens": {
+        "id": "019a7f00-0000-7000-8000-000000000063",
+        "type": "construct",
+        "name": "A lens",
+        "supertype": "Lens",
+        "subtype": "",
+        "x_lens": {
+          "types": [
+            "event",
+            "institution"
+          ],
+          "undated": "exclude",
+          "budget": 1
+        }
+      },
+      "as_of": 1194,
+      "kept": [
+        "019a7f00-0000-7000-8000-000000000010"
+      ],
+      "cut": {
+        "after_as_of": 2,
+        "undated": 1,
+        "budget": 1
+      }
+    },
+    {
+      "name": "totals-are-the-readers-guest",
+      "kind": "resolve",
+      "world": "vale",
+      "reader": "guest",
+      "lens": {
+        "id": "019a7f00-0000-7000-8000-000000000064",
+        "type": "construct",
+        "name": "A lens",
+        "supertype": "Lens",
+        "subtype": "",
+        "x_lens": {
+          "types": [
+            "character"
+          ],
+          "budget": 1
+        }
+      },
+      "kept": [
+        "019a7f00-0000-7000-8000-000000000004"
+      ],
+      "cut": {
+        "budget": 2
+      },
+      "note": "The guest's 2 more are two it could open; hidden Cass is not counted."
+    },
+    {
+      "name": "totals-are-the-readers-owner",
+      "kind": "resolve",
+      "world": "vale",
+      "reader": "owner",
+      "lens": {
+        "id": "019a7f00-0000-7000-8000-000000000064",
+        "type": "construct",
+        "name": "A lens",
+        "supertype": "Lens",
+        "subtype": "",
+        "x_lens": {
+          "types": [
+            "character"
+          ],
+          "budget": 1
+        }
+      },
+      "kept": [
+        "019a7f00-0000-7000-8000-000000000006"
+      ],
+      "cut": {
+        "budget": 3
+      }
+    },
+    {
+      "name": "show-name",
+      "kind": "resolve",
+      "world": "vale",
+      "reader": "contributor",
+      "lens": {
+        "id": "019a7f00-0000-7000-8000-000000000065",
+        "type": "construct",
+        "name": "A lens",
+        "supertype": "Lens",
+        "subtype": "",
+        "institutions": [
+          "019a7f00-0000-7000-8000-000000000003"
+        ],
+        "locations": [
+          "019a7f00-0000-7000-8000-000000000002"
+        ],
+        "x_lens": {
+          "depth": 0,
+          "show": "name"
+        }
+      },
+      "kept": [
+        "019a7f00-0000-7000-8000-000000000002",
+        "019a7f00-0000-7000-8000-000000000003"
+      ],
+      "cut": {},
+      "rows": [
+        {
+          "id": "019a7f00-0000-7000-8000-000000000002",
+          "type": "location",
+          "name": "Harrowgate"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000003",
+          "type": "institution",
+          "name": "Lamplighters' Guild"
+        }
+      ]
+    },
+    {
+      "name": "show-first-line",
+      "kind": "resolve",
+      "world": "vale",
+      "reader": "contributor",
+      "lens": {
+        "id": "019a7f00-0000-7000-8000-000000000065",
+        "type": "construct",
+        "name": "A lens",
+        "supertype": "Lens",
+        "subtype": "",
+        "institutions": [
+          "019a7f00-0000-7000-8000-000000000003"
+        ],
+        "locations": [
+          "019a7f00-0000-7000-8000-000000000002"
+        ],
+        "x_lens": {
+          "depth": 0,
+          "show": "first_line"
+        }
+      },
+      "kept": [
+        "019a7f00-0000-7000-8000-000000000002",
+        "019a7f00-0000-7000-8000-000000000003"
+      ],
+      "cut": {},
+      "rows": [
+        {
+          "id": "019a7f00-0000-7000-8000-000000000002",
+          "type": "location",
+          "name": "Harrowgate",
+          "description": "A harbour town on the grey coast."
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000003",
+          "type": "institution",
+          "name": "Lamplighters' Guild",
+          "description": "Keepers of the harbour lamps."
+        }
+      ],
+      "note": "Anchors in link order: the Construct lists locations before institutions."
+    },
+    {
+      "name": "show-full",
+      "kind": "resolve",
+      "world": "vale",
+      "reader": "contributor",
+      "lens": {
+        "id": "019a7f00-0000-7000-8000-000000000065",
+        "type": "construct",
+        "name": "A lens",
+        "supertype": "Lens",
+        "subtype": "",
+        "institutions": [
+          "019a7f00-0000-7000-8000-000000000003"
+        ],
+        "locations": [
+          "019a7f00-0000-7000-8000-000000000002"
+        ],
+        "x_lens": {
+          "depth": 0,
+          "show": "full"
+        }
+      },
+      "kept": [
+        "019a7f00-0000-7000-8000-000000000002",
+        "019a7f00-0000-7000-8000-000000000003"
+      ],
+      "cut": {},
+      "rows": [
+        {
+          "id": "019a7f00-0000-7000-8000-000000000002",
+          "type": "location",
+          "name": "Harrowgate",
+          "founding_date": 1020,
+          "primary_power": "019a7f00-0000-7000-8000-000000000003",
+          "description": "A harbour town on the grey coast.",
+          "updated_at": "2026-09-20T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000003",
+          "type": "institution",
+          "name": "Lamplighters' Guild",
+          "founding_date": 1150,
+          "description": "Keepers of the harbour lamps.\nFounded after the first great fire.",
+          "updated_at": "2026-09-21T12:00:00Z"
+        }
+      ]
+    },
+    {
+      "name": "show-full-is-the-readers-served-body",
+      "kind": "resolve",
+      "world": "vale",
+      "reader": "guest",
+      "lens": {
+        "id": "019a7f00-0000-7000-8000-000000000066",
+        "type": "construct",
+        "name": "A lens",
+        "supertype": "Lens",
+        "subtype": "",
+        "characters": [
+          "019a7f00-0000-7000-8000-000000000001"
+        ],
+        "x_lens": {
+          "depth": 0,
+          "show": "full"
+        }
+      },
+      "kept": [
+        "019a7f00-0000-7000-8000-000000000001"
+      ],
+      "cut": {},
+      "rows": [
+        {
+          "id": "019a7f00-0000-7000-8000-000000000001",
+          "type": "character",
+          "name": "Ada Venn",
+          "birth_date": 1170,
+          "birthplace": "019a7f00-0000-7000-8000-000000000002",
+          "institutions": [],
+          "friends": [
+            "019a7f00-0000-7000-8000-000000000004"
+          ],
+          "updated_at": "2026-10-01T12:00:00Z"
+        }
+      ],
+      "note": "The Guild is outside the guest's view, so the served body drops it."
+    },
+    {
+      "name": "notes-caption-their-anchors",
+      "kind": "resolve",
+      "world": "vale",
+      "reader": "contributor",
+      "lens": {
+        "id": "019a7f00-0000-7000-8000-000000000067",
+        "type": "construct",
+        "name": "A lens",
+        "supertype": "Lens",
+        "subtype": "",
+        "institutions": [
+          "019a7f00-0000-7000-8000-000000000003"
+        ],
+        "x_lens": {
+          "depth": 0,
+          "notes": {
+            "019a7f00-0000-7000-8000-000000000003": "Who keeps the lamps.",
+            "019a7f00-0000-7000-8000-000000000007": "Not an anchor."
+          }
+        }
+      },
+      "kept": [
+        "019a7f00-0000-7000-8000-000000000003"
+      ],
+      "cut": {},
+      "rows": [
+        {
+          "id": "019a7f00-0000-7000-8000-000000000003",
+          "type": "institution",
+          "name": "Lamplighters' Guild",
+          "description": "Keepers of the harbour lamps.\nFounded after the first great fire.",
+          "founding_date": 1150,
+          "updated_at": "2026-09-21T12:00:00Z",
+          "note": "Who keeps the lamps."
+        }
+      ],
+      "notes_ignored": 1
+    },
+    {
+      "name": "umbrella-unions-its-children-in-link-order",
+      "kind": "resolve",
+      "world": "office",
+      "reader": "contributor",
+      "lens": "019a7f00-0000-7000-8000-000000000021",
+      "kept": [
+        "019a7f00-0000-7000-8000-000000000015",
+        "019a7f00-0000-7000-8000-000000000016",
+        "019a7f00-0000-7000-8000-000000000017"
+      ],
+      "cut": {},
+      "note": "People, then House; House's link back to Office and Office's link to itself are not entered twice."
+    },
+    {
+      "name": "cycle-enters-each-child-once",
+      "kind": "resolve",
+      "world": "office",
+      "reader": "contributor",
+      "lens": "019a7f00-0000-7000-8000-000000000020",
+      "kept": [
+        "019a7f00-0000-7000-8000-000000000017",
+        "019a7f00-0000-7000-8000-000000000015",
+        "019a7f00-0000-7000-8000-000000000016"
+      ],
+      "cut": {}
+    },
+    {
+      "name": "lens-that-only-reaches-itself-resolves-to-its-anchors",
+      "kind": "resolve",
+      "world": "office",
+      "reader": "contributor",
+      "lens": "019a7f00-0000-7000-8000-000000000022",
+      "kept": [
+        "019a7f00-0000-7000-8000-000000000016"
+      ],
+      "cut": {}
+    },
+    {
+      "name": "lens-reached-by-a-hop-is-kept-never-entered",
+      "kind": "resolve",
+      "world": "office",
+      "reader": "contributor",
+      "lens": {
+        "id": "019a7f00-0000-7000-8000-000000000068",
+        "type": "construct",
+        "name": "A lens",
+        "supertype": "Lens",
+        "subtype": "",
+        "characters": [
+          "019a7f00-0000-7000-8000-000000000015"
+        ]
+      },
+      "kept": [
+        "019a7f00-0000-7000-8000-000000000015",
+        "019a7f00-0000-7000-8000-000000000018",
+        "019a7f00-0000-7000-8000-000000000019"
+      ],
+      "cut": {},
+      "note": "People links Mira, so a hop reaches it: kept as an element, never resolved."
+    },
+    {
+      "name": "construct-that-is-not-a-lens-is-an-anchor",
+      "kind": "resolve",
+      "world": "office",
+      "reader": "contributor",
+      "lens": "019a7f00-0000-7000-8000-000000000023",
+      "kept": [
+        "019a7f00-0000-7000-8000-000000000018",
+        "019a7f00-0000-7000-8000-000000000015"
+      ],
+      "cut": {},
+      "note": "The lens being read is never in its own result."
+    },
+    {
+      "name": "planted-owner",
+      "kind": "resolve",
+      "world": "planted",
+      "reader": "owner",
+      "lens": {
+        "id": "019a7f00-0000-7000-8000-000000000069",
+        "type": "construct",
+        "name": "A lens",
+        "supertype": "Lens",
+        "subtype": "",
+        "characters": [
+          "019a7f00-0000-7000-8000-000000000024"
+        ],
+        "objects": [
+          "019a7f00-0000-7000-8000-000000000028"
+        ],
+        "x_lens": {
+          "depth": 2,
+          "show": "full",
+          "budget": 6
+        }
+      },
+      "kept": [
+        "019a7f00-0000-7000-8000-000000000024",
+        "019a7f00-0000-7000-8000-000000000028",
+        "019a7f00-0000-7000-8000-000000000026",
+        "019a7f00-0000-7000-8000-000000000025",
+        "019a7f00-0000-7000-8000-000000000029"
+      ],
+      "cut": {
+        "hops_not_served": 1
+      }
+    },
+    {
+      "name": "planted-contributor",
+      "kind": "resolve",
+      "world": "planted",
+      "reader": "contributor",
+      "lens": {
+        "id": "019a7f00-0000-7000-8000-000000000069",
+        "type": "construct",
+        "name": "A lens",
+        "supertype": "Lens",
+        "subtype": "",
+        "characters": [
+          "019a7f00-0000-7000-8000-000000000024"
+        ],
+        "objects": [
+          "019a7f00-0000-7000-8000-000000000028"
+        ],
+        "x_lens": {
+          "depth": 2,
+          "show": "full",
+          "budget": 6
+        }
+      },
+      "kept": [
+        "019a7f00-0000-7000-8000-000000000024",
+        "019a7f00-0000-7000-8000-000000000025",
+        "019a7f00-0000-7000-8000-000000000029"
+      ],
+      "cut": {}
+    },
+    {
+      "name": "planted-seat",
+      "kind": "resolve",
+      "world": "planted",
+      "reader": "seat",
+      "lens": {
+        "id": "019a7f00-0000-7000-8000-000000000069",
+        "type": "construct",
+        "name": "A lens",
+        "supertype": "Lens",
+        "subtype": "",
+        "characters": [
+          "019a7f00-0000-7000-8000-000000000024"
+        ],
+        "objects": [
+          "019a7f00-0000-7000-8000-000000000028"
+        ],
+        "x_lens": {
+          "depth": 2,
+          "show": "full",
+          "budget": 6
+        }
+      },
+      "kept": [
+        "019a7f00-0000-7000-8000-000000000024",
+        "019a7f00-0000-7000-8000-000000000025",
+        "019a7f00-0000-7000-8000-000000000029"
+      ],
+      "cut": {}
+    },
+    {
+      "name": "planted-guest",
+      "kind": "resolve",
+      "world": "planted",
+      "reader": "guest",
+      "lens": {
+        "id": "019a7f00-0000-7000-8000-000000000069",
+        "type": "construct",
+        "name": "A lens",
+        "supertype": "Lens",
+        "subtype": "",
+        "characters": [
+          "019a7f00-0000-7000-8000-000000000024"
+        ],
+        "objects": [
+          "019a7f00-0000-7000-8000-000000000028"
+        ],
+        "x_lens": {
+          "depth": 2,
+          "show": "full",
+          "budget": 6
+        }
+      },
+      "kept": [
+        "019a7f00-0000-7000-8000-000000000024",
+        "019a7f00-0000-7000-8000-000000000025",
+        "019a7f00-0000-7000-8000-000000000029"
+      ],
+      "cut": {}
+    },
+    {
+      "name": "planted-public",
+      "kind": "resolve",
+      "world": "planted",
+      "reader": "public",
+      "lens": {
+        "id": "019a7f00-0000-7000-8000-000000000069",
+        "type": "construct",
+        "name": "A lens",
+        "supertype": "Lens",
+        "subtype": "",
+        "characters": [
+          "019a7f00-0000-7000-8000-000000000024"
+        ],
+        "objects": [
+          "019a7f00-0000-7000-8000-000000000028"
+        ],
+        "x_lens": {
+          "depth": 2,
+          "show": "full",
+          "budget": 6
+        }
+      },
+      "kept": [
+        "019a7f00-0000-7000-8000-000000000024",
+        "019a7f00-0000-7000-8000-000000000025",
+        "019a7f00-0000-7000-8000-000000000029"
+      ],
+      "cut": {}
+    },
+    {
+      "name": "planted-owner-as-guest",
+      "kind": "resolve",
+      "world": "planted",
+      "reader": "owner-as-guest",
+      "lens": {
+        "id": "019a7f00-0000-7000-8000-000000000069",
+        "type": "construct",
+        "name": "A lens",
+        "supertype": "Lens",
+        "subtype": "",
+        "characters": [
+          "019a7f00-0000-7000-8000-000000000024"
+        ],
+        "objects": [
+          "019a7f00-0000-7000-8000-000000000028"
+        ],
+        "x_lens": {
+          "depth": 2,
+          "show": "full",
+          "budget": 6
+        }
+      },
+      "kept": [
+        "019a7f00-0000-7000-8000-000000000024",
+        "019a7f00-0000-7000-8000-000000000025",
+        "019a7f00-0000-7000-8000-000000000029"
+      ],
+      "cut": {
+        "anchor_not_visible": 1,
+        "not_visible": 1
+      }
+    },
+    {
+      "name": "invariant-1-every-result-is-a-subset-of-the-owners",
+      "kind": "invariant",
+      "invariant": 1,
+      "claim": "subset",
+      "world": "planted",
+      "lens": {
+        "id": "019a7f00-0000-7000-8000-000000000069",
+        "type": "construct",
+        "name": "A lens",
+        "supertype": "Lens",
+        "subtype": "",
+        "characters": [
+          "019a7f00-0000-7000-8000-000000000024"
+        ],
+        "objects": [
+          "019a7f00-0000-7000-8000-000000000028"
+        ],
+        "x_lens": {
+          "depth": 2,
+          "show": "full",
+          "budget": 6
+        }
+      },
+      "readers": [
+        "contributor",
+        "seat",
+        "guest",
+        "public",
+        "owner-as-guest"
+      ],
+      "secrets": [
+        "019a7f00-0000-7000-8000-000000000026",
+        "019a7f00-0000-7000-8000-000000000028"
+      ]
+    },
+    {
+      "name": "invariant-2-a-public-reading-is-the-same-without-the-private-anchor",
+      "kind": "invariant",
+      "invariant": 2,
+      "claim": "same_without",
+      "world": "planted",
+      "lens": {
+        "id": "019a7f00-0000-7000-8000-000000000069",
+        "type": "construct",
+        "name": "A lens",
+        "supertype": "Lens",
+        "subtype": "",
+        "characters": [
+          "019a7f00-0000-7000-8000-000000000024"
+        ],
+        "objects": [
+          "019a7f00-0000-7000-8000-000000000028"
+        ],
+        "x_lens": {
+          "depth": 2,
+          "show": "full",
+          "budget": 6
+        }
+      },
+      "readers": [
+        "public",
+        "guest"
+      ],
+      "without": [
+        "019a7f00-0000-7000-8000-000000000028"
+      ]
+    },
+    {
+      "name": "invariant-3-the-hop-stops-at-the-readers-edge",
+      "kind": "invariant",
+      "invariant": 3,
+      "claim": "same_without",
+      "world": "planted",
+      "lens": {
+        "id": "019a7f00-0000-7000-8000-000000000069",
+        "type": "construct",
+        "name": "A lens",
+        "supertype": "Lens",
+        "subtype": "",
+        "characters": [
+          "019a7f00-0000-7000-8000-000000000024"
+        ],
+        "objects": [
+          "019a7f00-0000-7000-8000-000000000028"
+        ],
+        "x_lens": {
+          "depth": 2,
+          "show": "full",
+          "budget": 6
+        }
+      },
+      "readers": [
+        "guest",
+        "contributor",
+        "seat"
+      ],
+      "without": [
+        "019a7f00-0000-7000-8000-000000000026"
+      ]
+    },
+    {
+      "name": "invariant-4-a-reading-never-moves-the-world",
+      "kind": "invariant",
+      "invariant": 4,
+      "claim": "unchanged",
+      "world": "vale",
+      "lens": {
+        "id": "019a7f00-0000-7000-8000-000000000044",
+        "type": "construct",
+        "name": "A lens",
+        "supertype": "Lens",
+        "subtype": "",
+        "locations": [
+          "019a7f00-0000-7000-8000-000000000002"
+        ],
+        "x_lens": {
+          "depth": 2
+        }
+      },
+      "readers": [
+        "owner",
+        "contributor",
+        "guest",
+        "public",
+        "owner-as-guest"
+      ]
+    },
+    {
+      "name": "invariant-5-the-membership-wins",
+      "kind": "uses",
+      "membership": [
+        "019a7f00-0000-7000-8000-000000000019"
+      ],
+      "x_lens_uses": [
+        "019a7f00-0000-7000-8000-000000000020"
+      ],
+      "lenses": [
+        "019a7f00-0000-7000-8000-000000000019"
+      ]
+    },
+    {
+      "name": "folder-reads-x-lens-uses",
+      "kind": "uses",
+      "membership": null,
+      "x_lens_uses": [
+        "019a7f00-0000-7000-8000-000000000020"
+      ],
+      "lenses": [
+        "019a7f00-0000-7000-8000-000000000020"
+      ],
+      "note": "A folder world has no membership: the Character's x_lens_uses is the choice."
+    },
+    {
+      "name": "membership-empty-choice-is-a-choice",
+      "kind": "uses",
+      "membership": [],
+      "x_lens_uses": [
+        "019a7f00-0000-7000-8000-000000000020"
+      ],
+      "lenses": []
+    },
+    {
+      "name": "no-choice-anywhere-is-none",
+      "kind": "uses",
+      "membership": null,
+      "x_lens_uses": null,
+      "lenses": []
+    },
+    {
+      "name": "mail-reads-the-message-profile",
+      "kind": "resolve",
+      "world": "post",
+      "reader": "seat",
+      "lens": {
+        "id": "019a7f00-0000-7000-8000-000000000070",
+        "type": "construct",
+        "name": "A lens",
+        "supertype": "Lens",
+        "subtype": "",
+        "x_lens": {
+          "types": [
+            "narrative/message"
+          ],
+          "mail": "unread_full_read_titles"
+        }
+      },
+      "clock": "2026-10-27T12:00:00Z",
+      "kept": [],
+      "cut": {},
+      "mail": {
+        "unread": [
+          "019a7f00-0000-7000-8000-000000000034",
+          "019a7f00-0000-7000-8000-000000000035"
+        ],
+        "read": [
+          "019a7f00-0000-7000-8000-000000000033"
+        ],
+        "rows": [
+          {
+            "id": "019a7f00-0000-7000-8000-000000000033",
+            "name": "On the lamps",
+            "narrator": "019a7f00-0000-7000-8000-000000000032",
+            "created_at": "2026-10-20T12:00:00Z"
+          },
+          {
+            "id": "019a7f00-0000-7000-8000-000000000034",
+            "type": "narrative",
+            "name": "Notes to self",
+            "supertype": "Message",
+            "narrator": "019a7f00-0000-7000-8000-000000000030",
+            "characters": [],
+            "story": "A line that claims Ada wrote it.",
+            "created_by": "019a7f00-0000-7000-8000-000000000042",
+            "created_at": "2026-10-22T12:00:00Z",
+            "updated_at": "2026-10-22T12:00:00Z"
+          },
+          {
+            "id": "019a7f00-0000-7000-8000-000000000035",
+            "type": "narrative",
+            "name": "Night shift",
+            "supertype": "Message",
+            "narrator": "019a7f00-0000-7000-8000-000000000031",
+            "characters": [
+              "019a7f00-0000-7000-8000-000000000030"
+            ],
+            "story": "Can you take Thursday?",
+            "created_by": "019a7f00-0000-7000-8000-000000000041",
+            "created_at": "2026-10-25T12:00:00Z",
+            "updated_at": "2026-10-25T12:00:00Z"
+          }
+        ],
+        "cut": {
+          "window": 1
+        },
+        "totals": {
+          "unread": 3,
+          "read": 1
+        }
+      },
+      "note": "Unread in full, read as a title; 'Notes to self' claims Ada and was written by Dov's hand, so it is not hers and stays unread; the summer letter is outside thirty days; the sealed letter is hidden from this seat and never counted."
+    },
+    {
+      "name": "mail-budget-keeps-the-newest",
+      "kind": "resolve",
+      "world": "post",
+      "reader": "seat",
+      "lens": {
+        "id": "019a7f00-0000-7000-8000-000000000071",
+        "type": "construct",
+        "name": "A lens",
+        "supertype": "Lens",
+        "subtype": "",
+        "x_lens": {
+          "types": [
+            "narrative/message"
+          ],
+          "mail": "unread_full_read_titles",
+          "budget": 2
+        }
+      },
+      "clock": "2026-10-27T12:00:00Z",
+      "kept": [],
+      "cut": {},
+      "mail": {
+        "unread": [
+          "019a7f00-0000-7000-8000-000000000034",
+          "019a7f00-0000-7000-8000-000000000035"
+        ],
+        "read": [],
+        "cut": {
+          "window": 1,
+          "budget": 1
+        },
+        "totals": {
+          "unread": 3,
+          "read": 1
+        }
+      }
+    },
+    {
+      "name": "mail-all-shows-every-message-in-full",
+      "kind": "resolve",
+      "world": "post",
+      "reader": "seat",
+      "lens": {
+        "id": "019a7f00-0000-7000-8000-000000000072",
+        "type": "construct",
+        "name": "A lens",
+        "supertype": "Lens",
+        "subtype": "",
+        "x_lens": {
+          "types": [
+            "narrative/message"
+          ],
+          "mail": "all"
+        }
+      },
+      "clock": "2026-10-27T12:00:00Z",
+      "kept": [],
+      "cut": {},
+      "mail": {
+        "unread": [
+          "019a7f00-0000-7000-8000-000000000034",
+          "019a7f00-0000-7000-8000-000000000035"
+        ],
+        "read": [
+          "019a7f00-0000-7000-8000-000000000033"
+        ],
+        "rows": [
+          {
+            "id": "019a7f00-0000-7000-8000-000000000033",
+            "type": "narrative",
+            "name": "On the lamps",
+            "supertype": "Message",
+            "narrator": "019a7f00-0000-7000-8000-000000000032",
+            "characters": [
+              "019a7f00-0000-7000-8000-000000000030"
+            ],
+            "story": "The east lamp is out.",
+            "created_by": "019a7f00-0000-7000-8000-000000000042",
+            "created_at": "2026-10-20T12:00:00Z",
+            "updated_at": "2026-10-20T12:00:00Z"
+          },
+          {
+            "id": "019a7f00-0000-7000-8000-000000000034",
+            "type": "narrative",
+            "name": "Notes to self",
+            "supertype": "Message",
+            "narrator": "019a7f00-0000-7000-8000-000000000030",
+            "characters": [],
+            "story": "A line that claims Ada wrote it.",
+            "created_by": "019a7f00-0000-7000-8000-000000000042",
+            "created_at": "2026-10-22T12:00:00Z",
+            "updated_at": "2026-10-22T12:00:00Z"
+          },
+          {
+            "id": "019a7f00-0000-7000-8000-000000000035",
+            "type": "narrative",
+            "name": "Night shift",
+            "supertype": "Message",
+            "narrator": "019a7f00-0000-7000-8000-000000000031",
+            "characters": [
+              "019a7f00-0000-7000-8000-000000000030"
+            ],
+            "story": "Can you take Thursday?",
+            "created_by": "019a7f00-0000-7000-8000-000000000041",
+            "created_at": "2026-10-25T12:00:00Z",
+            "updated_at": "2026-10-25T12:00:00Z"
+          }
+        ],
+        "cut": {
+          "window": 1
+        },
+        "totals": {
+          "unread": 3,
+          "read": 1
+        }
+      }
+    }
+  ]
+}
