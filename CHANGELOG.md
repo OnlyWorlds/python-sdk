@@ -4,6 +4,8 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+- **`out_degree_of(graph)`**: each node's out-degree in a graph `world_graph` answered, the number of distinct nodes its own link fields point at: a target listed in two fields counts once, a link to itself does not count, and a mirror pair counts 1 at each end. Every node is a key, 0 included. Beside `degree_of` ("most linked"), it says how far an element reaches out. Held to a direct count on every graph case of the lens profile's fixture, and equal to the npm SDK's `outDegreeOf` on 3,000 random graphs (38,969 nodes).
+
 ## 0.79.3 (2026-10-28)
 
 - **A lens's mail part no longer reads a known-of stub as a message to everyone.** A stub never serves `characters`, and the message profile reads a Message with no recipients as addressed to everyone, so a guest's mail part listed every Message it knew only as a stub, unread. The mail part now reads whole bodies only, as the API reads it. A shared edge case holds it, the same file as the npm SDK's.

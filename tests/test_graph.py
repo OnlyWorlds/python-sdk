@@ -12,7 +12,7 @@ from typing import Any
 
 import pytest
 
-from onlyworlds import FIELD_KINDS, WorldGraph, degree_of, resolve_lens, world_graph
+from onlyworlds import FIELD_KINDS, WorldGraph, degree_of, out_degree_of, resolve_lens, world_graph
 
 REPO = Path(__file__).resolve().parent.parent
 FIXTURE = REPO / "codegen" / "schema-dist" / "profiles" / "lens.fixture.json"
@@ -224,6 +224,40 @@ def test_degree_of_counts_each_node_s_edges_a_self_link_once() -> None:
     assert (d["c1"], d["c2"], d["r1"], d["c3"], d["o1"], d["constructor"], d["__proto__"]) == (4, 3, 3, 1, 0, 1, 1)
     with pytest.raises(TypeError):
         degree_of({"nodes": []})
+
+
+def test_out_degree_of_counts_distinct_targets_a_self_link_none() -> None:
+    world: dict[str, Any] = {
+        "elements": [
+            {"id": "c1", "type": "character", "name": "Ada", "friends": ["c2", "c1"], "rivals": ["c2"]},
+            {"id": "c2", "type": "character", "name": "Bo", "friends": ["c1"]},
+            {"id": "r1", "type": "relation", "name": "Pact", "characters": ["c1", "c2", "c3"]},
+            {"id": "c3", "type": "character", "name": "Cy"},
+            {"id": "o1", "type": "object", "name": "Lamp"},
+            {"id": "constructor", "type": "object", "name": "An id like an inherited key"},
+            {"id": "__proto__", "type": "character", "name": "Another", "objects": ["constructor"]},
+        ]
+    }
+    g = world_graph(world, {"rung": "owner"})
+    d = out_degree_of(g)
+    assert list(d) == [n["id"] for n in g["nodes"]]
+    assert (d["c1"], d["c2"], d["r1"], d["c3"], d["o1"], d["constructor"], d["__proto__"]) == (1, 1, 3, 0, 0, 0, 1)
+    with pytest.raises(TypeError):
+        out_degree_of({"nodes": []})
+
+
+def test_out_degree_of_on_every_fixture_graph_case_equals_a_direct_count() -> None:
+    cases = 0
+    for c in load_cases():
+        want = c["want"]
+        if "nodes" not in want:
+            continue
+        cases += 1
+        d = out_degree_of({"nodes": want["nodes"], "edges": want["edges"]})
+        for n in want["nodes"]:
+            direct = len({e["target"] for e in want["edges"] if e["source"] == n["id"] and e["target"] != n["id"]})
+            assert d[n["id"]] == direct, (c["name"], n["id"])
+    assert cases > 0, "no fixture graph case was read"
 
 
 def test_degree_of_on_every_fixture_graph_case_equals_a_direct_count() -> None:

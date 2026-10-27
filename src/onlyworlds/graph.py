@@ -295,3 +295,23 @@ def degree_of(graph: Mapping[str, Any]) -> dict[str, int]:
         if e["target"] != e["source"] and e["target"] in count:
             count[e["target"]] += 1
     return count
+
+
+def out_degree_of(graph: Mapping[str, Any]) -> dict[str, int]:
+    """Each node's out-degree in a graph ``world_graph`` answered: the number of distinct nodes its own link
+    fields point at. A target listed in two fields counts once, a link to itself does not count, and a mirror
+    pair (A lists B, B lists A) counts 1 at each end, since each counts its own list. Every node is a key, 0
+    included, in the graph's node order. Like ``degree_of``, the count is the reader's: what the reading left
+    out is never counted. This is how far an element reaches out, apart from how often it is named. A graph
+    that is not one is a TypeError. The npm SDK's ``outDegreeOf`` gives the same answer on the same graph."""
+    if (
+        not isinstance(graph, Mapping)
+        or not isinstance(graph.get("nodes"), list)
+        or not isinstance(graph.get("edges"), list)
+    ):
+        raise TypeError("out_degree_of: graph is what world_graph answers, a mapping with nodes and edges lists.")
+    targets: dict[str, set[str]] = {n["id"]: set() for n in graph["nodes"]}
+    for e in graph["edges"]:
+        if e["target"] != e["source"] and e["source"] in targets:
+            targets[e["source"]].add(e["target"])
+    return {node_id: len(t) for node_id, t in targets.items()}
