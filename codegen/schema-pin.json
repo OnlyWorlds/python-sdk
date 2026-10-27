@@ -2,15 +2,20 @@
   "_what": "The recorded pin for the vendored OnlyWorlds schema distribution (codegen/schema-dist/, copied byte-exact). Do not edit by hand; re-vendor from the pinned tag and review the diff. Kept equal to the npm SDK's pin (github.com/OnlyWorlds/sdk, codegen/schema-pin.json) on purpose: two clients, one schema.",
   "_why_manifest_sha256": "Verifying the tree against its own MANIFEST.json only proves internal consistency. If the tag moved, the manifest moved with it. The hash recorded here is the one first accepted, which is what makes a moved tag visible.",
   "repo": "https://github.com/OnlyWorlds/schema-dist",
-  "tag": "v0.33.0-dist.75",
-  "commit": "889fa3b492e01428d6723ae169b1f8013bf7f2d7",
-  "manifest_sha256": "6f0150dfa47849453676c5c6a33ab43bdf3c3791dd0b3b42b56f4b138cb80e82",
+  "tag": "v0.33.0-dist.76",
+  "commit": "afe869681638eef312fe9309c6e0aec8729bc2f2",
+  "manifest_sha256": "4f8e04035bdc8a5f3c233ef01646ab921f78cd220b7799619a497e958f5a4b34",
   "canonical_version": "00.33.00",
-  "dist_serial": 75,
-  "published": "2026-10-26",
-  "pinned_at": "2026-10-26",
+  "dist_serial": 76,
+  "published": "2026-10-27",
+  "pinned_at": "2026-10-27",
   "pinned_by": "The maintainer: tree from `git archive` of the tag in a schema-dist checkout (191 files, every one the MANIFEST lists); files re-hashed against MANIFEST.json by generate_schema.py; MANIFEST self-hash matched against the raw file GitHub serves at the tag, whose ref resolves to the commit above.",
   "previous_pins": [
+    {
+      "tag": "v0.33.0-dist.75",
+      "manifest_sha256": "6f0150dfa47849453676c5c6a33ab43bdf3c3791dd0b3b42b56f4b138cb80e82",
+      "note": "superseded by v0.33.0-dist.76 (same canonical 00.33.00; the message profile only: an empty characters with x_served_trimmed naming characters is to someone the reader cannot see, unseen recipients and the unseen sender, a reader with no credential never asserts to everyone, an edit names the later hand (edited_by), a taken Character verifies as the role, a mark with changed_by and no created_by is ignored, an unreadable created_at sorts after every readable one, and the Note (NOTE_PAIR, is_note, note_of) is not a message; message.fixture.json at 81 cases; no schema file moved)"
+    },
     {
       "tag": "v0.33.0-dist.74",
       "manifest_sha256": "e12f7c758758f986000edce7b607d98734d480de8fa4937d005e362cdf209230",

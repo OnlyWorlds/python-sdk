@@ -1,26 +1,34 @@
-"""The message profile (schema-dist ``profiles/message.md``, serial 75): every conformance case in
+"""The message profile (schema-dist ``profiles/message.md``, serial 76): every conformance case in
 ``codegen/schema-dist/profiles/message.fixture.json``, vendored with the distribution, replayed through the
 package's readers, dispatched on the case's kind. The npm SDK's readers run the same cases."""
 
 from __future__ import annotations
 
+import hashlib
 import json
 from collections import Counter
 from collections.abc import Mapping
 from pathlib import Path
 from typing import Any
 
+import pytest
+
 from onlyworlds import (
     MESSAGE_PAIR,
+    NOTE_PAIR,
     READ_MARK_PAIR,
     ROOM_PAIRS,
+    EditRead,
     FolderElement,
     SenderRead,
+    edited_by,
     has_unseen_recipients,
     is_addressed_to,
     is_message,
+    is_note,
     is_sent_by,
     is_to_everyone,
+    note_of,
     read_mark_of,
     recipients_of,
     sender_status,
@@ -30,7 +38,19 @@ from onlyworlds import (
 
 REPO = Path(__file__).resolve().parent.parent
 FIXTURE = REPO / "codegen" / "schema-dist" / "profiles" / "message.fixture.json"
-KINDS = {"pair": 9, "addressed": 9, "sent_by": 3, "sender": 10, "unread": 12, "mark": 9, "thread": 3}
+KINDS = {
+    "pair": 10,
+    "addressed": 10,
+    "sent_by": 3,
+    "sender": 14,
+    "unread": 15,
+    "mark": 10,
+    "thread": 3,
+    "unseen": 3,
+    "everyone": 3,
+    "edited": 4,
+    "note": 6,
+}
 
 ADA = "019a3b10-0000-7000-8000-0000000000a1"
 MARA = "019a3b10-0000-7000-8000-0000000000a2"
@@ -62,6 +82,21 @@ def replay(case: dict[str, Any], doc: dict[str, Any]) -> list[str]:
         expect("is_message", is_message(case["element"]), case["is_message"])
     elif kind == "addressed":
         expect("is_addressed_to", is_addressed_to(case["message"], case["character"]), case["addressed"])
+    elif kind == "unseen":
+        # A case without keyless has a credential.
+        expect("is_addressed_to", is_addressed_to(case["message"], case["character"]), case["addressed"])
+        expect("has_unseen_recipients", has_unseen_recipients(case["message"]), case["unseen_recipients"])
+    elif kind == "everyone":
+        keyless = case["keyless"]
+        expect("is_to_everyone", is_to_everyone(case["message"], keyless=keyless), case["to_everyone"])
+        expect(
+            "has_unseen_recipients", has_unseen_recipients(case["message"], keyless=keyless), case["unseen_recipients"]
+        )
+    elif kind == "edited":
+        edit = edited_by(case["message"], members)
+        expect("edited_by", (edit.edited, edit.by), (case["edited"], case["edited_by"]))
+    elif kind == "note":
+        expect("note_of", note_of(case["notes"], case["character"], members), case["line"])
     elif kind == "sent_by":
         expect("is_sent_by", is_sent_by(case["message"], case["character"]), case["sent_by"])
     elif kind == "sender":
@@ -87,7 +122,7 @@ def test_every_fixture_case_is_answered_as_the_fixture_says() -> None:
     cases = doc["cases"]
     wrong = [line for case in cases for line in replay(case, doc)]
     assert wrong == []
-    assert len(cases) == 55, f"the fixture holds {len(cases)} cases, serial 75 has 55"
+    assert len(cases) == 81, f"the fixture holds {len(cases)} cases, serial 76 has 81"
     assert Counter(c["kind"] for c in cases) == KINDS
 
 
@@ -96,6 +131,10 @@ def test_the_pairs_are_the_fixtures_and_the_message_is_a_room_pair() -> None:
     assert {"type": MESSAGE_PAIR[0], "supertype": MESSAGE_PAIR[1]} == doc["pair"]
     assert (READ_MARK_PAIR[0], READ_MARK_PAIR[1]) == (doc["read_mark"]["type"], doc["read_mark"]["supertype"])
     assert MESSAGE_PAIR in ROOM_PAIRS
+    assert {"type": NOTE_PAIR[0], "supertype": NOTE_PAIR[1]} == doc["note_pair"]
+    assert is_note({"type": " Narrative ", "supertype": "NOTE"}) is True
+    assert is_note({"type": "narrative", "supertype": "Notes"}) is False
+    assert is_note({"type": "narrative", "supertype": "Message"}) is False
 
 
 def test_the_pair_is_trimmed_and_folded_as_the_room_profile() -> None:
@@ -135,7 +174,7 @@ def test_recipients_keep_their_order_and_a_malformed_list_is_not_everyone() -> N
 
 
 def test_a_list_the_server_trimmed_is_never_everyone_and_says_someone_unseen_is_addressed() -> None:
-    """keel #746: every recipient hidden arrives as an empty list with the mark, never everyone."""
+    """Every recipient hidden arrives as an empty list with the mark, never everyone."""
 
     def trimmed(characters: list[str], mark: list[str] | None = None) -> dict[str, Any]:
         return {"characters": characters, "x_served_trimmed": ["characters"] if mark is None else mark}
@@ -322,3 +361,54 @@ def test_unread_proves_the_readers_own_messages_on_the_wire_and_trusts_a_folder(
     assert ids(unread_for([message("n", None, 1)], MARA, None)) == ["n"]
     # An empty id is no Character: nothing is unread for it, not even a message to everyone.
     assert unread_for([message("e", None, 1)], "", None) == []
+
+
+# The shared edge cases: inputs the fixture leaves open, the same file byte for byte as the npm SDK's
+# test/fixtures/message-edges.json (both suites hold its sha256), answers written by hand.
+EDGES_FILE = REPO / "tests" / "fixtures" / "message-edges.json"
+EDGES_SHA256 = "83a1d2d5c447bb4b95b13133f81300d458c2b30aa24e3396750f235f44ef94b8"
+
+
+def _edge_answer(e: dict[str, Any]) -> Any:
+    reader = e["reader"]
+    if reader == "recipients":
+        return recipients_of(e["message"])
+    if reader == "addressed":
+        return is_addressed_to(e["message"], e["character"])
+    if reader == "everyone":
+        return is_to_everyone(e["message"], keyless=e["keyless"])
+    if reader == "unseen":
+        return has_unseen_recipients(e["message"], keyless=e["keyless"])
+    if reader == "unread":
+        return ids(unread_for(e["messages"], e["reader_id"], None, e["members"]))
+    if reader == "thread":
+        return ids(thread_of(e["messages"], e["root"]))
+    if reader == "edited":
+        edit = edited_by(e["message"], e["members"])
+        return {"edited": edit.edited, "by": edit.by}
+    if reader == "note":
+        return note_of(e["notes"], e["character"], e["members"])
+    raise AssertionError(f"an edge of unknown reader {reader!r}")
+
+
+def test_the_shared_edge_cases_notes_on_every_reader_the_created_at_rule_the_edit_the_line() -> None:
+    raw = EDGES_FILE.read_bytes()
+    assert hashlib.sha256(raw).hexdigest() == EDGES_SHA256
+    edges: list[dict[str, Any]] = json.loads(raw.decode("utf-8"))
+    wrong = []
+    for e in edges:
+        got = _edge_answer(e)
+        if got != e["want"] or type(got) is not type(e["want"]):
+            wrong.append(f"{e['name']}: gave {got!r}, want {e['want']!r}")
+    assert wrong == []
+    assert len(edges) == 26
+
+
+def test_keyless_is_a_boolean() -> None:
+    not_bools: tuple[Any, ...] = ("yes", 1, None)
+    for bad in not_bools:
+        with pytest.raises(TypeError):
+            is_to_everyone({"characters": []}, keyless=bad)
+        with pytest.raises(TypeError):
+            has_unseen_recipients({"characters": []}, keyless=bad)
+    assert edited_by({"changed_by": "b2"}, None) == EditRead(True, None)

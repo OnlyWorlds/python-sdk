@@ -35,6 +35,10 @@ import sys
 from pathlib import Path
 from typing import Any
 
+# Importing the walk and the folder lint from the vendored tree would drop `walk/__pycache__/*.pyc` inside
+# a hash-verified directory (the npm SDK's generator turns it off for the same reason).
+sys.dont_write_bytecode = True
+
 HERE = Path(__file__).resolve().parent
 DIST = HERE / "schema-dist"
 PIN = HERE / "schema-pin.json"
@@ -267,16 +271,18 @@ def room_mark() -> str:
     return mark
 
 
-def message_pairs(types: list[str], room: list[tuple[str, str]]) -> tuple[tuple[str, str], tuple[str, str]]:
-    """The message profile's two pairs (dist serial 72 on, profiles/message.md): the message (``pair``) and
-    the reader's read mark (``read_mark``), each (type, supertype), from the fixture. The message's pair must
-    be one of the room profile's (the page: "the pair the room profile lists as a line in the room"), and
-    both supertypes must be named on the page, or generation fails."""
+def message_pairs(
+    types: list[str], room: list[tuple[str, str]]
+) -> tuple[tuple[str, str], tuple[str, str], tuple[str, str]]:
+    """The message profile's three pairs (dist serial 72 on, profiles/message.md): the message (``pair``), the
+    reader's read mark (``read_mark``) and (serial 76 on) the Note (``note_pair``), each (type, supertype), from
+    the fixture. The message's pair must be one of the room profile's (the page: "the pair the room profile
+    lists as a line in the room"), and every supertype must be named on the page, or generation fails."""
     fixture_path, page_path = DIST / "profiles" / "message.fixture.json", DIST / "profiles" / "message.md"
     fixture: dict[str, Any] = json.loads(fixture_path.read_text(encoding="utf-8"))
     page = page_path.read_text(encoding="utf-8")
     out: list[tuple[str, str]] = []
-    for key in ("pair", "read_mark"):
+    for key in ("pair", "read_mark", "note_pair"):
         p = fixture.get(key)
         if not isinstance(p, dict):
             raise SystemExit(f"{fixture_path}: `{key}` is {p!r}, expected {{type, supertype, ...}}")
@@ -288,7 +294,7 @@ def message_pairs(types: list[str], room: list[tuple[str, str]]) -> tuple[tuple[
         out.append((t, s))
     if out[0] not in room:
         raise SystemExit(f"message.fixture.json's pair {out[0]} is not one of the room profile's pairs {room}")
-    return out[0], out[1]
+    return out[0], out[1], out[2]
 
 
 SPINE_ROW = re.compile(r"^\|\s*([A-Z][a-z]+)\s*\|((?:\s*`[^`]+`\s*,?)+)\|\s*$")
@@ -342,7 +348,7 @@ def render(
     public: dict[str, list[str]],
     room: list[tuple[str, str]],
     mark: str,
-    message: tuple[tuple[str, str], tuple[str, str]],
+    message: tuple[tuple[str, str], tuple[str, str], tuple[str, str]],
     spine: dict[str, list[str]],
 ) -> str:
     def strs(names: list[str]) -> str:
@@ -459,6 +465,9 @@ def render(
         "# (message.is_message, message.read_mark_of). From message.fixture.json's pair and read_mark.",
         f'MESSAGE_PAIR: tuple[str, str] = ("{message[0][0]}", "{message[0][1]}")',
         f'READ_MARK_PAIR: tuple[str, str] = ("{message[1][0]}", "{message[1][1]}")',
+        "# The Note (message.is_note, message.note_of): a member's own line in the world, never a message. From",
+        "# message.fixture.json's note_pair, matched as MESSAGE_PAIR is.",
+        f'NOTE_PAIR: tuple[str, str] = ("{message[2][0]}", "{message[2][1]}")',
         "",
         "# The spine profile (profiles/spine.md): each listed type's closed list of supertypes (its kinds), in",
         "# the page's order and spelling, compared trimmed and without regard to case (spine.read_spine_element).",

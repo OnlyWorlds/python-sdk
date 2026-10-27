@@ -122,7 +122,7 @@ def test_created_by_is_never_sent(tmp_path: Path) -> None:
 
 
 def test_the_served_trimmed_mark_is_never_sent(tmp_path: Path) -> None:
-    """keel #746: a file keeps x_served_trimmed as served, and keel refuses a write that carries it."""
+    """A file keeps x_served_trimmed as served, and keel refuses a write that carries it."""
     base, edit = folders(
         tmp_path,
         {"character": [wire_char(C1, "A"), wire_char(C2, "B")]},

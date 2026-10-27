@@ -30,6 +30,7 @@ from conftest import FakeTransport, jresp
 
 import onlyworlds.http as _http
 from onlyworlds import ELEMENT_TYPES, FIELD_KINDS, ApiError, Client
+from onlyworlds.push import NOT_SENT
 
 SOURCE = os.environ.get("OW_OPENAPI")
 pytestmark = pytest.mark.skipif(not SOURCE, reason="set OW_OPENAPI to keel's OpenAPI document (URL or file)")
@@ -45,6 +46,10 @@ SERVER_MANAGED = (set(_http.READ_ONLY_FIELDS) - {"world"}) | {
     "changed_via",
     "changed_client",
 }
+# The message profile's served-only mark, which keel serves on a Narrative alone: the package reads it
+# (message.has_unseen_recipients, sender_status), push never sends it (NOT_SENT), and the client
+# leaves it in a body it is handed, so keel's 422 served_trimmed_not_writable is the signal.
+SERVED_ONLY = {"narrative": {"x_served_trimmed"}}
 KIND = {"text": "string", "integer": "integer", "multi_link": "array", "single_link": "string"}
 
 
@@ -363,7 +368,7 @@ def test_fields_and_kinds_equal_the_read_schemas_both_ways(doc: dict[str, Any]) 
     problems: list[str] = []
     for ty in ELEMENT_TYPES:
         props = schemas[ty.capitalize()]["properties"]
-        known = set(FIELD_KINDS[ty]) | SERVER_MANAGED
+        known = set(FIELD_KINDS[ty]) | SERVER_MANAGED | SERVED_ONLY.get(ty, set())
         problems += [
             f"{ty}: the document returns `{k}`, the package does not know it" for k in sorted(set(props) - known)
         ]
@@ -377,6 +382,16 @@ def test_fields_and_kinds_equal_the_read_schemas_both_ways(doc: dict[str, Any]) 
         if required != ["name"]:
             problems.append(f"{ty}: the write schema requires {required}, the package assumes ['name']")
     assert not problems, "\n".join(problems[:20])
+
+
+def test_the_served_trimmed_mark_is_left_to_keel_and_never_pushed(doc: dict[str, Any]) -> None:
+    schemas = doc["components"]["schemas"]
+    for ty, marks in SERVED_ONLY.items():
+        for mark in marks:
+            assert schemas[ty.capitalize()]["properties"][mark].get("readOnly") is True, (ty, mark)
+            assert mark in NOT_SENT
+            assert mark not in _http.READ_ONLY_FIELDS
+            assert _http.sanitize_payload({"name": "x", mark: ["characters"]}) == {"name": "x", mark: ["characters"]}
 
 
 def test_a_write_never_carries_what_the_write_schema_refuses(doc: dict[str, Any]) -> None:
