@@ -60,7 +60,7 @@ __all__ = [
     "unread_for",
 ]
 
-SenderStatus = Literal["verified", "mismatch", "unverifiable"]
+SenderStatus = Literal["verified", "mismatch", "unverifiable", "unseen"]
 
 _UTC = datetime.UTC
 _NO_TIME = datetime.datetime.min.replace(tzinfo=_UTC)
@@ -70,8 +70,9 @@ _NO_TIME = datetime.datetime.min.replace(tzinfo=_UTC)
 class SenderRead:
     """What ``sender_status`` says of one message.
 
-    ``status`` is ``"verified"``, ``"mismatch"`` or ``"unverifiable"``. ``claimed`` is the ``narrator``
-    (``None`` when the message names none: shown as from nobody, never as to everyone). ``written_by`` is
+    ``status`` is ``"verified"``, ``"mismatch"``, ``"unverifiable"`` or ``"unseen"`` (the sender hidden
+    from this reader). ``claimed`` is the ``narrator`` (``None`` when the message names none: shown as
+    from nobody, or as from someone you cannot see when ``unseen``, never as to everyone). ``written_by`` is
     the author's Character on a ``mismatch``, else ``None``."""
 
     status: SenderStatus
@@ -121,23 +122,30 @@ def is_addressed_to(message: Mapping[str, Any], character_id: str) -> bool:
     return isinstance(value, list | tuple) and character_id in value
 
 
-def is_to_everyone(message: Mapping[str, Any]) -> bool:
+def is_to_everyone(message: Mapping[str, Any], *, keyless: bool = False) -> bool:
     """True when the message is addressed to every member: its ``characters`` is absent, ``None`` or
     empty. A list that names no valid id (``[""]``) or a value that is not a list is addressed to nobody,
     so it is False here, though ``recipients_of`` gives ``[]`` for both. A list the server trimmed for this
     reader (``x_served_trimmed`` names ``characters``) is never everyone, even when it arrives empty: see
-    ``has_unseen_recipients``."""
-    if has_unseen_recipients(message):
+    ``has_unseen_recipients``. A body read keyless (``keyless=True``, the public reader with no
+    credential) is never to everyone: it carries no mark, so an empty list may hold someone the reader
+    cannot see."""
+    if keyless or has_unseen_recipients(message) is True:
         return False
     value = message.get("characters")
     return value is None or (isinstance(value, list | tuple) and len(value) == 0)
 
 
-def has_unseen_recipients(message: Mapping[str, Any]) -> bool:
+def has_unseen_recipients(message: Mapping[str, Any], *, keyless: bool = False) -> bool | None:
     """True when the message is addressed to someone this reader cannot see: the server served it with
     ``characters`` trimmed (its ``x_served_trimmed`` list names ``characters``), whatever is left in the
-    list. It says that such a recipient exists, never who or how many."""
-    mark = message.get("x_served_trimmed") if isinstance(message, Mapping) else None
+    list. It says that such a recipient exists, never who or how many. ``None`` for a body read keyless
+    (``keyless=True``): it carries no mark, so the reader cannot say either way."""
+    if not isinstance(message, Mapping):
+        return False
+    if keyless:
+        return None
+    mark = message.get("x_served_trimmed")
     return isinstance(mark, list) and "characters" in mark
 
 
@@ -172,9 +180,14 @@ def sender_status(message: Mapping[str, Any], members: Sequence[Mapping[str, Any
     read it. ``verified``: the author's Character is ``narrator``. ``mismatch``: it is another Character,
     named in ``written_by``. ``unverifiable``: no ``narrator``, no ``created_by`` key on the body
     (``None`` is the owner, not absent), no members list, the author not on it, or the author's row
-    naming no Character."""
+    naming no Character. ``unseen``: the sender is hidden from this reader (the server trimmed
+    ``narrator``, its ``x_served_trimmed`` names it); show "from someone you cannot see", never "from
+    nobody"."""
     narrator = message.get("narrator")
     claimed = narrator if isinstance(narrator, str) and narrator else None
+    mark = message.get("x_served_trimmed")
+    if claimed is None and isinstance(mark, list) and "narrator" in mark:
+        return SenderRead("unseen", None)
     if claimed is None:
         return SenderRead("unverifiable", None)
     author = _author_character(message, members)

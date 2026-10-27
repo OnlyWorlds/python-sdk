@@ -155,6 +155,14 @@ def test_a_list_the_server_trimmed_is_never_everyone_and_says_someone_unseen_is_
     )
     for m in no_mark:
         assert has_unseen_recipients(m) is False, m
+    keyless_bodies: tuple[dict[str, Any], ...] = ({}, {"characters": []}, {"characters": None})
+    for m in keyless_bodies:
+        assert is_to_everyone(m, keyless=True) is False, m
+        assert has_unseen_recipients(m, keyless=True) is None, m
+        assert is_to_everyone(m, keyless=False) is True, m
+    assert sender_status({"narrator": None, "x_served_trimmed": ["narrator"]}, []) == SenderRead("unseen", None)
+    assert sender_status({"narrator": None, "x_served_trimmed": ["characters"]}, []).status == "unverifiable"
+    assert sender_status({"narrator": None}, []).status == "unverifiable"
 
 
 def test_the_read_mark_supertype_is_folded_and_a_mark_with_no_members_list_has_no_hand() -> None:
