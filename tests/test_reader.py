@@ -159,3 +159,14 @@ def test_an_id_in_both_layouts_serves_elements_and_is_named(tmp_path: Path) -> N
     assert f.all_elements()[other].body["name"] == "only legacy"
     assert f.in_both_layouts == [pid]
     assert read_folder(tmp_path, legacy=False).in_both_layouts == []
+
+
+def test_a_repeated_id_keeps_the_first_file_by_code_point_on_every_platform(tmp_path: Path) -> None:
+    """Names compare by code point, never as Paths: a Windows path sorts case-blind, where 'a.json'
+    comes before 'B.json', so the kept file would differ between platforms."""
+    d = tmp_path / "elements" / "character"
+    _w(d / "a.json", '{"id": "1", "name": "lower"}')
+    _w(d / "B.json", '{"id": "1", "name": "upper"}')
+    f = read_folder(tmp_path)
+    assert f.elements["1"].body["name"] == "upper"  # "B" (U+0042) before "a" (U+0061)
+    assert [d.ignored.name for d in f.duplicates] == ["a.json"]

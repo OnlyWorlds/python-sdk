@@ -452,7 +452,11 @@ def _open_tree(source: Path, stack: ExitStack) -> _Tree:
     notes: list[str] = []
     if source.is_dir():
         own_name = source.name
-        for path in sorted(p for p in source.rglob("*") if p.is_file()):
+        # By relative path in code point order, never by Path (case-blind on Windows), so every
+        # platform reads the tree in one order.
+        for path in sorted(
+            (p for p in source.rglob("*") if p.is_file()), key=lambda p: p.relative_to(source).as_posix()
+        ):
             rel = _safe_rel(path.relative_to(source).as_posix())
             if rel is None:
                 continue

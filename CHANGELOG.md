@@ -4,6 +4,10 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+## 0.75.1 (2026-10-27)
+
+- **A folder is read in one order on every platform**: `read_folder` visits type directories and element files by name in code point order, the folder format's one order, and the Notion door reads an export tree by relative path the same way. Both sorted `Path` objects before, and a Windows path sorts without regard to case, so when one id sat in two files whose names differed in case (`a.json`, `B.json`), Windows kept a different file than Linux or macOS. Now `B.json` is kept everywhere ("B" comes before "a").
+
 ## 0.75.0 (2026-10-27)
 
 - **Folder format v0.3.19**: every folder the package writes says `"format_version": "0.3.19"` (`FORMAT_VERSION`), and `onlyworlds.lint` is schema-dist's checker at serial 79, which reads 0.3.19 and checks `x_served_trimmed` as an array. v0.3.19 adds the served-trimmed rule: a file keeps `x_served_trimmed` exactly as served, a reader reads a field it names as trimmed, never as empty, and a writer never sends it up. The folder module already wrote the mark as served and the push already left it out, so only the version moves.

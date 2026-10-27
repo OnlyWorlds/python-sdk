@@ -448,7 +448,8 @@ def read_folder(root: str | os.PathLike[str], *, legacy: bool = True) -> Folder:
       inferred from the directory and flagged (``type_inferred``).
     - ``spatial/{map,pin,zone,marker}/`` (Atlas through v1.0) is read into ``legacy``
       unless ``legacy=False``. A missing type directory is "none of that type".
-    - A repeated id keeps the first file in sorted path order; the rest land in ``duplicates``.
+    - A repeated id keeps the first file in path order (each name by code point, on every platform);
+      the rest land in ``duplicates``.
     - A ``known_of: true`` file is a stub (§4.4): read as it is, flagged ``FolderElement.known_of``
       and listed in ``Folder.known_of``; nothing is filled in for the fields it lacks.
     """
@@ -478,12 +479,15 @@ def read_folder(root: str | os.PathLike[str], *, legacy: bool = True) -> Folder:
         base = root / (ELEMENTS_DIR if layout == "elements" else LEGACY_SPATIAL_DIR)
         if not base.is_dir():
             continue
-        for tdir in sorted(p for p in base.iterdir() if p.is_dir()):
+        # By name in code point order (the format's one order), never by Path: a Windows path sorts
+        # case-blind, so a duplicate id would keep a different file there than on Linux or macOS.
+        for tdir in sorted((p for p in base.iterdir() if p.is_dir()), key=lambda p: p.name):
             dir_type = tdir.name.lower()
             if dir_type not in allowed:
                 folder.ignored_dirs.append(tdir)
                 continue
-            for path in sorted(p for p in tdir.iterdir() if p.is_file() and p.name.lower().endswith(".json")):
+            files = (p for p in tdir.iterdir() if p.is_file() and p.name.lower().endswith(".json"))
+            for path in sorted(files, key=lambda p: p.name):
                 if path.name.startswith("."):
                     folder.skipped.append(SkippedFile(path, "a dot-prefixed file: a tool's litter, not an element"))
                     continue
