@@ -531,11 +531,13 @@ class Client:
         return self.call("GET", "health/")
 
     def me(self) -> dict[str, Any]:
-        """``GET /me``: who this key is, ``{world, scope, kind, role, membership, character, name?, front_door}``.
+        """``GET /me``: who this key is,
+        ``{world, scope, kind, role, membership, character, lenses, name?, front_door}``.
 
         ``kind`` is ``owner`` for an owner-minted or classic key, else the membership's (``person``,
         ``agent``, ``player``); ``role`` is ``owner``, ``co_builder``, ``contributor`` or ``guest``;
-        ``character`` is the member's Character id, or None. ``front_door`` is
+        ``character`` is the member's Character id, or None; ``lenses`` the lens ids its holder chose
+        (``set_my_lenses``), in order, empty for none. ``front_door`` is
         ``{sponsor, sponsor_character, my_character, my_seats, charter, charter_skill}``: who answers
         for a seat, its Character, the seats you answer for, and the world's Charter (every member's
         to read; an agent reads it first) with up to five Objects it names; anything hidden from the
@@ -549,6 +551,46 @@ class Client:
         data = self.call("GET", "me/")
         if not isinstance(data, dict):
             raise ValueError(f"GET /me returned no object: {str(data)[:200]}")
+        return data
+
+    def set_my_lenses(self, lens_ids: Sequence[str]) -> dict[str, Any]:
+        """``PUT /me/lenses``: choose the lenses this key's holder starts with, lens ids in order, 0 to 20
+        (keel drops repeats); an empty list is a choice too (the draught then adds no frame). Any write
+        key of the world, with its PIN, sets its own holder's list: a person member's, an agent seat's,
+        or on the owner's keys the owner's own. Answers ``GET /me``'s body. The draught reads the list
+        whenever it is given no ``lens`` and no policy. 404 for a lens this key cannot see; 422
+        ``not_a_lens``, ``lens_is_template`` or ``lens_hidden`` (``param`` lenses); 403 for a read key. A
+        lens only narrows what the holder may already read. A string, or anything but a list or tuple of
+        ids, is a TypeError before anything is sent."""
+        if isinstance(lens_ids, (str, bytes)) or not isinstance(lens_ids, (list, tuple)):
+            raise TypeError(
+                f"set_my_lenses: lens_ids is a list of lens ids ([] for none), not {lens_ids!r}. Nothing was sent."
+            )
+        ids = list(lens_ids)
+        data = self.call("PUT", "me/lenses", {"lenses": ids})
+        if not isinstance(data, dict):
+            raise ValueError(f"PUT /me/lenses returned no object: {str(data)[:200]}")
+        return data
+
+    def world_lenses(self, world_id: str, *, resolve: bool | None = None, read_as: str | None = None) -> dict[str, Any]:
+        """``GET /world/{world_id}/lenses``: ``{data, read_as}``, every lens in the world this key can see,
+        templates included and marked, each ``{id, name, element, template, retired, x_lens, titles,
+        chosen}`` (``x_lens`` its recipe with the defaults filled in, None for an unreadable lens, then
+        ``unreadable`` names the key). ``resolve=True`` adds each lens's ``reading`` for this key:
+        ``{rows, cut, cut_rows, reached, notes_ignored, mail?}``. The owner also gets ``chosen_by``,
+        ``health`` and the two counts of what a reader cannot see; with ``resolve``, the owner may
+        ``read_as`` another reader (``guest``, ``contributor``, ``co-builder``, ``public``, or a membership
+        id of this world): 403 ``read_as_owner_only`` from any other key, 422 without ``resolve``.
+        ``world_id`` is the key's own world (another is a 404). A read: no PIN. ``resolve`` is sent as
+        ``true`` or ``false``; ``None`` sends nothing; anything but a bool is a TypeError before
+        anything is sent. Served ``Cache-Control: private, no-store``."""
+        if resolve is not None and not isinstance(resolve, bool):
+            raise TypeError(f"world_lenses: resolve is True or False, not {resolve!r}. Nothing was sent.")
+        query = self._query({"resolve": resolve, "read_as": read_as})
+        path = f"world/{urllib.parse.quote(world_id, safe='')}/lenses"
+        data = self.call("GET", path + (f"?{query}" if query else ""))
+        if not isinstance(data, dict) or not isinstance(data.get("data"), list):
+            raise ValueError(f"GET /{path} returned no lens list: {str(data)[:200]}")
         return data
 
     def get_world(self) -> dict[str, Any]:
@@ -1180,6 +1222,7 @@ class Client:
         budget: int | None = None,
         depth: int | None = None,
         compact: bool | None = None,
+        lens: str | None = None,
     ) -> dict[str, Any]:
         """``GET /character/{id}/context``: the draught, one Character's context in
         one read as the recorded world holds it: her element, what she holds and sits in, her open
@@ -1196,7 +1239,14 @@ class Client:
         stay), so read a missing field as empty. A Message without the room mark is placed as any
         Narrative unless ``messages`` is named, when it is there and in no other section. Sent as ``true`` or
         ``false``; ``None`` sends nothing (keel's default, false). Anything but a bool is a
-        TypeError before anything is sent."""
+        TypeError before anything is sent.
+
+        ``lens``: a lens id (a Construct with supertype Lens, the lens profile). The packet then carries
+        ``lenses``, one frame ``{id, name?, rows?, cut?, mail?, skipped?, unreadable?}`` with that lens
+        read for this key's own view. The lens carries its own reach and limit, so ``lens`` beside
+        ``depth`` or ``budget`` is a 422 (``param`` lens); a lens this key cannot see is a 404. With no
+        ``lens`` and no policy key but ``compact``, keel adds one frame per lens chosen with
+        ``set_my_lenses``, in order."""
         if compact is not None and not isinstance(compact, bool):
             raise TypeError(f"draught: compact is True or False, not {compact!r}. Nothing was sent.")
         query = self._query(
@@ -1209,6 +1259,7 @@ class Client:
                 "budget": budget,
                 "depth": depth,
                 "compact": compact,
+                "lens": lens,
             }
         )
         page = self.call("GET", f"character/{character_id}/context" + (f"?{query}" if query else ""))

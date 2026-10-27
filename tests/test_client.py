@@ -320,6 +320,60 @@ def test_draught_compact_is_sent_as_true_or_false_and_absent_sends_nothing(make_
     assert len(t.calls) == 4, "a refused compact sends nothing"
 
 
+def test_draught_sends_lens_and_returns_the_frames(make_client: MakeClient) -> None:
+    frames = [{"id": "l1", "name": "Harbour watch", "rows": [], "cut": {}}, {"id": "l2", "skipped": "retired"}]
+    t = FakeTransport(handler=lambda *a: jresp(200, {"world": {"id": "w"}, "character": None, "lenses": frames}))
+    client = make_client(t)
+    packet = client.draught("c1", lens="l1", compact=True)
+    assert packet["lenses"] == frames
+    call = t.calls[0]
+    assert call.method == "GET" and call.body is None
+    assert call.url == "https://www.onlyworlds.com/api/v2/character/c1/context?compact=true&lens=l1"
+    assert "API-Pin" not in call.headers and call.headers["API-Key"] == "ow_w_testkey"
+    assert not {"X-OW-Agent", "X-OW-Client", "Content-Type"} & set(call.headers)
+
+
+def test_set_my_lenses_puts_the_ids_in_order_with_the_pin_and_no_write_headers() -> None:
+    me = {"world": {"id": "w", "name": "W"}, "kind": "person", "character": None, "lenses": ["l2", "l1"]}
+    t = FakeTransport(handler=lambda *a: jresp(200, me))
+    client = Client("ow_w_testkey", "1234", transport=t, agent=True, client="atlas")
+    assert client.set_my_lenses(["l2", "l1"]) == me
+    client.set_my_lenses(())
+    first, second = t.calls
+    assert first.method == "PUT" and first.url == "https://www.onlyworlds.com/api/v2/me/lenses"
+    assert first.body == {"lenses": ["l2", "l1"]} and second.body == {"lenses": []}
+    assert first.headers["API-Key"] == "ow_w_testkey" and first.headers["API-Pin"] == "1234"
+    assert first.headers["Content-Type"] == "application/json"
+    # keel's document declares no header parameter on PUT /me/lenses
+    assert not {"X-OW-Agent", "X-OW-Client"} & set(first.headers)
+    for wrong in ("l1", b"l1", {"l1"}, None):
+        with pytest.raises(TypeError, match="list of lens ids"):
+            client.set_my_lenses(wrong)  # type: ignore[arg-type]
+    assert len(t.calls) == 2, "a refused list sends nothing"
+
+
+def test_world_lenses_sends_resolve_and_read_as_without_the_pin() -> None:
+    answer = {"data": [{"id": "l1", "name": "Harbour watch", "chosen": True}], "read_as": "guest"}
+    t = FakeTransport(handler=lambda *a: jresp(200, answer))
+    client = Client("ow_w_testkey", "1234", transport=t, agent=True, client="atlas")
+    assert client.world_lenses("w 1", resolve=True, read_as="guest") == answer
+    client.world_lenses("w1")
+    client.world_lenses("w1", resolve=False)
+    first, second, third = t.calls
+    assert first.method == "GET" and first.body is None
+    assert first.url == "https://www.onlyworlds.com/api/v2/world/w%201/lenses?resolve=true&read_as=guest"
+    assert set(first.headers) == {"API-Key", "Accept", "User-Agent"}, "a read: the key alone, no PIN, no write header"
+    assert second.url == "https://www.onlyworlds.com/api/v2/world/w1/lenses"
+    assert third.url.endswith("/world/w1/lenses?resolve=false")
+    for wrong in ("yes", 1, 0):
+        with pytest.raises(TypeError, match="resolve is True or False"):
+            client.world_lenses("w1", resolve=wrong)  # type: ignore[arg-type]
+    assert len(t.calls) == 3, "a refused resolve sends nothing"
+    t2 = FakeTransport(script=[jresp(200, {"read_as": None})])
+    with pytest.raises(ValueError, match="no lens list"):
+        Client("ow_w_testkey", transport=t2).world_lenses("w1")
+
+
 def test_a_numeric_cursor_becomes_the_walks_cursor_as_text(make_client: MakeClient) -> None:
     """keel answers an owner's cursor at the head as a number; the walk keeps it, as a string, to pass back."""
     t = FakeTransport(

@@ -4,6 +4,12 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+- **The server's lens routes**: `Client.set_my_lenses(lens_ids)` is `PUT /me/lenses`, the lenses this key's holder starts with, lens ids in order (0 to 20, `[]` for none, which is a choice); a world write key with its PIN, answering `GET /me`'s body; no `X-OW-Agent` or `X-OW-Client`, which the document declares on neither; a string or anything but a list or tuple is a `TypeError` before sending. `Client.world_lenses(world_id, resolve=..., read_as=...)` is `GET /world/{world_id}/lenses`, `{data, read_as}`: every lens in the world this key can see, with its recipe echoed, the Titles it is the default for and whether this key chose it; `resolve=True` adds each lens's `reading`, and `read_as` (the owner only, with `resolve`) reads as another reader; a read, so no PIN; `resolve` is a bool or nothing. As the npm SDK's `setMyLenses` and `worldLenses`.
+- **`Client.draught(..., lens=...)`**: a lens id, sent as `lens`; the packet then carries `lenses`, one frame with that lens read for this key's own view. With no lens and no policy key but `compact`, keel adds one frame per lens chosen with `set_my_lenses`. `lens` beside `depth` or `budget` is keel's 422.
+- **`GET /me` names `lenses`**: `Client.me`'s docstring lists the key, which the server now serves.
+- **`x_served_trimmed` on a lens**: the server now serves the mark on a Construct too (a lens whose hidden anchors were left out). The wire test holds the mark on both read schemas; nothing else changes, since the package never keyed it to a type (push never sends it, the client leaves it in a body it is handed).
+- `PATCH /account/worlds/{world_id}/members/{member_id}` now takes `lenses`, but the package has no method for that route, so none is added.
+
 ## 0.75.1 (2026-10-27)
 
 - **A folder is read in one order on every platform**: `read_folder` visits type directories and element files by name in code point order, the folder format's one order, and the Notion door reads an export tree by relative path the same way. Both sorted `Path` objects before, and a Windows path sorts without regard to case, so when one id sat in two files whose names differed in case (`a.json`, `B.json`), Windows kept a different file than Linux or macOS. Now `B.json` is kept everywhere ("B" comes before "a").

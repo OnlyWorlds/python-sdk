@@ -46,10 +46,11 @@ SERVER_MANAGED = (set(_http.READ_ONLY_FIELDS) - {"world"}) | {
     "changed_via",
     "changed_client",
 }
-# The message profile's served-only mark, which keel serves on a Narrative alone: the package reads it
-# (message.has_unseen_recipients, sender_status), push never sends it (NOT_SENT), and the client
-# leaves it in a body it is handed, so keel's 422 served_trimmed_not_writable is the signal.
-SERVED_ONLY = {"narrative": {"x_served_trimmed"}}
+# The message and lens profiles' served-only mark, which keel serves on a Narrative (a message) and a
+# Construct (a lens): the package reads it (message.has_unseen_recipients, sender_status, and
+# resolve_lens's anchored lens), push never sends it (NOT_SENT), and the client leaves it in a body it
+# is handed, so keel's 422 served_trimmed_not_writable is the signal.
+SERVED_ONLY = {"narrative": {"x_served_trimmed"}, "construct": {"x_served_trimmed"}}
 KIND = {"text": "string", "integer": "integer", "multi_link": "array", "single_link": "string"}
 
 
@@ -107,6 +108,8 @@ def _norm(url: str) -> str:
             parts[5] = "{field}"
         if len(parts) > 5 and parts[4] == "proposals":
             parts[5] = "{pid}"
+    if len(parts) == 5 and parts[2] == "world" and parts[4] == "lenses":
+        parts[3] = "{world_id}"
     return "/" + "/".join(parts)
 
 
@@ -147,6 +150,9 @@ def _every_call(c: Client) -> None:
     c.draught(
         ID, components=["self"], mode="act", as_of=1, undated="exclude", since="c", budget=5, depth=0, compact=True
     )
+    c.draught(ID, lens=ID, compact=True)
+    c.set_my_lenses([ID])
+    c.world_lenses(ID, resolve=True, read_as="guest")
     for ty in ELEMENT_TYPES:
         c.list_page(
             ty, limit=1, cursor="c", expand=["a"], fields=["name"], filter={"name__icontains": "a", "supertype": "b"}
@@ -303,6 +309,21 @@ def test_me_documents_the_front_door_keys_the_document_declares(doc: dict[str, A
     row = re.search(r"``my_seats``.*?each ``\{([^}]*)\}``", text)
     assert row, "me's docstring lists no my_seats row keys"
     assert [k.strip() for k in row.group(1).split(",")] == list(door["properties"]["my_seats"]["items"]["properties"])
+
+
+def test_the_lens_calls_send_the_bodies_their_operations_take(doc: dict[str, Any]) -> None:
+    """``set_my_lenses`` sends exactly the body PUT /me/lenses requires (it allows no other key), and the
+    two lens reads reach their operations; ``me`` names ``lenses``, which GET /me serves."""
+    c, t = _recorder()
+    c.set_my_lenses([ID])
+    c.world_lenses(ID, resolve=True)
+    put = doc["paths"][_norm(t.calls[0].url)]["put"]
+    schema = put["requestBody"]["content"]["application/json"]["schema"]
+    assert schema.get("additionalProperties") is False
+    assert set(t.calls[0].body) == set(schema["properties"]) == set(schema["required"]) == {"lenses"}
+    assert "get" in doc["paths"][_norm(t.calls[1].url)]
+    me = doc["paths"]["/api/v2/me"]["get"]["responses"]["200"]["content"]["application/json"]["schema"]
+    assert "lenses" in me["required"] and "lenses" in (Client.me.__doc__ or "")
 
 
 def test_the_proposal_list_envelope_is_the_one_the_walk_follows(doc: dict[str, Any]) -> None:
