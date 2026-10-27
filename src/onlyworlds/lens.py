@@ -742,8 +742,12 @@ def _lens_reading(
 ) -> tuple[LensReading, dict[str, CutReason]]:
     """A lens read over one reading's world: the reading ``resolve_lens`` answers, and the reason each element
     it left out was cut, by id, before the counts drop the owner's two."""
-    # An id is read only when the reader can see that element; a body is read as given.
-    body: Mapping[str, Any] | None = (r.by_id[lens] if lens in r.view else None) if isinstance(lens, str) else lens
+    # An id is read only when the reader is served that element whole: a stub serves no links and no
+    # recipe, so a lens known only as a stub reads as one the reader cannot see (keel's find_lens). A
+    # body is read as given.
+    body: Mapping[str, Any] | None = (
+        (r.by_id[lens] if lens in r.view and lens not in r.stubs else None) if isinstance(lens, str) else lens
+    )
     if body is None or not is_lens(body):
         return _nothing(), {}
     recipe = _read_recipe(body.get("x_lens"))

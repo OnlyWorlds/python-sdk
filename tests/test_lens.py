@@ -15,7 +15,7 @@ from typing import Any
 
 import pytest
 
-from onlyworlds import ROOM_PAIRS, LensReading, is_lens, is_template, lenses_in_use, resolve_lens
+from onlyworlds import ROOM_PAIRS, LensReading, is_lens, is_template, lenses_in_use, resolve_lens, world_graph
 
 REPO = Path(__file__).resolve().parent.parent
 FIXTURE = REPO / "codegen" / "schema-dist" / "profiles" / "lens.fixture.json"
@@ -257,6 +257,29 @@ def test_the_shared_edge_cases() -> None:
         print(line)
     assert wrong == []
     assert len(edges) == 10
+
+
+def test_a_lens_a_guest_knows_only_as_a_stub_reads_as_nothing() -> None:
+    world: dict[str, Any] = {
+        "elements": [
+            {
+                "id": "L",
+                "type": "construct",
+                "name": "Ada and hers",
+                "supertype": "Lens",
+                "characters": ["c1"],
+                "x_lens": {"depth": 1},
+            },
+            {"id": "c1", "type": "character", "name": "Ada", "friends": ["c2"]},
+            {"id": "c2", "type": "character", "name": "Bo"},
+        ]
+    }
+    stub = {"rung": "guest", "whole": ["c1", "c2"], "known_of": ["L"]}
+    r = resolve_lens(world, "L", stub)
+    assert (r["kept"], r["cut"], r["unreadable"]) == ([], {}, None)
+    assert world_graph(world, stub, lens="L")["nodes"] == []
+    whole = {"rung": "guest", "whole": ["L", "c1", "c2"], "known_of": []}
+    assert resolve_lens(world, "L", whole)["kept"] == ["c1", "c2"]
 
 
 def test_resolve_lens_refuses_what_is_not_a_reading() -> None:
