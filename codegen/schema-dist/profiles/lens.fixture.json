@@ -7,7 +7,8 @@
     "worlds: each world's elements as its owner is served them, the ids its hidden mark keeps from every reader but the owner, and its readers. A reader's rung is owner (the whole world), contributor (the world less the hidden), guest (exactly the whole and known_of ids it lists; known_of is a stub) or public (the world less the hidden and the room elements). An element whose x_review_proposed holds any value but null is in no reader's view (the review profile's rule for a reader that hands a world on). A reader with as is the owner reading as that reader: the reader's view, and the owner's two counts (anchor_not_visible, not_visible).",
     "resolve: lens is the lens read, a body or the id of a lens in the world; as_of is the reading's date (absent: the world's now; with neither, no fence and the window cuts nothing); clock is the reading's time for the mail rule. kept is the resolved set in order, cut the count by reason (a reason with no count is absent). rows, where given, are the kept rows as show makes them; mail, where given, is the mail rule's part; notes_ignored counts notes on ids that are not anchors.",
     "invariant: subset (each reader's kept is a subset of the owner's, and no secret's id or name appears anywhere in a non-owner result), same_without (each reader's result is identical with the without ids removed from the world), unchanged (the world is identical before and after every reader's reading).",
-    "uses: which lenses a seat reads, from its membership's choice (null: none made) and its Character's x_lens_uses."
+    "uses: which lenses a seat reads, from its membership's choice (null: none made) and its Character's x_lens_uses.",
+    "graph: a case carries its own small world (the elements as the owner is served them, hidden: true on an element the hidden mark keeps, a room element by its pair and x_room_of, a proposed one by x_review_proposed) and reader (rung; a guest's whole and known_of; the owner's as), because the order case needs ids above U+FFFF that no uuid can carry; options are the graph's flags and lens (an id, or a lens body); want is the nodes in order with their marks, the edges in order, edges_cut, the lens's cut and unreadable; edges_cut_reasons lists every reason an edge can be cut by, the graph's own first, then a lens's; graph_links is the closed table of extension fields that make an edge."
   ],
   "pair": {
     "type": "construct",
@@ -2693,6 +2694,3280 @@
           "read": 1
         }
       }
+    },
+    {
+      "name": "a mirror pair is two edges, a one-way link one",
+      "kind": "graph",
+      "world": {
+        "elements": [
+          {
+            "id": "e1",
+            "type": "event",
+            "name": "Siege",
+            "relations": [
+              "r1"
+            ]
+          },
+          {
+            "id": "r1",
+            "type": "relation",
+            "name": "Truce",
+            "events": [
+              "e1"
+            ]
+          },
+          {
+            "id": "c1",
+            "type": "character",
+            "name": "Ada",
+            "friends": [
+              "c2"
+            ]
+          },
+          {
+            "id": "c2",
+            "type": "character",
+            "name": "Bo"
+          }
+        ]
+      },
+      "reader": {
+        "rung": "owner"
+      },
+      "want": {
+        "nodes": [
+          {
+            "id": "c1",
+            "type": "character",
+            "name": "Ada",
+            "family": "agents",
+            "icon": "person"
+          },
+          {
+            "id": "c2",
+            "type": "character",
+            "name": "Bo",
+            "family": "agents",
+            "icon": "person"
+          },
+          {
+            "id": "e1",
+            "type": "event",
+            "name": "Siege",
+            "family": "temporal",
+            "icon": "saved_search"
+          },
+          {
+            "id": "r1",
+            "type": "relation",
+            "name": "Truce",
+            "family": "temporal",
+            "icon": "link"
+          }
+        ],
+        "edges": [
+          {
+            "source": "c1",
+            "field": "friends",
+            "target": "c2",
+            "index": 0
+          },
+          {
+            "source": "e1",
+            "field": "relations",
+            "target": "r1",
+            "index": 0
+          },
+          {
+            "source": "r1",
+            "field": "events",
+            "target": "e1",
+            "index": 0
+          }
+        ],
+        "edges_cut": {},
+        "cut": {},
+        "unreadable": null
+      }
+    },
+    {
+      "name": "a Relation with three parties is a node with three edges",
+      "kind": "graph",
+      "world": {
+        "elements": [
+          {
+            "id": "r1",
+            "type": "relation",
+            "name": "Pact",
+            "intensity": 7,
+            "actor": "c1",
+            "characters": [
+              "c2",
+              "c3"
+            ]
+          },
+          {
+            "id": "c1",
+            "type": "character",
+            "name": "Ada"
+          },
+          {
+            "id": "c2",
+            "type": "character",
+            "name": "Bo"
+          },
+          {
+            "id": "c3",
+            "type": "character",
+            "name": "Cy"
+          }
+        ]
+      },
+      "reader": {
+        "rung": "owner"
+      },
+      "want": {
+        "nodes": [
+          {
+            "id": "c1",
+            "type": "character",
+            "name": "Ada",
+            "family": "agents",
+            "icon": "person"
+          },
+          {
+            "id": "c2",
+            "type": "character",
+            "name": "Bo",
+            "family": "agents",
+            "icon": "person"
+          },
+          {
+            "id": "c3",
+            "type": "character",
+            "name": "Cy",
+            "family": "agents",
+            "icon": "person"
+          },
+          {
+            "id": "r1",
+            "type": "relation",
+            "name": "Pact",
+            "family": "temporal",
+            "icon": "link"
+          }
+        ],
+        "edges": [
+          {
+            "source": "r1",
+            "field": "actor",
+            "target": "c1",
+            "index": 0
+          },
+          {
+            "source": "r1",
+            "field": "characters",
+            "target": "c2",
+            "index": 0
+          },
+          {
+            "source": "r1",
+            "field": "characters",
+            "target": "c3",
+            "index": 1
+          }
+        ],
+        "edges_cut": {},
+        "cut": {},
+        "unreadable": null
+      }
+    },
+    {
+      "name": "a known-of stub is a node with no edges out",
+      "kind": "graph",
+      "world": {
+        "elements": [
+          {
+            "id": "c1",
+            "type": "character",
+            "name": "Ada",
+            "friends": [
+              "c2"
+            ]
+          },
+          {
+            "id": "c2",
+            "type": "character",
+            "name": "Bo",
+            "friends": [
+              "c1"
+            ],
+            "rivals": [
+              "c3"
+            ]
+          },
+          {
+            "id": "c3",
+            "type": "character",
+            "name": "Cy"
+          }
+        ]
+      },
+      "reader": {
+        "rung": "guest",
+        "whole": [
+          "c1"
+        ],
+        "known_of": [
+          "c2"
+        ]
+      },
+      "want": {
+        "nodes": [
+          {
+            "id": "c1",
+            "type": "character",
+            "name": "Ada",
+            "family": "agents",
+            "icon": "person"
+          },
+          {
+            "id": "c2",
+            "type": "character",
+            "name": "Bo",
+            "family": "agents",
+            "icon": "person",
+            "known_of": true
+          }
+        ],
+        "edges": [
+          {
+            "source": "c1",
+            "field": "friends",
+            "target": "c2",
+            "index": 0
+          }
+        ],
+        "edges_cut": {},
+        "cut": {},
+        "unreadable": null
+      }
+    },
+    {
+      "name": "each kind out by default, counted by reason",
+      "kind": "graph",
+      "world": {
+        "elements": [
+          {
+            "id": "c1",
+            "type": "character",
+            "name": "Ada",
+            "friends": [
+              "c2",
+              "c3",
+              "c4"
+            ],
+            "location": "z1"
+          },
+          {
+            "id": "c2",
+            "type": "character",
+            "name": "Member",
+            "supertype": "Member",
+            "x_room_of": "w1"
+          },
+          {
+            "id": "c3",
+            "type": "character",
+            "name": "Ghost",
+            "hidden": true
+          },
+          {
+            "id": "c4",
+            "type": "character",
+            "name": "Maybe",
+            "x_review_proposed": {
+              "by": "m1"
+            }
+          },
+          {
+            "id": "z1",
+            "type": "location",
+            "name": "Keep",
+            "zone": "z2"
+          },
+          {
+            "id": "z2",
+            "type": "zone",
+            "name": "March"
+          },
+          {
+            "id": "m1",
+            "type": "map",
+            "name": "Chart",
+            "location": "z1"
+          }
+        ]
+      },
+      "reader": {
+        "rung": "owner"
+      },
+      "want": {
+        "nodes": [
+          {
+            "id": "c1",
+            "type": "character",
+            "name": "Ada",
+            "family": "agents",
+            "icon": "person"
+          },
+          {
+            "id": "z1",
+            "type": "location",
+            "name": "Keep",
+            "family": "world",
+            "icon": "castle"
+          }
+        ],
+        "edges": [
+          {
+            "source": "c1",
+            "field": "location",
+            "target": "z1",
+            "index": 0
+          }
+        ],
+        "edges_cut": {
+          "room": 1,
+          "hidden": 1,
+          "proposed": 1,
+          "map_space": 1
+        },
+        "cut": {
+          "room": 1,
+          "hidden": 1,
+          "proposed": 1,
+          "map_space": 2
+        },
+        "unreadable": null
+      }
+    },
+    {
+      "name": "rooms brings room elements back, marked",
+      "kind": "graph",
+      "world": {
+        "elements": [
+          {
+            "id": "c1",
+            "type": "character",
+            "name": "Ada",
+            "friends": [
+              "c2",
+              "c3",
+              "c4"
+            ],
+            "location": "z1"
+          },
+          {
+            "id": "c2",
+            "type": "character",
+            "name": "Member",
+            "supertype": "Member",
+            "x_room_of": "w1"
+          },
+          {
+            "id": "c3",
+            "type": "character",
+            "name": "Ghost",
+            "hidden": true
+          },
+          {
+            "id": "c4",
+            "type": "character",
+            "name": "Maybe",
+            "x_review_proposed": {
+              "by": "m1"
+            }
+          },
+          {
+            "id": "z1",
+            "type": "location",
+            "name": "Keep",
+            "zone": "z2"
+          },
+          {
+            "id": "z2",
+            "type": "zone",
+            "name": "March"
+          },
+          {
+            "id": "m1",
+            "type": "map",
+            "name": "Chart",
+            "location": "z1"
+          }
+        ]
+      },
+      "reader": {
+        "rung": "owner"
+      },
+      "options": {
+        "rooms": true
+      },
+      "want": {
+        "nodes": [
+          {
+            "id": "c1",
+            "type": "character",
+            "name": "Ada",
+            "family": "agents",
+            "icon": "person"
+          },
+          {
+            "id": "c2",
+            "type": "character",
+            "name": "Member",
+            "family": "agents",
+            "icon": "person",
+            "marks": [
+              "room"
+            ]
+          },
+          {
+            "id": "z1",
+            "type": "location",
+            "name": "Keep",
+            "family": "world",
+            "icon": "castle"
+          }
+        ],
+        "edges": [
+          {
+            "source": "c1",
+            "field": "friends",
+            "target": "c2",
+            "index": 0
+          },
+          {
+            "source": "c1",
+            "field": "location",
+            "target": "z1",
+            "index": 0
+          }
+        ],
+        "edges_cut": {
+          "hidden": 1,
+          "proposed": 1,
+          "map_space": 1
+        },
+        "cut": {
+          "hidden": 1,
+          "proposed": 1,
+          "map_space": 2
+        },
+        "unreadable": null
+      }
+    },
+    {
+      "name": "hidden brings hidden elements back to the owner, marked",
+      "kind": "graph",
+      "world": {
+        "elements": [
+          {
+            "id": "c1",
+            "type": "character",
+            "name": "Ada",
+            "friends": [
+              "c2",
+              "c3",
+              "c4"
+            ],
+            "location": "z1"
+          },
+          {
+            "id": "c2",
+            "type": "character",
+            "name": "Member",
+            "supertype": "Member",
+            "x_room_of": "w1"
+          },
+          {
+            "id": "c3",
+            "type": "character",
+            "name": "Ghost",
+            "hidden": true
+          },
+          {
+            "id": "c4",
+            "type": "character",
+            "name": "Maybe",
+            "x_review_proposed": {
+              "by": "m1"
+            }
+          },
+          {
+            "id": "z1",
+            "type": "location",
+            "name": "Keep",
+            "zone": "z2"
+          },
+          {
+            "id": "z2",
+            "type": "zone",
+            "name": "March"
+          },
+          {
+            "id": "m1",
+            "type": "map",
+            "name": "Chart",
+            "location": "z1"
+          }
+        ]
+      },
+      "reader": {
+        "rung": "owner"
+      },
+      "options": {
+        "hidden": true
+      },
+      "want": {
+        "nodes": [
+          {
+            "id": "c1",
+            "type": "character",
+            "name": "Ada",
+            "family": "agents",
+            "icon": "person"
+          },
+          {
+            "id": "c3",
+            "type": "character",
+            "name": "Ghost",
+            "family": "agents",
+            "icon": "person",
+            "marks": [
+              "hidden"
+            ]
+          },
+          {
+            "id": "z1",
+            "type": "location",
+            "name": "Keep",
+            "family": "world",
+            "icon": "castle"
+          }
+        ],
+        "edges": [
+          {
+            "source": "c1",
+            "field": "friends",
+            "target": "c3",
+            "index": 1
+          },
+          {
+            "source": "c1",
+            "field": "location",
+            "target": "z1",
+            "index": 0
+          }
+        ],
+        "edges_cut": {
+          "room": 1,
+          "proposed": 1,
+          "map_space": 1
+        },
+        "cut": {
+          "room": 1,
+          "proposed": 1,
+          "map_space": 2
+        },
+        "unreadable": null
+      }
+    },
+    {
+      "name": "proposed brings proposed elements back to the owner, marked",
+      "kind": "graph",
+      "world": {
+        "elements": [
+          {
+            "id": "c1",
+            "type": "character",
+            "name": "Ada",
+            "friends": [
+              "c2",
+              "c3",
+              "c4"
+            ],
+            "location": "z1"
+          },
+          {
+            "id": "c2",
+            "type": "character",
+            "name": "Member",
+            "supertype": "Member",
+            "x_room_of": "w1"
+          },
+          {
+            "id": "c3",
+            "type": "character",
+            "name": "Ghost",
+            "hidden": true
+          },
+          {
+            "id": "c4",
+            "type": "character",
+            "name": "Maybe",
+            "x_review_proposed": {
+              "by": "m1"
+            }
+          },
+          {
+            "id": "z1",
+            "type": "location",
+            "name": "Keep",
+            "zone": "z2"
+          },
+          {
+            "id": "z2",
+            "type": "zone",
+            "name": "March"
+          },
+          {
+            "id": "m1",
+            "type": "map",
+            "name": "Chart",
+            "location": "z1"
+          }
+        ]
+      },
+      "reader": {
+        "rung": "owner"
+      },
+      "options": {
+        "proposed": true
+      },
+      "want": {
+        "nodes": [
+          {
+            "id": "c1",
+            "type": "character",
+            "name": "Ada",
+            "family": "agents",
+            "icon": "person"
+          },
+          {
+            "id": "c4",
+            "type": "character",
+            "name": "Maybe",
+            "family": "agents",
+            "icon": "person",
+            "marks": [
+              "proposed"
+            ]
+          },
+          {
+            "id": "z1",
+            "type": "location",
+            "name": "Keep",
+            "family": "world",
+            "icon": "castle"
+          }
+        ],
+        "edges": [
+          {
+            "source": "c1",
+            "field": "friends",
+            "target": "c4",
+            "index": 2
+          },
+          {
+            "source": "c1",
+            "field": "location",
+            "target": "z1",
+            "index": 0
+          }
+        ],
+        "edges_cut": {
+          "room": 1,
+          "hidden": 1,
+          "map_space": 1
+        },
+        "cut": {
+          "room": 1,
+          "hidden": 1,
+          "map_space": 2
+        },
+        "unreadable": null
+      }
+    },
+    {
+      "name": "map_space brings Maps, Pins, Markers and Zones back, with no mark",
+      "kind": "graph",
+      "world": {
+        "elements": [
+          {
+            "id": "c1",
+            "type": "character",
+            "name": "Ada",
+            "friends": [
+              "c2",
+              "c3",
+              "c4"
+            ],
+            "location": "z1"
+          },
+          {
+            "id": "c2",
+            "type": "character",
+            "name": "Member",
+            "supertype": "Member",
+            "x_room_of": "w1"
+          },
+          {
+            "id": "c3",
+            "type": "character",
+            "name": "Ghost",
+            "hidden": true
+          },
+          {
+            "id": "c4",
+            "type": "character",
+            "name": "Maybe",
+            "x_review_proposed": {
+              "by": "m1"
+            }
+          },
+          {
+            "id": "z1",
+            "type": "location",
+            "name": "Keep",
+            "zone": "z2"
+          },
+          {
+            "id": "z2",
+            "type": "zone",
+            "name": "March"
+          },
+          {
+            "id": "m1",
+            "type": "map",
+            "name": "Chart",
+            "location": "z1"
+          }
+        ]
+      },
+      "reader": {
+        "rung": "owner"
+      },
+      "options": {
+        "map_space": true
+      },
+      "want": {
+        "nodes": [
+          {
+            "id": "c1",
+            "type": "character",
+            "name": "Ada",
+            "family": "agents",
+            "icon": "person"
+          },
+          {
+            "id": "m1",
+            "type": "map",
+            "name": "Chart",
+            "family": "world",
+            "icon": "map"
+          },
+          {
+            "id": "z1",
+            "type": "location",
+            "name": "Keep",
+            "family": "world",
+            "icon": "castle"
+          },
+          {
+            "id": "z2",
+            "type": "zone",
+            "name": "March",
+            "family": "world",
+            "icon": "pentagon"
+          }
+        ],
+        "edges": [
+          {
+            "source": "c1",
+            "field": "location",
+            "target": "z1",
+            "index": 0
+          },
+          {
+            "source": "m1",
+            "field": "location",
+            "target": "z1",
+            "index": 0
+          },
+          {
+            "source": "z1",
+            "field": "zone",
+            "target": "z2",
+            "index": 0
+          }
+        ],
+        "edges_cut": {
+          "room": 1,
+          "hidden": 1,
+          "proposed": 1
+        },
+        "cut": {
+          "room": 1,
+          "hidden": 1,
+          "proposed": 1
+        },
+        "unreadable": null
+      }
+    },
+    {
+      "name": "every flag from the owner: the whole world",
+      "kind": "graph",
+      "world": {
+        "elements": [
+          {
+            "id": "c1",
+            "type": "character",
+            "name": "Ada",
+            "friends": [
+              "c2",
+              "c3",
+              "c4"
+            ],
+            "location": "z1"
+          },
+          {
+            "id": "c2",
+            "type": "character",
+            "name": "Member",
+            "supertype": "Member",
+            "x_room_of": "w1"
+          },
+          {
+            "id": "c3",
+            "type": "character",
+            "name": "Ghost",
+            "hidden": true
+          },
+          {
+            "id": "c4",
+            "type": "character",
+            "name": "Maybe",
+            "x_review_proposed": {
+              "by": "m1"
+            }
+          },
+          {
+            "id": "z1",
+            "type": "location",
+            "name": "Keep",
+            "zone": "z2"
+          },
+          {
+            "id": "z2",
+            "type": "zone",
+            "name": "March"
+          },
+          {
+            "id": "m1",
+            "type": "map",
+            "name": "Chart",
+            "location": "z1"
+          }
+        ]
+      },
+      "reader": {
+        "rung": "owner"
+      },
+      "options": {
+        "rooms": true,
+        "hidden": true,
+        "proposed": true,
+        "map_space": true
+      },
+      "want": {
+        "nodes": [
+          {
+            "id": "c1",
+            "type": "character",
+            "name": "Ada",
+            "family": "agents",
+            "icon": "person"
+          },
+          {
+            "id": "c2",
+            "type": "character",
+            "name": "Member",
+            "family": "agents",
+            "icon": "person",
+            "marks": [
+              "room"
+            ]
+          },
+          {
+            "id": "c3",
+            "type": "character",
+            "name": "Ghost",
+            "family": "agents",
+            "icon": "person",
+            "marks": [
+              "hidden"
+            ]
+          },
+          {
+            "id": "c4",
+            "type": "character",
+            "name": "Maybe",
+            "family": "agents",
+            "icon": "person",
+            "marks": [
+              "proposed"
+            ]
+          },
+          {
+            "id": "m1",
+            "type": "map",
+            "name": "Chart",
+            "family": "world",
+            "icon": "map"
+          },
+          {
+            "id": "z1",
+            "type": "location",
+            "name": "Keep",
+            "family": "world",
+            "icon": "castle"
+          },
+          {
+            "id": "z2",
+            "type": "zone",
+            "name": "March",
+            "family": "world",
+            "icon": "pentagon"
+          }
+        ],
+        "edges": [
+          {
+            "source": "c1",
+            "field": "friends",
+            "target": "c2",
+            "index": 0
+          },
+          {
+            "source": "c1",
+            "field": "friends",
+            "target": "c3",
+            "index": 1
+          },
+          {
+            "source": "c1",
+            "field": "friends",
+            "target": "c4",
+            "index": 2
+          },
+          {
+            "source": "c1",
+            "field": "location",
+            "target": "z1",
+            "index": 0
+          },
+          {
+            "source": "m1",
+            "field": "location",
+            "target": "z1",
+            "index": 0
+          },
+          {
+            "source": "z1",
+            "field": "zone",
+            "target": "z2",
+            "index": 0
+          }
+        ],
+        "edges_cut": {},
+        "cut": {},
+        "unreadable": null
+      }
+    },
+    {
+      "name": "a contributor: the owner's two kinds are not visible and never counted",
+      "kind": "graph",
+      "world": {
+        "elements": [
+          {
+            "id": "c1",
+            "type": "character",
+            "name": "Ada",
+            "friends": [
+              "c2",
+              "c3",
+              "c4"
+            ],
+            "location": "z1"
+          },
+          {
+            "id": "c2",
+            "type": "character",
+            "name": "Member",
+            "supertype": "Member",
+            "x_room_of": "w1"
+          },
+          {
+            "id": "c3",
+            "type": "character",
+            "name": "Ghost",
+            "hidden": true
+          },
+          {
+            "id": "c4",
+            "type": "character",
+            "name": "Maybe",
+            "x_review_proposed": {
+              "by": "m1"
+            }
+          },
+          {
+            "id": "z1",
+            "type": "location",
+            "name": "Keep",
+            "zone": "z2"
+          },
+          {
+            "id": "z2",
+            "type": "zone",
+            "name": "March"
+          },
+          {
+            "id": "m1",
+            "type": "map",
+            "name": "Chart",
+            "location": "z1"
+          }
+        ]
+      },
+      "reader": {
+        "rung": "contributor"
+      },
+      "options": {
+        "rooms": true
+      },
+      "want": {
+        "nodes": [
+          {
+            "id": "c1",
+            "type": "character",
+            "name": "Ada",
+            "family": "agents",
+            "icon": "person"
+          },
+          {
+            "id": "c2",
+            "type": "character",
+            "name": "Member",
+            "family": "agents",
+            "icon": "person",
+            "marks": [
+              "room"
+            ]
+          },
+          {
+            "id": "z1",
+            "type": "location",
+            "name": "Keep",
+            "family": "world",
+            "icon": "castle"
+          }
+        ],
+        "edges": [
+          {
+            "source": "c1",
+            "field": "friends",
+            "target": "c2",
+            "index": 0
+          },
+          {
+            "source": "c1",
+            "field": "location",
+            "target": "z1",
+            "index": 0
+          }
+        ],
+        "edges_cut": {
+          "map_space": 1
+        },
+        "cut": {
+          "map_space": 2
+        },
+        "unreadable": null
+      }
+    },
+    {
+      "name": "a public reader with no flag: no room, hidden or proposed node, and no count of them",
+      "kind": "graph",
+      "world": {
+        "elements": [
+          {
+            "id": "c1",
+            "type": "character",
+            "name": "Ada",
+            "friends": [
+              "c2",
+              "c3",
+              "c4"
+            ],
+            "location": "z1"
+          },
+          {
+            "id": "c2",
+            "type": "character",
+            "name": "Member",
+            "supertype": "Member",
+            "x_room_of": "w1"
+          },
+          {
+            "id": "c3",
+            "type": "character",
+            "name": "Ghost",
+            "hidden": true
+          },
+          {
+            "id": "c4",
+            "type": "character",
+            "name": "Maybe",
+            "x_review_proposed": {
+              "by": "m1"
+            }
+          },
+          {
+            "id": "z1",
+            "type": "location",
+            "name": "Keep",
+            "zone": "z2"
+          },
+          {
+            "id": "z2",
+            "type": "zone",
+            "name": "March"
+          },
+          {
+            "id": "m1",
+            "type": "map",
+            "name": "Chart",
+            "location": "z1"
+          }
+        ]
+      },
+      "reader": {
+        "rung": "public"
+      },
+      "want": {
+        "nodes": [
+          {
+            "id": "c1",
+            "type": "character",
+            "name": "Ada",
+            "family": "agents",
+            "icon": "person"
+          },
+          {
+            "id": "z1",
+            "type": "location",
+            "name": "Keep",
+            "family": "world",
+            "icon": "castle"
+          }
+        ],
+        "edges": [
+          {
+            "source": "c1",
+            "field": "location",
+            "target": "z1",
+            "index": 0
+          }
+        ],
+        "edges_cut": {
+          "map_space": 1
+        },
+        "cut": {
+          "map_space": 2
+        },
+        "unreadable": null
+      }
+    },
+    {
+      "name": "an owner reading as a contributor keeps the owner's count of what that view leaves out",
+      "kind": "graph",
+      "world": {
+        "elements": [
+          {
+            "id": "c1",
+            "type": "character",
+            "name": "Ada",
+            "friends": [
+              "c2",
+              "c3",
+              "c4"
+            ],
+            "location": "z1"
+          },
+          {
+            "id": "c2",
+            "type": "character",
+            "name": "Member",
+            "supertype": "Member",
+            "x_room_of": "w1"
+          },
+          {
+            "id": "c3",
+            "type": "character",
+            "name": "Ghost",
+            "hidden": true
+          },
+          {
+            "id": "c4",
+            "type": "character",
+            "name": "Maybe",
+            "x_review_proposed": {
+              "by": "m1"
+            }
+          },
+          {
+            "id": "z1",
+            "type": "location",
+            "name": "Keep",
+            "zone": "z2"
+          },
+          {
+            "id": "z2",
+            "type": "zone",
+            "name": "March"
+          },
+          {
+            "id": "m1",
+            "type": "map",
+            "name": "Chart",
+            "location": "z1"
+          }
+        ]
+      },
+      "reader": {
+        "rung": "owner",
+        "as": {
+          "rung": "contributor"
+        }
+      },
+      "want": {
+        "nodes": [
+          {
+            "id": "c1",
+            "type": "character",
+            "name": "Ada",
+            "family": "agents",
+            "icon": "person"
+          },
+          {
+            "id": "z1",
+            "type": "location",
+            "name": "Keep",
+            "family": "world",
+            "icon": "castle"
+          }
+        ],
+        "edges": [
+          {
+            "source": "c1",
+            "field": "location",
+            "target": "z1",
+            "index": 0
+          }
+        ],
+        "edges_cut": {
+          "not_visible": 2,
+          "room": 1,
+          "map_space": 1
+        },
+        "cut": {
+          "room": 1,
+          "map_space": 2
+        },
+        "unreadable": null
+      }
+    },
+    {
+      "name": "hidden asked from a contributor is refused",
+      "kind": "graph",
+      "world": {
+        "elements": [
+          {
+            "id": "c1",
+            "type": "character",
+            "name": "Ada",
+            "friends": [
+              "c2",
+              "c3",
+              "c4"
+            ],
+            "location": "z1"
+          },
+          {
+            "id": "c2",
+            "type": "character",
+            "name": "Member",
+            "supertype": "Member",
+            "x_room_of": "w1"
+          },
+          {
+            "id": "c3",
+            "type": "character",
+            "name": "Ghost",
+            "hidden": true
+          },
+          {
+            "id": "c4",
+            "type": "character",
+            "name": "Maybe",
+            "x_review_proposed": {
+              "by": "m1"
+            }
+          },
+          {
+            "id": "z1",
+            "type": "location",
+            "name": "Keep",
+            "zone": "z2"
+          },
+          {
+            "id": "z2",
+            "type": "zone",
+            "name": "March"
+          },
+          {
+            "id": "m1",
+            "type": "map",
+            "name": "Chart",
+            "location": "z1"
+          }
+        ]
+      },
+      "reader": {
+        "rung": "contributor"
+      },
+      "options": {
+        "hidden": true
+      },
+      "want": {
+        "refused": "hidden"
+      }
+    },
+    {
+      "name": "proposed asked from a guest is refused",
+      "kind": "graph",
+      "world": {
+        "elements": [
+          {
+            "id": "c1",
+            "type": "character",
+            "name": "Ada",
+            "friends": [
+              "c2",
+              "c3",
+              "c4"
+            ],
+            "location": "z1"
+          },
+          {
+            "id": "c2",
+            "type": "character",
+            "name": "Member",
+            "supertype": "Member",
+            "x_room_of": "w1"
+          },
+          {
+            "id": "c3",
+            "type": "character",
+            "name": "Ghost",
+            "hidden": true
+          },
+          {
+            "id": "c4",
+            "type": "character",
+            "name": "Maybe",
+            "x_review_proposed": {
+              "by": "m1"
+            }
+          },
+          {
+            "id": "z1",
+            "type": "location",
+            "name": "Keep",
+            "zone": "z2"
+          },
+          {
+            "id": "z2",
+            "type": "zone",
+            "name": "March"
+          },
+          {
+            "id": "m1",
+            "type": "map",
+            "name": "Chart",
+            "location": "z1"
+          }
+        ]
+      },
+      "reader": {
+        "rung": "guest",
+        "whole": [
+          "c1"
+        ]
+      },
+      "options": {
+        "proposed": true
+      },
+      "want": {
+        "refused": "proposed"
+      }
+    },
+    {
+      "name": "hidden asked by an owner reading as a contributor is refused",
+      "kind": "graph",
+      "world": {
+        "elements": [
+          {
+            "id": "c1",
+            "type": "character",
+            "name": "Ada",
+            "friends": [
+              "c2",
+              "c3",
+              "c4"
+            ],
+            "location": "z1"
+          },
+          {
+            "id": "c2",
+            "type": "character",
+            "name": "Member",
+            "supertype": "Member",
+            "x_room_of": "w1"
+          },
+          {
+            "id": "c3",
+            "type": "character",
+            "name": "Ghost",
+            "hidden": true
+          },
+          {
+            "id": "c4",
+            "type": "character",
+            "name": "Maybe",
+            "x_review_proposed": {
+              "by": "m1"
+            }
+          },
+          {
+            "id": "z1",
+            "type": "location",
+            "name": "Keep",
+            "zone": "z2"
+          },
+          {
+            "id": "z2",
+            "type": "zone",
+            "name": "March"
+          },
+          {
+            "id": "m1",
+            "type": "map",
+            "name": "Chart",
+            "location": "z1"
+          }
+        ]
+      },
+      "reader": {
+        "rung": "owner",
+        "as": {
+          "rung": "contributor"
+        }
+      },
+      "options": {
+        "hidden": true
+      },
+      "want": {
+        "refused": "hidden"
+      }
+    },
+    {
+      "name": "a public reader asking every flag is refused",
+      "kind": "graph",
+      "world": {
+        "elements": [
+          {
+            "id": "c1",
+            "type": "character",
+            "name": "Ada",
+            "friends": [
+              "c2",
+              "c3",
+              "c4"
+            ],
+            "location": "z1"
+          },
+          {
+            "id": "c2",
+            "type": "character",
+            "name": "Member",
+            "supertype": "Member",
+            "x_room_of": "w1"
+          },
+          {
+            "id": "c3",
+            "type": "character",
+            "name": "Ghost",
+            "hidden": true
+          },
+          {
+            "id": "c4",
+            "type": "character",
+            "name": "Maybe",
+            "x_review_proposed": {
+              "by": "m1"
+            }
+          },
+          {
+            "id": "z1",
+            "type": "location",
+            "name": "Keep",
+            "zone": "z2"
+          },
+          {
+            "id": "z2",
+            "type": "zone",
+            "name": "March"
+          },
+          {
+            "id": "m1",
+            "type": "map",
+            "name": "Chart",
+            "location": "z1"
+          }
+        ]
+      },
+      "reader": {
+        "rung": "public"
+      },
+      "options": {
+        "rooms": true,
+        "hidden": true,
+        "proposed": true,
+        "map_space": true
+      },
+      "want": {
+        "refused": "hidden"
+      }
+    },
+    {
+      "name": "a public reader asking rooms is refused",
+      "kind": "graph",
+      "world": {
+        "elements": [
+          {
+            "id": "c1",
+            "type": "character",
+            "name": "Ada",
+            "friends": [
+              "c2",
+              "c3",
+              "c4"
+            ],
+            "location": "z1"
+          },
+          {
+            "id": "c2",
+            "type": "character",
+            "name": "Member",
+            "supertype": "Member",
+            "x_room_of": "w1"
+          },
+          {
+            "id": "c3",
+            "type": "character",
+            "name": "Ghost",
+            "hidden": true
+          },
+          {
+            "id": "c4",
+            "type": "character",
+            "name": "Maybe",
+            "x_review_proposed": {
+              "by": "m1"
+            }
+          },
+          {
+            "id": "z1",
+            "type": "location",
+            "name": "Keep",
+            "zone": "z2"
+          },
+          {
+            "id": "z2",
+            "type": "zone",
+            "name": "March"
+          },
+          {
+            "id": "m1",
+            "type": "map",
+            "name": "Chart",
+            "location": "z1"
+          }
+        ]
+      },
+      "reader": {
+        "rung": "public"
+      },
+      "options": {
+        "rooms": true
+      },
+      "want": {
+        "refused": "rooms"
+      }
+    },
+    {
+      "name": "a public reader asking map_space is refused",
+      "kind": "graph",
+      "world": {
+        "elements": [
+          {
+            "id": "c1",
+            "type": "character",
+            "name": "Ada",
+            "friends": [
+              "c2",
+              "c3",
+              "c4"
+            ],
+            "location": "z1"
+          },
+          {
+            "id": "c2",
+            "type": "character",
+            "name": "Member",
+            "supertype": "Member",
+            "x_room_of": "w1"
+          },
+          {
+            "id": "c3",
+            "type": "character",
+            "name": "Ghost",
+            "hidden": true
+          },
+          {
+            "id": "c4",
+            "type": "character",
+            "name": "Maybe",
+            "x_review_proposed": {
+              "by": "m1"
+            }
+          },
+          {
+            "id": "z1",
+            "type": "location",
+            "name": "Keep",
+            "zone": "z2"
+          },
+          {
+            "id": "z2",
+            "type": "zone",
+            "name": "March"
+          },
+          {
+            "id": "m1",
+            "type": "map",
+            "name": "Chart",
+            "location": "z1"
+          }
+        ]
+      },
+      "reader": {
+        "rung": "public"
+      },
+      "options": {
+        "map_space": true
+      },
+      "want": {
+        "refused": "map_space"
+      }
+    },
+    {
+      "name": "an edge into a lens's cut is counted by its reason, and one past its hops as outside_lens",
+      "kind": "graph",
+      "world": {
+        "elements": [
+          {
+            "id": "L1",
+            "type": "construct",
+            "supertype": "Lens",
+            "name": "Ada's lens",
+            "characters": [
+              "c1"
+            ],
+            "x_lens": {
+              "types": [
+                "character"
+              ]
+            }
+          },
+          {
+            "id": "c1",
+            "type": "character",
+            "name": "Ada",
+            "friends": [
+              "c2"
+            ],
+            "objects": [
+              "o1"
+            ],
+            "location": "p1",
+            "rivals": [
+              "c5"
+            ]
+          },
+          {
+            "id": "c2",
+            "type": "character",
+            "name": "Bo",
+            "rivals": [
+              "c3"
+            ]
+          },
+          {
+            "id": "c3",
+            "type": "character",
+            "name": "Cy"
+          },
+          {
+            "id": "o1",
+            "type": "object",
+            "name": "Lamp"
+          },
+          {
+            "id": "p1",
+            "type": "location",
+            "name": "Inn"
+          },
+          {
+            "id": "c5",
+            "type": "character",
+            "name": "Member",
+            "supertype": "Member",
+            "x_room_of": "w1"
+          },
+          {
+            "id": "m1",
+            "type": "map",
+            "name": "Chart"
+          }
+        ]
+      },
+      "reader": {
+        "rung": "owner"
+      },
+      "options": {
+        "lens": "L1"
+      },
+      "want": {
+        "nodes": [
+          {
+            "id": "c1",
+            "type": "character",
+            "name": "Ada",
+            "family": "agents",
+            "icon": "person"
+          },
+          {
+            "id": "c2",
+            "type": "character",
+            "name": "Bo",
+            "family": "agents",
+            "icon": "person"
+          }
+        ],
+        "edges": [
+          {
+            "source": "c1",
+            "field": "friends",
+            "target": "c2",
+            "index": 0
+          }
+        ],
+        "edges_cut": {
+          "types": 3,
+          "outside_lens": 1
+        },
+        "cut": {
+          "types": 3
+        },
+        "unreadable": null
+      }
+    },
+    {
+      "name": "no flag widens a lens",
+      "kind": "graph",
+      "world": {
+        "elements": [
+          {
+            "id": "L1",
+            "type": "construct",
+            "supertype": "Lens",
+            "name": "Ada's lens",
+            "characters": [
+              "c1"
+            ],
+            "x_lens": {
+              "types": [
+                "character"
+              ]
+            }
+          },
+          {
+            "id": "c1",
+            "type": "character",
+            "name": "Ada",
+            "friends": [
+              "c2"
+            ],
+            "objects": [
+              "o1"
+            ],
+            "location": "p1",
+            "rivals": [
+              "c5"
+            ]
+          },
+          {
+            "id": "c2",
+            "type": "character",
+            "name": "Bo",
+            "rivals": [
+              "c3"
+            ]
+          },
+          {
+            "id": "c3",
+            "type": "character",
+            "name": "Cy"
+          },
+          {
+            "id": "o1",
+            "type": "object",
+            "name": "Lamp"
+          },
+          {
+            "id": "p1",
+            "type": "location",
+            "name": "Inn"
+          },
+          {
+            "id": "c5",
+            "type": "character",
+            "name": "Member",
+            "supertype": "Member",
+            "x_room_of": "w1"
+          },
+          {
+            "id": "m1",
+            "type": "map",
+            "name": "Chart"
+          }
+        ]
+      },
+      "reader": {
+        "rung": "owner"
+      },
+      "options": {
+        "lens": "L1",
+        "rooms": true,
+        "hidden": true,
+        "proposed": true,
+        "map_space": true
+      },
+      "want": {
+        "nodes": [
+          {
+            "id": "c1",
+            "type": "character",
+            "name": "Ada",
+            "family": "agents",
+            "icon": "person"
+          },
+          {
+            "id": "c2",
+            "type": "character",
+            "name": "Bo",
+            "family": "agents",
+            "icon": "person"
+          }
+        ],
+        "edges": [
+          {
+            "source": "c1",
+            "field": "friends",
+            "target": "c2",
+            "index": 0
+          }
+        ],
+        "edges_cut": {
+          "types": 3,
+          "outside_lens": 1
+        },
+        "cut": {
+          "types": 3
+        },
+        "unreadable": null
+      }
+    },
+    {
+      "name": "a lens that names a room pair keeps its room elements without the rooms flag",
+      "kind": "graph",
+      "world": {
+        "elements": [
+          {
+            "id": "L2",
+            "type": "construct",
+            "supertype": "Lens",
+            "name": "Members",
+            "x_lens": {
+              "types": [
+                "character/Member"
+              ]
+            }
+          },
+          {
+            "id": "c1",
+            "type": "character",
+            "name": "Ada",
+            "friends": [
+              "c2"
+            ]
+          },
+          {
+            "id": "c2",
+            "type": "character",
+            "name": "Member",
+            "supertype": "Member",
+            "x_room_of": "w1",
+            "friends": [
+              "c1"
+            ]
+          }
+        ]
+      },
+      "reader": {
+        "rung": "owner"
+      },
+      "options": {
+        "lens": {
+          "id": "L2",
+          "type": "construct",
+          "supertype": "Lens",
+          "name": "Members",
+          "x_lens": {
+            "types": [
+              "character/Member"
+            ]
+          }
+        }
+      },
+      "want": {
+        "nodes": [
+          {
+            "id": "c2",
+            "type": "character",
+            "name": "Member",
+            "family": "agents",
+            "icon": "person",
+            "marks": [
+              "room"
+            ]
+          }
+        ],
+        "edges": [],
+        "edges_cut": {
+          "outside_lens": 1
+        },
+        "cut": {},
+        "unreadable": null
+      }
+    },
+    {
+      "name": "a lens id the reader cannot see reads as nothing",
+      "kind": "graph",
+      "world": {
+        "elements": [
+          {
+            "id": "L1",
+            "type": "construct",
+            "supertype": "Lens",
+            "name": "Ada's lens",
+            "characters": [
+              "c1"
+            ],
+            "x_lens": {
+              "types": [
+                "character"
+              ]
+            },
+            "hidden": true
+          },
+          {
+            "id": "c1",
+            "type": "character",
+            "name": "Ada",
+            "friends": [
+              "c2"
+            ]
+          }
+        ]
+      },
+      "reader": {
+        "rung": "contributor"
+      },
+      "options": {
+        "lens": "L1"
+      },
+      "want": {
+        "nodes": [],
+        "edges": [],
+        "edges_cut": {},
+        "cut": {},
+        "unreadable": null
+      }
+    },
+    {
+      "name": "an edge past a lens's hops (depth 0) is outside_lens",
+      "kind": "graph",
+      "world": {
+        "elements": [
+          {
+            "id": "LH",
+            "type": "construct",
+            "supertype": "Lens",
+            "name": "Ada only",
+            "characters": [
+              "c1"
+            ],
+            "x_lens": {
+              "depth": 0
+            }
+          },
+          {
+            "id": "LT",
+            "type": "construct",
+            "supertype": "Lens",
+            "name": "Characters",
+            "x_lens": {
+              "types": [
+                "character"
+              ]
+            }
+          },
+          {
+            "id": "LU",
+            "type": "construct",
+            "supertype": "Lens",
+            "name": "Too far",
+            "characters": [
+              "c1"
+            ],
+            "x_lens": {
+              "depth": 9
+            }
+          },
+          {
+            "id": "c1",
+            "type": "character",
+            "name": "Ada",
+            "friends": [
+              "c2"
+            ],
+            "objects": [
+              "o1"
+            ],
+            "rivals": [
+              "c3"
+            ]
+          },
+          {
+            "id": "c2",
+            "type": "character",
+            "name": "Bo"
+          },
+          {
+            "id": "c3",
+            "type": "character",
+            "name": "Ghost",
+            "hidden": true
+          },
+          {
+            "id": "o1",
+            "type": "object",
+            "name": "Lamp"
+          }
+        ]
+      },
+      "reader": {
+        "rung": "owner"
+      },
+      "options": {
+        "lens": "LH"
+      },
+      "want": {
+        "nodes": [
+          {
+            "id": "c1",
+            "type": "character",
+            "name": "Ada",
+            "family": "agents",
+            "icon": "person"
+          }
+        ],
+        "edges": [],
+        "edges_cut": {
+          "outside_lens": 3
+        },
+        "cut": {},
+        "unreadable": null
+      }
+    },
+    {
+      "name": "an edge out of a filter lens's types is outside_lens",
+      "kind": "graph",
+      "world": {
+        "elements": [
+          {
+            "id": "LH",
+            "type": "construct",
+            "supertype": "Lens",
+            "name": "Ada only",
+            "characters": [
+              "c1"
+            ],
+            "x_lens": {
+              "depth": 0
+            }
+          },
+          {
+            "id": "LT",
+            "type": "construct",
+            "supertype": "Lens",
+            "name": "Characters",
+            "x_lens": {
+              "types": [
+                "character"
+              ]
+            }
+          },
+          {
+            "id": "LU",
+            "type": "construct",
+            "supertype": "Lens",
+            "name": "Too far",
+            "characters": [
+              "c1"
+            ],
+            "x_lens": {
+              "depth": 9
+            }
+          },
+          {
+            "id": "c1",
+            "type": "character",
+            "name": "Ada",
+            "friends": [
+              "c2"
+            ],
+            "objects": [
+              "o1"
+            ],
+            "rivals": [
+              "c3"
+            ]
+          },
+          {
+            "id": "c2",
+            "type": "character",
+            "name": "Bo"
+          },
+          {
+            "id": "c3",
+            "type": "character",
+            "name": "Ghost",
+            "hidden": true
+          },
+          {
+            "id": "o1",
+            "type": "object",
+            "name": "Lamp"
+          }
+        ]
+      },
+      "reader": {
+        "rung": "owner"
+      },
+      "options": {
+        "lens": "LT"
+      },
+      "want": {
+        "nodes": [
+          {
+            "id": "c1",
+            "type": "character",
+            "name": "Ada",
+            "family": "agents",
+            "icon": "person"
+          },
+          {
+            "id": "c2",
+            "type": "character",
+            "name": "Bo",
+            "family": "agents",
+            "icon": "person"
+          },
+          {
+            "id": "c3",
+            "type": "character",
+            "name": "Ghost",
+            "family": "agents",
+            "icon": "person",
+            "marks": [
+              "hidden"
+            ]
+          }
+        ],
+        "edges": [
+          {
+            "source": "c1",
+            "field": "friends",
+            "target": "c2",
+            "index": 0
+          },
+          {
+            "source": "c1",
+            "field": "rivals",
+            "target": "c3",
+            "index": 0
+          }
+        ],
+        "edges_cut": {
+          "outside_lens": 1
+        },
+        "cut": {},
+        "unreadable": null
+      }
+    },
+    {
+      "name": "a contributor carries outside_lens, and still no count of what it does not see",
+      "kind": "graph",
+      "world": {
+        "elements": [
+          {
+            "id": "LH",
+            "type": "construct",
+            "supertype": "Lens",
+            "name": "Ada only",
+            "characters": [
+              "c1"
+            ],
+            "x_lens": {
+              "depth": 0
+            }
+          },
+          {
+            "id": "LT",
+            "type": "construct",
+            "supertype": "Lens",
+            "name": "Characters",
+            "x_lens": {
+              "types": [
+                "character"
+              ]
+            }
+          },
+          {
+            "id": "LU",
+            "type": "construct",
+            "supertype": "Lens",
+            "name": "Too far",
+            "characters": [
+              "c1"
+            ],
+            "x_lens": {
+              "depth": 9
+            }
+          },
+          {
+            "id": "c1",
+            "type": "character",
+            "name": "Ada",
+            "friends": [
+              "c2"
+            ],
+            "objects": [
+              "o1"
+            ],
+            "rivals": [
+              "c3"
+            ]
+          },
+          {
+            "id": "c2",
+            "type": "character",
+            "name": "Bo"
+          },
+          {
+            "id": "c3",
+            "type": "character",
+            "name": "Ghost",
+            "hidden": true
+          },
+          {
+            "id": "o1",
+            "type": "object",
+            "name": "Lamp"
+          }
+        ]
+      },
+      "reader": {
+        "rung": "contributor"
+      },
+      "options": {
+        "lens": "LT"
+      },
+      "want": {
+        "nodes": [
+          {
+            "id": "c1",
+            "type": "character",
+            "name": "Ada",
+            "family": "agents",
+            "icon": "person"
+          },
+          {
+            "id": "c2",
+            "type": "character",
+            "name": "Bo",
+            "family": "agents",
+            "icon": "person"
+          }
+        ],
+        "edges": [
+          {
+            "source": "c1",
+            "field": "friends",
+            "target": "c2",
+            "index": 0
+          }
+        ],
+        "edges_cut": {
+          "outside_lens": 1
+        },
+        "cut": {},
+        "unreadable": null
+      }
+    },
+    {
+      "name": "an unreadable lens by id answers empty, naming the key",
+      "kind": "graph",
+      "world": {
+        "elements": [
+          {
+            "id": "LH",
+            "type": "construct",
+            "supertype": "Lens",
+            "name": "Ada only",
+            "characters": [
+              "c1"
+            ],
+            "x_lens": {
+              "depth": 0
+            }
+          },
+          {
+            "id": "LT",
+            "type": "construct",
+            "supertype": "Lens",
+            "name": "Characters",
+            "x_lens": {
+              "types": [
+                "character"
+              ]
+            }
+          },
+          {
+            "id": "LU",
+            "type": "construct",
+            "supertype": "Lens",
+            "name": "Too far",
+            "characters": [
+              "c1"
+            ],
+            "x_lens": {
+              "depth": 9
+            }
+          },
+          {
+            "id": "c1",
+            "type": "character",
+            "name": "Ada",
+            "friends": [
+              "c2"
+            ],
+            "objects": [
+              "o1"
+            ],
+            "rivals": [
+              "c3"
+            ]
+          },
+          {
+            "id": "c2",
+            "type": "character",
+            "name": "Bo"
+          },
+          {
+            "id": "c3",
+            "type": "character",
+            "name": "Ghost",
+            "hidden": true
+          },
+          {
+            "id": "o1",
+            "type": "object",
+            "name": "Lamp"
+          }
+        ]
+      },
+      "reader": {
+        "rung": "owner"
+      },
+      "options": {
+        "lens": "LU"
+      },
+      "want": {
+        "nodes": [],
+        "edges": [],
+        "edges_cut": {},
+        "cut": {},
+        "unreadable": "depth"
+      }
+    },
+    {
+      "name": "an unreadable lens body answers empty, naming x_lens itself",
+      "kind": "graph",
+      "world": {
+        "elements": [
+          {
+            "id": "LH",
+            "type": "construct",
+            "supertype": "Lens",
+            "name": "Ada only",
+            "characters": [
+              "c1"
+            ],
+            "x_lens": {
+              "depth": 0
+            }
+          },
+          {
+            "id": "LT",
+            "type": "construct",
+            "supertype": "Lens",
+            "name": "Characters",
+            "x_lens": {
+              "types": [
+                "character"
+              ]
+            }
+          },
+          {
+            "id": "LU",
+            "type": "construct",
+            "supertype": "Lens",
+            "name": "Too far",
+            "characters": [
+              "c1"
+            ],
+            "x_lens": {
+              "depth": 9
+            }
+          },
+          {
+            "id": "c1",
+            "type": "character",
+            "name": "Ada",
+            "friends": [
+              "c2"
+            ],
+            "objects": [
+              "o1"
+            ],
+            "rivals": [
+              "c3"
+            ]
+          },
+          {
+            "id": "c2",
+            "type": "character",
+            "name": "Bo"
+          },
+          {
+            "id": "c3",
+            "type": "character",
+            "name": "Ghost",
+            "hidden": true
+          },
+          {
+            "id": "o1",
+            "type": "object",
+            "name": "Lamp"
+          }
+        ]
+      },
+      "reader": {
+        "rung": "contributor"
+      },
+      "options": {
+        "lens": {
+          "id": "LX",
+          "type": "construct",
+          "supertype": "Lens",
+          "name": "Odd",
+          "characters": [
+            "c1"
+          ],
+          "x_lens": "far"
+        }
+      },
+      "want": {
+        "nodes": [],
+        "edges": [],
+        "edges_cut": {},
+        "cut": {},
+        "unreadable": "x_lens"
+      }
+    },
+    {
+      "name": "an unlensed graph answers unreadable: null",
+      "kind": "graph",
+      "world": {
+        "elements": [
+          {
+            "id": "LH",
+            "type": "construct",
+            "supertype": "Lens",
+            "name": "Ada only",
+            "characters": [
+              "c1"
+            ],
+            "x_lens": {
+              "depth": 0
+            }
+          },
+          {
+            "id": "LT",
+            "type": "construct",
+            "supertype": "Lens",
+            "name": "Characters",
+            "x_lens": {
+              "types": [
+                "character"
+              ]
+            }
+          },
+          {
+            "id": "LU",
+            "type": "construct",
+            "supertype": "Lens",
+            "name": "Too far",
+            "characters": [
+              "c1"
+            ],
+            "x_lens": {
+              "depth": 9
+            }
+          },
+          {
+            "id": "c1",
+            "type": "character",
+            "name": "Ada",
+            "friends": [
+              "c2"
+            ],
+            "objects": [
+              "o1"
+            ],
+            "rivals": [
+              "c3"
+            ]
+          },
+          {
+            "id": "c2",
+            "type": "character",
+            "name": "Bo"
+          },
+          {
+            "id": "c3",
+            "type": "character",
+            "name": "Ghost",
+            "hidden": true
+          },
+          {
+            "id": "o1",
+            "type": "object",
+            "name": "Lamp"
+          }
+        ]
+      },
+      "reader": {
+        "rung": "owner"
+      },
+      "want": {
+        "nodes": [
+          {
+            "id": "LH",
+            "type": "construct",
+            "name": "Ada only",
+            "family": "world",
+            "icon": "api"
+          },
+          {
+            "id": "LT",
+            "type": "construct",
+            "name": "Characters",
+            "family": "world",
+            "icon": "api"
+          },
+          {
+            "id": "LU",
+            "type": "construct",
+            "name": "Too far",
+            "family": "world",
+            "icon": "api"
+          },
+          {
+            "id": "c1",
+            "type": "character",
+            "name": "Ada",
+            "family": "agents",
+            "icon": "person"
+          },
+          {
+            "id": "c2",
+            "type": "character",
+            "name": "Bo",
+            "family": "agents",
+            "icon": "person"
+          },
+          {
+            "id": "o1",
+            "type": "object",
+            "name": "Lamp",
+            "family": "world",
+            "icon": "webhook"
+          }
+        ],
+        "edges": [
+          {
+            "source": "LH",
+            "field": "characters",
+            "target": "c1",
+            "index": 0
+          },
+          {
+            "source": "LU",
+            "field": "characters",
+            "target": "c1",
+            "index": 0
+          },
+          {
+            "source": "c1",
+            "field": "friends",
+            "target": "c2",
+            "index": 0
+          },
+          {
+            "source": "c1",
+            "field": "objects",
+            "target": "o1",
+            "index": 0
+          }
+        ],
+        "edges_cut": {
+          "hidden": 1
+        },
+        "cut": {
+          "hidden": 1
+        },
+        "unreadable": null
+      }
+    },
+    {
+      "name": "the order: ids by code point, then field, then index; a list in its own order",
+      "kind": "graph",
+      "world": {
+        "elements": [
+          {
+            "id": "a😀",
+            "type": "character",
+            "name": "High",
+            "rivals": [
+              "k"
+            ],
+            "friends": [
+              "z",
+              "b",
+              "m"
+            ]
+          },
+          {
+            "id": "a｡",
+            "type": "character",
+            "name": "Low",
+            "friends": [
+              "a😀"
+            ]
+          },
+          {
+            "id": "b",
+            "type": "character",
+            "name": "B"
+          },
+          {
+            "id": "k",
+            "type": "character",
+            "name": "K"
+          },
+          {
+            "id": "m",
+            "type": "character",
+            "name": "M"
+          },
+          {
+            "id": "z",
+            "type": "character",
+            "name": "Z"
+          }
+        ]
+      },
+      "reader": {
+        "rung": "owner"
+      },
+      "want": {
+        "nodes": [
+          {
+            "id": "a｡",
+            "type": "character",
+            "name": "Low",
+            "family": "agents",
+            "icon": "person"
+          },
+          {
+            "id": "a😀",
+            "type": "character",
+            "name": "High",
+            "family": "agents",
+            "icon": "person"
+          },
+          {
+            "id": "b",
+            "type": "character",
+            "name": "B",
+            "family": "agents",
+            "icon": "person"
+          },
+          {
+            "id": "k",
+            "type": "character",
+            "name": "K",
+            "family": "agents",
+            "icon": "person"
+          },
+          {
+            "id": "m",
+            "type": "character",
+            "name": "M",
+            "family": "agents",
+            "icon": "person"
+          },
+          {
+            "id": "z",
+            "type": "character",
+            "name": "Z",
+            "family": "agents",
+            "icon": "person"
+          }
+        ],
+        "edges": [
+          {
+            "source": "a｡",
+            "field": "friends",
+            "target": "a😀",
+            "index": 0
+          },
+          {
+            "source": "a😀",
+            "field": "friends",
+            "target": "z",
+            "index": 0
+          },
+          {
+            "source": "a😀",
+            "field": "friends",
+            "target": "b",
+            "index": 1
+          },
+          {
+            "source": "a😀",
+            "field": "friends",
+            "target": "m",
+            "index": 2
+          },
+          {
+            "source": "a😀",
+            "field": "rivals",
+            "target": "k",
+            "index": 0
+          }
+        ],
+        "edges_cut": {},
+        "cut": {},
+        "unreadable": null
+      }
+    },
+    {
+      "name": "the owner's index is the stored place",
+      "kind": "graph",
+      "world": {
+        "elements": [
+          {
+            "id": "c1",
+            "type": "character",
+            "name": "Ada",
+            "friends": [
+              "c2",
+              "c3"
+            ]
+          },
+          {
+            "id": "c2",
+            "type": "character",
+            "name": "Ghost"
+          },
+          {
+            "id": "c3",
+            "type": "character",
+            "name": "Cy"
+          }
+        ],
+        "hidden": [
+          "c2"
+        ]
+      },
+      "reader": {
+        "rung": "owner"
+      },
+      "want": {
+        "nodes": [
+          {
+            "id": "c1",
+            "type": "character",
+            "name": "Ada",
+            "family": "agents",
+            "icon": "person"
+          },
+          {
+            "id": "c3",
+            "type": "character",
+            "name": "Cy",
+            "family": "agents",
+            "icon": "person"
+          }
+        ],
+        "edges": [
+          {
+            "source": "c1",
+            "field": "friends",
+            "target": "c3",
+            "index": 1
+          }
+        ],
+        "edges_cut": {
+          "hidden": 1
+        },
+        "cut": {
+          "hidden": 1
+        },
+        "unreadable": null
+      }
+    },
+    {
+      "name": "a contributor's index is the place in the list it is served",
+      "kind": "graph",
+      "world": {
+        "elements": [
+          {
+            "id": "c1",
+            "type": "character",
+            "name": "Ada",
+            "friends": [
+              "c2",
+              "c3"
+            ]
+          },
+          {
+            "id": "c2",
+            "type": "character",
+            "name": "Ghost"
+          },
+          {
+            "id": "c3",
+            "type": "character",
+            "name": "Cy"
+          }
+        ],
+        "hidden": [
+          "c2"
+        ]
+      },
+      "reader": {
+        "rung": "contributor"
+      },
+      "want": {
+        "nodes": [
+          {
+            "id": "c1",
+            "type": "character",
+            "name": "Ada",
+            "family": "agents",
+            "icon": "person"
+          },
+          {
+            "id": "c3",
+            "type": "character",
+            "name": "Cy",
+            "family": "agents",
+            "icon": "person"
+          }
+        ],
+        "edges": [
+          {
+            "source": "c1",
+            "field": "friends",
+            "target": "c3",
+            "index": 0
+          }
+        ],
+        "edges_cut": {},
+        "cut": {},
+        "unreadable": null
+      }
+    },
+    {
+      "name": "x_lens_leads_to and x_spine_depends_on are links; another x_ field is not; a missing id is not counted",
+      "kind": "graph",
+      "world": {
+        "elements": [
+          {
+            "id": "L1",
+            "type": "construct",
+            "supertype": "Lens",
+            "name": "Sign",
+            "x_lens_leads_to": [
+              "L2",
+              "gone"
+            ]
+          },
+          {
+            "id": "L2",
+            "type": "construct",
+            "supertype": "Lens",
+            "name": "Next"
+          },
+          {
+            "id": "t1",
+            "type": "title",
+            "name": "Steward",
+            "x_spine_depends_on": [
+              "t2",
+              "t2"
+            ],
+            "x_other": [
+              "t2"
+            ]
+          },
+          {
+            "id": "t2",
+            "type": "title",
+            "name": "Clerk"
+          }
+        ]
+      },
+      "reader": {
+        "rung": "owner"
+      },
+      "want": {
+        "nodes": [
+          {
+            "id": "L1",
+            "type": "construct",
+            "name": "Sign",
+            "family": "world",
+            "icon": "api"
+          },
+          {
+            "id": "L2",
+            "type": "construct",
+            "name": "Next",
+            "family": "world",
+            "icon": "api"
+          },
+          {
+            "id": "t1",
+            "type": "title",
+            "name": "Steward",
+            "family": "abstract",
+            "icon": "military_tech"
+          },
+          {
+            "id": "t2",
+            "type": "title",
+            "name": "Clerk",
+            "family": "abstract",
+            "icon": "military_tech"
+          }
+        ],
+        "edges": [
+          {
+            "source": "L1",
+            "field": "x_lens_leads_to",
+            "target": "L2",
+            "index": 0
+          },
+          {
+            "source": "t1",
+            "field": "x_spine_depends_on",
+            "target": "t2",
+            "index": 0
+          },
+          {
+            "source": "t1",
+            "field": "x_spine_depends_on",
+            "target": "t2",
+            "index": 1
+          }
+        ],
+        "edges_cut": {},
+        "cut": {},
+        "unreadable": null
+      }
+    },
+    {
+      "name": "a link to the lens element itself is outside_lens: the lens read is never in its own result",
+      "kind": "graph",
+      "world": {
+        "elements": [
+          {
+            "id": "LR",
+            "type": "construct",
+            "supertype": "Lens",
+            "name": "Bonds and charters",
+            "x_lens": {
+              "types": [
+                "relation",
+                "construct"
+              ]
+            }
+          },
+          {
+            "id": "k1",
+            "type": "construct",
+            "name": "Charter"
+          },
+          {
+            "id": "r1",
+            "type": "relation",
+            "name": "Pact",
+            "constructs": [
+              "LR",
+              "k1"
+            ]
+          }
+        ]
+      },
+      "reader": {
+        "rung": "owner"
+      },
+      "options": {
+        "lens": "LR"
+      },
+      "want": {
+        "nodes": [
+          {
+            "id": "k1",
+            "type": "construct",
+            "name": "Charter",
+            "family": "world",
+            "icon": "api"
+          },
+          {
+            "id": "r1",
+            "type": "relation",
+            "name": "Pact",
+            "family": "temporal",
+            "icon": "link"
+          }
+        ],
+        "edges": [
+          {
+            "source": "r1",
+            "field": "constructs",
+            "target": "k1",
+            "index": 1
+          }
+        ],
+        "edges_cut": {
+          "outside_lens": 1
+        },
+        "cut": {},
+        "unreadable": null
+      }
+    },
+    {
+      "name": "a link to a message the mail part took is outside_lens: the mail part is not kept",
+      "kind": "graph",
+      "world": {
+        "members": [
+          {
+            "id": "u-ada",
+            "character": "ada"
+          },
+          {
+            "id": "u-bo",
+            "character": "bo"
+          }
+        ],
+        "elements": [
+          {
+            "id": "LM",
+            "type": "construct",
+            "supertype": "Lens",
+            "name": "Rota and post",
+            "x_lens": {
+              "types": [
+                "relation",
+                "narrative/message"
+              ],
+              "mail": "unread_full_read_titles"
+            }
+          },
+          {
+            "id": "ada",
+            "type": "character",
+            "name": "Ada"
+          },
+          {
+            "id": "bo",
+            "type": "character",
+            "name": "Bo"
+          },
+          {
+            "id": "m1",
+            "type": "narrative",
+            "supertype": "Message",
+            "name": "Thursday",
+            "narrator": "bo",
+            "characters": [
+              "ada"
+            ],
+            "story": "Can you take Thursday?",
+            "created_by": "u-bo",
+            "created_at": "2026-10-25T12:00:00Z"
+          },
+          {
+            "id": "r1",
+            "type": "relation",
+            "name": "Watch rota",
+            "narratives": [
+              "m1"
+            ]
+          }
+        ]
+      },
+      "reader": {
+        "rung": "contributor",
+        "character": "ada"
+      },
+      "options": {
+        "lens": "LM",
+        "clock": "2026-10-27T12:00:00Z"
+      },
+      "want": {
+        "nodes": [
+          {
+            "id": "r1",
+            "type": "relation",
+            "name": "Watch rota",
+            "family": "temporal",
+            "icon": "link"
+          }
+        ],
+        "edges": [],
+        "edges_cut": {
+          "outside_lens": 1
+        },
+        "cut": {},
+        "unreadable": null
+      }
     }
+  ],
+  "graph_links": [
+    "x_lens_leads_to",
+    "x_spine_depends_on"
+  ],
+  "graph_flags": [
+    "rooms",
+    "hidden",
+    "proposed",
+    "map_space"
+  ],
+  "owner_only_flags": [
+    "hidden",
+    "proposed"
+  ],
+  "edges_cut_reasons": [
+    "room",
+    "hidden",
+    "proposed",
+    "map_space",
+    "not_visible",
+    "outside_lens",
+    "budget",
+    "types",
+    "window",
+    "undated",
+    "after_as_of",
+    "anchor_not_visible",
+    "hops_not_served"
+  ],
+  "owner_only_edges_cut_reasons": [
+    "hidden",
+    "not_visible",
+    "anchor_not_visible"
   ]
 }

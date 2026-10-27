@@ -1,10 +1,10 @@
-"""The lens profile's graph section: ``world_graph`` on the shared cases in ``tests/fixtures/graph-edges.json`` (the
-same bytes as the npm SDK's ``test/fixtures/graph-edges.json``; both suites hold its sha256), answers written by
-hand, and the section's invariants checked on every answer."""
+"""The lens profile's graph section: ``world_graph`` on the graph kind of
+``codegen/schema-dist/profiles/lens.fixture.json`` (schema-dist serial 81, vendored with the pin; the MANIFEST holds
+its sha256, the npm SDK runs the same cases), the section's invariants checked on every answer, and the fixture's graph
+tables read back."""
 
 from __future__ import annotations
 
-import hashlib
 import json
 from collections.abc import Iterator, Mapping
 from pathlib import Path
@@ -15,15 +15,16 @@ import pytest
 from onlyworlds import FIELD_KINDS, WorldGraph, resolve_lens, world_graph
 
 REPO = Path(__file__).resolve().parent.parent
-EDGES_FILE = REPO / "tests" / "fixtures" / "graph-edges.json"
-EDGES_SHA256 = "f114dadebff07167f999ea60bef1245eeaf20d8c8cdcc6d4d388a0be45050f45"
+FIXTURE = REPO / "codegen" / "schema-dist" / "profiles" / "lens.fixture.json"
+
+
+def load_fixture() -> dict[str, Any]:
+    doc: dict[str, Any] = json.loads(FIXTURE.read_text(encoding="utf-8"))
+    return doc
 
 
 def load_cases() -> list[dict[str, Any]]:
-    raw = EDGES_FILE.read_bytes()
-    assert hashlib.sha256(raw).hexdigest() == EDGES_SHA256
-    cases: list[dict[str, Any]] = json.loads(raw.decode("utf-8"))
-    return cases
+    return [c for c in load_fixture()["cases"] if c["kind"] == "graph"]
 
 
 def invariants(g: WorldGraph, c: Mapping[str, Any]) -> None:
@@ -101,7 +102,7 @@ def links_add_up(g: WorldGraph, c: Mapping[str, Any]) -> None:
     )
 
 
-def test_the_shared_graph_cases() -> None:
+def test_the_fixtures_graph_cases() -> None:
     cases = load_cases()
     wrong: list[str] = []
     for c in cases:
@@ -127,7 +128,43 @@ def test_the_shared_graph_cases() -> None:
     for line in wrong:
         print(line)
     assert wrong == []
-    assert len(cases) == 34
+    assert len(cases) == 34, f"the fixture holds {len(cases)} graph cases, serial 81 has 34"
+
+
+def test_the_fixtures_graph_tables_read_back_through_the_reader() -> None:
+    doc = load_fixture()
+    assert doc["graph_flags"] == ["rooms", "hidden", "proposed", "map_space"]
+    empty: dict[str, Any] = {"elements": []}
+    for f in doc["graph_flags"]:
+        flag: dict[str, Any] = {f: True}
+        world_graph(empty, {"rung": "owner"}, **flag)
+        if f in doc["owner_only_flags"]:
+            with pytest.raises(ValueError, match="owner's alone"):
+                world_graph(empty, {"rung": "contributor"}, **flag)
+        else:
+            world_graph(empty, {"rung": "contributor"}, **flag)
+        with pytest.raises(ValueError):
+            world_graph(empty, {"rung": "public"}, **flag)
+    reasons = set(doc["edges_cut_reasons"])
+    for c in load_cases():
+        assert set(c["want"].get("edges_cut", {})) <= reasons, c["name"]
+    for f in doc["graph_links"]:
+        world = {
+            "elements": [
+                {"id": "a", "type": "construct", "name": "A", f: ["b"]},
+                {"id": "b", "type": "construct", "name": "B"},
+            ]
+        }
+        assert world_graph(world, {"rung": "owner"})["edges"] == [
+            {"source": "a", "field": f, "target": "b", "index": 0}
+        ], f
+    other = {
+        "elements": [
+            {"id": "a", "type": "construct", "name": "A", "x_other_links": ["b"]},
+            {"id": "b", "type": "construct", "name": "B"},
+        ]
+    }
+    assert world_graph(other, {"rung": "owner"})["edges"] == []
 
 
 class _Unread(list[Any]):
