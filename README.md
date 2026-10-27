@@ -304,6 +304,22 @@ lore = [el for el in folder.all_elements().values() if not is_room_element(el)]
 
 A lore view (a list, a count, search, a graph, a story's context, a survey) leaves room elements out unless the person asks; the room's own views show them whole, and a writer writes them like any element. A Law with supertype `Charter` is lore on purpose. The profile: [`profiles/room.md`](https://github.com/OnlyWorlds/schema-dist/blob/main/profiles/room.md) in the schema distribution.
 
+### Lenses
+
+A lens is a saved way of reading a world: a Construct with supertype `Lens` (`is_lens(el)`) whose links are its anchors and whose `x_lens` is the recipe (`depth`, `types`, `window` or `from` and `to`, `undated`, `show`, `budget`, `mail`, `notes`). `resolve_lens(world, lens, reader, as_of=None, clock=None)` resolves it for one reader over a world snapshot, the same answer as the npm SDK's `resolveLens`: the kept ids and their rows in the profile's order, the cut counted by reason, and the mail part when the lens names a mail rule. A template (`is_template(el)`, subtype `Template`) resolves to nothing; `lenses_in_use(membership, character.get("x_lens_uses"))` gives the lenses a seat reads (the membership's choice wins).
+
+```python
+from onlyworlds import is_lens, resolve_lens
+
+lens = next(el for el in elements if is_lens(el))
+r = resolve_lens(
+    {"elements": elements, "members": members, "now": 1200}, lens, {"rung": "contributor", "character": me}
+)
+r["kept"], r["rows"], r["cut"]  # ids in order, rows as show makes them, e.g. {"budget": 3, "after_as_of": 1}
+```
+
+The world holds the elements as the owner is served them; the reader's `rung` (`owner`, `contributor`, `guest` with its `whole` and `known_of` ids, `public`) decides what it sees, and an owner reading `as` another reader keeps the owner's two counts (`anchor_not_visible`, `not_visible`), which no other reader ever carries. A value outside the profile's table makes the lens unreadable: `r["unreadable"]` names the key. The profile: [`profiles/lens.md`](https://github.com/OnlyWorlds/schema-dist/blob/main/profiles/lens.md).
+
 ### A world's own words
 
 A world may name its types in its own words: in a work world a Character is an *Employee*. The map is `x_names` on the World (`world.json` in a folder), and only what a person reads changes; the API, the folder and every id keep the standard's names. `onlyworlds.type_word(world, element_type, supertype=None, many=False)` gives the word to print, or `None` for the standard's name:

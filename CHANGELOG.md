@@ -4,6 +4,8 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+- **The lens profile's reader** (schema-dist `v0.33.0-dist.78`, `profiles/lens.md`; the schema repinned from dist.77, the same canonical 00.33.00, so `SCHEMA_VERSION` stays `00.33.00` and no element field moved), the npm SDK's under snake_case names. `is_lens(element)`, `is_template(element)` (a lens with subtype `Template`, which resolves to nothing), `resolve_lens(world, lens, reader, as_of=None, clock=None)` returning `LensReading` (`kept`, `rows`, `cut` by reason, `notes_ignored`, `mail`, `unreadable`): the profile's ten rules over a world snapshot, pure, for one reader (`owner`, `contributor`, `guest` with `whole` and `known_of`, `public`, and an owner reading `as` another). A value outside the profile's table names the key in `unreadable` and resolves nothing. The mail rule reads the message profile's own readers. `lenses_in_use(membership, x_lens_uses)`: the membership's choice wins. The fixture's 84 cases run as `tests/test_lens.py`, beside eight shared edge cases (`tests/fixtures/lens-edges.json`, the same bytes as the npm SDK's) for what the fixture leaves open; the answers equal the npm SDK's `resolveLens` on thousands of random worlds.
+
 ## 0.73.1 (2026-10-27)
 
 - **`note_of` reads the hidden mark as `is_hidden` does**: any `hidden` but absent, null or `false` leaves a Note out (it read only `True`), so a doubt is left out, as the pack and the archive writer already decide. The shared edge case moves with it, in both packages.

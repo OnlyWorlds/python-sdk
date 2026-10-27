@@ -1,0 +1,447 @@
+[
+ {
+  "name": "a-known-of-stub-carries-no-links-so-nothing-reaches-through-it",
+  "world": {
+   "now": 10,
+   "elements": [
+    {
+     "id": "a",
+     "type": "character",
+     "name": "A"
+    },
+    {
+     "id": "s",
+     "type": "event",
+     "name": "S",
+     "characters": [
+      "a"
+     ]
+    }
+   ]
+  },
+  "lens": {
+   "id": "L",
+   "type": "construct",
+   "name": "L",
+   "supertype": "Lens",
+   "characters": [
+    "a"
+   ]
+  },
+  "reader": {
+   "rung": "guest",
+   "whole": [
+    "a"
+   ],
+   "known_of": [
+    "s"
+   ]
+  },
+  "want": {
+   "kept": [
+    "a"
+   ],
+   "cut": {}
+  }
+ },
+ {
+  "name": "the-window-includes-its-edge",
+  "world": {
+   "now": 10,
+   "elements": [
+    {
+     "id": "e1",
+     "type": "event",
+     "name": "E1",
+     "start_date": 7
+    },
+    {
+     "id": "e2",
+     "type": "event",
+     "name": "E2",
+     "start_date": 6
+    }
+   ]
+  },
+  "lens": {
+   "id": "L",
+   "type": "construct",
+   "name": "L",
+   "supertype": "Lens",
+   "x_lens": {
+    "types": [
+     "event"
+    ],
+    "window": 3
+   }
+  },
+  "reader": {
+   "rung": "owner"
+  },
+  "want": {
+   "kept": [
+    "e1"
+   ],
+   "cut": {
+    "window": 1
+   }
+  }
+ },
+ {
+  "name": "a-to-after-as-of-keeps-an-element-dated-as-of",
+  "world": {
+   "now": 10,
+   "elements": [
+    {
+     "id": "e1",
+     "type": "event",
+     "name": "E1",
+     "start_date": 10
+    },
+    {
+     "id": "e2",
+     "type": "event",
+     "name": "E2",
+     "start_date": 11
+    }
+   ]
+  },
+  "lens": {
+   "id": "L",
+   "type": "construct",
+   "name": "L",
+   "supertype": "Lens",
+   "x_lens": {
+    "types": [
+     "event"
+    ],
+    "from": 5,
+    "to": 20
+   }
+  },
+  "reader": {
+   "rung": "owner"
+  },
+  "want": {
+   "kept": [
+    "e1"
+   ],
+   "cut": {
+    "after_as_of": 1
+   }
+  }
+ },
+ {
+  "name": "the-fence-and-undated-apply-to-anchors",
+  "world": {
+   "now": 10,
+   "elements": [
+    {
+     "id": "e1",
+     "type": "event",
+     "name": "E1",
+     "start_date": 12
+    },
+    {
+     "id": "e2",
+     "type": "event",
+     "name": "E2"
+    },
+    {
+     "id": "o1",
+     "type": "object",
+     "name": "O1"
+    }
+   ]
+  },
+  "lens": {
+   "id": "L",
+   "type": "construct",
+   "name": "L",
+   "supertype": "Lens",
+   "events": [
+    "e1",
+    "e2"
+   ],
+   "objects": [
+    "o1"
+   ],
+   "x_lens": {
+    "depth": 0,
+    "undated": "exclude"
+   }
+  },
+  "reader": {
+   "rung": "owner"
+  },
+  "want": {
+   "kept": [
+    "o1"
+   ],
+   "cut": {
+    "undated": 1,
+    "after_as_of": 1
+   }
+  }
+ },
+ {
+  "name": "the-mail-rule-proves-the-readers-own-message-by-the-members-list",
+  "world": {
+   "now": 10,
+   "members": [
+    {
+     "id": null,
+     "character": null
+    },
+    {
+     "id": "m1",
+     "character": "a"
+    }
+   ],
+   "elements": [
+    {
+     "id": "a",
+     "type": "character",
+     "name": "A"
+    },
+    {
+     "id": "n1",
+     "type": "narrative",
+     "name": "Mine",
+     "supertype": "Message",
+     "narrator": "a",
+     "characters": [],
+     "created_by": "m1",
+     "created_at": "2026-10-20T12:00:00Z"
+    }
+   ]
+  },
+  "lens": {
+   "id": "L",
+   "type": "construct",
+   "name": "L",
+   "supertype": "Lens",
+   "x_lens": {
+    "types": [
+     "character"
+    ],
+    "mail": "all"
+   }
+  },
+  "reader": {
+   "rung": "contributor",
+   "character": "a"
+  },
+  "clock": "2026-10-27T12:00:00Z",
+  "want": {
+   "kept": [
+    "a"
+   ],
+   "cut": {},
+   "mail": {
+    "unread": [],
+    "read": [],
+    "rows": [],
+    "cut": {},
+    "totals": {
+     "unread": 0,
+     "read": 0
+    }
+   }
+  }
+ },
+ {
+  "name": "a-message-in-the-mail-part-is-not-repeated-among-the-kept",
+  "world": {
+   "now": 10,
+   "elements": [
+    {
+     "id": "a",
+     "type": "character",
+     "name": "A"
+    },
+    {
+     "id": "b",
+     "type": "character",
+     "name": "B"
+    },
+    {
+     "id": "n1",
+     "type": "narrative",
+     "name": "To A",
+     "supertype": "Message",
+     "narrator": "b",
+     "characters": [
+      "a"
+     ],
+     "created_at": "2026-10-20T12:00:00Z",
+     "updated_at": "2026-10-20T12:00:00Z"
+    },
+    {
+     "id": "n2",
+     "type": "narrative",
+     "name": "Lore",
+     "updated_at": "2026-10-01T12:00:00Z"
+    }
+   ]
+  },
+  "lens": {
+   "id": "L",
+   "type": "construct",
+   "name": "L",
+   "supertype": "Lens",
+   "x_lens": {
+    "types": [
+     "narrative"
+    ],
+    "mail": "unread_full_read_titles"
+   }
+  },
+  "reader": {
+   "rung": "contributor",
+   "character": "a"
+  },
+  "clock": "2026-10-27T12:00:00Z",
+  "want": {
+   "kept": [
+    "n2"
+   ],
+   "cut": {},
+   "mail": {
+    "unread": [
+     "n1"
+    ],
+    "read": [],
+    "cut": {},
+    "totals": {
+     "unread": 1,
+     "read": 0
+    }
+   }
+  }
+ },
+ {
+  "name": "the-mail-window-is-thirty-days-its-edge-included",
+  "world": {
+   "elements": [
+    {
+     "id": "a",
+     "type": "character",
+     "name": "A"
+    },
+    {
+     "id": "n1",
+     "type": "narrative",
+     "name": "day 30",
+     "supertype": "Message",
+     "narrator": null,
+     "characters": [
+      "a"
+     ],
+     "created_at": "2026-09-27T12:00:00Z"
+    },
+    {
+     "id": "n2",
+     "type": "narrative",
+     "name": "day 31",
+     "supertype": "Message",
+     "narrator": null,
+     "characters": [
+      "a"
+     ],
+     "created_at": "2026-09-27T11:59:59Z"
+    }
+   ]
+  },
+  "lens": {
+   "id": "L",
+   "type": "construct",
+   "name": "L",
+   "supertype": "Lens",
+   "x_lens": {
+    "types": [
+     "character"
+    ],
+    "mail": "unread_full_read_titles"
+   }
+  },
+  "reader": {
+   "rung": "owner",
+   "character": "a"
+  },
+  "clock": "2026-10-27T12:00:00Z",
+  "want": {
+   "kept": [
+    "a"
+   ],
+   "cut": {},
+   "mail": {
+    "unread": [
+     "n1"
+    ],
+    "read": [],
+    "cut": {
+     "window": 1
+    },
+    "totals": {
+     "unread": 2,
+     "read": 0
+    }
+   }
+  }
+ },
+ {
+  "name": "equal-times-order-by-id-by-code-point",
+  "world": {
+   "elements": [
+    {
+     "id": "x\ud83d\ude00",
+     "type": "character",
+     "name": "astral",
+     "updated_at": "2026-10-01T12:00:00Z"
+    },
+    {
+     "id": "x\uff21",
+     "type": "character",
+     "name": "fullwidth",
+     "updated_at": "2026-10-01T12:00:00Z"
+    },
+    {
+     "id": "b2",
+     "type": "character",
+     "name": "b2",
+     "updated_at": "2026-10-01T12:00:00Z"
+    },
+    {
+     "id": "b1",
+     "type": "character",
+     "name": "b1",
+     "updated_at": "2026-10-01T12:00:00Z"
+    }
+   ]
+  },
+  "lens": {
+   "id": "L",
+   "type": "construct",
+   "name": "L",
+   "supertype": "Lens",
+   "x_lens": {
+    "types": [
+     "character"
+    ]
+   }
+  },
+  "reader": {
+   "rung": "owner"
+  },
+  "want": {
+   "kept": [
+    "b1",
+    "b2",
+    "x\uff21",
+    "x\ud83d\ude00"
+   ],
+   "cut": {}
+  }
+ }
+]
