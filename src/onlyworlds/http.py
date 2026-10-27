@@ -137,7 +137,8 @@ def _refuse_known_of(element: Mapping[str, Any], where: str) -> None:
 #: ``agent_writes_proposed`` is ``readOnly`` in the document, set on the world page.
 #: ``origin`` is served on every body and is an unknown key to PATCH (422): it is written
 #: as the plain keys ``source`` and ``producer``, which a read body does not carry.
-#: ``counts`` rides only a keyless ``GET /world`` and is an unknown key to PATCH (422).
+#: ``counts`` rides every ``GET /world`` (keel PR 289; before it, the keyless read alone) and is an unknown
+#: key to PATCH (422).
 #: ``owner_character`` is not here: PATCH takes it (a 200 on staging).
 WORLD_READ_ONLY_FIELDS: tuple[str, ...] = (
     "id",
