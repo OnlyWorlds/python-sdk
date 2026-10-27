@@ -22,6 +22,7 @@ import copy
 import re
 from collections.abc import Callable, Iterable, Mapping, Sequence
 from datetime import UTC, datetime
+from types import MappingProxyType
 from typing import Any, Literal, TypedDict
 
 from ._schema import FIELD_KINDS, PUBLIC_FIELDS, ROOM_PAIRS
@@ -30,7 +31,16 @@ from .message import _instant, is_message, read_mark_of, unread_for
 from .review import hands_on_as_proposed
 from .room import _fold, is_room_element
 
-__all__ = ["LensMail", "LensReading", "is_lens", "is_template", "lenses_in_use", "resolve_lens"]
+__all__ = [
+    "DATE_FIELD",
+    "LensMail",
+    "LensReading",
+    "date_of",
+    "is_lens",
+    "is_template",
+    "lenses_in_use",
+    "resolve_lens",
+]
 
 CutReason = Literal[
     "budget", "types", "window", "undated", "after_as_of", "anchor_not_visible", "not_visible", "hops_not_served"
@@ -120,21 +130,25 @@ _TYPE_ORDER: tuple[str, ...] = (
 """The schema's type order (schema.json's), which the budget's order reads."""
 _TYPE_RANK: dict[str, int] = {t: i for i, t in enumerate(_TYPE_ORDER)}
 
-_DATE_FIELD: dict[str, str] = {
-    "character": "birth_date",
-    "creature": "birth_date",
-    "institution": "founding_date",
-    "location": "founding_date",
-    "collective": "formation_date",
-    "law": "date",
-    "title": "grant_date",
-    "construct": "start_date",
-    "event": "start_date",
-    "narrative": "start_date",
-    "relation": "start_date",
-    "zone": "start_date",
-}
-"""The date table: each dated type's date field; the other ten types are timeless and never fenced."""
+DATE_FIELD: Mapping[str, str] = MappingProxyType(
+    {
+        "character": "birth_date",
+        "creature": "birth_date",
+        "institution": "founding_date",
+        "location": "founding_date",
+        "collective": "formation_date",
+        "law": "date",
+        "title": "grant_date",
+        "construct": "start_date",
+        "event": "start_date",
+        "narrative": "start_date",
+        "relation": "start_date",
+        "zone": "start_date",
+    }
+)
+"""The lens profile's date table: each dated type's date field, by the type's lowercase name. The other ten
+types are timeless and never fenced. The lens reader's fence and window read it, and so can a timeline or a
+horizon that must date elements the same way. Read-only."""
 
 _CUT_REASONS: tuple[CutReason, ...] = (
     "budget",
@@ -183,6 +197,21 @@ def _whole(value: Any) -> int | None:
     if isinstance(value, float) and value.is_integer():
         return int(value)
     return None
+
+
+def date_of(element: Any) -> int | None:
+    """An element's date as the lens profile reads it: the whole number in its type's date field
+    (``DATE_FIELD``), in the world's own time unit. ``None`` for a timeless type, a body with no known
+    ``type``, and a date field that is absent, null or not a whole number. It reads the body it is given: a
+    known-of stub serves no date, so it reads ``None``, whatever the element's own date is. The npm SDK's
+    ``dateOf`` gives the same answer on the same body."""
+    if not isinstance(element, Mapping):
+        return None
+    kind = element.get("type")
+    field = DATE_FIELD.get(_fold(kind)) if isinstance(kind, str) else None
+    if field is None:
+        return None
+    return _whole(element.get(field))
 
 
 def is_lens(element: Any) -> bool:
@@ -476,7 +505,7 @@ class _Reading:
         return out
 
     def _date(self, eid: str) -> tuple[bool, int | None]:
-        field = _DATE_FIELD.get(self.type_of[eid])
+        field = DATE_FIELD.get(self.type_of[eid])
         if field is None:
             return False, None
         return True, _whole(self.by_id[eid].get(field))

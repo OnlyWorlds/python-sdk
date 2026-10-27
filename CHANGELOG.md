@@ -4,6 +4,10 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+## 0.79.0 (2026-10-27)
+
+- **`DATE_FIELD`** and **`date_of(element)`**: the lens profile's date table, exported (each dated type's date field by the type's lowercase name; the ten timeless types are not in it; read-only), and an element's date as that table reads it: the whole number in its type's date field, or `None` for a timeless type, a body with no known `type`, and a date field that is absent, null or not a whole number. It reads the body it is given, so a known-of stub reads `None`. A timeline or a horizon can now date elements exactly as the lens reader's fence does, from one table. The npm SDK's `DATE_FIELD` and `dateOf` give the same answers.
+
 ## 0.78.0 (2026-10-27)
 
 - **`degree_of(graph)`**: each node's degree in a graph the graph reader answered: its edges in or out, each counted once for every node it touches (a mirror pair counts 2 at each end, a link to itself once), every node a key with 0 included, in the graph's node order. It is "most linked" as a finder ranks it: the reader's own count, since what the reading left out has no edge. The npm SDK's `degreeOf` gives the same answer on the same graph.

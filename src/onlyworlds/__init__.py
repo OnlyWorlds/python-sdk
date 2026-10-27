@@ -62,7 +62,7 @@ from .http import (
     check_kinds,
     sanitize_payload,
 )
-from .lens import LensMail, LensReading, is_lens, is_template, lenses_in_use, resolve_lens
+from .lens import DATE_FIELD, LensMail, LensReading, date_of, is_lens, is_template, lenses_in_use, resolve_lens
 from .message import (
     EditRead,
     SenderRead,
@@ -99,6 +99,7 @@ __all__ = [
     "API_BASE",
     "CHECKS_FIELD",
     "CREATE_FIELDS",
+    "DATE_FIELD",
     "ELEMENT_TYPES",
     "FIELD_KINDS",
     "FORMAT_VERSION",
@@ -153,6 +154,7 @@ __all__ = [
     "__version__",
     "apply_checks",
     "check_kinds",
+    "date_of",
     "degree_of",
     "draught_text",
     "edited_by",

@@ -320,6 +320,8 @@ r["kept"], r["rows"], r["cut"]  # ids in order, rows as show makes them, e.g. {"
 
 The world holds the elements as the owner is served them; the reader's `rung` (`owner`, `contributor`, `guest` with its `whole` and `known_of` ids, `public`) decides what it sees, and an owner reading `as` another reader keeps the owner's two counts (`anchor_not_visible`, `not_visible`), which no other reader ever carries. A value outside the profile's table makes the lens unreadable: `r["unreadable"]` names the key. The profile: [`profiles/lens.md`](https://github.com/OnlyWorlds/schema-dist/blob/main/profiles/lens.md).
 
+`DATE_FIELD` is the profile's date table (each dated type's date field; the ten timeless types are not in it), and `date_of(el)` is an element's date as that table reads it: the whole number in its type's date field, else `None`. A timeline or a horizon dates elements exactly as the lens reader's fence does.
+
 `world_graph(world, reader, *, lens=None, as_of=None, clock=None, rooms=False, hidden=False, proposed=False, map_space=False)` reads the same snapshot, for the same reader, as nodes and edges: `nodes` (`{id, type, name, family, icon}`, by id), `edges` (`{source, field, target, index}`, one per link, by source, field and index), `edges_cut` (links to elements that are not nodes, by reason; with a lens, `outside_lens` counts links to elements the reader sees that the lens left out), `cut` and `unreadable` (the `x_lens` key a lens could not be read by, else `None`). Room elements, hidden and proposed ones and map space are out unless a flag brings them back (`hidden` and `proposed` are the owner's alone, and a public reader takes no flag); with `lens` the nodes are exactly what the lens kept.
 
 ```python
