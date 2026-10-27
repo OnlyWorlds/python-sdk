@@ -89,7 +89,8 @@
     }
    ],
    "edges_cut": {},
-   "cut": {}
+   "cut": {},
+   "unreadable": null
   }
  },
  {
@@ -179,7 +180,8 @@
     }
    ],
    "edges_cut": {},
-   "cut": {}
+   "cut": {},
+   "unreadable": null
   }
  },
  {
@@ -248,7 +250,8 @@
     }
    ],
    "edges_cut": {},
-   "cut": {}
+   "cut": {},
+   "unreadable": null
   }
  },
  {
@@ -345,7 +348,8 @@
     "hidden": 1,
     "proposed": 1,
     "map_space": 2
-   }
+   },
+   "unreadable": null
   }
  },
  {
@@ -459,7 +463,8 @@
     "hidden": 1,
     "proposed": 1,
     "map_space": 2
-   }
+   },
+   "unreadable": null
   }
  },
  {
@@ -573,7 +578,8 @@
     "room": 1,
     "proposed": 1,
     "map_space": 2
-   }
+   },
+   "unreadable": null
   }
  },
  {
@@ -687,7 +693,8 @@
     "room": 1,
     "hidden": 1,
     "map_space": 2
-   }
+   },
+   "unreadable": null
   }
  },
  {
@@ -811,7 +818,8 @@
     "room": 1,
     "hidden": 1,
     "proposed": 1
-   }
+   },
+   "unreadable": null
   }
  },
  {
@@ -978,7 +986,8 @@
     }
    ],
    "edges_cut": {},
-   "cut": {}
+   "cut": {},
+   "unreadable": null
   }
  },
  {
@@ -1088,7 +1097,8 @@
    },
    "cut": {
     "map_space": 2
-   }
+   },
+   "unreadable": null
   }
  },
  {
@@ -1179,7 +1189,8 @@
    },
    "cut": {
     "map_space": 2
-   }
+   },
+   "unreadable": null
   }
  },
  {
@@ -1276,7 +1287,8 @@
    "cut": {
     "room": 1,
     "map_space": 2
-   }
+   },
+   "unreadable": null
   }
  },
  {
@@ -1679,7 +1691,7 @@
   }
  },
  {
-  "name": "an edge into a lens's cut is counted by its reason, and one past its hops is not counted",
+  "name": "an edge into a lens's cut is counted by its reason, and one past its hops as outside_lens",
   "world": {
    "elements": [
     {
@@ -1780,11 +1792,13 @@
     }
    ],
    "edges_cut": {
-    "types": 3
+    "types": 3,
+    "outside_lens": 1
    },
    "cut": {
     "types": 3
-   }
+   },
+   "unreadable": null
   }
  },
  {
@@ -1893,11 +1907,13 @@
     }
    ],
    "edges_cut": {
-    "types": 3
+    "types": 3,
+    "outside_lens": 1
    },
    "cut": {
     "types": 3
-   }
+   },
+   "unreadable": null
   }
  },
  {
@@ -1965,8 +1981,11 @@
     }
    ],
    "edges": [],
-   "edges_cut": {},
-   "cut": {}
+   "edges_cut": {
+    "outside_lens": 1
+   },
+   "cut": {},
+   "unreadable": null
   }
  },
  {
@@ -2008,7 +2027,670 @@
    "nodes": [],
    "edges": [],
    "edges_cut": {},
-   "cut": {}
+   "cut": {},
+   "unreadable": null
+  }
+ },
+ {
+  "name": "an edge past a lens's hops (depth 0) is outside_lens",
+  "world": {
+   "elements": [
+    {
+     "id": "LH",
+     "type": "construct",
+     "supertype": "Lens",
+     "name": "Ada only",
+     "characters": [
+      "c1"
+     ],
+     "x_lens": {
+      "depth": 0
+     }
+    },
+    {
+     "id": "LT",
+     "type": "construct",
+     "supertype": "Lens",
+     "name": "Characters",
+     "x_lens": {
+      "types": [
+       "character"
+      ]
+     }
+    },
+    {
+     "id": "LU",
+     "type": "construct",
+     "supertype": "Lens",
+     "name": "Too far",
+     "characters": [
+      "c1"
+     ],
+     "x_lens": {
+      "depth": 9
+     }
+    },
+    {
+     "id": "c1",
+     "type": "character",
+     "name": "Ada",
+     "friends": [
+      "c2"
+     ],
+     "objects": [
+      "o1"
+     ],
+     "rivals": [
+      "c3"
+     ]
+    },
+    {
+     "id": "c2",
+     "type": "character",
+     "name": "Bo"
+    },
+    {
+     "id": "c3",
+     "type": "character",
+     "name": "Ghost",
+     "hidden": true
+    },
+    {
+     "id": "o1",
+     "type": "object",
+     "name": "Lamp"
+    }
+   ]
+  },
+  "reader": {
+   "rung": "owner"
+  },
+  "options": {
+   "lens": "LH"
+  },
+  "want": {
+   "nodes": [
+    {
+     "id": "c1",
+     "type": "character",
+     "name": "Ada",
+     "family": "agents",
+     "icon": "person"
+    }
+   ],
+   "edges": [],
+   "edges_cut": {
+    "outside_lens": 3
+   },
+   "cut": {},
+   "unreadable": null
+  }
+ },
+ {
+  "name": "an edge out of a filter lens's types is outside_lens",
+  "world": {
+   "elements": [
+    {
+     "id": "LH",
+     "type": "construct",
+     "supertype": "Lens",
+     "name": "Ada only",
+     "characters": [
+      "c1"
+     ],
+     "x_lens": {
+      "depth": 0
+     }
+    },
+    {
+     "id": "LT",
+     "type": "construct",
+     "supertype": "Lens",
+     "name": "Characters",
+     "x_lens": {
+      "types": [
+       "character"
+      ]
+     }
+    },
+    {
+     "id": "LU",
+     "type": "construct",
+     "supertype": "Lens",
+     "name": "Too far",
+     "characters": [
+      "c1"
+     ],
+     "x_lens": {
+      "depth": 9
+     }
+    },
+    {
+     "id": "c1",
+     "type": "character",
+     "name": "Ada",
+     "friends": [
+      "c2"
+     ],
+     "objects": [
+      "o1"
+     ],
+     "rivals": [
+      "c3"
+     ]
+    },
+    {
+     "id": "c2",
+     "type": "character",
+     "name": "Bo"
+    },
+    {
+     "id": "c3",
+     "type": "character",
+     "name": "Ghost",
+     "hidden": true
+    },
+    {
+     "id": "o1",
+     "type": "object",
+     "name": "Lamp"
+    }
+   ]
+  },
+  "reader": {
+   "rung": "owner"
+  },
+  "options": {
+   "lens": "LT"
+  },
+  "want": {
+   "nodes": [
+    {
+     "id": "c1",
+     "type": "character",
+     "name": "Ada",
+     "family": "agents",
+     "icon": "person"
+    },
+    {
+     "id": "c2",
+     "type": "character",
+     "name": "Bo",
+     "family": "agents",
+     "icon": "person"
+    },
+    {
+     "id": "c3",
+     "type": "character",
+     "name": "Ghost",
+     "family": "agents",
+     "icon": "person",
+     "marks": [
+      "hidden"
+     ]
+    }
+   ],
+   "edges": [
+    {
+     "source": "c1",
+     "field": "friends",
+     "target": "c2",
+     "index": 0
+    },
+    {
+     "source": "c1",
+     "field": "rivals",
+     "target": "c3",
+     "index": 0
+    }
+   ],
+   "edges_cut": {
+    "outside_lens": 1
+   },
+   "cut": {},
+   "unreadable": null
+  }
+ },
+ {
+  "name": "a contributor carries outside_lens, and still no count of what it does not see",
+  "world": {
+   "elements": [
+    {
+     "id": "LH",
+     "type": "construct",
+     "supertype": "Lens",
+     "name": "Ada only",
+     "characters": [
+      "c1"
+     ],
+     "x_lens": {
+      "depth": 0
+     }
+    },
+    {
+     "id": "LT",
+     "type": "construct",
+     "supertype": "Lens",
+     "name": "Characters",
+     "x_lens": {
+      "types": [
+       "character"
+      ]
+     }
+    },
+    {
+     "id": "LU",
+     "type": "construct",
+     "supertype": "Lens",
+     "name": "Too far",
+     "characters": [
+      "c1"
+     ],
+     "x_lens": {
+      "depth": 9
+     }
+    },
+    {
+     "id": "c1",
+     "type": "character",
+     "name": "Ada",
+     "friends": [
+      "c2"
+     ],
+     "objects": [
+      "o1"
+     ],
+     "rivals": [
+      "c3"
+     ]
+    },
+    {
+     "id": "c2",
+     "type": "character",
+     "name": "Bo"
+    },
+    {
+     "id": "c3",
+     "type": "character",
+     "name": "Ghost",
+     "hidden": true
+    },
+    {
+     "id": "o1",
+     "type": "object",
+     "name": "Lamp"
+    }
+   ]
+  },
+  "reader": {
+   "rung": "contributor"
+  },
+  "options": {
+   "lens": "LT"
+  },
+  "want": {
+   "nodes": [
+    {
+     "id": "c1",
+     "type": "character",
+     "name": "Ada",
+     "family": "agents",
+     "icon": "person"
+    },
+    {
+     "id": "c2",
+     "type": "character",
+     "name": "Bo",
+     "family": "agents",
+     "icon": "person"
+    }
+   ],
+   "edges": [
+    {
+     "source": "c1",
+     "field": "friends",
+     "target": "c2",
+     "index": 0
+    }
+   ],
+   "edges_cut": {
+    "outside_lens": 1
+   },
+   "cut": {},
+   "unreadable": null
+  }
+ },
+ {
+  "name": "an unreadable lens by id answers empty, naming the key",
+  "world": {
+   "elements": [
+    {
+     "id": "LH",
+     "type": "construct",
+     "supertype": "Lens",
+     "name": "Ada only",
+     "characters": [
+      "c1"
+     ],
+     "x_lens": {
+      "depth": 0
+     }
+    },
+    {
+     "id": "LT",
+     "type": "construct",
+     "supertype": "Lens",
+     "name": "Characters",
+     "x_lens": {
+      "types": [
+       "character"
+      ]
+     }
+    },
+    {
+     "id": "LU",
+     "type": "construct",
+     "supertype": "Lens",
+     "name": "Too far",
+     "characters": [
+      "c1"
+     ],
+     "x_lens": {
+      "depth": 9
+     }
+    },
+    {
+     "id": "c1",
+     "type": "character",
+     "name": "Ada",
+     "friends": [
+      "c2"
+     ],
+     "objects": [
+      "o1"
+     ],
+     "rivals": [
+      "c3"
+     ]
+    },
+    {
+     "id": "c2",
+     "type": "character",
+     "name": "Bo"
+    },
+    {
+     "id": "c3",
+     "type": "character",
+     "name": "Ghost",
+     "hidden": true
+    },
+    {
+     "id": "o1",
+     "type": "object",
+     "name": "Lamp"
+    }
+   ]
+  },
+  "reader": {
+   "rung": "owner"
+  },
+  "options": {
+   "lens": "LU"
+  },
+  "want": {
+   "nodes": [],
+   "edges": [],
+   "edges_cut": {},
+   "cut": {},
+   "unreadable": "depth"
+  }
+ },
+ {
+  "name": "an unreadable lens body answers empty, naming x_lens itself",
+  "world": {
+   "elements": [
+    {
+     "id": "LH",
+     "type": "construct",
+     "supertype": "Lens",
+     "name": "Ada only",
+     "characters": [
+      "c1"
+     ],
+     "x_lens": {
+      "depth": 0
+     }
+    },
+    {
+     "id": "LT",
+     "type": "construct",
+     "supertype": "Lens",
+     "name": "Characters",
+     "x_lens": {
+      "types": [
+       "character"
+      ]
+     }
+    },
+    {
+     "id": "LU",
+     "type": "construct",
+     "supertype": "Lens",
+     "name": "Too far",
+     "characters": [
+      "c1"
+     ],
+     "x_lens": {
+      "depth": 9
+     }
+    },
+    {
+     "id": "c1",
+     "type": "character",
+     "name": "Ada",
+     "friends": [
+      "c2"
+     ],
+     "objects": [
+      "o1"
+     ],
+     "rivals": [
+      "c3"
+     ]
+    },
+    {
+     "id": "c2",
+     "type": "character",
+     "name": "Bo"
+    },
+    {
+     "id": "c3",
+     "type": "character",
+     "name": "Ghost",
+     "hidden": true
+    },
+    {
+     "id": "o1",
+     "type": "object",
+     "name": "Lamp"
+    }
+   ]
+  },
+  "reader": {
+   "rung": "contributor"
+  },
+  "options": {
+   "lens": {
+    "id": "LX",
+    "type": "construct",
+    "supertype": "Lens",
+    "name": "Odd",
+    "characters": [
+     "c1"
+    ],
+    "x_lens": "far"
+   }
+  },
+  "want": {
+   "nodes": [],
+   "edges": [],
+   "edges_cut": {},
+   "cut": {},
+   "unreadable": "x_lens"
+  }
+ },
+ {
+  "name": "an unlensed graph answers unreadable: null",
+  "world": {
+   "elements": [
+    {
+     "id": "LH",
+     "type": "construct",
+     "supertype": "Lens",
+     "name": "Ada only",
+     "characters": [
+      "c1"
+     ],
+     "x_lens": {
+      "depth": 0
+     }
+    },
+    {
+     "id": "LT",
+     "type": "construct",
+     "supertype": "Lens",
+     "name": "Characters",
+     "x_lens": {
+      "types": [
+       "character"
+      ]
+     }
+    },
+    {
+     "id": "LU",
+     "type": "construct",
+     "supertype": "Lens",
+     "name": "Too far",
+     "characters": [
+      "c1"
+     ],
+     "x_lens": {
+      "depth": 9
+     }
+    },
+    {
+     "id": "c1",
+     "type": "character",
+     "name": "Ada",
+     "friends": [
+      "c2"
+     ],
+     "objects": [
+      "o1"
+     ],
+     "rivals": [
+      "c3"
+     ]
+    },
+    {
+     "id": "c2",
+     "type": "character",
+     "name": "Bo"
+    },
+    {
+     "id": "c3",
+     "type": "character",
+     "name": "Ghost",
+     "hidden": true
+    },
+    {
+     "id": "o1",
+     "type": "object",
+     "name": "Lamp"
+    }
+   ]
+  },
+  "reader": {
+   "rung": "owner"
+  },
+  "want": {
+   "nodes": [
+    {
+     "id": "LH",
+     "type": "construct",
+     "name": "Ada only",
+     "family": "world",
+     "icon": "api"
+    },
+    {
+     "id": "LT",
+     "type": "construct",
+     "name": "Characters",
+     "family": "world",
+     "icon": "api"
+    },
+    {
+     "id": "LU",
+     "type": "construct",
+     "name": "Too far",
+     "family": "world",
+     "icon": "api"
+    },
+    {
+     "id": "c1",
+     "type": "character",
+     "name": "Ada",
+     "family": "agents",
+     "icon": "person"
+    },
+    {
+     "id": "c2",
+     "type": "character",
+     "name": "Bo",
+     "family": "agents",
+     "icon": "person"
+    },
+    {
+     "id": "o1",
+     "type": "object",
+     "name": "Lamp",
+     "family": "world",
+     "icon": "webhook"
+    }
+   ],
+   "edges": [
+    {
+     "source": "LH",
+     "field": "characters",
+     "target": "c1",
+     "index": 0
+    },
+    {
+     "source": "LU",
+     "field": "characters",
+     "target": "c1",
+     "index": 0
+    },
+    {
+     "source": "c1",
+     "field": "friends",
+     "target": "c2",
+     "index": 0
+    },
+    {
+     "source": "c1",
+     "field": "objects",
+     "target": "o1",
+     "index": 0
+    }
+   ],
+   "edges_cut": {
+    "hidden": 1
+   },
+   "cut": {
+    "hidden": 1
+   },
+   "unreadable": null
   }
  },
  {
@@ -2139,7 +2821,8 @@
     }
    ],
    "edges_cut": {},
-   "cut": {}
+   "cut": {},
+   "unreadable": null
   }
  },
  {
@@ -2203,7 +2886,8 @@
    },
    "cut": {
     "hidden": 1
-   }
+   },
+   "unreadable": null
   }
  },
  {
@@ -2263,7 +2947,8 @@
     }
    ],
    "edges_cut": {},
-   "cut": {}
+   "cut": {},
+   "unreadable": null
   }
  },
  {
@@ -2360,7 +3045,8 @@
     }
    ],
    "edges_cut": {},
-   "cut": {}
+   "cut": {},
+   "unreadable": null
   }
  }
 ]

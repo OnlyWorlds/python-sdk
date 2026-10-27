@@ -64,13 +64,18 @@ class WorldGraph(TypedDict):
     nodes: list[GraphNode]
     #: The edges, by source id, then field name (both in code point order), then index.
     edges: list[GraphEdge]
-    #: The links left out because their target is not a node, counted by the target's reason. A reason with no
-    #: count is absent; a reader that is not the owner never carries ``anchor_not_visible``, ``not_visible``,
-    #: ``hidden`` or ``proposed``.
+    #: The links left out because their target is not a node, counted by the target's reason, in the reasons' one
+    #: order: the lens's cut reasons, then ``room``, ``hidden``, ``proposed``, ``map_space``, ``outside_lens``. A
+    #: reason with no count is absent; a reader that is not the owner never carries ``anchor_not_visible``,
+    #: ``not_visible``, ``hidden`` or ``proposed``, and every reader carries ``outside_lens`` (a link, with a lens,
+    #: to an element the reader sees that the lens neither kept nor cut; never in a lens's cut).
     edges_cut: dict[str, int]
     #: With a lens, the lens's own cut, unchanged. Without one, the elements out by default, counted by reason
     #: (``room``, ``hidden`` and ``proposed`` for the owner only, ``map_space``).
     cut: dict[str, int]
+    #: With a lens whose ``x_lens`` the lens reader cannot read, the key it names (as ``resolve_lens``'s
+    #: ``unreadable``), and the graph is empty. ``None`` otherwise, and always ``None`` without a lens.
+    unreadable: str | None
 
 
 _DECLARED_LINKS: tuple[str, ...] = ("x_lens_leads_to", "x_spine_depends_on")
@@ -79,7 +84,7 @@ profile's."""
 _MAP_SPACE = frozenset({"map", "pin", "marker", "zone"})
 _KINDS: tuple[str, ...] = ("room", "hidden", "proposed", "map_space")
 _MARKS: tuple[GraphMark, ...] = ("room", "hidden", "proposed")
-_GRAPH_REASONS: tuple[str, ...] = (*_CUT_REASONS, *_KINDS)
+_GRAPH_REASONS: tuple[str, ...] = (*_CUT_REASONS, *_KINDS, "outside_lens")
 _GRAPH_OWNER_ONLY = frozenset({*_OWNER_ONLY, "hidden", "proposed"})
 
 
@@ -112,13 +117,16 @@ def world_graph(
     Marker, Zone), each brought back by its flag (``rooms``, ``hidden``, ``proposed``, ``map_space``) and then
     marked. With ``lens`` (a lens body, or the id of a lens the reader can see) the nodes are exactly the lens's
     ``kept``, its cut rides along unchanged, and a flag adds nothing; ``as_of`` and ``clock`` are the lens's, as
-    ``resolve_lens`` takes them, and are read only with a lens.
+    ``resolve_lens`` takes them, and are read only with a lens. A lens whose ``x_lens`` cannot be read gives an
+    empty graph with ``unreadable`` naming the key, as ``resolve_lens`` does.
 
     Each schema link field, and each extension field a profile declares a link (``x_lens_leads_to``,
     ``x_spine_depends_on``), gives one edge per target that is a node, with the target's place in the list as the
     reader is served it; a link held on both ends is two edges. A guest's known-of element has no edges out. A link
-    to an element that is not a node is counted in ``edges_cut`` by that element's reason (``not_visible`` for one
-    the reader does not see); a link to an id that is not in the world is left out and not counted.
+    to an element that is not a node is counted in ``edges_cut`` by that element's reason: the lens's cut reason,
+    else, with a lens, ``outside_lens`` for one the reader sees that the lens neither kept nor cut (counted for every
+    rung); one of the four kinds without a lens; and ``not_visible`` for one the reader does not see. A link to an id
+    that is not in the world is left out and not counted.
 
     ``hidden`` or ``proposed`` from a reader that is not the owner, or any flag from a public reader, raises
     ``ValueError`` naming the flag before anything is read. An owner reading ``as`` another reader is judged by that
@@ -168,16 +176,18 @@ def world_graph(
     node_ids: set[str] = set()
     cut: dict[str, int]
     reason_of: Callable[[str], str | None]
+    unreadable: str | None = None
     if lens is not None:
         reading, cut_by_id = _lens_reading(r, lens, clock)
         node_ids.update(reading["kept"])
         cut = dict(reading["cut"])
+        unreadable = reading["unreadable"]
 
         def lens_reason(eid: str) -> str | None:
             why = cut_by_id.get(eid)
             if why is not None:
                 return why
-            return None if eid in r.view else "not_visible"
+            return "outside_lens" if eid in r.view else "not_visible"
 
         reason_of = lens_reason
 
@@ -256,4 +266,10 @@ def world_graph(
                 for i, t in enumerate(v):
                     visit(source, field, t, i)
     edges.sort(key=lambda e: (e["source"], e["field"], e["index"]))
-    return {"nodes": nodes, "edges": edges, "edges_cut": _tally(cut_edges, r.owner), "cut": cut}
+    return {
+        "nodes": nodes,
+        "edges": edges,
+        "edges_cut": _tally(cut_edges, r.owner),
+        "cut": cut,
+        "unreadable": unreadable,
+    }

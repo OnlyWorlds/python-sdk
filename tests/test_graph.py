@@ -12,11 +12,11 @@ from typing import Any
 
 import pytest
 
-from onlyworlds import WorldGraph, resolve_lens, world_graph
+from onlyworlds import FIELD_KINDS, WorldGraph, resolve_lens, world_graph
 
 REPO = Path(__file__).resolve().parent.parent
 EDGES_FILE = REPO / "tests" / "fixtures" / "graph-edges.json"
-EDGES_SHA256 = "ce8eca146b22dcabcb89d7850b3d6e3ea92f875f32689ad577d9a5da77eaa795"
+EDGES_SHA256 = "14a4c008fb99f8046417c70ff4497ab1a1563496cfc7b6959c0740de411bf334"
 
 
 def load_cases() -> list[dict[str, Any]]:
@@ -57,6 +57,48 @@ def invariants(g: WorldGraph, c: Mapping[str, Any]) -> None:
         r = resolve_lens(c["world"], opts["lens"], reader, as_of=opts.get("as_of"), clock=opts.get("clock"))
         assert sorted(ids) == sorted(r["kept"]), f"{name}: a lens's graph has exactly the lens's kept as its nodes"
         assert g["cut"] == r["cut"], f"{name}: the lens's cut rides along unchanged"
+        assert g["unreadable"] == r["unreadable"], f"{name}: unreadable is the lens reading's"
+        links_add_up(g, c)
+    else:
+        assert g["unreadable"] is None, f"{name}: unreadable is None without a lens"
+
+
+_UNSEEN = ("not_visible", "anchor_not_visible")
+
+
+def links_add_up(g: WorldGraph, c: Mapping[str, Any]) -> None:
+    """Every link from a kept node to an element in the world is an edge or counted, read as the owner (the same
+    view, the owner's counts); less the links the view leaves out, so is every link of the reader's own."""
+    name, reader, opts = c["name"], c["reader"], c.get("options", {})
+    owner_view = reader if reader["rung"] == "owner" else {"rung": "owner", "as": reader}
+    go = world_graph(c["world"], owner_view, lens=opts["lens"], as_of=opts.get("as_of"), clock=opts.get("clock"))
+    by_id = {el["id"]: el for el in reversed(c["world"]["elements"])}
+
+    def linked(v: Any) -> int:
+        return 1 if isinstance(v, str) and v in by_id else 0
+
+    links = 0
+    for n in go["nodes"]:
+        if n.get("known_of"):
+            continue
+        el = by_id[n["id"]]
+        for field, kind in FIELD_KINDS[n["type"]].items():
+            v = el.get(field)
+            if kind == "single_link":
+                links += linked(v)
+            elif kind == "multi_link" and isinstance(v, list):
+                links += sum(linked(t) for t in v)
+        for field in ("x_lens_leads_to", "x_spine_depends_on"):
+            v = el.get(field)
+            if isinstance(v, list):
+                links += sum(linked(t) for t in v)
+    assert len(go["edges"]) + sum(go["edges_cut"].values()) == links, (
+        f"{name}: every link from a kept node is an edge or counted"
+    )
+    in_view = links - sum(v for k, v in go["edges_cut"].items() if k in _UNSEEN)
+    assert len(g["edges"]) + sum(v for k, v in g["edges_cut"].items() if k not in _UNSEEN) == in_view, (
+        f"{name}: every link from a kept node to an element the reader sees is an edge or counted"
+    )
 
 
 def test_the_shared_graph_cases() -> None:
@@ -85,7 +127,7 @@ def test_the_shared_graph_cases() -> None:
     for line in wrong:
         print(line)
     assert wrong == []
-    assert len(cases) == 26
+    assert len(cases) == 32
 
 
 class _Unread(list[Any]):
@@ -124,4 +166,4 @@ def test_world_graph_refuses_what_is_not_a_reading() -> None:
     with pytest.raises(TypeError):
         world_graph({"elements": []}, {"rung": "owner"}, as_of=1.5)  # type: ignore[arg-type]
     empty = world_graph({"elements": []}, {"rung": "public"}, rooms=False)
-    assert empty == {"nodes": [], "edges": [], "edges_cut": {}, "cut": {}}
+    assert empty == {"nodes": [], "edges": [], "edges_cut": {}, "cut": {}, "unreadable": None}
