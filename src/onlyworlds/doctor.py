@@ -40,12 +40,12 @@ And on both doors, (11) the world's own house rules: the checks profile (schema-
 carries the mark ``x_charter_of``, which only a keeper may set; through the API it is
 ``front_door.charter`` from ``GET /me``, keel's own answer, and otherwise ``charter_of``'s selection
 over what the door read. Every other marked Charter is a finding, its rules not applied (a tool
-offers to retire it); a Law with supertype Charter and house rules but no mark is lore, and a finding
-too, since its rules are not applied. Each element a rule finds short is a finding (the rule's sentence as
-the reason; the charter, the rule's index and its field as evidence); a rule the reader cannot
-apply is a finding on the charter, naming the rule and why; a key that is not a list is one
-finding on the charter; a charter without the key checks nothing and says so. ``compared``
-carries every rule's ``scoped`` and ``short`` counts and the view read (``folder``, or the
+offers to retire it); a Law with supertype Charter and no mark is lore, not a Charter and not a
+finding, and any house rules it carries are never applied (serial 85). Each element a rule finds
+short is a finding (the rule's sentence as the reason; the charter, the rule's index and its field
+as evidence); a rule the reader cannot apply is a finding on the charter, naming the rule and why;
+a key that is not a list is one finding on the charter; a charter without the key checks nothing and
+says so. ``compared`` carries every rule's ``scoped`` and ``short`` counts and the view read (``folder``, or the
 key's role). A known-of stub is not judged (its absent fields are unknown; the profile's rule
 6), and the rules are
 on a Law only: a charter of another type that carries them is a finding, its rules not read.
@@ -647,8 +647,8 @@ def _the_charter(els: list[_El], laws: list[_El], named: Any) -> tuple[_El | Non
 def _house_rules(run: _Run, els: list[_El], *, view: str, named: Any = _NOT_ASKED) -> None:
     """Flag 11: the Charter's ``x_checks_rules`` (the checks profile) applied to the elements the
     door could read; the Charter is the newest marked one (``_the_charter``), every other marked Charter is a
-    finding, its rules not applied, and so is a Law with supertype Charter that carries house rules without the
-    mark (lore, whose rules are never applied). Never writes, reorders or repairs a list."""
+    finding, its rules not applied; a Law with supertype Charter without the mark is lore, not a Charter and not a
+    finding, and its rules are never applied. Never writes, reorders or repairs a list."""
     flag = CHECKS_FLAG
     charters = [el for el in els if _folded(el.body.get("supertype")) == "charter"]
     for el in charters:
@@ -665,7 +665,7 @@ def _house_rules(run: _Run, els: list[_El], *, view: str, named: Any = _NOT_ASKE
     if unknown is not None:
         run.find(flag, None, f"no house rule is checked: {unknown}", {"source": source})
     marked = [el for el in laws if _aid_word(el) == "law/charter"]
-    for el in laws:
+    for el in marked:
         if el is the:
             continue
         rules = el.body.get(CHECKS_FIELD)
@@ -674,15 +674,12 @@ def _house_rules(run: _Run, els: list[_El], *, view: str, named: Any = _NOT_ASKE
             "charter": the.id if the is not None else None,
             "source": source,
             "carries_rules": CHECKS_FIELD in el.body,
-            "marked": el in marked,
+            "marked": True,
         }
-        if el in marked:
-            why = "a marked Charter that is not the world's Charter (the newest marked one); a tool offers to retire it"
-        elif held:
-            why = "a Law with supertype Charter and house rules but no x_charter_of mark: lore, not the world's Charter"
-        else:
-            continue  # the pair without the mark is lore (a kingdom's charter), and holds no rule
+        why = "a marked Charter that is not the world's Charter (the newest marked one); a tool offers to retire it"
         run.find(flag, el, f"{why}{held}", evidence)
+    # The pair without the mark is lore (a kingdom's charter): not a Charter and not a finding, and any house
+    # rules it carries are never applied.
     judged = [el for el in els if not el.known_of]  # a stub's absent fields are unknown, not short
     bodies = [{**el.body, "type": el.type, "id": el.id} for el in judged]
     by_ref = {(el.type, el.id): el for el in judged}

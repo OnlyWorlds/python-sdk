@@ -4,6 +4,8 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+- **The doctor's flag 11 no longer reports an unmarked Law with supertype Charter.** The checks profile at schema-dist serial 85 rules that such a Law is lore, not a Charter and not a finding, house rules or not; the doctor followed the older reading and named one carrying `x_checks_rules` as a finding. Its rules are still never applied, on a folder and through the API (with `front_door.charter` null too); a marked Charter that is not the newest stays a finding. Tests: three, the unmarked Law newer than the Charter, a world with no marked Charter, and the API's null front door, now assert no finding and no rule applied from it.
+
 ## 0.83.1 (2026-10-28)
 
 - **Schema repinned to schema-dist `v0.33.0-dist.85`** (from dist.84; the same canonical 00.33.00, so `SCHEMA_VERSION` stays, no type, field or constant moved, and the folder lint and `FORMAT_VERSION` stay at 0.3.20). Four descriptions in the vendored `schema.json` follow the standard: `supertype` and `subtype` are a classification within the element's category, and a Title's `grant_date` and `revoke_date` are the title's own dates, a holder's span being a Relation; no fixture case changed, and every reader replays as before.

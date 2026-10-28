@@ -1285,8 +1285,8 @@ def test_11_brainboosts_three_rules_through_the_api() -> None:
 
 # The Charter is the newest marked Charter (the charter profile, serial 83): a Law with supertype Charter
 # carrying x_charter_of, newest by created_at, then the higher id. Who made it no longer decides: only a keeper
-# may set the mark. Every other marked Charter is a finding; an unmarked one is lore, a finding only when it
-# carries house rules that are then never applied.
+# may set the mark. Every other marked Charter is a finding; an unmarked one is lore, not a Charter and not a
+# finding, and house rules it carries are never applied (serial 85).
 SEAT = "seat-membership"
 LAW2 = "a0000000-0000-7000-8000-000000000002"
 ONE_RULE = [{"rule": "Every Location says where it is.", "where": {"type": "location"}, "present": "parent_location"}]
@@ -1344,9 +1344,10 @@ def test_11_a_folder_keeps_the_newer_marked_charter_when_the_second_is_older(tmp
 def test_11_an_unmarked_charter_is_lore_even_when_newer(tmp_path: Path) -> None:
     r = folder_report(tmp_path, two_charters(marked=False, newer=True))
     assert r.compared[HR]["charter"] == LAW1 and r.compared[HR]["marked"] == 1
-    f = second_charter_finding(r)
-    assert f["reason"].startswith("a Law with supertype Charter and house rules but no x_charter_of mark: lore")
-    assert f["evidence"] == {"charter": LAW1, "source": "mark", "carries_rules": True, "marked": False}
+    # Lore, house rules and all: not a Charter and not a finding (serial 85), and its rule is never applied.
+    assert [f for f in found(r, HR) if f["element"] is not None and f["element"]["id"] == LAW2] == []
+    assert {row["charter"] for row in r.compared[HR]["rules"]} == {LAW1}
+    assert ONE_RULE[0]["rule"] not in [row["rule"] for row in r.compared[HR]["rules"]]
     # Without house rules the unmarked Law is lore and nothing to look at.
     quiet = folder_report(tmp_path, two_charters(marked=False, newer=True, rules_on_second=False))
     assert [f for f in found(quiet, HR) if f["element"] is not None and f["element"]["id"] == LAW2] == []
@@ -1355,8 +1356,7 @@ def test_11_an_unmarked_charter_is_lore_even_when_newer(tmp_path: Path) -> None:
 def test_11_no_marked_charter_applies_no_rule(tmp_path: Path) -> None:
     r = folder_report(tmp_path, edit(bb_world(), "law", LAW1, x_charter_of="  "))
     assert r.compared[HR]["charter"] is None and r.compared[HR]["rules"] == [] and r.compared[HR]["marked"] == 0
-    (f,) = found(r, HR)
-    assert f["element"]["id"] == LAW1 and f["evidence"]["marked"] is False
+    assert found(r, HR) == []  # the unmarked Law and its rules are lore: no rule checked, no finding
 
 
 def test_11_the_marks_value_is_never_compared(tmp_path: Path) -> None:
@@ -1386,13 +1386,13 @@ def test_11_the_api_without_a_front_door_reads_the_mark() -> None:
 
 def test_11_an_unmarked_seats_charter_is_never_applied_through_the_api() -> None:
     """front_door.charter null: keel found no marked Charter; a seat's unmarked Law with supertype Charter and
-    rules is a finding, and no rule is checked."""
+    rules is lore: no rule is checked, and it is no finding."""
     reader = FakeReader(on_the_wire(two_charters(marked=False, newer=True)), front_door={"charter": None})
     reader.elements["law"] = [b for b in reader.elements["law"] if b["id"] == LAW2]
     r = api_report(reader)
     assert r.compared[HR]["charter"] is None and r.compared[HR]["rules"] == []
-    f = second_charter_finding(r)
-    assert f["evidence"] == {"charter": None, "source": "front_door", "carries_rules": True, "marked": False}
+    assert (r.compared[HR]["charters"], r.compared[HR]["charter_from"]) == (1, "front_door")
+    assert found(r, HR) == []
 
 
 def test_11_the_api_says_so_when_front_door_names_a_law_it_did_not_list() -> None:
