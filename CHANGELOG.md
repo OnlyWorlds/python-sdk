@@ -4,6 +4,8 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+## 0.82.1 (2026-10-28)
+
 - **Fixed: lens rows below the public rung keep what the API serves about proposed elements, and no row carries a stored `x_served_trimmed`.** A proposed element (`x_review_proposed` anything but absent or `None`) is still in no reader's view: never a row, never hopped through. But a contributor or a guest that sees one is served the links to it, and a lens's note keyed to it, where `resolve_lens` left both out; the public rung still drops them, unmarked. A body that carries `x_served_trimmed` as stored is served without it: the owner's rows lose it, and below the owner the mark names only what this reading trimmed (it was merged into the stored one). Eight more row cases hold these readings, 28 in all, the same file as the npm SDK's.
 
 ## 0.82.0 (2026-10-28)
