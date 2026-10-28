@@ -71,6 +71,7 @@ def clean() -> Elements:
                 "id": LAW1,
                 "name": "Harbor Charter",
                 "supertype": "Charter",
+                "x_charter_of": WORLD["id"],
                 "description": "",
                 "declaration": "The port is free.",
                 "locations": [L1],
@@ -128,7 +129,7 @@ def snapshot(root: Path) -> dict[str, str]:
 def test_the_clean_world_has_nothing_to_look_at(tmp_path: Path) -> None:
     r = folder_report(tmp_path, clean())
     assert r.findings == []
-    assert r.ran == ["1", "3", "4", "5", "6a", "6b", "9", "10", "11"]
+    assert r.ran == ["1", "3", "4", "5", "6a", "6b", "9", "10", "11", "14"]
     assert [x["flag"] for x in r.not_run] == ["2", "7", "8", "12", "13"]
     assert r.world == {"id": WORLD["id"], "name": WORLD["name"], "door": "folder"}
     assert r.written == 0
@@ -420,7 +421,7 @@ def test_the_prose_report_reads_counts_first(tmp_path: Path) -> None:
     write_folder(root, WORLD, edit(clean(), "event", E1, end_date=1))
     _, out, _ = run_main([str(root)])
     lines = out.splitlines()
-    assert lines[2] == "1 things to look at, 9 flags ran, 5 could not run, 0 things written"
+    assert lines[2] == "1 things to look at, 10 flags ran, 5 could not run, 0 things written"
     assert lines.index("What was checked") < lines.index("What could not be checked, and why")
     assert "  - event Storm (" + E1 + "): it ends before it starts" in lines
     assert (
@@ -553,7 +554,7 @@ def test_the_api_door_on_the_clean_world() -> None:
     r = api_report(reader)
     assert r.findings == []
     assert r.world["door"] == "api"
-    assert r.ran == ["1", "3", "4", "5", "6a", "6b", "8", "11", "12"]
+    assert r.ran == ["1", "3", "4", "5", "6a", "6b", "8", "11", "12", "14"]
     assert {x["flag"]: x["why"] for x in r.not_run} == {
         "2": "the feed carries current bodies only; a holders change cannot be seen (measured: 7 upserts for 7 ids)",
         "7": "read marks are not readable through the API",
@@ -1250,7 +1251,7 @@ def test_11_brainboosts_three_rules_in_prose_and_json(tmp_path: Path) -> None:
     code, out, _ = run_main([str(root)])
     lines = out.splitlines()
     assert code == 1
-    assert lines[2].startswith("3 things to look at, 9 flags ran")
+    assert lines[2].startswith("3 things to look at, 10 flags ran")
     assert f"{HR}. House rules (the checks profile) (3)" in lines
     assert f"  - character Ann ({C1}): every Character carries a reputation" in lines
     assert f"  {HR}. House rules (the checks profile): 3 of 3 house rules applied (view: folder)" in lines
@@ -1282,16 +1283,18 @@ def test_11_brainboosts_three_rules_through_the_api() -> None:
     assert api_report(FakeReader(on_the_wire(bb_world()), role="guest")).compared[HR]["view"] == "guest"
 
 
-# The Charter is the newest Law with supertype Charter made by the owner or a
-# co-builder; its rules are the house rules, and every other such Law is a finding.
+# The Charter is the newest marked Charter (the charter profile, serial 83): a Law with supertype Charter
+# carrying x_charter_of, newest by created_at, then the higher id. Who made it no longer decides: only a keeper
+# may set the mark. Every other marked Charter is a finding; an unmarked one is lore, a finding only when it
+# carries house rules that are then never applied.
 SEAT = "seat-membership"
 LAW2 = "a0000000-0000-7000-8000-000000000002"
 ONE_RULE = [{"rule": "Every Location says where it is.", "where": {"type": "location"}, "present": "parent_location"}]
 
 
-def two_charters(*, maker: str | None, newer: bool, rules_on_second: bool = True) -> Elements:
-    """bb_world's Charter (the owner's, created 2026-01-02) and a second Law with supertype Charter,
-    made by ``maker`` (None: the owner), created before or after it, carrying ONE_RULE."""
+def two_charters(*, marked: bool, newer: bool, rules_on_second: bool = True, maker: str | None = SEAT) -> Elements:
+    """bb_world's Charter (marked, created 2026-01-02) and a second Law with supertype Charter, ``marked`` or
+    not, made by ``maker``, created before or after it, carrying ONE_RULE."""
     base = edit(bb_world(), "law", LAW1, created_at="2026-01-02T00:00:00Z")
     second: dict[str, Any] = {
         "id": LAW2,
@@ -1303,6 +1306,8 @@ def two_charters(*, maker: str | None, newer: bool, rules_on_second: bool = True
         "created_at": "2026-03-01T00:00:00Z" if newer else "2025-12-01T00:00:00Z",
         "created_by": maker,
     }
+    if marked:
+        second["x_charter_of"] = WORLD["id"]
     if rules_on_second:
         second["x_checks_rules"] = ONE_RULE
     return with_(base, "law", second)
@@ -1313,36 +1318,60 @@ def second_charter_finding(r: Report) -> dict[str, Any]:
     return f
 
 
-def test_11_a_folder_applies_the_owners_newest_charter_only(tmp_path: Path) -> None:
-    r = folder_report(tmp_path, two_charters(maker=None, newer=False))
-    assert r.compared[HR]["charter"] == LAW1 and r.compared[HR]["charter_from"] == "maker"
+def test_11_a_folder_applies_the_newest_marked_charter_whoever_made_it(tmp_path: Path) -> None:
+    r = folder_report(tmp_path, two_charters(marked=True, newer=True))
+    assert r.compared[HR]["charter"] == LAW2 and r.compared[HR]["charter_from"] == "mark"
+    assert (r.compared[HR]["charters"], r.compared[HR]["marked"]) == (2, 2)
+    assert [row["rule"] for row in r.compared[HR]["rules"]] == [ONE_RULE[0]["rule"]]
+    (older,) = [f for f in found(r, HR) if f["element"] is not None and f["element"]["id"] == LAW1]
+    assert older["reason"].startswith("a marked Charter that is not the world's Charter (the newest marked one)")
+    assert "3 house rule(s) are not applied" in older["reason"]
+    assert older["evidence"] == {"charter": LAW2, "source": "mark", "carries_rules": True, "marked": True}
+
+
+def test_11_a_folder_keeps_the_newer_marked_charter_when_the_second_is_older(tmp_path: Path) -> None:
+    r = folder_report(tmp_path, two_charters(marked=True, newer=False, maker=None))
+    assert r.compared[HR]["charter"] == LAW1
     assert sorted(
         (f["element"]["id"], f["evidence"].get("rule")) for f in found(r, HR) if f["element"]["id"] != LAW2
     ) == sorted([(C1, 0), (R3, 1), (R3, 2)])
     f = second_charter_finding(r)
-    assert "not the world's Charter" in f["reason"] and "1 house rule(s) are not applied" in f["reason"]
-    assert f["evidence"] == {"charter": LAW1, "source": "maker", "carries_rules": True}
+    assert "a marked Charter that is not the world's Charter" in f["reason"]
+    assert "1 house rule(s) are not applied" in f["reason"]
+    assert f["evidence"] == {"charter": LAW1, "source": "mark", "carries_rules": True, "marked": True}
 
 
-def test_11_a_folder_cannot_tell_when_a_members_charter_is_newer(tmp_path: Path) -> None:
-    r = folder_report(tmp_path, two_charters(maker=SEAT, newer=True))
-    assert r.compared[HR]["charter"] is None and r.compared[HR]["n"] == 0 and r.compared[HR]["rules"] == []
-    (world,) = [f for f in found(r, HR) if f["element"] is None]
-    assert world["reason"].startswith("no house rule is checked: 1 Law(s) with supertype Charter made by a member")
-    assert "a folder carries none" in world["reason"]
-    assert {f["element"]["id"] for f in found(r, HR) if f["element"] is not None} == {LAW1, LAW2}
+def test_11_an_unmarked_charter_is_lore_even_when_newer(tmp_path: Path) -> None:
+    r = folder_report(tmp_path, two_charters(marked=False, newer=True))
+    assert r.compared[HR]["charter"] == LAW1 and r.compared[HR]["marked"] == 1
+    f = second_charter_finding(r)
+    assert f["reason"].startswith("a Law with supertype Charter and house rules but no x_charter_of mark: lore")
+    assert f["evidence"] == {"charter": LAW1, "source": "mark", "carries_rules": True, "marked": False}
+    # Without house rules the unmarked Law is lore and nothing to look at.
+    quiet = folder_report(tmp_path, two_charters(marked=False, newer=True, rules_on_second=False))
+    assert [f for f in found(quiet, HR) if f["element"] is not None and f["element"]["id"] == LAW2] == []
 
 
-def test_11_a_folder_takes_the_owners_when_the_members_is_older(tmp_path: Path) -> None:
-    r = folder_report(tmp_path, two_charters(maker=SEAT, newer=False))
-    assert r.compared[HR]["charter"] == LAW1
-    assert second_charter_finding(r)["evidence"]["carries_rules"] is True
+def test_11_no_marked_charter_applies_no_rule(tmp_path: Path) -> None:
+    r = folder_report(tmp_path, edit(bb_world(), "law", LAW1, x_charter_of="  "))
+    assert r.compared[HR]["charter"] is None and r.compared[HR]["rules"] == [] and r.compared[HR]["marked"] == 0
+    (f,) = found(r, HR)
+    assert f["element"]["id"] == LAW1 and f["evidence"]["marked"] is False
 
 
-def test_11_the_api_takes_front_door_charter_even_a_co_builders() -> None:
-    """keel says which Law is the Charter: a co-builder's newer one is applied, the owner's older one is
-    a finding, though the doctor cannot see roles."""
-    reader = FakeReader(on_the_wire(two_charters(maker=SEAT, newer=True)), front_door={"charter": LAW2})
+def test_11_the_marks_value_is_never_compared(tmp_path: Path) -> None:
+    copied = edit(bb_world(), "law", LAW1, x_charter_of="0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f")
+    assert folder_report(tmp_path, copied).compared[HR]["charter"] == LAW1
+
+
+def test_11_a_charter_hidden_from_others_is_still_the_owners_folders_charter(tmp_path: Path) -> None:
+    r = folder_report(tmp_path, edit(bb_world(), "law", LAW1, hidden=True))
+    assert r.compared[HR]["charter"] == LAW1 and r.compared[HR]["n"] == 3
+
+
+def test_11_the_api_takes_front_door_charter() -> None:
+    """keel says which Law is the Charter: its own selection by the mark, over what the key can read."""
+    reader = FakeReader(on_the_wire(two_charters(marked=True, newer=False)), front_door={"charter": LAW2})
     r = api_report(reader)
     assert r.compared[HR]["charter"] == LAW2 and r.compared[HR]["charter_from"] == "front_door"
     assert [row["rule"] for row in r.compared[HR]["rules"]] == [ONE_RULE[0]["rule"]]
@@ -1350,15 +1379,20 @@ def test_11_the_api_takes_front_door_charter_even_a_co_builders() -> None:
     assert "3 house rule(s) are not applied" in owners["reason"]
 
 
-def test_11_a_seats_charter_is_never_applied_through_the_api() -> None:
-    """front_door.charter null: keel found no keeper's Charter; a seat's Law with supertype Charter and
+def test_11_the_api_without_a_front_door_reads_the_mark() -> None:
+    r = api_report(FakeReader(on_the_wire(two_charters(marked=True, newer=True))))
+    assert r.compared[HR]["charter"] == LAW2 and r.compared[HR]["charter_from"] == "mark"
+
+
+def test_11_an_unmarked_seats_charter_is_never_applied_through_the_api() -> None:
+    """front_door.charter null: keel found no marked Charter; a seat's unmarked Law with supertype Charter and
     rules is a finding, and no rule is checked."""
-    reader = FakeReader(on_the_wire(two_charters(maker=SEAT, newer=True)), front_door={"charter": None})
+    reader = FakeReader(on_the_wire(two_charters(marked=False, newer=True)), front_door={"charter": None})
     reader.elements["law"] = [b for b in reader.elements["law"] if b["id"] == LAW2]
     r = api_report(reader)
     assert r.compared[HR]["charter"] is None and r.compared[HR]["rules"] == []
     f = second_charter_finding(r)
-    assert f["evidence"] == {"charter": None, "source": "front_door", "carries_rules": True}
+    assert f["evidence"] == {"charter": None, "source": "front_door", "carries_rules": True, "marked": False}
 
 
 def test_11_the_api_says_so_when_front_door_names_a_law_it_did_not_list() -> None:
@@ -1391,8 +1425,9 @@ def test_11_a_charter_without_the_key_runs_and_checks_nothing(tmp_path: Path) ->
         "of": 0,
         "view": "folder",
         "charters": 1,
+        "marked": 1,
         "charter": LAW1,
-        "charter_from": "maker",
+        "charter_from": "mark",
         "carrying": 0,
         "stubs_not_judged": 0,
         "rules": [],
@@ -2065,3 +2100,90 @@ def test_13_the_marks_at_parses_as_an_iso_8601_time(tmp_path: Path, at: str) -> 
             spine_found(folder_report(tmp_path, projection(), {**WORLD, "x_spine_projection": {**MARK, "at": good}}))
             == []
         )
+
+
+# --- 14. a Guide or Domain entry that names a hidden or deleted element ---------------------------------
+
+AIDS = doctor.AIDS_FLAG
+DOM1 = "d0000000-0000-7000-8000-000000000011"
+GUIDE1 = "d0000000-0000-7000-8000-000000000012"
+CASE1 = "o0000000-0000-7000-8000-0000000000c5"
+
+
+def with_aids(
+    *, hidden_object: bool = False, deleted: bool = False, hidden_domain: bool = False, marked: bool = True
+) -> Elements:
+    """The clean world with a marked Guide and Domain (the charter profile): the Domain names the Harbor, Ann and a
+    case; the Guide names the Domain. The planted values: the case hidden, a deleted id in the Guide, the Domain
+    itself hidden, the Domain without its mark."""
+    case: dict[str, Any] = {"id": CASE1, "name": "Sealed case", "description": "Opened by the harbormaster."}
+    if hidden_object:
+        case["hidden"] = True
+    domain: dict[str, Any] = {
+        "id": DOM1,
+        "name": "The quay",
+        "supertype": "Domain",
+        "description": "Where the ships come in.",
+        "characters": [C1],
+        "objects": [CASE1],
+        "locations": [L1],
+    }
+    if marked:
+        domain["x_charter_of"] = WORLD["id"]
+    if hidden_domain:
+        domain["hidden"] = True
+    guide = {
+        "id": GUIDE1,
+        "name": "Start here",
+        "supertype": "Guide",
+        "x_charter_of": WORLD["id"],
+        "description": "Read the quay first.",
+        "constructs": [DOM1, *([GHOST] if deleted else [])],
+    }
+    return with_(with_(clean(), "object", case), "construct", domain, guide)
+
+
+def test_14_the_clean_twin_finds_nothing_and_counts_every_entry(tmp_path: Path) -> None:
+    r = folder_report(tmp_path, with_aids())
+    assert r.findings == []
+    assert r.compared[AIDS] == {"n": 4, "of": 4, "aids": 2}
+    assert FLAGS[AIDS] == "A Guide or Domain entry that names a hidden or deleted element"
+
+
+def test_14_a_domain_naming_a_hidden_element(tmp_path: Path) -> None:
+    (f,) = found(folder_report(tmp_path, with_aids(hidden_object=True)), AIDS)
+    assert f == {
+        "flag": AIDS,
+        "element": {"type": "construct", "id": DOM1, "name": "The quay"},
+        "reason": "this Domain's objects names a hidden element: every other reader is served the Domain without it",
+        "evidence": {"field": "objects", "hidden": {"type": "object", "id": CASE1, "name": "Sealed case"}},
+    }
+
+
+def test_14_a_guide_naming_a_deleted_element(tmp_path: Path) -> None:
+    r = folder_report(tmp_path, with_aids(deleted=True))
+    (f,) = found(r, AIDS)
+    assert f["element"]["id"] == GUIDE1
+    assert f["reason"] == "this Guide's constructs names an id that is not in the world (deleted)"
+    assert f["evidence"] == {"field": "constructs", "missing_id": GHOST}
+    assert r.compared[AIDS] == {"n": 5, "of": 5, "aids": 2}
+
+
+def test_14_a_hidden_domains_own_entries_and_an_unmarked_domain_are_no_finding(tmp_path: Path) -> None:
+    # The hidden Domain is read by keepers only: its entry for the hidden case is no finding, while the Guide
+    # naming the hidden Domain is.
+    (f,) = found(folder_report(tmp_path, with_aids(hidden_object=True, hidden_domain=True)), AIDS)
+    assert f["element"]["id"] == GUIDE1 and f["evidence"]["hidden"]["id"] == DOM1
+    lore = folder_report(tmp_path, with_aids(hidden_object=True, marked=False))
+    assert found(lore, AIDS) == [] and lore.compared[AIDS]["aids"] == 1  # the Guide alone; the Domain is lore
+
+
+def test_14_through_the_api_by_role() -> None:
+    planted = on_the_wire(with_aids(hidden_object=True, deleted=True))
+    owner = api_report(FakeReader(planted))
+    assert sorted(f["element"]["id"] for f in found(owner, AIDS)) == [DOM1, GUIDE1]
+    contributor = api_report(FakeReader(planted, role="contributor"))
+    assert [f["element"]["id"] for f in found(contributor, AIDS)] == [GUIDE1]
+    assert contributor.compared[AIDS]["not_checked"] == ["hidden"]
+    guest = api_report(FakeReader(planted, role="guest"))
+    assert AIDS not in guest.ran and AIDS in {x["flag"] for x in guest.not_run}

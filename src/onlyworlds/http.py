@@ -533,7 +533,7 @@ class Client:
 
     def me(self) -> dict[str, Any]:
         """``GET /me``: who this key is,
-        ``{world, scope, kind, role, membership, character, lenses, name?, front_door}``.
+        ``{world, scope, kind, role, membership, character, lenses, name?, front_door, reading_aids}``.
 
         ``kind`` is ``owner`` for an owner-minted or classic key, else the membership's (``person``,
         ``agent``, ``player``); ``role`` is ``owner``, ``co_builder``, ``contributor`` or ``guest``;
@@ -547,7 +547,11 @@ class Client:
         ``GET /members`` lists it, ``kind`` ``agent`` or ``player``, ``name`` None when the seat has
         none, ``character`` the Character it plays (None when it plays none you can read). It is
         empty for an AI or a player seat's own key and for anyone who answers for none; a seat made
-        from a link for an email address is never listed.
+        from a link for an email address is never listed. ``reading_aids`` is the world's reading aids as
+        this key reads them, ``{charter, guide, domains}``, the packet ``charter_of`` answers (the charter
+        profile): ``charter`` ``{id, name, rules, skill}`` or None, ``skill`` exactly ``front_door``'s
+        ``charter_skill``; ``guide`` ``{id, name}`` or None; ``domains`` a list of ``{id, name, sentence,
+        hubs}``.
         """
         data = self.call("GET", "me/")
         if not isinstance(data, dict):

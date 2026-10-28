@@ -35,12 +35,13 @@ when ``world.json`` is tracked by git.
 And on both doors, (11) the world's own house rules: the checks profile (schema-dist
 ``profiles/checks.md``, dist.47; the list case and reader rules 6 to 8 from dist.54),
 ``x_checks_rules`` on the world's Charter, read by
-``onlyworlds.checks.apply_checks``. The Charter is keel's one: the newest Law with
-supertype Charter made by the owner or a co-builder; through the API it is
-``front_door.charter`` from ``GET /me``, on a folder the owner's newest (a folder carries no
-roster, so when a member's Charter is newer the doctor says it cannot tell and applies none).
-Every other Law with supertype Charter is a finding, its rules not applied: a seat cannot write
-the rules it is judged by. Each element a rule finds short is a finding (the rule's sentence as
+``onlyworlds.checks.apply_checks``. The Charter is the charter profile's (schema-dist
+``profiles/charter.md``, serial 83): the newest marked Charter, a Law with supertype Charter that
+carries the mark ``x_charter_of``, which only a keeper may set; through the API it is
+``front_door.charter`` from ``GET /me``, keel's own answer, and otherwise ``charter_of``'s selection
+over what the door read. Every other marked Charter is a finding, its rules not applied (a tool
+offers to retire it); a Law with supertype Charter and house rules but no mark is lore, and a finding
+too, since its rules are not applied. Each element a rule finds short is a finding (the rule's sentence as
 the reason; the charter, the rule's index and its field as evidence); a rule the reader cannot
 apply is a finding on the charter, naming the rule and why; a key that is not a list is one
 finding on the charter; a charter without the key checks nothing and says so. ``compared``
@@ -99,6 +100,15 @@ and a string ``at`` is a finding on the World (``element`` null; on the folder d
 names ``world.json``), and the world is then read as unmarked. ``compared`` carries the mark as
 ``projection`` (null when unmarked).
 
+On both doors, (14) the reading aids' entries (the charter profile's Health line): a link on a marked
+Guide or Domain (a Construct with supertype Guide or Domain carrying ``x_charter_of``) to an id that is not
+in the world (deleted), or to a hidden element (the door names it; the Guide or Domain is served to every
+reader without it). A Guide or Domain that is itself hidden is read by keepers only, so its hidden entries
+are not findings; a known-of stub serves no links. Through a guest key the flag does not run (a link to an
+element it cannot see is neither hidden nor deleted to it); through a key that is not served hidden
+elements, ``compared`` names ``hidden`` in ``not_checked``. A deleted entry is flag 1's finding too, named
+here on the aid.
+
 A flag the walk cannot evaluate is reported in ``not_run`` with its reason, never as clean,
 and every flag that ran says how much it could compare (``compared: {n, of}``): a clean
 count over nothing compared is not a pass. A known-of stub's absent fields are unknown,
@@ -149,14 +159,16 @@ from typing import Any, Protocol
 
 from ._schema import ELEMENT_TYPES, FIELD_KINDS, GENERIC_PAIRS, LINK_TARGETS, SPINE_KINDS
 from ._version import __version__
+from .charter import charter_of
 from .checks import CHECKS_FIELD, apply_checks
 from .errors import ApiError
 from .folder import FORMAT_VERSION, HIDDEN, WORLD_FILE, Folder, is_hidden, is_known_of, read_folder
 from .http import API_BASE, Client
-from .room import _fold
+from .room import _fold, _reading_aid_key
 from .spine import SPINE_OFF_LIST, SPINE_PREFIX, SpineRead, read_spine_element
 
 __all__ = [
+    "AIDS_FLAG",
     "CHECKS_FLAG",
     "FLAGS",
     "MESSAGE_SUPERTYPES",
@@ -181,6 +193,9 @@ CHECKS_FLAG = "11"
 PROPOSALS_FLAG = "12"
 #: The spine flag (the spine profile and its audit): on both doors, on a world that carries an x_spine_ key.
 SPINE_FLAG = "13"
+#: The reading aids' flag (the charter profile's Health line): a Guide's or Domain's entry naming a hidden or
+#: deleted element, on both doors.
+AIDS_FLAG = "14"
 
 #: Flag id -> what it looks for. The ids are strings because flag 6 has two readings.
 FLAGS: dict[str, str] = {
@@ -198,6 +213,7 @@ FLAGS: dict[str, str] = {
     CHECKS_FLAG: "House rules (the checks profile)",
     PROPOSALS_FLAG: "Proposals waiting",
     SPINE_FLAG: "The spine (its profile and its audit)",
+    AIDS_FLAG: "A Guide or Domain entry that names a hidden or deleted element",
 }
 
 #: A finding on an element of these supertypes (compared case-folded) is ``kind: "message"``
@@ -219,6 +235,7 @@ _UNITS: dict[str, str] = {
     CHECKS_FLAG: "house rules applied",
     PROPOSALS_FLAG: "open and lapsed queue rows read",
     SPINE_FLAG: "elements read under the spine profile",
+    AIDS_FLAG: "links on marked Guides and Domains",
 }
 
 #: Fields that hold no prose even when the schema types them text.
@@ -600,21 +617,21 @@ def _json_kind(value: Any) -> str:
 _NOT_ASKED = object()
 
 
-def _newest(laws: list[_El]) -> _El | None:
-    """Keel's order (``accounts/front_door.py``): the newest by ``created_at``, then by id."""
-    return max(laws, key=lambda el: (str(el.body.get("created_at") or ""), el.id), default=None)
+def _aid_word(el: _El) -> str | None:
+    """The reading aid's pair word (``law/charter``, ``construct/guide``, ``construct/domain``) when ``el`` is one:
+    the pair, trimmed and folded, AND the mark ``x_charter_of`` by presence (``is_charter_element``)."""
+    return _reading_aid_key({**el.body, "type": el.type})
 
 
-def _the_charter(laws: list[_El], named: Any) -> tuple[_El | None, str, str | None]:
-    """The world's Charter among ``laws`` (each a Law with supertype Charter), by keel's one
-    definition (the checks profile from the serial after 47): the newest such Law made by
-    the owner or a co-builder. Returns the Charter or None, where the answer came from, and a reason
-    when it could not be told.
+def _the_charter(els: list[_El], laws: list[_El], named: Any) -> tuple[_El | None, str, str | None]:
+    """The world's Charter among ``laws`` (each a Law with supertype Charter), by the charter profile (serial 83):
+    the newest marked Charter. Returns the Charter or None, where the answer came from, and a reason when it could
+    not be told.
 
-    Through the API keel answers it: ``front_door.charter`` from ``GET /me`` (``named``, an id or
-    None). Otherwise only the owner's are known to be a keeper's (``created_by`` null or absent): a
-    folder carries no roster, so a Law made by a member may be a co-builder's or not, and when one is
-    newer than the owner's newest the Charter cannot be told; the doctor says so and applies none."""
+    Through the API keel answers it: ``front_door.charter`` from ``GET /me`` (``named``, an id or None).
+    Otherwise ``charter_of``'s selection over every element the door read, as their keeper reads them: the
+    newest marked Charter by ``created_at``, then the higher id. Who made the Law no longer decides: the mark
+    does, and only a keeper may set it."""
     if named is not _NOT_ASKED:
         if named is None:
             return None, "front_door", None
@@ -622,25 +639,16 @@ def _the_charter(laws: list[_El], named: Any) -> tuple[_El | None, str, str | No
         if hit is None:
             return None, "front_door", f"GET /me names {named} as the Charter, and no Law this key listed has that id"
         return hit, "front_door", None
-    owners = [el for el in laws if el.body.get("created_by") is None]
-    members = [el for el in laws if el.body.get("created_by") is not None]
-    owner = _newest(owners)
-    newer = [m for m in members if owner is None or _newest([owner, m]) is m]
-    if newer:
-        return (
-            None,
-            "maker",
-            f"{len(newer)} Law(s) with supertype Charter made by a member are newer than the owner's "
-            "newest, and only the roster says whether that member is a co-builder (a folder carries "
-            "none), so which Law is the Charter cannot be told here",
-        )
-    return owner, "maker", None
+    packet = charter_of({"elements": [{**el.body, "type": el.type, "id": el.id} for el in els]}, {"rung": "owner"})
+    chosen = packet["charter"]["id"] if packet["charter"] is not None else None
+    return next((el for el in laws if el.id == chosen), None), "mark", None
 
 
 def _house_rules(run: _Run, els: list[_El], *, view: str, named: Any = _NOT_ASKED) -> None:
     """Flag 11: the Charter's ``x_checks_rules`` (the checks profile) applied to the elements the
-    door could read; the Charter is the one keel names (``_the_charter``), and every other Law with
-    supertype Charter is a finding, its rules not applied. Never writes, reorders or repairs a list."""
+    door could read; the Charter is the newest marked one (``_the_charter``), every other marked Charter is a
+    finding, its rules not applied, and so is a Law with supertype Charter that carries house rules without the
+    mark (lore, whose rules are never applied). Never writes, reorders or repairs a list."""
     flag = CHECKS_FLAG
     charters = [el for el in els if _folded(el.body.get("supertype")) == "charter"]
     for el in charters:
@@ -653,25 +661,28 @@ def _house_rules(run: _Run, els: list[_El], *, view: str, named: Any = _NOT_ASKE
                 {"filed_as": el.type},
             )
     laws = [el for el in charters if el.type == "law"]
-    the, source, unknown = _the_charter(laws, named)
+    the, source, unknown = _the_charter(els, laws, named)
     if unknown is not None:
         run.find(flag, None, f"no house rule is checked: {unknown}", {"source": source})
+    marked = [el for el in laws if _aid_word(el) == "law/charter"]
     for el in laws:
         if el is the:
             continue
         rules = el.body.get(CHECKS_FIELD)
         held = f"; its {len(rules)} house rule(s) are not applied" if isinstance(rules, list) and rules else ""
-        run.find(
-            flag,
-            el,
-            "a Law with supertype Charter that is not the world's Charter (the newest one made by the owner "
-            f"or a co-builder){held}",
-            {
-                "charter": the.id if the is not None else None,
-                "source": source,
-                "carries_rules": CHECKS_FIELD in el.body,
-            },
-        )
+        evidence = {
+            "charter": the.id if the is not None else None,
+            "source": source,
+            "carries_rules": CHECKS_FIELD in el.body,
+            "marked": el in marked,
+        }
+        if el in marked:
+            why = "a marked Charter that is not the world's Charter (the newest marked one); a tool offers to retire it"
+        elif held:
+            why = "a Law with supertype Charter and house rules but no x_charter_of mark: lore, not the world's Charter"
+        else:
+            continue  # the pair without the mark is lore (a kingdom's charter), and holds no rule
+        run.find(flag, el, f"{why}{held}", evidence)
     judged = [el for el in els if not el.known_of]  # a stub's absent fields are unknown, not short
     bodies = [{**el.body, "type": el.type, "id": el.id} for el in judged]
     by_ref = {(el.type, el.id): el for el in judged}
@@ -716,12 +727,53 @@ def _house_rules(run: _Run, els: list[_El], *, view: str, named: Any = _NOT_ASKE
         len(rows),
         view=view,
         charters=len(laws),
+        marked=len(marked),
         charter=the.id if the is not None else None,
         charter_from=source,
         carrying=carrying,
         stubs_not_judged=len(els) - len(judged),
         rules=rows,
     )
+
+
+def _aid_entries(run: _Run, els: list[_El], *, whole_view: bool = True, sees_hidden: bool = True) -> None:
+    """Flag 14, the charter profile's Health line: a marked Guide's or Domain's link naming an id that is not in the
+    world, or a hidden element. ``whole_view`` False (a guest) does not run; ``sees_hidden`` False reads the
+    deleted half only and names ``hidden`` in ``not_checked``. A hidden Guide or Domain is read by keepers only,
+    so its hidden entries are not findings; a known-of stub serves no links."""
+    flag = AIDS_FLAG
+    if not whole_view:
+        run.skip(flag, "a guest key cannot see every element: a link to one it cannot see is not hidden or gone to it")
+        return
+    by_id = {el.id: el for el in els}
+    aids = [el for el in els if not el.known_of and _aid_word(el) in ("construct/guide", "construct/domain")]
+    values = compared = 0
+    for el in aids:
+        word = "Guide" if _aid_word(el) == "construct/guide" else "Domain"
+        for fname, value in _links(el):
+            values += 1
+            if not isinstance(value, str):
+                continue
+            compared += 1
+            target = by_id.get(value)
+            if target is None:
+                run.find(
+                    flag,
+                    el,
+                    f"this {word}'s {fname} names an id that is not in the world (deleted)",
+                    {"field": fname, "missing_id": value},
+                )
+            elif sees_hidden and not is_hidden(el.body) and is_hidden(target.body):
+                run.find(
+                    flag,
+                    el,
+                    f"this {word}'s {fname} names a hidden element: every other reader is served the {word} without it",
+                    {"field": fname, "hidden": target.ref()},
+                )
+    extra: dict[str, Any] = {"aids": len(aids)}
+    if not sees_hidden:
+        extra["not_checked"] = ["hidden"]
+    run.ran(flag, compared, values, **extra)
 
 
 #: A row kind's type -> the Title's field that lists it (the spine profile: "Ownership is the standard's").
@@ -1173,6 +1225,7 @@ def doctor_folder(folder: Folder, *, days: int = 14, changes: int = 50, now: _dt
     _walk(run, els, days=days, now=now or _dt.datetime.now(_dt.UTC))
     _house_rules(run, els, view="folder")
     _spine(run, els, world, world_file=WORLD_FILE)
+    _aid_entries(run, els)
     run.skip("2", "needs the feed's history of Title.holders")
     run.skip("7", "read marks are not in the folder")
     run.skip("8", "no feed in a folder")
@@ -1393,6 +1446,7 @@ def doctor_api(client: Reader, *, days: int = 14, changes: int = 50, now: _dt.da
     _walk(run, els, days=days, now=at, whole_view=role != "guest")
     _house_rules(run, els, view=view, named=named)
     _spine(run, els, world, whole_view=role != "guest", sees_hidden=role in _SEES_HIDDEN)
+    _aid_entries(run, els, whole_view=role != "guest", sees_hidden=role in _SEES_HIDDEN)
     try:
         rows, head = _feed(client)
     except (ApiError, ConnectionError, ValueError) as exc:
