@@ -495,7 +495,7 @@ def test_a_whole_number_key_refuses_a_float_and_a_date_field_reads_one_whole() -
 # co-builder and never on the public rung. The owner's rows are its bodies untouched. The same file byte for byte as
 # the npm SDK's test/fixtures/row-trim-cases.json (both suites hold its sha256), answers written by hand.
 ROW_TRIM_FILE = REPO / "tests" / "fixtures" / "row-trim-cases.json"
-ROW_TRIM_SHA256 = "a03998723cc2c717831785374e84fd6ac7e503f98d92a3218be5ec733c0168da"
+ROW_TRIM_SHA256 = "8365cf7c1364e8d04f2143824ba4cb19f275935d3a602178fb2ed497bf6fe140"
 
 
 def test_a_readers_rows_carry_only_ids_it_sees() -> None:
@@ -510,12 +510,13 @@ def test_a_readers_rows_carry_only_ids_it_sees() -> None:
     for line in wrong:
         print(line)
     assert wrong == []
-    assert len(cases) == 20
+    assert len(cases) == 28
 
 
 def test_the_owners_row_keeps_a_link_to_a_proposed_element() -> None:
     """The owner reading as itself is served its bodies untouched, a link to an element written as proposed too; the
-    proposed element is still in no reader's view, so nothing hops to it."""
+    proposed element is still in no reader's view, so nothing hops to it. A contributor is served the link too (keel's
+    ``scoped`` leaves proposed elements out for the public rung alone); the public reader is not."""
     world: dict[str, list[dict[str, Any]]] = {
         "elements": [
             {"id": _id(1), "type": "location", "name": "Quay", "buildings": [_id(2)]},
@@ -526,7 +527,9 @@ def test_the_owners_row_keeps_a_link_to_a_proposed_element() -> None:
     got = resolve_lens(world, lens, OWNER)
     assert got["kept"] == [_id(1)] and got["rows"] == [world["elements"][0]]
     seen = resolve_lens(world, lens, {"rung": "owner", "as": {"rung": "contributor"}})
-    assert seen["rows"] == [{**world["elements"][0], "buildings": []}]
+    assert seen["kept"] == [_id(1)] and seen["rows"] == [world["elements"][0]]
+    public = resolve_lens(world, lens, {"rung": "owner", "as": {"rung": "public"}})
+    assert public["rows"] == [{**world["elements"][0], "buildings": []}]
 
 
 def test_an_umbrellas_own_hop_keeps_a_child_lens_it_reaches() -> None:

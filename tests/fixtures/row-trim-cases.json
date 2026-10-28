@@ -3225,5 +3225,1717 @@
         "element_id": "019a7f00-0000-7000-8000-000000000304"
       }
     ]
+  },
+  {
+    "name": "a-link-to-a-proposed-object-contributor-kept",
+    "world": {
+      "elements": [
+        {
+          "id": "019a7f00-0000-7000-8000-000000000301",
+          "type": "location",
+          "name": "The wheelhouse",
+          "description": "Command and the lamps.\nThe second line.",
+          "defensive_objects": [
+            "019a7f00-0000-7000-8000-000000000302",
+            "019a7f00-0000-7000-8000-000000000303"
+          ],
+          "buildings": [
+            "019a7f00-0000-7000-8000-000000000303",
+            "019a7f00-0000-7000-8000-000000000304"
+          ]
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000302",
+          "type": "object",
+          "name": "Signal lamp"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000303",
+          "type": "object",
+          "name": "Sealed case",
+          "hidden": true
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000304",
+          "type": "character",
+          "name": "Ada"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000305",
+          "type": "character",
+          "name": "The heir",
+          "hidden": true
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000306",
+          "type": "relation",
+          "name": "Ada's ward",
+          "actor": "019a7f00-0000-7000-8000-000000000305",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000304",
+            "019a7f00-0000-7000-8000-000000000305"
+          ]
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000307",
+          "type": "construct",
+          "name": "Harbour watch",
+          "supertype": "Domain",
+          "x_charter_of": "019a7f00-0000-7000-8000-000000000399",
+          "description": "The wheelhouse and its lamps.",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000305"
+          ],
+          "objects": [
+            "019a7f00-0000-7000-8000-000000000302",
+            "019a7f00-0000-7000-8000-000000000303"
+          ],
+          "locations": [
+            "019a7f00-0000-7000-8000-000000000301"
+          ]
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000308",
+          "type": "narrative",
+          "name": "Orders",
+          "supertype": "Message",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000304",
+            "019a7f00-0000-7000-8000-000000000305"
+          ],
+          "narrator": "019a7f00-0000-7000-8000-000000000305",
+          "objects": [
+            "019a7f00-0000-7000-8000-000000000303"
+          ],
+          "locations": [
+            "019a7f00-0000-7000-8000-000000000311"
+          ],
+          "created_at": "2026-10-20T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000309",
+          "type": "pin",
+          "name": "Lamp pin",
+          "element_type": "object",
+          "element_id": "019a7f00-0000-7000-8000-000000000303"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000312",
+          "type": "pin",
+          "name": "Ada's pin",
+          "element_type": "object",
+          "element_id": "019a7f00-0000-7000-8000-000000000304"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000311",
+          "type": "location",
+          "name": "The vault",
+          "hidden": true
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000310",
+          "type": "construct",
+          "name": "Ada's watch",
+          "supertype": "Lens",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000304",
+            "019a7f00-0000-7000-8000-000000000305"
+          ],
+          "x_lens": {
+            "depth": 1,
+            "notes": {
+              "019a7f00-0000-7000-8000-000000000304": "She keeps the lamp.",
+              "019a7f00-0000-7000-8000-000000000305": "Heir to the wheelhouse.",
+              "019a7f00-0000-7000-8000-000000000303": "The case.",
+              "019a7f00-0000-7000-8000-000000000302": "The lamp."
+            }
+          }
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000313",
+          "type": "object",
+          "name": "Draft lantern",
+          "x_review_proposed": {
+            "by": "019a7f00-0000-7000-8000-000000000398",
+            "expires": "2026-11-30"
+          }
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000314",
+          "type": "location",
+          "name": "The quay",
+          "defensive_objects": [
+            "019a7f00-0000-7000-8000-000000000302",
+            "019a7f00-0000-7000-8000-000000000313"
+          ]
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000315",
+          "type": "construct",
+          "name": "Quay watch",
+          "supertype": "Lens",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000304"
+          ],
+          "x_lens": {
+            "depth": 1,
+            "notes": {
+              "019a7f00-0000-7000-8000-000000000304": "She walks the quay.",
+              "019a7f00-0000-7000-8000-000000000313": "The lantern on trial."
+            }
+          }
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000316",
+          "type": "narrative",
+          "name": "Second orders",
+          "supertype": "Message",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000304",
+            "019a7f00-0000-7000-8000-000000000305"
+          ],
+          "narrator": "019a7f00-0000-7000-8000-000000000304",
+          "created_at": "2026-10-21T12:00:00Z",
+          "x_served_trimmed": [
+            "narrator"
+          ]
+        }
+      ],
+      "now": 100
+    },
+    "lens": {
+      "id": "019a7f00-0000-7000-8000-000000000390",
+      "type": "construct",
+      "name": "The reading",
+      "supertype": "Lens",
+      "locations": [
+        "019a7f00-0000-7000-8000-000000000314"
+      ],
+      "x_lens": {
+        "depth": 0
+      }
+    },
+    "reader": {
+      "rung": "contributor"
+    },
+    "want_rows": [
+      {
+        "id": "019a7f00-0000-7000-8000-000000000314",
+        "type": "location",
+        "name": "The quay",
+        "defensive_objects": [
+          "019a7f00-0000-7000-8000-000000000302",
+          "019a7f00-0000-7000-8000-000000000313"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "a-link-to-a-proposed-object-guest-kept",
+    "world": {
+      "elements": [
+        {
+          "id": "019a7f00-0000-7000-8000-000000000301",
+          "type": "location",
+          "name": "The wheelhouse",
+          "description": "Command and the lamps.\nThe second line.",
+          "defensive_objects": [
+            "019a7f00-0000-7000-8000-000000000302",
+            "019a7f00-0000-7000-8000-000000000303"
+          ],
+          "buildings": [
+            "019a7f00-0000-7000-8000-000000000303",
+            "019a7f00-0000-7000-8000-000000000304"
+          ]
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000302",
+          "type": "object",
+          "name": "Signal lamp"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000303",
+          "type": "object",
+          "name": "Sealed case",
+          "hidden": true
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000304",
+          "type": "character",
+          "name": "Ada"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000305",
+          "type": "character",
+          "name": "The heir",
+          "hidden": true
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000306",
+          "type": "relation",
+          "name": "Ada's ward",
+          "actor": "019a7f00-0000-7000-8000-000000000305",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000304",
+            "019a7f00-0000-7000-8000-000000000305"
+          ]
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000307",
+          "type": "construct",
+          "name": "Harbour watch",
+          "supertype": "Domain",
+          "x_charter_of": "019a7f00-0000-7000-8000-000000000399",
+          "description": "The wheelhouse and its lamps.",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000305"
+          ],
+          "objects": [
+            "019a7f00-0000-7000-8000-000000000302",
+            "019a7f00-0000-7000-8000-000000000303"
+          ],
+          "locations": [
+            "019a7f00-0000-7000-8000-000000000301"
+          ]
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000308",
+          "type": "narrative",
+          "name": "Orders",
+          "supertype": "Message",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000304",
+            "019a7f00-0000-7000-8000-000000000305"
+          ],
+          "narrator": "019a7f00-0000-7000-8000-000000000305",
+          "objects": [
+            "019a7f00-0000-7000-8000-000000000303"
+          ],
+          "locations": [
+            "019a7f00-0000-7000-8000-000000000311"
+          ],
+          "created_at": "2026-10-20T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000309",
+          "type": "pin",
+          "name": "Lamp pin",
+          "element_type": "object",
+          "element_id": "019a7f00-0000-7000-8000-000000000303"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000312",
+          "type": "pin",
+          "name": "Ada's pin",
+          "element_type": "object",
+          "element_id": "019a7f00-0000-7000-8000-000000000304"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000311",
+          "type": "location",
+          "name": "The vault",
+          "hidden": true
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000310",
+          "type": "construct",
+          "name": "Ada's watch",
+          "supertype": "Lens",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000304",
+            "019a7f00-0000-7000-8000-000000000305"
+          ],
+          "x_lens": {
+            "depth": 1,
+            "notes": {
+              "019a7f00-0000-7000-8000-000000000304": "She keeps the lamp.",
+              "019a7f00-0000-7000-8000-000000000305": "Heir to the wheelhouse.",
+              "019a7f00-0000-7000-8000-000000000303": "The case.",
+              "019a7f00-0000-7000-8000-000000000302": "The lamp."
+            }
+          }
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000313",
+          "type": "object",
+          "name": "Draft lantern",
+          "x_review_proposed": {
+            "by": "019a7f00-0000-7000-8000-000000000398",
+            "expires": "2026-11-30"
+          }
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000314",
+          "type": "location",
+          "name": "The quay",
+          "defensive_objects": [
+            "019a7f00-0000-7000-8000-000000000302",
+            "019a7f00-0000-7000-8000-000000000313"
+          ]
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000315",
+          "type": "construct",
+          "name": "Quay watch",
+          "supertype": "Lens",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000304"
+          ],
+          "x_lens": {
+            "depth": 1,
+            "notes": {
+              "019a7f00-0000-7000-8000-000000000304": "She walks the quay.",
+              "019a7f00-0000-7000-8000-000000000313": "The lantern on trial."
+            }
+          }
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000316",
+          "type": "narrative",
+          "name": "Second orders",
+          "supertype": "Message",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000304",
+            "019a7f00-0000-7000-8000-000000000305"
+          ],
+          "narrator": "019a7f00-0000-7000-8000-000000000304",
+          "created_at": "2026-10-21T12:00:00Z",
+          "x_served_trimmed": [
+            "narrator"
+          ]
+        }
+      ],
+      "now": 100
+    },
+    "lens": {
+      "id": "019a7f00-0000-7000-8000-000000000390",
+      "type": "construct",
+      "name": "The reading",
+      "supertype": "Lens",
+      "locations": [
+        "019a7f00-0000-7000-8000-000000000314"
+      ],
+      "x_lens": {
+        "depth": 0
+      }
+    },
+    "reader": {
+      "rung": "guest",
+      "whole": [
+        "019a7f00-0000-7000-8000-000000000314",
+        "019a7f00-0000-7000-8000-000000000302",
+        "019a7f00-0000-7000-8000-000000000313"
+      ],
+      "known_of": []
+    },
+    "want_rows": [
+      {
+        "id": "019a7f00-0000-7000-8000-000000000314",
+        "type": "location",
+        "name": "The quay",
+        "defensive_objects": [
+          "019a7f00-0000-7000-8000-000000000302",
+          "019a7f00-0000-7000-8000-000000000313"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "a-link-to-a-proposed-object-public-dropped",
+    "world": {
+      "elements": [
+        {
+          "id": "019a7f00-0000-7000-8000-000000000301",
+          "type": "location",
+          "name": "The wheelhouse",
+          "description": "Command and the lamps.\nThe second line.",
+          "defensive_objects": [
+            "019a7f00-0000-7000-8000-000000000302",
+            "019a7f00-0000-7000-8000-000000000303"
+          ],
+          "buildings": [
+            "019a7f00-0000-7000-8000-000000000303",
+            "019a7f00-0000-7000-8000-000000000304"
+          ]
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000302",
+          "type": "object",
+          "name": "Signal lamp"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000303",
+          "type": "object",
+          "name": "Sealed case",
+          "hidden": true
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000304",
+          "type": "character",
+          "name": "Ada"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000305",
+          "type": "character",
+          "name": "The heir",
+          "hidden": true
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000306",
+          "type": "relation",
+          "name": "Ada's ward",
+          "actor": "019a7f00-0000-7000-8000-000000000305",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000304",
+            "019a7f00-0000-7000-8000-000000000305"
+          ]
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000307",
+          "type": "construct",
+          "name": "Harbour watch",
+          "supertype": "Domain",
+          "x_charter_of": "019a7f00-0000-7000-8000-000000000399",
+          "description": "The wheelhouse and its lamps.",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000305"
+          ],
+          "objects": [
+            "019a7f00-0000-7000-8000-000000000302",
+            "019a7f00-0000-7000-8000-000000000303"
+          ],
+          "locations": [
+            "019a7f00-0000-7000-8000-000000000301"
+          ]
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000308",
+          "type": "narrative",
+          "name": "Orders",
+          "supertype": "Message",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000304",
+            "019a7f00-0000-7000-8000-000000000305"
+          ],
+          "narrator": "019a7f00-0000-7000-8000-000000000305",
+          "objects": [
+            "019a7f00-0000-7000-8000-000000000303"
+          ],
+          "locations": [
+            "019a7f00-0000-7000-8000-000000000311"
+          ],
+          "created_at": "2026-10-20T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000309",
+          "type": "pin",
+          "name": "Lamp pin",
+          "element_type": "object",
+          "element_id": "019a7f00-0000-7000-8000-000000000303"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000312",
+          "type": "pin",
+          "name": "Ada's pin",
+          "element_type": "object",
+          "element_id": "019a7f00-0000-7000-8000-000000000304"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000311",
+          "type": "location",
+          "name": "The vault",
+          "hidden": true
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000310",
+          "type": "construct",
+          "name": "Ada's watch",
+          "supertype": "Lens",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000304",
+            "019a7f00-0000-7000-8000-000000000305"
+          ],
+          "x_lens": {
+            "depth": 1,
+            "notes": {
+              "019a7f00-0000-7000-8000-000000000304": "She keeps the lamp.",
+              "019a7f00-0000-7000-8000-000000000305": "Heir to the wheelhouse.",
+              "019a7f00-0000-7000-8000-000000000303": "The case.",
+              "019a7f00-0000-7000-8000-000000000302": "The lamp."
+            }
+          }
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000313",
+          "type": "object",
+          "name": "Draft lantern",
+          "x_review_proposed": {
+            "by": "019a7f00-0000-7000-8000-000000000398",
+            "expires": "2026-11-30"
+          }
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000314",
+          "type": "location",
+          "name": "The quay",
+          "defensive_objects": [
+            "019a7f00-0000-7000-8000-000000000302",
+            "019a7f00-0000-7000-8000-000000000313"
+          ]
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000315",
+          "type": "construct",
+          "name": "Quay watch",
+          "supertype": "Lens",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000304"
+          ],
+          "x_lens": {
+            "depth": 1,
+            "notes": {
+              "019a7f00-0000-7000-8000-000000000304": "She walks the quay.",
+              "019a7f00-0000-7000-8000-000000000313": "The lantern on trial."
+            }
+          }
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000316",
+          "type": "narrative",
+          "name": "Second orders",
+          "supertype": "Message",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000304",
+            "019a7f00-0000-7000-8000-000000000305"
+          ],
+          "narrator": "019a7f00-0000-7000-8000-000000000304",
+          "created_at": "2026-10-21T12:00:00Z",
+          "x_served_trimmed": [
+            "narrator"
+          ]
+        }
+      ],
+      "now": 100
+    },
+    "lens": {
+      "id": "019a7f00-0000-7000-8000-000000000390",
+      "type": "construct",
+      "name": "The reading",
+      "supertype": "Lens",
+      "locations": [
+        "019a7f00-0000-7000-8000-000000000314"
+      ],
+      "x_lens": {
+        "depth": 0
+      }
+    },
+    "reader": {
+      "rung": "public"
+    },
+    "want_rows": [
+      {
+        "id": "019a7f00-0000-7000-8000-000000000314",
+        "type": "location",
+        "name": "The quay",
+        "defensive_objects": [
+          "019a7f00-0000-7000-8000-000000000302"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "a-lens-note-on-a-proposed-object-contributor-kept",
+    "world": {
+      "elements": [
+        {
+          "id": "019a7f00-0000-7000-8000-000000000301",
+          "type": "location",
+          "name": "The wheelhouse",
+          "description": "Command and the lamps.\nThe second line.",
+          "defensive_objects": [
+            "019a7f00-0000-7000-8000-000000000302",
+            "019a7f00-0000-7000-8000-000000000303"
+          ],
+          "buildings": [
+            "019a7f00-0000-7000-8000-000000000303",
+            "019a7f00-0000-7000-8000-000000000304"
+          ]
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000302",
+          "type": "object",
+          "name": "Signal lamp"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000303",
+          "type": "object",
+          "name": "Sealed case",
+          "hidden": true
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000304",
+          "type": "character",
+          "name": "Ada"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000305",
+          "type": "character",
+          "name": "The heir",
+          "hidden": true
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000306",
+          "type": "relation",
+          "name": "Ada's ward",
+          "actor": "019a7f00-0000-7000-8000-000000000305",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000304",
+            "019a7f00-0000-7000-8000-000000000305"
+          ]
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000307",
+          "type": "construct",
+          "name": "Harbour watch",
+          "supertype": "Domain",
+          "x_charter_of": "019a7f00-0000-7000-8000-000000000399",
+          "description": "The wheelhouse and its lamps.",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000305"
+          ],
+          "objects": [
+            "019a7f00-0000-7000-8000-000000000302",
+            "019a7f00-0000-7000-8000-000000000303"
+          ],
+          "locations": [
+            "019a7f00-0000-7000-8000-000000000301"
+          ]
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000308",
+          "type": "narrative",
+          "name": "Orders",
+          "supertype": "Message",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000304",
+            "019a7f00-0000-7000-8000-000000000305"
+          ],
+          "narrator": "019a7f00-0000-7000-8000-000000000305",
+          "objects": [
+            "019a7f00-0000-7000-8000-000000000303"
+          ],
+          "locations": [
+            "019a7f00-0000-7000-8000-000000000311"
+          ],
+          "created_at": "2026-10-20T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000309",
+          "type": "pin",
+          "name": "Lamp pin",
+          "element_type": "object",
+          "element_id": "019a7f00-0000-7000-8000-000000000303"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000312",
+          "type": "pin",
+          "name": "Ada's pin",
+          "element_type": "object",
+          "element_id": "019a7f00-0000-7000-8000-000000000304"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000311",
+          "type": "location",
+          "name": "The vault",
+          "hidden": true
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000310",
+          "type": "construct",
+          "name": "Ada's watch",
+          "supertype": "Lens",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000304",
+            "019a7f00-0000-7000-8000-000000000305"
+          ],
+          "x_lens": {
+            "depth": 1,
+            "notes": {
+              "019a7f00-0000-7000-8000-000000000304": "She keeps the lamp.",
+              "019a7f00-0000-7000-8000-000000000305": "Heir to the wheelhouse.",
+              "019a7f00-0000-7000-8000-000000000303": "The case.",
+              "019a7f00-0000-7000-8000-000000000302": "The lamp."
+            }
+          }
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000313",
+          "type": "object",
+          "name": "Draft lantern",
+          "x_review_proposed": {
+            "by": "019a7f00-0000-7000-8000-000000000398",
+            "expires": "2026-11-30"
+          }
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000314",
+          "type": "location",
+          "name": "The quay",
+          "defensive_objects": [
+            "019a7f00-0000-7000-8000-000000000302",
+            "019a7f00-0000-7000-8000-000000000313"
+          ]
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000315",
+          "type": "construct",
+          "name": "Quay watch",
+          "supertype": "Lens",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000304"
+          ],
+          "x_lens": {
+            "depth": 1,
+            "notes": {
+              "019a7f00-0000-7000-8000-000000000304": "She walks the quay.",
+              "019a7f00-0000-7000-8000-000000000313": "The lantern on trial."
+            }
+          }
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000316",
+          "type": "narrative",
+          "name": "Second orders",
+          "supertype": "Message",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000304",
+            "019a7f00-0000-7000-8000-000000000305"
+          ],
+          "narrator": "019a7f00-0000-7000-8000-000000000304",
+          "created_at": "2026-10-21T12:00:00Z",
+          "x_served_trimmed": [
+            "narrator"
+          ]
+        }
+      ],
+      "now": 100
+    },
+    "lens": {
+      "id": "019a7f00-0000-7000-8000-000000000390",
+      "type": "construct",
+      "name": "The reading",
+      "supertype": "Lens",
+      "characters": [
+        "019a7f00-0000-7000-8000-000000000304"
+      ],
+      "x_lens": {
+        "depth": 1,
+        "types": [
+          "construct"
+        ]
+      }
+    },
+    "reader": {
+      "rung": "contributor"
+    },
+    "want_rows": [
+      {
+        "id": "019a7f00-0000-7000-8000-000000000304",
+        "type": "character",
+        "name": "Ada"
+      },
+      {
+        "id": "019a7f00-0000-7000-8000-000000000310",
+        "type": "construct",
+        "name": "Ada's watch",
+        "supertype": "Lens",
+        "characters": [
+          "019a7f00-0000-7000-8000-000000000304"
+        ],
+        "x_lens": {
+          "depth": 1,
+          "notes": {
+            "019a7f00-0000-7000-8000-000000000304": "She keeps the lamp.",
+            "019a7f00-0000-7000-8000-000000000302": "The lamp."
+          }
+        },
+        "x_served_trimmed": [
+          "characters",
+          "notes"
+        ]
+      },
+      {
+        "id": "019a7f00-0000-7000-8000-000000000315",
+        "type": "construct",
+        "name": "Quay watch",
+        "supertype": "Lens",
+        "characters": [
+          "019a7f00-0000-7000-8000-000000000304"
+        ],
+        "x_lens": {
+          "depth": 1,
+          "notes": {
+            "019a7f00-0000-7000-8000-000000000304": "She walks the quay.",
+            "019a7f00-0000-7000-8000-000000000313": "The lantern on trial."
+          }
+        }
+      }
+    ]
+  },
+  {
+    "name": "a-lens-note-on-a-proposed-object-public-dropped-unmarked",
+    "world": {
+      "elements": [
+        {
+          "id": "019a7f00-0000-7000-8000-000000000301",
+          "type": "location",
+          "name": "The wheelhouse",
+          "description": "Command and the lamps.\nThe second line.",
+          "defensive_objects": [
+            "019a7f00-0000-7000-8000-000000000302",
+            "019a7f00-0000-7000-8000-000000000303"
+          ],
+          "buildings": [
+            "019a7f00-0000-7000-8000-000000000303",
+            "019a7f00-0000-7000-8000-000000000304"
+          ]
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000302",
+          "type": "object",
+          "name": "Signal lamp"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000303",
+          "type": "object",
+          "name": "Sealed case",
+          "hidden": true
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000304",
+          "type": "character",
+          "name": "Ada"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000305",
+          "type": "character",
+          "name": "The heir",
+          "hidden": true
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000306",
+          "type": "relation",
+          "name": "Ada's ward",
+          "actor": "019a7f00-0000-7000-8000-000000000305",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000304",
+            "019a7f00-0000-7000-8000-000000000305"
+          ]
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000307",
+          "type": "construct",
+          "name": "Harbour watch",
+          "supertype": "Domain",
+          "x_charter_of": "019a7f00-0000-7000-8000-000000000399",
+          "description": "The wheelhouse and its lamps.",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000305"
+          ],
+          "objects": [
+            "019a7f00-0000-7000-8000-000000000302",
+            "019a7f00-0000-7000-8000-000000000303"
+          ],
+          "locations": [
+            "019a7f00-0000-7000-8000-000000000301"
+          ]
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000308",
+          "type": "narrative",
+          "name": "Orders",
+          "supertype": "Message",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000304",
+            "019a7f00-0000-7000-8000-000000000305"
+          ],
+          "narrator": "019a7f00-0000-7000-8000-000000000305",
+          "objects": [
+            "019a7f00-0000-7000-8000-000000000303"
+          ],
+          "locations": [
+            "019a7f00-0000-7000-8000-000000000311"
+          ],
+          "created_at": "2026-10-20T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000309",
+          "type": "pin",
+          "name": "Lamp pin",
+          "element_type": "object",
+          "element_id": "019a7f00-0000-7000-8000-000000000303"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000312",
+          "type": "pin",
+          "name": "Ada's pin",
+          "element_type": "object",
+          "element_id": "019a7f00-0000-7000-8000-000000000304"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000311",
+          "type": "location",
+          "name": "The vault",
+          "hidden": true
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000310",
+          "type": "construct",
+          "name": "Ada's watch",
+          "supertype": "Lens",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000304",
+            "019a7f00-0000-7000-8000-000000000305"
+          ],
+          "x_lens": {
+            "depth": 1,
+            "notes": {
+              "019a7f00-0000-7000-8000-000000000304": "She keeps the lamp.",
+              "019a7f00-0000-7000-8000-000000000305": "Heir to the wheelhouse.",
+              "019a7f00-0000-7000-8000-000000000303": "The case.",
+              "019a7f00-0000-7000-8000-000000000302": "The lamp."
+            }
+          }
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000313",
+          "type": "object",
+          "name": "Draft lantern",
+          "x_review_proposed": {
+            "by": "019a7f00-0000-7000-8000-000000000398",
+            "expires": "2026-11-30"
+          }
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000314",
+          "type": "location",
+          "name": "The quay",
+          "defensive_objects": [
+            "019a7f00-0000-7000-8000-000000000302",
+            "019a7f00-0000-7000-8000-000000000313"
+          ]
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000315",
+          "type": "construct",
+          "name": "Quay watch",
+          "supertype": "Lens",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000304"
+          ],
+          "x_lens": {
+            "depth": 1,
+            "notes": {
+              "019a7f00-0000-7000-8000-000000000304": "She walks the quay.",
+              "019a7f00-0000-7000-8000-000000000313": "The lantern on trial."
+            }
+          }
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000316",
+          "type": "narrative",
+          "name": "Second orders",
+          "supertype": "Message",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000304",
+            "019a7f00-0000-7000-8000-000000000305"
+          ],
+          "narrator": "019a7f00-0000-7000-8000-000000000304",
+          "created_at": "2026-10-21T12:00:00Z",
+          "x_served_trimmed": [
+            "narrator"
+          ]
+        }
+      ],
+      "now": 100
+    },
+    "lens": {
+      "id": "019a7f00-0000-7000-8000-000000000390",
+      "type": "construct",
+      "name": "The reading",
+      "supertype": "Lens",
+      "characters": [
+        "019a7f00-0000-7000-8000-000000000304"
+      ],
+      "x_lens": {
+        "depth": 1,
+        "types": [
+          "construct"
+        ]
+      }
+    },
+    "reader": {
+      "rung": "public"
+    },
+    "want_rows": [
+      {
+        "id": "019a7f00-0000-7000-8000-000000000304",
+        "type": "character",
+        "name": "Ada"
+      },
+      {
+        "id": "019a7f00-0000-7000-8000-000000000310",
+        "type": "construct",
+        "name": "Ada's watch",
+        "supertype": "Lens",
+        "characters": [
+          "019a7f00-0000-7000-8000-000000000304"
+        ],
+        "x_lens": {
+          "depth": 1,
+          "notes": {
+            "019a7f00-0000-7000-8000-000000000304": "She keeps the lamp.",
+            "019a7f00-0000-7000-8000-000000000302": "The lamp."
+          }
+        }
+      },
+      {
+        "id": "019a7f00-0000-7000-8000-000000000315",
+        "type": "construct",
+        "name": "Quay watch",
+        "supertype": "Lens",
+        "characters": [
+          "019a7f00-0000-7000-8000-000000000304"
+        ],
+        "x_lens": {
+          "depth": 1,
+          "notes": {
+            "019a7f00-0000-7000-8000-000000000304": "She walks the quay."
+          }
+        }
+      }
+    ]
+  },
+  {
+    "name": "a-stored-served-trimmed-mark-contributor-only-this-trim",
+    "world": {
+      "elements": [
+        {
+          "id": "019a7f00-0000-7000-8000-000000000301",
+          "type": "location",
+          "name": "The wheelhouse",
+          "description": "Command and the lamps.\nThe second line.",
+          "defensive_objects": [
+            "019a7f00-0000-7000-8000-000000000302",
+            "019a7f00-0000-7000-8000-000000000303"
+          ],
+          "buildings": [
+            "019a7f00-0000-7000-8000-000000000303",
+            "019a7f00-0000-7000-8000-000000000304"
+          ]
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000302",
+          "type": "object",
+          "name": "Signal lamp"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000303",
+          "type": "object",
+          "name": "Sealed case",
+          "hidden": true
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000304",
+          "type": "character",
+          "name": "Ada"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000305",
+          "type": "character",
+          "name": "The heir",
+          "hidden": true
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000306",
+          "type": "relation",
+          "name": "Ada's ward",
+          "actor": "019a7f00-0000-7000-8000-000000000305",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000304",
+            "019a7f00-0000-7000-8000-000000000305"
+          ]
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000307",
+          "type": "construct",
+          "name": "Harbour watch",
+          "supertype": "Domain",
+          "x_charter_of": "019a7f00-0000-7000-8000-000000000399",
+          "description": "The wheelhouse and its lamps.",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000305"
+          ],
+          "objects": [
+            "019a7f00-0000-7000-8000-000000000302",
+            "019a7f00-0000-7000-8000-000000000303"
+          ],
+          "locations": [
+            "019a7f00-0000-7000-8000-000000000301"
+          ]
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000308",
+          "type": "narrative",
+          "name": "Orders",
+          "supertype": "Message",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000304",
+            "019a7f00-0000-7000-8000-000000000305"
+          ],
+          "narrator": "019a7f00-0000-7000-8000-000000000305",
+          "objects": [
+            "019a7f00-0000-7000-8000-000000000303"
+          ],
+          "locations": [
+            "019a7f00-0000-7000-8000-000000000311"
+          ],
+          "created_at": "2026-10-20T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000309",
+          "type": "pin",
+          "name": "Lamp pin",
+          "element_type": "object",
+          "element_id": "019a7f00-0000-7000-8000-000000000303"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000312",
+          "type": "pin",
+          "name": "Ada's pin",
+          "element_type": "object",
+          "element_id": "019a7f00-0000-7000-8000-000000000304"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000311",
+          "type": "location",
+          "name": "The vault",
+          "hidden": true
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000310",
+          "type": "construct",
+          "name": "Ada's watch",
+          "supertype": "Lens",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000304",
+            "019a7f00-0000-7000-8000-000000000305"
+          ],
+          "x_lens": {
+            "depth": 1,
+            "notes": {
+              "019a7f00-0000-7000-8000-000000000304": "She keeps the lamp.",
+              "019a7f00-0000-7000-8000-000000000305": "Heir to the wheelhouse.",
+              "019a7f00-0000-7000-8000-000000000303": "The case.",
+              "019a7f00-0000-7000-8000-000000000302": "The lamp."
+            }
+          }
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000313",
+          "type": "object",
+          "name": "Draft lantern",
+          "x_review_proposed": {
+            "by": "019a7f00-0000-7000-8000-000000000398",
+            "expires": "2026-11-30"
+          }
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000314",
+          "type": "location",
+          "name": "The quay",
+          "defensive_objects": [
+            "019a7f00-0000-7000-8000-000000000302",
+            "019a7f00-0000-7000-8000-000000000313"
+          ]
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000315",
+          "type": "construct",
+          "name": "Quay watch",
+          "supertype": "Lens",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000304"
+          ],
+          "x_lens": {
+            "depth": 1,
+            "notes": {
+              "019a7f00-0000-7000-8000-000000000304": "She walks the quay.",
+              "019a7f00-0000-7000-8000-000000000313": "The lantern on trial."
+            }
+          }
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000316",
+          "type": "narrative",
+          "name": "Second orders",
+          "supertype": "Message",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000304",
+            "019a7f00-0000-7000-8000-000000000305"
+          ],
+          "narrator": "019a7f00-0000-7000-8000-000000000304",
+          "created_at": "2026-10-21T12:00:00Z",
+          "x_served_trimmed": [
+            "narrator"
+          ]
+        }
+      ],
+      "now": 100
+    },
+    "lens": {
+      "id": "019a7f00-0000-7000-8000-000000000390",
+      "type": "construct",
+      "name": "The reading",
+      "supertype": "Lens",
+      "narratives": [
+        "019a7f00-0000-7000-8000-000000000316"
+      ],
+      "x_lens": {
+        "depth": 0
+      }
+    },
+    "reader": {
+      "rung": "contributor"
+    },
+    "want_rows": [
+      {
+        "id": "019a7f00-0000-7000-8000-000000000316",
+        "type": "narrative",
+        "name": "Second orders",
+        "supertype": "Message",
+        "characters": [
+          "019a7f00-0000-7000-8000-000000000304"
+        ],
+        "narrator": "019a7f00-0000-7000-8000-000000000304",
+        "created_at": "2026-10-21T12:00:00Z",
+        "x_served_trimmed": [
+          "characters"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "a-stored-served-trimmed-mark-public-dropped",
+    "world": {
+      "elements": [
+        {
+          "id": "019a7f00-0000-7000-8000-000000000301",
+          "type": "location",
+          "name": "The wheelhouse",
+          "description": "Command and the lamps.\nThe second line.",
+          "defensive_objects": [
+            "019a7f00-0000-7000-8000-000000000302",
+            "019a7f00-0000-7000-8000-000000000303"
+          ],
+          "buildings": [
+            "019a7f00-0000-7000-8000-000000000303",
+            "019a7f00-0000-7000-8000-000000000304"
+          ]
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000302",
+          "type": "object",
+          "name": "Signal lamp"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000303",
+          "type": "object",
+          "name": "Sealed case",
+          "hidden": true
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000304",
+          "type": "character",
+          "name": "Ada"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000305",
+          "type": "character",
+          "name": "The heir",
+          "hidden": true
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000306",
+          "type": "relation",
+          "name": "Ada's ward",
+          "actor": "019a7f00-0000-7000-8000-000000000305",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000304",
+            "019a7f00-0000-7000-8000-000000000305"
+          ]
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000307",
+          "type": "construct",
+          "name": "Harbour watch",
+          "supertype": "Domain",
+          "x_charter_of": "019a7f00-0000-7000-8000-000000000399",
+          "description": "The wheelhouse and its lamps.",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000305"
+          ],
+          "objects": [
+            "019a7f00-0000-7000-8000-000000000302",
+            "019a7f00-0000-7000-8000-000000000303"
+          ],
+          "locations": [
+            "019a7f00-0000-7000-8000-000000000301"
+          ]
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000308",
+          "type": "narrative",
+          "name": "Orders",
+          "supertype": "Message",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000304",
+            "019a7f00-0000-7000-8000-000000000305"
+          ],
+          "narrator": "019a7f00-0000-7000-8000-000000000305",
+          "objects": [
+            "019a7f00-0000-7000-8000-000000000303"
+          ],
+          "locations": [
+            "019a7f00-0000-7000-8000-000000000311"
+          ],
+          "created_at": "2026-10-20T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000309",
+          "type": "pin",
+          "name": "Lamp pin",
+          "element_type": "object",
+          "element_id": "019a7f00-0000-7000-8000-000000000303"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000312",
+          "type": "pin",
+          "name": "Ada's pin",
+          "element_type": "object",
+          "element_id": "019a7f00-0000-7000-8000-000000000304"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000311",
+          "type": "location",
+          "name": "The vault",
+          "hidden": true
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000310",
+          "type": "construct",
+          "name": "Ada's watch",
+          "supertype": "Lens",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000304",
+            "019a7f00-0000-7000-8000-000000000305"
+          ],
+          "x_lens": {
+            "depth": 1,
+            "notes": {
+              "019a7f00-0000-7000-8000-000000000304": "She keeps the lamp.",
+              "019a7f00-0000-7000-8000-000000000305": "Heir to the wheelhouse.",
+              "019a7f00-0000-7000-8000-000000000303": "The case.",
+              "019a7f00-0000-7000-8000-000000000302": "The lamp."
+            }
+          }
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000313",
+          "type": "object",
+          "name": "Draft lantern",
+          "x_review_proposed": {
+            "by": "019a7f00-0000-7000-8000-000000000398",
+            "expires": "2026-11-30"
+          }
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000314",
+          "type": "location",
+          "name": "The quay",
+          "defensive_objects": [
+            "019a7f00-0000-7000-8000-000000000302",
+            "019a7f00-0000-7000-8000-000000000313"
+          ]
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000315",
+          "type": "construct",
+          "name": "Quay watch",
+          "supertype": "Lens",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000304"
+          ],
+          "x_lens": {
+            "depth": 1,
+            "notes": {
+              "019a7f00-0000-7000-8000-000000000304": "She walks the quay.",
+              "019a7f00-0000-7000-8000-000000000313": "The lantern on trial."
+            }
+          }
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000316",
+          "type": "narrative",
+          "name": "Second orders",
+          "supertype": "Message",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000304",
+            "019a7f00-0000-7000-8000-000000000305"
+          ],
+          "narrator": "019a7f00-0000-7000-8000-000000000304",
+          "created_at": "2026-10-21T12:00:00Z",
+          "x_served_trimmed": [
+            "narrator"
+          ]
+        }
+      ],
+      "now": 100
+    },
+    "lens": {
+      "id": "019a7f00-0000-7000-8000-000000000390",
+      "type": "construct",
+      "name": "The reading",
+      "supertype": "Lens",
+      "narratives": [
+        "019a7f00-0000-7000-8000-000000000316"
+      ],
+      "x_lens": {
+        "depth": 0
+      }
+    },
+    "reader": {
+      "rung": "public"
+    },
+    "want_rows": [
+      {
+        "id": "019a7f00-0000-7000-8000-000000000316",
+        "type": "narrative",
+        "name": "Second orders",
+        "supertype": "Message",
+        "characters": [
+          "019a7f00-0000-7000-8000-000000000304"
+        ],
+        "narrator": "019a7f00-0000-7000-8000-000000000304",
+        "created_at": "2026-10-21T12:00:00Z"
+      }
+    ]
+  },
+  {
+    "name": "a-stored-served-trimmed-mark-owner-dropped",
+    "world": {
+      "elements": [
+        {
+          "id": "019a7f00-0000-7000-8000-000000000301",
+          "type": "location",
+          "name": "The wheelhouse",
+          "description": "Command and the lamps.\nThe second line.",
+          "defensive_objects": [
+            "019a7f00-0000-7000-8000-000000000302",
+            "019a7f00-0000-7000-8000-000000000303"
+          ],
+          "buildings": [
+            "019a7f00-0000-7000-8000-000000000303",
+            "019a7f00-0000-7000-8000-000000000304"
+          ]
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000302",
+          "type": "object",
+          "name": "Signal lamp"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000303",
+          "type": "object",
+          "name": "Sealed case",
+          "hidden": true
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000304",
+          "type": "character",
+          "name": "Ada"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000305",
+          "type": "character",
+          "name": "The heir",
+          "hidden": true
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000306",
+          "type": "relation",
+          "name": "Ada's ward",
+          "actor": "019a7f00-0000-7000-8000-000000000305",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000304",
+            "019a7f00-0000-7000-8000-000000000305"
+          ]
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000307",
+          "type": "construct",
+          "name": "Harbour watch",
+          "supertype": "Domain",
+          "x_charter_of": "019a7f00-0000-7000-8000-000000000399",
+          "description": "The wheelhouse and its lamps.",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000305"
+          ],
+          "objects": [
+            "019a7f00-0000-7000-8000-000000000302",
+            "019a7f00-0000-7000-8000-000000000303"
+          ],
+          "locations": [
+            "019a7f00-0000-7000-8000-000000000301"
+          ]
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000308",
+          "type": "narrative",
+          "name": "Orders",
+          "supertype": "Message",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000304",
+            "019a7f00-0000-7000-8000-000000000305"
+          ],
+          "narrator": "019a7f00-0000-7000-8000-000000000305",
+          "objects": [
+            "019a7f00-0000-7000-8000-000000000303"
+          ],
+          "locations": [
+            "019a7f00-0000-7000-8000-000000000311"
+          ],
+          "created_at": "2026-10-20T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000309",
+          "type": "pin",
+          "name": "Lamp pin",
+          "element_type": "object",
+          "element_id": "019a7f00-0000-7000-8000-000000000303"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000312",
+          "type": "pin",
+          "name": "Ada's pin",
+          "element_type": "object",
+          "element_id": "019a7f00-0000-7000-8000-000000000304"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000311",
+          "type": "location",
+          "name": "The vault",
+          "hidden": true
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000310",
+          "type": "construct",
+          "name": "Ada's watch",
+          "supertype": "Lens",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000304",
+            "019a7f00-0000-7000-8000-000000000305"
+          ],
+          "x_lens": {
+            "depth": 1,
+            "notes": {
+              "019a7f00-0000-7000-8000-000000000304": "She keeps the lamp.",
+              "019a7f00-0000-7000-8000-000000000305": "Heir to the wheelhouse.",
+              "019a7f00-0000-7000-8000-000000000303": "The case.",
+              "019a7f00-0000-7000-8000-000000000302": "The lamp."
+            }
+          }
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000313",
+          "type": "object",
+          "name": "Draft lantern",
+          "x_review_proposed": {
+            "by": "019a7f00-0000-7000-8000-000000000398",
+            "expires": "2026-11-30"
+          }
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000314",
+          "type": "location",
+          "name": "The quay",
+          "defensive_objects": [
+            "019a7f00-0000-7000-8000-000000000302",
+            "019a7f00-0000-7000-8000-000000000313"
+          ]
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000315",
+          "type": "construct",
+          "name": "Quay watch",
+          "supertype": "Lens",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000304"
+          ],
+          "x_lens": {
+            "depth": 1,
+            "notes": {
+              "019a7f00-0000-7000-8000-000000000304": "She walks the quay.",
+              "019a7f00-0000-7000-8000-000000000313": "The lantern on trial."
+            }
+          }
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000316",
+          "type": "narrative",
+          "name": "Second orders",
+          "supertype": "Message",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000304",
+            "019a7f00-0000-7000-8000-000000000305"
+          ],
+          "narrator": "019a7f00-0000-7000-8000-000000000304",
+          "created_at": "2026-10-21T12:00:00Z",
+          "x_served_trimmed": [
+            "narrator"
+          ]
+        }
+      ],
+      "now": 100
+    },
+    "lens": {
+      "id": "019a7f00-0000-7000-8000-000000000390",
+      "type": "construct",
+      "name": "The reading",
+      "supertype": "Lens",
+      "narratives": [
+        "019a7f00-0000-7000-8000-000000000316"
+      ],
+      "x_lens": {
+        "depth": 0
+      }
+    },
+    "reader": {
+      "rung": "owner"
+    },
+    "want_rows": [
+      {
+        "id": "019a7f00-0000-7000-8000-000000000316",
+        "type": "narrative",
+        "name": "Second orders",
+        "supertype": "Message",
+        "characters": [
+          "019a7f00-0000-7000-8000-000000000304",
+          "019a7f00-0000-7000-8000-000000000305"
+        ],
+        "narrator": "019a7f00-0000-7000-8000-000000000304",
+        "created_at": "2026-10-21T12:00:00Z"
+      }
+    ]
   }
 ]

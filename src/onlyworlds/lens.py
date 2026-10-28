@@ -403,6 +403,9 @@ class _Reading:
         self.hidden = hidden
         #: The ids written as proposed, which no reader's view holds.
         self.proposed: set[str] = set()
+        #: The ids a body this reader is served may link to: the view, and the proposed elements its rung sees
+        #: (keel's ``scoped`` leaves them out for the public rung alone).
+        self.linkable: set[str] = set()
         for el in world["elements"]:
             if not isinstance(el, dict):
                 continue
@@ -437,20 +440,22 @@ class _Reading:
         rung = seen["rung"]
         for eid in self.order:
             el = self.by_id[eid]
-            if hands_on_as_proposed(el):
+            proposed = hands_on_as_proposed(el)
+            if proposed:
                 self.proposed.add(eid)
-                continue
             if rung == "owner":
                 sees = True
             elif rung == "contributor":
                 sees = eid not in hidden
             elif rung == "public":
-                sees = eid not in hidden and eid not in self.room
+                sees = eid not in hidden and eid not in self.room and not proposed
             else:
                 sees = eid in whole_ids or eid in known_of
-                if eid not in whole_ids and eid in known_of:
+                if not proposed and eid not in whole_ids and eid in known_of:
                     self.stubs.add(eid)
             if sees:
+                self.linkable.add(eid)
+            if sees and not proposed:
                 self.view.add(eid)
         members = world.get("members")
         self.members: list[Mapping[str, Any]] | None = members if isinstance(members, list) else None
@@ -496,6 +501,7 @@ class _Reading:
             b["known_of"] = True
         else:
             b = copy.deepcopy(el)
+            b.pop("x_served_trimmed", None)  # keel serves only the mark it adds, never a stored one
             if self.seen_rung != "owner":
                 self._trim(b, kind)
         self._served[eid] = b
@@ -505,7 +511,7 @@ class _Reading:
         """Whether a link to ``eid`` stays in a served body: the reader sees it and, where the field names its
         target type, it is of that type (keel's ``present_ids`` per target type). Hops do not read this: they follow
         the stored link."""
-        return eid in self.view and (target_type is None or self.type_of[eid] == target_type)
+        return eid in self.linkable and (target_type is None or self.type_of[eid] == target_type)
 
     def _trim(self, b: Body, kind: str) -> None:
         """Keel's reading of a body for a reader that is not the owner (``elements/visibility.py`` ``redact``,
@@ -549,16 +555,13 @@ class _Reading:
             served = {i for f in _ANCHOR_FIELDS for i in (b.get(f) or []) if isinstance(i, str)}
             gone = before - served
             notes: dict[str, Any] = x["notes"]
-            kept = {k: v for k, v in notes.items() if k in served or (k not in gone and k in self.view)}
+            kept = {k: v for k, v in notes.items() if k in served or (k not in gone and k in self.linkable)}
             if len(kept) != len(notes):
                 b["x_lens"] = {**x, "notes": kept}
                 if any(k in gone for k in notes):
                     mark.append("notes")
         if mark and self.seen_rung != "public":
-            old = b.get("x_served_trimmed")
-            merged: list[Any] = list(old) if isinstance(old, list) else []
-            merged.extend(f for f in mark if f not in merged)
-            b["x_served_trimmed"] = merged
+            b["x_served_trimmed"] = mark
 
     def reach(
         self, start: Iterable[str], excluded: Callable[[str], bool], stops: Callable[[str], bool] | None = None
