@@ -19,9 +19,11 @@ from onlyworlds import (
     READING_AID_MARK,
     READING_AID_PAIRS,
     SKILL_MAX,
+    FolderElement,
     charter_of,
     domains_of,
     is_charter_element,
+    reading_aid_of,
 )
 from onlyworlds._schema import LINK_TARGETS
 
@@ -116,3 +118,27 @@ def test_charter_of_does_not_read_the_elements_order(case: dict[str, Any]) -> No
     reader = reader_of(world, case["reader"])
     reversed_world = {**world, "elements": list(reversed(world["elements"]))}
     assert charter_of(reversed_world, reader) == case["want"]
+
+
+def test_reading_aid_of_reads_the_pair_alone() -> None:
+    """Each of the fixture's pairs to its aid, trimmed and folded, the whole word; the mark is never read."""
+    assert len(DOC["pairs"]) == 3
+    for p in DOC["pairs"]:
+        assert reading_aid_of({"type": p["type"], "supertype": p["supertype"]}) == p["aid"], p
+    assert reading_aid_of({"type": "law", "supertype": " charter "}) == "charter"
+    assert reading_aid_of({"type": "LAW", "supertype": "CHARTER" + chr(0x3000)}) == "charter"
+    assert reading_aid_of({"type": "law", "supertype": "Guide"}) is None
+    assert reading_aid_of({"type": "law", "supertype": "Charters"}) is None
+    assert reading_aid_of({"type": "object", "supertype": "Domain"}) is None
+    # Unmarked, so lore to is_charter_element, and still the pair of a charter.
+    unmarked = {"type": "law", "supertype": "Charter"}
+    assert is_charter_element(unmarked) is False
+    assert reading_aid_of(unmarked) == "charter"
+    assert reading_aid_of({**unmarked, "x_charter_of": None}) == "charter"
+    body = {"id": "g1", "supertype": "Guide"}
+    path = Path("elements") / "construct" / "g1.json"
+    el = FolderElement(id="g1", type="construct", type_inferred=True, body=body, path=path, layout="elements")
+    assert reading_aid_of(el) == "guide"
+    bad: list[Any] = [None, "law/charter", 7, ["law", "Charter"], {"type": "law"}, {"type": "law", "supertype": None}]
+    for b in [*bad, {"supertype": "Charter"}]:
+        assert reading_aid_of(b) is None, b

@@ -96,7 +96,7 @@ from .message import (
 from .names import type_word
 from .push import Patch, PushPlan, PushResult, plan_push, push, verify_level
 from .review import PROPOSED_MARK, ProposedMark, hands_on_as_proposed, proposed_mark_of
-from .room import is_charter_element, is_room_element
+from .room import is_charter_element, is_room_element, reading_aid_of
 from .spine import SPINE_KINDS, SpineRead, read_spine_element
 from .worldfile import (
     WORLD_FILE_MEDIA_TYPE,
@@ -208,6 +208,7 @@ __all__ = [
     "read_mark_of",
     "read_spine_element",
     "read_world_file",
+    "reading_aid_of",
     "recipients_of",
     "resolve_filenames",
     "resolve_lens",

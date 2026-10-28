@@ -14,13 +14,16 @@ SDK's ``isRoomElement`` is the same matcher, with the same fold.
 from __future__ import annotations
 
 from collections.abc import Mapping
-from typing import Any
+from typing import Any, Literal, cast
 
 from ._schema import READING_AID_MARK, READING_AID_PAIRS, ROOM_MARK, ROOM_PAIRS
 from .folder import FolderElement
 from .worldfile import simple_case_fold
 
-__all__ = ["ROOM_PAIRS", "is_charter_element", "is_room_element"]
+__all__ = ["ROOM_PAIRS", "is_charter_element", "is_room_element", "reading_aid_of"]
+
+#: The three reading aids, as the charter profile names them (``profiles/charter.fixture.json``'s ``aid``).
+ReadingAid = Literal["charter", "guide", "domain"]
 
 
 _WHITE_SPACE: str = "".join(
@@ -133,3 +136,34 @@ def is_charter_element(element: Mapping[str, Any] | FolderElement) -> bool:
     (``law/charter``, ``construct/guide``, ``construct/domain``); one the lens names as an anchor is kept and
     followed like any anchor. The npm SDK's ``isCharterElement`` is the same matcher, with the same fold."""
     return _reading_aid_key(element) is not None
+
+
+_AID_BY_KEY: dict[str, ReadingAid] = {
+    f"{_fold(t)}/{_fold(s)}": cast(ReadingAid, _fold(s)) for t, s in READING_AID_PAIRS
+}
+"""The reading aids' pair words to their aid: each aid is its pair's supertype, folded, as the charter fixture's
+``pairs`` write it (``law/charter`` to ``charter``)."""
+
+
+def reading_aid_of(element: Mapping[str, Any] | FolderElement) -> ReadingAid | None:
+    """Which reading aid the element's pair makes it (schema-dist ``profiles/charter.md``): ``"charter"`` for a
+    ``law`` with supertype ``Charter``, ``"guide"`` for a ``construct`` with supertype ``Guide``, ``"domain"`` for a
+    ``construct`` with supertype ``Domain``, the type and supertype each trimmed and compared without regard to
+    case, the whole word, as ``is_charter_element`` matches them; ``None`` for any other pair, for an element
+    without a string type and supertype, and for anything that is neither a mapping nor a ``FolderElement``.
+
+    It reads the pair only and ignores the mark ``x_charter_of``: an unmarked Charter answers ``"charter"``, which
+    is what a tool offering to mark an element needs. Whether the element IS a reading aid (the pair and the mark)
+    is ``is_charter_element``. The npm SDK's ``readingAidOf`` is the same reader, with the same fold."""
+    body: Any
+    kind: Any
+    if isinstance(element, FolderElement):
+        body, kind = element.body, element.type
+    elif isinstance(element, Mapping):
+        body, kind = element, element.get("type")
+    else:
+        return None
+    supertype = body.get("supertype")
+    if not isinstance(kind, str) or not isinstance(supertype, str):
+        return None
+    return _AID_BY_KEY.get(f"{_fold(kind)}/{_fold(supertype)}")
