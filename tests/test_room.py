@@ -54,9 +54,11 @@ def test_the_mark_is_read_by_presence_never_by_its_value() -> None:
     """room.md (serial 83): a mark counts when its value is not null, a string only when something is left after
     the White_Space trim; any other value counts as present."""
     message = {"type": "narrative", "supertype": "Message"}
-    for mark in (7, 0, False, {}, [], {"world": WORLD}, "x", chr(0x1F), chr(0xFEFF), f"  {WORLD}  "):
+    present: tuple[Any, ...] = (7, 0, False, {}, [], {"world": WORLD}, "x", chr(0x1F), chr(0xFEFF), f"  {WORLD}  ")
+    for mark in present:
         assert is_room_element({**message, "x_room_of": mark}) is True, repr(mark)
-    for mark in (None, "", " ", chr(0xA0) + chr(0x3000), "\t\n"):
+    absent: tuple[Any, ...] = (None, "", " ", chr(0xA0) + chr(0x3000), "\t\n")
+    for mark in absent:
         assert is_room_element({**message, "x_room_of": mark}) is False, repr(mark)
 
 
