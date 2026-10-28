@@ -1,4 +1,4 @@
-"""The lens profile (schema-dist ``profiles/lens.md``, serial 82): a saved way of reading a world.
+"""The lens profile (schema-dist ``profiles/lens.md``, serial 83): a saved way of reading a world.
 
 A lens is a Construct with supertype ``Lens`` (``is_lens``); its links are its anchors, and ``x_lens`` is the
 recipe: how far (``depth``), which types (``types``), how far back (``window``, or ``from`` and ``to``), what
@@ -209,6 +209,13 @@ def _whole(value: Any) -> int | None:
     return None
 
 
+def _key_whole(value: Any) -> int | None:
+    """A whole-number ``x_lens`` key's value, or ``None``: an int, never a float (``7.0`` is refused as ``7.5`` is,
+    since Python's JSON reader keeps a number's text apart; a date field still reads ``7.0`` whole, ``_whole``) and
+    never a boolean (serial 83)."""
+    return value if isinstance(value, int) and not isinstance(value, bool) else None
+
+
 def date_of(element: Any) -> int | None:
     """An element's date as the lens profile reads it: the whole number in its type's date field
     (``DATE_FIELD``), in the world's own time unit. ``None`` for a timeless type, a body with no known
@@ -312,7 +319,7 @@ def _read_recipe(raw: Any) -> _Recipe | str:
         return "x_lens"
     r = _Recipe()
     depth_v = raw.get("depth")
-    depth = 1 if depth_v is None else _whole(depth_v)
+    depth = 1 if depth_v is None else _key_whole(depth_v)
     if depth is None or not 0 <= depth <= 2:
         return "depth"
     r.depth = depth
@@ -330,15 +337,15 @@ def _read_recipe(raw: Any) -> _Recipe | str:
             words.add(w)
         r.types = frozenset(words) if words else None
     window_v, from_v, to_v = raw.get("window"), raw.get("from"), raw.get("to")
-    window = None if window_v is None else _whole(window_v)
+    window = None if window_v is None else _key_whole(window_v)
     if window_v is not None and (window is None or window < 0 or from_v is not None or to_v is not None):
         return "window"
     r.window = window
-    from_ = None if from_v is None else _whole(from_v)
+    from_ = None if from_v is None else _key_whole(from_v)
     if from_v is not None and from_ is None:
         return "from"
     r.from_ = from_
-    to = None if to_v is None else _whole(to_v)
+    to = None if to_v is None else _key_whole(to_v)
     if to_v is not None and (to is None or from_ is None or to <= from_):
         return "to"
     r.to = to
@@ -346,14 +353,14 @@ def _read_recipe(raw: Any) -> _Recipe | str:
     if undated_v is not None and undated_v not in ("include", "exclude"):
         return "undated"
     changed_v = raw.get("changed_within")
-    changed_within = None if changed_v is None else _whole(changed_v)
+    changed_within = None if changed_v is None else _key_whole(changed_v)
     if changed_v is not None and (changed_within is None or changed_within < 1):
         return "changed_within"
     show_v = raw.get("show")
     if show_v is not None and show_v not in ("full", "first_line", "name"):
         return "show"
     budget_v = raw.get("budget")
-    budget = 50 if budget_v is None else _whole(budget_v)
+    budget = 50 if budget_v is None else _key_whole(budget_v)
     if budget is None or not 1 <= budget <= 1000:
         return "budget"
     mail_v = raw.get("mail")
@@ -666,16 +673,20 @@ def _anchors_of(lens: Mapping[str, Any], r: _Reading) -> tuple[list[str], list[s
     return anchors, children, unseen, bool(seen) or trimmed
 
 
-_Entry = tuple[str, dict[str, Any]]
-
-
 def _resolve_one(
-    lens: Mapping[str, Any], recipe: _Recipe, r: _Reading, visited: set[str], wall: tuple[int, int]
-) -> tuple[list[_Entry], dict[str, CutReason]]:
-    """One lens by its own recipe, its children entered once each through the shared visited set. An anchor is
-    kept and followed whatever ``types``, ``window`` and ``changed_within`` say (a reading aid too; a room element is
-    kept and not followed); what a hop or a filter reaches is cut by the fence, then ``types``, then the window, then
-    ``changed_within``, against ``wall``, the reading's wall clock."""
+    lens: Mapping[str, Any], recipe: _Recipe, r: _Reading, visited: set[str], clock: tuple[int, int, int]
+) -> tuple[list[str], dict[str, CutReason], LensMail | None]:
+    """One lens by its own recipe, its children entered once each through the shared visited set: its kept ids
+    (after its own mail rule and its own budget), the reason each element it left out was cut, and its mail part.
+
+    An anchor is kept and followed whatever ``types``, ``window`` and ``changed_within`` say (a reading aid too; a
+    room element is kept and not followed); what a hop or a filter reaches is cut by the fence, then ``types``, then
+    the window, then ``changed_within``, against ``clock``, the reading's wall clock. Nothing is hopped out of an
+    element the fence cuts ``after_as_of``, an anchor among them (rule 8). Each child keeps at most its own
+    ``budget`` and loses its own mail rule's messages, uncounted, before its kept joins the union in link order
+    (rule 3); the union drops an element only by its id, so a sibling lens a child's hop reached stays an
+    element. The rows are made once, by the caller, from the lens read."""
+    wall = (clock[1], clock[2])
     cut: dict[str, CutReason] = {}
 
     def add_cut(eid: str, why: CutReason) -> None:
@@ -691,8 +702,9 @@ def _resolve_one(
         if eid not in r.view or eid in unseen:
             add_cut(eid, "anchor_not_visible")
             continue
-        frontier.append(eid)
         why = r.fence_cut(eid, recipe)
+        if why != "after_as_of":
+            frontier.append(eid)
         if why is not None:
             add_cut(eid, why)
         else:
@@ -725,10 +737,13 @@ def _resolve_one(
             for eid in r.unseen(frontier, edges, excluded):
                 add_cut(eid, "not_visible")
         if recipe.depth == 2:
-            second, _ = r.reach(hop, lambda e: excluded(e) or e in hop, lambda e: r.stops_at(e, recipe))
+            onward = [e for e in hop if r.fence_cut(e, recipe) != "after_as_of"]
+            second, _ = r.reach(onward, lambda e: excluded(e) or e in hop, lambda e: r.stops_at(e, recipe))
             for eid in second:
-                add_cut(eid, "hops_not_served")
-    out: list[_Entry] = [(e, r.row(e, recipe.show, recipe.notes if e in anchor_set else None)) for e in listed]
+                # Rule 4 stops a hop at a room element or a reading aid whose pair `types` does not name, so the
+                # second hop never counts one.
+                if (eid not in r.room and eid not in r.aid) or r.kept(eid, recipe):
+                    add_cut(eid, "hops_not_served")
     for child in children:
         if child in visited:
             continue
@@ -737,11 +752,22 @@ def _resolve_one(
         read = _read_recipe(body.get("x_lens"))
         if isinstance(read, str) or is_template(body):
             continue
-        sub, sub_cut = _resolve_one(body, read, r, visited, wall)
-        out.extend(sub)
+        sub, sub_cut, _ = _resolve_one(body, read, r, visited, clock)
+        listed.extend(sub)
         for eid, why in sub_cut.items():
             add_cut(eid, why)
-    return out, cut
+    mail: LensMail | None = None
+    if recipe.mail != "none":
+        mail = _mail_part(r, recipe.mail, recipe.budget, clock)
+        in_mail = {*mail["unread"], *mail["read"]}
+        listed = [e for e in listed if e not in in_mail]
+    union = list(dict.fromkeys(listed))
+    keep = union[: recipe.budget]
+    for eid in union[recipe.budget :]:
+        cut[eid] = "budget"
+    for eid in keep:
+        cut.pop(eid, None)
+    return keep, cut, mail
 
 
 def _mail_part(r: _Reading, mode: str, budget: int, clock: tuple[int, int, int]) -> LensMail:
@@ -879,27 +905,7 @@ def _lens_reading(
     visited: set[str] = set()
     if isinstance(body.get("id"), str):
         visited.add(body["id"])
-    listed, cut = _resolve_one(body, recipe, r, visited, (instant[1], instant[2]))
-    mail: LensMail | None = None
-    if recipe.mail != "none":
-        mail = _mail_part(r, recipe.mail, recipe.budget, instant)
-    in_mail = set() if mail is None else {*mail["unread"], *mail["read"]}
-
-    seen: set[str] = set()
-    union: list[_Entry] = []
-    for entry in listed:
-        eid = entry[0]
-        if eid in seen or eid in visited or eid in in_mail:
-            continue
-        seen.add(eid)
-        union.append(entry)
-    keep = union[: recipe.budget]
-    for eid, _ in union[recipe.budget :]:
-        cut[eid] = "budget"
-    for eid, _ in keep:
-        cut.pop(eid, None)
-    for eid in visited:
-        cut.pop(eid, None)
+    keep, cut, mail = _resolve_one(body, recipe, r, visited, instant)
     counts: dict[str, int] = {}
     for why in _CUT_REASONS:
         if why in _OWNER_ONLY and not r.owner:
@@ -911,9 +917,12 @@ def _lens_reading(
     # A note on an id that is not an anchor is counted only where the reader sees that id: a note keyed to an
     # element it cannot see, or to no element, is no note of its, and counting it would tell a guest it exists.
     notes_ignored = sum(1 for k in recipe.notes if k not in anchors and k in r.view)
+    # The rows are made once, from the union, by this lens's `show`; a note captions this lens's own anchors only
+    # (a child's notes and `show` stay the child's, rule 3).
+    own = set(anchors)
     reading: LensReading = {
-        "kept": [e for e, _ in keep],
-        "rows": [row for _, row in keep],
+        "kept": keep,
+        "rows": [r.row(e, recipe.show, recipe.notes if e in own else None) for e in keep],
         "cut": counts,
         "notes_ignored": notes_ignored,
         "mail": mail,

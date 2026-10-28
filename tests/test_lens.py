@@ -471,3 +471,18 @@ def test_resolve_lens_refuses_what_is_not_a_reading() -> None:
     assert resolve_lens(world, LENS["id"], {"rung": "contributor"})["kept"] == []
     assert resolve_lens(world, _id(1), OWNER)["kept"] == []
     assert resolve_lens(world, LENS["id"], OWNER)["kept"] == [_id(1)]
+
+
+def test_a_whole_number_key_refuses_a_float_and_a_date_field_reads_one_whole() -> None:
+    """lens.md (serial 83): a fraction is refused everywhere, an integral float where a reader sees the number's
+    text, as Python's JSON reader does; only x_lens's keys are held to it."""
+    for key, value in [("depth", 1.0), ("budget", 7.0), ("window", 3.0), ("changed_within", 2.0), ("budget", True)]:
+        got = resolve_lens({"elements": []}, {**LENS, "x_lens": {key: value}}, OWNER)
+        assert got["unreadable"] == key, (key, value)
+    raw = json.loads('{"from": 1.0, "to": 5}')
+    assert resolve_lens({"elements": []}, {**LENS, "x_lens": raw}, OWNER)["unreadable"] == "from"
+    assert resolve_lens({"elements": []}, {**LENS, "x_lens": {"budget": 7}}, OWNER)["unreadable"] is None
+    # A date field reading 7.0 is the whole number 7: fenced after an as_of of 6, kept at 7.
+    world = {"elements": [{"id": _id(1), "type": "event", "name": "e", "start_date": 7.0}]}
+    assert resolve_lens(world, LENS, OWNER, as_of=6)["cut"] == {"after_as_of": 1}
+    assert resolve_lens(world, LENS, OWNER, as_of=7)["kept"] == [_id(1)]
