@@ -4,6 +4,8 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+## 0.81.0 (2026-10-28)
+
 - **`set_my_lenses(None)`**: `None` puts the key holder's lens list back to never chosen, so a seat playing a Character starts with its Titles' lenses again, while an empty list now keeps a seat off them (the API tells the two apart from this release on). On the owner's own keys `None` is the empty list. Anything that is neither a list or tuple nor `None` is still refused before sending.
 
 ## 0.80.0 (2026-10-28)
