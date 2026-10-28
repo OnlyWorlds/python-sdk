@@ -1221,6 +1221,88 @@
           "character": null
         }
       }
+    },
+    "watch": {
+      "id": "019a7f00-0000-7000-8000-00000000f008",
+      "name": "Merrow Gate",
+      "time_basic_unit": "day",
+      "now": 100,
+      "elements": [
+        {
+          "id": "019a7f00-0000-7000-8000-000000000140",
+          "type": "character",
+          "name": "Tamsin Hale",
+          "updated_at": "2026-10-01T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000141",
+          "type": "character",
+          "name": "The heir",
+          "updated_at": "2026-10-02T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000142",
+          "type": "object",
+          "name": "Sealed Ledger",
+          "updated_at": "2026-10-03T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000143",
+          "type": "location",
+          "name": "Merrow Quay",
+          "updated_at": "2026-10-04T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000144",
+          "type": "construct",
+          "name": "The night roll",
+          "supertype": "Lens",
+          "subtype": "",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000140",
+            "019a7f00-0000-7000-8000-000000000141"
+          ],
+          "x_lens": {
+            "depth": 0,
+            "show": "name",
+            "notes": {
+              "019a7f00-0000-7000-8000-000000000140": "Tamsin keeps the gate.",
+              "019a7f00-0000-7000-8000-000000000141": "Why the roll is kept at all.",
+              "019a7f00-0000-7000-8000-000000000142": "Where the roll's names are written.",
+              "019a7f00-0000-7000-8000-000000000143": "The roll is read aloud on the quay."
+            }
+          },
+          "updated_at": "2026-10-05T12:00:00Z"
+        }
+      ],
+      "hidden": [
+        "019a7f00-0000-7000-8000-000000000141",
+        "019a7f00-0000-7000-8000-000000000142"
+      ],
+      "readers": {
+        "owner": {
+          "rung": "owner",
+          "character": null
+        },
+        "contributor": {
+          "rung": "contributor",
+          "character": null
+        },
+        "guest": {
+          "rung": "guest",
+          "character": null,
+          "whole": [
+            "019a7f00-0000-7000-8000-000000000140",
+            "019a7f00-0000-7000-8000-000000000143",
+            "019a7f00-0000-7000-8000-000000000144"
+          ],
+          "known_of": []
+        },
+        "public": {
+          "rung": "public",
+          "character": null
+        }
+      }
     }
   },
   "cases": [
@@ -7086,6 +7168,229 @@
         "cut": {},
         "unreadable": null
       }
+    },
+    {
+      "name": "a-hop-reached-lens-is-served-whole-to-the-owner",
+      "kind": "resolve",
+      "world": "watch",
+      "reader": "owner",
+      "lens": {
+        "id": "019a7f00-0000-7000-8000-000000000145",
+        "type": "construct",
+        "name": "A lens",
+        "supertype": "Lens",
+        "subtype": "",
+        "characters": [
+          "019a7f00-0000-7000-8000-000000000140"
+        ],
+        "x_lens": {
+          "depth": 1,
+          "show": "full"
+        }
+      },
+      "kept": [
+        "019a7f00-0000-7000-8000-000000000140",
+        "019a7f00-0000-7000-8000-000000000144"
+      ],
+      "cut": {},
+      "rows": [
+        {
+          "id": "019a7f00-0000-7000-8000-000000000140",
+          "type": "character",
+          "name": "Tamsin Hale",
+          "updated_at": "2026-10-01T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000144",
+          "type": "construct",
+          "name": "The night roll",
+          "supertype": "Lens",
+          "subtype": "",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000140",
+            "019a7f00-0000-7000-8000-000000000141"
+          ],
+          "x_lens": {
+            "depth": 0,
+            "show": "name",
+            "notes": {
+              "019a7f00-0000-7000-8000-000000000140": "Tamsin keeps the gate.",
+              "019a7f00-0000-7000-8000-000000000141": "Why the roll is kept at all.",
+              "019a7f00-0000-7000-8000-000000000142": "Where the roll's names are written.",
+              "019a7f00-0000-7000-8000-000000000143": "The roll is read aloud on the quay."
+            }
+          },
+          "updated_at": "2026-10-05T12:00:00Z"
+        }
+      ],
+      "note": "The night roll links Tamsin Hale, so the lens's hop reaches it; a lens reached by a hop is kept as an element and never entered (rule 3), and its full row is the body the owner is served: both anchors and all four notes as stored."
+    },
+    {
+      "name": "a-hop-reached-lens-drops-hidden-notes-for-a-contributor",
+      "kind": "resolve",
+      "world": "watch",
+      "reader": "contributor",
+      "lens": {
+        "id": "019a7f00-0000-7000-8000-000000000145",
+        "type": "construct",
+        "name": "A lens",
+        "supertype": "Lens",
+        "subtype": "",
+        "characters": [
+          "019a7f00-0000-7000-8000-000000000140"
+        ],
+        "x_lens": {
+          "depth": 1,
+          "show": "full"
+        }
+      },
+      "kept": [
+        "019a7f00-0000-7000-8000-000000000140",
+        "019a7f00-0000-7000-8000-000000000144"
+      ],
+      "cut": {},
+      "rows": [
+        {
+          "id": "019a7f00-0000-7000-8000-000000000140",
+          "type": "character",
+          "name": "Tamsin Hale",
+          "updated_at": "2026-10-01T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000144",
+          "type": "construct",
+          "name": "The night roll",
+          "supertype": "Lens",
+          "subtype": "",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000140"
+          ],
+          "x_lens": {
+            "depth": 0,
+            "show": "name",
+            "notes": {
+              "019a7f00-0000-7000-8000-000000000140": "Tamsin keeps the gate.",
+              "019a7f00-0000-7000-8000-000000000143": "The roll is read aloud on the quay."
+            }
+          },
+          "updated_at": "2026-10-05T12:00:00Z",
+          "x_served_trimmed": [
+            "characters",
+            "notes"
+          ]
+        }
+      ],
+      "note": "Rule 6 on a row: the served body of a lens reached by a hop leaves out the hidden anchor and its note, and the note keyed to the hidden Object; the note on the quay, which the contributor sees, stays. x_served_trimmed names the anchor field and notes."
+    },
+    {
+      "name": "a-hop-reached-lens-drops-hidden-notes-for-a-guest",
+      "kind": "resolve",
+      "world": "watch",
+      "reader": "guest",
+      "lens": {
+        "id": "019a7f00-0000-7000-8000-000000000145",
+        "type": "construct",
+        "name": "A lens",
+        "supertype": "Lens",
+        "subtype": "",
+        "characters": [
+          "019a7f00-0000-7000-8000-000000000140"
+        ],
+        "x_lens": {
+          "depth": 1,
+          "show": "full"
+        }
+      },
+      "kept": [
+        "019a7f00-0000-7000-8000-000000000140",
+        "019a7f00-0000-7000-8000-000000000144"
+      ],
+      "cut": {},
+      "rows": [
+        {
+          "id": "019a7f00-0000-7000-8000-000000000140",
+          "type": "character",
+          "name": "Tamsin Hale",
+          "updated_at": "2026-10-01T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000144",
+          "type": "construct",
+          "name": "The night roll",
+          "supertype": "Lens",
+          "subtype": "",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000140"
+          ],
+          "x_lens": {
+            "depth": 0,
+            "show": "name",
+            "notes": {
+              "019a7f00-0000-7000-8000-000000000140": "Tamsin keeps the gate.",
+              "019a7f00-0000-7000-8000-000000000143": "The roll is read aloud on the quay."
+            }
+          },
+          "updated_at": "2026-10-05T12:00:00Z",
+          "x_served_trimmed": [
+            "characters",
+            "notes"
+          ]
+        }
+      ],
+      "note": "The guest's slice holds Tamsin Hale, the quay and the roll: the roll's row is served as to the contributor, the hidden anchor and both hidden notes left out, the mark naming characters and notes."
+    },
+    {
+      "name": "a-hop-reached-lens-drops-hidden-notes-for-the-public-reader",
+      "kind": "resolve",
+      "world": "watch",
+      "reader": "public",
+      "lens": {
+        "id": "019a7f00-0000-7000-8000-000000000145",
+        "type": "construct",
+        "name": "A lens",
+        "supertype": "Lens",
+        "subtype": "",
+        "characters": [
+          "019a7f00-0000-7000-8000-000000000140"
+        ],
+        "x_lens": {
+          "depth": 1,
+          "show": "full"
+        }
+      },
+      "kept": [
+        "019a7f00-0000-7000-8000-000000000140",
+        "019a7f00-0000-7000-8000-000000000144"
+      ],
+      "cut": {},
+      "rows": [
+        {
+          "id": "019a7f00-0000-7000-8000-000000000140",
+          "type": "character",
+          "name": "Tamsin Hale",
+          "updated_at": "2026-10-01T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000144",
+          "type": "construct",
+          "name": "The night roll",
+          "supertype": "Lens",
+          "subtype": "",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000140"
+          ],
+          "x_lens": {
+            "depth": 0,
+            "show": "name",
+            "notes": {
+              "019a7f00-0000-7000-8000-000000000140": "Tamsin keeps the gate.",
+              "019a7f00-0000-7000-8000-000000000143": "The roll is read aloud on the quay."
+            }
+          },
+          "updated_at": "2026-10-05T12:00:00Z"
+        }
+      ],
+      "note": "The public reader is served the roll with the hidden anchor and both hidden notes left out, and no x_served_trimmed: the mark is never served on the public rung, so the public reading is the same with or without the hidden elements."
     }
   ],
   "graph_links": [

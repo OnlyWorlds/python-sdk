@@ -1478,6 +1478,211 @@
         "domains": []
       },
       "note": "One form alone; a world carried by the case, as a graph case does."
+    },
+    {
+      "name": "a-guide-held-only-as-a-stub-is-the-guide-its-name-and-id",
+      "kind": "charter",
+      "world": {
+        "id": "019a7f00-0000-7000-8000-00000000f101",
+        "name": "Grey Harbour",
+        "elements": [
+          {
+            "id": "019a7f00-0000-7000-8000-000000000200",
+            "type": "law",
+            "name": "House Rules",
+            "supertype": "Charter",
+            "x_charter_of": "019a7f00-0000-7000-8000-00000000f101",
+            "created_at": "2026-10-10T12:00:00Z",
+            "description": "These are the rules of the harbour.\nRead ow://object/019a7f00-0000-7000-8000-000000000210 and ow://object/019a7f00-0000-7000-8000-000000000211 before you write; never open ow://object/019a7f00-0000-7000-8000-000000000212.",
+            "x_checks_rules": [
+              {
+                "rule": "every Character carries a reputation",
+                "where": {
+                  "type": "character"
+                },
+                "require": {
+                  "field": "reputation",
+                  "present": true
+                }
+              }
+            ]
+          },
+          {
+            "id": "019a7f00-0000-7000-8000-000000000203",
+            "type": "construct",
+            "name": "Start here",
+            "supertype": "Guide",
+            "x_charter_of": "019a7f00-0000-7000-8000-00000000f101",
+            "created_at": "2026-10-05T12:00:00Z",
+            "description": "Begin with the Archive, then the Docks.",
+            "constructs": [
+              "019a7f00-0000-7000-8000-000000000205",
+              "019a7f00-0000-7000-8000-000000000204",
+              "019a7f00-0000-7000-8000-000000000205",
+              "019a7f00-0000-7000-8000-000000000208",
+              "019a7f00-0000-7000-8000-000000000207",
+              "019a7f00-0000-7000-8000-000000000209"
+            ]
+          },
+          {
+            "id": "019a7f00-0000-7000-8000-000000000204",
+            "type": "construct",
+            "name": "The Docks",
+            "supertype": "Domain",
+            "x_charter_of": "019a7f00-0000-7000-8000-00000000f101",
+            "created_at": "2026-10-06T12:00:00Z",
+            "description": "Where the ships come in.\rThe second line.",
+            "characters": [
+              "019a7f00-0000-7000-8000-000000000214"
+            ],
+            "locations": [
+              "019a7f00-0000-7000-8000-000000000215"
+            ],
+            "constructs": [
+              "019a7f00-0000-7000-8000-000000000204"
+            ]
+          },
+          {
+            "id": "019a7f00-0000-7000-8000-000000000205",
+            "type": "construct",
+            "name": "the Archive",
+            "supertype": "Domain",
+            "x_charter_of": "019a7f00-0000-7000-8000-00000000f101",
+            "created_at": "2026-10-06T13:00:00Z",
+            "description": "  Ledgers and letters.  \nKept by the Board.",
+            "objects": [
+              "019a7f00-0000-7000-8000-000000000210",
+              "019a7f00-0000-7000-8000-000000000212"
+            ],
+            "institutions": [
+              "019a7f00-0000-7000-8000-000000000216"
+            ]
+          },
+          {
+            "id": "019a7f00-0000-7000-8000-000000000206",
+            "type": "construct",
+            "name": "ash row",
+            "supertype": "Domain",
+            "x_charter_of": "019a7f00-0000-7000-8000-00000000f101",
+            "created_at": "2026-10-07T12:00:00Z",
+            "characters": [
+              "019a7f00-0000-7000-8000-000000000214"
+            ]
+          },
+          {
+            "id": "019a7f00-0000-7000-8000-000000000210",
+            "type": "object",
+            "name": "Tide Tables",
+            "description": "When the water turns."
+          },
+          {
+            "id": "019a7f00-0000-7000-8000-000000000211",
+            "type": "object",
+            "name": "Signal Codes",
+            "description": "Flags and lamps."
+          },
+          {
+            "id": "019a7f00-0000-7000-8000-000000000214",
+            "type": "character",
+            "name": "Ada Venn"
+          },
+          {
+            "id": "019a7f00-0000-7000-8000-000000000215",
+            "type": "location",
+            "name": "The Quay"
+          }
+        ],
+        "readers": {
+          "owner": {
+            "rung": "owner",
+            "character": null
+          },
+          "guest": {
+            "rung": "guest",
+            "character": null,
+            "whole": [
+              "019a7f00-0000-7000-8000-000000000200",
+              "019a7f00-0000-7000-8000-000000000204",
+              "019a7f00-0000-7000-8000-000000000205",
+              "019a7f00-0000-7000-8000-000000000206",
+              "019a7f00-0000-7000-8000-000000000210",
+              "019a7f00-0000-7000-8000-000000000211",
+              "019a7f00-0000-7000-8000-000000000214",
+              "019a7f00-0000-7000-8000-000000000215"
+            ],
+            "known_of": [
+              "019a7f00-0000-7000-8000-000000000203"
+            ]
+          }
+        }
+      },
+      "reader": "guest",
+      "want": {
+        "charter": {
+          "id": "019a7f00-0000-7000-8000-000000000200",
+          "name": "House Rules",
+          "rules": [
+            {
+              "rule": "every Character carries a reputation",
+              "where": {
+                "type": "character"
+              },
+              "require": {
+                "field": "reputation",
+                "present": true
+              }
+            }
+          ],
+          "skill": [
+            "019a7f00-0000-7000-8000-000000000210",
+            "019a7f00-0000-7000-8000-000000000211"
+          ]
+        },
+        "guide": {
+          "id": "019a7f00-0000-7000-8000-000000000203",
+          "name": "Start here"
+        },
+        "domains": [
+          {
+            "id": "019a7f00-0000-7000-8000-000000000206",
+            "name": "ash row",
+            "sentence": "",
+            "hubs": [
+              {
+                "type": "character",
+                "id": "019a7f00-0000-7000-8000-000000000214"
+              }
+            ]
+          },
+          {
+            "id": "019a7f00-0000-7000-8000-000000000205",
+            "name": "the Archive",
+            "sentence": "Ledgers and letters.",
+            "hubs": [
+              {
+                "type": "object",
+                "id": "019a7f00-0000-7000-8000-000000000210"
+              }
+            ]
+          },
+          {
+            "id": "019a7f00-0000-7000-8000-000000000204",
+            "name": "The Docks",
+            "sentence": "Where the ships come in.",
+            "hubs": [
+              {
+                "type": "character",
+                "id": "019a7f00-0000-7000-8000-000000000214"
+              },
+              {
+                "type": "location",
+                "id": "019a7f00-0000-7000-8000-000000000215"
+              }
+            ]
+          }
+        ]
+      },
+      "note": "The guest knows the Guide only as a stub, a name and an id: it is still the Guide, answered as {id, name}. A stub serves no links, so its constructs order nothing: the Domains the guest sees come by folded name and id alone, ash row first, where the Guide's stored order would put the Archive and the Docks first."
     }
   ]
 }

@@ -4,6 +4,8 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+- **Schema repinned to schema-dist `v0.33.0-dist.84`** (from dist.83; the same canonical 00.33.00, so `SCHEMA_VERSION` stays and no element field moved; the folder lint and `FORMAT_VERSION` stay at 0.3.20). Serial 84 adds four lens cases, a lens reached by a hop served whole to the owner and, to a contributor, a guest and the public reader, without its hidden anchor and every note keyed to a hidden element, and one charter case, a Guide held only as a stub; the lens fixture holds 151 cases (75 resolve, 37 graph), the charter fixture 23, every one passing with no reader change. The room, checks and spine profiles gain the folder format's re-key line, and the spine profile the line that an editor shows `x_spine_` keys read-only; nothing in this package restates either.
+
 ## 0.82.1 (2026-10-28)
 
 - **Fixed: lens rows below the public rung keep what the API serves about proposed elements, and no row carries a stored `x_served_trimmed`.** A proposed element (`x_review_proposed` anything but absent or `None`) is still in no reader's view: never a row, never hopped through. But a contributor or a guest that sees one is served the links to it, and a lens's note keyed to it, where `resolve_lens` left both out; the public rung still drops them, unmarked. A body that carries `x_served_trimmed` as stored is served without it: the owner's rows lose it, and below the owner the mark names only what this reading trimmed (it was merged into the stored one). Eight more row cases hold these readings, 28 in all, the same file as the npm SDK's.
