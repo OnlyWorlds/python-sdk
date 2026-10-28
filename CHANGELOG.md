@@ -4,6 +4,8 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+## 0.83.1 (2026-10-28)
+
 - **Schema repinned to schema-dist `v0.33.0-dist.85`** (from dist.84; the same canonical 00.33.00, so `SCHEMA_VERSION` stays, no type, field or constant moved, and the folder lint and `FORMAT_VERSION` stay at 0.3.20). Four descriptions in the vendored `schema.json` follow the standard: `supertype` and `subtype` are a classification within the element's category, and a Title's `grant_date` and `revoke_date` are the title's own dates, a holder's span being a Relation; no fixture case changed, and every reader replays as before.
 
 ## 0.83.0 (2026-10-28)
