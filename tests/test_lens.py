@@ -511,3 +511,19 @@ def test_a_readers_rows_carry_only_ids_it_sees() -> None:
         print(line)
     assert wrong == []
     assert len(cases) == 20
+
+
+def test_the_owners_row_keeps_a_link_to_a_proposed_element() -> None:
+    """The owner reading as itself is served its bodies untouched, a link to an element written as proposed too; the
+    proposed element is still in no reader's view, so nothing hops to it."""
+    world: dict[str, list[dict[str, Any]]] = {
+        "elements": [
+            {"id": _id(1), "type": "location", "name": "Quay", "buildings": [_id(2)]},
+            {"id": _id(2), "type": "object", "name": "Crane", "x_review_proposed": {"by": "seat"}},
+        ]
+    }
+    lens = {**LENS, "locations": [_id(1)], "x_lens": {"depth": 1}}
+    got = resolve_lens(world, lens, OWNER)
+    assert got["kept"] == [_id(1)] and got["rows"] == [world["elements"][0]]
+    seen = resolve_lens(world, lens, {"rung": "owner", "as": {"rung": "contributor"}})
+    assert seen["rows"] == [{**world["elements"][0], "buildings": []}]

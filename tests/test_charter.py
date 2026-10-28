@@ -107,3 +107,12 @@ def test_charter_of_refuses_what_is_not_a_reading() -> None:
     with pytest.raises(TypeError):
         charter_of({"elements": []}, {"rung": "admin"})
     assert charter_of({"elements": []}, {"rung": "owner"}) == {"charter": None, "guide": None, "domains": []}
+
+
+@pytest.mark.parametrize("case", [c for c in CASES if c["kind"] == "charter"], ids=lambda c: c["name"])
+def test_charter_of_does_not_read_the_elements_order(case: dict[str, Any]) -> None:
+    """The selection's ties are the higher id and created_at, never which element came first in the snapshot."""
+    world = world_of(case)
+    reader = reader_of(world, case["reader"])
+    reversed_world = {**world, "elements": list(reversed(world["elements"]))}
+    assert charter_of(reversed_world, reader) == case["want"]

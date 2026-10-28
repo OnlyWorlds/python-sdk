@@ -39,7 +39,7 @@ __all__ = [
     "domains_of",
 ]
 
-#: At most this many skill Objects on the Charter (keel's ``charter_skill``, D152).
+#: At most this many skill Objects on the Charter (keel's ``charter_skill``).
 SKILL_MAX = 5
 
 _ID = re.compile(r"[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}")
