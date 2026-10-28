@@ -584,5 +584,113 @@
    ],
    "cut": {}
   }
+ },
+ {
+  "name": "umbrella-child-a-stub-is-not-entered",
+  "world": {
+   "elements": [
+    {
+     "id": "U",
+     "type": "construct",
+     "name": "U",
+     "supertype": "Lens",
+     "constructs": [
+      "L2"
+     ],
+     "characters": [],
+     "x_lens": {
+      "depth": 0
+     }
+    },
+    {
+     "id": "L2",
+     "type": "construct",
+     "name": "L2",
+     "supertype": "Lens",
+     "constructs": [],
+     "characters": [
+      "c1"
+     ],
+     "x_lens": {
+      "depth": 0
+     }
+    },
+    {
+     "id": "c1",
+     "type": "character",
+     "name": "Secret contact"
+    }
+   ]
+  },
+  "lens": "U",
+  "reader": {
+   "rung": "guest",
+   "whole": [
+    "U"
+   ],
+   "known_of": [
+    "L2",
+    "c1"
+   ]
+  },
+  "want": {
+   "kept": [],
+   "cut": {}
+  }
+ },
+ {
+  "name": "umbrella-child-whole-is-entered",
+  "world": {
+   "elements": [
+    {
+     "id": "U",
+     "type": "construct",
+     "name": "U",
+     "supertype": "Lens",
+     "constructs": [
+      "L2"
+     ],
+     "characters": [],
+     "x_lens": {
+      "depth": 0
+     }
+    },
+    {
+     "id": "L2",
+     "type": "construct",
+     "name": "L2",
+     "supertype": "Lens",
+     "constructs": [],
+     "characters": [
+      "c1"
+     ],
+     "x_lens": {
+      "depth": 0
+     }
+    },
+    {
+     "id": "c1",
+     "type": "character",
+     "name": "Secret contact"
+    }
+   ]
+  },
+  "lens": "U",
+  "reader": {
+   "rung": "guest",
+   "whole": [
+    "U",
+    "L2"
+   ],
+   "known_of": [
+    "c1"
+   ]
+  },
+  "want": {
+   "kept": [
+    "c1"
+   ],
+   "cut": {}
+  }
  }
 ]

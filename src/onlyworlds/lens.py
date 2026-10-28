@@ -568,10 +568,15 @@ class _Reading:
         return row
 
 
-def _anchors_of(lens: Mapping[str, Any], r: _Reading) -> tuple[list[str], list[str], bool]:
-    """The anchors and the umbrella's children of a lens, in its link order, and whether it names any."""
+def _anchors_of(lens: Mapping[str, Any], r: _Reading) -> tuple[list[str], list[str], set[str], bool]:
+    """The anchors and the umbrella's children of a lens, in its link order, and whether it names any.
+
+    A child is a lens in ``constructs`` the reader sees whole; one it knows only as a stub serves no recipe
+    and no links, so it is an anchor the reader cannot see (``unseen``), never entered (keel's ``_anchors``).
+    """
     anchors: list[str] = []
     children: list[str] = []
+    unseen: set[str] = set()
     seen: set[str] = set()
     for field in _ANCHOR_FIELDS:
         v = lens.get(field)
@@ -582,12 +587,14 @@ def _anchors_of(lens: Mapping[str, Any], r: _Reading) -> tuple[list[str], list[s
                 continue
             seen.add(i)
             if field == "constructs" and i in r.view and is_lens(r.by_id[i]):
-                children.append(i)
-            else:
-                anchors.append(i)
+                if i not in r.stubs:
+                    children.append(i)
+                    continue
+                unseen.add(i)
+            anchors.append(i)
     mark = lens.get("x_served_trimmed")
     trimmed = isinstance(mark, list) and any(isinstance(f, str) and f in _ANCHOR_FIELDS for f in mark)
-    return anchors, children, bool(seen) or trimmed
+    return anchors, children, unseen, bool(seen) or trimmed
 
 
 _Entry = tuple[str, dict[str, Any]]
@@ -602,14 +609,14 @@ def _resolve_one(
     def add_cut(eid: str, why: CutReason) -> None:
         cut.setdefault(eid, why)
 
-    anchors, children, anchored = _anchors_of(lens, r)
+    anchors, children, unseen, anchored = _anchors_of(lens, r)
     anchor_set, child_set = set(anchors), set(children)
     listed: list[str] = []
     frontier: list[str] = []
     for eid in anchors:
         if eid in visited or eid not in r.by_id:
             continue
-        if eid not in r.view:
+        if eid not in r.view or eid in unseen:
             add_cut(eid, "anchor_not_visible")
             continue
         frontier.append(eid)
@@ -819,7 +826,7 @@ def _lens_reading(
         n = sum(1 for w in cut.values() if w == why)
         if n:
             counts[why] = n
-    anchors, _, _ = _anchors_of(body, r)
+    anchors, _, _, _ = _anchors_of(body, r)
     notes_ignored = sum(1 for k in recipe.notes if k not in anchors)
     reading: LensReading = {
         "kept": [e for e, _ in keep],

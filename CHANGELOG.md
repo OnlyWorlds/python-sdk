@@ -4,6 +4,10 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+## 0.79.2 (2026-10-28)
+
+- **An umbrella lens no longer enters a child lens the reader knows only as a stub.** Since 0.77.1 a lens named by id reads as nothing when the reader is served it only as a known-of stub; as an umbrella's child, the same stub was still entered and its stored anchors read, so a guest's reading kept elements reached through links it was never served. Such a child is now an anchor the reader cannot see (`anchor_not_visible`, counted for the owner only), as the API reads it. Two shared edge cases hold it, the same file as the npm SDK's.
+
 ## 0.79.1 (2026-10-27)
 
 - **The lens and graph readers read the world's now as the API serves it.** `GET /world` names the world's now `time_range_current`, and a world folder names it `time_current`; `resolve_lens` and `world_graph` read only `now` and `time_current`, so a World body passed straight from the API had no now: no fence, and a `window` that cut nothing. They now read `now`, else `time_current`, else `time_range_current`. A shared edge case holds it in both packages; the npm SDK's `resolveLens` and `worldGraph` read the same.

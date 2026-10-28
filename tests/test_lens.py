@@ -229,10 +229,10 @@ def test_the_fixtures_tables_read_back_through_the_reader() -> None:
 # The shared edge cases: inputs the fixture leaves open (a stub's links, the window's edge, the World's time_current
 # as its now, no window without a now, a to after as_of, the
 # fence on anchors, the members list in the mail rule, a message not repeated among the kept, the thirty days' edge,
-# ties by id by code point), the same file byte for byte as the npm SDK's test/fixtures/lens-edges.json (both suites
-# hold its sha256), answers written by hand.
+# ties by id by code point, an umbrella's child a guest knows only as a stub), the same file byte for byte as the
+# npm SDK's test/fixtures/lens-edges.json (both suites hold its sha256), answers written by hand.
 EDGES_FILE = REPO / "tests" / "fixtures" / "lens-edges.json"
-EDGES_SHA256 = "5ee70fe31868a36e1a97b516d8e65700a385fbc7212bbc87f5955e4441b038f6"
+EDGES_SHA256 = "68cbdb16afa7498e432e86f0e1124cd1403c2a1c15e137996092a6ef88e94682"
 
 
 def test_the_shared_edge_cases() -> None:
@@ -256,7 +256,7 @@ def test_the_shared_edge_cases() -> None:
     for line in wrong:
         print(line)
     assert wrong == []
-    assert len(edges) == 11
+    assert len(edges) == 13
 
 
 def test_a_lens_a_guest_knows_only_as_a_stub_reads_as_nothing() -> None:
