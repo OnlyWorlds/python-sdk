@@ -4,6 +4,8 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+## 0.83.2 (2026-10-29)
+
 - **The doctor's flag 11 no longer reports an unmarked Law with supertype Charter.** The checks profile at schema-dist serial 85 rules that such a Law is lore, not a Charter and not a finding, house rules or not; the doctor followed the older reading and named one carrying `x_checks_rules` as a finding. Its rules are still never applied, on a folder and through the API (with `front_door.charter` null too); a marked Charter that is not the newest stays a finding. Tests: three, the unmarked Law newer than the Charter, a world with no marked Charter, and the API's null front door, now assert no finding and no rule applied from it.
 - Tests and one comment name the checks fixture's world, Fernhollow, or a company world, in place of a private world's name; no behaviour changed.
 
