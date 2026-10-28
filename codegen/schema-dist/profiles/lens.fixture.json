@@ -4,6 +4,7 @@
   "notes": [
     "pair: construct + supertype Lens, each trimmed and folded like the room profile's pairs; a template is a lens whose subtype, trimmed and folded, is Template.",
     "keys: the legal values of x_lens; a case's legal is what a reader's check answers, and bad names the first key refused (x_lens itself when the value is not an object).",
+    "text_only: a case marked text_only: true holds for a reader that can see a number's text (7.0 beside 7); a reader whose JSON parser gives one number type cannot tell them apart and may skip it, its why says so. Such a reader reads an integral float whole: a platform limit, not a rule.",
     "worlds: each world's elements as its owner is served them, the ids its hidden mark keeps from every reader but the owner, and its readers. A reader's rung is owner (the whole world), contributor (the world less the hidden), guest (exactly the whole and known_of ids it lists; known_of is a stub) or public (the world less the hidden and the room elements). An element whose x_review_proposed holds any value but null is in no reader's view (the review profile's rule for a reader that hands a world on). A reader with as is the owner reading as that reader: the reader's view, and the owner's two counts (anchor_not_visible, not_visible).",
     "resolve: lens is the lens read, a body or the id of a lens in the world; as_of is the reading's date (absent: the world's now; with neither, no fence and the window cuts nothing); clock is the reading's wall clock, for the mail rule and changed_within. kept is the resolved set in order, cut the count by reason (a reason with no count is absent). rows, where given, are the kept rows as show makes them; mail, where given, is the mail rule's part; notes_ignored counts notes on ids that are not anchors.",
     "invariant: subset (each reader's kept is a subset of the owner's, and no secret's id or name appears anywhere in a non-owner result), same_without (each reader's result is identical with the without ids removed from the world), unchanged (the world is identical before and after every reader's reading).",
@@ -776,6 +777,450 @@
           "character": null
         }
       }
+    },
+    "stubs": {
+      "id": "019a7f00-0000-7000-8000-00000000f006",
+      "name": "The Stub Room",
+      "time_basic_unit": "day",
+      "now": 100,
+      "elements": [
+        {
+          "id": "019a7f00-0000-7000-8000-000000000100",
+          "type": "character",
+          "name": "Ash Vey",
+          "updated_at": "2026-10-01T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000101",
+          "type": "character",
+          "name": "Bel Orrin",
+          "updated_at": "2026-10-02T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000102",
+          "type": "character",
+          "name": "Secret contact",
+          "updated_at": "2026-10-03T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000103",
+          "type": "construct",
+          "name": "Desk, child known of",
+          "supertype": "Lens",
+          "subtype": "",
+          "constructs": [
+            "019a7f00-0000-7000-8000-000000000105"
+          ],
+          "x_lens": {
+            "depth": 0
+          },
+          "updated_at": "2026-10-04T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000104",
+          "type": "construct",
+          "name": "Desk, child whole",
+          "supertype": "Lens",
+          "subtype": "",
+          "constructs": [
+            "019a7f00-0000-7000-8000-000000000105"
+          ],
+          "x_lens": {
+            "depth": 0
+          },
+          "updated_at": "2026-10-05T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000105",
+          "type": "construct",
+          "name": "Contacts",
+          "supertype": "Lens",
+          "subtype": "",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000102"
+          ],
+          "x_lens": {
+            "depth": 0
+          },
+          "updated_at": "2026-10-06T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000106",
+          "type": "narrative",
+          "name": "Known of",
+          "supertype": "Message",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000101"
+          ],
+          "story": "For Bel only.",
+          "created_at": "2026-10-20T12:00:00Z",
+          "updated_at": "2026-10-20T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000107",
+          "type": "narrative",
+          "name": "To everyone",
+          "supertype": "Message",
+          "characters": [],
+          "story": "The doors open at nine.",
+          "created_at": "2026-10-21T12:00:00Z",
+          "updated_at": "2026-10-21T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000131",
+          "type": "construct",
+          "name": "Mail of the room",
+          "supertype": "Lens",
+          "subtype": "",
+          "narratives": [
+            "019a7f00-0000-7000-8000-000000000107"
+          ],
+          "x_lens": {
+            "depth": 0,
+            "mail": "unread_full_read_titles"
+          },
+          "updated_at": "2026-10-07T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000130",
+          "type": "construct",
+          "name": "Desk and its mail",
+          "supertype": "Lens",
+          "subtype": "",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000100"
+          ],
+          "constructs": [
+            "019a7f00-0000-7000-8000-000000000131"
+          ],
+          "x_lens": {
+            "depth": 0
+          },
+          "updated_at": "2026-10-07T12:00:00Z"
+        }
+      ],
+      "hidden": [],
+      "readers": {
+        "owner": {
+          "rung": "owner",
+          "character": null
+        },
+        "guest": {
+          "rung": "guest",
+          "character": null,
+          "whole": [
+            "019a7f00-0000-7000-8000-000000000100",
+            "019a7f00-0000-7000-8000-000000000103",
+            "019a7f00-0000-7000-8000-000000000107"
+          ],
+          "known_of": [
+            "019a7f00-0000-7000-8000-000000000105",
+            "019a7f00-0000-7000-8000-000000000102"
+          ]
+        },
+        "guest-whole-child": {
+          "rung": "guest",
+          "character": null,
+          "whole": [
+            "019a7f00-0000-7000-8000-000000000100",
+            "019a7f00-0000-7000-8000-000000000104",
+            "019a7f00-0000-7000-8000-000000000105",
+            "019a7f00-0000-7000-8000-000000000107"
+          ],
+          "known_of": [
+            "019a7f00-0000-7000-8000-000000000102"
+          ]
+        },
+        "guest-mail": {
+          "rung": "guest",
+          "character": "019a7f00-0000-7000-8000-000000000100",
+          "whole": [
+            "019a7f00-0000-7000-8000-000000000100",
+            "019a7f00-0000-7000-8000-000000000107",
+            "019a7f00-0000-7000-8000-000000000130",
+            "019a7f00-0000-7000-8000-000000000131"
+          ],
+          "known_of": [
+            "019a7f00-0000-7000-8000-000000000106"
+          ]
+        },
+        "owner-as-guest": {
+          "rung": "owner",
+          "as": "guest",
+          "character": null
+        }
+      }
+    },
+    "reach": {
+      "id": "019a7f00-0000-7000-8000-00000000f007",
+      "name": "Tull's Reach",
+      "time_basic_unit": "year",
+      "now": 100,
+      "elements": [
+        {
+          "id": "019a7f00-0000-7000-8000-000000000110",
+          "type": "event",
+          "name": "The Late Treaty",
+          "start_date": 120,
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000111"
+          ],
+          "updated_at": "2026-10-01T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000111",
+          "type": "character",
+          "name": "Kell Dray",
+          "updated_at": "2026-10-02T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000112",
+          "type": "character",
+          "name": "Ash Morrow",
+          "friends": [
+            "019a7f00-0000-7000-8000-000000000113"
+          ],
+          "updated_at": "2026-10-03T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000113",
+          "type": "character",
+          "name": "Bram Tull",
+          "location": "019a7f00-0000-7000-8000-000000000114",
+          "updated_at": "2026-10-04T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000114",
+          "type": "location",
+          "name": "Tull's Yard",
+          "updated_at": "2026-10-05T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000115",
+          "type": "narrative",
+          "name": "A line in the room",
+          "supertype": "Message",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000113"
+          ],
+          "x_room_of": "019a7f00-0000-7000-8000-00000000f007",
+          "created_at": "2026-10-20T12:00:00Z",
+          "updated_at": "2026-10-20T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000116",
+          "type": "construct",
+          "name": "The yard",
+          "supertype": "Domain",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000113"
+          ],
+          "x_charter_of": "019a7f00-0000-7000-8000-00000000f007",
+          "description": "Where the carts stand.",
+          "updated_at": "2026-10-06T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000125",
+          "type": "character",
+          "name": "Cora Fenn",
+          "updated_at": "2026-10-08T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000126",
+          "type": "character",
+          "name": "Dace Holm",
+          "updated_at": "2026-10-09T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000127",
+          "type": "character",
+          "name": "Edda Lune",
+          "updated_at": "2026-10-10T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000119",
+          "type": "construct",
+          "name": "Yard hands",
+          "supertype": "Lens",
+          "subtype": "",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000127",
+            "019a7f00-0000-7000-8000-000000000126",
+            "019a7f00-0000-7000-8000-000000000125"
+          ],
+          "x_lens": {
+            "depth": 0,
+            "budget": 2
+          },
+          "updated_at": "2026-10-07T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000120",
+          "type": "construct",
+          "name": "Reach desk",
+          "supertype": "Lens",
+          "subtype": "",
+          "constructs": [
+            "019a7f00-0000-7000-8000-000000000119"
+          ],
+          "x_lens": {
+            "depth": 0,
+            "budget": 10
+          },
+          "updated_at": "2026-10-07T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000121",
+          "type": "construct",
+          "name": "Hands by name",
+          "supertype": "Lens",
+          "subtype": "",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000125"
+          ],
+          "x_lens": {
+            "depth": 0,
+            "show": "name"
+          },
+          "updated_at": "2026-10-07T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000122",
+          "type": "construct",
+          "name": "Desk in full",
+          "supertype": "Lens",
+          "subtype": "",
+          "constructs": [
+            "019a7f00-0000-7000-8000-000000000121"
+          ],
+          "x_lens": {
+            "depth": 0,
+            "show": "full"
+          },
+          "updated_at": "2026-10-07T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000123",
+          "type": "construct",
+          "name": "Hands in full",
+          "supertype": "Lens",
+          "subtype": "",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000126"
+          ],
+          "x_lens": {
+            "depth": 0,
+            "show": "full"
+          },
+          "updated_at": "2026-10-07T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000124",
+          "type": "construct",
+          "name": "Desk by name",
+          "supertype": "Lens",
+          "subtype": "",
+          "constructs": [
+            "019a7f00-0000-7000-8000-000000000123"
+          ],
+          "x_lens": {
+            "depth": 0,
+            "show": "name"
+          },
+          "updated_at": "2026-10-07T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000129",
+          "type": "construct",
+          "name": "Hands with notes",
+          "supertype": "Lens",
+          "subtype": "",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000125"
+          ],
+          "x_lens": {
+            "depth": 0,
+            "notes": {
+              "019a7f00-0000-7000-8000-000000000125": "Keeps the ledger."
+            }
+          },
+          "updated_at": "2026-10-07T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000128",
+          "type": "construct",
+          "name": "Desk with no notes",
+          "supertype": "Lens",
+          "subtype": "",
+          "constructs": [
+            "019a7f00-0000-7000-8000-000000000129"
+          ],
+          "x_lens": {
+            "depth": 0
+          },
+          "updated_at": "2026-10-07T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000133",
+          "type": "character",
+          "name": "Hale Orrin",
+          "updated_at": "2026-10-11T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000134",
+          "type": "construct",
+          "name": "Gate roll",
+          "supertype": "Lens",
+          "subtype": "",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000133"
+          ],
+          "x_lens": {
+            "depth": 0
+          },
+          "updated_at": "2026-10-07T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000135",
+          "type": "construct",
+          "name": "Gate watch",
+          "supertype": "Lens",
+          "subtype": "",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000133"
+          ],
+          "x_lens": {
+            "depth": 1
+          },
+          "updated_at": "2026-10-07T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000136",
+          "type": "construct",
+          "name": "Gate desk",
+          "supertype": "Lens",
+          "subtype": "",
+          "constructs": [
+            "019a7f00-0000-7000-8000-000000000135",
+            "019a7f00-0000-7000-8000-000000000134"
+          ],
+          "x_lens": {
+            "depth": 0
+          },
+          "updated_at": "2026-10-07T12:00:00Z"
+        }
+      ],
+      "hidden": [],
+      "readers": {
+        "owner": {
+          "rung": "owner",
+          "character": null
+        },
+        "contributor": {
+          "rung": "contributor",
+          "character": null
+        }
+      }
     }
   },
   "cases": [
@@ -1062,6 +1507,27 @@
       },
       "legal": false,
       "bad": "notes"
+    },
+    {
+      "name": "keys-a-fraction-is-refused",
+      "kind": "keys",
+      "x_lens": {
+        "depth": 7.5
+      },
+      "legal": false,
+      "bad": "depth",
+      "note": "A fraction is no whole number for any reader: the key is named."
+    },
+    {
+      "name": "keys-an-integral-float-is-refused-where-the-text-shows",
+      "kind": "keys",
+      "x_lens": {
+        "depth": 7.0
+      },
+      "legal": false,
+      "bad": "depth",
+      "text_only": true,
+      "why": "a reader whose JSON parser gives one number type reads 7.0 as 7 and may skip this case"
     },
     {
       "name": "keys-not-an-object-is-refused",
@@ -2943,6 +3409,268 @@
         "019a7f00-0000-7000-8000-000000000085"
       ],
       "cut": {}
+    },
+    {
+      "name": "umbrella-child-a-stub-is-not-entered",
+      "kind": "resolve",
+      "world": "stubs",
+      "reader": "guest",
+      "lens": "019a7f00-0000-7000-8000-000000000103",
+      "kept": [],
+      "cut": {},
+      "note": "The guest sees the umbrella whole and its child, Contacts, only as a stub: a stub carries no links and no x_lens, so the child is not entered, and its anchor, known of too, is never reached."
+    },
+    {
+      "name": "umbrella-child-a-stub-is-the-owners-anchor-not-visible",
+      "kind": "resolve",
+      "world": "stubs",
+      "reader": "owner-as-guest",
+      "lens": "019a7f00-0000-7000-8000-000000000103",
+      "kept": [],
+      "cut": {
+        "anchor_not_visible": 1
+      },
+      "note": "The owner reading as that guest counts the stub child as an anchor the view cannot see (rule 6)."
+    },
+    {
+      "name": "umbrella-child-whole-is-entered",
+      "kind": "resolve",
+      "world": "stubs",
+      "reader": "guest-whole-child",
+      "lens": "019a7f00-0000-7000-8000-000000000104",
+      "kept": [
+        "019a7f00-0000-7000-8000-000000000102"
+      ],
+      "cut": {},
+      "note": "The control: the child seen whole is entered, and its anchor, a stub, is kept as served."
+    },
+    {
+      "name": "the-mail-part-reads-whole-messages-only-a-stub-is-not-to-everyone",
+      "kind": "resolve",
+      "world": "stubs",
+      "reader": "guest-mail",
+      "lens": {
+        "id": "019a7f00-0000-7000-8000-000000000108",
+        "type": "construct",
+        "name": "A lens",
+        "supertype": "Lens",
+        "subtype": "",
+        "x_lens": {
+          "types": [
+            "character"
+          ],
+          "mail": "unread_full_read_titles"
+        }
+      },
+      "clock": "2026-10-27T12:00:00Z",
+      "kept": [
+        "019a7f00-0000-7000-8000-000000000100"
+      ],
+      "cut": {},
+      "mail": {
+        "unread": [
+          "019a7f00-0000-7000-8000-000000000107"
+        ],
+        "read": [],
+        "cut": {},
+        "totals": {
+          "unread": 1,
+          "read": 0
+        }
+      },
+      "note": "Known of is served as a stub, with no characters: it is never read as addressed to everyone. To everyone, whole with an empty list, is."
+    },
+    {
+      "name": "an-anchor-cut-after-as-of-is-not-hopped-out-of",
+      "kind": "resolve",
+      "world": "reach",
+      "reader": "contributor",
+      "lens": {
+        "id": "019a7f00-0000-7000-8000-000000000117",
+        "type": "construct",
+        "name": "A lens",
+        "supertype": "Lens",
+        "subtype": "",
+        "events": [
+          "019a7f00-0000-7000-8000-000000000110"
+        ]
+      },
+      "kept": [],
+      "cut": {
+        "after_as_of": 1
+      },
+      "note": "The Late Treaty is dated 120, after the world's now of 100: cut, and Kell Dray, whom only it links, is not reached."
+    },
+    {
+      "name": "depth-2-counts-no-room-element-or-reading-aid-its-types-would-not-keep",
+      "kind": "resolve",
+      "world": "reach",
+      "reader": "contributor",
+      "lens": {
+        "id": "019a7f00-0000-7000-8000-000000000118",
+        "type": "construct",
+        "name": "A lens",
+        "supertype": "Lens",
+        "subtype": "",
+        "characters": [
+          "019a7f00-0000-7000-8000-000000000112"
+        ],
+        "x_lens": {
+          "depth": 2
+        }
+      },
+      "kept": [
+        "019a7f00-0000-7000-8000-000000000112",
+        "019a7f00-0000-7000-8000-000000000113"
+      ],
+      "cut": {
+        "hops_not_served": 1
+      },
+      "note": "Hop 2 from Bram Tull reaches Tull's Yard, a room line and a marked Domain; only the Yard is counted, since types (empty: any type, no room element, no reading aid) would keep neither of the other two."
+    },
+    {
+      "name": "umbrella-child-keeps-its-own-budget-before-the-union",
+      "kind": "resolve",
+      "world": "reach",
+      "reader": "contributor",
+      "lens": "019a7f00-0000-7000-8000-000000000120",
+      "kept": [
+        "019a7f00-0000-7000-8000-000000000127",
+        "019a7f00-0000-7000-8000-000000000126"
+      ],
+      "cut": {
+        "budget": 1
+      },
+      "note": "Yard hands keeps two of its three anchors, its own budget, and counts the third budget in its own reading; the union then takes the umbrella's budget of 10, which cuts nothing more."
+    },
+    {
+      "name": "umbrella-show-is-its-own-a-child-by-name-reads-in-full",
+      "kind": "resolve",
+      "world": "reach",
+      "reader": "contributor",
+      "lens": "019a7f00-0000-7000-8000-000000000122",
+      "kept": [
+        "019a7f00-0000-7000-8000-000000000125"
+      ],
+      "cut": {},
+      "rows": [
+        {
+          "id": "019a7f00-0000-7000-8000-000000000125",
+          "type": "character",
+          "name": "Cora Fenn",
+          "updated_at": "2026-10-08T12:00:00Z"
+        }
+      ],
+      "note": "The rows are made once, from the union, by the umbrella's show: full, though the child says name."
+    },
+    {
+      "name": "umbrella-show-is-its-own-a-child-in-full-reads-by-name",
+      "kind": "resolve",
+      "world": "reach",
+      "reader": "contributor",
+      "lens": "019a7f00-0000-7000-8000-000000000124",
+      "kept": [
+        "019a7f00-0000-7000-8000-000000000126"
+      ],
+      "cut": {},
+      "rows": [
+        {
+          "id": "019a7f00-0000-7000-8000-000000000126",
+          "type": "character",
+          "name": "Dace Holm"
+        }
+      ],
+      "note": "The reverse: the umbrella says name, so the child's full reads as id, type and name."
+    },
+    {
+      "name": "umbrella-a-childs-notes-never-reach-a-row",
+      "kind": "resolve",
+      "world": "reach",
+      "reader": "contributor",
+      "lens": "019a7f00-0000-7000-8000-000000000128",
+      "kept": [
+        "019a7f00-0000-7000-8000-000000000125"
+      ],
+      "cut": {},
+      "rows": [
+        {
+          "id": "019a7f00-0000-7000-8000-000000000125",
+          "type": "character",
+          "name": "Cora Fenn",
+          "updated_at": "2026-10-08T12:00:00Z"
+        }
+      ],
+      "notes_ignored": 0,
+      "note": "The child's note on Cora Fenn is the child's: the rows are made at the umbrella, by its recipe, and the umbrella has no notes."
+    },
+    {
+      "name": "umbrella-a-childs-mail-rule-takes-its-messages-out-uncounted",
+      "kind": "resolve",
+      "world": "stubs",
+      "reader": "guest-mail",
+      "lens": "019a7f00-0000-7000-8000-000000000130",
+      "clock": "2026-10-27T12:00:00Z",
+      "kept": [
+        "019a7f00-0000-7000-8000-000000000100"
+      ],
+      "cut": {},
+      "note": "The child's mail rule takes To everyone out of its kept; the umbrella's mail is none, so the message is neither kept, nor a mail part, nor counted."
+    },
+    {
+      "name": "umbrella-a-siblings-lens-reached-by-a-hop-is-kept-as-an-element",
+      "kind": "resolve",
+      "world": "reach",
+      "reader": "contributor",
+      "lens": "019a7f00-0000-7000-8000-000000000136",
+      "kept": [
+        "019a7f00-0000-7000-8000-000000000133",
+        "019a7f00-0000-7000-8000-000000000134"
+      ],
+      "cut": {},
+      "note": "Gate desk enters Gate watch, then Gate roll. Gate watch's hop from Hale Orrin reaches Gate roll before it is entered, and keeps it as an element; Gate roll is then entered as the next child, and the union drops an element only by id, so Gate roll stays in the umbrella's kept: a lens is never in its own result, and Gate roll's own result is not this one. In the other link order Gate roll is entered first and the hop never reaches it."
+    },
+    {
+      "name": "a-note-on-a-kept-element-that-is-not-an-anchor-is-ignored-and-counted",
+      "kind": "resolve",
+      "world": "reach",
+      "reader": "contributor",
+      "lens": {
+        "id": "019a7f00-0000-7000-8000-000000000132",
+        "type": "construct",
+        "name": "A lens",
+        "supertype": "Lens",
+        "subtype": "",
+        "characters": [
+          "019a7f00-0000-7000-8000-000000000112"
+        ],
+        "x_lens": {
+          "show": "name",
+          "notes": {
+            "019a7f00-0000-7000-8000-000000000112": "The anchor.",
+            "019a7f00-0000-7000-8000-000000000113": "Reached, not an anchor."
+          }
+        }
+      },
+      "kept": [
+        "019a7f00-0000-7000-8000-000000000112",
+        "019a7f00-0000-7000-8000-000000000113"
+      ],
+      "cut": {},
+      "rows": [
+        {
+          "id": "019a7f00-0000-7000-8000-000000000112",
+          "type": "character",
+          "name": "Ash Morrow",
+          "note": "The anchor."
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000113",
+          "type": "character",
+          "name": "Bram Tull"
+        }
+      ],
+      "notes_ignored": 1,
+      "note": "Bram Tull is kept, one hop out, but is no anchor: his row carries no note and the note is counted."
     },
     {
       "name": "a mirror pair is two edges, a one-way link one",

@@ -2,15 +2,20 @@
   "_what": "The recorded pin for the vendored OnlyWorlds schema distribution (codegen/schema-dist/, copied byte-exact). Do not edit by hand; re-vendor from the pinned tag and review the diff. Kept equal to the npm SDK's pin (github.com/OnlyWorlds/sdk, codegen/schema-pin.json) on purpose: two clients, one schema.",
   "_why_manifest_sha256": "Verifying the tree against its own MANIFEST.json only proves internal consistency. If the tag moved, the manifest moved with it. The hash recorded here is the one first accepted, which is what makes a moved tag visible.",
   "repo": "https://github.com/OnlyWorlds/schema-dist",
-  "tag": "v0.33.0-dist.82",
-  "commit": "c19e402c009f7887743ba59b9db8b9b757a099fd",
-  "manifest_sha256": "22b718e781df1f8469378e18475db9f034dfde68c220bd4c85364643e5496799",
+  "tag": "v0.33.0-dist.83",
+  "commit": "e9007ac66fae5cdbed8a705090f15c77b3dbb05b",
+  "manifest_sha256": "cf0c6a3338b45f13f17af6a2fb2297cc890d4bd07618992db50f3ab28be2cb03",
   "canonical_version": "00.33.00",
-  "dist_serial": 82,
+  "dist_serial": 83,
   "published": "2026-10-28",
   "pinned_at": "2026-10-28",
-  "pinned_by": "The maintainer: tree from `git archive` of the tag in a schema-dist checkout (195 files, every one the MANIFEST lists); files re-hashed against MANIFEST.json by generate_schema.py; MANIFEST self-hash matched against the raw file GitHub serves at the tag, whose ref resolves to the commit above.",
+  "pinned_by": "The maintainer: tree from `git archive` of the tag in a schema-dist checkout (197 files, every one the MANIFEST lists); files re-hashed against MANIFEST.json by generate_schema.py; MANIFEST self-hash matched against the raw file GitHub serves at the tag, whose ref resolves to the commit above.",
   "previous_pins": [
+    {
+      "tag": "v0.33.0-dist.82",
+      "manifest_sha256": "22b718e781df1f8469378e18475db9f034dfde68c220bd4c85364643e5496799",
+      "note": "superseded by v0.33.0-dist.83 (the charter profile, profiles/charter.md and charter.fixture.json: the selection, the packet charterOf answers and the writer's rule; the room and charter marks read by presence; the lens profile's stub, umbrella, fence and second-hop rulings, the fixture's lens cases more; walk/lint_folder.py's FORMAT_VERSION at 0.3.20)"
+    },
     {
       "tag": "v0.33.0-dist.81",
       "manifest_sha256": "8a8c4412ccee14e04471f194c3563c317188149b1045232735c19d00e8c1728f",

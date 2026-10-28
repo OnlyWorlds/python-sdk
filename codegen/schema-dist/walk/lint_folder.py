@@ -40,7 +40,7 @@ from pathlib import Path
 # The folder format's version this lint was written against: the folder spec's
 # own version line, the one source. It moves when the spec's version moves, and
 # publish_dist.py writes the dist README's version sentence from it.
-FORMAT_VERSION = "0.3.19"
+FORMAT_VERSION = "0.3.20"
 
 # Keys an element body carries that the schema does not declare: the type
 # slug and the server-managed fields (elements/serialize.py READONLY_FIELDS
@@ -94,7 +94,7 @@ def is_uuid(value) -> bool:
 
 
 def version_tuple(value) -> tuple[int, ...] | None:
-    """`"0.3.19"` -> (0, 3, 19); None for anything that is not dotted integers."""
+    """`"0.3.20"` -> (0, 3, 20); None for anything that is not dotted integers."""
     if not isinstance(value, str):
         return None
     try:

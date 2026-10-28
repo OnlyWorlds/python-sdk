@@ -287,6 +287,42 @@
         "x_room_of": null
       },
       "in_room": false
+    },
+    {
+      "name": "mark-a-number",
+      "element": {
+        "type": "narrative",
+        "supertype": "Message",
+        "x_room_of": 7
+      },
+      "in_room": true
+    },
+    {
+      "name": "mark-spaces",
+      "element": {
+        "type": "narrative",
+        "supertype": "Message",
+        "x_room_of": "  "
+      },
+      "in_room": false
+    },
+    {
+      "name": "mark-unit-separator",
+      "element": {
+        "type": "narrative",
+        "supertype": "Message",
+        "x_room_of": "\u001f"
+      },
+      "in_room": true
+    },
+    {
+      "name": "mark-padded-id",
+      "element": {
+        "type": "narrative",
+        "supertype": "Message",
+        "x_room_of": "  0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f  "
+      },
+      "in_room": true
     }
   ],
   "mark": {
