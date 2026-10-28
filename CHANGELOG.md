@@ -4,6 +4,8 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+- **`set_my_lenses(None)`**: `None` puts the key holder's lens list back to never chosen, so a seat playing a Character starts with its Titles' lenses again, while an empty list now keeps a seat off them (the API tells the two apart from this release on). On the owner's own keys `None` is the empty list. Anything that is neither a list or tuple nor `None` is still refused before sending.
+
 ## 0.80.0 (2026-10-28)
 
 - **The reading aids, and `is_charter_element(element)`**: the world's charter (a Law with supertype `Charter`), its guide and its domains (Constructs with supertype `Guide` or `Domain`) are reading aids when they carry the mark `x_charter_of`, the id of the world they belong to. `is_charter_element` is true for one (a body or a `FolderElement`): the pair, trimmed and case-blind as `is_room_element` matches, AND the mark, present and not `None` (a string mark only when something is left after trimming). The pair without the mark is lore, a Law like any other. `resolve_lens` keeps an aid a hop reaches only when `types` names its pair (`law/charter`, `construct/guide`, `construct/domain`, now legal `types` words), cuts it as `types` otherwise, and never hops on out of it unless the pair is named; an aid the lens names as an anchor is kept and followed like any anchor. `world_graph` leaves the aids out of an unlensed graph, counted `reading_aid` in `cut` and `edges_cut`, and no flag brings them back; a lens that names the pair keeps them as nodes. The pairs and the mark are generated from the distribution's lens fixture.

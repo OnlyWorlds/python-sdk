@@ -554,20 +554,24 @@ class Client:
             raise ValueError(f"GET /me returned no object: {str(data)[:200]}")
         return data
 
-    def set_my_lenses(self, lens_ids: Sequence[str]) -> dict[str, Any]:
+    def set_my_lenses(self, lens_ids: Sequence[str] | None) -> dict[str, Any]:
         """``PUT /me/lenses``: choose the lenses this key's holder starts with, lens ids in order, 0 to 20
-        (keel drops repeats); an empty list is a choice too (the draught then adds no frame). Any write
+        (keel drops repeats); an empty list is a choice too (the draught then adds no frame), and keeps a
+        seat off its Titles' lenses. ``None`` goes back to never chosen: a seat playing a Character then
+        starts with its Titles' lenses (``lenses_from`` says where a list comes from); on the owner's own
+        keys ``None`` is the empty list. Any write
         key of the world, with its PIN, sets its own holder's list: a person member's, an agent seat's,
         or on the owner's keys the owner's own. Answers ``GET /me``'s body. The draught reads the list
         whenever it is given no ``lens`` and no policy. 404 for a lens this key cannot see; 422
         ``not_a_lens``, ``lens_is_template`` or ``lens_hidden`` (``param`` lenses); 403 for a read key. A
         lens only narrows what the holder may already read. A string, or anything but a list or tuple of
-        ids, is a TypeError before anything is sent."""
-        if isinstance(lens_ids, (str, bytes)) or not isinstance(lens_ids, (list, tuple)):
+        ids or ``None``, is a TypeError before anything is sent."""
+        if lens_ids is not None and (isinstance(lens_ids, (str, bytes)) or not isinstance(lens_ids, (list, tuple))):
             raise TypeError(
-                f"set_my_lenses: lens_ids is a list of lens ids ([] for none), not {lens_ids!r}. Nothing was sent."
+                f"set_my_lenses: lens_ids is a list of lens ids ([] for none, None for never chosen), "
+                f"not {lens_ids!r}. Nothing was sent."
             )
-        ids = list(lens_ids)
+        ids = None if lens_ids is None else list(lens_ids)
         data = self.call("PUT", "me/lenses", {"lenses": ids})
         if not isinstance(data, dict):
             raise ValueError(f"PUT /me/lenses returned no object: {str(data)[:200]}")

@@ -346,10 +346,13 @@ def test_set_my_lenses_puts_the_ids_in_order_with_the_pin_and_no_write_headers()
     assert first.headers["Content-Type"] == "application/json"
     # keel's document declares no header parameter on PUT /me/lenses
     assert not {"X-OW-Agent", "X-OW-Client"} & set(first.headers)
-    for wrong in ("l1", b"l1", {"l1"}, None):
+    # None puts the list back to never chosen (keel's opt-out: [] keeps a seat off its Titles' lenses)
+    client.set_my_lenses(None)
+    assert t.calls[2].body == {"lenses": None}
+    for wrong in ("l1", b"l1", {"l1"}, {"0": "l1"}):
         with pytest.raises(TypeError, match="list of lens ids"):
             client.set_my_lenses(wrong)  # type: ignore[arg-type]
-    assert len(t.calls) == 2, "a refused list sends nothing"
+    assert len(t.calls) == 3, "a refused list sends nothing"
 
 
 def test_world_lenses_sends_resolve_and_read_as_without_the_pin() -> None:
