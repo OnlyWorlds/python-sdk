@@ -26,7 +26,7 @@ from datetime import UTC, datetime
 from types import MappingProxyType
 from typing import Any, Literal, TypedDict
 
-from ._schema import FIELD_KINDS, PUBLIC_FIELDS, ROOM_PAIRS
+from ._schema import FIELD_KINDS, GENERIC_PAIRS, PUBLIC_FIELDS, ROOM_PAIRS
 from .folder import is_hidden
 from .message import _instant, is_message, read_mark_of, unread_for
 from .review import hands_on_as_proposed
@@ -111,6 +111,10 @@ _ANCHOR_FIELDS: tuple[str, ...] = (
     "narratives",
 )
 """The anchor fields: the Construct's Involves links in the schema's order, less ``titles``."""
+
+_MESSAGE_TRIMMED: tuple[str, ...] = ("characters", "narrator")
+"""A Message's addressing: what ``x_served_trimmed`` names on a Message served with an id left out (keel
+``elements/serialize.py``, ``SERVED_TRIMMED_FIELDS``), in this order."""
 
 _TYPE_ORDER: tuple[str, ...] = (
     "ability",
@@ -477,8 +481,8 @@ class _Reading:
         return [t for t in self.full_links(eid) if t in self.view]
 
     def body(self, eid: str) -> Body:
-        """The body this reader is served: a stub for a known-of element, the links outside the view left out
-        (and named in ``x_served_trimmed`` on a message or a lens)."""
+        """The body this reader is served: the owner's own body untouched; for any other reader, a stub for a
+        known-of element, or the body with every id outside the view left out (``_trim``)."""
         cached = self._served.get(eid)
         if cached is not None:
             return cached
@@ -492,29 +496,60 @@ class _Reading:
             b["known_of"] = True
         else:
             b = copy.deepcopy(el)
-            trimmed: list[str] = []
-            for field, many in _LINK_FIELDS.get(kind, ()):
-                if field not in b:
-                    continue
-                v = b[field]
-                if many:
-                    if not isinstance(v, list):
-                        continue
-                    if any(isinstance(t, str) and t not in self.view for t in v):
-                        trimmed.append(field)
-                    b[field] = [t for t in v if isinstance(t, str) and t in self.view]
-                elif isinstance(v, str) and v not in self.view:
-                    b[field] = None
-                    trimmed.append(field)
-            if trimmed and (is_message(b) or is_lens(b)):
-                old = b.get("x_served_trimmed")
-                mark: list[Any] = list(old) if isinstance(old, list) else []
-                for f in trimmed:
-                    if f not in mark:
-                        mark.append(f)
-                b["x_served_trimmed"] = mark
+            if self.seen_rung != "owner":
+                self._trim(b, kind)
         self._served[eid] = b
         return b
+
+    def _trim(self, b: Body, kind: str) -> None:
+        """Keel's reading of a body for a reader that is not the owner (``elements/visibility.py`` ``redact``,
+        ``elements/serialize.py``), in place: a link to an id outside the view is left out (a single link reads
+        ``None``, a list keeps its order), a Pin's generic pair whose target is unseen reads ``""`` and ``None``, and a
+        lens's ``x_lens.notes`` keeps the notes on its served anchors and on other ids the reader sees. Below
+        co-builder and never on the public rung, ``x_served_trimmed`` names what the trim changed the meaning of: a
+        Message's ``characters`` and ``narrator``, a lens's anchor fields and, when an anchor's note went with it,
+        ``notes``; names only, never an id or a count."""
+        for type_key, id_key in GENERIC_PAIRS.get(kind, ()):
+            target, of = b.get(id_key), b.get(type_key)
+            if not isinstance(target, str) or target == "":
+                continue
+            if not (isinstance(of, str) and _fold(of) in _TYPE_RANK and target in self.view):
+                if type_key in b:
+                    b[type_key] = ""
+                b[id_key] = None
+        lens = is_lens(b)
+        before = {i for f in _ANCHOR_FIELDS for i in (b.get(f) or []) if isinstance(i, str)} if lens else set()
+        changed: list[str] = []
+        for field, many in _LINK_FIELDS.get(kind, ()):
+            if field not in b:
+                continue
+            v = b[field]
+            if many:
+                if not isinstance(v, list):
+                    continue
+                if any(isinstance(t, str) and t not in self.view for t in v):
+                    changed.append(field)
+                b[field] = [t for t in v if isinstance(t, str) and t in self.view]
+            elif isinstance(v, str) and v not in self.view:
+                b[field] = None
+                changed.append(field)
+        named: tuple[str, ...] = _ANCHOR_FIELDS if lens else _MESSAGE_TRIMMED if is_message(b) else ()
+        mark = [f for f in named if f in changed]
+        x = b.get("x_lens")
+        if lens and isinstance(x, dict) and isinstance(x.get("notes"), dict):
+            served = {i for f in _ANCHOR_FIELDS for i in (b.get(f) or []) if isinstance(i, str)}
+            gone = before - served
+            notes: dict[str, Any] = x["notes"]
+            kept = {k: v for k, v in notes.items() if k in served or (k not in gone and k in self.view)}
+            if len(kept) != len(notes):
+                b["x_lens"] = {**x, "notes": kept}
+                if any(k in gone for k in notes):
+                    mark.append("notes")
+        if mark and self.seen_rung != "public":
+            old = b.get("x_served_trimmed")
+            merged: list[Any] = list(old) if isinstance(old, list) else []
+            merged.extend(f for f in mark if f not in merged)
+            b["x_served_trimmed"] = merged
 
     def reach(
         self, start: Iterable[str], excluded: Callable[[str], bool], stops: Callable[[str], bool] | None = None

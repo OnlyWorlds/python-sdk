@@ -1,0 +1,2870 @@
+[
+  {
+    "name": "a-room-linking-a-hidden-object-public",
+    "world": {
+      "elements": [
+        {
+          "id": "019a7f00-0000-7000-8000-000000000301",
+          "type": "location",
+          "name": "The bridge",
+          "description": "Command and the lamps.\nThe second line.",
+          "defensive_objects": [
+            "019a7f00-0000-7000-8000-000000000302",
+            "019a7f00-0000-7000-8000-000000000303"
+          ],
+          "buildings": [
+            "019a7f00-0000-7000-8000-000000000303"
+          ]
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000302",
+          "type": "object",
+          "name": "Signal lamp"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000303",
+          "type": "object",
+          "name": "Sealed case",
+          "hidden": true
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000304",
+          "type": "character",
+          "name": "Ada"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000305",
+          "type": "character",
+          "name": "The heir",
+          "hidden": true
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000306",
+          "type": "relation",
+          "name": "Ada's ward",
+          "actor": "019a7f00-0000-7000-8000-000000000305",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000304",
+            "019a7f00-0000-7000-8000-000000000305"
+          ]
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000307",
+          "type": "construct",
+          "name": "Bridge watch",
+          "supertype": "Domain",
+          "x_charter_of": "019a7f00-0000-7000-8000-000000000399",
+          "description": "The bridge and its lamps.",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000305"
+          ],
+          "objects": [
+            "019a7f00-0000-7000-8000-000000000302",
+            "019a7f00-0000-7000-8000-000000000303"
+          ],
+          "locations": [
+            "019a7f00-0000-7000-8000-000000000301"
+          ]
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000308",
+          "type": "narrative",
+          "name": "Orders",
+          "supertype": "Message",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000304",
+            "019a7f00-0000-7000-8000-000000000305"
+          ],
+          "narrator": "019a7f00-0000-7000-8000-000000000305",
+          "objects": [
+            "019a7f00-0000-7000-8000-000000000303"
+          ],
+          "created_at": "2026-10-20T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000309",
+          "type": "pin",
+          "name": "Lamp pin",
+          "element_type": "object",
+          "element_id": "019a7f00-0000-7000-8000-000000000303"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000310",
+          "type": "construct",
+          "name": "Ada's watch",
+          "supertype": "Lens",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000304",
+            "019a7f00-0000-7000-8000-000000000305"
+          ],
+          "x_lens": {
+            "depth": 1,
+            "notes": {
+              "019a7f00-0000-7000-8000-000000000304": "She keeps the lamp.",
+              "019a7f00-0000-7000-8000-000000000305": "Heir to the bridge.",
+              "019a7f00-0000-7000-8000-000000000303": "The case.",
+              "019a7f00-0000-7000-8000-000000000302": "The lamp."
+            }
+          }
+        }
+      ],
+      "now": 100
+    },
+    "lens": {
+      "id": "019a7f00-0000-7000-8000-000000000390",
+      "type": "construct",
+      "name": "The reading",
+      "supertype": "Lens",
+      "locations": [
+        "019a7f00-0000-7000-8000-000000000301"
+      ],
+      "x_lens": {
+        "depth": 0
+      }
+    },
+    "reader": {
+      "rung": "public"
+    },
+    "want_rows": [
+      {
+        "id": "019a7f00-0000-7000-8000-000000000301",
+        "type": "location",
+        "name": "The bridge",
+        "description": "Command and the lamps.\nThe second line.",
+        "defensive_objects": [
+          "019a7f00-0000-7000-8000-000000000302"
+        ],
+        "buildings": []
+      }
+    ]
+  },
+  {
+    "name": "a-room-linking-a-hidden-object-contributor",
+    "world": {
+      "elements": [
+        {
+          "id": "019a7f00-0000-7000-8000-000000000301",
+          "type": "location",
+          "name": "The bridge",
+          "description": "Command and the lamps.\nThe second line.",
+          "defensive_objects": [
+            "019a7f00-0000-7000-8000-000000000302",
+            "019a7f00-0000-7000-8000-000000000303"
+          ],
+          "buildings": [
+            "019a7f00-0000-7000-8000-000000000303"
+          ]
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000302",
+          "type": "object",
+          "name": "Signal lamp"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000303",
+          "type": "object",
+          "name": "Sealed case",
+          "hidden": true
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000304",
+          "type": "character",
+          "name": "Ada"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000305",
+          "type": "character",
+          "name": "The heir",
+          "hidden": true
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000306",
+          "type": "relation",
+          "name": "Ada's ward",
+          "actor": "019a7f00-0000-7000-8000-000000000305",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000304",
+            "019a7f00-0000-7000-8000-000000000305"
+          ]
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000307",
+          "type": "construct",
+          "name": "Bridge watch",
+          "supertype": "Domain",
+          "x_charter_of": "019a7f00-0000-7000-8000-000000000399",
+          "description": "The bridge and its lamps.",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000305"
+          ],
+          "objects": [
+            "019a7f00-0000-7000-8000-000000000302",
+            "019a7f00-0000-7000-8000-000000000303"
+          ],
+          "locations": [
+            "019a7f00-0000-7000-8000-000000000301"
+          ]
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000308",
+          "type": "narrative",
+          "name": "Orders",
+          "supertype": "Message",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000304",
+            "019a7f00-0000-7000-8000-000000000305"
+          ],
+          "narrator": "019a7f00-0000-7000-8000-000000000305",
+          "objects": [
+            "019a7f00-0000-7000-8000-000000000303"
+          ],
+          "created_at": "2026-10-20T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000309",
+          "type": "pin",
+          "name": "Lamp pin",
+          "element_type": "object",
+          "element_id": "019a7f00-0000-7000-8000-000000000303"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000310",
+          "type": "construct",
+          "name": "Ada's watch",
+          "supertype": "Lens",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000304",
+            "019a7f00-0000-7000-8000-000000000305"
+          ],
+          "x_lens": {
+            "depth": 1,
+            "notes": {
+              "019a7f00-0000-7000-8000-000000000304": "She keeps the lamp.",
+              "019a7f00-0000-7000-8000-000000000305": "Heir to the bridge.",
+              "019a7f00-0000-7000-8000-000000000303": "The case.",
+              "019a7f00-0000-7000-8000-000000000302": "The lamp."
+            }
+          }
+        }
+      ],
+      "now": 100
+    },
+    "lens": {
+      "id": "019a7f00-0000-7000-8000-000000000390",
+      "type": "construct",
+      "name": "The reading",
+      "supertype": "Lens",
+      "locations": [
+        "019a7f00-0000-7000-8000-000000000301"
+      ],
+      "x_lens": {
+        "depth": 0
+      }
+    },
+    "reader": {
+      "rung": "contributor"
+    },
+    "want_rows": [
+      {
+        "id": "019a7f00-0000-7000-8000-000000000301",
+        "type": "location",
+        "name": "The bridge",
+        "description": "Command and the lamps.\nThe second line.",
+        "defensive_objects": [
+          "019a7f00-0000-7000-8000-000000000302"
+        ],
+        "buildings": []
+      }
+    ]
+  },
+  {
+    "name": "a-room-linking-a-hidden-object-guest",
+    "world": {
+      "elements": [
+        {
+          "id": "019a7f00-0000-7000-8000-000000000301",
+          "type": "location",
+          "name": "The bridge",
+          "description": "Command and the lamps.\nThe second line.",
+          "defensive_objects": [
+            "019a7f00-0000-7000-8000-000000000302",
+            "019a7f00-0000-7000-8000-000000000303"
+          ],
+          "buildings": [
+            "019a7f00-0000-7000-8000-000000000303"
+          ]
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000302",
+          "type": "object",
+          "name": "Signal lamp"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000303",
+          "type": "object",
+          "name": "Sealed case",
+          "hidden": true
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000304",
+          "type": "character",
+          "name": "Ada"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000305",
+          "type": "character",
+          "name": "The heir",
+          "hidden": true
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000306",
+          "type": "relation",
+          "name": "Ada's ward",
+          "actor": "019a7f00-0000-7000-8000-000000000305",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000304",
+            "019a7f00-0000-7000-8000-000000000305"
+          ]
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000307",
+          "type": "construct",
+          "name": "Bridge watch",
+          "supertype": "Domain",
+          "x_charter_of": "019a7f00-0000-7000-8000-000000000399",
+          "description": "The bridge and its lamps.",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000305"
+          ],
+          "objects": [
+            "019a7f00-0000-7000-8000-000000000302",
+            "019a7f00-0000-7000-8000-000000000303"
+          ],
+          "locations": [
+            "019a7f00-0000-7000-8000-000000000301"
+          ]
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000308",
+          "type": "narrative",
+          "name": "Orders",
+          "supertype": "Message",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000304",
+            "019a7f00-0000-7000-8000-000000000305"
+          ],
+          "narrator": "019a7f00-0000-7000-8000-000000000305",
+          "objects": [
+            "019a7f00-0000-7000-8000-000000000303"
+          ],
+          "created_at": "2026-10-20T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000309",
+          "type": "pin",
+          "name": "Lamp pin",
+          "element_type": "object",
+          "element_id": "019a7f00-0000-7000-8000-000000000303"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000310",
+          "type": "construct",
+          "name": "Ada's watch",
+          "supertype": "Lens",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000304",
+            "019a7f00-0000-7000-8000-000000000305"
+          ],
+          "x_lens": {
+            "depth": 1,
+            "notes": {
+              "019a7f00-0000-7000-8000-000000000304": "She keeps the lamp.",
+              "019a7f00-0000-7000-8000-000000000305": "Heir to the bridge.",
+              "019a7f00-0000-7000-8000-000000000303": "The case.",
+              "019a7f00-0000-7000-8000-000000000302": "The lamp."
+            }
+          }
+        }
+      ],
+      "now": 100
+    },
+    "lens": {
+      "id": "019a7f00-0000-7000-8000-000000000390",
+      "type": "construct",
+      "name": "The reading",
+      "supertype": "Lens",
+      "locations": [
+        "019a7f00-0000-7000-8000-000000000301"
+      ],
+      "x_lens": {
+        "depth": 0
+      }
+    },
+    "reader": {
+      "rung": "guest",
+      "whole": [
+        "019a7f00-0000-7000-8000-000000000301",
+        "019a7f00-0000-7000-8000-000000000302"
+      ],
+      "known_of": []
+    },
+    "want_rows": [
+      {
+        "id": "019a7f00-0000-7000-8000-000000000301",
+        "type": "location",
+        "name": "The bridge",
+        "description": "Command and the lamps.\nThe second line.",
+        "defensive_objects": [
+          "019a7f00-0000-7000-8000-000000000302"
+        ],
+        "buildings": []
+      }
+    ]
+  },
+  {
+    "name": "a-room-linking-a-hidden-object-owner-untouched",
+    "world": {
+      "elements": [
+        {
+          "id": "019a7f00-0000-7000-8000-000000000301",
+          "type": "location",
+          "name": "The bridge",
+          "description": "Command and the lamps.\nThe second line.",
+          "defensive_objects": [
+            "019a7f00-0000-7000-8000-000000000302",
+            "019a7f00-0000-7000-8000-000000000303"
+          ],
+          "buildings": [
+            "019a7f00-0000-7000-8000-000000000303"
+          ]
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000302",
+          "type": "object",
+          "name": "Signal lamp"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000303",
+          "type": "object",
+          "name": "Sealed case",
+          "hidden": true
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000304",
+          "type": "character",
+          "name": "Ada"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000305",
+          "type": "character",
+          "name": "The heir",
+          "hidden": true
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000306",
+          "type": "relation",
+          "name": "Ada's ward",
+          "actor": "019a7f00-0000-7000-8000-000000000305",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000304",
+            "019a7f00-0000-7000-8000-000000000305"
+          ]
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000307",
+          "type": "construct",
+          "name": "Bridge watch",
+          "supertype": "Domain",
+          "x_charter_of": "019a7f00-0000-7000-8000-000000000399",
+          "description": "The bridge and its lamps.",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000305"
+          ],
+          "objects": [
+            "019a7f00-0000-7000-8000-000000000302",
+            "019a7f00-0000-7000-8000-000000000303"
+          ],
+          "locations": [
+            "019a7f00-0000-7000-8000-000000000301"
+          ]
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000308",
+          "type": "narrative",
+          "name": "Orders",
+          "supertype": "Message",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000304",
+            "019a7f00-0000-7000-8000-000000000305"
+          ],
+          "narrator": "019a7f00-0000-7000-8000-000000000305",
+          "objects": [
+            "019a7f00-0000-7000-8000-000000000303"
+          ],
+          "created_at": "2026-10-20T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000309",
+          "type": "pin",
+          "name": "Lamp pin",
+          "element_type": "object",
+          "element_id": "019a7f00-0000-7000-8000-000000000303"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000310",
+          "type": "construct",
+          "name": "Ada's watch",
+          "supertype": "Lens",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000304",
+            "019a7f00-0000-7000-8000-000000000305"
+          ],
+          "x_lens": {
+            "depth": 1,
+            "notes": {
+              "019a7f00-0000-7000-8000-000000000304": "She keeps the lamp.",
+              "019a7f00-0000-7000-8000-000000000305": "Heir to the bridge.",
+              "019a7f00-0000-7000-8000-000000000303": "The case.",
+              "019a7f00-0000-7000-8000-000000000302": "The lamp."
+            }
+          }
+        }
+      ],
+      "now": 100
+    },
+    "lens": {
+      "id": "019a7f00-0000-7000-8000-000000000390",
+      "type": "construct",
+      "name": "The reading",
+      "supertype": "Lens",
+      "locations": [
+        "019a7f00-0000-7000-8000-000000000301"
+      ],
+      "x_lens": {
+        "depth": 0
+      }
+    },
+    "reader": {
+      "rung": "owner"
+    },
+    "want_rows": [
+      {
+        "id": "019a7f00-0000-7000-8000-000000000301",
+        "type": "location",
+        "name": "The bridge",
+        "description": "Command and the lamps.\nThe second line.",
+        "defensive_objects": [
+          "019a7f00-0000-7000-8000-000000000302",
+          "019a7f00-0000-7000-8000-000000000303"
+        ],
+        "buildings": [
+          "019a7f00-0000-7000-8000-000000000303"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "a-room-linking-a-hidden-object-owner-as-contributor",
+    "world": {
+      "elements": [
+        {
+          "id": "019a7f00-0000-7000-8000-000000000301",
+          "type": "location",
+          "name": "The bridge",
+          "description": "Command and the lamps.\nThe second line.",
+          "defensive_objects": [
+            "019a7f00-0000-7000-8000-000000000302",
+            "019a7f00-0000-7000-8000-000000000303"
+          ],
+          "buildings": [
+            "019a7f00-0000-7000-8000-000000000303"
+          ]
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000302",
+          "type": "object",
+          "name": "Signal lamp"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000303",
+          "type": "object",
+          "name": "Sealed case",
+          "hidden": true
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000304",
+          "type": "character",
+          "name": "Ada"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000305",
+          "type": "character",
+          "name": "The heir",
+          "hidden": true
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000306",
+          "type": "relation",
+          "name": "Ada's ward",
+          "actor": "019a7f00-0000-7000-8000-000000000305",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000304",
+            "019a7f00-0000-7000-8000-000000000305"
+          ]
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000307",
+          "type": "construct",
+          "name": "Bridge watch",
+          "supertype": "Domain",
+          "x_charter_of": "019a7f00-0000-7000-8000-000000000399",
+          "description": "The bridge and its lamps.",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000305"
+          ],
+          "objects": [
+            "019a7f00-0000-7000-8000-000000000302",
+            "019a7f00-0000-7000-8000-000000000303"
+          ],
+          "locations": [
+            "019a7f00-0000-7000-8000-000000000301"
+          ]
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000308",
+          "type": "narrative",
+          "name": "Orders",
+          "supertype": "Message",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000304",
+            "019a7f00-0000-7000-8000-000000000305"
+          ],
+          "narrator": "019a7f00-0000-7000-8000-000000000305",
+          "objects": [
+            "019a7f00-0000-7000-8000-000000000303"
+          ],
+          "created_at": "2026-10-20T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000309",
+          "type": "pin",
+          "name": "Lamp pin",
+          "element_type": "object",
+          "element_id": "019a7f00-0000-7000-8000-000000000303"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000310",
+          "type": "construct",
+          "name": "Ada's watch",
+          "supertype": "Lens",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000304",
+            "019a7f00-0000-7000-8000-000000000305"
+          ],
+          "x_lens": {
+            "depth": 1,
+            "notes": {
+              "019a7f00-0000-7000-8000-000000000304": "She keeps the lamp.",
+              "019a7f00-0000-7000-8000-000000000305": "Heir to the bridge.",
+              "019a7f00-0000-7000-8000-000000000303": "The case.",
+              "019a7f00-0000-7000-8000-000000000302": "The lamp."
+            }
+          }
+        }
+      ],
+      "now": 100
+    },
+    "lens": {
+      "id": "019a7f00-0000-7000-8000-000000000390",
+      "type": "construct",
+      "name": "The reading",
+      "supertype": "Lens",
+      "locations": [
+        "019a7f00-0000-7000-8000-000000000301"
+      ],
+      "x_lens": {
+        "depth": 0
+      }
+    },
+    "reader": {
+      "rung": "owner",
+      "as": {
+        "rung": "contributor"
+      }
+    },
+    "want_rows": [
+      {
+        "id": "019a7f00-0000-7000-8000-000000000301",
+        "type": "location",
+        "name": "The bridge",
+        "description": "Command and the lamps.\nThe second line.",
+        "defensive_objects": [
+          "019a7f00-0000-7000-8000-000000000302"
+        ],
+        "buildings": []
+      }
+    ]
+  },
+  {
+    "name": "a-room-first-line-row-carries-no-link",
+    "world": {
+      "elements": [
+        {
+          "id": "019a7f00-0000-7000-8000-000000000301",
+          "type": "location",
+          "name": "The bridge",
+          "description": "Command and the lamps.\nThe second line.",
+          "defensive_objects": [
+            "019a7f00-0000-7000-8000-000000000302",
+            "019a7f00-0000-7000-8000-000000000303"
+          ],
+          "buildings": [
+            "019a7f00-0000-7000-8000-000000000303"
+          ]
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000302",
+          "type": "object",
+          "name": "Signal lamp"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000303",
+          "type": "object",
+          "name": "Sealed case",
+          "hidden": true
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000304",
+          "type": "character",
+          "name": "Ada"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000305",
+          "type": "character",
+          "name": "The heir",
+          "hidden": true
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000306",
+          "type": "relation",
+          "name": "Ada's ward",
+          "actor": "019a7f00-0000-7000-8000-000000000305",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000304",
+            "019a7f00-0000-7000-8000-000000000305"
+          ]
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000307",
+          "type": "construct",
+          "name": "Bridge watch",
+          "supertype": "Domain",
+          "x_charter_of": "019a7f00-0000-7000-8000-000000000399",
+          "description": "The bridge and its lamps.",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000305"
+          ],
+          "objects": [
+            "019a7f00-0000-7000-8000-000000000302",
+            "019a7f00-0000-7000-8000-000000000303"
+          ],
+          "locations": [
+            "019a7f00-0000-7000-8000-000000000301"
+          ]
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000308",
+          "type": "narrative",
+          "name": "Orders",
+          "supertype": "Message",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000304",
+            "019a7f00-0000-7000-8000-000000000305"
+          ],
+          "narrator": "019a7f00-0000-7000-8000-000000000305",
+          "objects": [
+            "019a7f00-0000-7000-8000-000000000303"
+          ],
+          "created_at": "2026-10-20T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000309",
+          "type": "pin",
+          "name": "Lamp pin",
+          "element_type": "object",
+          "element_id": "019a7f00-0000-7000-8000-000000000303"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000310",
+          "type": "construct",
+          "name": "Ada's watch",
+          "supertype": "Lens",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000304",
+            "019a7f00-0000-7000-8000-000000000305"
+          ],
+          "x_lens": {
+            "depth": 1,
+            "notes": {
+              "019a7f00-0000-7000-8000-000000000304": "She keeps the lamp.",
+              "019a7f00-0000-7000-8000-000000000305": "Heir to the bridge.",
+              "019a7f00-0000-7000-8000-000000000303": "The case.",
+              "019a7f00-0000-7000-8000-000000000302": "The lamp."
+            }
+          }
+        }
+      ],
+      "now": 100
+    },
+    "lens": {
+      "id": "019a7f00-0000-7000-8000-000000000390",
+      "type": "construct",
+      "name": "The reading",
+      "supertype": "Lens",
+      "locations": [
+        "019a7f00-0000-7000-8000-000000000301"
+      ],
+      "x_lens": {
+        "depth": 0,
+        "show": "first_line"
+      }
+    },
+    "reader": {
+      "rung": "public"
+    },
+    "want_rows": [
+      {
+        "id": "019a7f00-0000-7000-8000-000000000301",
+        "type": "location",
+        "name": "The bridge",
+        "description": "Command and the lamps."
+      }
+    ]
+  },
+  {
+    "name": "a-room-name-row-carries-no-link",
+    "world": {
+      "elements": [
+        {
+          "id": "019a7f00-0000-7000-8000-000000000301",
+          "type": "location",
+          "name": "The bridge",
+          "description": "Command and the lamps.\nThe second line.",
+          "defensive_objects": [
+            "019a7f00-0000-7000-8000-000000000302",
+            "019a7f00-0000-7000-8000-000000000303"
+          ],
+          "buildings": [
+            "019a7f00-0000-7000-8000-000000000303"
+          ]
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000302",
+          "type": "object",
+          "name": "Signal lamp"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000303",
+          "type": "object",
+          "name": "Sealed case",
+          "hidden": true
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000304",
+          "type": "character",
+          "name": "Ada"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000305",
+          "type": "character",
+          "name": "The heir",
+          "hidden": true
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000306",
+          "type": "relation",
+          "name": "Ada's ward",
+          "actor": "019a7f00-0000-7000-8000-000000000305",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000304",
+            "019a7f00-0000-7000-8000-000000000305"
+          ]
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000307",
+          "type": "construct",
+          "name": "Bridge watch",
+          "supertype": "Domain",
+          "x_charter_of": "019a7f00-0000-7000-8000-000000000399",
+          "description": "The bridge and its lamps.",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000305"
+          ],
+          "objects": [
+            "019a7f00-0000-7000-8000-000000000302",
+            "019a7f00-0000-7000-8000-000000000303"
+          ],
+          "locations": [
+            "019a7f00-0000-7000-8000-000000000301"
+          ]
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000308",
+          "type": "narrative",
+          "name": "Orders",
+          "supertype": "Message",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000304",
+            "019a7f00-0000-7000-8000-000000000305"
+          ],
+          "narrator": "019a7f00-0000-7000-8000-000000000305",
+          "objects": [
+            "019a7f00-0000-7000-8000-000000000303"
+          ],
+          "created_at": "2026-10-20T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000309",
+          "type": "pin",
+          "name": "Lamp pin",
+          "element_type": "object",
+          "element_id": "019a7f00-0000-7000-8000-000000000303"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000310",
+          "type": "construct",
+          "name": "Ada's watch",
+          "supertype": "Lens",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000304",
+            "019a7f00-0000-7000-8000-000000000305"
+          ],
+          "x_lens": {
+            "depth": 1,
+            "notes": {
+              "019a7f00-0000-7000-8000-000000000304": "She keeps the lamp.",
+              "019a7f00-0000-7000-8000-000000000305": "Heir to the bridge.",
+              "019a7f00-0000-7000-8000-000000000303": "The case.",
+              "019a7f00-0000-7000-8000-000000000302": "The lamp."
+            }
+          }
+        }
+      ],
+      "now": 100
+    },
+    "lens": {
+      "id": "019a7f00-0000-7000-8000-000000000390",
+      "type": "construct",
+      "name": "The reading",
+      "supertype": "Lens",
+      "locations": [
+        "019a7f00-0000-7000-8000-000000000301"
+      ],
+      "x_lens": {
+        "depth": 0,
+        "show": "name"
+      }
+    },
+    "reader": {
+      "rung": "contributor"
+    },
+    "want_rows": [
+      {
+        "id": "019a7f00-0000-7000-8000-000000000301",
+        "type": "location",
+        "name": "The bridge"
+      }
+    ]
+  },
+  {
+    "name": "a-relation-naming-a-hidden-character-public",
+    "world": {
+      "elements": [
+        {
+          "id": "019a7f00-0000-7000-8000-000000000301",
+          "type": "location",
+          "name": "The bridge",
+          "description": "Command and the lamps.\nThe second line.",
+          "defensive_objects": [
+            "019a7f00-0000-7000-8000-000000000302",
+            "019a7f00-0000-7000-8000-000000000303"
+          ],
+          "buildings": [
+            "019a7f00-0000-7000-8000-000000000303"
+          ]
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000302",
+          "type": "object",
+          "name": "Signal lamp"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000303",
+          "type": "object",
+          "name": "Sealed case",
+          "hidden": true
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000304",
+          "type": "character",
+          "name": "Ada"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000305",
+          "type": "character",
+          "name": "The heir",
+          "hidden": true
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000306",
+          "type": "relation",
+          "name": "Ada's ward",
+          "actor": "019a7f00-0000-7000-8000-000000000305",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000304",
+            "019a7f00-0000-7000-8000-000000000305"
+          ]
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000307",
+          "type": "construct",
+          "name": "Bridge watch",
+          "supertype": "Domain",
+          "x_charter_of": "019a7f00-0000-7000-8000-000000000399",
+          "description": "The bridge and its lamps.",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000305"
+          ],
+          "objects": [
+            "019a7f00-0000-7000-8000-000000000302",
+            "019a7f00-0000-7000-8000-000000000303"
+          ],
+          "locations": [
+            "019a7f00-0000-7000-8000-000000000301"
+          ]
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000308",
+          "type": "narrative",
+          "name": "Orders",
+          "supertype": "Message",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000304",
+            "019a7f00-0000-7000-8000-000000000305"
+          ],
+          "narrator": "019a7f00-0000-7000-8000-000000000305",
+          "objects": [
+            "019a7f00-0000-7000-8000-000000000303"
+          ],
+          "created_at": "2026-10-20T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000309",
+          "type": "pin",
+          "name": "Lamp pin",
+          "element_type": "object",
+          "element_id": "019a7f00-0000-7000-8000-000000000303"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000310",
+          "type": "construct",
+          "name": "Ada's watch",
+          "supertype": "Lens",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000304",
+            "019a7f00-0000-7000-8000-000000000305"
+          ],
+          "x_lens": {
+            "depth": 1,
+            "notes": {
+              "019a7f00-0000-7000-8000-000000000304": "She keeps the lamp.",
+              "019a7f00-0000-7000-8000-000000000305": "Heir to the bridge.",
+              "019a7f00-0000-7000-8000-000000000303": "The case.",
+              "019a7f00-0000-7000-8000-000000000302": "The lamp."
+            }
+          }
+        }
+      ],
+      "now": 100
+    },
+    "lens": {
+      "id": "019a7f00-0000-7000-8000-000000000390",
+      "type": "construct",
+      "name": "The reading",
+      "supertype": "Lens",
+      "relations": [
+        "019a7f00-0000-7000-8000-000000000306"
+      ],
+      "x_lens": {
+        "depth": 0
+      }
+    },
+    "reader": {
+      "rung": "public"
+    },
+    "want_rows": [
+      {
+        "id": "019a7f00-0000-7000-8000-000000000306",
+        "type": "relation",
+        "name": "Ada's ward",
+        "actor": null,
+        "characters": [
+          "019a7f00-0000-7000-8000-000000000304"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "a-relation-naming-a-hidden-character-contributor",
+    "world": {
+      "elements": [
+        {
+          "id": "019a7f00-0000-7000-8000-000000000301",
+          "type": "location",
+          "name": "The bridge",
+          "description": "Command and the lamps.\nThe second line.",
+          "defensive_objects": [
+            "019a7f00-0000-7000-8000-000000000302",
+            "019a7f00-0000-7000-8000-000000000303"
+          ],
+          "buildings": [
+            "019a7f00-0000-7000-8000-000000000303"
+          ]
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000302",
+          "type": "object",
+          "name": "Signal lamp"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000303",
+          "type": "object",
+          "name": "Sealed case",
+          "hidden": true
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000304",
+          "type": "character",
+          "name": "Ada"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000305",
+          "type": "character",
+          "name": "The heir",
+          "hidden": true
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000306",
+          "type": "relation",
+          "name": "Ada's ward",
+          "actor": "019a7f00-0000-7000-8000-000000000305",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000304",
+            "019a7f00-0000-7000-8000-000000000305"
+          ]
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000307",
+          "type": "construct",
+          "name": "Bridge watch",
+          "supertype": "Domain",
+          "x_charter_of": "019a7f00-0000-7000-8000-000000000399",
+          "description": "The bridge and its lamps.",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000305"
+          ],
+          "objects": [
+            "019a7f00-0000-7000-8000-000000000302",
+            "019a7f00-0000-7000-8000-000000000303"
+          ],
+          "locations": [
+            "019a7f00-0000-7000-8000-000000000301"
+          ]
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000308",
+          "type": "narrative",
+          "name": "Orders",
+          "supertype": "Message",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000304",
+            "019a7f00-0000-7000-8000-000000000305"
+          ],
+          "narrator": "019a7f00-0000-7000-8000-000000000305",
+          "objects": [
+            "019a7f00-0000-7000-8000-000000000303"
+          ],
+          "created_at": "2026-10-20T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000309",
+          "type": "pin",
+          "name": "Lamp pin",
+          "element_type": "object",
+          "element_id": "019a7f00-0000-7000-8000-000000000303"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000310",
+          "type": "construct",
+          "name": "Ada's watch",
+          "supertype": "Lens",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000304",
+            "019a7f00-0000-7000-8000-000000000305"
+          ],
+          "x_lens": {
+            "depth": 1,
+            "notes": {
+              "019a7f00-0000-7000-8000-000000000304": "She keeps the lamp.",
+              "019a7f00-0000-7000-8000-000000000305": "Heir to the bridge.",
+              "019a7f00-0000-7000-8000-000000000303": "The case.",
+              "019a7f00-0000-7000-8000-000000000302": "The lamp."
+            }
+          }
+        }
+      ],
+      "now": 100
+    },
+    "lens": {
+      "id": "019a7f00-0000-7000-8000-000000000390",
+      "type": "construct",
+      "name": "The reading",
+      "supertype": "Lens",
+      "relations": [
+        "019a7f00-0000-7000-8000-000000000306"
+      ],
+      "x_lens": {
+        "depth": 0
+      }
+    },
+    "reader": {
+      "rung": "contributor"
+    },
+    "want_rows": [
+      {
+        "id": "019a7f00-0000-7000-8000-000000000306",
+        "type": "relation",
+        "name": "Ada's ward",
+        "actor": null,
+        "characters": [
+          "019a7f00-0000-7000-8000-000000000304"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "a-domain-naming-a-hidden-hub-public",
+    "world": {
+      "elements": [
+        {
+          "id": "019a7f00-0000-7000-8000-000000000301",
+          "type": "location",
+          "name": "The bridge",
+          "description": "Command and the lamps.\nThe second line.",
+          "defensive_objects": [
+            "019a7f00-0000-7000-8000-000000000302",
+            "019a7f00-0000-7000-8000-000000000303"
+          ],
+          "buildings": [
+            "019a7f00-0000-7000-8000-000000000303"
+          ]
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000302",
+          "type": "object",
+          "name": "Signal lamp"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000303",
+          "type": "object",
+          "name": "Sealed case",
+          "hidden": true
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000304",
+          "type": "character",
+          "name": "Ada"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000305",
+          "type": "character",
+          "name": "The heir",
+          "hidden": true
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000306",
+          "type": "relation",
+          "name": "Ada's ward",
+          "actor": "019a7f00-0000-7000-8000-000000000305",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000304",
+            "019a7f00-0000-7000-8000-000000000305"
+          ]
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000307",
+          "type": "construct",
+          "name": "Bridge watch",
+          "supertype": "Domain",
+          "x_charter_of": "019a7f00-0000-7000-8000-000000000399",
+          "description": "The bridge and its lamps.",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000305"
+          ],
+          "objects": [
+            "019a7f00-0000-7000-8000-000000000302",
+            "019a7f00-0000-7000-8000-000000000303"
+          ],
+          "locations": [
+            "019a7f00-0000-7000-8000-000000000301"
+          ]
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000308",
+          "type": "narrative",
+          "name": "Orders",
+          "supertype": "Message",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000304",
+            "019a7f00-0000-7000-8000-000000000305"
+          ],
+          "narrator": "019a7f00-0000-7000-8000-000000000305",
+          "objects": [
+            "019a7f00-0000-7000-8000-000000000303"
+          ],
+          "created_at": "2026-10-20T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000309",
+          "type": "pin",
+          "name": "Lamp pin",
+          "element_type": "object",
+          "element_id": "019a7f00-0000-7000-8000-000000000303"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000310",
+          "type": "construct",
+          "name": "Ada's watch",
+          "supertype": "Lens",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000304",
+            "019a7f00-0000-7000-8000-000000000305"
+          ],
+          "x_lens": {
+            "depth": 1,
+            "notes": {
+              "019a7f00-0000-7000-8000-000000000304": "She keeps the lamp.",
+              "019a7f00-0000-7000-8000-000000000305": "Heir to the bridge.",
+              "019a7f00-0000-7000-8000-000000000303": "The case.",
+              "019a7f00-0000-7000-8000-000000000302": "The lamp."
+            }
+          }
+        }
+      ],
+      "now": 100
+    },
+    "lens": {
+      "id": "019a7f00-0000-7000-8000-000000000390",
+      "type": "construct",
+      "name": "The reading",
+      "supertype": "Lens",
+      "constructs": [
+        "019a7f00-0000-7000-8000-000000000307"
+      ],
+      "x_lens": {
+        "depth": 0
+      }
+    },
+    "reader": {
+      "rung": "public"
+    },
+    "want_rows": [
+      {
+        "id": "019a7f00-0000-7000-8000-000000000307",
+        "type": "construct",
+        "name": "Bridge watch",
+        "supertype": "Domain",
+        "x_charter_of": "019a7f00-0000-7000-8000-000000000399",
+        "description": "The bridge and its lamps.",
+        "characters": [],
+        "objects": [
+          "019a7f00-0000-7000-8000-000000000302"
+        ],
+        "locations": [
+          "019a7f00-0000-7000-8000-000000000301"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "a-domain-naming-a-hidden-hub-guest",
+    "world": {
+      "elements": [
+        {
+          "id": "019a7f00-0000-7000-8000-000000000301",
+          "type": "location",
+          "name": "The bridge",
+          "description": "Command and the lamps.\nThe second line.",
+          "defensive_objects": [
+            "019a7f00-0000-7000-8000-000000000302",
+            "019a7f00-0000-7000-8000-000000000303"
+          ],
+          "buildings": [
+            "019a7f00-0000-7000-8000-000000000303"
+          ]
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000302",
+          "type": "object",
+          "name": "Signal lamp"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000303",
+          "type": "object",
+          "name": "Sealed case",
+          "hidden": true
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000304",
+          "type": "character",
+          "name": "Ada"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000305",
+          "type": "character",
+          "name": "The heir",
+          "hidden": true
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000306",
+          "type": "relation",
+          "name": "Ada's ward",
+          "actor": "019a7f00-0000-7000-8000-000000000305",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000304",
+            "019a7f00-0000-7000-8000-000000000305"
+          ]
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000307",
+          "type": "construct",
+          "name": "Bridge watch",
+          "supertype": "Domain",
+          "x_charter_of": "019a7f00-0000-7000-8000-000000000399",
+          "description": "The bridge and its lamps.",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000305"
+          ],
+          "objects": [
+            "019a7f00-0000-7000-8000-000000000302",
+            "019a7f00-0000-7000-8000-000000000303"
+          ],
+          "locations": [
+            "019a7f00-0000-7000-8000-000000000301"
+          ]
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000308",
+          "type": "narrative",
+          "name": "Orders",
+          "supertype": "Message",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000304",
+            "019a7f00-0000-7000-8000-000000000305"
+          ],
+          "narrator": "019a7f00-0000-7000-8000-000000000305",
+          "objects": [
+            "019a7f00-0000-7000-8000-000000000303"
+          ],
+          "created_at": "2026-10-20T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000309",
+          "type": "pin",
+          "name": "Lamp pin",
+          "element_type": "object",
+          "element_id": "019a7f00-0000-7000-8000-000000000303"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000310",
+          "type": "construct",
+          "name": "Ada's watch",
+          "supertype": "Lens",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000304",
+            "019a7f00-0000-7000-8000-000000000305"
+          ],
+          "x_lens": {
+            "depth": 1,
+            "notes": {
+              "019a7f00-0000-7000-8000-000000000304": "She keeps the lamp.",
+              "019a7f00-0000-7000-8000-000000000305": "Heir to the bridge.",
+              "019a7f00-0000-7000-8000-000000000303": "The case.",
+              "019a7f00-0000-7000-8000-000000000302": "The lamp."
+            }
+          }
+        }
+      ],
+      "now": 100
+    },
+    "lens": {
+      "id": "019a7f00-0000-7000-8000-000000000390",
+      "type": "construct",
+      "name": "The reading",
+      "supertype": "Lens",
+      "constructs": [
+        "019a7f00-0000-7000-8000-000000000307"
+      ],
+      "x_lens": {
+        "depth": 0
+      }
+    },
+    "reader": {
+      "rung": "guest",
+      "whole": [
+        "019a7f00-0000-7000-8000-000000000307",
+        "019a7f00-0000-7000-8000-000000000302"
+      ],
+      "known_of": [
+        "019a7f00-0000-7000-8000-000000000301"
+      ]
+    },
+    "want_rows": [
+      {
+        "id": "019a7f00-0000-7000-8000-000000000307",
+        "type": "construct",
+        "name": "Bridge watch",
+        "supertype": "Domain",
+        "x_charter_of": "019a7f00-0000-7000-8000-000000000399",
+        "description": "The bridge and its lamps.",
+        "characters": [],
+        "objects": [
+          "019a7f00-0000-7000-8000-000000000302"
+        ],
+        "locations": [
+          "019a7f00-0000-7000-8000-000000000301"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "a-message-to-a-hidden-character-contributor-marked",
+    "world": {
+      "elements": [
+        {
+          "id": "019a7f00-0000-7000-8000-000000000301",
+          "type": "location",
+          "name": "The bridge",
+          "description": "Command and the lamps.\nThe second line.",
+          "defensive_objects": [
+            "019a7f00-0000-7000-8000-000000000302",
+            "019a7f00-0000-7000-8000-000000000303"
+          ],
+          "buildings": [
+            "019a7f00-0000-7000-8000-000000000303"
+          ]
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000302",
+          "type": "object",
+          "name": "Signal lamp"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000303",
+          "type": "object",
+          "name": "Sealed case",
+          "hidden": true
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000304",
+          "type": "character",
+          "name": "Ada"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000305",
+          "type": "character",
+          "name": "The heir",
+          "hidden": true
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000306",
+          "type": "relation",
+          "name": "Ada's ward",
+          "actor": "019a7f00-0000-7000-8000-000000000305",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000304",
+            "019a7f00-0000-7000-8000-000000000305"
+          ]
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000307",
+          "type": "construct",
+          "name": "Bridge watch",
+          "supertype": "Domain",
+          "x_charter_of": "019a7f00-0000-7000-8000-000000000399",
+          "description": "The bridge and its lamps.",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000305"
+          ],
+          "objects": [
+            "019a7f00-0000-7000-8000-000000000302",
+            "019a7f00-0000-7000-8000-000000000303"
+          ],
+          "locations": [
+            "019a7f00-0000-7000-8000-000000000301"
+          ]
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000308",
+          "type": "narrative",
+          "name": "Orders",
+          "supertype": "Message",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000304",
+            "019a7f00-0000-7000-8000-000000000305"
+          ],
+          "narrator": "019a7f00-0000-7000-8000-000000000305",
+          "objects": [
+            "019a7f00-0000-7000-8000-000000000303"
+          ],
+          "created_at": "2026-10-20T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000309",
+          "type": "pin",
+          "name": "Lamp pin",
+          "element_type": "object",
+          "element_id": "019a7f00-0000-7000-8000-000000000303"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000310",
+          "type": "construct",
+          "name": "Ada's watch",
+          "supertype": "Lens",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000304",
+            "019a7f00-0000-7000-8000-000000000305"
+          ],
+          "x_lens": {
+            "depth": 1,
+            "notes": {
+              "019a7f00-0000-7000-8000-000000000304": "She keeps the lamp.",
+              "019a7f00-0000-7000-8000-000000000305": "Heir to the bridge.",
+              "019a7f00-0000-7000-8000-000000000303": "The case.",
+              "019a7f00-0000-7000-8000-000000000302": "The lamp."
+            }
+          }
+        }
+      ],
+      "now": 100
+    },
+    "lens": {
+      "id": "019a7f00-0000-7000-8000-000000000390",
+      "type": "construct",
+      "name": "The reading",
+      "supertype": "Lens",
+      "narratives": [
+        "019a7f00-0000-7000-8000-000000000308"
+      ],
+      "x_lens": {
+        "depth": 0
+      }
+    },
+    "reader": {
+      "rung": "contributor"
+    },
+    "want_rows": [
+      {
+        "id": "019a7f00-0000-7000-8000-000000000308",
+        "type": "narrative",
+        "name": "Orders",
+        "supertype": "Message",
+        "characters": [
+          "019a7f00-0000-7000-8000-000000000304"
+        ],
+        "narrator": null,
+        "objects": [],
+        "created_at": "2026-10-20T12:00:00Z",
+        "x_served_trimmed": [
+          "characters",
+          "narrator"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "a-message-to-a-hidden-character-public-unmarked",
+    "world": {
+      "elements": [
+        {
+          "id": "019a7f00-0000-7000-8000-000000000301",
+          "type": "location",
+          "name": "The bridge",
+          "description": "Command and the lamps.\nThe second line.",
+          "defensive_objects": [
+            "019a7f00-0000-7000-8000-000000000302",
+            "019a7f00-0000-7000-8000-000000000303"
+          ],
+          "buildings": [
+            "019a7f00-0000-7000-8000-000000000303"
+          ]
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000302",
+          "type": "object",
+          "name": "Signal lamp"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000303",
+          "type": "object",
+          "name": "Sealed case",
+          "hidden": true
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000304",
+          "type": "character",
+          "name": "Ada"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000305",
+          "type": "character",
+          "name": "The heir",
+          "hidden": true
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000306",
+          "type": "relation",
+          "name": "Ada's ward",
+          "actor": "019a7f00-0000-7000-8000-000000000305",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000304",
+            "019a7f00-0000-7000-8000-000000000305"
+          ]
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000307",
+          "type": "construct",
+          "name": "Bridge watch",
+          "supertype": "Domain",
+          "x_charter_of": "019a7f00-0000-7000-8000-000000000399",
+          "description": "The bridge and its lamps.",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000305"
+          ],
+          "objects": [
+            "019a7f00-0000-7000-8000-000000000302",
+            "019a7f00-0000-7000-8000-000000000303"
+          ],
+          "locations": [
+            "019a7f00-0000-7000-8000-000000000301"
+          ]
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000308",
+          "type": "narrative",
+          "name": "Orders",
+          "supertype": "Message",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000304",
+            "019a7f00-0000-7000-8000-000000000305"
+          ],
+          "narrator": "019a7f00-0000-7000-8000-000000000305",
+          "objects": [
+            "019a7f00-0000-7000-8000-000000000303"
+          ],
+          "created_at": "2026-10-20T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000309",
+          "type": "pin",
+          "name": "Lamp pin",
+          "element_type": "object",
+          "element_id": "019a7f00-0000-7000-8000-000000000303"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000310",
+          "type": "construct",
+          "name": "Ada's watch",
+          "supertype": "Lens",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000304",
+            "019a7f00-0000-7000-8000-000000000305"
+          ],
+          "x_lens": {
+            "depth": 1,
+            "notes": {
+              "019a7f00-0000-7000-8000-000000000304": "She keeps the lamp.",
+              "019a7f00-0000-7000-8000-000000000305": "Heir to the bridge.",
+              "019a7f00-0000-7000-8000-000000000303": "The case.",
+              "019a7f00-0000-7000-8000-000000000302": "The lamp."
+            }
+          }
+        }
+      ],
+      "now": 100
+    },
+    "lens": {
+      "id": "019a7f00-0000-7000-8000-000000000390",
+      "type": "construct",
+      "name": "The reading",
+      "supertype": "Lens",
+      "narratives": [
+        "019a7f00-0000-7000-8000-000000000308"
+      ],
+      "x_lens": {
+        "depth": 0
+      }
+    },
+    "reader": {
+      "rung": "public"
+    },
+    "want_rows": [
+      {
+        "id": "019a7f00-0000-7000-8000-000000000308",
+        "type": "narrative",
+        "name": "Orders",
+        "supertype": "Message",
+        "characters": [
+          "019a7f00-0000-7000-8000-000000000304"
+        ],
+        "narrator": null,
+        "objects": [],
+        "created_at": "2026-10-20T12:00:00Z"
+      }
+    ]
+  },
+  {
+    "name": "a-message-to-a-hidden-character-guest-marked",
+    "world": {
+      "elements": [
+        {
+          "id": "019a7f00-0000-7000-8000-000000000301",
+          "type": "location",
+          "name": "The bridge",
+          "description": "Command and the lamps.\nThe second line.",
+          "defensive_objects": [
+            "019a7f00-0000-7000-8000-000000000302",
+            "019a7f00-0000-7000-8000-000000000303"
+          ],
+          "buildings": [
+            "019a7f00-0000-7000-8000-000000000303"
+          ]
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000302",
+          "type": "object",
+          "name": "Signal lamp"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000303",
+          "type": "object",
+          "name": "Sealed case",
+          "hidden": true
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000304",
+          "type": "character",
+          "name": "Ada"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000305",
+          "type": "character",
+          "name": "The heir",
+          "hidden": true
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000306",
+          "type": "relation",
+          "name": "Ada's ward",
+          "actor": "019a7f00-0000-7000-8000-000000000305",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000304",
+            "019a7f00-0000-7000-8000-000000000305"
+          ]
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000307",
+          "type": "construct",
+          "name": "Bridge watch",
+          "supertype": "Domain",
+          "x_charter_of": "019a7f00-0000-7000-8000-000000000399",
+          "description": "The bridge and its lamps.",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000305"
+          ],
+          "objects": [
+            "019a7f00-0000-7000-8000-000000000302",
+            "019a7f00-0000-7000-8000-000000000303"
+          ],
+          "locations": [
+            "019a7f00-0000-7000-8000-000000000301"
+          ]
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000308",
+          "type": "narrative",
+          "name": "Orders",
+          "supertype": "Message",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000304",
+            "019a7f00-0000-7000-8000-000000000305"
+          ],
+          "narrator": "019a7f00-0000-7000-8000-000000000305",
+          "objects": [
+            "019a7f00-0000-7000-8000-000000000303"
+          ],
+          "created_at": "2026-10-20T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000309",
+          "type": "pin",
+          "name": "Lamp pin",
+          "element_type": "object",
+          "element_id": "019a7f00-0000-7000-8000-000000000303"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000310",
+          "type": "construct",
+          "name": "Ada's watch",
+          "supertype": "Lens",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000304",
+            "019a7f00-0000-7000-8000-000000000305"
+          ],
+          "x_lens": {
+            "depth": 1,
+            "notes": {
+              "019a7f00-0000-7000-8000-000000000304": "She keeps the lamp.",
+              "019a7f00-0000-7000-8000-000000000305": "Heir to the bridge.",
+              "019a7f00-0000-7000-8000-000000000303": "The case.",
+              "019a7f00-0000-7000-8000-000000000302": "The lamp."
+            }
+          }
+        }
+      ],
+      "now": 100
+    },
+    "lens": {
+      "id": "019a7f00-0000-7000-8000-000000000390",
+      "type": "construct",
+      "name": "The reading",
+      "supertype": "Lens",
+      "narratives": [
+        "019a7f00-0000-7000-8000-000000000308"
+      ],
+      "x_lens": {
+        "depth": 0
+      }
+    },
+    "reader": {
+      "rung": "guest",
+      "whole": [
+        "019a7f00-0000-7000-8000-000000000308",
+        "019a7f00-0000-7000-8000-000000000304"
+      ],
+      "known_of": []
+    },
+    "want_rows": [
+      {
+        "id": "019a7f00-0000-7000-8000-000000000308",
+        "type": "narrative",
+        "name": "Orders",
+        "supertype": "Message",
+        "characters": [
+          "019a7f00-0000-7000-8000-000000000304"
+        ],
+        "narrator": null,
+        "objects": [],
+        "created_at": "2026-10-20T12:00:00Z",
+        "x_served_trimmed": [
+          "characters",
+          "narrator"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "a-message-owner-as-contributor-marked",
+    "world": {
+      "elements": [
+        {
+          "id": "019a7f00-0000-7000-8000-000000000301",
+          "type": "location",
+          "name": "The bridge",
+          "description": "Command and the lamps.\nThe second line.",
+          "defensive_objects": [
+            "019a7f00-0000-7000-8000-000000000302",
+            "019a7f00-0000-7000-8000-000000000303"
+          ],
+          "buildings": [
+            "019a7f00-0000-7000-8000-000000000303"
+          ]
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000302",
+          "type": "object",
+          "name": "Signal lamp"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000303",
+          "type": "object",
+          "name": "Sealed case",
+          "hidden": true
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000304",
+          "type": "character",
+          "name": "Ada"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000305",
+          "type": "character",
+          "name": "The heir",
+          "hidden": true
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000306",
+          "type": "relation",
+          "name": "Ada's ward",
+          "actor": "019a7f00-0000-7000-8000-000000000305",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000304",
+            "019a7f00-0000-7000-8000-000000000305"
+          ]
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000307",
+          "type": "construct",
+          "name": "Bridge watch",
+          "supertype": "Domain",
+          "x_charter_of": "019a7f00-0000-7000-8000-000000000399",
+          "description": "The bridge and its lamps.",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000305"
+          ],
+          "objects": [
+            "019a7f00-0000-7000-8000-000000000302",
+            "019a7f00-0000-7000-8000-000000000303"
+          ],
+          "locations": [
+            "019a7f00-0000-7000-8000-000000000301"
+          ]
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000308",
+          "type": "narrative",
+          "name": "Orders",
+          "supertype": "Message",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000304",
+            "019a7f00-0000-7000-8000-000000000305"
+          ],
+          "narrator": "019a7f00-0000-7000-8000-000000000305",
+          "objects": [
+            "019a7f00-0000-7000-8000-000000000303"
+          ],
+          "created_at": "2026-10-20T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000309",
+          "type": "pin",
+          "name": "Lamp pin",
+          "element_type": "object",
+          "element_id": "019a7f00-0000-7000-8000-000000000303"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000310",
+          "type": "construct",
+          "name": "Ada's watch",
+          "supertype": "Lens",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000304",
+            "019a7f00-0000-7000-8000-000000000305"
+          ],
+          "x_lens": {
+            "depth": 1,
+            "notes": {
+              "019a7f00-0000-7000-8000-000000000304": "She keeps the lamp.",
+              "019a7f00-0000-7000-8000-000000000305": "Heir to the bridge.",
+              "019a7f00-0000-7000-8000-000000000303": "The case.",
+              "019a7f00-0000-7000-8000-000000000302": "The lamp."
+            }
+          }
+        }
+      ],
+      "now": 100
+    },
+    "lens": {
+      "id": "019a7f00-0000-7000-8000-000000000390",
+      "type": "construct",
+      "name": "The reading",
+      "supertype": "Lens",
+      "narratives": [
+        "019a7f00-0000-7000-8000-000000000308"
+      ],
+      "x_lens": {
+        "depth": 0
+      }
+    },
+    "reader": {
+      "rung": "owner",
+      "as": {
+        "rung": "contributor"
+      }
+    },
+    "want_rows": [
+      {
+        "id": "019a7f00-0000-7000-8000-000000000308",
+        "type": "narrative",
+        "name": "Orders",
+        "supertype": "Message",
+        "characters": [
+          "019a7f00-0000-7000-8000-000000000304"
+        ],
+        "narrator": null,
+        "objects": [],
+        "created_at": "2026-10-20T12:00:00Z",
+        "x_served_trimmed": [
+          "characters",
+          "narrator"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "a-lens-row-loses-a-hidden-anchor-and-its-note-contributor",
+    "world": {
+      "elements": [
+        {
+          "id": "019a7f00-0000-7000-8000-000000000301",
+          "type": "location",
+          "name": "The bridge",
+          "description": "Command and the lamps.\nThe second line.",
+          "defensive_objects": [
+            "019a7f00-0000-7000-8000-000000000302",
+            "019a7f00-0000-7000-8000-000000000303"
+          ],
+          "buildings": [
+            "019a7f00-0000-7000-8000-000000000303"
+          ]
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000302",
+          "type": "object",
+          "name": "Signal lamp"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000303",
+          "type": "object",
+          "name": "Sealed case",
+          "hidden": true
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000304",
+          "type": "character",
+          "name": "Ada"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000305",
+          "type": "character",
+          "name": "The heir",
+          "hidden": true
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000306",
+          "type": "relation",
+          "name": "Ada's ward",
+          "actor": "019a7f00-0000-7000-8000-000000000305",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000304",
+            "019a7f00-0000-7000-8000-000000000305"
+          ]
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000307",
+          "type": "construct",
+          "name": "Bridge watch",
+          "supertype": "Domain",
+          "x_charter_of": "019a7f00-0000-7000-8000-000000000399",
+          "description": "The bridge and its lamps.",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000305"
+          ],
+          "objects": [
+            "019a7f00-0000-7000-8000-000000000302",
+            "019a7f00-0000-7000-8000-000000000303"
+          ],
+          "locations": [
+            "019a7f00-0000-7000-8000-000000000301"
+          ]
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000308",
+          "type": "narrative",
+          "name": "Orders",
+          "supertype": "Message",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000304",
+            "019a7f00-0000-7000-8000-000000000305"
+          ],
+          "narrator": "019a7f00-0000-7000-8000-000000000305",
+          "objects": [
+            "019a7f00-0000-7000-8000-000000000303"
+          ],
+          "created_at": "2026-10-20T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000309",
+          "type": "pin",
+          "name": "Lamp pin",
+          "element_type": "object",
+          "element_id": "019a7f00-0000-7000-8000-000000000303"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000310",
+          "type": "construct",
+          "name": "Ada's watch",
+          "supertype": "Lens",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000304",
+            "019a7f00-0000-7000-8000-000000000305"
+          ],
+          "x_lens": {
+            "depth": 1,
+            "notes": {
+              "019a7f00-0000-7000-8000-000000000304": "She keeps the lamp.",
+              "019a7f00-0000-7000-8000-000000000305": "Heir to the bridge.",
+              "019a7f00-0000-7000-8000-000000000303": "The case.",
+              "019a7f00-0000-7000-8000-000000000302": "The lamp."
+            }
+          }
+        }
+      ],
+      "now": 100
+    },
+    "lens": {
+      "id": "019a7f00-0000-7000-8000-000000000390",
+      "type": "construct",
+      "name": "The reading",
+      "supertype": "Lens",
+      "characters": [
+        "019a7f00-0000-7000-8000-000000000304"
+      ],
+      "x_lens": {
+        "depth": 1,
+        "types": [
+          "construct"
+        ]
+      }
+    },
+    "reader": {
+      "rung": "contributor"
+    },
+    "want_rows": [
+      {
+        "id": "019a7f00-0000-7000-8000-000000000304",
+        "type": "character",
+        "name": "Ada"
+      },
+      {
+        "id": "019a7f00-0000-7000-8000-000000000310",
+        "type": "construct",
+        "name": "Ada's watch",
+        "supertype": "Lens",
+        "characters": [
+          "019a7f00-0000-7000-8000-000000000304"
+        ],
+        "x_lens": {
+          "depth": 1,
+          "notes": {
+            "019a7f00-0000-7000-8000-000000000304": "She keeps the lamp.",
+            "019a7f00-0000-7000-8000-000000000302": "The lamp."
+          }
+        },
+        "x_served_trimmed": [
+          "characters",
+          "notes"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "a-lens-row-loses-a-hidden-anchor-and-its-note-public",
+    "world": {
+      "elements": [
+        {
+          "id": "019a7f00-0000-7000-8000-000000000301",
+          "type": "location",
+          "name": "The bridge",
+          "description": "Command and the lamps.\nThe second line.",
+          "defensive_objects": [
+            "019a7f00-0000-7000-8000-000000000302",
+            "019a7f00-0000-7000-8000-000000000303"
+          ],
+          "buildings": [
+            "019a7f00-0000-7000-8000-000000000303"
+          ]
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000302",
+          "type": "object",
+          "name": "Signal lamp"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000303",
+          "type": "object",
+          "name": "Sealed case",
+          "hidden": true
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000304",
+          "type": "character",
+          "name": "Ada"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000305",
+          "type": "character",
+          "name": "The heir",
+          "hidden": true
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000306",
+          "type": "relation",
+          "name": "Ada's ward",
+          "actor": "019a7f00-0000-7000-8000-000000000305",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000304",
+            "019a7f00-0000-7000-8000-000000000305"
+          ]
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000307",
+          "type": "construct",
+          "name": "Bridge watch",
+          "supertype": "Domain",
+          "x_charter_of": "019a7f00-0000-7000-8000-000000000399",
+          "description": "The bridge and its lamps.",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000305"
+          ],
+          "objects": [
+            "019a7f00-0000-7000-8000-000000000302",
+            "019a7f00-0000-7000-8000-000000000303"
+          ],
+          "locations": [
+            "019a7f00-0000-7000-8000-000000000301"
+          ]
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000308",
+          "type": "narrative",
+          "name": "Orders",
+          "supertype": "Message",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000304",
+            "019a7f00-0000-7000-8000-000000000305"
+          ],
+          "narrator": "019a7f00-0000-7000-8000-000000000305",
+          "objects": [
+            "019a7f00-0000-7000-8000-000000000303"
+          ],
+          "created_at": "2026-10-20T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000309",
+          "type": "pin",
+          "name": "Lamp pin",
+          "element_type": "object",
+          "element_id": "019a7f00-0000-7000-8000-000000000303"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000310",
+          "type": "construct",
+          "name": "Ada's watch",
+          "supertype": "Lens",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000304",
+            "019a7f00-0000-7000-8000-000000000305"
+          ],
+          "x_lens": {
+            "depth": 1,
+            "notes": {
+              "019a7f00-0000-7000-8000-000000000304": "She keeps the lamp.",
+              "019a7f00-0000-7000-8000-000000000305": "Heir to the bridge.",
+              "019a7f00-0000-7000-8000-000000000303": "The case.",
+              "019a7f00-0000-7000-8000-000000000302": "The lamp."
+            }
+          }
+        }
+      ],
+      "now": 100
+    },
+    "lens": {
+      "id": "019a7f00-0000-7000-8000-000000000390",
+      "type": "construct",
+      "name": "The reading",
+      "supertype": "Lens",
+      "characters": [
+        "019a7f00-0000-7000-8000-000000000304"
+      ],
+      "x_lens": {
+        "depth": 1,
+        "types": [
+          "construct"
+        ]
+      }
+    },
+    "reader": {
+      "rung": "public"
+    },
+    "want_rows": [
+      {
+        "id": "019a7f00-0000-7000-8000-000000000304",
+        "type": "character",
+        "name": "Ada"
+      },
+      {
+        "id": "019a7f00-0000-7000-8000-000000000310",
+        "type": "construct",
+        "name": "Ada's watch",
+        "supertype": "Lens",
+        "characters": [
+          "019a7f00-0000-7000-8000-000000000304"
+        ],
+        "x_lens": {
+          "depth": 1,
+          "notes": {
+            "019a7f00-0000-7000-8000-000000000304": "She keeps the lamp.",
+            "019a7f00-0000-7000-8000-000000000302": "The lamp."
+          }
+        }
+      }
+    ]
+  },
+  {
+    "name": "a-lens-row-owner-untouched",
+    "world": {
+      "elements": [
+        {
+          "id": "019a7f00-0000-7000-8000-000000000301",
+          "type": "location",
+          "name": "The bridge",
+          "description": "Command and the lamps.\nThe second line.",
+          "defensive_objects": [
+            "019a7f00-0000-7000-8000-000000000302",
+            "019a7f00-0000-7000-8000-000000000303"
+          ],
+          "buildings": [
+            "019a7f00-0000-7000-8000-000000000303"
+          ]
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000302",
+          "type": "object",
+          "name": "Signal lamp"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000303",
+          "type": "object",
+          "name": "Sealed case",
+          "hidden": true
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000304",
+          "type": "character",
+          "name": "Ada"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000305",
+          "type": "character",
+          "name": "The heir",
+          "hidden": true
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000306",
+          "type": "relation",
+          "name": "Ada's ward",
+          "actor": "019a7f00-0000-7000-8000-000000000305",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000304",
+            "019a7f00-0000-7000-8000-000000000305"
+          ]
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000307",
+          "type": "construct",
+          "name": "Bridge watch",
+          "supertype": "Domain",
+          "x_charter_of": "019a7f00-0000-7000-8000-000000000399",
+          "description": "The bridge and its lamps.",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000305"
+          ],
+          "objects": [
+            "019a7f00-0000-7000-8000-000000000302",
+            "019a7f00-0000-7000-8000-000000000303"
+          ],
+          "locations": [
+            "019a7f00-0000-7000-8000-000000000301"
+          ]
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000308",
+          "type": "narrative",
+          "name": "Orders",
+          "supertype": "Message",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000304",
+            "019a7f00-0000-7000-8000-000000000305"
+          ],
+          "narrator": "019a7f00-0000-7000-8000-000000000305",
+          "objects": [
+            "019a7f00-0000-7000-8000-000000000303"
+          ],
+          "created_at": "2026-10-20T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000309",
+          "type": "pin",
+          "name": "Lamp pin",
+          "element_type": "object",
+          "element_id": "019a7f00-0000-7000-8000-000000000303"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000310",
+          "type": "construct",
+          "name": "Ada's watch",
+          "supertype": "Lens",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000304",
+            "019a7f00-0000-7000-8000-000000000305"
+          ],
+          "x_lens": {
+            "depth": 1,
+            "notes": {
+              "019a7f00-0000-7000-8000-000000000304": "She keeps the lamp.",
+              "019a7f00-0000-7000-8000-000000000305": "Heir to the bridge.",
+              "019a7f00-0000-7000-8000-000000000303": "The case.",
+              "019a7f00-0000-7000-8000-000000000302": "The lamp."
+            }
+          }
+        }
+      ],
+      "now": 100
+    },
+    "lens": {
+      "id": "019a7f00-0000-7000-8000-000000000390",
+      "type": "construct",
+      "name": "The reading",
+      "supertype": "Lens",
+      "characters": [
+        "019a7f00-0000-7000-8000-000000000304"
+      ],
+      "x_lens": {
+        "depth": 1,
+        "types": [
+          "construct"
+        ]
+      }
+    },
+    "reader": {
+      "rung": "owner"
+    },
+    "want_rows": [
+      {
+        "id": "019a7f00-0000-7000-8000-000000000304",
+        "type": "character",
+        "name": "Ada"
+      },
+      {
+        "id": "019a7f00-0000-7000-8000-000000000310",
+        "type": "construct",
+        "name": "Ada's watch",
+        "supertype": "Lens",
+        "characters": [
+          "019a7f00-0000-7000-8000-000000000304",
+          "019a7f00-0000-7000-8000-000000000305"
+        ],
+        "x_lens": {
+          "depth": 1,
+          "notes": {
+            "019a7f00-0000-7000-8000-000000000304": "She keeps the lamp.",
+            "019a7f00-0000-7000-8000-000000000305": "Heir to the bridge.",
+            "019a7f00-0000-7000-8000-000000000303": "The case.",
+            "019a7f00-0000-7000-8000-000000000302": "The lamp."
+          }
+        }
+      }
+    ]
+  },
+  {
+    "name": "a-pin-on-a-hidden-object-contributor",
+    "world": {
+      "elements": [
+        {
+          "id": "019a7f00-0000-7000-8000-000000000301",
+          "type": "location",
+          "name": "The bridge",
+          "description": "Command and the lamps.\nThe second line.",
+          "defensive_objects": [
+            "019a7f00-0000-7000-8000-000000000302",
+            "019a7f00-0000-7000-8000-000000000303"
+          ],
+          "buildings": [
+            "019a7f00-0000-7000-8000-000000000303"
+          ]
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000302",
+          "type": "object",
+          "name": "Signal lamp"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000303",
+          "type": "object",
+          "name": "Sealed case",
+          "hidden": true
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000304",
+          "type": "character",
+          "name": "Ada"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000305",
+          "type": "character",
+          "name": "The heir",
+          "hidden": true
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000306",
+          "type": "relation",
+          "name": "Ada's ward",
+          "actor": "019a7f00-0000-7000-8000-000000000305",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000304",
+            "019a7f00-0000-7000-8000-000000000305"
+          ]
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000307",
+          "type": "construct",
+          "name": "Bridge watch",
+          "supertype": "Domain",
+          "x_charter_of": "019a7f00-0000-7000-8000-000000000399",
+          "description": "The bridge and its lamps.",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000305"
+          ],
+          "objects": [
+            "019a7f00-0000-7000-8000-000000000302",
+            "019a7f00-0000-7000-8000-000000000303"
+          ],
+          "locations": [
+            "019a7f00-0000-7000-8000-000000000301"
+          ]
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000308",
+          "type": "narrative",
+          "name": "Orders",
+          "supertype": "Message",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000304",
+            "019a7f00-0000-7000-8000-000000000305"
+          ],
+          "narrator": "019a7f00-0000-7000-8000-000000000305",
+          "objects": [
+            "019a7f00-0000-7000-8000-000000000303"
+          ],
+          "created_at": "2026-10-20T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000309",
+          "type": "pin",
+          "name": "Lamp pin",
+          "element_type": "object",
+          "element_id": "019a7f00-0000-7000-8000-000000000303"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000310",
+          "type": "construct",
+          "name": "Ada's watch",
+          "supertype": "Lens",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000304",
+            "019a7f00-0000-7000-8000-000000000305"
+          ],
+          "x_lens": {
+            "depth": 1,
+            "notes": {
+              "019a7f00-0000-7000-8000-000000000304": "She keeps the lamp.",
+              "019a7f00-0000-7000-8000-000000000305": "Heir to the bridge.",
+              "019a7f00-0000-7000-8000-000000000303": "The case.",
+              "019a7f00-0000-7000-8000-000000000302": "The lamp."
+            }
+          }
+        }
+      ],
+      "now": 100
+    },
+    "lens": {
+      "id": "019a7f00-0000-7000-8000-000000000390",
+      "type": "construct",
+      "name": "The reading",
+      "supertype": "Lens",
+      "x_lens": {
+        "types": [
+          "pin"
+        ]
+      }
+    },
+    "reader": {
+      "rung": "contributor"
+    },
+    "want_rows": [
+      {
+        "id": "019a7f00-0000-7000-8000-000000000309",
+        "type": "pin",
+        "name": "Lamp pin",
+        "element_type": "",
+        "element_id": null
+      }
+    ]
+  },
+  {
+    "name": "a-pin-on-a-hidden-object-owner-untouched",
+    "world": {
+      "elements": [
+        {
+          "id": "019a7f00-0000-7000-8000-000000000301",
+          "type": "location",
+          "name": "The bridge",
+          "description": "Command and the lamps.\nThe second line.",
+          "defensive_objects": [
+            "019a7f00-0000-7000-8000-000000000302",
+            "019a7f00-0000-7000-8000-000000000303"
+          ],
+          "buildings": [
+            "019a7f00-0000-7000-8000-000000000303"
+          ]
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000302",
+          "type": "object",
+          "name": "Signal lamp"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000303",
+          "type": "object",
+          "name": "Sealed case",
+          "hidden": true
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000304",
+          "type": "character",
+          "name": "Ada"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000305",
+          "type": "character",
+          "name": "The heir",
+          "hidden": true
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000306",
+          "type": "relation",
+          "name": "Ada's ward",
+          "actor": "019a7f00-0000-7000-8000-000000000305",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000304",
+            "019a7f00-0000-7000-8000-000000000305"
+          ]
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000307",
+          "type": "construct",
+          "name": "Bridge watch",
+          "supertype": "Domain",
+          "x_charter_of": "019a7f00-0000-7000-8000-000000000399",
+          "description": "The bridge and its lamps.",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000305"
+          ],
+          "objects": [
+            "019a7f00-0000-7000-8000-000000000302",
+            "019a7f00-0000-7000-8000-000000000303"
+          ],
+          "locations": [
+            "019a7f00-0000-7000-8000-000000000301"
+          ]
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000308",
+          "type": "narrative",
+          "name": "Orders",
+          "supertype": "Message",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000304",
+            "019a7f00-0000-7000-8000-000000000305"
+          ],
+          "narrator": "019a7f00-0000-7000-8000-000000000305",
+          "objects": [
+            "019a7f00-0000-7000-8000-000000000303"
+          ],
+          "created_at": "2026-10-20T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000309",
+          "type": "pin",
+          "name": "Lamp pin",
+          "element_type": "object",
+          "element_id": "019a7f00-0000-7000-8000-000000000303"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000310",
+          "type": "construct",
+          "name": "Ada's watch",
+          "supertype": "Lens",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000304",
+            "019a7f00-0000-7000-8000-000000000305"
+          ],
+          "x_lens": {
+            "depth": 1,
+            "notes": {
+              "019a7f00-0000-7000-8000-000000000304": "She keeps the lamp.",
+              "019a7f00-0000-7000-8000-000000000305": "Heir to the bridge.",
+              "019a7f00-0000-7000-8000-000000000303": "The case.",
+              "019a7f00-0000-7000-8000-000000000302": "The lamp."
+            }
+          }
+        }
+      ],
+      "now": 100
+    },
+    "lens": {
+      "id": "019a7f00-0000-7000-8000-000000000390",
+      "type": "construct",
+      "name": "The reading",
+      "supertype": "Lens",
+      "x_lens": {
+        "types": [
+          "pin"
+        ]
+      }
+    },
+    "reader": {
+      "rung": "owner"
+    },
+    "want_rows": [
+      {
+        "id": "019a7f00-0000-7000-8000-000000000309",
+        "type": "pin",
+        "name": "Lamp pin",
+        "element_type": "object",
+        "element_id": "019a7f00-0000-7000-8000-000000000303"
+      }
+    ]
+  }
+]

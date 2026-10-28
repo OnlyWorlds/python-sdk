@@ -486,3 +486,28 @@ def test_a_whole_number_key_refuses_a_float_and_a_date_field_reads_one_whole() -
     world = {"elements": [{"id": _id(1), "type": "event", "name": "e", "start_date": 7.0}]}
     assert resolve_lens(world, LENS, OWNER, as_of=6)["cut"] == {"after_as_of": 1}
     assert resolve_lens(world, LENS, OWNER, as_of=7)["kept"] == [_id(1)]
+
+
+# A row is the body as the reader is served it (lens.md, "Resolution"; keel elements/serialize.py and
+# elements/visibility.py redact): a reader that is not the owner gets, in every link field, only ids it sees, a Pin's
+# generic pair emptied when its target is unseen, and a lens's notes keyed to an unseen element left out;
+# x_served_trimmed names only a Message's characters and narrator and a lens's anchor fields and notes, below
+# co-builder and never on the public rung. The owner's rows are its bodies untouched. The same file byte for byte as
+# the npm SDK's test/fixtures/row-trim-cases.json (both suites hold its sha256), answers written by hand.
+ROW_TRIM_FILE = REPO / "tests" / "fixtures" / "row-trim-cases.json"
+ROW_TRIM_SHA256 = "c4d04b62ca7088f500af063545aa36655c0cf0ed244cb3a793c129d5dc11a8bd"
+
+
+def test_a_readers_rows_carry_only_ids_it_sees() -> None:
+    raw = ROW_TRIM_FILE.read_bytes()
+    assert hashlib.sha256(raw).hexdigest() == ROW_TRIM_SHA256
+    cases = json.loads(raw.decode("utf-8"))
+    wrong = []
+    for c in cases:
+        got = resolve_lens(c["world"], c["lens"], c["reader"])["rows"]
+        if got != c["want_rows"]:
+            wrong.append(f"{c['name']}: gave {got!r}, wants {c['want_rows']!r}")
+    for line in wrong:
+        print(line)
+    assert wrong == []
+    assert len(cases) == 20
