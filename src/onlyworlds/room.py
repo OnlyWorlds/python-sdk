@@ -1,4 +1,5 @@
-"""The room profile (schema-dist ``profiles/room.md``, serial 45): which elements a parlor puts in a world.
+"""The room profile (schema-dist ``profiles/room.md``, serial 45; the mark by presence, serial 83): which elements a
+parlor puts in a world.
 
 A parlor's lines, board entries, work items, specs, hearts, votes, sittings and member cards live in
 the world as ordinary elements, told apart by type and supertype and marked with ``x_room_of`` (the id
@@ -54,11 +55,18 @@ def _fold(text: str) -> str:
     return simple_case_fold(text.strip(_WHITE_SPACE))
 
 
+def _has_mark(value: Any) -> bool:
+    """The room and charter profiles' presence rule for a mark (``x_room_of``, ``x_charter_of``): any value but
+    ``None``; a string only when something is left after trimming White_Space. Never compared to anything."""
+    return value is not None and not (isinstance(value, str) and value.strip(_WHITE_SPACE) == "")
+
+
 def is_room_element(element: Mapping[str, Any] | FolderElement) -> bool:
     """True when the element's type and supertype, each trimmed (Unicode White_Space at both ends, so a
     leading byte order mark is no match) and compared without regard to case (Unicode simple case
     folding, the ``.owworld`` reader's table), match one of ``ROOM_PAIRS``, AND it
-    carries the mark ``x_room_of`` as a non-empty string.
+    carries the mark ``x_room_of``, read by presence (serial 83): any value but ``None``, a string only when
+    something is left after trimming it, and the value is never compared (a number counts, ``"  "`` does not).
 
     Both, always: a pair without the mark is lore (a novel's letters are Narratives with supertype
     Message), and a mark without a pair is not a room element (a malformed mark: report it, never hide
@@ -77,7 +85,7 @@ def is_room_element(element: Mapping[str, Any] | FolderElement) -> bool:
     supertype, mark = body.get("supertype"), body.get(ROOM_MARK)
     if not isinstance(kind, str) or not isinstance(supertype, str):
         return False
-    if not isinstance(mark, str) or mark == "":
+    if not _has_mark(mark):
         return False
     key = (_fold(kind), _fold(supertype))
     return any((_fold(t), _fold(s)) == key for t, s in ROOM_PAIRS)
@@ -105,8 +113,7 @@ def _reading_aid_key(element: Any) -> str | None:
     key = f"{_fold(kind)}/{_fold(supertype)}"
     if key not in _READING_AID_KEYS:
         return None
-    mark = body.get(READING_AID_MARK)
-    if mark is None or (isinstance(mark, str) and mark.strip(_WHITE_SPACE) == ""):
+    if not _has_mark(body.get(READING_AID_MARK)):
         return None
     return key
 

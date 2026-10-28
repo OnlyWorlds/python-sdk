@@ -38,15 +38,26 @@ def test_is_room_element_answers_every_fixture_case() -> None:
         if (got := is_room_element(c["element"])) is not c["in_room"]
     ]
     assert wrong == []
-    assert len(cases) == 28, f"the fixture holds {len(cases)} cases, serial 71 has 28"
+    assert len(cases) == 32, f"the fixture holds {len(cases)} cases, serial 83 has 32"
 
 
-def test_without_a_string_type_supertype_or_mark_it_is_not_in_the_room() -> None:
+def test_without_a_string_type_or_supertype_or_a_mark_it_is_not_in_the_room() -> None:
     assert is_room_element({}) is False
     assert is_room_element({"type": "narrative", "x_room_of": WORLD}) is False
     assert is_room_element({"supertype": "Message", "x_room_of": WORLD}) is False
     assert is_room_element({"type": "narrative", "supertype": "   ", "x_room_of": WORLD}) is False
-    assert is_room_element({"type": "narrative", "supertype": "Message", "x_room_of": 7}) is False
+    assert is_room_element({"type": "narrative", "supertype": "Message", "x_room_of": None}) is False
+    assert is_room_element({"type": "narrative", "supertype": "Message"}) is False
+
+
+def test_the_mark_is_read_by_presence_never_by_its_value() -> None:
+    """room.md (serial 83): a mark counts when its value is not null, a string only when something is left after
+    the White_Space trim; any other value counts as present."""
+    message = {"type": "narrative", "supertype": "Message"}
+    for mark in (7, 0, False, {}, [], {"world": WORLD}, "x", chr(0x1F), chr(0xFEFF), f"  {WORLD}  "):
+        assert is_room_element({**message, "x_room_of": mark}) is True, repr(mark)
+    for mark in (None, "", " ", chr(0xA0) + chr(0x3000), "\t\n"):
+        assert is_room_element({**message, "x_room_of": mark}) is False, repr(mark)
 
 
 def test_the_fold_is_unicode_simple_case_folding_as_the_npm_sdk() -> None:
