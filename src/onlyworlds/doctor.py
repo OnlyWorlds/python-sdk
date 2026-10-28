@@ -1321,7 +1321,7 @@ def _charters(run: _Run, els: list[_El], rows: list[dict[str, Any]], head: Any, 
         return
     for el in charters:
         if el.type != "law":
-            # BrainBoost files its charter as a Construct: still a charter to this flag,
+            # A company world may file its charter as a Construct: still a charter to this flag,
             # but keel's world page and the parlor read a Law with supertype Charter, so say so.
             run.find(
                 "8",

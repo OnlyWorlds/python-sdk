@@ -318,7 +318,7 @@ def test_6b_skips_the_types_whose_text_is_description_alone(tmp_path: Path) -> N
 
 
 def test_a_finding_on_a_message_is_kind_message(tmp_path: Path) -> None:
-    # BrainBoost: two "Re:" messages collided by name; they are room things, not facts about the world
+    # A company world: two "Re:" messages collided by name; they are room things, not facts about the world
     re1 = {"id": "n0000000-0000-7000-8000-000000000002", "name": "Re: Plans", "supertype": "Message", "story": "Yes."}
     re2 = {**re1, "id": "n0000000-0000-7000-8000-000000000003", "story": "No."}
     planted = folder_report(tmp_path, with_(clean(), "narrative", {**re1, "narrator": C1}, {**re2, "narrator": C1}))
@@ -632,7 +632,7 @@ def test_8_a_charter_untouched_after_n_changes() -> None:
 
 
 def test_8_a_charter_filed_as_a_construct_is_found_and_named() -> None:
-    # BrainBoost's case (TC): the charter is a Construct with supertype Charter, no Law.
+    # A company world's case: the charter is a Construct with supertype Charter, no Law.
     con1 = "d0000000-0000-7000-8000-000000000001"
     base = edit(clean(), "law", LAW1, supertype="Decree")
     base["construct"] = [{"id": con1, "name": "Charter", "supertype": "Charter", "description": "Our rules."}]
@@ -1182,8 +1182,8 @@ def test_11_apply_checks_never_changes_the_rules() -> None:
     assert rules == before
 
 
-def bb_world(rules: Any = None, *, key: bool = True) -> Elements:
-    """The clean world, its Charter carrying BrainBoost's three rules (the fixture's first three), one
+def fernhollow_world(rules: Any = None, *, key: bool = True) -> Elements:
+    """The clean world, its Charter carrying Fernhollow's three rules (the fixture's first three), one
     Character without a reputation, a Funding line short of Next and roles, and two lines that hold."""
     base = with_(
         clean(),
@@ -1223,8 +1223,8 @@ def bb_world(rules: Any = None, *, key: bool = True) -> Elements:
     return base
 
 
-def test_11_brainboosts_three_rules_on_a_folder(tmp_path: Path) -> None:
-    r = folder_report(tmp_path, bb_world())
+def test_11_fernhollows_three_rules_on_a_folder(tmp_path: Path) -> None:
+    r = folder_report(tmp_path, fernhollow_world())
     assert HR in r.ran
     got = sorted((f["element"]["id"], f["evidence"]["rule"]) for f in found(r, HR))
     assert got == sorted([(C1, 0), (R3, 1), (R3, 2)])
@@ -1245,9 +1245,9 @@ def test_11_brainboosts_three_rules_on_a_folder(tmp_path: Path) -> None:
     assert c["rules"][1]["rule"] == "a live line carries its Next"
 
 
-def test_11_brainboosts_three_rules_in_prose_and_json(tmp_path: Path) -> None:
+def test_11_fernhollows_three_rules_in_prose_and_json(tmp_path: Path) -> None:
     root = tmp_path / "w"
-    write_folder(root, WORLD, bb_world())
+    write_folder(root, WORLD, fernhollow_world())
     code, out, _ = run_main([str(root)])
     lines = out.splitlines()
     assert code == 1
@@ -1265,7 +1265,7 @@ def test_11_brainboosts_three_rules_in_prose_and_json(tmp_path: Path) -> None:
 
 def test_11_the_key_is_read_from_the_charters_file(tmp_path: Path) -> None:
     root = tmp_path / "w"
-    write_folder(root, WORLD, bb_world())
+    write_folder(root, WORLD, fernhollow_world())
     (path,) = [p for p in (root / "elements" / "law").glob("*.json")]
     assert json.loads(path.read_text(encoding="utf-8"))["x_checks_rules"] == checks_fixture()["rules"][:3]
     before = snapshot(root)
@@ -1274,13 +1274,13 @@ def test_11_the_key_is_read_from_the_charters_file(tmp_path: Path) -> None:
     assert snapshot(root) == before  # never written, reordered or repaired
 
 
-def test_11_brainboosts_three_rules_through_the_api() -> None:
-    r = api_report(FakeReader(on_the_wire(bb_world())))
+def test_11_fernhollows_three_rules_through_the_api() -> None:
+    r = api_report(FakeReader(on_the_wire(fernhollow_world())))
     assert sorted((f["element"]["id"], f["evidence"]["rule"]) for f in found(r, HR)) == sorted(
         [(C1, 0), (R3, 1), (R3, 2)]
     )
     assert r.compared[HR]["view"] == "owner"
-    assert api_report(FakeReader(on_the_wire(bb_world()), role="guest")).compared[HR]["view"] == "guest"
+    assert api_report(FakeReader(on_the_wire(fernhollow_world()), role="guest")).compared[HR]["view"] == "guest"
 
 
 # The Charter is the newest marked Charter (the charter profile, serial 83): a Law with supertype Charter
@@ -1293,9 +1293,9 @@ ONE_RULE = [{"rule": "Every Location says where it is.", "where": {"type": "loca
 
 
 def two_charters(*, marked: bool, newer: bool, rules_on_second: bool = True, maker: str | None = SEAT) -> Elements:
-    """bb_world's Charter (marked, created 2026-01-02) and a second Law with supertype Charter, ``marked`` or
+    """fernhollow_world's Charter (marked, created 2026-01-02) and a second Law with supertype Charter, ``marked`` or
     not, made by ``maker``, created before or after it, carrying ONE_RULE."""
-    base = edit(bb_world(), "law", LAW1, created_at="2026-01-02T00:00:00Z")
+    base = edit(fernhollow_world(), "law", LAW1, created_at="2026-01-02T00:00:00Z")
     second: dict[str, Any] = {
         "id": LAW2,
         "name": "Seat's Charter",
@@ -1354,18 +1354,18 @@ def test_11_an_unmarked_charter_is_lore_even_when_newer(tmp_path: Path) -> None:
 
 
 def test_11_no_marked_charter_applies_no_rule(tmp_path: Path) -> None:
-    r = folder_report(tmp_path, edit(bb_world(), "law", LAW1, x_charter_of="  "))
+    r = folder_report(tmp_path, edit(fernhollow_world(), "law", LAW1, x_charter_of="  "))
     assert r.compared[HR]["charter"] is None and r.compared[HR]["rules"] == [] and r.compared[HR]["marked"] == 0
     assert found(r, HR) == []  # the unmarked Law and its rules are lore: no rule checked, no finding
 
 
 def test_11_the_marks_value_is_never_compared(tmp_path: Path) -> None:
-    copied = edit(bb_world(), "law", LAW1, x_charter_of="0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f")
+    copied = edit(fernhollow_world(), "law", LAW1, x_charter_of="0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f")
     assert folder_report(tmp_path, copied).compared[HR]["charter"] == LAW1
 
 
 def test_11_a_charter_hidden_from_others_is_still_the_owners_folders_charter(tmp_path: Path) -> None:
-    r = folder_report(tmp_path, edit(bb_world(), "law", LAW1, hidden=True))
+    r = folder_report(tmp_path, edit(fernhollow_world(), "law", LAW1, hidden=True))
     assert r.compared[HR]["charter"] == LAW1 and r.compared[HR]["n"] == 3
 
 
@@ -1396,7 +1396,7 @@ def test_11_an_unmarked_seats_charter_is_never_applied_through_the_api() -> None
 
 
 def test_11_the_api_says_so_when_front_door_names_a_law_it_did_not_list() -> None:
-    reader = FakeReader(on_the_wire(bb_world()), front_door={"charter": LAW2})
+    reader = FakeReader(on_the_wire(fernhollow_world()), front_door={"charter": LAW2})
     r = api_report(reader)
     (world,) = [f for f in found(r, HR) if f["element"] is None]
     assert (
@@ -1407,7 +1407,7 @@ def test_11_the_api_says_so_when_front_door_names_a_law_it_did_not_list() -> Non
 
 def test_11_the_packet_takes_the_short_elements(tmp_path: Path) -> None:
     root = tmp_path / "w"
-    write_folder(root, WORLD, bb_world())
+    write_folder(root, WORLD, fernhollow_world())
     code, out, _ = run_main([str(root), "--packet"])
     (packet,) = json.loads(out)
     entries = {e["id"]: e["reason"] for e in packet["x_packet_elements"]}
@@ -1418,7 +1418,7 @@ def test_11_the_packet_takes_the_short_elements(tmp_path: Path) -> None:
 
 
 def test_11_a_charter_without_the_key_runs_and_checks_nothing(tmp_path: Path) -> None:
-    r = folder_report(tmp_path, bb_world(key=False))
+    r = folder_report(tmp_path, fernhollow_world(key=False))
     assert HR in r.ran and found(r, HR) == []
     assert r.compared[HR] == {
         "n": 0,
@@ -1440,12 +1440,12 @@ def test_11_a_charter_without_the_key_runs_and_checks_nothing(tmp_path: Path) ->
 
 
 def test_11_an_empty_list_checks_nothing_and_finds_nothing(tmp_path: Path) -> None:
-    r = folder_report(tmp_path, bb_world([]))
+    r = folder_report(tmp_path, fernhollow_world([]))
     assert found(r, HR) == [] and r.compared[HR]["of"] == 0
 
 
 def test_11_a_key_that_is_not_a_list_is_one_finding_on_the_charter(tmp_path: Path) -> None:
-    r = folder_report(tmp_path, bb_world({"rule": "every Character carries a reputation"}))
+    r = folder_report(tmp_path, fernhollow_world({"rule": "every Character carries a reputation"}))
     (f,) = found(r, HR)
     assert f["element"]["id"] == LAW1
     assert f["reason"] == "x_checks_rules is not a list (an object), so no house rule on it is checked"
@@ -1456,7 +1456,7 @@ def test_11_a_key_that_is_not_a_list_is_one_finding_on_the_charter(tmp_path: Pat
 def test_11_a_fifth_predicate_is_not_checked_and_said(tmp_path: Path) -> None:
     fifth = checks_fixture()["not_checked"][0]["rule"]
     assert "longer_than" in fifth["require"]
-    r = folder_report(tmp_path, bb_world([*checks_fixture()["rules"][:1], fifth]))
+    r = folder_report(tmp_path, fernhollow_world([*checks_fixture()["rules"][:1], fifth]))
     nc = [f for f in found(r, HR) if f["element"]["id"] == LAW1]
     (f,) = nc
     assert f["reason"].startswith('house rule 1, "a fifth predicate", is not checked: ')
@@ -1472,7 +1472,7 @@ def test_11_a_fifth_predicate_is_not_checked_and_said(tmp_path: Path) -> None:
 
 def test_11_a_known_of_stub_is_not_judged(tmp_path: Path) -> None:
     stub = {"id": C3, "name": "Cy", "known_of": True}
-    r = folder_report(tmp_path, with_(bb_world(), "character", stub))
+    r = folder_report(tmp_path, with_(fernhollow_world(), "character", stub))
     assert C3 not in {f["element"]["id"] for f in found(r, HR)}
     assert r.compared[HR]["stubs_not_judged"] == 1
     assert r.compared[HR]["rules"][0]["scoped"] == 2
