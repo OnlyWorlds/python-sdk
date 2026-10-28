@@ -2,15 +2,20 @@
   "_what": "The recorded pin for the vendored OnlyWorlds schema distribution (codegen/schema-dist/, copied byte-exact). Do not edit by hand; re-vendor from the pinned tag and review the diff. Kept equal to the npm SDK's pin (github.com/OnlyWorlds/sdk, codegen/schema-pin.json) on purpose: two clients, one schema.",
   "_why_manifest_sha256": "Verifying the tree against its own MANIFEST.json only proves internal consistency. If the tag moved, the manifest moved with it. The hash recorded here is the one first accepted, which is what makes a moved tag visible.",
   "repo": "https://github.com/OnlyWorlds/schema-dist",
-  "tag": "v0.33.0-dist.81",
-  "commit": "3a757879f163fb52b5320042ceffa4bba3f06078",
-  "manifest_sha256": "8a8c4412ccee14e04471f194c3563c317188149b1045232735c19d00e8c1728f",
+  "tag": "v0.33.0-dist.82",
+  "commit": "c19e402c009f7887743ba59b9db8b9b757a099fd",
+  "manifest_sha256": "22b718e781df1f8469378e18475db9f034dfde68c220bd4c85364643e5496799",
   "canonical_version": "00.33.00",
-  "dist_serial": 81,
-  "published": "2026-10-27",
-  "pinned_at": "2026-10-27",
+  "dist_serial": 82,
+  "published": "2026-10-28",
+  "pinned_at": "2026-10-28",
   "pinned_by": "The maintainer: tree from `git archive` of the tag in a schema-dist checkout (195 files, every one the MANIFEST lists); files re-hashed against MANIFEST.json by generate_schema.py; MANIFEST self-hash matched against the raw file GitHub serves at the tag, whose ref resolves to the commit above.",
   "previous_pins": [
+    {
+      "tag": "v0.33.0-dist.81",
+      "manifest_sha256": "8a8c4412ccee14e04471f194c3563c317188149b1045232735c19d00e8c1728f",
+      "note": "superseded by v0.33.0-dist.82 (the lens profile's reading aids, the charter, its guide and its domains, by the pair and the mark x_charter_of; changed_within, counted stale; a lens served only as a stub reads as not there; the fixture's lens cases, 132)"
+    },
     {
       "tag": "v0.33.0-dist.80",
       "manifest_sha256": "535f0ad756df24118725757b0fc187a1881576338519add520232404ce8a1813",

@@ -5,7 +5,7 @@
     "pair: construct + supertype Lens, each trimmed and folded like the room profile's pairs; a template is a lens whose subtype, trimmed and folded, is Template.",
     "keys: the legal values of x_lens; a case's legal is what a reader's check answers, and bad names the first key refused (x_lens itself when the value is not an object).",
     "worlds: each world's elements as its owner is served them, the ids its hidden mark keeps from every reader but the owner, and its readers. A reader's rung is owner (the whole world), contributor (the world less the hidden), guest (exactly the whole and known_of ids it lists; known_of is a stub) or public (the world less the hidden and the room elements). An element whose x_review_proposed holds any value but null is in no reader's view (the review profile's rule for a reader that hands a world on). A reader with as is the owner reading as that reader: the reader's view, and the owner's two counts (anchor_not_visible, not_visible).",
-    "resolve: lens is the lens read, a body or the id of a lens in the world; as_of is the reading's date (absent: the world's now; with neither, no fence and the window cuts nothing); clock is the reading's time for the mail rule. kept is the resolved set in order, cut the count by reason (a reason with no count is absent). rows, where given, are the kept rows as show makes them; mail, where given, is the mail rule's part; notes_ignored counts notes on ids that are not anchors.",
+    "resolve: lens is the lens read, a body or the id of a lens in the world; as_of is the reading's date (absent: the world's now; with neither, no fence and the window cuts nothing); clock is the reading's wall clock, for the mail rule and changed_within. kept is the resolved set in order, cut the count by reason (a reason with no count is absent). rows, where given, are the kept rows as show makes them; mail, where given, is the mail rule's part; notes_ignored counts notes on ids that are not anchors.",
     "invariant: subset (each reader's kept is a subset of the owner's, and no secret's id or name appears anywhere in a non-owner result), same_without (each reader's result is identical with the without ids removed from the world), unchanged (the world is identical before and after every reader's reading).",
     "uses: which lenses a seat reads, from its membership's choice (null: none made) and its Character's x_lens_uses.",
     "graph: a case carries its own small world (the elements as the owner is served them, hidden: true on an element the hidden mark keeps, a room element by its pair and x_room_of, a proposed one by x_review_proposed) and reader (rung; a guest's whole and known_of; the owner's as), because the order case needs ids above U+FFFF that no uuid can carry; options are the graph's flags and lens (an id, or a lens body); want is the nodes in order with their marks, the edges in order, edges_cut, the lens's cut and unreadable; edges_cut_reasons lists every reason an edge can be cut by, the graph's own first, then a lens's; graph_links is the closed table of extension fields that make an edge."
@@ -85,10 +85,20 @@
     "event/sitting",
     "character/member"
   ],
+  "reading_aid_pairs": [
+    "law/charter",
+    "construct/guide",
+    "construct/domain"
+  ],
+  "reading_aid_mark": {
+    "field": "x_charter_of",
+    "value": "the id of the world the aid belongs to"
+  },
   "cut_reasons": [
     "budget",
     "types",
     "window",
+    "stale",
     "undated",
     "after_as_of",
     "anchor_not_visible",
@@ -410,6 +420,68 @@
             "depth": 1
           },
           "updated_at": "2026-09-04T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000080",
+          "type": "institution",
+          "name": "The Desk",
+          "constructs": [
+            "019a7f00-0000-7000-8000-000000000082"
+          ],
+          "updated_at": "2026-10-02T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000081",
+          "type": "law",
+          "name": "House Rules",
+          "supertype": "Charter",
+          "author": "019a7f00-0000-7000-8000-000000000080",
+          "updated_at": "2026-10-03T12:00:00Z",
+          "x_charter_of": "019a7f00-0000-7000-8000-00000000f002"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000082",
+          "type": "construct",
+          "name": "Reporting",
+          "supertype": "Domain",
+          "updated_at": "2026-10-04T12:00:00Z",
+          "x_charter_of": "019a7f00-0000-7000-8000-00000000f002"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000083",
+          "type": "institution",
+          "name": "The Bindery",
+          "objects": [
+            "019a7f00-0000-7000-8000-000000000084",
+            "019a7f00-0000-7000-8000-000000000085"
+          ],
+          "updated_at": "2026-09-17T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000084",
+          "type": "object",
+          "name": "Proof Sheet",
+          "updated_at": "2026-10-24T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000085",
+          "type": "object",
+          "name": "Old Plate",
+          "updated_at": "2026-09-27T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000089",
+          "type": "institution",
+          "name": "The Harbour Board",
+          "updated_at": "2026-10-05T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000088",
+          "type": "law",
+          "name": "Harbour Charter",
+          "supertype": "Charter",
+          "author": "019a7f00-0000-7000-8000-000000000089",
+          "updated_at": "2026-10-06T12:00:00Z"
         }
       ],
       "hidden": [],
@@ -788,6 +860,7 @@
         ],
         "window": 30,
         "undated": "exclude",
+        "changed_within": 7,
         "show": "first_line",
         "budget": 1000,
         "mail": "unread_full_read_titles",
@@ -2696,6 +2769,182 @@
       }
     },
     {
+      "name": "reading-aids-are-cut-as-types-by-default",
+      "kind": "resolve",
+      "world": "office",
+      "reader": "contributor",
+      "lens": {
+        "id": "019a7f00-0000-7000-8000-000000000086",
+        "type": "construct",
+        "name": "A lens",
+        "supertype": "Lens",
+        "subtype": "",
+        "institutions": [
+          "019a7f00-0000-7000-8000-000000000080"
+        ]
+      },
+      "kept": [
+        "019a7f00-0000-7000-8000-000000000080"
+      ],
+      "cut": {
+        "types": 2
+      },
+      "note": "The Desk's charter links it and its domain is linked from it: a reading aid, not lore, so a hop does not keep either unless types names the pair."
+    },
+    {
+      "name": "types-names-a-reading-aid-pair",
+      "kind": "resolve",
+      "world": "office",
+      "reader": "contributor",
+      "lens": {
+        "id": "019a7f00-0000-7000-8000-000000000086",
+        "type": "construct",
+        "name": "A lens",
+        "supertype": "Lens",
+        "subtype": "",
+        "institutions": [
+          "019a7f00-0000-7000-8000-000000000080"
+        ],
+        "x_lens": {
+          "types": [
+            "construct/domain"
+          ]
+        }
+      },
+      "kept": [
+        "019a7f00-0000-7000-8000-000000000080",
+        "019a7f00-0000-7000-8000-000000000082"
+      ],
+      "cut": {
+        "types": 1
+      },
+      "note": "The domain's pair is named and kept; the charter's is not."
+    },
+    {
+      "name": "a-charter-without-the-mark-is-lore",
+      "kind": "resolve",
+      "world": "office",
+      "reader": "contributor",
+      "lens": {
+        "id": "019a7f00-0000-7000-8000-000000000090",
+        "type": "construct",
+        "name": "A lens",
+        "supertype": "Lens",
+        "subtype": "",
+        "institutions": [
+          "019a7f00-0000-7000-8000-000000000089"
+        ]
+      },
+      "kept": [
+        "019a7f00-0000-7000-8000-000000000089",
+        "019a7f00-0000-7000-8000-000000000088"
+      ],
+      "cut": {},
+      "note": "The Harbour Charter is a Law with supertype Charter and no x_charter_of: lore, kept by a lens with no types like any Law."
+    },
+    {
+      "name": "a-reading-aid-anchor-is-followed-like-any-anchor",
+      "kind": "resolve",
+      "world": "office",
+      "reader": "contributor",
+      "lens": {
+        "id": "019a7f00-0000-7000-8000-000000000091",
+        "type": "construct",
+        "name": "A lens",
+        "supertype": "Lens",
+        "subtype": "",
+        "constructs": [
+          "019a7f00-0000-7000-8000-000000000082"
+        ]
+      },
+      "kept": [
+        "019a7f00-0000-7000-8000-000000000082",
+        "019a7f00-0000-7000-8000-000000000080"
+      ],
+      "cut": {},
+      "note": "The lens starts from the Reporting domain and no types: the domain is kept and its links are followed, so The Desk that names it is kept. A room anchor is never followed; a reading aid anchor is."
+    },
+    {
+      "name": "a-hop-cuts-a-marked-charter-when-types-names-only-law",
+      "kind": "resolve",
+      "world": "office",
+      "reader": "contributor",
+      "lens": {
+        "id": "019a7f00-0000-7000-8000-000000000092",
+        "type": "construct",
+        "name": "A lens",
+        "supertype": "Lens",
+        "subtype": "",
+        "institutions": [
+          "019a7f00-0000-7000-8000-000000000080"
+        ],
+        "x_lens": {
+          "types": [
+            "institution",
+            "law"
+          ]
+        }
+      },
+      "kept": [
+        "019a7f00-0000-7000-8000-000000000080"
+      ],
+      "cut": {
+        "types": 2
+      },
+      "note": "A hop reaches the House Rules charter and the Reporting domain; the plain type law keeps no marked charter, so both are cut as types."
+    },
+    {
+      "name": "changed-within-cuts-what-is-stale",
+      "kind": "resolve",
+      "world": "office",
+      "reader": "contributor",
+      "lens": {
+        "id": "019a7f00-0000-7000-8000-000000000087",
+        "type": "construct",
+        "name": "A lens",
+        "supertype": "Lens",
+        "subtype": "",
+        "institutions": [
+          "019a7f00-0000-7000-8000-000000000083"
+        ],
+        "x_lens": {
+          "changed_within": 7
+        }
+      },
+      "clock": "2026-10-27T12:00:00Z",
+      "kept": [
+        "019a7f00-0000-7000-8000-000000000083",
+        "019a7f00-0000-7000-8000-000000000084"
+      ],
+      "cut": {
+        "stale": 1
+      },
+      "note": "The Proof Sheet changed 3 days before the clock and is kept; the Old Plate 30 days before and is cut. The Bindery changed 40 days before and is kept: changed_within never applies to an anchor."
+    },
+    {
+      "name": "no-changed-within-keeps-what-is-stale",
+      "kind": "resolve",
+      "world": "office",
+      "reader": "contributor",
+      "lens": {
+        "id": "019a7f00-0000-7000-8000-000000000087",
+        "type": "construct",
+        "name": "A lens",
+        "supertype": "Lens",
+        "subtype": "",
+        "institutions": [
+          "019a7f00-0000-7000-8000-000000000083"
+        ]
+      },
+      "clock": "2026-10-27T12:00:00Z",
+      "kept": [
+        "019a7f00-0000-7000-8000-000000000083",
+        "019a7f00-0000-7000-8000-000000000084",
+        "019a7f00-0000-7000-8000-000000000085"
+      ],
+      "cut": {}
+    },
+    {
       "name": "a mirror pair is two edges, a one-way link one",
       "kind": "graph",
       "world": {
@@ -2948,6 +3197,62 @@
             "index": 0
           }
         ],
+        "edges_cut": {},
+        "cut": {},
+        "unreadable": null
+      }
+    },
+    {
+      "name": "a lens the reader holds only as a stub reads as nothing",
+      "kind": "graph",
+      "world": {
+        "elements": [
+          {
+            "id": "L1",
+            "type": "construct",
+            "supertype": "Lens",
+            "name": "Ada's lens",
+            "characters": [
+              "c1"
+            ],
+            "x_lens": {
+              "types": [
+                "character"
+              ]
+            }
+          },
+          {
+            "id": "c1",
+            "type": "character",
+            "name": "Ada",
+            "friends": [
+              "c2"
+            ]
+          },
+          {
+            "id": "c2",
+            "type": "character",
+            "name": "Bo"
+          }
+        ]
+      },
+      "reader": {
+        "rung": "guest",
+        "character": "c1",
+        "whole": [
+          "c1",
+          "c2"
+        ],
+        "known_of": [
+          "L1"
+        ]
+      },
+      "options": {
+        "lens": "L1"
+      },
+      "want": {
+        "nodes": [],
+        "edges": [],
         "edges_cut": {},
         "cut": {},
         "unreadable": null
@@ -5934,6 +6239,125 @@
         "cut": {},
         "unreadable": null
       }
+    },
+    {
+      "name": "a charter is out of an unlensed graph as reading_aid",
+      "kind": "graph",
+      "world": {
+        "elements": [
+          {
+            "id": "t1",
+            "type": "title",
+            "name": "Keeper",
+            "laws": [
+              "ch1",
+              "lw1"
+            ]
+          },
+          {
+            "id": "ch1",
+            "type": "law",
+            "name": "House Rules",
+            "supertype": "Charter",
+            "x_charter_of": "w1"
+          },
+          {
+            "id": "lw1",
+            "type": "law",
+            "name": "Harbour Law"
+          }
+        ]
+      },
+      "reader": {
+        "rung": "owner"
+      },
+      "want": {
+        "nodes": [
+          {
+            "id": "lw1",
+            "type": "law",
+            "name": "Harbour Law",
+            "family": "abstract",
+            "icon": "gpp_bad"
+          },
+          {
+            "id": "t1",
+            "type": "title",
+            "name": "Keeper",
+            "family": "abstract",
+            "icon": "military_tech"
+          }
+        ],
+        "edges": [
+          {
+            "source": "t1",
+            "field": "laws",
+            "target": "lw1",
+            "index": 1
+          }
+        ],
+        "edges_cut": {
+          "reading_aid": 1
+        },
+        "cut": {
+          "reading_aid": 1
+        },
+        "unreadable": null
+      }
+    },
+    {
+      "name": "a charter without the mark is lore in an unlensed graph",
+      "kind": "graph",
+      "world": {
+        "elements": [
+          {
+            "id": "t1",
+            "type": "title",
+            "name": "Crown",
+            "laws": [
+              "ch1"
+            ]
+          },
+          {
+            "id": "ch1",
+            "type": "law",
+            "name": "Royal Charter",
+            "supertype": "Charter"
+          }
+        ]
+      },
+      "reader": {
+        "rung": "owner"
+      },
+      "want": {
+        "nodes": [
+          {
+            "id": "ch1",
+            "type": "law",
+            "name": "Royal Charter",
+            "family": "abstract",
+            "icon": "gpp_bad"
+          },
+          {
+            "id": "t1",
+            "type": "title",
+            "name": "Crown",
+            "family": "abstract",
+            "icon": "military_tech"
+          }
+        ],
+        "edges": [
+          {
+            "source": "t1",
+            "field": "laws",
+            "target": "ch1",
+            "index": 0
+          }
+        ],
+        "edges_cut": {},
+        "cut": {},
+        "unreadable": null
+      }
     }
   ],
   "graph_links": [
@@ -5955,11 +6379,13 @@
     "hidden",
     "proposed",
     "map_space",
+    "reading_aid",
     "not_visible",
     "outside_lens",
     "budget",
     "types",
     "window",
+    "stale",
     "undated",
     "after_as_of",
     "anchor_not_visible",

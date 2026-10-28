@@ -1,5 +1,5 @@
 """The lens profile's graph section: ``world_graph`` on the graph kind of
-``codegen/schema-dist/profiles/lens.fixture.json`` (schema-dist serial 81, vendored with the pin; the MANIFEST holds
+``codegen/schema-dist/profiles/lens.fixture.json`` (schema-dist serial 82, vendored with the pin; the MANIFEST holds
 its sha256, the npm SDK runs the same cases), the section's invariants checked on every answer, and the fixture's graph
 tables read back."""
 
@@ -128,7 +128,7 @@ def test_the_fixtures_graph_cases() -> None:
     for line in wrong:
         print(line)
     assert wrong == []
-    assert len(cases) == 34, f"the fixture holds {len(cases)} graph cases, serial 81 has 34"
+    assert len(cases) == 37, f"the fixture holds {len(cases)} graph cases, serial 82 has 37"
 
 
 def test_the_fixtures_graph_tables_read_back_through_the_reader() -> None:

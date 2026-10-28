@@ -56,6 +56,8 @@ The reading is the form (`human` or `text`), the world (`null` in the in-world t
 - **Not an identity key.** `x_identity_key` (the identity profile) says two elements in different worlds are the same being. An address only points at one element; two addresses to one element say nothing about who it is.
 - **Not a promise that the target exists**, or that the reader may see it. The site's public page answers only while the world's page is on, and its element pages serve 19 of the 22 types: a pin, a marker or a zone at its human address answers the site's page for a missing element. The address is still theirs, and a tool that opens an element by its triple opens them.
 
+**What onlyworlds.com commits to**: an id is never reused; an address outlives a rename of the element or the world; a deleted element answers like a missing one (the same 404 as a closed door).
+
 **Where it is read from.** The packages publish the two directions, `elementAddress` (a triple, or a world, to a string) and `parseOwLink` (a string to a reading), in npm and Python, from this page and its fixture. The conformance fixture beside this page, `address.fixture.json`, holds the cases a reader and a writer must agree on: each spelling with and without each option, a world's own address, a slug, the 22 type words, and every refusal by name, each case naming its claim. A reader conforms when it passes every case.
 
 **Ruled** 2026-10-26: the canonical human address, the two text forms, the moment and the lens, and the convention for a field. Written 2026-10-27, the world's own address added the same day.
