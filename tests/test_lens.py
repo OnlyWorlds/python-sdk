@@ -495,7 +495,7 @@ def test_a_whole_number_key_refuses_a_float_and_a_date_field_reads_one_whole() -
 # co-builder and never on the public rung. The owner's rows are its bodies untouched. The same file byte for byte as
 # the npm SDK's test/fixtures/row-trim-cases.json (both suites hold its sha256), answers written by hand.
 ROW_TRIM_FILE = REPO / "tests" / "fixtures" / "row-trim-cases.json"
-ROW_TRIM_SHA256 = "c4d04b62ca7088f500af063545aa36655c0cf0ed244cb3a793c129d5dc11a8bd"
+ROW_TRIM_SHA256 = "a03998723cc2c717831785374e84fd6ac7e503f98d92a3218be5ec733c0168da"
 
 
 def test_a_readers_rows_carry_only_ids_it_sees() -> None:
@@ -527,3 +527,13 @@ def test_the_owners_row_keeps_a_link_to_a_proposed_element() -> None:
     assert got["kept"] == [_id(1)] and got["rows"] == [world["elements"][0]]
     seen = resolve_lens(world, lens, {"rung": "owner", "as": {"rung": "contributor"}})
     assert seen["rows"] == [{**world["elements"][0], "buildings": []}]
+
+
+def test_an_umbrellas_own_hop_keeps_a_child_lens_it_reaches() -> None:
+    """Rule 3: what a hop never reaches is the lens read and every lens already entered; a child the umbrella has not
+    entered yet is an element like any other when its own hop reaches it (keel's `known` holds the anchors, the
+    unseen and the visited, never the children). The npm SDK's reader answers the same."""
+    child = {**LENS, "id": _id(2), "name": "Child", "characters": [_id(1)], "x_lens": {"depth": 0}}
+    umbrella = {**LENS, "id": _id(3), "name": "Umbrella", "characters": [_id(1)], "constructs": [_id(2)]}
+    world = {"elements": [{"id": _id(1), "type": "character", "name": "Ada"}, child, umbrella]}
+    assert resolve_lens(world, _id(3), OWNER)["kept"] == [_id(1), _id(2)]

@@ -26,7 +26,7 @@ from datetime import UTC, datetime
 from types import MappingProxyType
 from typing import Any, Literal, TypedDict
 
-from ._schema import FIELD_KINDS, GENERIC_PAIRS, PUBLIC_FIELDS, ROOM_PAIRS
+from ._schema import FIELD_KINDS, GENERIC_PAIRS, LINK_TARGETS, PUBLIC_FIELDS, ROOM_PAIRS
 from .folder import is_hidden
 from .message import _instant, is_message, read_mark_of, unread_for
 from .review import hands_on_as_proposed
@@ -501,36 +501,45 @@ class _Reading:
         self._served[eid] = b
         return b
 
+    def served_as(self, eid: str, target_type: str | None) -> bool:
+        """Whether a link to ``eid`` stays in a served body: the reader sees it and, where the field names its
+        target type, it is of that type (keel's ``present_ids`` per target type). Hops do not read this: they follow
+        the stored link."""
+        return eid in self.view and (target_type is None or self.type_of[eid] == target_type)
+
     def _trim(self, b: Body, kind: str) -> None:
         """Keel's reading of a body for a reader that is not the owner (``elements/visibility.py`` ``redact``,
-        ``elements/serialize.py``), in place: a link to an id outside the view is left out (a single link reads
-        ``None``, a list keeps its order), a Pin's generic pair whose target is unseen reads ``""`` and ``None``, and a
-        lens's ``x_lens.notes`` keeps the notes on its served anchors and on other ids the reader sees. Below
-        co-builder and never on the public rung, ``x_served_trimmed`` names what the trim changed the meaning of: a
-        Message's ``characters`` and ``narrator``, a lens's anchor fields and, when an anchor's note went with it,
-        ``notes``; names only, never an id or a count."""
+        ``elements/serialize.py``), in place: a link to an id outside the view, or to an element that is not the
+        field's target type, is left out (a single link reads ``None``, a list keeps its order), a Pin's generic pair
+        whose target is unseen or not of its ``element_type`` reads ``""`` and ``None``, and a lens's ``x_lens.notes``
+        keeps the notes on its served anchors and on other ids the reader sees. Below co-builder and never on the
+        public rung, ``x_served_trimmed`` names what the trim changed the meaning of: a Message's ``characters`` and
+        ``narrator``, a lens's anchor fields and, when an anchor's note went with it, ``notes``; names only, never an
+        id or a count."""
         for type_key, id_key in GENERIC_PAIRS.get(kind, ()):
             target, of = b.get(id_key), b.get(type_key)
             if not isinstance(target, str) or target == "":
                 continue
-            if not (isinstance(of, str) and _fold(of) in _TYPE_RANK and target in self.view):
+            if not (isinstance(of, str) and self.served_as(target, _fold(of))):
                 if type_key in b:
                     b[type_key] = ""
                 b[id_key] = None
         lens = is_lens(b)
         before = {i for f in _ANCHOR_FIELDS for i in (b.get(f) or []) if isinstance(i, str)} if lens else set()
         changed: list[str] = []
+        targets = LINK_TARGETS.get(kind, {})
         for field, many in _LINK_FIELDS.get(kind, ()):
             if field not in b:
                 continue
             v = b[field]
+            target_type = targets.get(field)
             if many:
                 if not isinstance(v, list):
                     continue
-                if any(isinstance(t, str) and t not in self.view for t in v):
+                if any(isinstance(t, str) and not self.served_as(t, target_type) for t in v):
                     changed.append(field)
-                b[field] = [t for t in v if isinstance(t, str) and t in self.view]
-            elif isinstance(v, str) and v not in self.view:
+                b[field] = [t for t in v if isinstance(t, str) and self.served_as(t, target_type)]
+            elif isinstance(v, str) and not self.served_as(v, target_type):
                 b[field] = None
                 changed.append(field)
         named: tuple[str, ...] = _ANCHOR_FIELDS if lens else _MESSAGE_TRIMMED if is_message(b) else ()
@@ -728,7 +737,7 @@ def _resolve_one(
         cut.setdefault(eid, why)
 
     anchors, children, unseen, anchored = _anchors_of(lens, r)
-    anchor_set, child_set = set(anchors), set(children)
+    anchor_set = set(anchors)
     listed: list[str] = []
     frontier: list[str] = []
     for eid in anchors:
@@ -764,7 +773,7 @@ def _resolve_one(
     elif recipe.depth >= 1:
 
         def excluded(eid: str) -> bool:
-            return eid in anchor_set or eid in child_set or eid in visited
+            return eid in anchor_set or eid in visited
 
         hop, edges = r.reach(frontier, excluded)
         listed.extend(r.sort([e for e in hop if passes(e)]))
