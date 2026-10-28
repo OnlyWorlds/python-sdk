@@ -675,7 +675,9 @@ def _mail_part(r: _Reading, mode: str, budget: int, clock: tuple[int, int, int])
     if r.character is None:
         return {"unread": [], "read": [], "rows": [], "cut": {}, "totals": {"unread": 0, "read": 0}}
     in_view = [e for e in r.order if e in r.view]
-    messages = [b for b in (r.body(e) for e in in_view) if is_message(b)]
+    # Whole bodies only: a known-of stub serves no `characters`, so its recipients are unknown, never everyone
+    # (keel's `_mail`).
+    messages = [b for b in (r.body(e) for e in in_view if e not in r.stubs) if is_message(b)]
     relations = [r.body(e) for e in in_view if r.type_of[e] == "relation"]
     mark = read_mark_of(relations, r.character, r.members)
     mine = unread_for(messages, r.character, None, r.members)

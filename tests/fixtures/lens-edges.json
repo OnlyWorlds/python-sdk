@@ -692,5 +692,75 @@
    ],
    "cut": {}
   }
+ },
+ {
+  "name": "the-mail-part-reads-whole-messages-only-a-stub-is-not-to-everyone",
+  "world": {
+   "elements": [
+    {
+     "id": "a",
+     "type": "character",
+     "name": "A"
+    },
+    {
+     "id": "n1",
+     "type": "narrative",
+     "name": "Known of",
+     "supertype": "Message",
+     "characters": [],
+     "created_at": "2026-10-20T12:00:00Z"
+    },
+    {
+     "id": "n2",
+     "type": "narrative",
+     "name": "To everyone",
+     "supertype": "Message",
+     "characters": [],
+     "created_at": "2026-10-21T12:00:00Z"
+    }
+   ]
+  },
+  "lens": {
+   "id": "L",
+   "type": "construct",
+   "name": "L",
+   "supertype": "Lens",
+   "x_lens": {
+    "types": [
+     "character"
+    ],
+    "mail": "unread_full_read_titles"
+   }
+  },
+  "reader": {
+   "rung": "guest",
+   "character": "a",
+   "whole": [
+    "a",
+    "L",
+    "n2"
+   ],
+   "known_of": [
+    "n1"
+   ]
+  },
+  "clock": "2026-10-27T12:00:00Z",
+  "want": {
+   "kept": [
+    "a"
+   ],
+   "cut": {},
+   "mail": {
+    "unread": [
+     "n2"
+    ],
+    "read": [],
+    "cut": {},
+    "totals": {
+     "unread": 1,
+     "read": 0
+    }
+   }
+  }
  }
 ]

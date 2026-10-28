@@ -4,6 +4,10 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+## 0.79.3 (2026-10-28)
+
+- **A lens's mail part no longer reads a known-of stub as a message to everyone.** A stub never serves `characters`, and the message profile reads a Message with no recipients as addressed to everyone, so a guest's mail part listed every Message it knew only as a stub, unread. The mail part now reads whole bodies only, as the API reads it. A shared edge case holds it, the same file as the npm SDK's.
+
 ## 0.79.2 (2026-10-28)
 
 - **An umbrella lens no longer enters a child lens the reader knows only as a stub.** Since 0.77.1 a lens named by id reads as nothing when the reader is served it only as a known-of stub; as an umbrella's child, the same stub was still entered and its stored anchors read, so a guest's reading kept elements reached through links it was never served. Such a child is now an anchor the reader cannot see (`anchor_not_visible`, counted for the owner only), as the API reads it. Two shared edge cases hold it, the same file as the npm SDK's.
