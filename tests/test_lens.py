@@ -280,6 +280,156 @@ def test_the_shared_edge_cases() -> None:
     assert len(edges) == 15
 
 
+# The reading aids and changed_within on the public calls (the npm SDK holds the same cases).
+AIDS: dict[str, Any] = {
+    "elements": [
+        {"id": "desk", "type": "institution", "name": "The Desk", "constructs": ["domain", "guide"]},
+        {
+            "id": "rules",
+            "type": "law",
+            "name": "House Rules",
+            "supertype": "Charter",
+            "author": "desk",
+            "x_charter_of": "w1",
+        },
+        {"id": "charter", "type": "law", "name": "Harbour Charter", "supertype": " charter ", "author": "desk"},
+        {"id": "domain", "type": "construct", "name": "Reporting", "supertype": "Domain", "x_charter_of": "w1"},
+        {
+            "id": "guide",
+            "type": "construct",
+            "name": "How we work",
+            "supertype": "GUIDE",
+            "x_charter_of": "w1",
+            "objects": ["ledger"],
+        },
+        {"id": "ledger", "type": "object", "name": "Ledger"},
+    ]
+}
+
+
+def _lens_on(anchors: dict[str, list[str]], x_lens: dict[str, Any] | None = None) -> dict[str, Any]:
+    return {
+        "id": "L",
+        "type": "construct",
+        "name": "L",
+        "supertype": "Lens",
+        **anchors,
+        **({"x_lens": x_lens} if x_lens else {}),
+    }
+
+
+def test_is_charter_element_reads_the_pair_and_the_mark_both() -> None:
+    els = AIDS["elements"]
+    assert is_charter_element(els[1])
+    assert not is_charter_element(els[2])  # the pair without the mark: lore
+    assert is_charter_element(els[3])
+    assert is_charter_element(els[4])  # GUIDE, folded
+    assert not is_charter_element({"type": "law", "supertype": "Charters", "x_charter_of": "w1"})  # the whole word
+    assert not is_charter_element({"type": "object", "supertype": "Charter", "x_charter_of": "w1"})
+    assert not is_charter_element({"type": "law", "supertype": "Charter", "x_charter_of": ""})
+    assert not is_charter_element({"type": "law", "supertype": "Charter", "x_charter_of": " " + chr(0x3000)})
+    assert not is_charter_element({"type": "law", "supertype": "Charter", "x_charter_of": None})
+    assert is_charter_element({"type": "law", "supertype": "Charter", "x_charter_of": 7})
+    assert not is_charter_element(
+        {"type": "law", "supertype": "Charter", "x_room_of": "w1"}
+    )  # the room's mark is not it
+
+
+def test_an_unmarked_charter_is_lore_kept_like_any_law() -> None:
+    plain = resolve_lens(AIDS, _lens_on({"institutions": ["desk"]}), OWNER)
+    assert plain["kept"] == ["desk", "charter"]
+    assert plain["cut"] == {"types": 3}
+    laws = resolve_lens(AIDS, _lens_on({"institutions": ["desk"]}, {"types": ["law"]}), OWNER)
+    assert laws["kept"] == ["desk", "charter"]
+    assert laws["cut"] == {"types": 3}
+
+
+def test_a_marked_domain_a_hop_reaches_is_cut_unless_types_names_its_pair() -> None:
+    none = resolve_lens(AIDS, _lens_on({"institutions": ["desk"]}, {"types": ["construct"]}), OWNER)
+    assert none["kept"] == ["desk"]
+    assert none["cut"] == {"types": 4}  # the three aids, and the lore Charter, a Law
+    named = resolve_lens(AIDS, _lens_on({"institutions": ["desk"]}, {"types": [" Construct/Domain "]}), OWNER)
+    assert named["kept"] == ["desk", "domain"]
+    assert named["cut"] == {"types": 3}
+    # A hop does not continue out of an aid whose pair is not named: the Ledger, behind the Guide, is never reached.
+    deep = resolve_lens(AIDS, _lens_on({"institutions": ["desk"]}, {"depth": 2}), OWNER)
+    assert deep["cut"] == {"types": 3}
+    through_lens = _lens_on({"institutions": ["desk"]}, {"depth": 2, "types": ["construct/guide", "institution"]})
+    assert resolve_lens(AIDS, through_lens, OWNER)["cut"] == {"types": 3, "hops_not_served": 1}
+    # In an unlensed graph the aids are out, whatever flag is asked; a lens naming the pair keeps them as nodes.
+    g = world_graph(AIDS, OWNER, rooms=True, hidden=True, proposed=True, map_space=True)
+    assert [n["id"] for n in g["nodes"]] == ["charter", "desk", "ledger"]
+    assert g["cut"] == {"reading_aid": 3}
+    assert g["edges_cut"] == {"reading_aid": 2}  # the Desk's links to the Domain and the Guide
+    assert g["edges"] == [{"source": "charter", "field": "author", "target": "desk", "index": 0}]
+    lensed = world_graph(
+        AIDS, OWNER, lens=_lens_on({"institutions": ["desk"]}, {"types": ["construct/domain", "institution"]})
+    )
+    assert [(n["id"], n.get("marks")) for n in lensed["nodes"]] == [("desk", None), ("domain", None)]
+
+
+def test_an_anchor_that_is_a_marked_guide_is_kept_and_followed() -> None:
+    r = resolve_lens(AIDS, _lens_on({"constructs": ["guide"]}, {"types": ["object", "institution"]}), OWNER)
+    assert r["kept"] == ["guide", "desk", "ledger"]
+    assert r["cut"] == {}
+    public = resolve_lens(AIDS, _lens_on({"constructs": ["guide"]}), {"rung": "public"})
+    assert public["kept"] == ["guide", "desk", "ledger"]  # an aid is no room element: a public reader sees it
+
+
+def test_changed_within_keeps_its_exact_edge_and_never_cuts_an_anchor() -> None:
+    clock = "2026-10-27T12:00:00Z"
+    elements: list[dict[str, Any]] = [
+        {
+            "id": "a",
+            "type": "institution",
+            "name": "Anchor",
+            "updated_at": "2020-01-01T00:00:00Z",
+            "objects": ["edge", "past", "none", "bad"],
+        },
+        {"id": "edge", "type": "object", "name": "Seven days", "updated_at": "2026-10-20T12:00:00Z"},
+        {"id": "past", "type": "object", "name": "Seven days and a second", "updated_at": "2026-10-20T11:59:59Z"},
+        {"id": "none", "type": "object", "name": "No time"},
+        {"id": "bad", "type": "object", "name": "Unreadable", "updated_at": "yesterday"},
+    ]
+    world = {"elements": elements}
+    lens = _lens_on({"institutions": ["a"]}, {"changed_within": 7})
+    r = resolve_lens(world, lens, OWNER, clock=clock)
+    assert r["kept"] == ["a", "edge", "bad", "none"]  # no readable time: never cut, sorted last
+    assert r["cut"] == {"stale": 1}
+    # An offset is read: 13:00+01:00 is the same instant as the edge.
+    elements[2]["updated_at"] = "2026-10-20T13:00:00+01:00"
+    assert resolve_lens(world, lens, OWNER, clock=clock)["cut"] == {}
+    # A filter is cut too, after the fence, types and the window.
+    f = resolve_lens(world, _lens_on({}, {"types": ["object"], "changed_within": 1}), OWNER, clock=clock)
+    assert (f["kept"], f["cut"]) == (["bad", "none"], {"stale": 2})
+    for bad in (0, -1, 1.5, "7", True, [7]):
+        got = resolve_lens(world, _lens_on({"institutions": ["a"]}, {"changed_within": bad}), OWNER)
+        assert got["unreadable"] == "changed_within", bad
+    null = _lens_on({"institutions": ["a"]}, {"changed_within": None})
+    assert resolve_lens(world, null, OWNER, clock=clock)["unreadable"] is None
+
+
+def test_changed_within_reads_a_folder_element_by_the_newer_sync_stamp() -> None:
+    clock = "2026-10-27T12:00:00Z"
+    lens = _lens_on({"institutions": ["a"]}, {"changed_within": 7})
+
+    def kept(**stamps: str) -> bool:
+        world = {
+            "elements": [
+                {"id": "a", "type": "institution", "name": "Anchor", "objects": ["o"]},
+                {"id": "o", "type": "object", "name": "Folder copy", **stamps},
+            ]
+        }
+        return "o" in resolve_lens(world, lens, OWNER, clock=clock)["kept"]
+
+    assert kept(server_updated_at="2026-09-01T00:00:00Z", local_updated_at="2026-10-26T00:00:00Z")
+    assert kept(server_updated_at="2026-10-26T00:00:00Z", local_updated_at="2026-09-01T00:00:00Z")
+    assert not kept(server_updated_at="2026-09-01T00:00:00Z", local_updated_at="2026-09-02T00:00:00Z")
+    # A folder stamp, where one reads, wins over updated_at; an unreadable one is no stamp.
+    assert not kept(updated_at="2026-10-26T00:00:00Z", local_updated_at="2026-09-02T00:00:00Z")
+    assert kept(updated_at="2026-10-26T00:00:00Z", local_updated_at="soon")
+
+
 def test_a_lens_a_guest_knows_only_as_a_stub_reads_as_nothing() -> None:
     world: dict[str, Any] = {
         "elements": [
