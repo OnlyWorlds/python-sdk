@@ -4,6 +4,8 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+## 0.83.0 (2026-10-28)
+
 - **`reading_aid_of(element)`**: which reading aid an element's type and supertype make it, `"charter"`, `"guide"` or `"domain"` (trimmed and compared without regard to case, the whole word), else `None`; a body or a `FolderElement`. It ignores the mark `x_charter_of`, so a tool can offer the right mark on an unmarked element; whether an element is a reading aid, the pair and the mark, is still `is_charter_element`. The npm SDK's `readingAidOf` is the same reader.
 - **Schema repinned to schema-dist `v0.33.0-dist.84`** (from dist.83; the same canonical 00.33.00, so `SCHEMA_VERSION` stays and no element field moved; the folder lint and `FORMAT_VERSION` stay at 0.3.20). Serial 84 adds four lens cases, a lens reached by a hop served whole to the owner and, to a contributor, a guest and the public reader, without its hidden anchor and every note keyed to a hidden element, and one charter case, a Guide held only as a stub; the lens fixture holds 151 cases (75 resolve, 37 graph), the charter fixture 23, every one passing with no reader change. The room, checks and spine profiles gain the folder format's re-key line, and the spine profile the line that an editor shows `x_spine_` keys read-only; nothing in this package restates either.
 
