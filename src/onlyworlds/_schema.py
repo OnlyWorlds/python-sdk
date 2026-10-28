@@ -1068,6 +1068,17 @@ ROOM_PAIRS: tuple[tuple[str, str], ...] = (
 # world or sitting the room belongs to (room.fixture.json's mark.field, checked against room.md).
 ROOM_MARK = "x_room_of"
 
+# The reading aids (profiles/lens.md rule 4, profiles/room.md): the charter, its guide and its domains, each
+# matched by its (type, supertype) pair, trimmed and without regard to case as ROOM_PAIRS, AND the mark
+# READING_AID_MARK, the id of the world the aid belongs to (room.is_charter_element). From
+# lens.fixture.json's reading_aid_pairs, as it writes them, and reading_aid_mark, checked against the pages.
+READING_AID_PAIRS: tuple[tuple[str, str], ...] = (
+    ("law", "charter"),
+    ("construct", "guide"),
+    ("construct", "domain"),
+)
+READING_AID_MARK = "x_charter_of"
+
 # The message profile (profiles/message.md): the (type, supertype) pair of a message between a world's
 # members, and of a reader's read mark, each matched trimmed and without regard to case as ROOM_PAIRS
 # (message.is_message, message.read_mark_of). From message.fixture.json's pair and read_mark.

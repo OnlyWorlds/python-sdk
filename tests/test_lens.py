@@ -15,7 +15,16 @@ from typing import Any
 
 import pytest
 
-from onlyworlds import ROOM_PAIRS, LensReading, is_lens, is_template, lenses_in_use, resolve_lens, world_graph
+from onlyworlds import (
+    ROOM_PAIRS,
+    LensReading,
+    is_charter_element,
+    is_lens,
+    is_template,
+    lenses_in_use,
+    resolve_lens,
+    world_graph,
+)
 
 REPO = Path(__file__).resolve().parent.parent
 FIXTURE = REPO / "codegen" / "schema-dist" / "profiles" / "lens.fixture.json"
@@ -192,10 +201,21 @@ def test_the_fixtures_tables_read_back_through_the_reader() -> None:
         assert (
             resolve_lens({"elements": []}, {**LENS, "x_lens": {"types": [pair.upper()]}}, OWNER)["unreadable"] is None
         )
+    # The reading aids: each pair word is a legal `types` word, and an element of the pair is an aid only with the mark.
+    assert doc["reading_aid_pairs"] == ["law/charter", "construct/guide", "construct/domain"]
+    assert doc["reading_aid_mark"]["field"] == "x_charter_of"
+    for pair in doc["reading_aid_pairs"]:
+        legal = resolve_lens({"elements": []}, {**LENS, "x_lens": {"types": [f" {pair.upper()} "]}}, OWNER)
+        assert legal["unreadable"] is None, pair
+        kind, supertype = pair.split("/")
+        el = {"id": _id(500), "type": kind, "name": pair, "supertype": supertype.upper()}
+        assert not is_charter_element(el), f"{pair} without the mark"
+        assert is_charter_element({**el, doc["reading_aid_mark"]["field"]: "w1"}), f"{pair} with the mark"
     assert doc["cut_reasons"] == [
         "budget",
         "types",
         "window",
+        "stale",
         "undated",
         "after_as_of",
         "anchor_not_visible",
@@ -233,7 +253,7 @@ def test_the_fixtures_tables_read_back_through_the_reader() -> None:
 # part), the same file byte for byte as the npm SDK's test/fixtures/lens-edges.json (both suites hold its sha256),
 # answers written by hand.
 EDGES_FILE = REPO / "tests" / "fixtures" / "lens-edges.json"
-EDGES_SHA256 = "adb4e2badfcadaa52eb3b740479aec649ee283ab84edb45f2c9f648af1242b04"
+EDGES_SHA256 = "4cb440cde85da877e2b5ba7129dd34be90a1e0bb109eefb56f0cae040a19b080"
 
 
 def test_the_shared_edge_cases() -> None:
@@ -257,7 +277,7 @@ def test_the_shared_edge_cases() -> None:
     for line in wrong:
         print(line)
     assert wrong == []
-    assert len(edges) == 14
+    assert len(edges) == 15
 
 
 def test_a_lens_a_guest_knows_only_as_a_stub_reads_as_nothing() -> None:

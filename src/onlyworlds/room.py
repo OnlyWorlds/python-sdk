@@ -15,11 +15,11 @@ from __future__ import annotations
 from collections.abc import Mapping
 from typing import Any
 
-from ._schema import ROOM_MARK, ROOM_PAIRS
+from ._schema import READING_AID_MARK, READING_AID_PAIRS, ROOM_MARK, ROOM_PAIRS
 from .folder import FolderElement
 from .worldfile import simple_case_fold
 
-__all__ = ["ROOM_PAIRS", "is_room_element"]
+__all__ = ["ROOM_PAIRS", "is_charter_element", "is_room_element"]
 
 
 _WHITE_SPACE: str = "".join(
@@ -62,8 +62,9 @@ def is_room_element(element: Mapping[str, Any] | FolderElement) -> bool:
 
     Both, always: a pair without the mark is lore (a novel's letters are Narratives with supertype
     Message), and a mark without a pair is not a room element (a malformed mark: report it, never hide
-    it). The pair match is the whole word: a Narrative with supertype ``Messages`` is lore, and so is the
-    charter (``law`` / ``Charter``). A missing, ``None`` or empty supertype is never a room element.
+    it). The pair match is the whole word: a Narrative with supertype ``Messages`` is lore. The charter
+    (``law`` / ``Charter``) is never a room element: with its own mark it is a reading aid
+    (``is_charter_element``), without it lore. A missing, ``None`` or empty supertype is never a room element.
     Takes a body (an API element or a folder file's dict) or a ``FolderElement``, whose type may come from
     its directory when the body has none.
     """
@@ -80,3 +81,48 @@ def is_room_element(element: Mapping[str, Any] | FolderElement) -> bool:
         return False
     key = (_fold(kind), _fold(supertype))
     return any((_fold(t), _fold(s)) == key for t, s in ROOM_PAIRS)
+
+
+_READING_AID_KEYS: frozenset[str] = frozenset(f"{_fold(t)}/{_fold(s)}" for t, s in READING_AID_PAIRS)
+"""The reading aids' pairs as ``types`` words, folded: ``law/charter``, ``construct/guide``, ``construct/domain``."""
+
+
+def _reading_aid_key(element: Any) -> str | None:
+    """The reading aid's pair word (folded) when the element is one, else ``None`` (the lens and graph readers read
+    it). The mark counts when it is present and not ``None``, and a string only when something is left after
+    trimming, as the API reads it."""
+    body: Any
+    kind: Any
+    if isinstance(element, FolderElement):
+        body, kind = element.body, element.type
+    elif isinstance(element, Mapping):
+        body, kind = element, element.get("type")
+    else:
+        return None
+    supertype = body.get("supertype")
+    if not isinstance(kind, str) or not isinstance(supertype, str):
+        return None
+    key = f"{_fold(kind)}/{_fold(supertype)}"
+    if key not in _READING_AID_KEYS:
+        return None
+    mark = body.get(READING_AID_MARK)
+    if mark is None or (isinstance(mark, str) and mark.strip(_WHITE_SPACE) == ""):
+        return None
+    return key
+
+
+def is_charter_element(element: Mapping[str, Any] | FolderElement) -> bool:
+    """True when the element is a reading aid (schema-dist ``profiles/room.md``, ``profiles/lens.md`` rule 4): the
+    world's charter (``law``, supertype ``Charter``), its guide (``construct``, supertype ``Guide``) or one of its
+    domains (``construct``, supertype ``Domain``), the type and supertype each trimmed and compared without regard
+    to case, the whole word, AND the mark ``x_charter_of``, the id of the world the aid belongs to. The mark counts
+    when it is present and not ``None``; a string mark counts only when something is left after trimming. Both,
+    always: the pair without the mark is lore, and stays in every view (a kingdom's Charter in a novel's world is a
+    Law like any other).
+
+    What it is for: a tool's front door shows the aids first; a lore view (a list, a graph, a story's context)
+    leaves them out by default. A reading aid is not a room element: ``is_room_element`` answers ``False`` for one,
+    and a public reader sees it. In a lens, one reached by a hop is kept only when ``types`` names its pair
+    (``law/charter``, ``construct/guide``, ``construct/domain``); one the lens names as an anchor is kept and
+    followed like any anchor. The npm SDK's ``isCharterElement`` is the same matcher, with the same fold."""
+    return _reading_aid_key(element) is not None

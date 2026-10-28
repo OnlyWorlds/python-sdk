@@ -291,6 +291,40 @@ def room_mark() -> str:
     return mark
 
 
+def reading_aids(types: list[str]) -> tuple[list[tuple[str, str]], str]:
+    """The reading aids (dist serial 82 on, profiles/lens.md rule 4 and profiles/room.md): the charter, its guide
+    and its domains, each a (type, supertype) pair, and the mark that tells one from lore; the npm SDK's
+    READING_AID_PAIRS and READING_AID_MARK. Emitted from the lens fixture's ``reading_aid_pairs`` (each word
+    ``type/supertype``) and ``reading_aid_mark.field``; each pair and the mark must be named on lens.md, and the
+    mark on room.md, or generation fails. No fallback: emitting "no aids" would read every charter as lore."""
+    fixture_path = DIST / "profiles" / "lens.fixture.json"
+    fixture: dict[str, Any] = json.loads(fixture_path.read_text(encoding="utf-8"))
+    raw = fixture.get("reading_aid_pairs")
+    if not isinstance(raw, list) or not raw or not all(isinstance(w, str) and w.count("/") == 1 for w in raw):
+        raise SystemExit(f"{fixture_path}: `reading_aid_pairs` is {raw!r}, expected a list of 'type/supertype' words")
+    pairs: list[tuple[str, str]] = []
+    for w in raw:
+        t, s = w.split("/")
+        if t not in types or not s or s != s.strip() or '"' in s or "\\" in s:
+            raise SystemExit(
+                f"{fixture_path}: reading aid {w!r}: not an element type, or a supertype this emitter refuses"
+            )
+        pairs.append((t, s))
+    if len({(t.lower(), s.lower()) for t, s in pairs}) != len(pairs):
+        raise SystemExit(f"{fixture_path}: reading aid pairs repeat one another without regard to case: {pairs!r}")
+    mark = (fixture.get("reading_aid_mark") or {}).get("field")
+    if not isinstance(mark, str) or not re.fullmatch(r"x_[a-z0-9_]+", mark):
+        raise SystemExit(f"{fixture_path}: reading_aid_mark.field is {mark!r}, expected an extension key")
+    page = (DIST / "profiles" / "lens.md").read_text(encoding="utf-8")
+    room = (DIST / "profiles" / "room.md").read_text(encoding="utf-8")
+    missing = [f"`{w}`" for w in raw if f"`{w}`" not in page] + [
+        f"`{mark}`" for t in (page, room) if f"`{mark}`" not in t
+    ]
+    if missing:
+        raise SystemExit(f"the lens and room pages do not name the fixture's reading aids {missing}")
+    return pairs, mark
+
+
 def message_pairs(
     types: list[str], room: list[tuple[str, str]]
 ) -> tuple[tuple[str, str], tuple[str, str], tuple[str, str]]:
@@ -371,6 +405,7 @@ def render(
     mark: str,
     message: tuple[tuple[str, str], tuple[str, str], tuple[str, str]],
     spine: dict[str, list[str]],
+    aids: tuple[list[tuple[str, str]], str],
 ) -> str:
     def strs(names: list[str]) -> str:
         return "(" + ", ".join(f'"{n}"' for n in names) + ("," if len(names) == 1 else "") + ")"
@@ -490,6 +525,15 @@ def render(
         "# world or sitting the room belongs to (room.fixture.json's mark.field, checked against room.md).",
         f'ROOM_MARK = "{mark}"',
         "",
+        "# The reading aids (profiles/lens.md rule 4, profiles/room.md): the charter, its guide and its domains, each",
+        "# matched by its (type, supertype) pair, trimmed and without regard to case as ROOM_PAIRS, AND the mark",
+        "# READING_AID_MARK, the id of the world the aid belongs to (room.is_charter_element). From",
+        "# lens.fixture.json's reading_aid_pairs, as it writes them, and reading_aid_mark, checked against the pages.",
+        "READING_AID_PAIRS: tuple[tuple[str, str], ...] = (",
+        *[f'    ("{t}", "{s}"),' for t, s in aids[0]],
+        ")",
+        f'READING_AID_MARK = "{aids[1]}"',
+        "",
         "# The message profile (profiles/message.md): the (type, supertype) pair of a message between a world's",
         "# members, and of a reader's read mark, each matched trimmed and without regard to case as ROOM_PAIRS",
         "# (message.is_message, message.read_mark_of). From message.fixture.json's pair and read_mark.",
@@ -538,6 +582,7 @@ def main() -> int:
         room_mark(),
         message_pairs(types, room),
         spine_kinds(types),
+        reading_aids(types),
     )
     if args.check:
         current = OUT.read_bytes().decode("utf-8") if OUT.is_file() else ""

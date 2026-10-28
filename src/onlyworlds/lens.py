@@ -1,16 +1,17 @@
-"""The lens profile (schema-dist ``profiles/lens.md``, serial 78): a saved way of reading a world.
+"""The lens profile (schema-dist ``profiles/lens.md``, serial 82): a saved way of reading a world.
 
 A lens is a Construct with supertype ``Lens`` (``is_lens``); its links are its anchors, and ``x_lens`` is the
 recipe: how far (``depth``), which types (``types``), how far back (``window``, or ``from`` and ``to``), what
-the fence does with an undated element (``undated``), how much of each (``show``), how many in all
+the fence does with an undated element (``undated``), how recently changed (``changed_within``), how much of
+each (``show``), how many in all
 (``budget``), the mail rule (``mail``) and a sentence per anchor (``notes``). ``resolve_lens`` is the one
 resolution every reader agrees on, a pure function over a world snapshot: the kept elements in the profile's
 order, the cut counted by reason, and the mail part. A template (``is_template``) resolves to nothing; an
 umbrella enters each child lens once; ``lenses_in_use`` says which lenses a seat reads (the membership's
 choice wins over a Character's ``x_lens_uses``).
 
-The pair is matched by the room profile's trim and fold (``room._fold``), room elements by its matcher,
-proposed elements by the review profile's hand-on rule (``hands_on_as_proposed``), the hidden mark by
+The pair is matched by the room profile's trim and fold (``room._fold``), room elements and reading aids by its
+matchers, proposed elements by the review profile's hand-on rule (``hands_on_as_proposed``), the hidden mark by
 ``folder.is_hidden``, and the mail rule by the message profile's readers, never a second copy. The fixture
 (``codegen/schema-dist/profiles/lens.fixture.json``) is replayed whole by ``tests/test_lens.py``; the npm
 SDK's ``resolveLens``, ``isLens``, ``isTemplate`` and ``lensesInUse`` give the same answers on the same input.
@@ -29,7 +30,7 @@ from ._schema import FIELD_KINDS, PUBLIC_FIELDS, ROOM_PAIRS
 from .folder import is_hidden
 from .message import _instant, is_message, read_mark_of, unread_for
 from .review import hands_on_as_proposed
-from .room import _fold, is_room_element
+from .room import _READING_AID_KEYS, _fold, _reading_aid_key, is_room_element
 
 __all__ = [
     "DATE_FIELD",
@@ -43,7 +44,15 @@ __all__ = [
 ]
 
 CutReason = Literal[
-    "budget", "types", "window", "undated", "after_as_of", "anchor_not_visible", "not_visible", "hops_not_served"
+    "budget",
+    "types",
+    "window",
+    "stale",
+    "undated",
+    "after_as_of",
+    "anchor_not_visible",
+    "not_visible",
+    "hops_not_served",
 ]
 
 
@@ -73,7 +82,7 @@ class LensReading(TypedDict):
     #: The cut, counted by reason; a reason with no count is absent, and a reader that is not the owner never
     #: carries the owner's two (``anchor_not_visible``, ``not_visible``).
     cut: dict[str, int]
-    #: Notes on ids that are not anchors of the lens read.
+    #: Notes on ids that are not anchors of the lens read, counted only where the reader sees the id.
     notes_ignored: int
     #: The mail part, when the lens names a mail rule; ``None`` otherwise.
     mail: LensMail | None
@@ -154,6 +163,7 @@ _CUT_REASONS: tuple[CutReason, ...] = (
     "budget",
     "types",
     "window",
+    "stale",
     "undated",
     "after_as_of",
     "anchor_not_visible",
@@ -214,6 +224,18 @@ def date_of(element: Any) -> int | None:
     return _whole(element.get(field))
 
 
+def _changed_at(el: Mapping[str, Any]) -> tuple[int, int] | None:
+    """When an element last changed, as ``changed_within`` reads it: the newer of a folder element's
+    ``server_updated_at`` and ``local_updated_at`` where either reads as a time, else its ``updated_at``; ``None``
+    when none reads as one."""
+    stamps = [k for k in (_instant(el.get("server_updated_at")), _instant(el.get("local_updated_at"))) if not k[0]]
+    if not stamps:
+        unreadable, seconds, micros = _instant(el.get("updated_at"))
+        return None if unreadable else (seconds, micros)
+    newest = max(stamps)
+    return (newest[1], newest[2])
+
+
 def is_lens(element: Any) -> bool:
     """True when the element is a lens: a Construct with supertype ``Lens``, the type and the supertype each
     trimmed (Unicode White_Space at both ends) and compared without regard to case, the whole word (``Lenses``
@@ -252,15 +274,30 @@ def lenses_in_use(membership: Sequence[str] | None, x_lens_uses: Any) -> list[st
 
 
 class _Recipe:
-    __slots__ = ("budget", "depth", "from_", "mail", "notes", "show", "to", "types", "undated", "window")
+    __slots__ = (
+        "budget",
+        "changed_within",
+        "depth",
+        "from_",
+        "mail",
+        "notes",
+        "show",
+        "to",
+        "types",
+        "undated",
+        "window",
+    )
 
     def __init__(self) -> None:
         self.depth = 1
+        #: Folded type slugs, room pairs and reading aids' pairs; ``None``: any type, and no room element or aid.
         self.types: frozenset[str] | None = None
         self.window: int | None = None
         self.from_: int | None = None
         self.to: int | None = None
         self.undated = "include"
+        #: Days back from the reading's wall clock; ``None``: no cut by when an element changed.
+        self.changed_within: int | None = None
         self.show = "full"
         self.budget = 50
         self.mail = "none"
@@ -288,7 +325,7 @@ def _read_recipe(raw: Any) -> _Recipe | str:
             if not isinstance(word, str):
                 return "types"
             w = _fold(word)
-            if not (w in _ROOM_KEYS if "/" in w else w in _TYPE_RANK):
+            if not ((w in _ROOM_KEYS or w in _READING_AID_KEYS) if "/" in w else w in _TYPE_RANK):
                 return "types"
             words.add(w)
         r.types = frozenset(words) if words else None
@@ -308,6 +345,10 @@ def _read_recipe(raw: Any) -> _Recipe | str:
     undated_v = raw.get("undated")
     if undated_v is not None and undated_v not in ("include", "exclude"):
         return "undated"
+    changed_v = raw.get("changed_within")
+    changed_within = None if changed_v is None else _whole(changed_v)
+    if changed_v is not None and (changed_within is None or changed_within < 1):
+        return "changed_within"
     show_v = raw.get("show")
     if show_v is not None and show_v not in ("full", "first_line", "name"):
         return "show"
@@ -322,6 +363,7 @@ def _read_recipe(raw: Any) -> _Recipe | str:
     if notes_v is not None and (not isinstance(notes_v, dict) or any(not isinstance(v, str) for v in notes_v.values())):
         return "notes"
     r.undated = "include" if undated_v is None else undated_v
+    r.changed_within = changed_within
     r.show = "full" if show_v is None else show_v
     r.budget = budget
     r.mail = "none" if mail_v is None else mail_v
@@ -339,6 +381,8 @@ class _Reading:
         self.view: set[str] = set()
         self.stubs: set[str] = set()
         self.room: set[str] = set()
+        #: The reading aids (the charter, its guide, its domains: the pair and the mark), each id to its pair word.
+        self.aid: dict[str, str] = {}
         self._served: dict[str, Body] = {}
         self._in_view: dict[str, list[str]] = {}
         self._in_full: dict[str, list[str]] = {}
@@ -365,6 +409,9 @@ class _Reading:
                 hidden.add(eid)
             if is_room_element(el):
                 self.room.add(eid)
+            aid = _reading_aid_key(el)
+            if aid is not None:
+                self.aid[eid] = aid
         self.owner = reader["rung"] == "owner"
         seen: Mapping[str, Any] = reader["as"] if self.owner and reader.get("as") is not None else reader
         #: The rung whose view is read: the reader's own, or on an owner the rung of the reader it reads ``as``.
@@ -462,12 +509,15 @@ class _Reading:
         self._served[eid] = b
         return b
 
-    def reach(self, start: Iterable[str], excluded: Callable[[str], bool]) -> tuple[set[str], list[str]]:
+    def reach(
+        self, start: Iterable[str], excluded: Callable[[str], bool], stops: Callable[[str], bool] | None = None
+    ) -> tuple[set[str], list[str]]:
         """One hop from each element of ``start``, both ways, and on through each Relation it lands on to that
-        Relation's parties. Gives what it reached and the Relations that carried the hop."""
+        Relation's parties. Nothing hops out of a stub or a room element, nor out of an element ``stops`` names.
+        Gives what it reached and the Relations that carried the hop."""
         landed: set[str] = set()
         for f in start:
-            if f in self.stubs or f in self.room:
+            if f in self.stubs or f in self.room or (stops is not None and stops(f)):
                 continue
             for t in [*self.links(f), *self._in_view.get(f, [])]:
                 if not excluded(t):
@@ -534,13 +584,32 @@ class _Reading:
             return "window"
         return None
 
+    def stale_cut(self, eid: str, recipe: _Recipe, wall: tuple[int, int]) -> CutReason | None:
+        """``changed_within``: changed longer ago than that many days before the reading's wall clock. The time read
+        is the element's ``updated_at``, or for a folder element (one carrying ``server_updated_at`` or
+        ``local_updated_at``) the newer of those two; an element with no readable time is never cut."""
+        if recipe.changed_within is None:
+            return None
+        at = _changed_at(self.by_id[eid])
+        if at is None:
+            return None
+        return "stale" if at < (wall[0] - recipe.changed_within * 86400, wall[1]) else None
+
     def kept(self, eid: str, recipe: _Recipe) -> bool:
-        """Whether ``types`` keeps the element: a room element only when its pair is named, any other by its type
-        (or any type when ``types`` is empty)."""
+        """Whether ``types`` keeps the element: a room element or a reading aid only when its pair is named, any
+        other by its type (or any type when ``types`` is empty)."""
         if eid in self.room:
             el = self.by_id[eid]
             return recipe.types is not None and f"{_fold(el['type'])}/{_fold(el['supertype'])}" in recipe.types
+        aid = self.aid.get(eid)
+        if aid is not None:
+            return recipe.types is not None and aid in recipe.types
         return recipe.types is None or self.type_of[eid] in recipe.types
+
+    def stops_at(self, eid: str, recipe: _Recipe) -> bool:
+        """Rule 4: a reading aid a hop reached is not hopped out of unless ``types`` names its pair."""
+        aid = self.aid.get(eid)
+        return aid is not None and not (recipe.types is not None and aid in recipe.types)
 
     def sort(self, ids: Iterable[str]) -> list[str]:
         """Rule 5's order past the anchors: the schema's type order, newest ``updated_at`` first (an unreadable
@@ -601,9 +670,12 @@ _Entry = tuple[str, dict[str, Any]]
 
 
 def _resolve_one(
-    lens: Mapping[str, Any], recipe: _Recipe, r: _Reading, visited: set[str]
+    lens: Mapping[str, Any], recipe: _Recipe, r: _Reading, visited: set[str], wall: tuple[int, int]
 ) -> tuple[list[_Entry], dict[str, CutReason]]:
-    """One lens by its own recipe, its children entered once each through the shared visited set."""
+    """One lens by its own recipe, its children entered once each through the shared visited set. An anchor is
+    kept and followed whatever ``types``, ``window`` and ``changed_within`` say (a reading aid too; a room element is
+    kept and not followed); what a hop or a filter reaches is cut by the fence, then ``types``, then the window, then
+    ``changed_within``, against ``wall``, the reading's wall clock."""
     cut: dict[str, CutReason] = {}
 
     def add_cut(eid: str, why: CutReason) -> None:
@@ -632,6 +704,8 @@ def _resolve_one(
             why = "types"
         if why is None:
             why = r.window_cut(eid, recipe)
+        if why is None:
+            why = r.stale_cut(eid, recipe, wall)
         if why is not None:
             add_cut(eid, why)
         return why is None
@@ -651,7 +725,7 @@ def _resolve_one(
             for eid in r.unseen(frontier, edges, excluded):
                 add_cut(eid, "not_visible")
         if recipe.depth == 2:
-            second, _ = r.reach(hop, lambda e: excluded(e) or e in hop)
+            second, _ = r.reach(hop, lambda e: excluded(e) or e in hop, lambda e: r.stops_at(e, recipe))
             for eid in second:
                 add_cut(eid, "hops_not_served")
     out: list[_Entry] = [(e, r.row(e, recipe.show, recipe.notes if e in anchor_set else None)) for e in listed]
@@ -663,7 +737,7 @@ def _resolve_one(
         read = _read_recipe(body.get("x_lens"))
         if isinstance(read, str) or is_template(body):
             continue
-        sub, sub_cut = _resolve_one(body, read, r, visited)
+        sub, sub_cut = _resolve_one(body, read, r, visited, wall)
         out.extend(sub)
         for eid, why in sub_cut.items():
             add_cut(eid, why)
@@ -746,15 +820,18 @@ def resolve_lens(
     ``known_of`` ids, or ``public``), ``character`` (for the mail rule), and on an owner ``as``, the reader it
     reads as (that reader's view, the owner's two counts). ``as_of`` is the reading's date (absent: the world's
     now; none at all: no fence, and the window cuts nothing), ``clock`` the reading's wall-clock time for the mail
-    rule's thirty days (absent: the machine's time), never the world's now.
+    rule's thirty days and ``changed_within`` (absent: the machine's time), never the world's now.
 
     The rules, in short: visibility first (a hidden or proposed element is not there to hop through; a known-of
     stub is kept as served and nothing hops out of it); a hop reaches both ways, and on through a Relation to its
-    parties; an umbrella enters each child lens once; a hop never crosses a room element; anchors first in link
+    parties; an umbrella enters each child lens once; a hop never crosses a room element; a reading aid (the
+    charter, its guide, a domain: ``is_charter_element``) a hop reaches is kept, and hopped on from, only when
+    ``types`` names its pair, while one the lens names as an anchor is kept and followed; anchors first in link
     order, then by type in the schema's order, newest first, then by id; an anchor the reader cannot see is
-    skipped; a template resolves to nothing; the fence is ``as_of`` on each element's own date. A value outside the
-    profile's table makes the lens unreadable: ``unreadable`` names the key and nothing is resolved. The npm SDK's
-    ``resolveLens`` gives the same answer on the same input."""
+    skipped; a template resolves to nothing; the fence is ``as_of`` on each element's own date; ``changed_within``
+    cuts what a hop or a filter reaches that changed longer ago than that many days before ``clock`` (``stale``),
+    never an anchor. A value outside the profile's table makes the lens unreadable: ``unreadable`` names the key and
+    nothing is resolved. The npm SDK's ``resolveLens`` gives the same answer on the same input."""
     if not isinstance(world, Mapping) or not isinstance(world.get("elements"), list):
         raise TypeError("resolve_lens: world is a mapping with an elements list.")
     _check_reader(reader, "resolve_lens: reader")
@@ -797,13 +874,15 @@ def _lens_reading(
     if is_template(body):
         return _nothing(), {}
 
+    # The reading's wall clock, read once: the mail rule's thirty days and ``changed_within`` both measure from it.
+    instant = _instant(clock or datetime.now(UTC).isoformat())
     visited: set[str] = set()
     if isinstance(body.get("id"), str):
         visited.add(body["id"])
-    listed, cut = _resolve_one(body, recipe, r, visited)
+    listed, cut = _resolve_one(body, recipe, r, visited, (instant[1], instant[2]))
     mail: LensMail | None = None
     if recipe.mail != "none":
-        mail = _mail_part(r, recipe.mail, recipe.budget, _instant(clock or datetime.now(UTC).isoformat()))
+        mail = _mail_part(r, recipe.mail, recipe.budget, instant)
     in_mail = set() if mail is None else {*mail["unread"], *mail["read"]}
 
     seen: set[str] = set()
@@ -829,7 +908,9 @@ def _lens_reading(
         if n:
             counts[why] = n
     anchors, _, _, _ = _anchors_of(body, r)
-    notes_ignored = sum(1 for k in recipe.notes if k not in anchors)
+    # A note on an id that is not an anchor is counted only where the reader sees that id: a note keyed to an
+    # element it cannot see, or to no element, is no note of its, and counting it would tell a guest it exists.
+    notes_ignored = sum(1 for k in recipe.notes if k not in anchors and k in r.view)
     reading: LensReading = {
         "kept": [e for e, _ in keep],
         "rows": [row for _, row in keep],

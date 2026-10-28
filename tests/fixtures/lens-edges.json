@@ -762,5 +762,60 @@
     }
    }
   }
+ },
+ {
+  "name": "notes-ignored-counts-only-non-anchor-ids-the-reader-sees",
+  "world": {
+   "elements": [
+    {
+     "id": "c1",
+     "type": "character",
+     "name": "Ada"
+    },
+    {
+     "id": "c2",
+     "type": "character",
+     "name": "Bo"
+    },
+    {
+     "id": "c3",
+     "type": "character",
+     "name": "Hidden from the guest"
+    }
+   ]
+  },
+  "lens": {
+   "id": "L",
+   "type": "construct",
+   "name": "L",
+   "supertype": "Lens",
+   "characters": [
+    "c1"
+   ],
+   "x_lens": {
+    "depth": 0,
+    "notes": {
+     "c1": "an anchor's note",
+     "c2": "a note on an element the guest sees, not an anchor",
+     "c3": "a note on an element the guest cannot see",
+     "zz": "a note on an id in no element"
+    }
+   }
+  },
+  "reader": {
+   "rung": "guest",
+   "whole": [
+    "c1",
+    "c2"
+   ],
+   "known_of": []
+  },
+  "want": {
+   "kept": [
+    "c1"
+   ],
+   "cut": {},
+   "notes_ignored": 1
+  }
  }
 ]
