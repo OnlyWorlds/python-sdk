@@ -2,15 +2,20 @@
   "_what": "The recorded pin for the vendored OnlyWorlds schema distribution (codegen/schema-dist/, copied byte-exact). Do not edit by hand; re-vendor from the pinned tag and review the diff. Kept equal to the npm SDK's pin (github.com/OnlyWorlds/sdk, codegen/schema-pin.json) on purpose: two clients, one schema.",
   "_why_manifest_sha256": "Verifying the tree against its own MANIFEST.json only proves internal consistency. If the tag moved, the manifest moved with it. The hash recorded here is the one first accepted, which is what makes a moved tag visible.",
   "repo": "https://github.com/OnlyWorlds/schema-dist",
-  "tag": "v0.33.0-dist.84",
-  "commit": "47b2be36ad9a067f08a7bb21274f8a87b6ba2274",
-  "manifest_sha256": "04aa87e61ea4925bab58ae12646333b663829bfa80f1e3931c4055bd44900ec9",
+  "tag": "v0.33.0-dist.85",
+  "commit": "dc4be3ee6cbb8ee8e45527c374fe2648d990113c",
+  "manifest_sha256": "31e953dac2ba77cbc0d65b71de2ac3520d50d9df760156df95359c155c0c57ed",
   "canonical_version": "00.33.00",
-  "dist_serial": 84,
+  "dist_serial": 85,
   "published": "2026-10-28",
   "pinned_at": "2026-10-28",
   "pinned_by": "The maintainer: tree from `git archive` of the tag in a schema-dist checkout (197 files, every one the MANIFEST lists); files re-hashed against MANIFEST.json by generate_schema.py; MANIFEST self-hash matched against the raw file GitHub serves at the tag, whose ref resolves to the commit above.",
   "previous_pins": [
+    {
+      "tag": "v0.33.0-dist.84",
+      "manifest_sha256": "04aa87e61ea4925bab58ae12646333b663829bfa80f1e3931c4055bd44900ec9",
+      "note": "superseded by v0.33.0-dist.85 (four description lines of the standard: supertype and subtype a classification within its category, a Title's grant_date and revoke_date its own with a holder's span a Relation; charter.md's retire sentence and readingAidOf among its readers; checks.md selecting the Charter by the mark; three example names reworded in pages and checks.fixture.json; no fixture case changed, no type or field moved)"
+    },
     {
       "tag": "v0.33.0-dist.83",
       "manifest_sha256": "cf0c6a3338b45f13f17af6a2fb2297cc890d4bd07618992db50f3ab28be2cb03",

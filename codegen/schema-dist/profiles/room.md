@@ -8,7 +8,7 @@
 
 | Type | Supertype | What it is |
 |---|---|---|
-| `narrative` | `Message` | a line in the room (the Manifest's Wire and BrainBoost use it already) |
+| `narrative` | `Message` | a line in the room (the Manifest's Wire and Fernhollow use it already) |
 | `narrative` | `Board` | a board entry (red, orange, green as the subtype) |
 | `relation` | `Work item` | a packet of work about the world (the packet profile) |
 | `construct` | `Spec` | a workshop's spec, its owner's own element |

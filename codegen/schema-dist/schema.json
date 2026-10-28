@@ -31,13 +31,13 @@
       "name": "supertype",
       "kind": "scalar_str",
       "required": false,
-      "desc": "The top level category to which the element belongs"
+      "desc": "The top level classification of the element within its category"
     },
     {
       "name": "subtype",
       "kind": "scalar_str",
       "required": false,
-      "desc": "The sub level category through which the element is further classified"
+      "desc": "The sub level classification through which the element is further sorted within its category"
     },
     {
       "name": "image_url",
@@ -2474,14 +2474,14 @@
       {
         "name": "grant_date",
         "kind": "scalar_int",
-        "desc": "Date on which the title was granted, defined in world TIME units",
+        "desc": "Date on which the title was created or first granted, defined in world TIME units; a holder's own span is a Relation, not this field",
         "section": "Mandate",
         "required": false
       },
       {
         "name": "revoke_date",
         "kind": "scalar_int",
-        "desc": "Date on which the title ended or was revoked, defined in world TIME units",
+        "desc": "Date on which the title ended or was abolished, defined in world TIME units; a holder's own span is a Relation, not this field",
         "section": "Mandate",
         "required": false
       },

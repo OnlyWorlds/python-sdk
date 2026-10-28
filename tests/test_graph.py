@@ -128,7 +128,7 @@ def test_the_fixtures_graph_cases() -> None:
     for line in wrong:
         print(line)
     assert wrong == []
-    assert len(cases) == 37, f"the fixture holds {len(cases)} graph cases, serial 82 has 37"
+    assert len(cases) == 37, f"the fixture holds {len(cases)} graph cases, serial 85 has 37"
 
 
 def test_the_fixtures_graph_tables_read_back_through_the_reader() -> None:

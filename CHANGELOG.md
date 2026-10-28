@@ -4,6 +4,8 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+- **Schema repinned to schema-dist `v0.33.0-dist.85`** (from dist.84; the same canonical 00.33.00, so `SCHEMA_VERSION` stays, no type, field or constant moved, and the folder lint and `FORMAT_VERSION` stay at 0.3.20). Four descriptions in the vendored `schema.json` follow the standard: `supertype` and `subtype` are a classification within the element's category, and a Title's `grant_date` and `revoke_date` are the title's own dates, a holder's span being a Relation; no fixture case changed, and every reader replays as before.
+
 ## 0.83.0 (2026-10-28)
 
 - **`reading_aid_of(element)`**: which reading aid an element's type and supertype make it, `"charter"`, `"guide"` or `"domain"` (trimmed and compared without regard to case, the whole word), else `None`; a body or a `FolderElement`. It ignores the mark `x_charter_of`, so a tool can offer the right mark on an unmarked element; whether an element is a reading aid, the pair and the mark, is still `is_charter_element`. The npm SDK's `readingAidOf` is the same reader.

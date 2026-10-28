@@ -2,11 +2,11 @@
   "profile": "checks",
   "profile_page": "profiles/checks.md",
   "notes": [
-    "rules: BrainBoost's house rules as a Charter would carry them in x_checks_rules (draft 1, 2026-10-22).",
+    "rules: Fernhollow's house rules as a Charter would carry them in x_checks_rules (draft 1, 2026-10-22).",
     "cases: element gives a body as a reader might hold it; expect gives, per rule index, 'ok', 'short' or 'out' (not scoped); a rule index absent from expect is not applied to that case.",
     "not_checked: rules a reader must report by name, never apply and never pass silently; reason is prose, a reader's words may differ.",
     "stubs: an element marked known_of: true (folder spec 4.4) is judged by no rule and counted in no rule's scoped; its absent fields are unknown, not short, and a filled field does not bring it in (serial 64).",
-    "measured: the counts the reference reader printed on BrainBoost's live world on 2026-10-22 (37 Characters, 24 Relations), the specimen's receipt, not a verdict a reader must reproduce."
+    "measured: the counts the reference reader printed on Fernhollow's live world on 2026-10-22 (37 Characters, 24 Relations), the specimen's receipt, not a verdict a reader must reproduce."
   ],
   "rules": [
     {"rule": "every Character carries a reputation", "where": {"type": "character"}, "require": {"field": "reputation", "present": true}},
@@ -52,7 +52,7 @@
     {"rule": {"rule": "a field one listed type does not have", "where": {"type": ["character", "institution"]}, "require": {"field": "reputation", "present": true}}, "reason": "the field must be a field of every listed type, or an extension key"}
   ],
   "measured": {
-    "world": "BrainBoost, read through Kael's agent seat (guest view of the roster, every element the seat sees), 2026-10-22 14:3x",
+    "world": "Fernhollow, read through an agent seat (guest view of the roster, every element the seat sees), 2026-10-22 14:3x",
     "rows": [
       {"rule": 0, "scoped": 37, "short": 4},
       {"rule": 1, "scoped": 16, "short": 11},
