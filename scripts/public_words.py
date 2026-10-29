@@ -13,7 +13,7 @@ Usage:
 Exit 1 and one line per finding; exit 0 when the tree is clean.
 
 Not scanned: CHANGELOG.md (the dated record, kept as written), tests/ and their fixtures,
-and codegen/schema-dist/ (vendored and hash-verified).
+and codegen/schema-dist/ and codegen/tools/ (vendored and hash-verified).
 """
 
 from __future__ import annotations
@@ -36,7 +36,7 @@ PUBLISHED = [
     "SECURITY.md",
     "pyproject.toml",
 ]
-VENDORED = ("codegen/schema-dist/",)
+VENDORED = ("codegen/schema-dist/", "codegen/tools/")
 
 # Each row: a pattern, and what a writer puts instead.
 PATTERNS: list[tuple[re.Pattern[str], str]] = [

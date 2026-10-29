@@ -1,0 +1,141 @@
+{
+  "format": 1,
+  "tools": [
+    {
+      "id": "atlas",
+      "name": "Atlas",
+      "sentence": "A world browser and editor where your world is a folder of plain files on your disk or in your browser, with optional sync to an onlyworlds.com account.",
+      "url": "https://atlas.onlyworlds.com",
+      "source": "https://github.com/OnlyWorlds/atlas",
+      "source_note": null,
+      "maker": "OnlyWorlds (Temper, an AI agent working for Titus)",
+      "doors": [
+        "api",
+        "folder",
+        "owworld"
+      ],
+      "open": {
+        "world": "https://atlas.onlyworlds.com/#/open/{world}",
+        "element": "https://atlas.onlyworlds.com/#/open/{world}/element/{id}",
+        "needs": "account"
+      },
+      "client": "atlas",
+      "prefix": "atlas_",
+      "free_core": "Make, browse and edit worlds as folders with no account; linking to a free onlyworlds.com account adds sync.",
+      "paid": null,
+      "rung": "listed",
+      "listed_on": "2026-10-23",
+      "listed_by": "Kael, the OnlyWorlds maintainer, on a read of the seven lines at atlas d787ee2",
+      "delisted_on": null,
+      "delisted_why": null,
+      "submission": "https://github.com/OnlyWorlds/tools/blob/master/reads/2026-10-23-atlas.md",
+      "checks": {
+        "what_it_says": {
+          "result": "pass",
+          "how": "read",
+          "on": "2026-10-23"
+        },
+        "keys_stay": {
+          "result": "pass",
+          "how": "read in source",
+          "on": "2026-10-23",
+          "note": "The world key, PIN and account token in the browser's localStorage; a linked folder carries the world key, never the PIN."
+        },
+        "names_itself": {
+          "result": "pass",
+          "how": "read in source",
+          "on": "2026-10-23"
+        },
+        "speaks_the_wire": {
+          "result": "pass",
+          "how": "read",
+          "on": "2026-10-23",
+          "note": "A fresh Atlas world (two elements, no links or atlas_ keys) passes the folder lint of schema-dist serial 54; its world file opens in the SDK's reader."
+        },
+        "what_leaves": {
+          "result": "pass",
+          "how": "read in source",
+          "on": "2026-10-23",
+          "note": "A world stays on your disk or in your browser; only a world you link sends its elements to www.onlyworlds.com and its images to upload.onlyworlds.com."
+        },
+        "host": {
+          "result": "pass",
+          "how": "read",
+          "on": "2026-10-23"
+        },
+        "free_core": {
+          "result": "pass",
+          "how": "read",
+          "on": "2026-10-23"
+        }
+      }
+    },
+    {
+      "id": "lantern",
+      "name": "Lantern",
+      "sentence": "Your worlds on your phone: find anything, follow links, fix a field, catch a note, run a game at the table, offline first.",
+      "url": "https://lantern.onlyworlds.com",
+      "source": "https://github.com/OnlyWorlds/lantern",
+      "source_note": null,
+      "maker": "OnlyWorlds (Temper, an AI agent working for Titus)",
+      "doors": [
+        "api",
+        "owworld"
+      ],
+      "open": {
+        "world": "https://lantern.onlyworlds.com/#/open/{world}",
+        "element": "https://lantern.onlyworlds.com/#/open/{world}/element/{id}",
+        "needs": "account"
+      },
+      "client": "lantern",
+      "prefix": null,
+      "free_core": "Hold, search, edit and play worlds on your phone with no account; online sync, and Ask and Sort within a daily allowance, with a free account.",
+      "paid": null,
+      "rung": "listed",
+      "listed_on": "2026-10-23",
+      "listed_by": "Kael, the OnlyWorlds maintainer, on a read of the seven lines at lantern 725da67",
+      "delisted_on": null,
+      "delisted_why": null,
+      "submission": "https://github.com/OnlyWorlds/tools/blob/master/reads/2026-10-23-lantern.md",
+      "checks": {
+        "what_it_says": {
+          "result": "pass",
+          "how": "read",
+          "on": "2026-10-23"
+        },
+        "keys_stay": {
+          "result": "pass",
+          "how": "read in source",
+          "on": "2026-10-23",
+          "note": "The world key and account token in IndexedDB, the PIN in localStorage, on the phone."
+        },
+        "names_itself": {
+          "result": "pass",
+          "how": "read in source",
+          "on": "2026-10-23"
+        },
+        "speaks_the_wire": {
+          "result": "pass",
+          "how": "read in source",
+          "on": "2026-10-23"
+        },
+        "what_leaves": {
+          "result": "pass",
+          "how": "read in source",
+          "on": "2026-10-23",
+          "note": "A world on the phone stays there; a world online syncs its elements with www.onlyworlds.com and images with upload.onlyworlds.com, and Ask and Sort send the elements the phone's own lookup found, as text, to onlyworlds.com, never to a model host."
+        },
+        "host": {
+          "result": "pass",
+          "how": "read",
+          "on": "2026-10-23"
+        },
+        "free_core": {
+          "result": "pass",
+          "how": "read",
+          "on": "2026-10-23"
+        }
+      }
+    }
+  ]
+}

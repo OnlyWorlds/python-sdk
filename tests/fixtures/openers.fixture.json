@@ -1,0 +1,1453 @@
+{
+ "what": "The rows of the Open with menu: openersFor (npm SDK) and openers_for (Python package) on the same cases. Every expected row is written by hand. The same bytes in both packages; each test holds this file's sha256.",
+ "keys": "tools names a list in lists; kind is world or element; address is what parseOwLink reads or elementAddress takes; surface is the options object with snake_case keys (signed_in), which the npm test spells signedIn. expect is the rows in order, each {id, name, href, state}; refuse is the refusal: error address with the address error's reason, or error type (a TypeError) whose message names names (spelt signedIn in the npm test).",
+ "lists": {
+  "three": [
+   {
+    "id": "zephyr",
+    "name": "Zephyr",
+    "url": "https://zephyr.example",
+    "client": "zephyr-web",
+    "rung": "listed",
+    "open": {
+     "world": "https://zephyr.example/#/w/{world}",
+     "element": "https://zephyr.example/#/w/{world}/{type}/{id}",
+     "needs": "account"
+    }
+   },
+   {
+    "id": "bramble",
+    "name": "Bramble",
+    "url": "https://bramble.example",
+    "client": "bramble",
+    "rung": "listed",
+    "open": {
+     "world": "https://bramble.example/open/{world}",
+     "element": "https://bramble.example/open/{world}/e/{id}",
+     "needs": "device"
+    }
+   },
+   {
+    "id": "corvid",
+    "name": "Corvid",
+    "url": "https://corvid.example",
+    "client": null,
+    "rung": "listed",
+    "open": {
+     "world": "https://corvid.example/w/{world}",
+     "element": "https://corvid.example/w/{world}/{type}/{id}",
+     "needs": null
+    }
+   }
+  ],
+  "mixed": [
+   {
+    "id": "quill",
+    "name": "Quill",
+    "url": "https://quill.example",
+    "client": "quill",
+    "rung": "listed",
+    "open": null
+   },
+   {
+    "id": "harbor",
+    "name": "Harbor",
+    "url": "https://harbor.example",
+    "client": "harbor",
+    "rung": "listed",
+    "open": {
+     "world": "https://harbor.example/#/{world}",
+     "element": null,
+     "needs": null
+    }
+   },
+   {
+    "id": "lumen",
+    "name": "Lumen",
+    "url": "https://lumen.example",
+    "client": "lumen",
+    "rung": "listed",
+    "open": {
+     "world": "https://lumen.example/w/{world}",
+     "element": null,
+     "needs": "account"
+    }
+   },
+   {
+    "id": "stitch",
+    "name": "Stitch",
+    "url": "https://stitch.example",
+    "client": "stitch",
+    "rung": "listed",
+    "open": {
+     "world": null,
+     "element": "https://stitch.example/e/{id}",
+     "needs": null
+    }
+   },
+   {
+    "id": "draft",
+    "name": "Draft",
+    "url": "https://draft.example",
+    "client": "draft",
+    "rung": "built",
+    "open": {
+     "world": "https://draft.example/{world}",
+     "element": "https://draft.example/{world}/{id}",
+     "needs": null
+    }
+   },
+   {
+    "id": "gone",
+    "name": "Gone",
+    "url": "https://gone.example",
+    "client": "gone",
+    "rung": "delisted",
+    "open": {
+     "world": "https://gone.example/{world}",
+     "element": "https://gone.example/{world}/{id}",
+     "needs": null
+    }
+   }
+  ],
+  "odd-needs": [
+   {
+    "id": "ferry",
+    "name": "Ferry",
+    "url": "https://ferry.example",
+    "client": "ferry",
+    "rung": "listed",
+    "open": {
+     "world": "https://ferry.example/{world}",
+     "element": null,
+     "needs": "network"
+    }
+   }
+  ],
+  "empty": []
+ },
+ "cases": [
+  {
+   "name": "member-world-in-list-order",
+   "why": "onlyworlds.com first, then the list's order (not sorted); signed in on a desktop browser, no row has a word",
+   "tools": "three",
+   "kind": "world",
+   "address": {
+    "form": "human",
+    "world": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f"
+   },
+   "surface": {
+    "audience": "member",
+    "signed_in": true
+   },
+   "expect": [
+    {
+     "id": "onlyworlds",
+     "name": "onlyworlds.com",
+     "href": "https://www.onlyworlds.com/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+     "state": null
+    },
+    {
+     "id": "zephyr",
+     "name": "Zephyr",
+     "href": "https://zephyr.example/#/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+     "state": null
+    },
+    {
+     "id": "bramble",
+     "name": "Bramble",
+     "href": "https://bramble.example/open/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+     "state": null
+    },
+    {
+     "id": "corvid",
+     "name": "Corvid",
+     "href": "https://corvid.example/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+     "state": null
+    }
+   ]
+  },
+  {
+   "name": "member-element-in-list-order",
+   "why": "each element template filled with the world, the type word and the id",
+   "tools": "three",
+   "kind": "element",
+   "address": {
+    "form": "text",
+    "world": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+    "type": "character",
+    "id": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a"
+   },
+   "surface": {
+    "audience": "member",
+    "signed_in": true
+   },
+   "expect": [
+    {
+     "id": "onlyworlds",
+     "name": "onlyworlds.com",
+     "href": "https://www.onlyworlds.com/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/character/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
+     "state": null
+    },
+    {
+     "id": "zephyr",
+     "name": "Zephyr",
+     "href": "https://zephyr.example/#/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/character/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
+     "state": null
+    },
+    {
+     "id": "bramble",
+     "name": "Bramble",
+     "href": "https://bramble.example/open/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/e/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
+     "state": null
+    },
+    {
+     "id": "corvid",
+     "name": "Corvid",
+     "href": "https://corvid.example/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/character/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
+     "state": null
+    }
+   ]
+  },
+  {
+   "name": "public-world",
+   "why": "the public sees only rows whose open needs nothing, beside onlyworlds.com",
+   "tools": "three",
+   "kind": "world",
+   "address": {
+    "form": "human",
+    "world": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f"
+   },
+   "surface": {
+    "audience": "public"
+   },
+   "expect": [
+    {
+     "id": "onlyworlds",
+     "name": "onlyworlds.com",
+     "href": "https://www.onlyworlds.com/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+     "state": null
+    },
+    {
+     "id": "corvid",
+     "name": "Corvid",
+     "href": "https://corvid.example/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+     "state": null
+    }
+   ]
+  },
+  {
+   "name": "public-element",
+   "why": "the same on an element",
+   "tools": "three",
+   "kind": "element",
+   "address": {
+    "form": "text",
+    "world": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+    "type": "character",
+    "id": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a"
+   },
+   "surface": {
+    "audience": "public",
+    "signed_in": null
+   },
+   "expect": [
+    {
+     "id": "onlyworlds",
+     "name": "onlyworlds.com",
+     "href": "https://www.onlyworlds.com/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/character/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
+     "state": null
+    },
+    {
+     "id": "corvid",
+     "name": "Corvid",
+     "href": "https://corvid.example/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/character/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
+     "state": null
+    }
+   ]
+  },
+  {
+   "name": "public-signed-in-still-public",
+   "why": "a row that needs anything does not exist for the public, whatever the surface knows",
+   "tools": "three",
+   "kind": "world",
+   "address": {
+    "form": "human",
+    "world": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f"
+   },
+   "surface": {
+    "audience": "public",
+    "signed_in": true,
+    "phone": true
+   },
+   "expect": [
+    {
+     "id": "onlyworlds",
+     "name": "onlyworlds.com",
+     "href": "https://www.onlyworlds.com/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+     "state": null
+    },
+    {
+     "id": "corvid",
+     "name": "Corvid",
+     "href": "https://corvid.example/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+     "state": null
+    }
+   ]
+  },
+  {
+   "name": "sign-in-first",
+   "why": "needs account, signed out, in a browser: the row's own tool name in the word",
+   "tools": "three",
+   "kind": "world",
+   "address": {
+    "form": "human",
+    "world": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f"
+   },
+   "surface": {
+    "audience": "member",
+    "signed_in": false
+   },
+   "expect": [
+    {
+     "id": "onlyworlds",
+     "name": "onlyworlds.com",
+     "href": "https://www.onlyworlds.com/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+     "state": null
+    },
+    {
+     "id": "zephyr",
+     "name": "Zephyr",
+     "href": "https://zephyr.example/#/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+     "state": "Sign in to Zephyr first"
+    },
+    {
+     "id": "bramble",
+     "name": "Bramble",
+     "href": "https://bramble.example/open/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+     "state": null
+    },
+    {
+     "id": "corvid",
+     "name": "Corvid",
+     "href": "https://corvid.example/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+     "state": null
+    }
+   ]
+  },
+  {
+   "name": "outside-a-browser",
+   "why": "needs account outside a browser: the browser's sign-in is not the app's to see",
+   "tools": "three",
+   "kind": "world",
+   "address": {
+    "form": "human",
+    "world": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f"
+   },
+   "surface": {
+    "audience": "member",
+    "signed_in": false,
+    "browser": false
+   },
+   "expect": [
+    {
+     "id": "onlyworlds",
+     "name": "onlyworlds.com",
+     "href": "https://www.onlyworlds.com/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+     "state": null
+    },
+    {
+     "id": "zephyr",
+     "name": "Zephyr",
+     "href": "https://zephyr.example/#/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+     "state": "Opens in your browser"
+    },
+    {
+     "id": "bramble",
+     "name": "Bramble",
+     "href": "https://bramble.example/open/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+     "state": null
+    },
+    {
+     "id": "corvid",
+     "name": "Corvid",
+     "href": "https://corvid.example/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+     "state": null
+    }
+   ]
+  },
+  {
+   "name": "outside-a-browser-not-known",
+   "why": "outside a browser the word stands whether or not the app knows a sign-in",
+   "tools": "three",
+   "kind": "element",
+   "address": {
+    "form": "text",
+    "world": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+    "type": "character",
+    "id": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a"
+   },
+   "surface": {
+    "audience": "member",
+    "signed_in": null,
+    "browser": false
+   },
+   "expect": [
+    {
+     "id": "onlyworlds",
+     "name": "onlyworlds.com",
+     "href": "https://www.onlyworlds.com/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/character/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
+     "state": null
+    },
+    {
+     "id": "zephyr",
+     "name": "Zephyr",
+     "href": "https://zephyr.example/#/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/character/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
+     "state": "Opens in your browser"
+    },
+    {
+     "id": "bramble",
+     "name": "Bramble",
+     "href": "https://bramble.example/open/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/e/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
+     "state": null
+    },
+    {
+     "id": "corvid",
+     "name": "Corvid",
+     "href": "https://corvid.example/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/character/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
+     "state": null
+    }
+   ]
+  },
+  {
+   "name": "signed-in-not-known",
+   "why": "needs account, the surface cannot know: no word",
+   "tools": "three",
+   "kind": "world",
+   "address": {
+    "form": "human",
+    "world": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f"
+   },
+   "surface": {
+    "audience": "member",
+    "signed_in": null
+   },
+   "expect": [
+    {
+     "id": "onlyworlds",
+     "name": "onlyworlds.com",
+     "href": "https://www.onlyworlds.com/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+     "state": null
+    },
+    {
+     "id": "zephyr",
+     "name": "Zephyr",
+     "href": "https://zephyr.example/#/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+     "state": null
+    },
+    {
+     "id": "bramble",
+     "name": "Bramble",
+     "href": "https://bramble.example/open/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+     "state": null
+    },
+    {
+     "id": "corvid",
+     "name": "Corvid",
+     "href": "https://corvid.example/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+     "state": null
+    }
+   ]
+  },
+  {
+   "name": "signed-in-absent-is-not-known",
+   "why": "signed_in absent reads as null",
+   "tools": "three",
+   "kind": "world",
+   "address": {
+    "form": "human",
+    "world": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f"
+   },
+   "surface": {
+    "audience": "member"
+   },
+   "expect": [
+    {
+     "id": "onlyworlds",
+     "name": "onlyworlds.com",
+     "href": "https://www.onlyworlds.com/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+     "state": null
+    },
+    {
+     "id": "zephyr",
+     "name": "Zephyr",
+     "href": "https://zephyr.example/#/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+     "state": null
+    },
+    {
+     "id": "bramble",
+     "name": "Bramble",
+     "href": "https://bramble.example/open/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+     "state": null
+    },
+    {
+     "id": "corvid",
+     "name": "Corvid",
+     "href": "https://corvid.example/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+     "state": null
+    }
+   ]
+  },
+  {
+   "name": "device-on-a-phone",
+   "why": "needs device on a phone",
+   "tools": "three",
+   "kind": "element",
+   "address": {
+    "form": "text",
+    "world": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+    "type": "character",
+    "id": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a"
+   },
+   "surface": {
+    "audience": "member",
+    "signed_in": true,
+    "phone": true
+   },
+   "expect": [
+    {
+     "id": "onlyworlds",
+     "name": "onlyworlds.com",
+     "href": "https://www.onlyworlds.com/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/character/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
+     "state": null
+    },
+    {
+     "id": "zephyr",
+     "name": "Zephyr",
+     "href": "https://zephyr.example/#/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/character/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
+     "state": null
+    },
+    {
+     "id": "bramble",
+     "name": "Bramble",
+     "href": "https://bramble.example/open/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/e/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
+     "state": "Needs the world on this phone"
+    },
+    {
+     "id": "corvid",
+     "name": "Corvid",
+     "href": "https://corvid.example/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/character/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
+     "state": null
+    }
+   ]
+  },
+  {
+   "name": "device-off-a-phone",
+   "why": "needs device off a phone: no word",
+   "tools": "three",
+   "kind": "element",
+   "address": {
+    "form": "text",
+    "world": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+    "type": "character",
+    "id": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a"
+   },
+   "surface": {
+    "audience": "member",
+    "signed_in": true,
+    "phone": false
+   },
+   "expect": [
+    {
+     "id": "onlyworlds",
+     "name": "onlyworlds.com",
+     "href": "https://www.onlyworlds.com/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/character/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
+     "state": null
+    },
+    {
+     "id": "zephyr",
+     "name": "Zephyr",
+     "href": "https://zephyr.example/#/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/character/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
+     "state": null
+    },
+    {
+     "id": "bramble",
+     "name": "Bramble",
+     "href": "https://bramble.example/open/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/e/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
+     "state": null
+    },
+    {
+     "id": "corvid",
+     "name": "Corvid",
+     "href": "https://corvid.example/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/character/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
+     "state": null
+    }
+   ]
+  },
+  {
+   "name": "you-are-here-over-sign-in",
+   "why": "the surface's own tool says You are here, before any other word",
+   "tools": "three",
+   "kind": "world",
+   "address": {
+    "form": "human",
+    "world": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f"
+   },
+   "surface": {
+    "audience": "member",
+    "tool": "zephyr-web",
+    "signed_in": false
+   },
+   "expect": [
+    {
+     "id": "onlyworlds",
+     "name": "onlyworlds.com",
+     "href": "https://www.onlyworlds.com/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+     "state": null
+    },
+    {
+     "id": "zephyr",
+     "name": "Zephyr",
+     "href": "https://zephyr.example/#/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+     "state": "You are here"
+    },
+    {
+     "id": "bramble",
+     "name": "Bramble",
+     "href": "https://bramble.example/open/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+     "state": null
+    },
+    {
+     "id": "corvid",
+     "name": "Corvid",
+     "href": "https://corvid.example/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+     "state": null
+    }
+   ]
+  },
+  {
+   "name": "you-are-here-over-device",
+   "why": "You are here before the phone's word",
+   "tools": "three",
+   "kind": "element",
+   "address": {
+    "form": "text",
+    "world": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+    "type": "character",
+    "id": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a"
+   },
+   "surface": {
+    "audience": "member",
+    "tool": "bramble",
+    "signed_in": true,
+    "phone": true
+   },
+   "expect": [
+    {
+     "id": "onlyworlds",
+     "name": "onlyworlds.com",
+     "href": "https://www.onlyworlds.com/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/character/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
+     "state": null
+    },
+    {
+     "id": "zephyr",
+     "name": "Zephyr",
+     "href": "https://zephyr.example/#/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/character/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
+     "state": null
+    },
+    {
+     "id": "bramble",
+     "name": "Bramble",
+     "href": "https://bramble.example/open/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/e/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
+     "state": "You are here"
+    },
+    {
+     "id": "corvid",
+     "name": "Corvid",
+     "href": "https://corvid.example/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/character/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
+     "state": null
+    }
+   ]
+  },
+  {
+   "name": "you-are-here-by-client",
+   "why": "the surface's tool is matched on the row's client, never its id",
+   "tools": "three",
+   "kind": "world",
+   "address": {
+    "form": "human",
+    "world": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f"
+   },
+   "surface": {
+    "audience": "member",
+    "tool": "zephyr",
+    "signed_in": false
+   },
+   "expect": [
+    {
+     "id": "onlyworlds",
+     "name": "onlyworlds.com",
+     "href": "https://www.onlyworlds.com/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+     "state": null
+    },
+    {
+     "id": "zephyr",
+     "name": "Zephyr",
+     "href": "https://zephyr.example/#/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+     "state": "Sign in to Zephyr first"
+    },
+    {
+     "id": "bramble",
+     "name": "Bramble",
+     "href": "https://bramble.example/open/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+     "state": null
+    },
+    {
+     "id": "corvid",
+     "name": "Corvid",
+     "href": "https://corvid.example/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+     "state": null
+    }
+   ]
+  },
+  {
+   "name": "no-tool-matches-no-client",
+   "why": "a surface with no tool is no row's, a row with no client included",
+   "tools": "three",
+   "kind": "world",
+   "address": {
+    "form": "human",
+    "world": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f"
+   },
+   "surface": {
+    "audience": "member",
+    "tool": null,
+    "signed_in": true
+   },
+   "expect": [
+    {
+     "id": "onlyworlds",
+     "name": "onlyworlds.com",
+     "href": "https://www.onlyworlds.com/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+     "state": null
+    },
+    {
+     "id": "zephyr",
+     "name": "Zephyr",
+     "href": "https://zephyr.example/#/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+     "state": null
+    },
+    {
+     "id": "bramble",
+     "name": "Bramble",
+     "href": "https://bramble.example/open/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+     "state": null
+    },
+    {
+     "id": "corvid",
+     "name": "Corvid",
+     "href": "https://corvid.example/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+     "state": null
+    }
+   ]
+  },
+  {
+   "name": "mixed-world",
+   "why": "open null, an element door alone on a world, and a row not listed (built, delisted): no row",
+   "tools": "mixed",
+   "kind": "world",
+   "address": {
+    "form": "human",
+    "world": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f"
+   },
+   "surface": {
+    "audience": "member",
+    "signed_in": true
+   },
+   "expect": [
+    {
+     "id": "onlyworlds",
+     "name": "onlyworlds.com",
+     "href": "https://www.onlyworlds.com/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+     "state": null
+    },
+    {
+     "id": "harbor",
+     "name": "Harbor",
+     "href": "https://harbor.example/#/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+     "state": null
+    },
+    {
+     "id": "lumen",
+     "name": "Lumen",
+     "href": "https://lumen.example/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+     "state": null
+    }
+   ]
+  },
+  {
+   "name": "mixed-element",
+   "why": "a world door alone on an element opens the world and says so; an element door alone is a row",
+   "tools": "mixed",
+   "kind": "element",
+   "address": {
+    "form": "text",
+    "world": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+    "type": "character",
+    "id": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a"
+   },
+   "surface": {
+    "audience": "member",
+    "signed_in": true
+   },
+   "expect": [
+    {
+     "id": "onlyworlds",
+     "name": "onlyworlds.com",
+     "href": "https://www.onlyworlds.com/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/character/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
+     "state": null
+    },
+    {
+     "id": "harbor",
+     "name": "Harbor",
+     "href": "https://harbor.example/#/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+     "state": "Opens the world"
+    },
+    {
+     "id": "lumen",
+     "name": "Lumen",
+     "href": "https://lumen.example/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+     "state": "Opens the world"
+    },
+    {
+     "id": "stitch",
+     "name": "Stitch",
+     "href": "https://stitch.example/e/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
+     "state": null
+    }
+   ]
+  },
+  {
+   "name": "world-door-sign-in-first",
+   "why": "a world door alone that needs a sign-in: the sign-in word first, the href still the world door",
+   "tools": "mixed",
+   "kind": "element",
+   "address": {
+    "form": "text",
+    "world": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+    "type": "character",
+    "id": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a"
+   },
+   "surface": {
+    "audience": "member",
+    "signed_in": false
+   },
+   "expect": [
+    {
+     "id": "onlyworlds",
+     "name": "onlyworlds.com",
+     "href": "https://www.onlyworlds.com/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/character/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
+     "state": null
+    },
+    {
+     "id": "harbor",
+     "name": "Harbor",
+     "href": "https://harbor.example/#/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+     "state": "Opens the world"
+    },
+    {
+     "id": "lumen",
+     "name": "Lumen",
+     "href": "https://lumen.example/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+     "state": "Sign in to Lumen first"
+    },
+    {
+     "id": "stitch",
+     "name": "Stitch",
+     "href": "https://stitch.example/e/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
+     "state": null
+    }
+   ]
+  },
+  {
+   "name": "world-door-outside-a-browser",
+   "why": "the same outside a browser",
+   "tools": "mixed",
+   "kind": "element",
+   "address": {
+    "form": "text",
+    "world": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+    "type": "character",
+    "id": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a"
+   },
+   "surface": {
+    "audience": "member",
+    "signed_in": false,
+    "browser": false
+   },
+   "expect": [
+    {
+     "id": "onlyworlds",
+     "name": "onlyworlds.com",
+     "href": "https://www.onlyworlds.com/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/character/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
+     "state": null
+    },
+    {
+     "id": "harbor",
+     "name": "Harbor",
+     "href": "https://harbor.example/#/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+     "state": "Opens the world"
+    },
+    {
+     "id": "lumen",
+     "name": "Lumen",
+     "href": "https://lumen.example/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+     "state": "Opens in your browser"
+    },
+    {
+     "id": "stitch",
+     "name": "Stitch",
+     "href": "https://stitch.example/e/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
+     "state": null
+    }
+   ]
+  },
+  {
+   "name": "world-door-not-known",
+   "why": "no sign-in word known: Opens the world",
+   "tools": "mixed",
+   "kind": "element",
+   "address": {
+    "form": "text",
+    "world": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+    "type": "character",
+    "id": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a"
+   },
+   "surface": {
+    "audience": "member",
+    "signed_in": null
+   },
+   "expect": [
+    {
+     "id": "onlyworlds",
+     "name": "onlyworlds.com",
+     "href": "https://www.onlyworlds.com/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/character/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
+     "state": null
+    },
+    {
+     "id": "harbor",
+     "name": "Harbor",
+     "href": "https://harbor.example/#/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+     "state": "Opens the world"
+    },
+    {
+     "id": "lumen",
+     "name": "Lumen",
+     "href": "https://lumen.example/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+     "state": "Opens the world"
+    },
+    {
+     "id": "stitch",
+     "name": "Stitch",
+     "href": "https://stitch.example/e/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
+     "state": null
+    }
+   ]
+  },
+  {
+   "name": "world-door-you-are-here",
+   "why": "You are here before Opens the world",
+   "tools": "mixed",
+   "kind": "element",
+   "address": {
+    "form": "text",
+    "world": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+    "type": "character",
+    "id": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a"
+   },
+   "surface": {
+    "audience": "member",
+    "tool": "lumen",
+    "signed_in": false
+   },
+   "expect": [
+    {
+     "id": "onlyworlds",
+     "name": "onlyworlds.com",
+     "href": "https://www.onlyworlds.com/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/character/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
+     "state": null
+    },
+    {
+     "id": "harbor",
+     "name": "Harbor",
+     "href": "https://harbor.example/#/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+     "state": "Opens the world"
+    },
+    {
+     "id": "lumen",
+     "name": "Lumen",
+     "href": "https://lumen.example/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+     "state": "You are here"
+    },
+    {
+     "id": "stitch",
+     "name": "Stitch",
+     "href": "https://stitch.example/e/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
+     "state": null
+    }
+   ]
+  },
+  {
+   "name": "mixed-public-element",
+   "why": "the public sees the rows that need nothing, the world door alone still worded",
+   "tools": "mixed",
+   "kind": "element",
+   "address": {
+    "form": "text",
+    "world": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+    "type": "character",
+    "id": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a"
+   },
+   "surface": {
+    "audience": "public"
+   },
+   "expect": [
+    {
+     "id": "onlyworlds",
+     "name": "onlyworlds.com",
+     "href": "https://www.onlyworlds.com/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/character/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
+     "state": null
+    },
+    {
+     "id": "harbor",
+     "name": "Harbor",
+     "href": "https://harbor.example/#/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+     "state": "Opens the world"
+    },
+    {
+     "id": "stitch",
+     "name": "Stitch",
+     "href": "https://stitch.example/e/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
+     "state": null
+    }
+   ]
+  },
+  {
+   "name": "public-you-are-here",
+   "why": "You are here on a public page too",
+   "tools": "mixed",
+   "kind": "world",
+   "address": {
+    "form": "human",
+    "world": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f"
+   },
+   "surface": {
+    "audience": "public",
+    "tool": "harbor"
+   },
+   "expect": [
+    {
+     "id": "onlyworlds",
+     "name": "onlyworlds.com",
+     "href": "https://www.onlyworlds.com/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+     "state": null
+    },
+    {
+     "id": "harbor",
+     "name": "Harbor",
+     "href": "https://harbor.example/#/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+     "state": "You are here"
+    }
+   ]
+  },
+  {
+   "name": "empty-list",
+   "why": "no tools: onlyworlds.com alone",
+   "tools": "empty",
+   "kind": "element",
+   "address": {
+    "form": "text",
+    "world": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+    "type": "character",
+    "id": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a"
+   },
+   "surface": {
+    "audience": "member",
+    "signed_in": true
+   },
+   "expect": [
+    {
+     "id": "onlyworlds",
+     "name": "onlyworlds.com",
+     "href": "https://www.onlyworlds.com/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/character/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
+     "state": null
+    }
+   ]
+  },
+  {
+   "name": "ids-lowercased",
+   "why": "ids in either case of hex, written lowercase in every href",
+   "tools": "three",
+   "kind": "element",
+   "address": {
+    "form": "human",
+    "world": "0199C3A1-7B2E-7C3D-8E4F-5A6B7C8D9E0F",
+    "type": "character",
+    "id": "0199C3A1-7B2E-7C3D-8E4F-5A6B7C8D9E1A"
+   },
+   "surface": {
+    "audience": "member",
+    "signed_in": true
+   },
+   "expect": [
+    {
+     "id": "onlyworlds",
+     "name": "onlyworlds.com",
+     "href": "https://www.onlyworlds.com/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/character/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
+     "state": null
+    },
+    {
+     "id": "zephyr",
+     "name": "Zephyr",
+     "href": "https://zephyr.example/#/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/character/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
+     "state": null
+    },
+    {
+     "id": "bramble",
+     "name": "Bramble",
+     "href": "https://bramble.example/open/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/e/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
+     "state": null
+    },
+    {
+     "id": "corvid",
+     "name": "Corvid",
+     "href": "https://corvid.example/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/character/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
+     "state": null
+    }
+   ]
+  },
+  {
+   "name": "lens-and-moment-not-in-href",
+   "why": "a lens and a moment ride on no href",
+   "tools": "three",
+   "kind": "element",
+   "address": {
+    "form": "text",
+    "world": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+    "type": "character",
+    "id": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
+    "lens": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e2b",
+    "moment": -12
+   },
+   "surface": {
+    "audience": "member",
+    "signed_in": true
+   },
+   "expect": [
+    {
+     "id": "onlyworlds",
+     "name": "onlyworlds.com",
+     "href": "https://www.onlyworlds.com/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/character/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
+     "state": null
+    },
+    {
+     "id": "zephyr",
+     "name": "Zephyr",
+     "href": "https://zephyr.example/#/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/character/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
+     "state": null
+    },
+    {
+     "id": "bramble",
+     "name": "Bramble",
+     "href": "https://bramble.example/open/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/e/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
+     "state": null
+    },
+    {
+     "id": "corvid",
+     "name": "Corvid",
+     "href": "https://corvid.example/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/character/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
+     "state": null
+    }
+   ]
+  },
+  {
+   "name": "world-from-an-element-address",
+   "why": "a world's openers from an element's address: the world's rows",
+   "tools": "three",
+   "kind": "world",
+   "address": {
+    "form": "text",
+    "world": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+    "type": "character",
+    "id": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a"
+   },
+   "surface": {
+    "audience": "member",
+    "signed_in": true
+   },
+   "expect": [
+    {
+     "id": "onlyworlds",
+     "name": "onlyworlds.com",
+     "href": "https://www.onlyworlds.com/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+     "state": null
+    },
+    {
+     "id": "zephyr",
+     "name": "Zephyr",
+     "href": "https://zephyr.example/#/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+     "state": null
+    },
+    {
+     "id": "bramble",
+     "name": "Bramble",
+     "href": "https://bramble.example/open/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+     "state": null
+    },
+    {
+     "id": "corvid",
+     "name": "Corvid",
+     "href": "https://corvid.example/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+     "state": null
+    }
+   ]
+  },
+  {
+   "name": "slug-world",
+   "why": "a slug is never an id: a slug can change, an id does not",
+   "tools": "three",
+   "kind": "world",
+   "address": {
+    "form": "human",
+    "world": "old-harbour"
+   },
+   "surface": {
+    "audience": "member",
+    "signed_in": true
+   },
+   "refuse": {
+    "error": "address",
+    "reason": "bad_world"
+   }
+  },
+  {
+   "name": "no-world",
+   "why": "the text form inside a world names no world",
+   "tools": "three",
+   "kind": "element",
+   "address": {
+    "form": "text",
+    "type": "character",
+    "id": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a"
+   },
+   "surface": {
+    "audience": "member",
+    "signed_in": true
+   },
+   "refuse": {
+    "error": "address",
+    "reason": "no_world"
+   }
+  },
+  {
+   "name": "bad-id",
+   "why": "an element id that is not a UUID",
+   "tools": "three",
+   "kind": "element",
+   "address": {
+    "form": "human",
+    "world": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+    "type": "character",
+    "id": "e1"
+   },
+   "surface": {
+    "audience": "member",
+    "signed_in": true
+   },
+   "refuse": {
+    "error": "address",
+    "reason": "bad_id"
+   }
+  },
+  {
+   "name": "type-without-id",
+   "why": "a type needs an id",
+   "tools": "three",
+   "kind": "element",
+   "address": {
+    "form": "human",
+    "world": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+    "type": "character"
+   },
+   "surface": {
+    "audience": "member",
+    "signed_in": true
+   },
+   "refuse": {
+    "error": "address",
+    "reason": "segments"
+   }
+  },
+  {
+   "name": "element-without-type-and-id",
+   "why": "an element's openers need the element",
+   "tools": "three",
+   "kind": "element",
+   "address": {
+    "form": "human",
+    "world": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f"
+   },
+   "surface": {
+    "audience": "member",
+    "signed_in": true
+   },
+   "refuse": {
+    "error": "type",
+    "names": "type"
+   }
+  },
+  {
+   "name": "unknown-address-key",
+   "why": "the address is a closed set of keys",
+   "tools": "three",
+   "kind": "world",
+   "address": {
+    "form": "human",
+    "world": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+    "wrold": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f"
+   },
+   "surface": {
+    "audience": "member",
+    "signed_in": true
+   },
+   "refuse": {
+    "error": "type",
+    "names": "wrold"
+   }
+  },
+  {
+   "name": "unknown-kind",
+   "why": "kind is world or element",
+   "tools": "three",
+   "kind": "folder",
+   "address": {
+    "form": "human",
+    "world": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f"
+   },
+   "surface": {
+    "audience": "member",
+    "signed_in": true
+   },
+   "refuse": {
+    "error": "type",
+    "names": "kind"
+   }
+  },
+  {
+   "name": "unknown-surface-key",
+   "why": "the surface refuses a key it does not know, by name",
+   "tools": "three",
+   "kind": "world",
+   "address": {
+    "form": "human",
+    "world": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f"
+   },
+   "surface": {
+    "audience": "member",
+    "colour": "blue"
+   },
+   "refuse": {
+    "error": "type",
+    "names": "colour"
+   }
+  },
+  {
+   "name": "audience-required",
+   "why": "the audience is never guessed",
+   "tools": "three",
+   "kind": "world",
+   "address": {
+    "form": "human",
+    "world": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f"
+   },
+   "surface": {
+    "signed_in": true
+   },
+   "refuse": {
+    "error": "type",
+    "names": "audience"
+   }
+  },
+  {
+   "name": "audience-unknown-word",
+   "why": "a guest is a member; there is no third audience",
+   "tools": "three",
+   "kind": "world",
+   "address": {
+    "form": "human",
+    "world": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f"
+   },
+   "surface": {
+    "audience": "guest"
+   },
+   "refuse": {
+    "error": "type",
+    "names": "audience"
+   }
+  },
+  {
+   "name": "signed-in-not-a-boolean",
+   "why": "signed_in is true, false or null",
+   "tools": "three",
+   "kind": "world",
+   "address": {
+    "form": "human",
+    "world": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f"
+   },
+   "surface": {
+    "audience": "member",
+    "signed_in": "yes"
+   },
+   "refuse": {
+    "error": "type",
+    "names": "signed_in"
+   }
+  },
+  {
+   "name": "browser-not-a-boolean",
+   "why": "browser is a boolean",
+   "tools": "three",
+   "kind": "world",
+   "address": {
+    "form": "human",
+    "world": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f"
+   },
+   "surface": {
+    "audience": "member",
+    "browser": null
+   },
+   "refuse": {
+    "error": "type",
+    "names": "browser"
+   }
+  },
+  {
+   "name": "needs-the-list-does-not-know",
+   "why": "a needs word outside the list's format is refused, never read as nothing",
+   "tools": "odd-needs",
+   "kind": "world",
+   "address": {
+    "form": "human",
+    "world": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f"
+   },
+   "surface": {
+    "audience": "member",
+    "signed_in": true
+   },
+   "refuse": {
+    "error": "type",
+    "names": "needs"
+   }
+  }
+ ]
+}

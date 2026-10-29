@@ -360,6 +360,20 @@ reading = parse_ow_link(text)  # AddressReading: form, world, world_is_slug, typ
 
 A field that holds an address is text: never fetch or resolve it on the server. `parse_ow_link` reads one string whole; finding a link inside other text is yours. The profile: [`profiles/address.md`](https://github.com/OnlyWorlds/schema-dist/blob/main/profiles/address.md), with its 133-case fixture, which is this module's test.
 
+### Open with
+
+The rows of an "Open with" menu for a world or one of its elements: the site's page first, then each listed tool that has a link for it, in the tools list's order, each with the word it says when it cannot open now. `onlyworlds.TOOLS` is the [OnlyWorlds tools list](https://github.com/OnlyWorlds/tools) as of this release.
+
+```python
+from onlyworlds import TOOLS, openers_for, parse_ow_link
+
+rows = openers_for(TOOLS, "element", parse_ow_link(link), {"audience": "member", "signed_in": False})
+# [{"id": "onlyworlds", "name": "onlyworlds.com", "href": ..., "state": None},
+#  {"id": "atlas", "name": "Atlas", "href": ..., "state": "Sign in to Atlas first"}, ...]
+```
+
+`surface` says what the page knows and nothing is guessed: `audience` (`member` or `public`; the public sees only rows that need nothing first), `signed_in` (`None` when the page cannot know, and then no row says so), `browser` (False in a desktop app), `phone`, and `tool`, the page's own client name, whose row says "You are here". The npm SDK's `openersFor` gives the same rows.
+
 ### The spine
 
 A world may map a software ecosystem: what is built, where each thing lives, who keeps it and what it depends on. Each kind is a type with a supertype from a closed list (`onlyworlds.SPINE_KINDS`: a `Tool` or a `Package` is an Object, a `Repo` a Location, a `Seat` a Title), and `x_spine_*` keys carry the rest. `onlyworlds.read_spine_element(type, element)` reads one element as the profile does: its kind (or `off-list`), each key as read or `None`, and every value it left out, named in `dropped`.

@@ -45,12 +45,12 @@ testpaths = ["tests"]
 [tool.ruff]
 line-length = 120
 target-version = "py312"
-extend-exclude = ["codegen/schema-dist", "src/onlyworlds/_schema.py", "src/onlyworlds/_walk"]  # the vendored dist, its copied checker and the generated module keep their own shape
+extend-exclude = ["codegen/schema-dist", "codegen/tools", "src/onlyworlds/_schema.py", "src/onlyworlds/_tools.py", "src/onlyworlds/_walk"]  # the vendored dist and tools list, the copied checker and the generated modules keep their own shape
 
 [tool.ruff.lint]
 select = ["E", "F", "W", "I", "B", "UP", "SIM", "RUF"]
 
 [tool.mypy]
 strict = true
-files = ["src", "tests", "codegen/generate_schema.py"]
+files = ["src", "tests", "codegen/generate_schema.py", "codegen/generate_tools.py"]
 exclude = ["src/onlyworlds/_walk/"]  # the dist's checker, copied byte for byte

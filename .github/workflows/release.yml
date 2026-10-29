@@ -64,6 +64,7 @@ jobs:
       - run: uv run ruff check .
       - run: uv run mypy --strict src tests
       - run: uv run python codegen/generate_schema.py --check
+      - run: uv run python codegen/generate_tools.py --check
       # Published text names no one inside the team and points at no internal room or tracker.
       - run: uv run python scripts/public_words.py
       - run: uv build

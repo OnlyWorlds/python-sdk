@@ -20,6 +20,7 @@ from ._schema import (
     SCHEMA_MANIFEST_SHA256,
     SCHEMA_VERSION,
 )
+from ._tools import TOOLS
 from ._version import __version__
 from .address import (
     AddressError,
@@ -94,6 +95,7 @@ from .message import (
     unread_for,
 )
 from .names import type_word
+from .openers import Opener, Tool, ToolOpen, openers_for
 from .push import Patch, PushPlan, PushResult, plan_push, push, verify_level
 from .review import PROPOSED_MARK, ProposedMark, hands_on_as_proposed, proposed_mark_of
 from .room import is_charter_element, is_room_element, reading_aid_of
@@ -130,6 +132,7 @@ __all__ = [
     "SCHEMA_VERSION",
     "SKILL_MAX",
     "SPINE_KINDS",
+    "TOOLS",
     "WORLD_FILE_MEDIA_TYPE",
     "AddressError",
     "AddressForm",
@@ -152,6 +155,7 @@ __all__ = [
     "GuideRead",
     "LensMail",
     "LensReading",
+    "Opener",
     "Patch",
     "PreconditionFailed",
     "ProposedError",
@@ -165,6 +169,8 @@ __all__ = [
     "SkippedFile",
     "SpineRead",
     "StaleProposal",
+    "Tool",
+    "ToolOpen",
     "Transport",
     "UrllibTransport",
     "WorldFile",
@@ -198,6 +204,7 @@ __all__ = [
     "is_to_everyone",
     "lenses_in_use",
     "note_of",
+    "openers_for",
     "out_degree_of",
     "parse_ow_link",
     "parse_retry_after",
