@@ -403,6 +403,40 @@ def test_mid_labels_and_month_starts() -> None:
     assert month_start_steps(MINIMAL, 0) == []
 
 
+def test_an_intercalary_day_after_a_month_the_year_lacks_is_unreadable() -> None:
+    # Serial 89 (Quillon's Unreal port): a day after a month the year lacks has no position.
+    months = {"names": ["A", "B"], "lengths": [10, 10]}
+
+    def at(after_month: int, bundles: dict[str, Any] | None = None) -> dict[str, Any]:
+        return {
+            "version": 1,
+            "grain": "day",
+            "bundles": bundles or {"months": months},
+            "intercalary": [{"name": "Gap", "after_month": after_month}],
+        }
+
+    for ok in (0, 1, 2):
+        assert read_calendar_config(at(ok)) is not None, ok
+    assert read_calendar_config(at(3)) is None
+    assert read_calendar_config(at(0, {"year": {"steps": 10}})) is not None
+    assert read_calendar_config(at(1, {"year": {"steps": 10}})) is None
+
+
+def test_a_format_that_is_not_a_string_prints_the_default() -> None:
+    # Serial 89: a format template that is not a string is ignored and the default prints.
+    base: dict[str, Any] = {
+        "version": 1,
+        "grain": "day",
+        "bundles": {"months": {"names": ["A", "B"], "lengths": [10, 10]}},
+        "intercalary": [{"name": "Gap", "after_month": 1}],
+    }
+    for bad in (1, None, ["{day}"], {"x": 1}):
+        cfg = read_calendar_config({**base, "format": bad, "format_intercalary": bad})
+        assert cfg is not None, bad
+        for step in (0, 10):
+            assert format_step(cfg, step) == format_step(base, step), (bad, step)
+
+
 def test_the_defensive_read() -> None:
     for value in (
         None,

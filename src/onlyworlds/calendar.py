@@ -696,6 +696,11 @@ def read_calendar_config(value: object) -> CalendarConfig | None:
     # Version 2's leap keys (version 1 ignores them, as it ignores any unknown key).
     if _strict_eq(version, 2) and any(_leap_rule_problem(i) is not None for i in entries):
         return None
+    # A day placed after a month the year does not have has no position, and a reader never
+    # invents one: the calendar is unreadable (the profile, serial 89; the free week raised here).
+    month_count = len(_prop(months, "names")) if _truthy(months) else 0
+    if any(_prop(i, "after_month") > month_count for i in entries):
+        return None
     return cast(CalendarConfig, cfg)
 
 
@@ -1160,12 +1165,14 @@ def format_step(cfg: Mapping[str, Any], step: int) -> str:
         "step": _js_num_str(s),
         "intercalary": intercalary,
     }
+    # A template that is not a string is ignored and the default prints (the profile: a reader may
+    # ignore the format templates, serial 89; _render raised on one).
     if not _nullish(intercalary):
         template = _prop(cfg, "format_intercalary")
-        template = _DEFAULT_FORMAT_INTERCALARY if _nullish(template) else template
+        template = template if isinstance(template, str) else _DEFAULT_FORMAT_INTERCALARY
     else:
         template = _prop(cfg, "format")
-        if _nullish(template):
+        if not isinstance(template, str):
             template = _DEFAULT_FORMAT_MONTHS if _truthy(_bundle(cfg, "months")) else _DEFAULT_FORMAT_PLAIN
     return _render(template, values)
 
