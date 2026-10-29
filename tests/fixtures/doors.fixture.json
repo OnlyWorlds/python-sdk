@@ -1,0 +1,817 @@
+{
+  "what": "The door history of an element: doorsOf (npm SDK) and doors_of (Python package) on the same cases. Every expected list is written by hand. The same bytes in both packages; each test holds this file's sha256.",
+  "keys": "tools is the tools list every case reads, unless the case carries its own tools. element is an element body as the API serves it (doors, changed_client, changed_via, updated_at). expected is the entries in order, each {door, at, tool, last, from}, tool null or the matched row's {id, name}.",
+  "tools": [
+    {
+      "id": "atlas",
+      "name": "Atlas",
+      "url": "https://atlas.example",
+      "client": "atlas",
+      "rung": "listed",
+      "open": null
+    },
+    {
+      "id": "atlas-beta",
+      "name": "Atlas Beta",
+      "url": "https://beta.atlas.example",
+      "client": "atlas",
+      "rung": "built",
+      "open": null
+    },
+    {
+      "id": "lantern",
+      "name": "Lantern",
+      "url": "https://lantern.example",
+      "client": "lantern",
+      "rung": "listed",
+      "open": null
+    },
+    {
+      "id": "corvid",
+      "name": "Corvid",
+      "url": "https://corvid.example",
+      "client": null,
+      "rung": "listed",
+      "open": null
+    }
+  ],
+  "cases": [
+    {
+      "name": "newest first across several keys",
+      "element": {
+        "doors": {
+          "atlas": "2026-10-12T09:15:00.000000+00:00",
+          "lantern": "2026-10-29T14:31:07.123456+00:00",
+          "mcp": "2026-10-20T08:00:00Z",
+          "site": "2026-09-30T23:59:59.999999Z"
+        },
+        "updated_at": "2026-10-29T14:31:07.123456+00:00"
+      },
+      "expected": [
+        {
+          "door": "lantern",
+          "at": "2026-10-29T14:31:07.123456+00:00",
+          "tool": {
+            "id": "lantern",
+            "name": "Lantern"
+          },
+          "last": true,
+          "from": "doors"
+        },
+        {
+          "door": "mcp",
+          "at": "2026-10-20T08:00:00Z",
+          "tool": null,
+          "last": false,
+          "from": "doors"
+        },
+        {
+          "door": "atlas",
+          "at": "2026-10-12T09:15:00.000000+00:00",
+          "tool": {
+            "id": "atlas",
+            "name": "Atlas"
+          },
+          "last": false,
+          "from": "doors"
+        },
+        {
+          "door": "site",
+          "at": "2026-09-30T23:59:59.999999Z",
+          "tool": null,
+          "last": false,
+          "from": "doors"
+        }
+      ]
+    },
+    {
+      "name": "times compare as instants, not as strings",
+      "element": {
+        "doors": {
+          "api": "2026-10-29T16:00:00+02:00",
+          "server": "2026-10-30T01:00:00+14:00",
+          "sync": "2026-10-29T14:30:00Z",
+          "v1": "2026-10-29T10:00:00-05:00"
+        },
+        "updated_at": "2026-10-29T15:00:00Z"
+      },
+      "expected": [
+        {
+          "door": "v1",
+          "at": "2026-10-29T10:00:00-05:00",
+          "tool": null,
+          "last": true,
+          "from": "doors"
+        },
+        {
+          "door": "sync",
+          "at": "2026-10-29T14:30:00Z",
+          "tool": null,
+          "last": false,
+          "from": "doors"
+        },
+        {
+          "door": "api",
+          "at": "2026-10-29T16:00:00+02:00",
+          "tool": null,
+          "last": false,
+          "from": "doors"
+        },
+        {
+          "door": "server",
+          "at": "2026-10-30T01:00:00+14:00",
+          "tool": null,
+          "last": false,
+          "from": "doors"
+        }
+      ]
+    },
+    {
+      "name": "an offset across midnight, a month end and a year end",
+      "element": {
+        "doors": {
+          "declared": "2026-01-01T00:30:00+01:00",
+          "seat": "2025-12-31T23:45:00Z",
+          "server": "2024-03-01T00:30:00+01:00",
+          "sync": "2024-02-29T23:45:00Z"
+        },
+        "updated_at": "2025-12-31T23:45:00Z"
+      },
+      "expected": [
+        {
+          "door": "seat",
+          "at": "2025-12-31T23:45:00Z",
+          "tool": null,
+          "last": true,
+          "from": "doors"
+        },
+        {
+          "door": "declared",
+          "at": "2026-01-01T00:30:00+01:00",
+          "tool": null,
+          "last": false,
+          "from": "doors"
+        },
+        {
+          "door": "sync",
+          "at": "2024-02-29T23:45:00Z",
+          "tool": null,
+          "last": false,
+          "from": "doors"
+        },
+        {
+          "door": "server",
+          "at": "2024-03-01T00:30:00+01:00",
+          "tool": null,
+          "last": false,
+          "from": "doors"
+        }
+      ]
+    },
+    {
+      "name": "a tie at one instant goes by key, by code point (not locale, not UTF-16 unit)",
+      "element": {
+        "doors": {
+          "site": "2026-10-29T12:00:00Z",
+          "mcp": "2026-10-29T12:00:00Z",
+          "api": "2026-10-29T12:00:00Z",
+          "Zed": "2026-10-29T12:00:00Z",
+          "😀": "2026-10-29T12:00:00Z",
+          "～": "2026-10-29T12:00:00Z"
+        },
+        "updated_at": "2026-10-29T12:00:00Z"
+      },
+      "expected": [
+        {
+          "door": "Zed",
+          "at": "2026-10-29T12:00:00Z",
+          "tool": null,
+          "last": true,
+          "from": "doors"
+        },
+        {
+          "door": "api",
+          "at": "2026-10-29T12:00:00Z",
+          "tool": null,
+          "last": false,
+          "from": "doors"
+        },
+        {
+          "door": "mcp",
+          "at": "2026-10-29T12:00:00Z",
+          "tool": null,
+          "last": false,
+          "from": "doors"
+        },
+        {
+          "door": "site",
+          "at": "2026-10-29T12:00:00Z",
+          "tool": null,
+          "last": false,
+          "from": "doors"
+        },
+        {
+          "door": "～",
+          "at": "2026-10-29T12:00:00Z",
+          "tool": null,
+          "last": false,
+          "from": "doors"
+        },
+        {
+          "door": "😀",
+          "at": "2026-10-29T12:00:00Z",
+          "tool": null,
+          "last": false,
+          "from": "doors"
+        }
+      ]
+    },
+    {
+      "name": "two times that differ only at the microsecond",
+      "element": {
+        "doors": {
+          "atlas": "2026-10-29T14:31:07.123456Z",
+          "lantern": "2026-10-29T14:31:07.123457Z"
+        },
+        "updated_at": "2026-10-29T14:31:07.123457Z"
+      },
+      "expected": [
+        {
+          "door": "lantern",
+          "at": "2026-10-29T14:31:07.123457Z",
+          "tool": {
+            "id": "lantern",
+            "name": "Lantern"
+          },
+          "last": true,
+          "from": "doors"
+        },
+        {
+          "door": "atlas",
+          "at": "2026-10-29T14:31:07.123456Z",
+          "tool": {
+            "id": "atlas",
+            "name": "Atlas"
+          },
+          "last": false,
+          "from": "doors"
+        }
+      ]
+    },
+    {
+      "name": "fractions of different lengths",
+      "element": {
+        "doors": {
+          "api": "2026-10-29T14:31:07.49999999Z",
+          "mcp": "2026-10-29T14:31:07.5Z",
+          "seat": "2026-10-29T14:31:07Z"
+        },
+        "updated_at": "2026-10-29T14:31:07.500Z"
+      },
+      "expected": [
+        {
+          "door": "mcp",
+          "at": "2026-10-29T14:31:07.5Z",
+          "tool": null,
+          "last": true,
+          "from": "doors"
+        },
+        {
+          "door": "api",
+          "at": "2026-10-29T14:31:07.49999999Z",
+          "tool": null,
+          "last": false,
+          "from": "doors"
+        },
+        {
+          "door": "seat",
+          "at": "2026-10-29T14:31:07Z",
+          "tool": null,
+          "last": false,
+          "from": "doors"
+        }
+      ]
+    },
+    {
+      "name": "the same instant in two offsets is a tie, by key",
+      "element": {
+        "doors": {
+          "sdk": "2026-10-29T15:31:07.5+01:00",
+          "api": "2026-10-29T14:31:07.500000Z"
+        },
+        "updated_at": "2026-10-29T14:31:07.5Z"
+      },
+      "expected": [
+        {
+          "door": "api",
+          "at": "2026-10-29T14:31:07.500000Z",
+          "tool": null,
+          "last": true,
+          "from": "doors"
+        },
+        {
+          "door": "sdk",
+          "at": "2026-10-29T15:31:07.5+01:00",
+          "tool": null,
+          "last": false,
+          "from": "doors"
+        }
+      ]
+    },
+    {
+      "name": "tool by client: a listed tool (its first row), an unlisted client, door words",
+      "element": {
+        "doors": {
+          "atlas": "2026-10-29T10:00:00Z",
+          "sdk": "2026-10-29T11:00:00Z",
+          "site": "2026-10-29T12:00:00Z",
+          "mcp": "2026-10-29T13:00:00Z",
+          "lantern": "2026-10-29T09:00:00Z"
+        },
+        "updated_at": "2026-10-29T13:00:00Z"
+      },
+      "expected": [
+        {
+          "door": "mcp",
+          "at": "2026-10-29T13:00:00Z",
+          "tool": null,
+          "last": true,
+          "from": "doors"
+        },
+        {
+          "door": "site",
+          "at": "2026-10-29T12:00:00Z",
+          "tool": null,
+          "last": false,
+          "from": "doors"
+        },
+        {
+          "door": "sdk",
+          "at": "2026-10-29T11:00:00Z",
+          "tool": null,
+          "last": false,
+          "from": "doors"
+        },
+        {
+          "door": "atlas",
+          "at": "2026-10-29T10:00:00Z",
+          "tool": {
+            "id": "atlas",
+            "name": "Atlas"
+          },
+          "last": false,
+          "from": "doors"
+        },
+        {
+          "door": "lantern",
+          "at": "2026-10-29T09:00:00Z",
+          "tool": {
+            "id": "lantern",
+            "name": "Lantern"
+          },
+          "last": false,
+          "from": "doors"
+        }
+      ]
+    },
+    {
+      "name": "the case's own tools: a row whose client is a door word, and a client no row holds",
+      "tools": [
+        {
+          "id": "zephyr",
+          "name": "Zephyr",
+          "url": "https://zephyr.example",
+          "client": "site",
+          "rung": "listed",
+          "open": null
+        }
+      ],
+      "element": {
+        "doors": {
+          "site": "2026-10-29T12:00:00Z",
+          "atlas": "2026-10-29T11:00:00Z"
+        },
+        "updated_at": "2026-10-29T12:00:00Z"
+      },
+      "expected": [
+        {
+          "door": "site",
+          "at": "2026-10-29T12:00:00Z",
+          "tool": {
+            "id": "zephyr",
+            "name": "Zephyr"
+          },
+          "last": true,
+          "from": "doors"
+        },
+        {
+          "door": "atlas",
+          "at": "2026-10-29T11:00:00Z",
+          "tool": null,
+          "last": false,
+          "from": "doors"
+        }
+      ]
+    },
+    {
+      "name": "invalid entries are skipped",
+      "element": {
+        "doors": {
+          "": "2026-10-29T12:00:00Z",
+          "atlas": 1761740000,
+          "lantern": "yesterday",
+          "site": "2026-13-01T00:00:00Z",
+          "api": null,
+          "seat": true,
+          "sync": {
+            "at": "2026-10-29T12:00:00Z"
+          },
+          "v1": [
+            "2026-10-29T12:00:00Z"
+          ],
+          "mcp": "2026-10-29T08:00:00Z"
+        },
+        "updated_at": "2026-10-29T08:00:00Z"
+      },
+      "expected": [
+        {
+          "door": "mcp",
+          "at": "2026-10-29T08:00:00Z",
+          "tool": null,
+          "last": true,
+          "from": "doors"
+        }
+      ]
+    },
+    {
+      "name": "times outside the accepted form are skipped",
+      "element": {
+        "doors": {
+          "not-a-leap-year": "2026-02-29T00:00:00Z",
+          "leap-day": "2024-02-29T00:00:00Z",
+          "no-offset": "2026-10-29T12:00:00",
+          "space": "2026-10-29 12:00:00Z",
+          "lowercase-z": "2026-10-29T12:00:00z",
+          "hour-24": "2026-10-29T24:00:00Z",
+          "minute-60": "2026-10-29T12:60:00Z",
+          "second-60": "2026-10-29T12:00:60Z",
+          "empty-fraction": "2026-10-29T12:00:00.Z",
+          "comma-fraction": "2026-10-29T12:00:00,5Z",
+          "offset-no-colon": "2026-10-29T12:00:00+0100",
+          "offset-hour-only": "2026-10-29T12:00:00+01",
+          "offset-hour-24": "2026-10-29T12:00:00+24:00",
+          "offset-minute-60": "2026-10-29T12:00:00+05:60",
+          "april-31": "2026-04-31T12:00:00Z",
+          "month-0": "2026-00-10T00:00:00Z",
+          "day-0": "2026-10-00T00:00:00Z",
+          "no-seconds": "2026-10-29T12:00Z",
+          "date-only": "2026-10-29",
+          "lowercase-t": "2026-10-29t12:00:00Z",
+          "signed-year": "+2026-10-29T12:00:00Z",
+          "five-digit-year": "12026-10-29T12:00:00Z",
+          "leading-space": " 2026-10-29T12:00:00Z",
+          "trailing-newline": "2026-10-29T12:00:00Z\n",
+          "fullwidth-digit": "２026-10-29T12:00:00Z",
+          "arabic-indic-digit": "٢026-10-29T12:00:00Z",
+          "offset-0530": "2026-10-29T12:00:00+05:30",
+          "minus-zero": "2000-02-29T23:59:59.000001-00:00",
+          "twelve-fraction-digits": "2026-10-29T12:00:00.123456789123Z"
+        },
+        "updated_at": "2026-10-29T12:00:00.123456789123Z"
+      },
+      "expected": [
+        {
+          "door": "twelve-fraction-digits",
+          "at": "2026-10-29T12:00:00.123456789123Z",
+          "tool": null,
+          "last": true,
+          "from": "doors"
+        },
+        {
+          "door": "offset-0530",
+          "at": "2026-10-29T12:00:00+05:30",
+          "tool": null,
+          "last": false,
+          "from": "doors"
+        },
+        {
+          "door": "leap-day",
+          "at": "2024-02-29T00:00:00Z",
+          "tool": null,
+          "last": false,
+          "from": "doors"
+        },
+        {
+          "door": "minus-zero",
+          "at": "2000-02-29T23:59:59.000001-00:00",
+          "tool": null,
+          "last": false,
+          "from": "doors"
+        }
+      ]
+    },
+    {
+      "name": "every entry invalid: the last write's client",
+      "element": {
+        "doors": {
+          "atlas": "soon"
+        },
+        "changed_client": "lantern",
+        "changed_via": "api",
+        "updated_at": "2026-10-29T09:00:00Z"
+      },
+      "expected": [
+        {
+          "door": "lantern",
+          "at": "2026-10-29T09:00:00Z",
+          "tool": {
+            "id": "lantern",
+            "name": "Lantern"
+          },
+          "last": true,
+          "from": "last-write"
+        }
+      ]
+    },
+    {
+      "name": "doors null: the last write's client",
+      "element": {
+        "doors": null,
+        "changed_client": "atlas",
+        "changed_via": "site",
+        "updated_at": "2026-10-29T14:31:07.123456+00:00"
+      },
+      "expected": [
+        {
+          "door": "atlas",
+          "at": "2026-10-29T14:31:07.123456+00:00",
+          "tool": {
+            "id": "atlas",
+            "name": "Atlas"
+          },
+          "last": true,
+          "from": "last-write"
+        }
+      ]
+    },
+    {
+      "name": "doors absent: the last write's door word",
+      "element": {
+        "changed_via": "mcp",
+        "changed_client": null,
+        "updated_at": "2026-10-28T07:00:00Z"
+      },
+      "expected": [
+        {
+          "door": "mcp",
+          "at": "2026-10-28T07:00:00Z",
+          "tool": null,
+          "last": true,
+          "from": "last-write"
+        }
+      ]
+    },
+    {
+      "name": "doors empty and an empty client: the last write's door word",
+      "element": {
+        "doors": {},
+        "changed_client": "",
+        "changed_via": "site",
+        "updated_at": "2026-10-28T07:00:00+02:00"
+      },
+      "expected": [
+        {
+          "door": "site",
+          "at": "2026-10-28T07:00:00+02:00",
+          "tool": null,
+          "last": true,
+          "from": "last-write"
+        }
+      ]
+    },
+    {
+      "name": "doors not an object: the last write's client",
+      "element": {
+        "doors": [
+          "atlas"
+        ],
+        "changed_client": "sdk",
+        "changed_via": "api",
+        "updated_at": "2026-10-28T07:00:00Z"
+      },
+      "expected": [
+        {
+          "door": "sdk",
+          "at": "2026-10-28T07:00:00Z",
+          "tool": null,
+          "last": true,
+          "from": "last-write"
+        }
+      ]
+    },
+    {
+      "name": "doors, changed_via and changed_client all null: empty",
+      "element": {
+        "doors": null,
+        "changed_via": null,
+        "changed_client": null,
+        "updated_at": "2026-10-29T09:00:00Z"
+      },
+      "expected": []
+    },
+    {
+      "name": "every entry invalid and no last-write door: empty",
+      "element": {
+        "doors": {
+          "": "2026-10-29T09:00:00Z"
+        },
+        "changed_via": "",
+        "changed_client": null,
+        "updated_at": "2026-10-29T09:00:00Z"
+      },
+      "expected": []
+    },
+    {
+      "name": "a public body, served none of the door fields: empty",
+      "element": {
+        "id": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
+        "name": "Eknomos",
+        "updated_at": "2026-10-29T09:00:00Z"
+      },
+      "expected": []
+    },
+    {
+      "name": "the last write with an updated_at that is not a time: empty",
+      "element": {
+        "doors": null,
+        "changed_client": "atlas",
+        "changed_via": "site",
+        "updated_at": "2026-10-29"
+      },
+      "expected": []
+    },
+    {
+      "name": "the last write with no updated_at: empty",
+      "element": {
+        "changed_client": "atlas",
+        "changed_via": "site"
+      },
+      "expected": []
+    },
+    {
+      "name": "last on an entry that is not the first",
+      "element": {
+        "doors": {
+          "atlas": "2026-10-29T12:00:00Z",
+          "lantern": "2026-10-29T13:00:00+02:00"
+        },
+        "updated_at": "2026-10-29T11:00:00.000Z"
+      },
+      "expected": [
+        {
+          "door": "atlas",
+          "at": "2026-10-29T12:00:00Z",
+          "tool": {
+            "id": "atlas",
+            "name": "Atlas"
+          },
+          "last": false,
+          "from": "doors"
+        },
+        {
+          "door": "lantern",
+          "at": "2026-10-29T13:00:00+02:00",
+          "tool": {
+            "id": "lantern",
+            "name": "Lantern"
+          },
+          "last": true,
+          "from": "doors"
+        }
+      ]
+    },
+    {
+      "name": "last matches updated_at as an instant, in another offset",
+      "element": {
+        "doors": {
+          "atlas": "2026-10-29T14:31:07.123456Z",
+          "site": "2026-10-28T10:00:00Z"
+        },
+        "updated_at": "2026-10-29T16:31:07.123456+02:00"
+      },
+      "expected": [
+        {
+          "door": "atlas",
+          "at": "2026-10-29T14:31:07.123456Z",
+          "tool": {
+            "id": "atlas",
+            "name": "Atlas"
+          },
+          "last": true,
+          "from": "doors"
+        },
+        {
+          "door": "site",
+          "at": "2026-10-28T10:00:00Z",
+          "tool": null,
+          "last": false,
+          "from": "doors"
+        }
+      ]
+    },
+    {
+      "name": "a restore: updated_at newer than every door, nothing last",
+      "element": {
+        "doors": {
+          "atlas": "2026-10-12T09:15:00Z",
+          "mcp": "2026-10-20T08:00:00Z"
+        },
+        "changed_via": null,
+        "changed_client": null,
+        "updated_at": "2026-10-29T18:00:00Z"
+      },
+      "expected": [
+        {
+          "door": "mcp",
+          "at": "2026-10-20T08:00:00Z",
+          "tool": null,
+          "last": false,
+          "from": "doors"
+        },
+        {
+          "door": "atlas",
+          "at": "2026-10-12T09:15:00Z",
+          "tool": {
+            "id": "atlas",
+            "name": "Atlas"
+          },
+          "last": false,
+          "from": "doors"
+        }
+      ]
+    },
+    {
+      "name": "updated_at missing: nothing last",
+      "element": {
+        "doors": {
+          "atlas": "2026-10-12T09:15:00Z",
+          "lantern": "2026-10-20T08:00:00Z"
+        }
+      },
+      "expected": [
+        {
+          "door": "lantern",
+          "at": "2026-10-20T08:00:00Z",
+          "tool": {
+            "id": "lantern",
+            "name": "Lantern"
+          },
+          "last": false,
+          "from": "doors"
+        },
+        {
+          "door": "atlas",
+          "at": "2026-10-12T09:15:00Z",
+          "tool": {
+            "id": "atlas",
+            "name": "Atlas"
+          },
+          "last": false,
+          "from": "doors"
+        }
+      ]
+    },
+    {
+      "name": "updated_at not a time: nothing last",
+      "element": {
+        "doors": {
+          "atlas": "2026-10-12T09:15:00Z",
+          "lantern": "2026-10-20T08:00:00Z"
+        },
+        "updated_at": "2026-10-20T08:00:00"
+      },
+      "expected": [
+        {
+          "door": "lantern",
+          "at": "2026-10-20T08:00:00Z",
+          "tool": {
+            "id": "lantern",
+            "name": "Lantern"
+          },
+          "last": false,
+          "from": "doors"
+        },
+        {
+          "door": "atlas",
+          "at": "2026-10-12T09:15:00Z",
+          "tool": {
+            "id": "atlas",
+            "name": "Atlas"
+          },
+          "last": false,
+          "from": "doors"
+        }
+      ]
+    }
+  ]
+}

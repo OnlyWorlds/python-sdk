@@ -41,6 +41,7 @@ from .charter import (
     domains_of,
 )
 from .checks import CHECKS_FIELD, CheckRow, apply_checks
+from .doors import Door, doors_of
 from .draught_text import draught_text
 from .errors import PreconditionFailed, ProposedError, StaleProposal, parse_retry_after
 from .export import export_world
@@ -147,6 +148,7 @@ __all__ = [
     "CheckRow",
     "Client",
     "DomainRead",
+    "Door",
     "EditRead",
     "Folder",
     "FolderElement",
@@ -184,6 +186,7 @@ __all__ = [
     "date_of",
     "degree_of",
     "domains_of",
+    "doors_of",
     "draught_text",
     "edited_by",
     "element_address",
