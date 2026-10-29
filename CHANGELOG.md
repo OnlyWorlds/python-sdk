@@ -4,6 +4,17 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+## 0.89.0 (2026-10-29)
+
+- **`door_where(door)`**: where one entry of `doors_of` wrote the element, as the where-phrase a "Last shaped" line shows, and nothing else (no reader, no time: "by you" and when stay the caller's). It pairs with `doors_of`: pass it an entry as `doors_of` gives it, its tools-list match already made. The words are the ones the Open with menu will use:
+  - a listed tool (`tool` not None): `in <tool name>`, such as `in Atlas`; this rule comes first;
+  - `site`: `on onlyworlds.com`;
+  - an agent's door (`seat`, `mcp`, `declared`): `with an AI`;
+  - `server`: `by OnlyWorlds`;
+  - anything else (`sync`, `api`, `v1`, a client the tools list does not hold, such as `sdk`): `in code`.
+
+  An entry that is not a mapping, a `door` that is not a string, or a `tool` that is neither None nor a mapping with a string `name` raises `TypeError`. The shared fixture gives every case a `where` list, one phrase per expected entry, and a case with every rule's word (27 cases); the npm SDK's `doorWhere` answers it phrase for phrase.
+
 ## 0.88.0 (2026-10-29)
 
 - **Schema repinned to schema-dist `v0.33.0-dist.91`** (from dist.90; the same canonical 00.33.00, so `SCHEMA_VERSION` stays and no type or field moved). Serial 91 moves only the dist's folder checker and its README.

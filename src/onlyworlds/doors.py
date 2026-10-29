@@ -3,7 +3,8 @@
 The API serves every element a ``doors`` field (to a world's members only): one key per tool that wrote it, the name
 the tool sent in ``X-OW-Client`` or else the door word of that write (``site``, ``api``, ``mcp``, ...), each value the
 ``updated_at`` that write left. Pure: a UI's "Last shaped in Atlas" line reads the first entry, a trail reads them all,
-and the npm SDK's ``doorsOf`` answers the shared fixture, ``tests/fixtures/doors.fixture.json``, the same way.
+``door_where`` gives an entry's "in Atlas", and the npm SDK's ``doorsOf`` and ``doorWhere`` answer the shared fixture,
+``tests/fixtures/doors.fixture.json``, the same way.
 """
 
 from __future__ import annotations
@@ -16,7 +17,7 @@ from typing import Any, Literal, NamedTuple, NoReturn, TypedDict
 from ._tools import TOOLS
 from .openers import Tool
 
-__all__ = ["Door", "DoorTool", "doors_of"]
+__all__ = ["Door", "DoorTool", "door_where", "doors_of"]
 
 
 class DoorTool(TypedDict):
@@ -171,3 +172,43 @@ def doors_of(element: Mapping[str, Any], tools: Sequence[Tool] = TOOLS) -> list[
         last_seen = last_seen or last
         entries.append({"door": door, "at": at, "tool": tool_of(door), "last": last, "from": "doors"})
     return entries
+
+
+# The doors that mean agent-made: an agent seat, the MCP server, or a client that declared itself (the npm SDK's
+# AGENT_DOORS and isAgentDoor).
+_AGENT_DOORS = frozenset({"seat", "mcp", "declared"})
+
+
+def door_where(door: Door) -> str:
+    """Where an entry of ``doors_of`` wrote the element, as the words a UI shows after "Last shaped": the where-phrase
+    only.
+
+    - A listed tool (``tool`` not None): ``in <tool name>``, such as ``in Atlas``. This comes first, so a door word the
+      case's tools list holds as a client reads as that tool.
+    - ``site``: ``on onlyworlds.com``.
+    - An agent's door (``seat``, ``mcp``, ``declared``): ``with an AI``.
+    - ``server``: ``by OnlyWorlds``.
+    - Anything else (``sync``, ``api``, ``v1``, a client the tools list does not hold, such as ``sdk``): ``in code``.
+
+    Nothing about the reader or the time: "by you" and when are the caller's. Raises ``TypeError`` when ``door`` is
+    not a mapping, its ``door`` is not a string, or its ``tool`` is neither None nor a mapping with a string ``name``.
+    The npm SDK's ``doorWhere`` gives the same words on the shared fixture.
+    """
+    if not isinstance(door, Mapping):
+        raise TypeError("door_where: the door is an entry of doors_of, a mapping")
+    word = door.get("door")
+    if not isinstance(word, str):
+        raise TypeError("door_where: the entry's door is a string")
+    tool = door.get("tool")
+    if tool is not None:
+        name = tool.get("name") if isinstance(tool, Mapping) else None
+        if not isinstance(name, str):
+            raise TypeError("door_where: the entry's tool is None or {id, name}")
+        return f"in {name}"
+    if word == "site":
+        return "on onlyworlds.com"
+    if word in _AGENT_DOORS:
+        return "with an AI"
+    if word == "server":
+        return "by OnlyWorlds"
+    return "in code"

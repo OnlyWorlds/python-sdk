@@ -1,6 +1,6 @@
 {
-  "what": "The door history of an element: doorsOf (npm SDK) and doors_of (Python package) on the same cases. Every expected list is written by hand. The same bytes in both packages; each test holds this file's sha256.",
-  "keys": "tools is the tools list every case reads, unless the case carries its own tools. element is an element body as the API serves it (doors, changed_client, changed_via, updated_at). expected is the entries in order, each {door, at, tool, last, from}, tool null or the matched row's {id, name}.",
+  "what": "The door history of an element: doorsOf (npm SDK) and doors_of (Python package) on the same cases, and doorWhere and door_where on each entry they give. Every expected list is written by hand. The same bytes in both packages; each test holds this file's sha256.",
+  "keys": "tools is the tools list every case reads, unless the case carries its own tools. element is an element body as the API serves it (doors, changed_client, changed_via, updated_at). expected is the entries in order, each {door, at, tool, last, from}, tool null or the matched row's {id, name}. where is the phrase doorWhere and door_where give for each expected entry, in the same order.",
   "tools": [
     {
       "id": "atlas",
@@ -82,6 +82,12 @@
           "last": false,
           "from": "doors"
         }
+      ],
+      "where": [
+        "in Lantern",
+        "with an AI",
+        "in Atlas",
+        "on onlyworlds.com"
       ]
     },
     {
@@ -124,6 +130,12 @@
           "last": false,
           "from": "doors"
         }
+      ],
+      "where": [
+        "in code",
+        "in code",
+        "in code",
+        "by OnlyWorlds"
       ]
     },
     {
@@ -166,6 +178,12 @@
           "last": false,
           "from": "doors"
         }
+      ],
+      "where": [
+        "with an AI",
+        "with an AI",
+        "in code",
+        "by OnlyWorlds"
       ]
     },
     {
@@ -224,6 +242,14 @@
           "last": false,
           "from": "doors"
         }
+      ],
+      "where": [
+        "in code",
+        "in code",
+        "with an AI",
+        "on onlyworlds.com",
+        "in code",
+        "in code"
       ]
     },
     {
@@ -256,6 +282,10 @@
           "last": false,
           "from": "doors"
         }
+      ],
+      "where": [
+        "in Lantern",
+        "in Atlas"
       ]
     },
     {
@@ -290,6 +320,11 @@
           "last": false,
           "from": "doors"
         }
+      ],
+      "where": [
+        "with an AI",
+        "in code",
+        "with an AI"
       ]
     },
     {
@@ -316,6 +351,10 @@
           "last": false,
           "from": "doors"
         }
+      ],
+      "where": [
+        "in code",
+        "in code"
       ]
     },
     {
@@ -372,6 +411,13 @@
           "last": false,
           "from": "doors"
         }
+      ],
+      "where": [
+        "with an AI",
+        "on onlyworlds.com",
+        "in code",
+        "in Atlas",
+        "in Lantern"
       ]
     },
     {
@@ -411,6 +457,10 @@
           "last": false,
           "from": "doors"
         }
+      ],
+      "where": [
+        "in Zephyr",
+        "in code"
       ]
     },
     {
@@ -441,6 +491,9 @@
           "last": true,
           "from": "doors"
         }
+      ],
+      "where": [
+        "with an AI"
       ]
     },
     {
@@ -508,6 +561,12 @@
           "last": false,
           "from": "doors"
         }
+      ],
+      "where": [
+        "in code",
+        "in code",
+        "in code",
+        "in code"
       ]
     },
     {
@@ -531,6 +590,9 @@
           "last": true,
           "from": "last-write"
         }
+      ],
+      "where": [
+        "in Lantern"
       ]
     },
     {
@@ -552,6 +614,9 @@
           "last": true,
           "from": "last-write"
         }
+      ],
+      "where": [
+        "in Atlas"
       ]
     },
     {
@@ -569,6 +634,9 @@
           "last": true,
           "from": "last-write"
         }
+      ],
+      "where": [
+        "with an AI"
       ]
     },
     {
@@ -587,6 +655,9 @@
           "last": true,
           "from": "last-write"
         }
+      ],
+      "where": [
+        "on onlyworlds.com"
       ]
     },
     {
@@ -607,6 +678,9 @@
           "last": true,
           "from": "last-write"
         }
+      ],
+      "where": [
+        "in code"
       ]
     },
     {
@@ -617,7 +691,8 @@
         "changed_client": null,
         "updated_at": "2026-10-29T09:00:00Z"
       },
-      "expected": []
+      "expected": [],
+      "where": []
     },
     {
       "name": "every entry invalid and no last-write door: empty",
@@ -629,7 +704,8 @@
         "changed_client": null,
         "updated_at": "2026-10-29T09:00:00Z"
       },
-      "expected": []
+      "expected": [],
+      "where": []
     },
     {
       "name": "a public body, served none of the door fields: empty",
@@ -638,7 +714,8 @@
         "name": "Eknomos",
         "updated_at": "2026-10-29T09:00:00Z"
       },
-      "expected": []
+      "expected": [],
+      "where": []
     },
     {
       "name": "the last write with an updated_at that is not a time: empty",
@@ -648,7 +725,8 @@
         "changed_via": "site",
         "updated_at": "2026-10-29"
       },
-      "expected": []
+      "expected": [],
+      "where": []
     },
     {
       "name": "the last write with no updated_at: empty",
@@ -656,7 +734,8 @@
         "changed_client": "atlas",
         "changed_via": "site"
       },
-      "expected": []
+      "expected": [],
+      "where": []
     },
     {
       "name": "last on an entry that is not the first",
@@ -688,6 +767,10 @@
           "last": true,
           "from": "doors"
         }
+      ],
+      "where": [
+        "in Atlas",
+        "in Lantern"
       ]
     },
     {
@@ -717,6 +800,10 @@
           "last": false,
           "from": "doors"
         }
+      ],
+      "where": [
+        "in Atlas",
+        "on onlyworlds.com"
       ]
     },
     {
@@ -748,6 +835,10 @@
           "last": false,
           "from": "doors"
         }
+      ],
+      "where": [
+        "with an AI",
+        "in Atlas"
       ]
     },
     {
@@ -779,6 +870,10 @@
           "last": false,
           "from": "doors"
         }
+      ],
+      "where": [
+        "in Lantern",
+        "in Atlas"
       ]
     },
     {
@@ -811,6 +906,151 @@
           "last": false,
           "from": "doors"
         }
+      ],
+      "where": [
+        "in Lantern",
+        "in Atlas"
+      ]
+    },
+    {
+      "name": "where: each rule's word, and in code for every other door",
+      "element": {
+        "doors": {
+          "atlas": "2026-10-29T13:00:00Z",
+          "site": "2026-10-29T12:00:00Z",
+          "seat": "2026-10-29T11:00:00Z",
+          "mcp": "2026-10-29T10:00:00Z",
+          "declared": "2026-10-29T09:00:00Z",
+          "server": "2026-10-29T08:00:00Z",
+          "sync": "2026-10-29T07:00:00Z",
+          "api": "2026-10-29T06:00:00Z",
+          "v1": "2026-10-29T05:00:00Z",
+          "sdk": "2026-10-29T04:00:00Z",
+          "python": "2026-10-29T03:00:00Z",
+          "toolkit": "2026-10-29T02:00:00Z",
+          "windrose": "2026-10-29T01:00:00Z",
+          "corvid": "2026-10-29T00:00:00Z"
+        },
+        "updated_at": "2026-10-29T13:00:00Z"
+      },
+      "expected": [
+        {
+          "door": "atlas",
+          "at": "2026-10-29T13:00:00Z",
+          "tool": {
+            "id": "atlas",
+            "name": "Atlas"
+          },
+          "last": true,
+          "from": "doors"
+        },
+        {
+          "door": "site",
+          "at": "2026-10-29T12:00:00Z",
+          "tool": null,
+          "last": false,
+          "from": "doors"
+        },
+        {
+          "door": "seat",
+          "at": "2026-10-29T11:00:00Z",
+          "tool": null,
+          "last": false,
+          "from": "doors"
+        },
+        {
+          "door": "mcp",
+          "at": "2026-10-29T10:00:00Z",
+          "tool": null,
+          "last": false,
+          "from": "doors"
+        },
+        {
+          "door": "declared",
+          "at": "2026-10-29T09:00:00Z",
+          "tool": null,
+          "last": false,
+          "from": "doors"
+        },
+        {
+          "door": "server",
+          "at": "2026-10-29T08:00:00Z",
+          "tool": null,
+          "last": false,
+          "from": "doors"
+        },
+        {
+          "door": "sync",
+          "at": "2026-10-29T07:00:00Z",
+          "tool": null,
+          "last": false,
+          "from": "doors"
+        },
+        {
+          "door": "api",
+          "at": "2026-10-29T06:00:00Z",
+          "tool": null,
+          "last": false,
+          "from": "doors"
+        },
+        {
+          "door": "v1",
+          "at": "2026-10-29T05:00:00Z",
+          "tool": null,
+          "last": false,
+          "from": "doors"
+        },
+        {
+          "door": "sdk",
+          "at": "2026-10-29T04:00:00Z",
+          "tool": null,
+          "last": false,
+          "from": "doors"
+        },
+        {
+          "door": "python",
+          "at": "2026-10-29T03:00:00Z",
+          "tool": null,
+          "last": false,
+          "from": "doors"
+        },
+        {
+          "door": "toolkit",
+          "at": "2026-10-29T02:00:00Z",
+          "tool": null,
+          "last": false,
+          "from": "doors"
+        },
+        {
+          "door": "windrose",
+          "at": "2026-10-29T01:00:00Z",
+          "tool": null,
+          "last": false,
+          "from": "doors"
+        },
+        {
+          "door": "corvid",
+          "at": "2026-10-29T00:00:00Z",
+          "tool": null,
+          "last": false,
+          "from": "doors"
+        }
+      ],
+      "where": [
+        "in Atlas",
+        "on onlyworlds.com",
+        "with an AI",
+        "with an AI",
+        "with an AI",
+        "by OnlyWorlds",
+        "in code",
+        "in code",
+        "in code",
+        "in code",
+        "in code",
+        "in code",
+        "in code",
+        "in code"
       ]
     }
   ]
