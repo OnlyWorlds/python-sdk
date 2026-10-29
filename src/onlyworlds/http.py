@@ -652,10 +652,13 @@ class Client:
     # --- elements -------------------------------------------------------------
 
     @staticmethod
-    def _query(params: Mapping[str, Any]) -> str:
+    def _query(params: Mapping[str, Any], keep_empty: frozenset[str] = frozenset()) -> str:
+        # An empty value is dropped, except for the keys in ``keep_empty``: a list filter's empty value
+        # is a filter of its own on keel (``supertype=`` lists the elements with none, ``characters=`` a
+        # Message to everyone, a single link's the elements linking to nothing).
         parts = []
         for k, v in params.items():
-            if v is None or v == "":
+            if v is None or (v == "" and k not in keep_empty):
                 continue
             text = str(v).lower() if isinstance(v, bool) else str(v)
             parts.append(f"{urllib.parse.quote(k, safe='')}={urllib.parse.quote(text, safe=',')}")
@@ -677,8 +680,12 @@ class Client:
         """``GET /{type}``: one cursor page, ``{data, has_more, next_cursor}``.
 
         ``expand`` replaces the named links' ids with stubs one level deep; ``fields`` keeps
-        only the named keys. Only ``name__icontains``, ``supertype`` and ``subtype`` filter
-        (anything else is a 422 naming it); ``ordering`` is a 422 too. Filter or sort here.
+        only the named keys. ``filter`` takes ``name``, ``name__icontains``, ``supertype``,
+        ``subtype``, ``characters`` on a type with that link, and each single link of the type
+        (``parent_location``, ``birthplace``, ...); anything else is a 422 naming the filters.
+        An empty value is sent as ``key=``, a filter of its own (``supertype=""`` lists the
+        elements with none, ``characters=""`` a Message to everyone; until 0.89.1 it was dropped
+        and the list came back whole). ``ordering`` is a 422 too: sort here.
 
         ``view_as`` (sent as ``as``) reads as another reader of this world would: a
         membership id (a person, an agent seat or a player seat) as that member's own key, a
@@ -699,7 +706,8 @@ class Client:
                 "ids": ",".join(ids) if ids else None,
                 "created_by": created_by,
                 "as": view_as,
-            }
+            },
+            keep_empty=frozenset(filter or {}),
         )
         page = self.call("GET", f"{t}/?{query}")
         if not isinstance(page, dict):

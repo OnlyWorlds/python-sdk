@@ -4,6 +4,10 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+## 0.89.1 (2026-10-29)
+
+- **A list filter with an empty value is sent.** `list_page` and `iter_elements` sent nothing for a key in `filter` whose value was `""`, so `filter={"characters": ""}` or `filter={"supertype": ""}` listed every element. On keel an empty value is a filter of its own: `supertype=` and `subtype=` list the elements with none, `characters=` the Messages addressed to everyone, and a single link's (`parent_location=`, since every single link became a list filter) the elements linking to nothing. Each key in `filter` is now sent as given, `""` included; an empty `name__icontains` still matches every name, and outside `filter` an empty value is still not sent. The `list_page` docstring names the filters.
+
 ## 0.89.0 (2026-10-29)
 
 - **`door_where(door)`**: where one entry of `doors_of` wrote the element, as the where-phrase a "Last shaped" line shows, and nothing else (no reader, no time: "by you" and when stay the caller's). It pairs with `doors_of`: pass it an entry as `doors_of` gives it, its tools-list match already made. The words are the ones the Open with menu will use:

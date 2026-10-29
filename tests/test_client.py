@@ -73,6 +73,17 @@ def test_list_query_is_built_not_concatenated(make_client: MakeClient) -> None:
     assert q == "limit=5&cursor=a%20b%26c%3D1&expand=friends,location&fields=name&name__icontains=x%20y&supertype=s"
 
 
+def test_a_filter_with_an_empty_value_is_sent_as_key_equals(make_client: MakeClient) -> None:
+    # keel reads an empty filter value as a filter of its own (0.89.1); outside ``filter`` an empty value is not sent.
+    t = FakeTransport(handler=lambda *a: jresp(200, {"data": [], "has_more": False, "next_cursor": None}))
+    c = make_client(t)
+    c.list_page("narrative", limit=5, filter={"characters": "", "supertype": ""})
+    list(c.iter_elements("location", limit=5, filter={"parent_location": ""}))
+    c.list_page("character", limit=5, cursor="", filter={"name__icontains": "a"})
+    queries = [x.url.split("?", 1)[1] for x in t.calls]
+    assert queries == ["limit=5&characters=&supertype=", "limit=5&parent_location=", "limit=5&name__icontains=a"]
+
+
 def test_view_as_is_sent_as_as_on_get_and_list_and_only_when_given(make_client: MakeClient) -> None:
     page = {"data": [], "has_more": False, "next_cursor": None}
     t = FakeTransport(handler=lambda *a: jresp(200, {"id": ID, "name": "K", **page}))
