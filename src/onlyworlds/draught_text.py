@@ -15,6 +15,7 @@ from collections.abc import Mapping
 from typing import Any
 
 from ._schema import FIELD_KINDS
+from .review import hands_on_as_proposed
 
 __all__ = ["draught_text"]
 
@@ -130,11 +131,9 @@ def _kind_of(el: Mapping[str, Any]) -> str | None:
 
 
 def _marks(el: Mapping[str, Any]) -> str:
-    """`` · hidden`` when ``hidden`` is true, `` · proposed`` when ``x_review_proposed`` is present and not None (as the
-    server counts it)."""
-    return (" · hidden" if el.get("hidden") is True else "") + (
-        " · proposed" if el.get("x_review_proposed") is not None else ""
-    )
+    """`` · hidden`` when ``hidden`` is true, `` · proposed`` when ``x_review_proposed`` is present
+    (``hands_on_as_proposed``: an empty mark is settled, as the server's compact rule leaves it out)."""
+    return (" · hidden" if el.get("hidden") is True else "") + (" · proposed" if hands_on_as_proposed(el) else "")
 
 
 def _description_lines(el: Mapping[str, Any]) -> list[str]:
