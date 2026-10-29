@@ -14,5 +14,7 @@ tests/fixtures/row-trim-cases.json -text
 tests/fixtures/openers.fixture.json -text
 # The door history's shared cases, the same bytes as the npm SDK's copy (both tests hold its sha256).
 tests/fixtures/doors.fixture.json -text
+# The world file writers' author field cases, the same bytes as the npm SDK's copy (both tests hold its sha256).
+tests/fixtures/author-fields.fixture.json -text
 # The tools list, vendored byte for byte as GitHub serves it at the pinned commit (codegen/tools-pin.json holds its sha256).
 codegen/tools/tools.json -text

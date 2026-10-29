@@ -469,7 +469,7 @@ def test_the_same_folder_twice_gives_the_same_bytes_wherever_it_sits(tmp_path: P
 
 def test_round_trip_folder_to_archive_to_folder_every_file_byte_equal(tmp_path: Path) -> None:
     src = shutil.copytree(HYPERION, tmp_path / "src")
-    r = read_world_file(write_world_file(src, tmp_path / "h.owworld"))
+    r = read_world_file(write_world_file(src, tmp_path / "h.owworld", include_author_fields=True))
     back = r.to_folder(tmp_path / "back")
     assert tree(back) == tree(src)
     a, b = read_folder(src), read_folder(back)
@@ -607,3 +607,94 @@ def test_a_hidden_element_travels_byte_for_byte_unless_the_file_is_a_share(tmp_p
     again: list[str] = []
     written = write_world_file(src, tmp_path / "share.owworld", include_hidden=False, hidden_left_out=again)
     assert written.read_bytes() == share and again == left
+
+
+# --- author fields: which member and which tool wrote each element, left out of a file handed on
+
+# The same bytes as the npm SDK's test/fixtures/author-fields.fixture.json (both suites hold its sha256).
+AUTHOR_FIXTURE = REPO / "tests" / "fixtures" / "author-fields.fixture.json"
+AUTHOR_FIXTURE_SHA256 = "ed9e2a6161b0b6b276b71680750943f7ee6fe5d49fdbd932995a1b93555a1e4f"
+AUTHOR_CASES = 5
+AUTHOR_FIELDS = ["created_by", "changed_by", "changed_via", "changed_client", "doors"]
+
+
+def author_cases() -> list[dict[str, Any]]:
+    data = AUTHOR_FIXTURE.read_bytes()
+    assert hashlib.sha256(data).hexdigest() == AUTHOR_FIXTURE_SHA256
+    doc = json.loads(data.decode("utf-8"))
+    assert doc["fields"] == AUTHOR_FIELDS
+    assert len(doc["cases"]) == AUTHOR_CASES
+    cases: list[dict[str, Any]] = doc["cases"]
+    return cases
+
+
+def test_author_fields_every_case_of_the_shared_fixture(tmp_path: Path) -> None:
+    """Left out by default, every file byte for byte when asked; the npm SDK runs the same file."""
+    for n, case in enumerate(author_cases()):
+        files = {rel: text.encode("utf-8") for rel, text in case["files"].items()}
+        src = make_folder(tmp_path / str(n), files)
+        default = read_world_file(world_file_bytes(src)).entries
+        assert {rel: b.decode("utf-8") for rel, b in default.items()} == case["default"], case["name"]
+        assert sum(default[rel] != files[rel] for rel in files) == case["stripped"], case["name"]
+        asked = read_world_file(world_file_bytes(src, include_author_fields=True)).entries
+        assert asked == files, f"{case['name']}: asked, byte for byte"
+        written = write_world_file(src, tmp_path / f"{n}.owworld")
+        assert written.read_bytes() == world_file_bytes(src), case["name"]
+
+
+def test_author_fields_asked_is_the_archive_without_the_option(tmp_path: Path) -> None:
+    """With the option, the plan is the folder's files as they are: the same zip bytes as a folder
+    holding no author field gives by default, file for file."""
+    for n, case in enumerate(author_cases()):
+        src = make_folder(tmp_path / str(n), {rel: t.encode("utf-8") for rel, t in case["files"].items()})
+        same = make_folder(tmp_path / f"{n}-default", {rel: t.encode("utf-8") for rel, t in case["default"].items()})
+        assert world_file_bytes(same, include_author_fields=True) == world_file_bytes(same), case["name"]
+        if case["stripped"] == 0:
+            assert world_file_bytes(src, include_author_fields=True) == world_file_bytes(src), case["name"]
+
+
+def test_author_fields_the_example_world_hyperion(tmp_path: Path) -> None:
+    src = shutil.copytree(HYPERION, tmp_path / "src")
+    files = tree(src)
+    asked = read_world_file(world_file_bytes(src, include_author_fields=True)).entries
+    assert asked == files
+    default = read_world_file(world_file_bytes(src)).entries
+    rewritten = 0
+    for rel, raw in files.items():
+        if not rel.startswith("elements/"):
+            assert default[rel] == raw, rel
+            continue
+        body = json.loads(raw)
+        want = {k: v for k, v in body.items() if k not in AUTHOR_FIELDS}
+        got = json.loads(default[rel])
+        assert got == want and list(got) == list(want), rel
+        assert "created_at" in got and "updated_at" in got, rel
+        assert default[rel] == (raw if want == body else encode(want)), rel
+        rewritten += default[rel] != raw
+    assert rewritten > 0, "the example carries author fields"
+
+
+def test_author_fields_a_share_and_a_tools_dot_folder(tmp_path: Path) -> None:
+    src = make_folder(
+        tmp_path / "w",
+        {
+            "world.json": world_json(),
+            "elements/character/ada.json": encode({"id": "a", "hidden": True, "created_by": "u"}),
+            "elements/character/bo.json": encode({"id": "b", "changed_by": "u"}),
+            ".atlas/elements/character/c.json": encode({"id": "c", "created_by": "u"}),
+            "elements/character/latin.json": b'{"\xe9":1}',
+        },
+    )
+    left: list[str] = []
+    share = world_file_bytes(src, private_dir=".atlas", include_hidden=False, hidden_left_out=left)
+    out = read_world_file(share).entries
+    assert left == ["elements/character/ada.json"]
+    assert list(out) == [
+        ".atlas/elements/character/c.json",
+        "elements/character/bo.json",
+        "elements/character/latin.json",
+        "world.json",
+    ]
+    assert out["elements/character/bo.json"] == encode({"id": "b"})
+    assert out[".atlas/elements/character/c.json"] == encode({"id": "c", "created_by": "u"})
+    assert out["elements/character/latin.json"] == b'{"\xe9":1}', "not UTF-8: travels as it is"

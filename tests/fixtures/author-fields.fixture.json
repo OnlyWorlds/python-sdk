@@ -1,0 +1,89 @@
+{
+ "what": "The world file writers' author fields: writeWorldFile (npm SDK) and world_file_bytes (Python package) on the same folders. Every expected file is written by hand. The same bytes in both packages; each test holds this file's sha256.",
+ "keys": "fields are the five a world file leaves out of every element file by default. Each case's files is a folder, path to text (UTF-8); every file in it travels. default is the archive's entries with the default, path to text; with includeAuthorFields (include_author_fields) true the entries are files, each byte for byte. stripped counts the element files that lost a field.",
+ "fields": ["created_by", "changed_by", "changed_via", "changed_client", "doors"],
+ "cases": [
+  {
+   "name": "all five left out, created_at and updated_at kept, the other keys in their order",
+   "files": {
+    "world.json": "{\n  \"id\": \"0192a000-aaaa-7bbb-8ccc-000000000001\",\n  \"name\": \"W\"\n}\n",
+    "elements/character/ada--c1.json": "{\n  \"id\": \"c1\",\n  \"name\": \"Ada\",\n  \"created_at\": \"2026-10-01T09:00:00Z\",\n  \"created_by\": \"u-owner\",\n  \"updated_at\": \"2026-10-29T10:00:00.123456+00:00\",\n  \"changed_by\": \"u-friend\",\n  \"changed_via\": \"api\",\n  \"changed_client\": \"atlas\",\n  \"doors\": {\n    \"atlas\": \"2026-10-29T10:00:00.123456+00:00\",\n    \"site\": \"2026-10-02T08:00:00Z\"\n  },\n  \"x_note\": \"kept\",\n  \"friends\": [\n    \"c2\"\n  ]\n}\n"
+   },
+   "default": {
+    "world.json": "{\n  \"id\": \"0192a000-aaaa-7bbb-8ccc-000000000001\",\n  \"name\": \"W\"\n}\n",
+    "elements/character/ada--c1.json": "{\n  \"id\": \"c1\",\n  \"name\": \"Ada\",\n  \"created_at\": \"2026-10-01T09:00:00Z\",\n  \"updated_at\": \"2026-10-29T10:00:00.123456+00:00\",\n  \"x_note\": \"kept\",\n  \"friends\": [\n    \"c2\"\n  ]\n}\n"
+   },
+   "stripped": 1
+  },
+  {
+   "name": "an element file with none of the five keeps its bytes, whatever its form",
+   "files": {
+    "world.json": "{\n  \"id\": \"0192a000-aaaa-7bbb-8ccc-000000000001\",\n  \"name\": \"W\"\n}\n",
+    "elements/character/bo--c2.json": "{\"id\":\"c2\",\"name\":\"Bo\",\"created_at\":\"2026-10-01T09:00:00Z\"}",
+    "elements/character/cy--c3.json": "\ufeff{\n  \"id\": \"c3\",\n  \"name\": \"Cy\"\n}\n",
+    "elements/location/keep--l2.json": "{\r\n    \"id\": \"l2\",\r\n    \"name\": \"Keep\",\r\n    \"height\": 2.0\r\n}\r\n"
+   },
+   "default": {
+    "world.json": "{\n  \"id\": \"0192a000-aaaa-7bbb-8ccc-000000000001\",\n  \"name\": \"W\"\n}\n",
+    "elements/character/bo--c2.json": "{\"id\":\"c2\",\"name\":\"Bo\",\"created_at\":\"2026-10-01T09:00:00Z\"}",
+    "elements/character/cy--c3.json": "\ufeff{\n  \"id\": \"c3\",\n  \"name\": \"Cy\"\n}\n",
+    "elements/location/keep--l2.json": "{\r\n    \"id\": \"l2\",\r\n    \"name\": \"Keep\",\r\n    \"height\": 2.0\r\n}\r\n"
+   },
+   "stripped": 0
+  },
+  {
+   "name": "only the fields present are removed, a null one too; an element left with nothing is an empty object",
+   "files": {
+    "world.json": "{\n  \"id\": \"0192a000-aaaa-7bbb-8ccc-000000000001\",\n  \"name\": \"W\"\n}\n",
+    "elements/location/hall--l1.json": "{\r\n    \"id\": \"l1\",\r\n    \"name\": \"Hall\",\r\n    \"changed_by\": null,\r\n    \"doors\": {}\r\n}\r\n",
+    "elements/event/only--e2.json": "{\"created_by\":\"u\",\"doors\":{\"x\":\"2026-10-29T10:00:00Z\"}}"
+   },
+   "default": {
+    "world.json": "{\n  \"id\": \"0192a000-aaaa-7bbb-8ccc-000000000001\",\n  \"name\": \"W\"\n}\n",
+    "elements/location/hall--l1.json": "{\n  \"id\": \"l1\",\n  \"name\": \"Hall\"\n}\n",
+    "elements/event/only--e2.json": "{}\n"
+   },
+   "stripped": 2
+  },
+  {
+   "name": "a rewritten file is in the folder's own form: no byte order mark, strings, numbers and nesting as JSON.stringify writes them",
+   "files": {
+    "world.json": "{\n  \"id\": \"0192a000-aaaa-7bbb-8ccc-000000000001\",\n  \"name\": \"W\"\n}\n",
+    "elements/event/fair--e1.json": "\ufeff{\"id\":\"e1\",\"name\":\"Caf\u00e9 \\\"Q\\\"\",\"description\":\"line\\nnext\\ttab \\u2028 \\u0001\",\"created_by\":\"u\",\"height\":2.0,\"weight\":72.5,\"tiny\":1e-7,\"big\":1e21,\"neg\":-0.0,\"list\":[],\"obj\":{},\"x_meta\":{\"created_by\":\"kept\",\"doors\":{\"a\":\"b\"}}}"
+   },
+   "default": {
+    "world.json": "{\n  \"id\": \"0192a000-aaaa-7bbb-8ccc-000000000001\",\n  \"name\": \"W\"\n}\n",
+    "elements/event/fair--e1.json": "{\n  \"id\": \"e1\",\n  \"name\": \"Caf\u00e9 \\\"Q\\\"\",\n  \"description\": \"line\\nnext\\ttab \u2028 \\u0001\",\n  \"height\": 2,\n  \"weight\": 72.5,\n  \"tiny\": 1e-7,\n  \"big\": 1e+21,\n  \"neg\": 0,\n  \"list\": [],\n  \"obj\": {},\n  \"x_meta\": {\n    \"created_by\": \"kept\",\n    \"doors\": {\n      \"a\": \"b\"\n    }\n  }\n}\n"
+   },
+   "stripped": 1
+  },
+  {
+   "name": "only element files: elements/<type>/ and the legacy spatial/<type>/, .json in any case; world.json, records, media and every other file byte for byte",
+   "files": {
+    "world.json": "{\n  \"id\": \"0192a000-aaaa-7bbb-8ccc-000000000001\",\n  \"name\": \"W\",\n  \"created_by\": \"u\"\n}\n",
+    "spatial/pin/p--p1.json": "{\"id\":\"p1\",\"name\":\"P\",\"changed_via\":\"site\"}",
+    "elements/map/M--m1.JSON": "{\"id\":\"m1\",\"name\":\"M\",\"changed_client\":\"atlas\"}",
+    "elements/character/sub/s.json": "{\"id\":\"s\",\"created_by\":\"u\"}",
+    "elements/character/notes.txt": "{\"created_by\":\"u\"}",
+    "elements/character/list.json": "[{\"created_by\":\"u\"}]",
+    "elements/character/broken.json": "{\"id\":\"x\",\"created_by\":\"u\"",
+    "media/m.json": "{\"created_by\":\"u\"}",
+    "records/RECORDS.json": "[{\"producer\":\"lab\",\"format\":\"f\",\"version\":\"1\",\"deltas\":false,\"created_by\":\"u\"}]",
+    "records/lab/r.json": "{\"created_by\":\"u\",\"doors\":{}}"
+   },
+   "default": {
+    "world.json": "{\n  \"id\": \"0192a000-aaaa-7bbb-8ccc-000000000001\",\n  \"name\": \"W\",\n  \"created_by\": \"u\"\n}\n",
+    "spatial/pin/p--p1.json": "{\n  \"id\": \"p1\",\n  \"name\": \"P\"\n}\n",
+    "elements/map/M--m1.JSON": "{\n  \"id\": \"m1\",\n  \"name\": \"M\"\n}\n",
+    "elements/character/sub/s.json": "{\"id\":\"s\",\"created_by\":\"u\"}",
+    "elements/character/notes.txt": "{\"created_by\":\"u\"}",
+    "elements/character/list.json": "[{\"created_by\":\"u\"}]",
+    "elements/character/broken.json": "{\"id\":\"x\",\"created_by\":\"u\"",
+    "media/m.json": "{\"created_by\":\"u\"}",
+    "records/RECORDS.json": "[{\"producer\":\"lab\",\"format\":\"f\",\"version\":\"1\",\"deltas\":false,\"created_by\":\"u\"}]",
+    "records/lab/r.json": "{\"created_by\":\"u\",\"doors\":{}}"
+   },
+   "stripped": 2
+  }
+ ]
+}

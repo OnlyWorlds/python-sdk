@@ -51,7 +51,9 @@ OW-8, §4.5 rule 11), the manifest carried byte-exact either way. An element fil
 ``hidden: true`` is copied byte for byte unless the file is a share (``include_hidden=False``:
 left out whole, and counted; folder format §4.8, ruled 2026-10-23). The two
 defaults differ on purpose: private records stay out unless asked, hidden elements stay in unless
-the write is a share.
+the write is a share. Element files leave out the five author fields unless asked
+(``include_author_fields``): they record which member and which tool wrote each element, which
+means nothing to someone the world is handed to.
 """
 
 from __future__ import annotations
@@ -847,6 +849,29 @@ def _hidden_element_file(rel: str, src: Path) -> bool:
     return isinstance(body, dict) and is_hidden(body)
 
 
+#: Which member and which tool wrote an element (a membership id, a door): nothing to someone the
+#: world is handed to, so a world file leaves them out unless asked.
+_AUTHOR_FIELDS: tuple[str, ...] = ("created_by", "changed_by", "changed_via", "changed_client", "doors")
+
+
+def _without_author_fields(rel: str, src: Path) -> bytes | None:
+    """An element file (``.json`` directly in a type folder of ``elements/`` or legacy ``spatial/``,
+    as the TypeScript writer reads one) without its author fields, in the folder's own form
+    (``_jsonfmt.encode``: two-space indent, a trailing newline, the other keys in their order), or
+    None when it holds none of them or is not a JSON object: then it travels byte for byte. Only
+    top-level keys go; an ``x_*`` value that holds one of the names is the extension's, and stays."""
+    segs = rel.split("/")
+    if len(segs) != 3 or segs[0] not in (ELEMENTS_DIR, LEGACY_SPATIAL_DIR) or not rel.lower().endswith(".json"):
+        return None
+    try:
+        body = json.loads(src.read_bytes().decode("utf-8").removeprefix(_BOM), parse_constant=_reject_constant)
+    except ValueError:  # not UTF-8, or not JSON
+        return None
+    if not isinstance(body, dict) or not any(k in body for k in _AUTHOR_FIELDS):
+        return None
+    return encode({k: v for k, v in body.items() if k not in _AUTHOR_FIELDS})
+
+
 def _plan(
     folder: str | os.PathLike[str],
     top_dir: str | None,
@@ -854,6 +879,7 @@ def _plan(
     include_private_records: bool,
     include_hidden: bool = True,
     hidden_left_out: list[str] | None = None,
+    include_author_fields: bool = False,
 ) -> tuple[str, list[tuple[str, Path | bytes]]]:
     root = Path(folder)
     if not root.is_dir():
@@ -905,7 +931,11 @@ def _plan(
     _check_file_and_folder({MARKER_NAME, *keys})
     plan: list[tuple[str, Path | bytes]] = []
     for rel in sorted(files):  # str order is code point order, which is the UTF-8 byte order (OW-13)
-        plan.append((rel, world_bytes if rel == WORLD_FILE else files[rel]))
+        if rel == WORLD_FILE:
+            plan.append((rel, world_bytes))
+            continue
+        bare = None if include_author_fields else _without_author_fields(rel, files[rel])
+        plan.append((rel, files[rel] if bare is None else bare))
     return top, plan
 
 
@@ -939,11 +969,15 @@ def world_file_bytes(
     include_private_records: bool = False,
     include_hidden: bool = True,
     hidden_left_out: list[str] | None = None,
+    include_author_fields: bool = False,
 ) -> bytes:
     """The world file for the folder at ``folder``, as bytes. See ``write_world_file``: the
     same keywords, the same refusals, private records left out unless
-    ``include_private_records=True``, hidden elements kept unless ``include_hidden=False``."""
-    top, plan = _plan(folder, top_dir, private_dir, include_private_records, include_hidden, hidden_left_out)
+    ``include_private_records=True``, hidden elements kept unless ``include_hidden=False``,
+    author fields left out unless ``include_author_fields=True``."""
+    top, plan = _plan(
+        folder, top_dir, private_dir, include_private_records, include_hidden, hidden_left_out, include_author_fields
+    )
     buf = io.BytesIO()
     _write(buf, top, plan)
     return buf.getvalue()
@@ -958,6 +992,7 @@ def write_world_file(
     include_private_records: bool = False,
     include_hidden: bool = True,
     hidden_left_out: list[str] | None = None,
+    include_author_fields: bool = False,
 ) -> Path:
     """Write the folder at ``folder`` as one world file at ``path``; returns ``path``.
 
@@ -988,6 +1023,16 @@ def write_world_file(
       sorted, and its length is the count. Nothing else is rewritten: a visible element that links
       to a hidden one keeps the id, which dangles in the file (a reader meets it as a link to an
       element the world does not hold).
+    - Author fields are left out: ``created_by``, ``changed_by``, ``changed_via``,
+      ``changed_client`` and ``doors`` record which member and which tool wrote each element (a
+      membership id, a door), which means nothing to someone the world is handed to, so every
+      element file directly in a type folder of ``elements/`` or ``spatial/`` loses them;
+      ``created_at`` and ``updated_at`` stay. A file
+      holding any of them is rewritten without them in the folder's own form (two-space indent, a
+      trailing newline, the other keys in their order); one holding none, or that is not a JSON
+      object, travels byte for byte, and nothing outside the element files is touched.
+      ``include_author_fields=True`` carries every element file byte for byte, for an archive of
+      your own folder.
     - ``world.json`` is carried byte for byte, ``producer``, ``source`` and
       ``format_version`` included: a writer that copies never rewrites a folder's
       provenance. The one change is an ``api`` block, which is never written (OW-10).
@@ -1003,7 +1048,9 @@ def write_world_file(
     records are private. The archive is written beside ``path`` and renamed into place, so
     a crash never leaves half a file.
     """
-    top, plan = _plan(folder, top_dir, private_dir, include_private_records, include_hidden, hidden_left_out)
+    top, plan = _plan(
+        folder, top_dir, private_dir, include_private_records, include_hidden, hidden_left_out, include_author_fields
+    )
     target = Path(path)
     tmp = target.parent / f".{target.name}.tmp-{uuid.uuid4().hex[:8]}"
     try:

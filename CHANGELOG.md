@@ -4,6 +4,11 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+## 0.90.0 (2026-10-29)
+
+- **`write_world_file` and `world_file_bytes` leave the author fields out of every element file by default.** `created_by`, `changed_by`, `changed_via`, `changed_client` and `doors` record which member and which tool wrote each element (a membership id, a door), which means nothing to someone the world is handed to. Each element file directly in a type folder of `elements/` or `spatial/` holding any of the five is now written without them, in the folder's own form (two-space indent, a trailing newline, its other keys in their order); `created_at` and `updated_at` stay. A file holding none of them, or that is not a JSON object, travels byte for byte, and `world.json`, records, media and every other file are untouched; an `x_*` value that holds one of the names is the extension's and stays. A caller archiving their own world passes `include_author_fields=True`, which writes every file byte for byte, as 0.89.1 did.
+- A shared fixture of five cases (`tests/fixtures/author-fields.fixture.json`, the same bytes as the npm SDK's) holds both writers to the same entries.
+
 ## 0.89.1 (2026-10-29)
 
 - **A list filter with an empty value is sent.** `list_page` and `iter_elements` sent nothing for a key in `filter` whose value was `""`, so `filter={"characters": ""}` or `filter={"supertype": ""}` listed every element. On keel an empty value is a filter of its own: `supertype=` and `subtype=` list the elements with none, `characters=` the Messages addressed to everyone, and a single link's (`parent_location=`, since every single link became a list filter) the elements linking to nothing. Each key in `filter` is now sent as given, `""` included; an empty `name__icontains` still matches every name, and outside `filter` an empty value is still not sent. The `list_page` docstring names the filters.
