@@ -55,8 +55,8 @@ def reader_of(world: Mapping[str, Any], name: str) -> dict[str, Any]:
     return r
 
 
-def test_the_fixture_holds_serial_85s_cases() -> None:
-    assert len(CASES) == 23, f"the fixture holds {len(CASES)} cases, serial 85 has 23"
+def test_the_fixture_holds_serial_86s_cases() -> None:
+    assert len(CASES) == 23, f"the fixture holds {len(CASES)} cases, serial 86 has 23"
     assert Counter(c["kind"] for c in CASES) == {"charter": 18, "element": 5}
     assert sorted(DOC["worlds"]) == ["bare", "copy", "harbour", "lore", "open", "skills", "ties"]
 

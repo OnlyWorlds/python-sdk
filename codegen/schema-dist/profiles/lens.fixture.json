@@ -3799,28 +3799,28 @@
             "id": "c1",
             "type": "character",
             "name": "Ada",
-            "family": "agents",
+            "family": "blue",
             "icon": "person"
           },
           {
             "id": "c2",
             "type": "character",
             "name": "Bo",
-            "family": "agents",
+            "family": "blue",
             "icon": "person"
           },
           {
             "id": "e1",
             "type": "event",
             "name": "Siege",
-            "family": "temporal",
+            "family": "amber",
             "icon": "saved_search"
           },
           {
             "id": "r1",
             "type": "relation",
             "name": "Truce",
-            "family": "temporal",
+            "family": "amber",
             "icon": "link"
           }
         ],
@@ -3891,28 +3891,28 @@
             "id": "c1",
             "type": "character",
             "name": "Ada",
-            "family": "agents",
+            "family": "blue",
             "icon": "person"
           },
           {
             "id": "c2",
             "type": "character",
             "name": "Bo",
-            "family": "agents",
+            "family": "blue",
             "icon": "person"
           },
           {
             "id": "c3",
             "type": "character",
             "name": "Cy",
-            "family": "agents",
+            "family": "blue",
             "icon": "person"
           },
           {
             "id": "r1",
             "type": "relation",
             "name": "Pact",
-            "family": "temporal",
+            "family": "amber",
             "icon": "link"
           }
         ],
@@ -3987,14 +3987,14 @@
             "id": "c1",
             "type": "character",
             "name": "Ada",
-            "family": "agents",
+            "family": "blue",
             "icon": "person"
           },
           {
             "id": "c2",
             "type": "character",
             "name": "Bo",
-            "family": "agents",
+            "family": "blue",
             "icon": "person",
             "known_of": true
           }
@@ -4133,14 +4133,14 @@
             "id": "c1",
             "type": "character",
             "name": "Ada",
-            "family": "agents",
+            "family": "blue",
             "icon": "person"
           },
           {
             "id": "z1",
             "type": "location",
             "name": "Keep",
-            "family": "world",
+            "family": "green",
             "icon": "castle"
           }
         ],
@@ -4235,14 +4235,14 @@
             "id": "c1",
             "type": "character",
             "name": "Ada",
-            "family": "agents",
+            "family": "blue",
             "icon": "person"
           },
           {
             "id": "c2",
             "type": "character",
             "name": "Member",
-            "family": "agents",
+            "family": "blue",
             "icon": "person",
             "marks": [
               "room"
@@ -4252,7 +4252,7 @@
             "id": "z1",
             "type": "location",
             "name": "Keep",
-            "family": "world",
+            "family": "green",
             "icon": "castle"
           }
         ],
@@ -4351,14 +4351,14 @@
             "id": "c1",
             "type": "character",
             "name": "Ada",
-            "family": "agents",
+            "family": "blue",
             "icon": "person"
           },
           {
             "id": "c3",
             "type": "character",
             "name": "Ghost",
-            "family": "agents",
+            "family": "blue",
             "icon": "person",
             "marks": [
               "hidden"
@@ -4368,7 +4368,7 @@
             "id": "z1",
             "type": "location",
             "name": "Keep",
-            "family": "world",
+            "family": "green",
             "icon": "castle"
           }
         ],
@@ -4467,14 +4467,14 @@
             "id": "c1",
             "type": "character",
             "name": "Ada",
-            "family": "agents",
+            "family": "blue",
             "icon": "person"
           },
           {
             "id": "c4",
             "type": "character",
             "name": "Maybe",
-            "family": "agents",
+            "family": "blue",
             "icon": "person",
             "marks": [
               "proposed"
@@ -4484,7 +4484,7 @@
             "id": "z1",
             "type": "location",
             "name": "Keep",
-            "family": "world",
+            "family": "green",
             "icon": "castle"
           }
         ],
@@ -4583,28 +4583,28 @@
             "id": "c1",
             "type": "character",
             "name": "Ada",
-            "family": "agents",
+            "family": "blue",
             "icon": "person"
           },
           {
             "id": "m1",
             "type": "map",
             "name": "Chart",
-            "family": "world",
+            "family": "green",
             "icon": "map"
           },
           {
             "id": "z1",
             "type": "location",
             "name": "Keep",
-            "family": "world",
+            "family": "green",
             "icon": "castle"
           },
           {
             "id": "z2",
             "type": "zone",
             "name": "March",
-            "family": "world",
+            "family": "green",
             "icon": "pentagon"
           }
         ],
@@ -4712,14 +4712,14 @@
             "id": "c1",
             "type": "character",
             "name": "Ada",
-            "family": "agents",
+            "family": "blue",
             "icon": "person"
           },
           {
             "id": "c2",
             "type": "character",
             "name": "Member",
-            "family": "agents",
+            "family": "blue",
             "icon": "person",
             "marks": [
               "room"
@@ -4729,7 +4729,7 @@
             "id": "c3",
             "type": "character",
             "name": "Ghost",
-            "family": "agents",
+            "family": "blue",
             "icon": "person",
             "marks": [
               "hidden"
@@ -4739,7 +4739,7 @@
             "id": "c4",
             "type": "character",
             "name": "Maybe",
-            "family": "agents",
+            "family": "blue",
             "icon": "person",
             "marks": [
               "proposed"
@@ -4749,21 +4749,21 @@
             "id": "m1",
             "type": "map",
             "name": "Chart",
-            "family": "world",
+            "family": "green",
             "icon": "map"
           },
           {
             "id": "z1",
             "type": "location",
             "name": "Keep",
-            "family": "world",
+            "family": "green",
             "icon": "castle"
           },
           {
             "id": "z2",
             "type": "zone",
             "name": "March",
-            "family": "world",
+            "family": "green",
             "icon": "pentagon"
           }
         ],
@@ -4878,14 +4878,14 @@
             "id": "c1",
             "type": "character",
             "name": "Ada",
-            "family": "agents",
+            "family": "blue",
             "icon": "person"
           },
           {
             "id": "c2",
             "type": "character",
             "name": "Member",
-            "family": "agents",
+            "family": "blue",
             "icon": "person",
             "marks": [
               "room"
@@ -4895,7 +4895,7 @@
             "id": "z1",
             "type": "location",
             "name": "Keep",
-            "family": "world",
+            "family": "green",
             "icon": "castle"
           }
         ],
@@ -4987,14 +4987,14 @@
             "id": "c1",
             "type": "character",
             "name": "Ada",
-            "family": "agents",
+            "family": "blue",
             "icon": "person"
           },
           {
             "id": "z1",
             "type": "location",
             "name": "Keep",
-            "family": "world",
+            "family": "green",
             "icon": "castle"
           }
         ],
@@ -5083,14 +5083,14 @@
             "id": "c1",
             "type": "character",
             "name": "Ada",
-            "family": "agents",
+            "family": "blue",
             "icon": "person"
           },
           {
             "id": "z1",
             "type": "location",
             "name": "Keep",
-            "family": "world",
+            "family": "green",
             "icon": "castle"
           }
         ],
@@ -5602,14 +5602,14 @@
             "id": "c1",
             "type": "character",
             "name": "Ada",
-            "family": "agents",
+            "family": "blue",
             "icon": "person"
           },
           {
             "id": "c2",
             "type": "character",
             "name": "Bo",
-            "family": "agents",
+            "family": "blue",
             "icon": "person"
           }
         ],
@@ -5718,14 +5718,14 @@
             "id": "c1",
             "type": "character",
             "name": "Ada",
-            "family": "agents",
+            "family": "blue",
             "icon": "person"
           },
           {
             "id": "c2",
             "type": "character",
             "name": "Bo",
-            "family": "agents",
+            "family": "blue",
             "icon": "person"
           }
         ],
@@ -5805,7 +5805,7 @@
             "id": "c2",
             "type": "character",
             "name": "Member",
-            "family": "agents",
+            "family": "blue",
             "icon": "person",
             "marks": [
               "room"
@@ -5948,7 +5948,7 @@
             "id": "c1",
             "type": "character",
             "name": "Ada",
-            "family": "agents",
+            "family": "blue",
             "icon": "person"
           }
         ],
@@ -6044,21 +6044,21 @@
             "id": "c1",
             "type": "character",
             "name": "Ada",
-            "family": "agents",
+            "family": "blue",
             "icon": "person"
           },
           {
             "id": "c2",
             "type": "character",
             "name": "Bo",
-            "family": "agents",
+            "family": "blue",
             "icon": "person"
           },
           {
             "id": "c3",
             "type": "character",
             "name": "Ghost",
-            "family": "agents",
+            "family": "blue",
             "icon": "person",
             "marks": [
               "hidden"
@@ -6170,14 +6170,14 @@
             "id": "c1",
             "type": "character",
             "name": "Ada",
-            "family": "agents",
+            "family": "blue",
             "icon": "person"
           },
           {
             "id": "c2",
             "type": "character",
             "name": "Bo",
-            "family": "agents",
+            "family": "blue",
             "icon": "person"
           }
         ],
@@ -6458,42 +6458,42 @@
             "id": "LH",
             "type": "construct",
             "name": "Ada only",
-            "family": "world",
+            "family": "pink",
             "icon": "api"
           },
           {
             "id": "LT",
             "type": "construct",
             "name": "Characters",
-            "family": "world",
+            "family": "pink",
             "icon": "api"
           },
           {
             "id": "LU",
             "type": "construct",
             "name": "Too far",
-            "family": "world",
+            "family": "pink",
             "icon": "api"
           },
           {
             "id": "c1",
             "type": "character",
             "name": "Ada",
-            "family": "agents",
+            "family": "blue",
             "icon": "person"
           },
           {
             "id": "c2",
             "type": "character",
             "name": "Bo",
-            "family": "agents",
+            "family": "blue",
             "icon": "person"
           },
           {
             "id": "o1",
             "type": "object",
             "name": "Lamp",
-            "family": "world",
+            "family": "green",
             "icon": "webhook"
           }
         ],
@@ -6589,42 +6589,42 @@
             "id": "a｡",
             "type": "character",
             "name": "Low",
-            "family": "agents",
+            "family": "blue",
             "icon": "person"
           },
           {
             "id": "a😀",
             "type": "character",
             "name": "High",
-            "family": "agents",
+            "family": "blue",
             "icon": "person"
           },
           {
             "id": "b",
             "type": "character",
             "name": "B",
-            "family": "agents",
+            "family": "blue",
             "icon": "person"
           },
           {
             "id": "k",
             "type": "character",
             "name": "K",
-            "family": "agents",
+            "family": "blue",
             "icon": "person"
           },
           {
             "id": "m",
             "type": "character",
             "name": "M",
-            "family": "agents",
+            "family": "blue",
             "icon": "person"
           },
           {
             "id": "z",
             "type": "character",
             "name": "Z",
-            "family": "agents",
+            "family": "blue",
             "icon": "person"
           }
         ],
@@ -6703,14 +6703,14 @@
             "id": "c1",
             "type": "character",
             "name": "Ada",
-            "family": "agents",
+            "family": "blue",
             "icon": "person"
           },
           {
             "id": "c3",
             "type": "character",
             "name": "Cy",
-            "family": "agents",
+            "family": "blue",
             "icon": "person"
           }
         ],
@@ -6769,14 +6769,14 @@
             "id": "c1",
             "type": "character",
             "name": "Ada",
-            "family": "agents",
+            "family": "blue",
             "icon": "person"
           },
           {
             "id": "c3",
             "type": "character",
             "name": "Cy",
-            "family": "agents",
+            "family": "blue",
             "icon": "person"
           }
         ],
@@ -6842,28 +6842,28 @@
             "id": "L1",
             "type": "construct",
             "name": "Sign",
-            "family": "world",
+            "family": "pink",
             "icon": "api"
           },
           {
             "id": "L2",
             "type": "construct",
             "name": "Next",
-            "family": "world",
+            "family": "pink",
             "icon": "api"
           },
           {
             "id": "t1",
             "type": "title",
             "name": "Steward",
-            "family": "abstract",
+            "family": "pink",
             "icon": "military_tech"
           },
           {
             "id": "t2",
             "type": "title",
             "name": "Clerk",
-            "family": "abstract",
+            "family": "pink",
             "icon": "military_tech"
           }
         ],
@@ -6937,14 +6937,14 @@
             "id": "k1",
             "type": "construct",
             "name": "Charter",
-            "family": "world",
+            "family": "pink",
             "icon": "api"
           },
           {
             "id": "r1",
             "type": "relation",
             "name": "Pact",
-            "family": "temporal",
+            "family": "amber",
             "icon": "link"
           }
         ],
@@ -7038,7 +7038,7 @@
             "id": "r1",
             "type": "relation",
             "name": "Watch rota",
-            "family": "temporal",
+            "family": "amber",
             "icon": "link"
           }
         ],
@@ -7087,14 +7087,14 @@
             "id": "lw1",
             "type": "law",
             "name": "Harbour Law",
-            "family": "abstract",
+            "family": "pink",
             "icon": "gpp_bad"
           },
           {
             "id": "t1",
             "type": "title",
             "name": "Keeper",
-            "family": "abstract",
+            "family": "pink",
             "icon": "military_tech"
           }
         ],
@@ -7145,14 +7145,14 @@
             "id": "ch1",
             "type": "law",
             "name": "Royal Charter",
-            "family": "abstract",
+            "family": "pink",
             "icon": "gpp_bad"
           },
           {
             "id": "t1",
             "type": "title",
             "name": "Crown",
-            "family": "abstract",
+            "family": "pink",
             "icon": "military_tech"
           }
         ],

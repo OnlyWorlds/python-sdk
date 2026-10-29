@@ -11,7 +11,7 @@ from __future__ import annotations
 from collections.abc import Callable, Mapping
 from typing import Any, Literal, NotRequired, TypedDict
 
-from ._schema import ELEMENT_FAMILIES, ELEMENT_ICONS
+from ._schema import ELEMENT_GROUPS, ELEMENT_ICONS
 from .lens import (
     _CUT_REASONS,
     _LINK_FIELDS,
@@ -37,7 +37,8 @@ class GraphNode(TypedDict):
     type: str
     #: The element's name, or ``None`` when it has none.
     name: str | None
-    #: The type's family, from the distribution's presentation defaults.
+    #: The type's colour group, its colour word (``blue``, ``green``, ``pink`` or ``amber``) from the distribution's
+    #: presentation defaults: a key for drawing the 22, never a label. The key keeps the profile's name.
     family: str
     #: The type's icon name, from the distribution's presentation defaults.
     icon: str
@@ -227,7 +228,7 @@ def world_graph(
             "id": eid,
             "type": kind,
             "name": name if isinstance(name, str) else None,
-            "family": ELEMENT_FAMILIES[kind],
+            "family": ELEMENT_GROUPS[kind],
             "icon": ELEMENT_ICONS[kind],
         }
         present = kinds(eid)

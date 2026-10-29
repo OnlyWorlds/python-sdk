@@ -128,7 +128,28 @@ def test_the_fixtures_graph_cases() -> None:
     for line in wrong:
         print(line)
     assert wrong == []
-    assert len(cases) == 37, f"the fixture holds {len(cases)} graph cases, serial 85 has 37"
+    assert len(cases) == 37, f"the fixture holds {len(cases)} graph cases, serial 86 has 37"
+
+
+def test_a_node_s_family_is_its_type_s_colour_word() -> None:
+    """lens.md (serial 86): a node's ``family`` is the colour word presentation.json gives its type and nothing
+    else, so Construct is pink and Ability amber; the fixture's wanted nodes carry the same words."""
+    presentation = json.loads((FIXTURE.parent.parent / "presentation.json").read_text(encoding="utf-8"))
+    words = {t: v["family"] for t, v in presentation["types"].items()}
+    seen: set[str] = set()
+    for c in load_cases():
+        for n in c["want"].get("nodes", []):
+            assert n["family"] == words[n["type"]], f"{c['name']}: the fixture's {n['type']} node"
+        if c["want"].get("refused") is None:
+            for n in world_graph(c["world"], c["reader"], **c.get("options", {}))["nodes"]:
+                assert n["family"] == words[n["type"]], f"{c['name']}: {n['type']} node reads {n['family']!r}"
+                seen.add(n["family"])
+    assert seen == {"blue", "green", "pink", "amber"}
+    g = world_graph(
+        {"elements": [{"id": "c1", "type": "construct", "name": "C"}, {"id": "a1", "type": "ability", "name": "A"}]},
+        {"rung": "owner"},
+    )
+    assert {n["type"]: n["family"] for n in g["nodes"]} == {"ability": "amber", "construct": "pink"}
 
 
 def test_the_fixtures_graph_tables_read_back_through_the_reader() -> None:

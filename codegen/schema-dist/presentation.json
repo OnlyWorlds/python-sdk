@@ -1,37 +1,32 @@
 {
   "_meta": {
-    "what": "Presentation DEFAULTS (family + icon + family colours) per element type. Defaults, not authority \u2014 tools may override, and Atlas remaps wholesale for dark mode.",
+    "what": "Presentation DEFAULTS (colour group + icon, and the groups' colours) per element type. Defaults, not authority \u2014 tools may override, and Atlas remaps wholesale for dark mode.",
     "public": "Per type, the fields the OnlyWorlds platform shows on a 'known of' element (one a reader knows of but does not see whole) beside its name, description, supertype, subtype and picture. Platform behaviour, not a default to override; an empty list means those base fields only.",
-    "provenance": "Four-family palette adopted 2026-07 for measured colour-vision-deficiency separation: the previous 22-hue set left Title and Trait at deltaE 1.3 for deutan viewers. Values validated; change one only after re-running a colour-vision check, not by taste.",
-    "families": [
-      "agents",
-      "world",
-      "abstract",
-      "temporal"
-    ]
+    "provenance": "Four-colour palette adopted 2026-07 for measured colour-vision-deficiency separation: the previous 22-hue set left Title and Trait at deltaE 1.3 for deutan viewers. Values validated; change one only after re-running a colour-vision check, not by taste.",
+    "groups": "A visual aid for drawing the 22 types; not part of the standard."
   },
   "colors": {
-    "_note": "Defaults. Tools MAY override. Light assumes near-white surfaces, dark assumes near-black (measured against #0a0a0a). World green is identical in both modes and sits at its low-contrast end deliberately. Colour carries the FAMILY; the icon carries the TYPE \u2014 dark-mode pairs land in the 6-8 deltaE floor band, so icon + label are REQUIRED alongside colour, never optional.",
+    "_note": "Defaults. Tools MAY override. Light assumes near-white surfaces, dark assumes near-black (measured against #0a0a0a). The green is identical in both modes and sits at its low-contrast end deliberately. Colour carries the GROUP; the icon carries the TYPE \u2014 dark-mode pairs land in the 6-8 deltaE floor band, so icon + label are REQUIRED alongside colour, never optional.",
     "order": [
-      "agents",
-      "world",
-      "abstract",
-      "temporal"
+      "blue",
+      "green",
+      "pink",
+      "amber"
     ],
     "families": {
-      "agents": {
+      "blue": {
         "light": "#2a78d6",
         "dark": "#3987e5"
       },
-      "world": {
+      "green": {
         "light": "#008300",
         "dark": "#008300"
       },
-      "abstract": {
+      "pink": {
         "light": "#e87ba4",
         "dark": "#d55181"
       },
-      "temporal": {
+      "amber": {
         "light": "#eda100",
         "dark": "#c98500"
       }
@@ -39,17 +34,17 @@
   },
   "types": {
     "ability": {
-      "family": "abstract",
+      "family": "amber",
       "icon": "auto_fix_normal",
       "public": []
     },
     "collective": {
-      "family": "agents",
+      "family": "blue",
       "icon": "groups_3",
       "public": []
     },
     "character": {
-      "family": "agents",
+      "family": "blue",
       "icon": "person",
       "public": [
         "physicality",
@@ -60,97 +55,97 @@
       ]
     },
     "construct": {
-      "family": "world",
+      "family": "pink",
       "icon": "api",
       "public": []
     },
     "creature": {
-      "family": "agents",
+      "family": "blue",
       "icon": "bug_report",
       "public": []
     },
     "event": {
-      "family": "temporal",
+      "family": "amber",
       "icon": "saved_search",
       "public": []
     },
     "family": {
-      "family": "agents",
+      "family": "blue",
       "icon": "supervisor_account",
       "public": []
     },
     "institution": {
-      "family": "agents",
+      "family": "blue",
       "icon": "account_balance",
       "public": []
     },
     "language": {
-      "family": "abstract",
+      "family": "pink",
       "icon": "edit_road",
       "public": []
     },
     "law": {
-      "family": "abstract",
+      "family": "pink",
       "icon": "gpp_bad",
       "public": []
     },
     "location": {
-      "family": "world",
+      "family": "green",
       "icon": "castle",
       "public": []
     },
     "map": {
-      "family": "world",
+      "family": "green",
       "icon": "map",
       "public": []
     },
     "marker": {
-      "family": "world",
+      "family": "green",
       "icon": "polyline",
       "public": []
     },
     "narrative": {
-      "family": "temporal",
+      "family": "amber",
       "icon": "menu_book",
       "public": []
     },
     "object": {
-      "family": "world",
+      "family": "green",
       "icon": "webhook",
       "public": []
     },
     "phenomenon": {
-      "family": "temporal",
+      "family": "amber",
       "icon": "thunderstorm",
       "public": []
     },
     "pin": {
-      "family": "world",
+      "family": "green",
       "icon": "push_pin",
       "public": []
     },
     "relation": {
-      "family": "temporal",
+      "family": "amber",
       "icon": "link",
       "public": []
     },
     "species": {
-      "family": "agents",
+      "family": "blue",
       "icon": "crib",
       "public": []
     },
     "title": {
-      "family": "abstract",
+      "family": "pink",
       "icon": "military_tech",
       "public": []
     },
     "trait": {
-      "family": "abstract",
+      "family": "pink",
       "icon": "flaky",
       "public": []
     },
     "zone": {
-      "family": "world",
+      "family": "green",
       "icon": "pentagon",
       "public": []
     }

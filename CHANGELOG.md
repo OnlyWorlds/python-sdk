@@ -4,6 +4,11 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+## 0.84.0 (2026-10-29)
+
+- **A graph node's `family` is its type's colour word**: `blue`, `green`, `pink` or `amber`, the value the schema distribution's `presentation.json` now gives each type, in place of `agents`, `world`, `abstract` or `temporal`. The key keeps its name, as the lens profile's node does; the word is a key for drawing the 22, never a classification or a label. Two types move group: **Construct is pink** (was `world`, green) and **Ability is amber** (was `abstract`, pink); the four hexes are unchanged. A tool that matched on the old words reads the new ones. The generated map behind it, private to the package, is renamed `ELEMENT_GROUPS` (was `ELEMENT_FAMILIES`).
+- **Schema repinned to schema-dist `v0.33.0-dist.86`** (from dist.85; the same canonical 00.33.00, so `SCHEMA_VERSION` stays and no type or field moved; the folder lint and `FORMAT_VERSION` stay at 0.3.20). Serial 86 keys the presentation defaults' colour groups by their colour words, rules in the lens profile that a node's `family` is that word, and replays it in `lens.fixture.json`, whose 151 cases (37 graph) all pass. The address profile gains a sentence on what a pin's, a marker's or a zone's address answers on the site; nothing in this package restates it. Tests: the map against the vendored `presentation.json` for every type, Construct pink and Ability amber, and every node of every fixture graph case carrying its type's word.
+
 ## 0.83.2 (2026-10-29)
 
 - **The doctor's flag 11 no longer reports an unmarked Law with supertype Charter.** The checks profile at schema-dist serial 85 rules that such a Law is lore, not a Charter and not a finding, house rules or not; the doctor followed the older reading and named one carrying `x_checks_rules` as a finding. Its rules are still never applied, on a folder and through the API (with `front_door.charter` null too); a marked Charter that is not the newest stays a finding. Tests: three, the unmarked Law newer than the Charter, a world with no marked Charter, and the API's null front door, now assert no finding and no rule applied from it.

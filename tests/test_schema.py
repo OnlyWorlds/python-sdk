@@ -10,6 +10,7 @@ from pathlib import Path
 
 import onlyworlds
 from onlyworlds import ELEMENT_TYPES, FIELD_KINDS
+from onlyworlds._schema import ELEMENT_GROUPS, ELEMENT_ICONS
 
 ROOT = Path(__file__).resolve().parents[1]
 DIST = ROOT / "codegen" / "schema-dist"
@@ -51,3 +52,15 @@ def test_field_kinds() -> None:
     assert "world" not in FIELD_KINDS["character"] and "id" not in FIELD_KINDS["character"]
     # ruling collective-equipment-target: the v2 target, not the decommissioned v1 one
     assert FIELD_KINDS["collective"]["equipment"] == "multi_link"
+
+
+def test_colour_groups_are_the_presentation_defaults_colour_words() -> None:
+    """Serial 86: each type's colour group is the colour word presentation.json gives it, one of the four in
+    ``colors.order``; Construct moved to pink and Ability to amber."""
+    presentation = json.loads((DIST / "presentation.json").read_text(encoding="utf-8"))
+    assert presentation["colors"]["order"] == ["blue", "green", "pink", "amber"]
+    assert {t: presentation["types"][t]["family"] for t in ELEMENT_TYPES} == ELEMENT_GROUPS
+    assert {t: presentation["types"][t]["icon"] for t in ELEMENT_TYPES} == ELEMENT_ICONS
+    assert ELEMENT_GROUPS["construct"] == "pink"
+    assert ELEMENT_GROUPS["ability"] == "amber"
+    assert set(ELEMENT_GROUPS.values()) == {"blue", "green", "pink", "amber"}

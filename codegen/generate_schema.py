@@ -229,22 +229,23 @@ def public_fields(types: list[str], layout: dict[str, Any]) -> dict[str, list[st
 
 
 def presentation_keys(types: list[str]) -> dict[str, tuple[str, str]]:
-    """type -> (family, icon), the dist's presentation.json ``types.<type>.family`` and ``.icon``: the
-    first-party presentation defaults a reader hands a tool (the graph's nodes carry them). Every type must
-    have both, each a non-empty string, and each family one of ``colors.order``."""
+    """type -> (colour group, icon), the dist's presentation.json ``types.<type>.family`` (the key keeps its
+    name; the value is the colour word) and ``.icon``: the first-party presentation defaults a reader hands a
+    tool (the graph's nodes carry them). Every type must have both, each a non-empty string, and each colour
+    group one of ``colors.order``."""
     presentation: dict[str, Any] = json.loads((DIST / "presentation.json").read_text(encoding="utf-8"))
     by_type = presentation.get("types")
     if not isinstance(by_type, dict) or sorted(by_type) != sorted(types):
         raise SystemExit(f"presentation.json types {sorted(by_type or {})} disagree with ELEMENT_TYPES {types}")
-    families = (presentation.get("colors") or {}).get("order")
-    if not isinstance(families, list) or not families:
-        raise SystemExit(f"presentation.json colors.order is not a list of families: {families!r}")
+    groups = (presentation.get("colors") or {}).get("order")
+    if not isinstance(groups, list) or not groups:
+        raise SystemExit(f"presentation.json colors.order is not a list of colour groups: {groups!r}")
     out: dict[str, tuple[str, str]] = {}
     for t in types:
-        family, icon = by_type[t].get("family"), by_type[t].get("icon")
-        if family not in families or not isinstance(icon, str) or not icon:
-            raise SystemExit(f"presentation.json types.{t}: family {family!r} or icon {icon!r} is not one")
-        out[t] = (family, icon)
+        group, icon = by_type[t].get("family"), by_type[t].get("icon")
+        if group not in groups or not isinstance(icon, str) or not icon:
+            raise SystemExit(f"presentation.json types.{t}: colour group {group!r} or icon {icon!r} is not one")
+        out[t] = (group, icon)
     return out
 
 
@@ -502,9 +503,10 @@ def render(
         *[line for t in types for line in wrapped(f'    "{t}": ', public[t], ",")],
         "}",
         "",
-        "# type -> its family and its icon name: presentation.json ``types.<type>.family`` and ``.icon``, the",
-        "# first-party presentation defaults (not the standard; a tool may override them). Colour stays the tool's.",
-        "ELEMENT_FAMILIES: dict[str, str] = {",
+        "# type -> its colour group (the colour word: blue, green, pink or amber) and its icon name:",
+        "# presentation.json ``types.<type>.family`` and ``.icon``, the first-party presentation defaults (not the",
+        "# standard; a tool may override them). A key for drawing the 22, never a label. Colour stays the tool's.",
+        "ELEMENT_GROUPS: dict[str, str] = {",
         *[f'    "{t}": "{shown[t][0]}",' for t in types],
         "}",
         "ELEMENT_ICONS: dict[str, str] = {",
