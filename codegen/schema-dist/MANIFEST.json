@@ -165,7 +165,7 @@
     "profiles/room.md": "0b33fbd1da0fe1cf5438cecb0266096b3190de11d62fea873dc4c27efca6735a",
     "profiles/spine.fixture.json": "82ebcb81841a9697be42f2861befc9e13a2828bd8d566b27c42898a865c88e59",
     "profiles/spine.md": "887bfb1e4f89c7a6b3a9472d66d7d84bd4e78f55d41a46260316d083be5f3bfd",
-    "README.md": "3f431b6619405320ec6e5c4d126a4775097b810359145ff9a3e3deff5d9bd580",
+    "README.md": "723fce79366508425456ace3f88788066b7ed9d38fa1f5f35c7a42d3501c17c1",
     "schema/ability.yaml": "9fb53aa50af02134714e804b7e4c54652b63dd7adc11dd4aef991c64503205fc",
     "schema/base_properties.yaml": "ec3724ceb2faca973e431a2e2ff946e55bfb55b6b8d78689b6b22d0cfb7c9a2e",
     "schema/character.yaml": "8bf572cb676024e86c4f7502a0b7f5bdfb2531071633f6f184e446f4e39efa3a",
@@ -192,8 +192,8 @@
     "schema/zone.yaml": "9828429f3172b83b6277c0a71a75a3f4079b8b1eccb2135418a458f2fc80f2b7",
     "schema.json": "02a50f6589ed3e33ff300cbe19528cf895535658294c051a5d4d1330f00edb5d",
     "SECURITY.md": "939ee364b06f0b749bdd4cbe66b2fe49322c95abe732650ec4ef062a0c03820a",
-    "VERSION": "908a01f930cf667c7de43b8f22425cbe725fa83fea7b03acb787e1247c65104c",
-    "walk/lint_folder.py": "83eeb6bbd7128615523445024d9c05350f27a9a6afed0f61ff5c29f3c783458b",
+    "VERSION": "d0cdd6307d4500728f7601531d65e8e2089cf8527a8e1eaa2bd51f12043befcc",
+    "walk/lint_folder.py": "67d1ceab980f4a8f782f9fe31b79f02a79ba08302f0021b1eb87c1c5b3ab2400",
     "walk/rulings.yaml": "1fb87ce4012d160b809e0aac50688c62405d2a5e6e303a57df84b98c249374ca",
     "walk/schema_walk.py": "e4a490dda5133e3961252cd8675eb39e5b214df68f6a661fa8601ccd69e6aed0"
   }

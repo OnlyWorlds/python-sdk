@@ -40,13 +40,13 @@ from pathlib import Path
 # The folder format's version this lint was written against: the folder spec's
 # own version line, the one source. It moves when the spec's version moves, and
 # publish_dist.py writes the dist README's version sentence from it.
-FORMAT_VERSION = "0.3.20"
+FORMAT_VERSION = "0.3.21"
 
 # Keys an element body carries that the schema does not declare: the type
 # slug and the server-managed fields (elements/serialize.py READONLY_FIELDS
 # minus `world`, which bodies never carry). Extension prefixes as served.
 BODY_EXTRA_KEYS = {"type", "created_at", "updated_at", "change_seq", "created_by",
-                   "changed_by", "changed_via", "changed_client"}
+                   "changed_by", "changed_via", "changed_client", "doors"}
 # Keys the folder format itself puts in an element file (folder spec section 5,
 # the linked-folder guidance): Atlas's two sync stamps and the media id. A
 # linked folder carries them on every edited element; the first run on the

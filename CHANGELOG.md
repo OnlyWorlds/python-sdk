@@ -4,6 +4,12 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+## 0.88.0 (2026-10-29)
+
+- **Schema repinned to schema-dist `v0.33.0-dist.91`** (from dist.90; the same canonical 00.33.00, so `SCHEMA_VERSION` stays and no type or field moved). Serial 91 moves only the dist's folder checker and its README.
+- **The writers stamp folder format 0.3.21** (`FORMAT_VERSION`, from 0.3.20), following the dist's folder checker: a new `world.json` from `write_folder`, `export_world` and the Campfire, Kanka, LegendKeeper, Notion and World Anvil imports declares `format_version` 0.3.21. The doctor's check 9 (a `format_version` older than the package's) now flags a folder that declares 0.3.20 or older.
+- **`onlyworlds.lint` takes `doors`**: the vendored checker, byte for byte the dist's at the new pin, reads `doors` (the door history the API serves a world's members) as a server-managed key beside `changed_client`, so a folder pulled by a member lints clean. Before, each element file carrying it was a problem ("`doors` is not a field of character").
+
 ## 0.87.0 (2026-10-29)
 
 - **`doors_of(element, tools=TOOLS)`**: which tools wrote an element, newest first, from its `doors` field, each a dict `{door, at, tool, last, from}` (`Door`). `door` is the key (a tool's client name, or a door word such as `site` or `mcp`), `at` its time exactly as served, `tool` the first `tools` row whose `client` is the door as `{id, name}` (else None), `from` is `doors`. Times are compared as instants at their full precision, offsets and microseconds included, never as strings and never through `datetime.fromisoformat`; entries at the same instant go by key, by Unicode code point. A key that is empty, or a value that is not a time (`YYYY-MM-DDTHH:MM:SS`, an optional fraction, then `Z` or `±HH:MM`, with a real date and clock), is skipped. `last` is True on the first entry at the same instant as `updated_at`; when none is, the last write came through no door the field records (a restore or a scrub). An element without `doors`, or with no valid entry in it, gives one entry from its last write (`changed_client`, else `changed_via`, at `updated_at`, `from` `last-write`), or `[]` when it has neither door or no valid `updated_at`, as a public reader's element does. Data only, no words: a "Last shaped in Atlas" line reads the first entry. An element that is not a mapping, or `tools` that is not a sequence, raises `TypeError`. The npm SDK's `doorsOf` answers the same shared fixture (26 cases) entry for entry.

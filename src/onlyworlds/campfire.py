@@ -73,7 +73,7 @@ so the project is given or the title stands in:
 A second element of one type and name gets ``:<n>`` on its key and is named in the report; an
 exact copy folds into one. ``producer`` is ``{"tool": "onlyworlds", "version": ..., "input":
 "campfire-export"}`` (``PRODUCER_INPUT``, on the folder spec's §4.2 list since v0.3.18; the
-folder's ``format_version`` is the package's ``FORMAT_VERSION``, 0.3.20 since 0.82.0).
+folder's ``format_version`` is the package's ``FORMAT_VERSION``, 0.3.21 since 0.88.0).
 
 From the command line: exit 0 written (or planned), 2 on bad arguments (no ``--file``, a missing
 file, an OUT-DIR that is not empty, a blank ``--project``, a file that is not a Campfire export).

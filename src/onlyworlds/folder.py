@@ -1,6 +1,6 @@
 """The OnlyWorlds world folder: filenames, the writer, the reader.
 
-Spec: OnlyWorlds Folder Format v0.3.20.
+Spec: OnlyWorlds Folder Format v0.3.21.
 Section numbers below are that document's.
 
 ::
@@ -62,7 +62,7 @@ __all__ = [
 ]
 
 #: The spec version this module writes and reads against (§4.2 ``format_version``).
-FORMAT_VERSION = "0.3.20"
+FORMAT_VERSION = "0.3.21"
 
 #: §4.4 (v0.3.10): the stub marker. keel hands a guest an element it reaches only
 #: through its own Character's sheet as a stub, ``known_of: true``: these keys, its type's public

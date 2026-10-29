@@ -44,7 +44,7 @@ Only `id` and `name` are required. Element bodies read from the API also carry k
 
 ## The example world
 
-`example/hyperion/` is a world folder: `world.json` for the world, and one JSON file per element at `elements/<type>/<name>--<id tail>.json`. The `id` inside a file is the element's identity; the filename is only for people. It needs no account or key: load it, check it against `schema.json`, and you have tested your reader on real data. The format is described at [World Folders](https://onlyworlds.github.io/docs/schema/folders). The folder format is at 0.3.20 (the spec's own version line); a folder stamps `format_version` from it.
+`example/hyperion/` is a world folder: `world.json` for the world, and one JSON file per element at `elements/<type>/<name>--<id tail>.json`. The `id` inside a file is the element's identity; the filename is only for people. It needs no account or key: load it, check it against `schema.json`, and you have tested your reader on real data. The format is described at [World Folders](https://onlyworlds.github.io/docs/schema/folders). The folder format is at 0.3.21 (the spec's own version line); a folder stamps `format_version` from it.
 
 ## Using the walk (Python)
 

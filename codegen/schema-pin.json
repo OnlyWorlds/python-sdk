@@ -2,15 +2,20 @@
   "_what": "The recorded pin for the vendored OnlyWorlds schema distribution (codegen/schema-dist/, copied byte-exact). Do not edit by hand; re-vendor from the pinned tag and review the diff. Kept equal to the npm SDK's pin (github.com/OnlyWorlds/sdk, codegen/schema-pin.json) on purpose: two clients, one schema.",
   "_why_manifest_sha256": "Verifying the tree against its own MANIFEST.json only proves internal consistency. If the tag moved, the manifest moved with it. The hash recorded here is the one first accepted, which is what makes a moved tag visible.",
   "repo": "https://github.com/OnlyWorlds/schema-dist",
-  "tag": "v0.33.0-dist.90",
-  "commit": "7fa101aacaebcd81a04916ecd5a962da679337dc",
-  "manifest_sha256": "0acff899ad76c815e176d04e74cce26e7adfb0cc937b93607676eba0c3c9780b",
+  "tag": "v0.33.0-dist.91",
+  "commit": "e25e3d3fe0fbf70adc8039bf25ec85e01e0e2082",
+  "manifest_sha256": "250ab537d1afed166b36dfadb3fc16f3627f3064fc30614e965fb6ce5f9fb6f2",
   "canonical_version": "00.33.00",
-  "dist_serial": 90,
+  "dist_serial": 91,
   "published": "2026-10-29",
   "pinned_at": "2026-10-29",
   "pinned_by": "The maintainer: tree from `git archive` of the tag in a schema-dist checkout (197 files, every one the MANIFEST lists); files re-hashed against MANIFEST.json by generate_schema.py; MANIFEST self-hash matched against the raw file GitHub serves at the tag, whose ref resolves to the commit above.",
   "previous_pins": [
+    {
+      "tag": "v0.33.0-dist.90",
+      "manifest_sha256": "0acff899ad76c815e176d04e74cce26e7adfb0cc937b93607676eba0c3c9780b",
+      "note": "superseded by v0.33.0-dist.91 (walk/lint_folder.py: FORMAT_VERSION 0.3.20 to 0.3.21, and doors, the door history the API serves members, joins BODY_EXTRA_KEYS beside changed_client, so a folder that carries it lints clean; README's folder format sentence at 0.3.21; no schema file moved)"
+    },
     {
       "tag": "v0.33.0-dist.89",
       "manifest_sha256": "dfac118e9ec46958ddc491015f2a1be0e372e8d0509b6e628d1550b6cd89b251",

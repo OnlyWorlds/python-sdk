@@ -74,6 +74,27 @@ def test_each_problem_is_named(tmp_path: Path, capsys: pytest.CaptureFixture[str
     assert out.splitlines()[-1].endswith("problems") and not out.splitlines()[-1].endswith(": 0 problems")
 
 
+def test_an_element_file_with_doors_passes(tmp_path: Path, capsys: pytest.CaptureFixture[str]) -> None:
+    """``doors``, the door history the API serves members (each tool that wrote the element, with its last write's
+    time), is a server-managed key like ``changed_client``: a folder pulled by a member carries it, and it is clean."""
+    (tmp_path / "world.json").write_text(json.dumps(WORLD), encoding="utf-8")
+    chars = tmp_path / "elements" / "character"
+    chars.mkdir(parents=True)
+    body = {
+        "id": "0190f2c4-0000-7000-8000-000000000002",
+        "name": "Ash",
+        "updated_at": "2026-10-29T14:31:07.123456+00:00",
+        "changed_via": "api",
+        "changed_client": "atlas",
+        "doors": {"atlas": "2026-10-29T14:31:07.123456+00:00", "mcp": "2026-10-20T08:00:00+00:00"},
+    }
+    (chars / "ash--00000002.json").write_text(json.dumps(body), encoding="utf-8")
+    assert lint.main([str(tmp_path)]) == 0
+    out = capsys.readouterr().out
+    assert "doors" not in out
+    assert out.splitlines()[-1].endswith(": 0 problems")
+
+
 def test_not_a_world_folder(tmp_path: Path, capsys: pytest.CaptureFixture[str]) -> None:
     assert lint.main([str(tmp_path / "missing")]) == 2
     assert lint.main([str(tmp_path)]) == 2

@@ -71,7 +71,7 @@ def dev_file(root: Path) -> dict[str, Any]:
 
 def test_the_kept_keys_are_keels() -> None:
     assert frozenset(KEPT) == KNOWN_OF_KEEPS
-    assert FORMAT_VERSION == "0.3.20"
+    assert FORMAT_VERSION == "0.3.21"
 
 
 def test_is_known_of_only_for_true() -> None:
