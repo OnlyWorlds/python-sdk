@@ -639,7 +639,9 @@ def read_calendar_config(value: object) -> CalendarConfig | None:
         return None
     cfg = value
     version = _prop(cfg, "version")
-    if (not _strict_eq(version, 1) and not _strict_eq(version, 2)) or not isinstance(_prop(cfg, "grain"), str):
+    grain = _prop(cfg, "grain")
+    # The profile: grain is required, a string; an empty string is no grain (serial 89's case).
+    if (not _strict_eq(version, 1) and not _strict_eq(version, 2)) or not isinstance(grain, str) or grain == "":
         return None
     months = _bundle(cfg, "months")
     if _truthy(months):

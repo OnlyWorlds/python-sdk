@@ -4,6 +4,10 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+## 0.84.3 (2026-10-29)
+
+- **`onlyworlds.calendar.read_calendar_config` refuses an empty `grain`.** The calendar profile requires `grain` as a string, and an empty string is no grain: the reader took `"grain": ""` as a calendar while the validator already refused it. It now returns `None` (show bare numbers), as the TypeScript SDK's reader does from 4.102.5; schema-dist's next serial carries the case.
+
 ## 0.84.2 (2026-10-29)
 
 - **Schema repinned to schema-dist `v0.33.0-dist.88`** (from dist.87; the same canonical 00.33.00, so `SCHEMA_VERSION` stays and no type or field moved; the folder lint and `FORMAT_VERSION` stay at 0.3.20). Serial 88 adds a graph case to `lens.fixture.json`: two elements whose `x_review_proposed` is `{}` and `""` are drawn as settled nodes with no mark, and the lens profile names the case. The graph reader already read an empty mark so (since 0.84.1); no code changed. The lens fixture's 153 cases (39 graph) all pass, and a test checks the new case with and without the `proposed` flag.

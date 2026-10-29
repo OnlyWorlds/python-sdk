@@ -413,6 +413,11 @@ def test_the_defensive_read() -> None:
         {"version": 1, "grain": "day", "eras": [{"name": "X"}]},
     ):
         assert read_calendar_config(value) is None, value
+    # The profile's grain is required and a string; an empty string is no grain (Quillon's Unreal port).
+    for bad in ("", 1, None, ["day"]):
+        assert read_calendar_config({"version": 1, "grain": bad}) is None, bad
+        assert read_calendar_config({"version": 2, "grain": bad}) is None, bad
+    assert read_calendar_config({"version": 1, "grain": "day"}) is not None
     for falsy in (False, 0, ""):
         assert read_calendar_config({"version": 1, "grain": "day", "eras": falsy}) is None
         assert read_calendar_config({"version": 1, "grain": "day", "intercalary": falsy}) is None
