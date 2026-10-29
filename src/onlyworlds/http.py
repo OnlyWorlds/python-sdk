@@ -1044,8 +1044,9 @@ class Client:
     ) -> dict[str, Any]:
         """``GET /world/proposals``: one page of the world's queue, ``{data, has_more, next_cursor}``,
         newest first by ``created_at``. ``state`` and ``since`` as on ``list_proposals``; ``element``
-        keeps one element's rows. Keepers read every row in the world, any other member its own; a key
-        with no member and the keyless public view get 404.
+        keeps one element's rows. Keepers read every row in the world, the owner's read key too (or
+        its write key, no PIN needed), any other member its own; a demo key and the keyless public
+        view get 404.
 
         Two kinds of row, told apart by ``kind``: ``"proposal"``, a proposed change to an
         existing element, and ``"new_element"``, a new element that carries ``x_review_proposed``

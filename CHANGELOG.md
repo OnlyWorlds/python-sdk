@@ -4,6 +4,10 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+## 0.85.1 (2026-10-29)
+
+- **`world_proposals` says who reads the review queue as the server now answers**: the owner's read key (or the write key, with no PIN) reads every row, and a demo key and the keyless public view get 404. No code changed.
+
 ## 0.85.0 (2026-10-29)
 
 - **Schema repinned to schema-dist `v0.33.0-dist.89`** (from dist.88; the same canonical 00.33.00, so `SCHEMA_VERSION` stays and no type or field moved; the folder lint and `FORMAT_VERSION` stay at 0.3.20). Serial 89 amends the calendar and message profiles: `calendar.fixture.json` grows from 64 to 75 cases (34 calendars with 209 steps, 41 refusals), `message.fixture.json` from 85 to 87. Both fixtures pass whole.
