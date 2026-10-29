@@ -76,9 +76,9 @@ def test_the_vendored_fixture_reads_every_case_as_written() -> None:
     assert doc["profile"] == "atlas_calendar"
     cases = doc["cases"]
     # Counted, so a fixture that stops loading (or loses cases) fails here rather than passing on nothing.
-    assert len(cases) == 64
-    assert sum(c["valid"] for c in cases) == 30 and sum(not c["valid"] for c in cases) == 34
-    assert sum(len(c.get("steps", [])) for c in cases) == 198
+    assert len(cases) == 75
+    assert sum(c["valid"] for c in cases) == 34 and sum(not c["valid"] for c in cases) == 41
+    assert sum(len(c.get("steps", [])) for c in cases) == 209
     assert len(next(c for c in cases if c["name"] == "v2-except-chain-gregorian")["steps"]) == 29
     failed = []
     replayed = 0
@@ -105,7 +105,7 @@ def test_the_vendored_fixture_reads_every_case_as_written() -> None:
                 failed.append(f"{c['name']} step {s['step']}: {words!r} {got} for {s['words']!r} {s['breakdown']}")
             replayed += 1
     assert failed == []
-    assert replayed == 198
+    assert replayed == 209
 
 
 def test_the_reader_returns_the_value_itself_unknown_keys_kept() -> None:
@@ -404,22 +404,62 @@ def test_mid_labels_and_month_starts() -> None:
 
 
 def test_an_intercalary_day_after_a_month_the_year_lacks_is_unreadable() -> None:
-    # Serial 89 (Quillon's Unreal port): a day after a month the year lacks has no position.
-    months = {"names": ["A", "B"], "lengths": [10, 10]}
+    # Serial 89: a day after a month the year lacks (past the last, below the first) has no position.
+    # Ruled for the next serial, ahead of its fixture: with no months, any intercalary day is unreadable,
+    # after_month 0 included. The names are the edge cases the npm SDK's tests carry too.
+    months = {"months": {"names": ["A", "B"], "lengths": [10, 10]}}
+    year = {"year": {"steps": 10}}
 
-    def at(after_month: int, bundles: dict[str, Any] | None = None) -> dict[str, Any]:
-        return {
+    def at(after_month: int, bundles: dict[str, Any] | None) -> dict[str, Any]:
+        cfg: dict[str, Any] = {
             "version": 1,
             "grain": "day",
-            "bundles": bundles or {"months": months},
             "intercalary": [{"name": "Gap", "after_month": after_month}],
         }
+        if bundles is not None:
+            cfg["bundles"] = bundles
+        return cfg
 
-    for ok in (0, 1, 2):
-        assert read_calendar_config(at(ok)) is not None, ok
-    assert read_calendar_config(at(3)) is None
-    assert read_calendar_config(at(0, {"year": {"steps": 10}})) is not None
-    assert read_calendar_config(at(1, {"year": {"steps": 10}})) is None
+    edges: list[tuple[str, dict[str, Any], bool]] = [
+        ("after-month-0-of-2", at(0, months), True),
+        ("after-month-2-of-2", at(2, months), True),
+        ("after-month-3-of-2", at(3, months), False),
+        ("after-month-minus-1", at(-1, months), False),
+        ("after-month-0-year-only", at(0, year), False),
+        ("after-month-1-year-only", at(1, year), False),
+        ("after-month-0-no-bundles", at(0, None), False),
+        ("after-month-0-months-null", at(0, {"months": None, **year}), False),
+        ("empty-intercalary-year-only", {"version": 1, "grain": "day", "bundles": year, "intercalary": []}, True),
+        ("null-intercalary-year-only", {"version": 1, "grain": "day", "bundles": year, "intercalary": None}, True),
+    ]
+    wrong = [name for name, cfg, reads in edges if (read_calendar_config(cfg) is not None) != reads]
+    assert wrong == []
+    # The builder's check says why: a festival day needs months.
+    assert "Festival days need months" in validate_calendar_config(at(0, year))
+
+
+def test_a_grain_with_nothing_left_after_trimming_is_no_grain() -> None:
+    # Serial 89: grain is present by the room profile's rule, White_Space trimmed exactly (never
+    # str.strip(), which also strips U+001C to U+001F). The names are shared with the npm SDK's tests.
+    base: dict[str, Any] = {"version": 1, "bundles": {"months": {"names": ["A"], "lengths": [3]}}}
+    edges: list[tuple[str, object, bool]] = [
+        ("grain-day", "day", True),
+        ("grain-padded-day", " day\t", True),
+        ("grain-empty", "", False),
+        ("grain-spaces", "   ", False),
+        ("grain-tab-newline", "\t\n", False),
+        ("grain-ideographic-space", chr(0x3000), False),
+        ("grain-nbsp", chr(0xA0), False),
+        ("grain-next-line", chr(0x85), False),
+        ("grain-unit-separator-is-a-grain", chr(0x1F), True),
+        ("grain-bom-is-a-grain", chr(0xFEFF), True),
+        ("grain-zero-width-space-is-a-grain", chr(0x200B), True),
+        ("grain-number", 1, False),
+    ]
+    wrong = [name for name, g, reads in edges if (read_calendar_config({**base, "grain": g}) is not None) != reads]
+    assert wrong == []
+    for name, g, reads in edges:
+        assert ("Grain is required" in validate_calendar_config({**base, "grain": g})) is not reads, name
 
 
 def test_a_format_that_is_not_a_string_prints_the_default() -> None:

@@ -43,13 +43,13 @@ KINDS = {
     "addressed": 11,
     "sent_by": 3,
     "sender": 14,
-    "unread": 16,
+    "unread": 17,
     "mark": 10,
     "thread": 4,
     "unseen": 3,
     "everyone": 3,
     "edited": 4,
-    "note": 7,
+    "note": 8,
 }
 
 ADA = "019a3b10-0000-7000-8000-0000000000a1"
@@ -122,7 +122,7 @@ def test_every_fixture_case_is_answered_as_the_fixture_says() -> None:
     cases = doc["cases"]
     wrong = [line for case in cases for line in replay(case, doc)]
     assert wrong == []
-    assert len(cases) == 85, f"the fixture holds {len(cases)} cases, serial 79 has 85"
+    assert len(cases) == 87, f"the fixture holds {len(cases)} cases, serial 89 has 87"
     assert Counter(c["kind"] for c in cases) == KINDS
 
 

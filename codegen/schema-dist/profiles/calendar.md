@@ -11,7 +11,7 @@
 | Key | Meaning |
 |---|---|
 | `version` | `1`, or `2` when any `intercalary` entry carries `except` or `offset` (below). A reader that knows only `1` refuses a `2` whole (no calendar, the raw step shown), rather than reading a Gregorian leap rule as a plain every-4 one without saying so. Any other value: not a calendar. |
-| `grain` | The world's `time_basic_unit` when the calendar was made (`"day"`, `"year"`, ...). One step of the time line. Required: a value without a string `grain` is not a calendar. |
+| `grain` | The world's `time_basic_unit` when the calendar was made (`"day"`, `"year"`, ...). One step of the time line. Required: a value without a string `grain` with something left after trimming is not a calendar. |
 | `step_name` | The culture's word for one step ("Sol"). Optional; defaults to `grain`. |
 | `bundles.months` | `names` and `lengths` (same length, each length a whole number of steps from 1). |
 | `bundles.year` | `steps`: a year's length, only for a calendar without months. |
@@ -31,23 +31,23 @@ The TypeScript SDK holds this whole as `breakdownStep` and `formatStep` (and `pa
 
 **`null` is absent.** Anywhere in the value (`eras`, `intercalary`, `bundles.months`, an era's `direction`), `null` reads as if the key were not there, as it does everywhere in the standard.
 
-**Accepted as the SDK reads them.** Fewer weekday names than the week's length (no weekday is printed); months and `bundles.year` together (the months win); an `after_month` past the last month (that day sits in no month); neither months nor a year length (each step is one year).
+**Accepted as the SDK reads them.** Fewer weekday names than the week's length (no weekday is printed); months and `bundles.year` together (the months win); neither months nor a year length (each step is one year).
 
-**What a reader may ignore.** Unknown keys anywhere in the value. `closed` (it only governs date entry). `grain` in the arithmetic (it does not change how a step is read, but it must be present). `step_name` and the format templates, if the reader prints its own way.
+**What a reader may ignore.** Unknown keys anywhere in the value. `closed` (it only governs date entry). `grain` in the arithmetic (it does not change how a step is read, but it must be present). `step_name` and the format templates, if the reader prints its own way. A `format` or `format_intercalary` that is not a string is ignored: the default template prints.
 
 **Not a calendar.** A reader refuses the value, and shows bare numbers, never an error, when:
 - `version` is not 1 or 2 (a reader that knows only 1 refuses 2 whole);
-- `grain` is not a string;
+- `grain` is not a string with something left after trimming it (the White_Space set the room profile defines, `room.md`);
 - the months' `names` and `lengths` are not lists of the same, non-zero length, or a month name is not a string;
 - a month length, `bundles.year.steps`, `bundles.week.length` or an `every_years` is not a whole number from 1; an `except` is not a strictly ascending list of whole numbers, each larger than and a multiple of `every_years` and of the one before (`[4]` under `every_years` 4 selects no year), or an `offset` is not a whole number;
 - `bundles.week.names` is not a list of strings;
 - `eras` is present and not a list (`false`, `0` and `""` included), or an era lacks a string `name` or a whole-number `start`, or its `end` or `year_base` is present and not a whole number;
-- `intercalary` is present and not a list (`false`, `0` and `""` included), or an entry lacks a string `name` or a whole `after_month`.
+- `intercalary` is present and not a list (`false`, `0` and `""` included), or an entry lacks a string `name` or a whole `after_month`, or its `after_month` names a month the year does not have: past the last, or below the first. A day placed after a month the year does not have has no position, and a reader never invents one; with no months, any `after_month` above 0 is past the last.
 
 Every reader refuses the same values, or one tool shows a calendar where another shows numbers.
 
 **What a writer must keep.** Everything it did not change, unknown keys included. A re-key never rewrites the value (it holds no element ids).
 
-**Conformance.** `calendar.fixture.json`, beside this page: 64 cases, 52 generated from `@onlyworlds/sdk` 4.42.2 and 14 for the amendment from 4.76.0 (two of them replace `refuse-version` and `era-overlap-down-later-start`), 30 calendars with 198 steps and the words and breakdown each one reads as, and 34 values a reader must refuse. The steps of the two LegendKeeper calendars (`v2-except-chain-gregorian`, `v2-offset-harptos`) each match what LegendKeeper's API answered for a user's own project on 2026-10-25; the Gregorian case includes the days around Leap Day in 1900, 2000 and 2100, where a reader whose days ignore `except` while its year count keeps it would misread. A reader conforms when it passes every case.
+**Conformance.** `calendar.fixture.json`, beside this page: 75 cases, 52 generated from `@onlyworlds/sdk` 4.42.2, 14 for the amendment from 4.76.0 (two of them replace `refuse-version` and `era-overlap-down-later-start`) and 11 for serial 89, written from its rulings (and `intercalary-after-month-out-of-range` now a refusal), 34 calendars with 209 steps and the words and breakdown each one reads as, and 41 values a reader must refuse. One case, `found-by-the-field-never-by-type`, also carries a world's elements and the ids a reader finds a calendar on. The steps of the two LegendKeeper calendars (`v2-except-chain-gregorian`, `v2-offset-harptos`) each match what LegendKeeper's API answered for a user's own project on 2026-10-25; the Gregorian case includes the days around Leap Day in 1900, 2000 and 2100, where a reader whose days ignore `except` while its year count keeps it would misread. A reader conforms when it passes every case.
 
-Source: the TypeScript SDK's calendar kernel (`@onlyworlds/sdk` 4.42.2: `readCalendarConfig`, `breakdownStep`, `formatStep`), written from Atlas's calendar, which made the field. Amended 2026-10-25 (version 2: `except` and `offset` on an intercalary entry; an open era's end skips `down` eras), for two findings: three calendars version 1 could not hold exactly (Gregorian, Harptos and Scrolls), which now match what LegendKeeper's API answered for a user's own project on 2026-10-25, and an era-order fault found in two readers the same day.
+Source: the TypeScript SDK's calendar kernel (`@onlyworlds/sdk` 4.42.2: `readCalendarConfig`, `breakdownStep`, `formatStep`), written from Atlas's calendar, which made the field. Amended 2026-10-25 (version 2: `except` and `offset` on an intercalary entry; an open era's end skips `down` eras), for two findings: three calendars version 1 could not hold exactly (Gregorian, Harptos and Scrolls), which now match what LegendKeeper's API answered for a user's own project on 2026-10-25, and an era-order fault found in two readers the same day. Amended 2026-10-29, serial 89 (an `after_month` naming a month the year does not have and a `grain` with nothing left after trimming are not a calendar; a `format` or `format_intercalary` that is not a string is ignored), from five readers' ports of the profile, which named the cases where a wrong reader still passed every case.

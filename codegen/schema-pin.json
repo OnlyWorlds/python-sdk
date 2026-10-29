@@ -2,15 +2,20 @@
   "_what": "The recorded pin for the vendored OnlyWorlds schema distribution (codegen/schema-dist/, copied byte-exact). Do not edit by hand; re-vendor from the pinned tag and review the diff. Kept equal to the npm SDK's pin (github.com/OnlyWorlds/sdk, codegen/schema-pin.json) on purpose: two clients, one schema.",
   "_why_manifest_sha256": "Verifying the tree against its own MANIFEST.json only proves internal consistency. If the tag moved, the manifest moved with it. The hash recorded here is the one first accepted, which is what makes a moved tag visible.",
   "repo": "https://github.com/OnlyWorlds/schema-dist",
-  "tag": "v0.33.0-dist.88",
-  "commit": "e8176b950e4969a66b524df99910ea79afd92d61",
-  "manifest_sha256": "375a00634e37f00d39c7838ce568b85420c60bc3819167d4f99590b699a9c398",
+  "tag": "v0.33.0-dist.89",
+  "commit": "1eae9fa1f48d4682e4a36f25fc6c1f469565e6ce",
+  "manifest_sha256": "dfac118e9ec46958ddc491015f2a1be0e372e8d0509b6e628d1550b6cd89b251",
   "canonical_version": "00.33.00",
-  "dist_serial": 88,
+  "dist_serial": 89,
   "published": "2026-10-29",
   "pinned_at": "2026-10-29",
   "pinned_by": "The maintainer: tree from `git archive` of the tag in a schema-dist checkout (197 files, every one the MANIFEST lists); files re-hashed against MANIFEST.json by generate_schema.py; MANIFEST self-hash matched against the raw file GitHub serves at the tag, whose ref resolves to the commit above.",
   "previous_pins": [
+    {
+      "tag": "v0.33.0-dist.88",
+      "manifest_sha256": "375a00634e37f00d39c7838ce568b85420c60bc3819167d4f99590b699a9c398",
+      "note": "superseded by v0.33.0-dist.89 (calendar.md: a grain with nothing left after trimming White_Space, and an intercalary after_month past the last month, below the first or with no months, are not a calendar; a format or format_intercalary that is not a string is ignored; calendar.fixture.json 64 to 75 cases. message.md: created_at read as an instant, an offset and a fraction of a second counted; message.fixture.json adds that case and a newest-Note-listed-last case, 85 to 87; no type or field moved)"
+    },
     {
       "tag": "v0.33.0-dist.87",
       "manifest_sha256": "a8ba849c6ae5d216c758351605f68dd9d4ecb17ea3e9fe49c40f9ab69c3dfcf2",

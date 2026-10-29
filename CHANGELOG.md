@@ -4,6 +4,15 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+## 0.85.0 (2026-10-29)
+
+- **Schema repinned to schema-dist `v0.33.0-dist.89`** (from dist.88; the same canonical 00.33.00, so `SCHEMA_VERSION` stays and no type or field moved; the folder lint and `FORMAT_VERSION` stay at 0.3.20). Serial 89 amends the calendar and message profiles: `calendar.fixture.json` grows from 64 to 75 cases (34 calendars with 209 steps, 41 refusals), `message.fixture.json` from 85 to 87. Both fixtures pass whole.
+- **`onlyworlds.calendar.read_calendar_config` refuses a `grain` with nothing left after trimming.** `grain` is read by presence, as the room profile reads its marks: White_Space trimmed exactly, never Python's own `str.strip()`. So `""`, `"   "`, `"\t\n"` and U+3000 alone are no grain and the value is not a calendar (show bare numbers); a padded `" day "` reads, and a string of U+001C to U+001F, U+200B or U+FEFF alone is still a grain. 0.84.3 refused `""` only. `validate_calendar_config` says "Grain is required" for the same values.
+- **An intercalary day after a month the year does not have makes the calendar unreadable.** An `after_month` past the last month (before: that day sat in no month) or below 0 (before: read) is refused, as the profile now requires: a day with no position is never given one.
+- **An intercalary day on a calendar with no months makes it unreadable, `after_month` 0 included.** `after_month` names a place between months, and with none there is no place. This follows a ruling for the profile's next serial, ahead of its fixture: serial 89's fixture refuses only an `after_month` above 0 there, and no case in it reads such a calendar. An empty or `null` `intercalary` on a calendar without months still reads.
+- **A `format` or `format_intercalary` that is not a string is ignored and the default template prints.** Before, `format_step` raised `TypeError` on one (a number, a list, an object).
+- The message profile now says `created_at` is read as an instant (an offset and a fraction of a second count), and that the newest Note is the Character's line wherever it stands in the list. The message reader already did both; the two new fixture cases pass.
+
 ## 0.84.3 (2026-10-29)
 
 - **`onlyworlds.calendar.read_calendar_config` refuses an empty `grain`.** The calendar profile requires `grain` as a string, and an empty string is no grain: the reader took `"grain": ""` as a calendar while the validator already refused it. It now returns `None` (show bare numbers), as the TypeScript SDK's reader does from 4.102.5; schema-dist's next serial carries the case.

@@ -6,10 +6,11 @@
     "profile_tag": "v0.33.0-dist.68",
     "profile_page": "profiles/calendar.md"
   },
-  "generated_by": "@onlyworlds/sdk scripts/calendar-fixture-cases.mjs (the amendment's cases) over the 4.42.2 fixture",
+  "generated_by": "@onlyworlds/sdk scripts/calendar-fixture-cases.mjs (the amendment's cases) over the 4.42.2 fixture; serial 89's cases written from the profile's rulings of 2026-10-29, their steps read from the SDK's kernel",
   "notes": [
     "value: the raw atlas_calendar field value (an object, or a JSON string). valid: the SDK reader (readCalendarValue) returns a calendar; false means not a calendar, the reader shows bare numbers.",
-    "words: exactly what formatStep prints. breakdown: breakdownStep with its keys, except era, which is the era's name (or null) in place of the era object."
+    "words: exactly what formatStep prints. breakdown: breakdownStep with its keys, except era, which is the era's name (or null) in place of the era object.",
+    "elements and found (one case, found-by-the-field-never-by-type): a world's elements, and the ids of those a reader finds a calendar on, in list order: by the atlas_calendar field being present (null is absent), never by type or supertype. value is the calendar they carry, and its steps read as in any case."
   ],
   "cases": [
     {
@@ -2158,7 +2159,7 @@
     },
     {
       "name": "era-tie-up-wins-listed-first",
-      "why": "equal starts: the up era wins the tie whatever the listing order",
+      "why": "equal starts between two eras that both count up (a direction of sideways counts as up): the later-listed era, Sideways, wins the tie, and Upward, listed first, loses it",
       "value": {
         "version": 1,
         "grain": "month",
@@ -2810,7 +2811,7 @@
     },
     {
       "name": "intercalary-after-month-out-of-range",
-      "why": "after_month beyond the month count: the SDK reads it, the day counts in the year length but is placed nowhere, so its step has no month, day or intercalary name",
+      "why": "after_month 5 on a year of two months names a month the year does not have: the day has no position, so the value is not a calendar (before serial 89 the SDK read it and placed the day in no month)",
       "value": {
         "version": 1,
         "grain": "day",
@@ -2833,51 +2834,7 @@
           }
         ]
       },
-      "valid": true,
-      "steps": [
-        {
-          "step": 3,
-          "words": "2 B, 0",
-          "breakdown": {
-            "absYear": 0,
-            "year": 0,
-            "era": null,
-            "month": 2,
-            "monthName": "B",
-            "day": 2,
-            "intercalary": null,
-            "weekday": null
-          }
-        },
-        {
-          "step": 4,
-          "words": "0",
-          "breakdown": {
-            "absYear": 0,
-            "year": 0,
-            "era": null,
-            "month": null,
-            "monthName": null,
-            "day": null,
-            "intercalary": null,
-            "weekday": null
-          }
-        },
-        {
-          "step": 5,
-          "words": "1 A, 1",
-          "breakdown": {
-            "absYear": 1,
-            "year": 1,
-            "era": null,
-            "month": 1,
-            "monthName": "A",
-            "day": 1,
-            "intercalary": null,
-            "weekday": null
-          }
-        }
-      ]
+      "valid": false
     },
     {
       "name": "v2-except-chain-gregorian",
@@ -4541,6 +4498,478 @@
         ]
       },
       "valid": false
+    },
+    {
+      "name": "refuse-era-start-past-the-safe-integers",
+      "why": "an era's start of 2^53 (9007199254740992) is past the whole numbers a double holds exactly (from -(2^53 - 1) to 2^53 - 1, as the SDK's Number.isSafeInteger reads them): not a calendar; a reader with no bound would read it",
+      "value": {
+        "version": 1,
+        "grain": "year",
+        "eras": [
+          {
+            "name": "Long",
+            "start": 9007199254740992
+          }
+        ]
+      },
+      "valid": false
+    },
+    {
+      "name": "refuse-json-string-lax-number",
+      "why": "a JSON string whose version is written 01, which strict JSON does not allow (a lax parser reads it as 1, and the value would read): not a calendar",
+      "value": "{\"version\":01,\"grain\":\"day\"}",
+      "valid": false
+    },
+    {
+      "name": "format-separators-at-the-edges",
+      "why": "a template whose separators sit at its edges and between its tokens, with known tokens that have no value (no week, no era) at both edges and in the middle: the middle dot and the spaces beside each empty token close up, the middle dot between two values stays, and nothing is left at either edge",
+      "value": {
+        "version": 1,
+        "grain": "day",
+        "bundles": {
+          "months": {
+            "names": [
+              "Frost",
+              "Thaw"
+            ],
+            "lengths": [
+              10,
+              10
+            ]
+          }
+        },
+        "format": "{weekday} \u00b7 {day} \u00b7 {month} \u00b7 {weekday} \u00b7 {year} {era}"
+      },
+      "valid": true,
+      "steps": [
+        {
+          "step": 0,
+          "words": "1 \u00b7 Frost 0",
+          "breakdown": {
+            "absYear": 0,
+            "year": 0,
+            "era": null,
+            "month": 1,
+            "monthName": "Frost",
+            "day": 1,
+            "intercalary": null,
+            "weekday": null
+          }
+        },
+        {
+          "step": 25,
+          "words": "6 \u00b7 Frost 1",
+          "breakdown": {
+            "absYear": 1,
+            "year": 1,
+            "era": null,
+            "month": 1,
+            "monthName": "Frost",
+            "day": 6,
+            "intercalary": null,
+            "weekday": null
+          }
+        },
+        {
+          "step": -1,
+          "words": "10 \u00b7 Thaw -1",
+          "breakdown": {
+            "absYear": -1,
+            "year": -1,
+            "era": null,
+            "month": 2,
+            "monthName": "Thaw",
+            "day": 10,
+            "intercalary": null,
+            "weekday": null
+          }
+        }
+      ]
+    },
+    {
+      "name": "eras-no-restart-reads-the-year-index",
+      "why": "restart false on an era whose start (step 30) falls in year index 3: the era's years are the year index (3, 4), not a count from the era (1, 2); a reader that ignores restart reads 1 C at step 30",
+      "value": {
+        "version": 1,
+        "grain": "day",
+        "bundles": {
+          "year": {
+            "steps": 10
+          }
+        },
+        "eras": [
+          {
+            "name": "Count",
+            "abbrev": "C",
+            "start": 30,
+            "restart": false
+          }
+        ]
+      },
+      "valid": true,
+      "steps": [
+        {
+          "step": -1,
+          "words": "-1",
+          "breakdown": {
+            "absYear": -1,
+            "year": -1,
+            "era": null,
+            "month": null,
+            "monthName": null,
+            "day": null,
+            "intercalary": null,
+            "weekday": null
+          }
+        },
+        {
+          "step": 29,
+          "words": "2",
+          "breakdown": {
+            "absYear": 2,
+            "year": 2,
+            "era": null,
+            "month": null,
+            "monthName": null,
+            "day": null,
+            "intercalary": null,
+            "weekday": null
+          }
+        },
+        {
+          "step": 30,
+          "words": "3 C",
+          "breakdown": {
+            "absYear": 3,
+            "year": 3,
+            "era": "Count",
+            "month": null,
+            "monthName": null,
+            "day": null,
+            "intercalary": null,
+            "weekday": null
+          }
+        },
+        {
+          "step": 45,
+          "words": "4 C",
+          "breakdown": {
+            "absYear": 4,
+            "year": 4,
+            "era": "Count",
+            "month": null,
+            "monthName": null,
+            "day": null,
+            "intercalary": null,
+            "weekday": null
+          }
+        }
+      ]
+    },
+    {
+      "name": "found-by-the-field-never-by-type",
+      "why": "a reader finds calendars by the field being present, never by type or supertype: a Character carrying the field holds one, a Construct with supertype calendar and no field holds none, and a field that is null is absent",
+      "value": {
+        "version": 1,
+        "grain": "day",
+        "bundles": {
+          "months": {
+            "names": [
+              "Frost",
+              "Thaw"
+            ],
+            "lengths": [
+              10,
+              10
+            ]
+          }
+        }
+      },
+      "valid": true,
+      "steps": [
+        {
+          "step": 0,
+          "words": "1 Frost, 0",
+          "breakdown": {
+            "absYear": 0,
+            "year": 0,
+            "era": null,
+            "month": 1,
+            "monthName": "Frost",
+            "day": 1,
+            "intercalary": null,
+            "weekday": null
+          }
+        },
+        {
+          "step": 12,
+          "words": "3 Thaw, 0",
+          "breakdown": {
+            "absYear": 0,
+            "year": 0,
+            "era": null,
+            "month": 2,
+            "monthName": "Thaw",
+            "day": 3,
+            "intercalary": null,
+            "weekday": null
+          }
+        }
+      ],
+      "elements": [
+        {
+          "id": "019a3b10-0000-7000-8000-00000000ca01",
+          "type": "construct",
+          "supertype": "calendar",
+          "name": "A calendar Construct without the field"
+        },
+        {
+          "id": "019a3b10-0000-7000-8000-00000000ca02",
+          "type": "character",
+          "supertype": "",
+          "name": "A Character carrying a calendar",
+          "atlas_calendar": {
+            "version": 1,
+            "grain": "day",
+            "bundles": {
+              "months": {
+                "names": [
+                  "Frost",
+                  "Thaw"
+                ],
+                "lengths": [
+                  10,
+                  10
+                ]
+              }
+            }
+          }
+        },
+        {
+          "id": "019a3b10-0000-7000-8000-00000000ca03",
+          "type": "construct",
+          "supertype": "Calendar",
+          "name": "The world's calendar",
+          "atlas_calendar": {
+            "version": 1,
+            "grain": "day",
+            "bundles": {
+              "months": {
+                "names": [
+                  "Frost",
+                  "Thaw"
+                ],
+                "lengths": [
+                  10,
+                  10
+                ]
+              }
+            }
+          }
+        },
+        {
+          "id": "019a3b10-0000-7000-8000-00000000ca04",
+          "type": "location",
+          "supertype": "calendar",
+          "name": "A Location whose field is null",
+          "atlas_calendar": null
+        }
+      ],
+      "found": [
+        "019a3b10-0000-7000-8000-00000000ca02",
+        "019a3b10-0000-7000-8000-00000000ca03"
+      ]
+    },
+    {
+      "name": "refuse-grain-empty",
+      "why": "grain is an empty string: nothing is left after trimming, so there is no grain",
+      "value": {
+        "version": 1,
+        "grain": ""
+      },
+      "valid": false
+    },
+    {
+      "name": "refuse-grain-white-space",
+      "why": "grain is a single space: nothing is left after trimming the room profile's White_Space set, so there is no grain",
+      "value": {
+        "version": 1,
+        "grain": " "
+      },
+      "valid": false
+    },
+    {
+      "name": "refuse-intercalary-after-month-negative",
+      "why": "an intercalary after_month of -1 names no month (below the first): not a calendar",
+      "value": {
+        "version": 1,
+        "grain": "day",
+        "bundles": {
+          "months": {
+            "names": [
+              "Frost",
+              "Thaw"
+            ],
+            "lengths": [
+              10,
+              10
+            ]
+          }
+        },
+        "intercalary": [
+          {
+            "name": "Gap",
+            "after_month": -1
+          }
+        ]
+      },
+      "valid": false
+    },
+    {
+      "name": "refuse-intercalary-after-month-no-months",
+      "why": "with no months, any after_month above 0 names a month the year does not have: not a calendar",
+      "value": {
+        "version": 1,
+        "grain": "day",
+        "bundles": {
+          "year": {
+            "steps": 10
+          }
+        },
+        "intercalary": [
+          {
+            "name": "Gap",
+            "after_month": 1
+          }
+        ]
+      },
+      "valid": false
+    },
+    {
+      "name": "format-not-a-string-is-ignored",
+      "why": "a format that is not a string (7) is ignored, and the default template prints",
+      "value": {
+        "version": 1,
+        "grain": "day",
+        "bundles": {
+          "months": {
+            "names": [
+              "Frost",
+              "Thaw"
+            ],
+            "lengths": [
+              10,
+              10
+            ]
+          }
+        },
+        "format": 7
+      },
+      "valid": true,
+      "steps": [
+        {
+          "step": 0,
+          "words": "1 Frost, 0",
+          "breakdown": {
+            "absYear": 0,
+            "year": 0,
+            "era": null,
+            "month": 1,
+            "monthName": "Frost",
+            "day": 1,
+            "intercalary": null,
+            "weekday": null
+          }
+        },
+        {
+          "step": 25,
+          "words": "6 Frost, 1",
+          "breakdown": {
+            "absYear": 1,
+            "year": 1,
+            "era": null,
+            "month": 1,
+            "monthName": "Frost",
+            "day": 6,
+            "intercalary": null,
+            "weekday": null
+          }
+        }
+      ]
+    },
+    {
+      "name": "format-intercalary-not-a-string-is-ignored",
+      "why": "a format_intercalary that is not a string (an object) is ignored, and the default template for a day outside the months prints",
+      "value": {
+        "version": 1,
+        "grain": "day",
+        "bundles": {
+          "months": {
+            "names": [
+              "Frost",
+              "Thaw"
+            ],
+            "lengths": [
+              10,
+              10
+            ]
+          }
+        },
+        "intercalary": [
+          {
+            "name": "Gap",
+            "after_month": 1
+          }
+        ],
+        "format_intercalary": {
+          "template": "{intercalary} of {year}"
+        }
+      },
+      "valid": true,
+      "steps": [
+        {
+          "step": 0,
+          "words": "1 Frost, 0",
+          "breakdown": {
+            "absYear": 0,
+            "year": 0,
+            "era": null,
+            "month": 1,
+            "monthName": "Frost",
+            "day": 1,
+            "intercalary": null,
+            "weekday": null
+          }
+        },
+        {
+          "step": 10,
+          "words": "Gap, 0",
+          "breakdown": {
+            "absYear": 0,
+            "year": 0,
+            "era": null,
+            "month": null,
+            "monthName": null,
+            "day": null,
+            "intercalary": "Gap",
+            "weekday": null
+          }
+        },
+        {
+          "step": 11,
+          "words": "1 Thaw, 0",
+          "breakdown": {
+            "absYear": 0,
+            "year": 0,
+            "era": null,
+            "month": 2,
+            "monthName": "Thaw",
+            "day": 1,
+            "intercalary": null,
+            "weekday": null
+          }
+        }
+      ]
     }
   ]
 }

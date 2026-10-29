@@ -68,12 +68,12 @@ def version_fits(value: dict[str, Any]) -> bool:
 
 
 def test_the_reader_reads_the_vendored_fixture_as_the_profile_does() -> None:
-    """The calendar fixture beside the profile (64 cases, 30 calendars and 34 refusals): the package's
+    """The calendar fixture beside the profile (75 cases, 34 calendars and 41 refusals): the package's
     reader refuses exactly the values the fixture marks not valid (``tests/test_calendar.py`` replays
     the steps too)."""
     fixture = json.loads((DIST / "profiles" / "calendar.fixture.json").read_text(encoding="utf-8"))
     cases = fixture["cases"]
-    assert len(cases) == 64 and sum(not c["valid"] for c in cases) == 34
+    assert len(cases) == 75 and sum(not c["valid"] for c in cases) == 41
     wrong = [c["name"] for c in cases if (read_calendar_value(c["value"]) is not None) != c["valid"]]
     assert wrong == []
 

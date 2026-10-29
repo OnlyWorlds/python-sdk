@@ -87,6 +87,8 @@ from decimal import Decimal
 from functools import cmp_to_key
 from typing import Any, Final, Literal, NamedTuple, Required, TypedDict, cast
 
+from .room import _WHITE_SPACE
+
 #: The supertype a calendar Construct carries by the profile's convention: display only, never detection.
 CALENDAR_SUPERTYPE: Final = "calendar"
 
@@ -551,7 +553,7 @@ def validate_calendar_config(cfg: Mapping[str, Any]) -> list[str]:
     if not _strict_eq(version, 1) and not _strict_eq(version, 2):
         errors.append(f"Unsupported calendar version: {_js_string(version)}")
     grain = _prop(cfg, "grain")
-    if not _truthy(grain) or not isinstance(grain, str):
+    if not isinstance(grain, str) or grain.strip(_WHITE_SPACE) == "":
         errors.append("Grain is required")
 
     months = _bundle(cfg, "months")
@@ -634,14 +636,20 @@ def validate_calendar_config(cfg: Mapping[str, Any]) -> list[str]:
 
 def read_calendar_config(value: object) -> CalendarConfig | None:
     """The reader: ``value`` itself when it is a usable calendar object, else None (show bare numbers).
-    Refuses exactly what the profile's "Not a calendar" list refuses."""
+    Refuses exactly what the profile's "Not a calendar" list refuses, and an intercalary day on a calendar
+    with no months (ruled for the profile's next serial, ahead of its fixture)."""
     if not isinstance(value, Mapping):
         return None
     cfg = value
     version = _prop(cfg, "version")
     grain = _prop(cfg, "grain")
-    # The profile: grain is required, a string; an empty string is no grain (serial 89's case).
-    if (not _strict_eq(version, 1) and not _strict_eq(version, 2)) or not isinstance(grain, str) or grain == "":
+    # The profile: grain is required, a string with something left after trimming White_Space as the
+    # room profile trims (serial 89: "" and "  " are no grain; U+001C alone is a grain).
+    if (
+        (not _strict_eq(version, 1) and not _strict_eq(version, 2))
+        or not isinstance(grain, str)
+        or grain.strip(_WHITE_SPACE) == ""
+    ):
         return None
     months = _bundle(cfg, "months")
     if _truthy(months):
@@ -697,9 +705,13 @@ def read_calendar_config(value: object) -> CalendarConfig | None:
     if _strict_eq(version, 2) and any(_leap_rule_problem(i) is not None for i in entries):
         return None
     # A day placed after a month the year does not have has no position, and a reader never
-    # invents one: the calendar is unreadable (the profile, serial 89; the free week raised here).
+    # invents one: the calendar is unreadable (the profile, serial 89: past the last, below the first;
+    # the free week raised here). With no months there is no place between months, so any
+    # intercalary day is unreadable, after_month 0 included (ruled for the next serial, ahead of its fixture).
+    if entries and not _truthy(months):
+        return None
     month_count = len(_prop(months, "names")) if _truthy(months) else 0
-    if any(_prop(i, "after_month") > month_count for i in entries):
+    if any(_prop(i, "after_month") < 0 or _prop(i, "after_month") > month_count for i in entries):
         return None
     return cast(CalendarConfig, cfg)
 
