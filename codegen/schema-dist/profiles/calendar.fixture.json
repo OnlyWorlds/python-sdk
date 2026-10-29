@@ -6,7 +6,7 @@
     "profile_tag": "v0.33.0-dist.68",
     "profile_page": "profiles/calendar.md"
   },
-  "generated_by": "@onlyworlds/sdk scripts/calendar-fixture-cases.mjs (the amendment's cases) over the 4.42.2 fixture; serial 89's cases written from the profile's rulings of 2026-10-29, their steps read from the SDK's kernel",
+  "generated_by": "@onlyworlds/sdk scripts/calendar-fixture-cases.mjs (the amendment's cases) over the 4.42.2 fixture; serial 89's cases written from the profile's rulings of 2026-10-29, their steps read from the SDK's kernel; serial 90's case (a refusal, no steps) written from its ruling of the same day",
   "notes": [
     "value: the raw atlas_calendar field value (an object, or a JSON string). valid: the SDK reader (readCalendarValue) returns a calendar; false means not a calendar, the reader shows bare numbers.",
     "words: exactly what formatStep prints. breakdown: breakdownStep with its keys, except era, which is the era's name (or null) in place of the era object.",
@@ -4827,7 +4827,7 @@
     },
     {
       "name": "refuse-intercalary-after-month-no-months",
-      "why": "with no months, any after_month above 0 names a month the year does not have: not a calendar",
+      "why": "with no months, an after_month of 1 names a month the year does not have: not a calendar (since serial 90 no intercalary entry is readable without months, whatever its after_month)",
       "value": {
         "version": 1,
         "grain": "day",
@@ -4840,6 +4840,26 @@
           {
             "name": "Gap",
             "after_month": 1
+          }
+        ]
+      },
+      "valid": false
+    },
+    {
+      "name": "refuse-intercalary-no-months-after-month-0",
+      "why": "with no months, an intercalary entry is unreadable whatever its after_month, 0 included: after_month names a place between months and there are none, so the day has no position and the value is not a calendar (before serial 90 a reader could read 0 as before the first month and place the day)",
+      "value": {
+        "version": 1,
+        "grain": "day",
+        "bundles": {
+          "year": {
+            "steps": 10
+          }
+        },
+        "intercalary": [
+          {
+            "name": "Gap",
+            "after_month": 0
           }
         ]
       },

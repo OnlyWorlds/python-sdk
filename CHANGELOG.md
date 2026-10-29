@@ -4,6 +4,10 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+## 0.85.2 (2026-10-29)
+
+- **Schema repinned to schema-dist `v0.33.0-dist.90`** (from dist.89; the same canonical 00.33.00). The calendar fixture gains one refusal, an intercalary day on a calendar with no months at `after_month` 0 (76 cases, 42 refusals), which `read_calendar_config` has refused since 0.85.0; with that check removed, the case fails. `supertype` and `subtype` are described as a classification within the element's type, and the vendored folder checker's `schema.json` follows the dist byte for byte. No code changed.
+
 ## 0.85.1 (2026-10-29)
 
 - **`world_proposals` says who reads the review queue as the server now answers**: the owner's read key (or the write key, with no PIN) reads every row, and a demo key and the keyless public view get 404. No code changed.

@@ -31,13 +31,13 @@
       "name": "supertype",
       "kind": "scalar_str",
       "required": false,
-      "desc": "The top level classification of the element within its category"
+      "desc": "The top level classification of the element within its type"
     },
     {
       "name": "subtype",
       "kind": "scalar_str",
       "required": false,
-      "desc": "The sub level classification through which the element is further sorted within its category"
+      "desc": "The sub level classification through which the element is further sorted within its type"
     },
     {
       "name": "image_url",
