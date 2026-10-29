@@ -836,11 +836,11 @@ def _default_top(world: Mapping[str, Any]) -> str:
 
 
 def _hidden_element_file(rel: str, src: Path) -> bool:
-    """An element file (``elements/`` or legacy ``spatial/``, ``.json``) whose JSON object carries the
-    hidden mark at the top level (``folder.is_hidden``). A file that is not a JSON object is not an
-    element and is carried as it is, as ever."""
+    """An element file (a ``.json`` file directly in a type folder of ``elements/`` or legacy ``spatial/``)
+    whose JSON object carries the hidden mark at the top level (``folder.is_hidden``). A file anywhere
+    else, or that is not a JSON object, is not an element and is carried as it is, as ever."""
     segs = rel.split("/")
-    if len(segs) < 2 or segs[0] not in (ELEMENTS_DIR, LEGACY_SPATIAL_DIR) or not rel.lower().endswith(".json"):
+    if len(segs) != 3 or segs[0] not in (ELEMENTS_DIR, LEGACY_SPATIAL_DIR) or not rel.lower().endswith(".json"):
         return False
     try:
         body = json.loads(src.read_bytes().decode("utf-8-sig"))

@@ -609,6 +609,24 @@ def test_a_hidden_element_travels_byte_for_byte_unless_the_file_is_a_share(tmp_p
     assert written.read_bytes() == share and again == left
 
 
+def test_only_a_file_directly_in_a_type_folder_is_an_element_for_the_hidden_mark(tmp_path: Path) -> None:
+    # elements/<type>/*.json is the layout (spec §4), as the npm SDK's writer reads it: a marked file one
+    # level up or deeper is no element, so a share carries it as it is.
+    files = {
+        "world.json": world_json(),
+        "elements/character/cy--c-2.json": encode({"id": "c-2", "name": "Cy", "hidden": True}),
+        "elements/stray.json": encode({"id": "c-4", "name": "Up", "hidden": True}),
+        "elements/character/old/cy--c-5.json": encode({"id": "c-5", "name": "Deep", "hidden": True}),
+        "spatial/pin/extra/p--p-2.json": encode({"id": "p-2", "name": "Deep pin", "hidden": True}),
+    }
+    src = make_folder(tmp_path / "w", files)
+    left: list[str] = []
+    entries = read_world_file(world_file_bytes(src, include_hidden=False, hidden_left_out=left)).entries
+    assert left == ["elements/character/cy--c-2.json"]
+    elsewhere = {"elements/stray.json", "elements/character/old/cy--c-5.json", "spatial/pin/extra/p--p-2.json"}
+    assert elsewhere <= set(entries)
+
+
 # --- author fields: which member and which tool wrote each element, left out of a file handed on
 
 # The same bytes as the npm SDK's test/fixtures/author-fields.fixture.json (both suites hold its sha256).

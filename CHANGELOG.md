@@ -4,6 +4,10 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+## 0.90.1 (2026-10-30)
+
+- **A share leaves out only element files for the hidden mark.** `include_hidden=False` read a marked JSON object anywhere under `elements/` or `spatial/` as an element, `elements/stray.json` and `elements/character/old/x.json` too; an element file is one directly in a type folder (`elements/<type>/*.json`, the folder format's layout), as the npm SDK's writer reads it, so a marked file elsewhere now travels as it is, and the two writers give the same entries.
+
 ## 0.90.0 (2026-10-29)
 
 - **`write_world_file` and `world_file_bytes` leave the author fields out of every element file by default.** `created_by`, `changed_by`, `changed_via`, `changed_client` and `doors` record which member and which tool wrote each element (a membership id, a door), which means nothing to someone the world is handed to. Each element file directly in a type folder of `elements/` or `spatial/` holding any of the five is now written without them, in the folder's own form (two-space indent, a trailing newline, its other keys in their order); `created_at` and `updated_at` stay. A file holding none of them, or that is not a JSON object, travels byte for byte, and `world.json`, records, media and every other file are untouched; an `x_*` value that holds one of the names is the extension's and stays. A caller archiving their own world passes `include_author_fields=True`, which writes every file byte for byte, as 0.89.1 did.
