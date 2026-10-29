@@ -12,8 +12,8 @@ from typing import Any
 from onlyworlds import TOOLS, AddressError, openers_for, parse_ow_link
 
 FIXTURE = Path(__file__).resolve().parent / "fixtures" / "openers.fixture.json"
-FIXTURE_SHA256 = "d10485997d9149805284eb1d2b907a4e349dedd7524f514f923ad25bf50e7e45"
-CASES = 41
+FIXTURE_SHA256 = "93cb3f121cb1eef5ba4c6951c414399c13136c3896f864221a29a3802b82d266"
+CASES = 45
 WORLD = "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f"
 ELEMENT = "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a"
 

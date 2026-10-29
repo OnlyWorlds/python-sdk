@@ -4,6 +4,10 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+## 0.91.0 (2026-10-30)
+
+- **`openers_for` checks the whole address.** It handed the address writer only the world, type and id, in the site's form, so a malformed `lens` or `moment`, or a `form` that is neither `human` nor `text`, still gave rows. The whole address now goes to `element_address` in its own form (the site's when it has none), so it raises the writer's own `AddressError`, `bad_lens`, `bad_moment` or `bad_form`, as it already did for the world, type and id; an address without a world still raises `no_world`, the text form inside a world included. The rows are unchanged: a lens and a moment still ride on no href. The shared fixture gains four cases (45; the same bytes as the npm SDK's): the three refusals, and a well-formed lens and moment giving exactly the rows of the same address without them.
+
 ## 0.90.1 (2026-10-30)
 
 - **A share leaves out only element files for the hidden mark.** `include_hidden=False` read a marked JSON object anywhere under `elements/` or `spatial/` as an element, `elements/stray.json` and `elements/character/old/x.json` too; an element file is one directly in a type folder (`elements/<type>/*.json`, the folder format's layout), as the npm SDK's writer reads it, so a marked file elsewhere now travels as it is, and the two writers give the same entries.

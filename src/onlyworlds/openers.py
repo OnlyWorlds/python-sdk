@@ -100,8 +100,10 @@ def openers_for(
     surface knows it is true), ``device`` on a phone "Needs the world on this phone"; then "Opens the world" (a
     world door on an element: a sign-in the row needs is the more urgent word); else None.
 
-    Raises ``AddressError`` for an address without a world (``no_world``) or with a slug or anything else for its
-    id (``bad_world``), and a type, id or pairing ``element_address`` refuses. A ``TypeError`` names the rest: a
+    Raises ``AddressError`` for whatever ``element_address`` refuses of the whole address, in its own form (the
+    site's when it has none): a form, type, id, pairing, moment or lens (``bad_moment``, ``bad_lens``), and a slug
+    or anything else for the world's id (``bad_world``); and for an address without a world (``no_world``), the
+    text form inside a world included, since every row needs one. A ``TypeError`` names the rest: a
     ``kind`` that is neither, an element's openers asked of an address with no element, an unknown key on the
     address or the surface, a missing or unknown ``audience``, a surface value of the wrong type, a tools row that
     is not one (a ``needs`` outside the list's format included). The npm SDK's ``openersFor`` gives the same rows.
@@ -120,7 +122,9 @@ def openers_for(
     for key in a:
         if key not in _ADDRESS_KEYS:
             _fail(f"unknown key {key!r} in the address. The keys are {', '.join(_ADDRESS_KEYS)}.")
-    # The address's checks are the writer's, so a slug, a missing world and a bad type or id refuse as there.
+    # The address's checks are the writer's: the whole address in its own form, so a bad form, a slug, a bad type,
+    # id, moment or lens refuse as there; then the site's page, where a missing world refuses.
+    element_address({**a, "form": "human" if a.get("form") is None else a["form"]})
     page = element_address({"form": "human", "world": a.get("world"), "type": a.get("type"), "id": a.get("id")})
     world = str(a["world"]).lower()
     has_element = a.get("type") is not None

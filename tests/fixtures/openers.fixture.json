@@ -1213,6 +1213,50 @@
    ]
   },
   {
+   "name": "lens-and-moment-same-rows",
+   "why": "a well-formed lens and moment give exactly the rows of the same address without them (world-from-an-element-address)",
+   "tools": "three",
+   "kind": "world",
+   "address": {
+    "form": "text",
+    "world": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+    "type": "character",
+    "id": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
+    "lens": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e2b",
+    "moment": 40
+   },
+   "surface": {
+    "audience": "member",
+    "signed_in": true
+   },
+   "expect": [
+    {
+     "id": "onlyworlds",
+     "name": "onlyworlds.com",
+     "href": "https://www.onlyworlds.com/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+     "state": null
+    },
+    {
+     "id": "zephyr",
+     "name": "Zephyr",
+     "href": "https://zephyr.example/#/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+     "state": null
+    },
+    {
+     "id": "bramble",
+     "name": "Bramble",
+     "href": "https://bramble.example/open/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+     "state": null
+    },
+    {
+     "id": "corvid",
+     "name": "Corvid",
+     "href": "https://corvid.example/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+     "state": null
+    }
+   ]
+  },
+  {
    "name": "slug-world",
    "why": "a slug is never an id: a slug can change, an id does not",
    "tools": "three",
@@ -1286,6 +1330,68 @@
    "refuse": {
     "error": "address",
     "reason": "segments"
+   }
+  },
+  {
+   "name": "bad-lens",
+   "why": "the whole address is the writer's to check: a lens that is not an id refuses, though no href carries it",
+   "tools": "three",
+   "kind": "element",
+   "address": {
+    "form": "text",
+    "world": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+    "type": "character",
+    "id": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
+    "lens": "nightfall"
+   },
+   "surface": {
+    "audience": "member",
+    "signed_in": true
+   },
+   "refuse": {
+    "error": "address",
+    "reason": "bad_lens"
+   }
+  },
+  {
+   "name": "bad-moment",
+   "why": "the whole address is the writer's to check: a moment that is not a whole step refuses, though no href carries it",
+   "tools": "three",
+   "kind": "element",
+   "address": {
+    "form": "text",
+    "world": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+    "type": "character",
+    "id": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
+    "moment": 1.5
+   },
+   "surface": {
+    "audience": "member",
+    "signed_in": true
+   },
+   "refuse": {
+    "error": "address",
+    "reason": "bad_moment"
+   }
+  },
+  {
+   "name": "bad-form",
+   "why": "the whole address is the writer's to check: a form that is neither human nor text refuses",
+   "tools": "three",
+   "kind": "element",
+   "address": {
+    "form": "site",
+    "world": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+    "type": "character",
+    "id": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a"
+   },
+   "surface": {
+    "audience": "member",
+    "signed_in": true
+   },
+   "refuse": {
+    "error": "address",
+    "reason": "bad_form"
    }
   },
   {
