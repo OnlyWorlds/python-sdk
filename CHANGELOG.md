@@ -4,6 +4,10 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+## 0.84.2 (2026-10-29)
+
+- **Schema repinned to schema-dist `v0.33.0-dist.88`** (from dist.87; the same canonical 00.33.00, so `SCHEMA_VERSION` stays and no type or field moved; the folder lint and `FORMAT_VERSION` stay at 0.3.20). Serial 88 adds a graph case to `lens.fixture.json`: two elements whose `x_review_proposed` is `{}` and `""` are drawn as settled nodes with no mark, and the lens profile names the case. The graph reader already read an empty mark so (since 0.84.1); no code changed. The lens fixture's 153 cases (39 graph) all pass, and a test checks the new case with and without the `proposed` flag.
+
 ## 0.84.1 (2026-10-29)
 
 - **An empty review mark reads as settled.** The review profile's rule 1 now reads `x_review_proposed` by presence, as the room and charter profiles read their marks, and an empty list or an empty object is absent too. So `""`, a string of White_Space only (`"   "`, U+3000), `[]` and `{}` now mean settled: `proposed_mark_of` gives `None` and `hands_on_as_proposed` gives `False`, and the Markdown pack (`is_proposed`), the lens and graph readers, a Character's note line and `draught_text` (which no longer labels such an element ` · proposed`) read them so. Before, each was a doubt left out of a pack, a lens and a graph and counted with the proposed, and `{}` was shown as a mark. A string is trimmed by White_Space exactly, never Python's own `str.strip()`, so a string of U+001C alone is still present and a doubt; `false`, `0`, `[[]]` and any other non-object stay doubts, and a non-empty object (`{"x": null}`) stays a mark. keel refuses a write with an empty mark (422 `review_mark_empty`).

@@ -12,7 +12,16 @@ from typing import Any
 
 import pytest
 
-from onlyworlds import ELEMENT_TYPES, FIELD_KINDS, WorldGraph, degree_of, out_degree_of, resolve_lens, world_graph
+from onlyworlds import (
+    ELEMENT_TYPES,
+    FIELD_KINDS,
+    PROPOSED_MARK,
+    WorldGraph,
+    degree_of,
+    out_degree_of,
+    resolve_lens,
+    world_graph,
+)
 
 REPO = Path(__file__).resolve().parent.parent
 FIXTURE = REPO / "codegen" / "schema-dist" / "profiles" / "lens.fixture.json"
@@ -128,7 +137,7 @@ def test_the_fixtures_graph_cases() -> None:
     for line in wrong:
         print(line)
     assert wrong == []
-    assert len(cases) == 38, f"the fixture holds {len(cases)} graph cases, serial 87 has 38"
+    assert len(cases) == 39, f"the fixture holds {len(cases)} graph cases, serial 88 has 39"
 
 
 def test_a_node_s_family_is_its_type_s_colour_word() -> None:
@@ -165,6 +174,20 @@ def test_the_graph_case_over_the_22_types() -> None:
     for n in nodes:
         want = presentation["types"][n["type"]]
         assert (n["family"], n["icon"]) == (want["family"], want["icon"]), n["type"]
+
+
+def test_the_graph_case_over_empty_review_marks() -> None:
+    """lens.md (serial 88): an empty review mark (``{}``, ``""``) is settled, as review.md's rule 1 reads it: its
+    node is drawn without the proposed flag, nothing is cut as proposed, and no node carries a mark, flag or not."""
+    empty = [c for c in load_cases() if any(e.get(PROPOSED_MARK) == {} for e in c["world"]["elements"])]
+    assert len(empty) == 1
+    c = empty[0]
+    assert [e[PROPOSED_MARK] for e in c["world"]["elements"] if PROPOSED_MARK in e] == [{}, ""]
+    assert "options" not in c and c["reader"] == {"rung": "owner"}
+    for proposed in (False, True):
+        g = world_graph(c["world"], c["reader"], proposed=proposed)
+        assert [n["id"] for n in g["nodes"]] == [e["id"] for e in c["world"]["elements"]], proposed
+        assert g["cut"] == {} and all("marks" not in n for n in g["nodes"]), proposed
 
 
 def test_the_fixtures_graph_tables_read_back_through_the_reader() -> None:

@@ -7456,6 +7456,80 @@
       }
     },
     {
+      "name": "an empty review mark is settled: an object or a string with nothing in it is a node with no mark",
+      "kind": "graph",
+      "world": {
+        "elements": [
+          {
+            "id": "c1",
+            "type": "character",
+            "name": "Ada",
+            "friends": [
+              "c2",
+              "c3"
+            ]
+          },
+          {
+            "id": "c2",
+            "type": "character",
+            "name": "Bo",
+            "x_review_proposed": {}
+          },
+          {
+            "id": "c3",
+            "type": "character",
+            "name": "Cy",
+            "x_review_proposed": ""
+          }
+        ]
+      },
+      "reader": {
+        "rung": "owner"
+      },
+      "want": {
+        "nodes": [
+          {
+            "id": "c1",
+            "type": "character",
+            "name": "Ada",
+            "family": "blue",
+            "icon": "person"
+          },
+          {
+            "id": "c2",
+            "type": "character",
+            "name": "Bo",
+            "family": "blue",
+            "icon": "person"
+          },
+          {
+            "id": "c3",
+            "type": "character",
+            "name": "Cy",
+            "family": "blue",
+            "icon": "person"
+          }
+        ],
+        "edges": [
+          {
+            "source": "c1",
+            "field": "friends",
+            "target": "c2",
+            "index": 0
+          },
+          {
+            "source": "c1",
+            "field": "friends",
+            "target": "c3",
+            "index": 1
+          }
+        ],
+        "edges_cut": {},
+        "cut": {},
+        "unreadable": null
+      }
+    },
+    {
       "name": "a-hop-reached-lens-is-served-whole-to-the-owner",
       "kind": "resolve",
       "world": "watch",
