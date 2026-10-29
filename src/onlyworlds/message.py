@@ -459,7 +459,8 @@ def note_of(
     with ``created_by``, the wire: ``sender_status`` against ``members`` is ``verified``, so a mismatch or an
     unverifiable Note is nobody's), it is not hidden (the platform's hidden mark, read as ``is_hidden`` reads it:
     any value but absent, null and ``false``) and not proposed
-    (``x_review_proposed`` an object, the review profile), and its id is a string. Of those, the newest by
+    (``x_review_proposed`` an object that is not empty, the review profile's ``proposed_mark_of``), and its id is a
+    string. Of those, the newest by
     ``created_at`` (the last in ``created_at`` order among those whose time can be read; equal times: the
     later in the list), or the last in the list when none can be read. A Note is never a message: never
     unread, in no thread."""

@@ -40,7 +40,7 @@ slugs, a link keeps the target's slug, and ``x_names`` is never printed among th
 
 Left out unless asked: room elements (the room profile, ``room.is_room_element``; ``--rooms``
 keeps them), proposed elements (``is_proposed``: an AI seat's new element carrying
-``x_review_proposed`` with a value, not yet settled by a keeper; ``--proposed`` keeps them) and
+``x_review_proposed``, present and not empty, not yet settled by a keeper; ``--proposed`` keeps them) and
 extension keys (``x_``, ``atlas_``, ``shadow_``; ``--extensions`` keeps them), each counted in the
 report. A proposed element is not canon until a keeper settles it, and one handed on as canon is
 where a planted instruction would get through (ruled 2026-10-23): so the world
@@ -172,9 +172,10 @@ def hidden_line(left_out: int, kept: int) -> str | None:
 
 
 def is_proposed(body: Mapping[str, Any]) -> bool:
-    """True when the element carries ``x_review_proposed`` with any value but null. A
-    null mark is a settled one (an accept writes null); a malformed value still counts as marked,
-    so a doubt leaves the element out rather than handing it on as canon (``review.hands_on_as_proposed``)."""
+    """True when the element carries ``x_review_proposed`` present: any value but null, a blank string,
+    ``[]`` or ``{}``. A null mark is a settled one (an accept writes null), and so is an empty one (serial 87);
+    a malformed value still counts as marked, so a doubt leaves the element out rather than handing it on as
+    canon (``review.hands_on_as_proposed``)."""
     return hands_on_as_proposed(body)
 
 

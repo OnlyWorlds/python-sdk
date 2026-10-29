@@ -2,15 +2,20 @@
   "_what": "The recorded pin for the vendored OnlyWorlds schema distribution (codegen/schema-dist/, copied byte-exact). Do not edit by hand; re-vendor from the pinned tag and review the diff. Kept equal to the npm SDK's pin (github.com/OnlyWorlds/sdk, codegen/schema-pin.json) on purpose: two clients, one schema.",
   "_why_manifest_sha256": "Verifying the tree against its own MANIFEST.json only proves internal consistency. If the tag moved, the manifest moved with it. The hash recorded here is the one first accepted, which is what makes a moved tag visible.",
   "repo": "https://github.com/OnlyWorlds/schema-dist",
-  "tag": "v0.33.0-dist.86",
-  "commit": "b0ca326054f1328752a145594211a3275556dd6e",
-  "manifest_sha256": "15200898cd533de34fb3c05ba651beb6bc47ec35deaf016c6058e867da0cb1fe",
+  "tag": "v0.33.0-dist.87",
+  "commit": "1d1a5330d6ca03b949249971bf1da21f61e8a4e8",
+  "manifest_sha256": "a8ba849c6ae5d216c758351605f68dd9d4ecb17ea3e9fe49c40f9ab69c3dfcf2",
   "canonical_version": "00.33.00",
-  "dist_serial": 86,
-  "published": "2026-10-28",
+  "dist_serial": 87,
+  "published": "2026-10-29",
   "pinned_at": "2026-10-29",
   "pinned_by": "The maintainer: tree from `git archive` of the tag in a schema-dist checkout (197 files, every one the MANIFEST lists); files re-hashed against MANIFEST.json by generate_schema.py; MANIFEST self-hash matched against the raw file GitHub serves at the tag, whose ref resolves to the commit above.",
   "previous_pins": [
+    {
+      "tag": "v0.33.0-dist.86",
+      "manifest_sha256": "15200898cd533de34fb3c05ba651beb6bc47ec35deaf016c6058e867da0cb1fe",
+      "note": "superseded by v0.33.0-dist.87 (review.md rule 1: x_review_proposed read by presence as the room and charter profiles define it, and an empty list or an empty object absent too, so an empty mark is settled, never a doubt; keel refuses a write with an empty mark, 422 review_mark_empty; lens.fixture.json's graph case over one element of each of the 22 types; lens.md and presentation.json's _meta.groups: a reader meeting a word not in colors.order fails loudly; no type or field moved)"
+    },
     {
       "tag": "v0.33.0-dist.85",
       "manifest_sha256": "31e953dac2ba77cbc0d65b71de2ac3520d50d9df760156df95359c155c0c57ed",

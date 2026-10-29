@@ -366,7 +366,7 @@ def test_unread_proves_the_readers_own_messages_on_the_wire_and_trusts_a_folder(
 # The shared edge cases: inputs the fixture leaves open, the same file byte for byte as the npm SDK's
 # test/fixtures/message-edges.json (both suites hold its sha256), answers written by hand.
 EDGES_FILE = REPO / "tests" / "fixtures" / "message-edges.json"
-EDGES_SHA256 = "b4b93ec587045c5b1e672df93337544f4b039ef129378ff53e59d4fa4a21de2e"
+EDGES_SHA256 = "48fffaf28bced5faa49024f7d541a195938e03ebde4f2a71d21099c1d10a1980"
 
 
 def _edge_answer(e: dict[str, Any]) -> Any:

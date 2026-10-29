@@ -660,12 +660,20 @@ def test_a_kept_proposed_element_is_labelled_with_or_without_extensions() -> Non
 
 
 def test_a_null_mark_is_settled_not_proposed() -> None:
-    assert pack.is_proposed({"x_review_proposed": MARK}) and pack.is_proposed({"x_review_proposed": {}})
+    assert pack.is_proposed({"x_review_proposed": MARK}) and pack.is_proposed({"x_review_proposed": {"x": None}})
     assert not pack.is_proposed({"x_review_proposed": None}) and not pack.is_proposed({})
+    assert not pack.is_proposed({"x_review_proposed": {}}) and not pack.is_proposed({"x_review_proposed": " "})
     files, report = built(with_proposed(mark=None))
     assert report.proposed_left_out == 0 and report.proposed_kept == 0 and report.elements == 9
     unmarked = [(t, {k: v for k, v in b.items() if k != "x_review_proposed"}) for t, b in with_proposed()]
     assert files == built(unmarked)[0]  # an accepted element packs as if never marked
+    empties: list[Any] = ["", "   ", chr(0x3000), [], {}]
+    for empty in empties:  # serial 87: an empty mark is settled too, never a doubt
+        files, report = built(with_proposed(mark=empty))
+        assert report.proposed_left_out == 0 and report.proposed_kept == 0 and report.elements == 9, repr(empty)
+        assert files == built(unmarked)[0], repr(empty)
+    files, report = built(with_proposed(mark=chr(0x1C)))  # not White_Space: present, a doubt left out
+    assert report.proposed_left_out == 1 and report.elements == 8
 
 
 def test_a_proposed_room_element_is_counted_once_as_proposed() -> None:

@@ -7170,6 +7170,292 @@
       }
     },
     {
+      "name": "every type is a node with its colour word and icon, as presentation.json gives them",
+      "kind": "graph",
+      "world": {
+        "elements": [
+          {
+            "id": "t01",
+            "type": "ability",
+            "name": "One Ability"
+          },
+          {
+            "id": "t02",
+            "type": "collective",
+            "name": "One Collective"
+          },
+          {
+            "id": "t03",
+            "type": "character",
+            "name": "One Character"
+          },
+          {
+            "id": "t04",
+            "type": "construct",
+            "name": "One Construct"
+          },
+          {
+            "id": "t05",
+            "type": "creature",
+            "name": "One Creature"
+          },
+          {
+            "id": "t06",
+            "type": "event",
+            "name": "One Event"
+          },
+          {
+            "id": "t07",
+            "type": "family",
+            "name": "One Family"
+          },
+          {
+            "id": "t08",
+            "type": "institution",
+            "name": "One Institution"
+          },
+          {
+            "id": "t09",
+            "type": "language",
+            "name": "One Language"
+          },
+          {
+            "id": "t10",
+            "type": "law",
+            "name": "One Law"
+          },
+          {
+            "id": "t11",
+            "type": "location",
+            "name": "One Location"
+          },
+          {
+            "id": "t12",
+            "type": "map",
+            "name": "One Map"
+          },
+          {
+            "id": "t13",
+            "type": "marker",
+            "name": "One Marker"
+          },
+          {
+            "id": "t14",
+            "type": "narrative",
+            "name": "One Narrative"
+          },
+          {
+            "id": "t15",
+            "type": "object",
+            "name": "One Object"
+          },
+          {
+            "id": "t16",
+            "type": "phenomenon",
+            "name": "One Phenomenon"
+          },
+          {
+            "id": "t17",
+            "type": "pin",
+            "name": "One Pin"
+          },
+          {
+            "id": "t18",
+            "type": "relation",
+            "name": "One Relation"
+          },
+          {
+            "id": "t19",
+            "type": "species",
+            "name": "One Species"
+          },
+          {
+            "id": "t20",
+            "type": "title",
+            "name": "One Title"
+          },
+          {
+            "id": "t21",
+            "type": "trait",
+            "name": "One Trait"
+          },
+          {
+            "id": "t22",
+            "type": "zone",
+            "name": "One Zone"
+          }
+        ]
+      },
+      "reader": {
+        "rung": "owner"
+      },
+      "options": {
+        "map_space": true
+      },
+      "want": {
+        "nodes": [
+          {
+            "id": "t01",
+            "type": "ability",
+            "name": "One Ability",
+            "family": "amber",
+            "icon": "auto_fix_normal"
+          },
+          {
+            "id": "t02",
+            "type": "collective",
+            "name": "One Collective",
+            "family": "blue",
+            "icon": "groups_3"
+          },
+          {
+            "id": "t03",
+            "type": "character",
+            "name": "One Character",
+            "family": "blue",
+            "icon": "person"
+          },
+          {
+            "id": "t04",
+            "type": "construct",
+            "name": "One Construct",
+            "family": "pink",
+            "icon": "api"
+          },
+          {
+            "id": "t05",
+            "type": "creature",
+            "name": "One Creature",
+            "family": "blue",
+            "icon": "bug_report"
+          },
+          {
+            "id": "t06",
+            "type": "event",
+            "name": "One Event",
+            "family": "amber",
+            "icon": "saved_search"
+          },
+          {
+            "id": "t07",
+            "type": "family",
+            "name": "One Family",
+            "family": "blue",
+            "icon": "supervisor_account"
+          },
+          {
+            "id": "t08",
+            "type": "institution",
+            "name": "One Institution",
+            "family": "blue",
+            "icon": "account_balance"
+          },
+          {
+            "id": "t09",
+            "type": "language",
+            "name": "One Language",
+            "family": "pink",
+            "icon": "edit_road"
+          },
+          {
+            "id": "t10",
+            "type": "law",
+            "name": "One Law",
+            "family": "pink",
+            "icon": "gpp_bad"
+          },
+          {
+            "id": "t11",
+            "type": "location",
+            "name": "One Location",
+            "family": "green",
+            "icon": "castle"
+          },
+          {
+            "id": "t12",
+            "type": "map",
+            "name": "One Map",
+            "family": "green",
+            "icon": "map"
+          },
+          {
+            "id": "t13",
+            "type": "marker",
+            "name": "One Marker",
+            "family": "green",
+            "icon": "polyline"
+          },
+          {
+            "id": "t14",
+            "type": "narrative",
+            "name": "One Narrative",
+            "family": "amber",
+            "icon": "menu_book"
+          },
+          {
+            "id": "t15",
+            "type": "object",
+            "name": "One Object",
+            "family": "green",
+            "icon": "webhook"
+          },
+          {
+            "id": "t16",
+            "type": "phenomenon",
+            "name": "One Phenomenon",
+            "family": "amber",
+            "icon": "thunderstorm"
+          },
+          {
+            "id": "t17",
+            "type": "pin",
+            "name": "One Pin",
+            "family": "green",
+            "icon": "push_pin"
+          },
+          {
+            "id": "t18",
+            "type": "relation",
+            "name": "One Relation",
+            "family": "amber",
+            "icon": "link"
+          },
+          {
+            "id": "t19",
+            "type": "species",
+            "name": "One Species",
+            "family": "blue",
+            "icon": "crib"
+          },
+          {
+            "id": "t20",
+            "type": "title",
+            "name": "One Title",
+            "family": "pink",
+            "icon": "military_tech"
+          },
+          {
+            "id": "t21",
+            "type": "trait",
+            "name": "One Trait",
+            "family": "pink",
+            "icon": "flaky"
+          },
+          {
+            "id": "t22",
+            "type": "zone",
+            "name": "One Zone",
+            "family": "green",
+            "icon": "pentagon"
+          }
+        ],
+        "edges": [],
+        "edges_cut": {},
+        "cut": {},
+        "unreadable": null
+      }
+    },
+    {
       "name": "a-hop-reached-lens-is-served-whole-to-the-owner",
       "kind": "resolve",
       "world": "watch",

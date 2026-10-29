@@ -12,7 +12,7 @@ from typing import Any
 
 import pytest
 
-from onlyworlds import FIELD_KINDS, WorldGraph, degree_of, out_degree_of, resolve_lens, world_graph
+from onlyworlds import ELEMENT_TYPES, FIELD_KINDS, WorldGraph, degree_of, out_degree_of, resolve_lens, world_graph
 
 REPO = Path(__file__).resolve().parent.parent
 FIXTURE = REPO / "codegen" / "schema-dist" / "profiles" / "lens.fixture.json"
@@ -128,7 +128,7 @@ def test_the_fixtures_graph_cases() -> None:
     for line in wrong:
         print(line)
     assert wrong == []
-    assert len(cases) == 37, f"the fixture holds {len(cases)} graph cases, serial 86 has 37"
+    assert len(cases) == 38, f"the fixture holds {len(cases)} graph cases, serial 87 has 38"
 
 
 def test_a_node_s_family_is_its_type_s_colour_word() -> None:
@@ -150,6 +150,21 @@ def test_a_node_s_family_is_its_type_s_colour_word() -> None:
         {"rung": "owner"},
     )
     assert {n["type"]: n["family"] for n in g["nodes"]} == {"ability": "amber", "construct": "pink"}
+
+
+def test_the_graph_case_over_the_22_types() -> None:
+    """lens.md (serial 87): one element of each of the 22 types, map space on, each node with its colour word and
+    icon as presentation.json gives them."""
+    presentation = json.loads((FIXTURE.parent.parent / "presentation.json").read_text(encoding="utf-8"))
+    every = [c for c in load_cases() if sorted(e["type"] for e in c["world"]["elements"]) == sorted(ELEMENT_TYPES)]
+    assert len(every) == 1
+    c = every[0]
+    assert c["options"] == {"map_space": True} and c["reader"] == {"rung": "owner"}
+    nodes = world_graph(c["world"], c["reader"], **c["options"])["nodes"]
+    assert sorted(n["type"] for n in nodes) == sorted(ELEMENT_TYPES)
+    for n in nodes:
+        want = presentation["types"][n["type"]]
+        assert (n["family"], n["icon"]) == (want["family"], want["icon"]), n["type"]
 
 
 def test_the_fixtures_graph_tables_read_back_through_the_reader() -> None:

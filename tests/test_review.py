@@ -24,10 +24,19 @@ CASES: list[tuple[str, Any, Any, bool]] = [
     ("no key", _NO_KEY, None, False),
     ("null: settled", None, None, False),
     ("a string: not a mark, a doubt", "yes", None, True),
-    ("an array: not a mark, a doubt", [], None, True),
+    ("an empty string: an empty mark, settled", "", None, False),
+    ("ASCII spaces only: an empty mark, settled", "   ", None, False),
+    ("an empty array: an empty mark, settled", [], None, False),
+    ("an array holding an empty array: present, not a mark, a doubt", [[]], None, True),
     ("false: a value, a doubt", False, None, True),
     ("zero: a value, a doubt", 0, None, True),
-    ("an empty object", {}, {"by": None, "expires": None, "lapsed": False}, True),
+    ("an empty object: an empty mark, settled", {}, None, False),
+    (
+        "an object with no key the profile names: present, a mark",
+        {"x": None},
+        {"by": None, "expires": None, "lapsed": False},
+        True,
+    ),
     (
         "a whole mark, open",
         {"by": "m1", "evidence": "seen", "expires": "2026-11-01"},
@@ -55,6 +64,9 @@ CASES: list[tuple[str, Any, Any, bool]] = [
     ),
     ("a blank or non-string by", {"by": "   ", "expires": 7}, {"by": None, "expires": None, "lapsed": False}, True),
     # The two languages' own defaults disagree here (see the npm test): both trim by White_Space and read ASCII digits.
+    ("U+3000 only: White_Space, an empty mark, settled", chr(0x3000), None, False),
+    ("U+001C only: not White_Space, present, a doubt", FS, None, True),
+    ("a byte order mark only: not White_Space, present, a doubt", BOM, None, True),
     (
         "a by wrapped in U+001C keeps it",
         {"by": f"{FS}m1{FS}"},
@@ -110,4 +122,4 @@ def test_today_must_be_a_day() -> None:
         proposed_mark_of(_el({}), 20261026)  # type: ignore[arg-type]
     with pytest.raises(TypeError):
         proposed_mark_of(_el({}), ARABIC_DAY)
-    assert proposed_mark_of(_el({})) is not None  # today in UTC by default
+    assert proposed_mark_of(_el({"by": "m1"})) is not None  # today in UTC by default
