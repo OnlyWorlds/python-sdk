@@ -4,6 +4,11 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+## 0.86.1 (2026-10-29)
+
+- **`push` never sends `doors`**, the door history the API serves a world's members on every element since 2026-10-29 (each tool that wrote it, with its last write's time). Like `changed_client`, it is read-only and restamped on every write, so a folder copy without it (a public export, a pull from before it was served) is no edit: before this, `plan_push` patched such an element with `doors: null`, a write that changed nothing but its stamps, and sent a folder's differing `doors` beside a real edit. `pack` and `okf` leave out every key `push` never sends, so neither writes it.
+- The draught text fixture gains the `doors` case, the same bytes as the npm package's.
+
 ## 0.86.0 (2026-10-29)
 
 - **`openers_for(tools, kind, address, surface)`**: the rows of an "Open with" menu for a world (`kind="world"`) or one element of it (`"element"`), in order, each a dict `{id, name, href, state}` (`Opener`). First the site's own row (`onlyworlds.com`, the world's or the element's page on www.onlyworlds.com, never a word), then one row per tools list row, in the list's order, that is `listed` and has an `open` link for this kind; a tool with only a world link is offered on an element as opening its world. `surface` is a mapping of what the page knows, and nothing is guessed: `audience` (`member` or `public`, required; the public sees only rows whose `open.needs` is None), `signed_in` (True, False, or None when the page cannot know), `browser` (default True), `phone` (default False) and `tool`, the page's own client name. `state` is the first that holds: "You are here" (the row whose `client` is `tool`), "Opens in your browser" (needs an account, outside a browser), "Sign in to <name> first" (needs an account, signed out), "Needs the world on this phone" (needs the world on the device, on a phone), "Opens the world" (a world link on an element), else None. An address with no world, or with a slug for it, raises `AddressError` (`no_world`, `bad_world`); an element's rows from an address with no element, an unknown `kind`, a missing `audience`, and an unknown key on the address or the surface raise `TypeError`. The npm SDK's `openersFor` answers the same shared fixture (41 cases) row for row.

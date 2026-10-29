@@ -159,6 +159,18 @@ def test_changed_client_is_never_sent(tmp_path: Path) -> None:
     assert [(p.id, p.fields) for p in plan.patches] == [(C2, {"name": "B2"})]
 
 
+def test_doors_are_never_sent(tmp_path: Path) -> None:
+    """The door history is read-only like changed_client, restamped on every write and served to members only:
+    a folder copy without it (a public export, an older pull) is no edit."""
+    base, edit = folders(
+        tmp_path,
+        {"character": [wire_char(C1, "A", doors={"atlas": "2026-10-29T14:31:07Z"}), wire_char(C2, "B")]},
+        {"character": [wire_char(C1, "A"), wire_char(C2, "B2", doors={"python": "2026-10-29T15:00:00Z"})]},
+    )
+    plan = plan_push(base, edit)
+    assert [(p.id, p.fields) for p in plan.patches] == [(C2, {"name": "B2"})]
+
+
 def test_push_patch_carries_the_write_headers(tmp_path: Path) -> None:
     """The push's PATCH is an element write: it names the client and, for an agent, declares it."""
     base, edit = folders(tmp_path, {"character": [wire_char(C1, "A")]}, {"character": [wire_char(C1, "B")]})

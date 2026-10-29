@@ -45,6 +45,7 @@ SERVER_MANAGED = (set(_http.READ_ONLY_FIELDS) - {"world"}) | {
     "changed_by",
     "changed_via",
     "changed_client",
+    "doors",
 }
 # The message and lens profiles' served-only mark, which keel serves on a Narrative (a message) and a
 # Construct (a lens): the package reads it (message.has_unseen_recipients, sender_status, and

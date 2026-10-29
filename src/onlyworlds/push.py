@@ -16,8 +16,8 @@ never by the diff that was sent.
 
 Never sent, whatever the diff says: ``id``; the wire's server-managed fields
 (``world``, ``type``, ``created_at``, ``updated_at``, ``change_seq``: the npm SDK's
-``sanitizePayload`` list; keel ignores ``world`` and 422s the rest); ``created_by`` (and ``changed_by``, ``changed_via``
-and ``changed_client``), which keel drops
+``sanitizePayload`` list; keel ignores ``world`` and 422s the rest); ``created_by`` (and ``changed_by``,
+``changed_via``, ``changed_client`` and ``doors``), which keel drops
 from a write but still answers with a fresh ``change_seq`` (a folder without the key
 would otherwise rewrite every member-made element on every run); Atlas's in-file sync stamps
 ``local_updated_at`` / ``server_updated_at`` and ``image_media_id`` (spec §5, "not
@@ -111,6 +111,7 @@ NOT_SENT = frozenset(
         "changed_by",
         "changed_via",
         "changed_client",
+        "doors",
         "known_of",
         "x_served_trimmed",  # the message and lens profiles: served only, kept in the file, never sent
         "hidden",

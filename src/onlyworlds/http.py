@@ -66,7 +66,7 @@ USER_AGENT = f"onlyworlds-py/{__version__}"
 #: Fields the API must never receive on a write. A BLACKLIST, never a whitelist:
 #: namespaced extension fields (``atlas_*`` / ``shadow_*`` / ``x_*``) must pass through
 #: untouched, because tools round-trip their own state through other tools' writes.
-#: ``created_by``, ``changed_by``, ``changed_via`` and ``changed_client`` are not here: keel drops
+#: ``created_by``, ``changed_by``, ``changed_via``, ``changed_client`` and ``doors`` are not here: keel drops
 #: them silently on a write (spec §4), so a read body round-trips as it is. ``known_of``
 #: is an unknown field to keel's writes (a 422): stripped too, and a body where it is ``true``
 #: is refused before it gets here (``_refuse_known_of``).
