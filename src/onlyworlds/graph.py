@@ -83,7 +83,7 @@ class WorldGraph(TypedDict):
 _DECLARED_LINKS: tuple[str, ...] = ("x_lens_leads_to", "x_spine_depends_on")
 """The extension fields a published profile declares a link, each a list of ids: the lens profile's and the spine
 profile's."""
-_MAP_SPACE = frozenset({"map", "pin", "marker", "zone"})
+_MAP_SPACE = frozenset({"map", "pin", "marker"})
 _KINDS: tuple[str, ...] = ("room", "hidden", "proposed", "map_space", "reading_aid")
 """The kinds out of an unlensed graph by default. A reading aid has no flag: only a lens that names its pair keeps
 one."""
@@ -118,12 +118,13 @@ def world_graph(
 
     ``world`` and ``reader`` are what ``resolve_lens`` takes. Without ``lens`` the nodes are every element the
     reader sees less what is out by default: room elements, hidden ones, proposed ones and map space (Map, Pin,
-    Marker, Zone), each brought back by its flag (``rooms``, ``hidden``, ``proposed``, ``map_space``) and then
-    marked, and the reading aids (the charter, its guide, its domains: ``is_charter_element``), counted
-    ``reading_aid``, which no flag brings back. With ``lens`` (a lens body, or the id of a lens the reader can see)
-    the nodes are exactly the lens's ``kept``, its cut rides along unchanged, and a flag adds nothing; ``as_of`` and
-    ``clock`` are the lens's, as ``resolve_lens`` takes them, and are read only with a lens. A lens whose ``x_lens``
-    cannot be read gives an empty graph with ``unreadable`` naming the key, as ``resolve_lens`` does.
+    Marker; a Zone is content and a node like any other), each brought back by its flag (``rooms``, ``hidden``,
+    ``proposed``, ``map_space``) and then marked, and the reading aids (the charter, its guide, its domains:
+    ``is_charter_element``), counted ``reading_aid``, which no flag brings back. With ``lens`` (a lens body, or the
+    id of a lens the reader can see) the nodes are exactly the lens's ``kept``, its cut rides along unchanged, and a
+    flag adds nothing; ``as_of`` and ``clock`` are the lens's, as ``resolve_lens`` takes them, and are read only
+    with a lens. A lens whose ``x_lens`` cannot be read gives an empty graph with ``unreadable`` naming the key, as
+    ``resolve_lens`` does.
 
     Each schema link field, and each extension field a profile declares a link (``x_lens_leads_to``,
     ``x_spine_depends_on``), gives one edge per target that is a node, with the target's place in the list as the

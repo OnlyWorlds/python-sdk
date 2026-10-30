@@ -4,6 +4,10 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+## 0.92.0 (2026-10-30)
+
+- **A Zone is a node in `world_graph` by default.** schema-dist serial 92 (`v0.33.0-dist.92`) rules that a Zone is not map space: by its definition it is content that gains spatial presence through linked Markers, so the Markers are the geometry and the Zone is an element like any other, in a public reader's graph too. Without a lens, Zones are now nodes and their links edges; Maps, Pins and Markers stay out until `map_space=True` brings them back, and the `map_space` count no longer includes Zones. The fixture's eight graph cases over the shared world replay as the serial gives them. A graph read through a lens is unchanged: its nodes are still exactly what the lens kept.
+
 ## 0.91.0 (2026-10-30)
 
 - **`openers_for` checks the whole address.** It handed the address writer only the world, type and id, in the site's form, so a malformed `lens` or `moment`, or a `form` that is neither `human` nor `text`, still gave rows. The whole address now goes to `element_address` in its own form (the site's when it has none), so it raises the writer's own `AddressError`, `bad_lens`, `bad_moment` or `bad_form`, as it already did for the world, type and id; an address without a world still raises `no_world`, the text form inside a world included. The rows are unchanged: a lens and a moment still ride on no href. The shared fixture gains four cases (45; the same bytes as the npm SDK's): the three refusals, and a well-formed lens and moment giving exactly the rows of the same address without them.

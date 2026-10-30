@@ -4142,6 +4142,13 @@
             "name": "Keep",
             "family": "green",
             "icon": "castle"
+          },
+          {
+            "id": "z2",
+            "type": "zone",
+            "name": "March",
+            "family": "green",
+            "icon": "pentagon"
           }
         ],
         "edges": [
@@ -4150,19 +4157,24 @@
             "field": "location",
             "target": "z1",
             "index": 0
+          },
+          {
+            "source": "z1",
+            "field": "zone",
+            "target": "z2",
+            "index": 0
           }
         ],
         "edges_cut": {
           "room": 1,
           "hidden": 1,
-          "proposed": 1,
-          "map_space": 1
+          "proposed": 1
         },
         "cut": {
           "room": 1,
           "hidden": 1,
           "proposed": 1,
-          "map_space": 2
+          "map_space": 1
         },
         "unreadable": null
       }
@@ -4254,6 +4266,13 @@
             "name": "Keep",
             "family": "green",
             "icon": "castle"
+          },
+          {
+            "id": "z2",
+            "type": "zone",
+            "name": "March",
+            "family": "green",
+            "icon": "pentagon"
           }
         ],
         "edges": [
@@ -4268,17 +4287,22 @@
             "field": "location",
             "target": "z1",
             "index": 0
+          },
+          {
+            "source": "z1",
+            "field": "zone",
+            "target": "z2",
+            "index": 0
           }
         ],
         "edges_cut": {
           "hidden": 1,
-          "proposed": 1,
-          "map_space": 1
+          "proposed": 1
         },
         "cut": {
           "hidden": 1,
           "proposed": 1,
-          "map_space": 2
+          "map_space": 1
         },
         "unreadable": null
       }
@@ -4370,6 +4394,13 @@
             "name": "Keep",
             "family": "green",
             "icon": "castle"
+          },
+          {
+            "id": "z2",
+            "type": "zone",
+            "name": "March",
+            "family": "green",
+            "icon": "pentagon"
           }
         ],
         "edges": [
@@ -4384,17 +4415,22 @@
             "field": "location",
             "target": "z1",
             "index": 0
+          },
+          {
+            "source": "z1",
+            "field": "zone",
+            "target": "z2",
+            "index": 0
           }
         ],
         "edges_cut": {
           "room": 1,
-          "proposed": 1,
-          "map_space": 1
+          "proposed": 1
         },
         "cut": {
           "room": 1,
           "proposed": 1,
-          "map_space": 2
+          "map_space": 1
         },
         "unreadable": null
       }
@@ -4486,6 +4522,13 @@
             "name": "Keep",
             "family": "green",
             "icon": "castle"
+          },
+          {
+            "id": "z2",
+            "type": "zone",
+            "name": "March",
+            "family": "green",
+            "icon": "pentagon"
           }
         ],
         "edges": [
@@ -4500,23 +4543,28 @@
             "field": "location",
             "target": "z1",
             "index": 0
+          },
+          {
+            "source": "z1",
+            "field": "zone",
+            "target": "z2",
+            "index": 0
           }
         ],
         "edges_cut": {
           "room": 1,
-          "hidden": 1,
-          "map_space": 1
+          "hidden": 1
         },
         "cut": {
           "room": 1,
           "hidden": 1,
-          "map_space": 2
+          "map_space": 1
         },
         "unreadable": null
       }
     },
     {
-      "name": "map_space brings Maps, Pins, Markers and Zones back, with no mark",
+      "name": "map_space brings Maps, Pins and Markers back, with no mark",
       "kind": "graph",
       "world": {
         "elements": [
@@ -4897,6 +4945,13 @@
             "name": "Keep",
             "family": "green",
             "icon": "castle"
+          },
+          {
+            "id": "z2",
+            "type": "zone",
+            "name": "March",
+            "family": "green",
+            "icon": "pentagon"
           }
         ],
         "edges": [
@@ -4911,13 +4966,17 @@
             "field": "location",
             "target": "z1",
             "index": 0
+          },
+          {
+            "source": "z1",
+            "field": "zone",
+            "target": "z2",
+            "index": 0
           }
         ],
-        "edges_cut": {
-          "map_space": 1
-        },
+        "edges_cut": {},
         "cut": {
-          "map_space": 2
+          "map_space": 1
         },
         "unreadable": null
       }
@@ -4996,6 +5055,13 @@
             "name": "Keep",
             "family": "green",
             "icon": "castle"
+          },
+          {
+            "id": "z2",
+            "type": "zone",
+            "name": "March",
+            "family": "green",
+            "icon": "pentagon"
           }
         ],
         "edges": [
@@ -5004,13 +5070,17 @@
             "field": "location",
             "target": "z1",
             "index": 0
+          },
+          {
+            "source": "z1",
+            "field": "zone",
+            "target": "z2",
+            "index": 0
           }
         ],
-        "edges_cut": {
-          "map_space": 1
-        },
+        "edges_cut": {},
         "cut": {
-          "map_space": 2
+          "map_space": 1
         },
         "unreadable": null
       }
@@ -5092,6 +5162,13 @@
             "name": "Keep",
             "family": "green",
             "icon": "castle"
+          },
+          {
+            "id": "z2",
+            "type": "zone",
+            "name": "March",
+            "family": "green",
+            "icon": "pentagon"
           }
         ],
         "edges": [
@@ -5100,16 +5177,21 @@
             "field": "location",
             "target": "z1",
             "index": 0
+          },
+          {
+            "source": "z1",
+            "field": "zone",
+            "target": "z2",
+            "index": 0
           }
         ],
         "edges_cut": {
-          "not_visible": 2,
           "room": 1,
-          "map_space": 1
+          "not_visible": 2
         },
         "cut": {
           "room": 1,
-          "map_space": 2
+          "map_space": 1
         },
         "unreadable": null
       }
