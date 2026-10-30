@@ -24,7 +24,7 @@ def load_fixture() -> dict[str, Any]:
 
 def test_every_case_of_the_names_fixture() -> None:
     cases = load_fixture()["cases"]
-    assert len(cases) >= 23
+    assert len(cases) == 29, f"the fixture holds {len(cases)} cases, serial 94 has 29"
     for c in cases:
         got = type_word({"x_names": c["map"]}, c["type"], supertype=c.get("supertype"), many=c["many"])
         assert got == c["word"], c["name"]

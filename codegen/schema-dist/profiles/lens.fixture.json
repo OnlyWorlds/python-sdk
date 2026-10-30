@@ -1543,6 +1543,236 @@
           ]
         }
       }
+    },
+    "ledger": {
+      "id": "019a7f00-0000-7000-8000-00000000f010",
+      "name": "The Ledger House",
+      "time_basic_unit": "day",
+      "now": 100,
+      "hidden": [
+        "019a7f00-0000-7000-8000-000000000410",
+        "019a7f00-0000-7000-8000-000000000411"
+      ],
+      "readers": {
+        "owner": {
+          "rung": "owner",
+          "character": null
+        },
+        "contributor": {
+          "rung": "contributor",
+          "character": null
+        },
+        "owner-as-contributor": {
+          "rung": "owner",
+          "character": null,
+          "as": "contributor"
+        },
+        "guest": {
+          "rung": "guest",
+          "character": null,
+          "whole": [
+            "019a7f00-0000-7000-8000-000000000401",
+            "019a7f00-0000-7000-8000-000000000403"
+          ],
+          "known_of": []
+        },
+        "public": {
+          "rung": "public",
+          "character": null
+        }
+      },
+      "elements": [
+        {
+          "id": "019a7f00-0000-7000-8000-000000000400",
+          "type": "character",
+          "name": "Wren Dale",
+          "friends": [
+            "019a7f00-0000-7000-8000-000000000402",
+            "019a7f00-0000-7000-8000-000000000401"
+          ],
+          "updated_at": "2026-10-01T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000401",
+          "type": "character",
+          "name": "Hal Dale",
+          "updated_at": "2026-10-02T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000402",
+          "type": "character",
+          "name": "Ula Ness",
+          "x_review_proposed": {
+            "by": null,
+            "at": "2026-10-03T12:00:00Z"
+          },
+          "updated_at": "2026-10-03T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000403",
+          "type": "narrative",
+          "name": "A note to Hal",
+          "supertype": "Message",
+          "narrator": "",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000401"
+          ],
+          "updated_at": "2026-10-04T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000410",
+          "type": "construct",
+          "name": "The self lens",
+          "supertype": "Lens",
+          "subtype": "",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000401"
+          ],
+          "constructs": [
+            "019a7f00-0000-7000-8000-000000000410"
+          ],
+          "x_lens": {
+            "depth": 0
+          },
+          "updated_at": "2026-10-05T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000411",
+          "type": "character",
+          "name": "The Heir",
+          "updated_at": "2026-10-06T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000412",
+          "type": "species",
+          "name": "Grey Gulls",
+          "updated_at": "2026-10-07T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000420",
+          "type": "character",
+          "name": "Ash Tor",
+          "updated_at": "2026-10-01T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000421",
+          "type": "character",
+          "name": "Bel Tor",
+          "updated_at": "2026-10-01T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000422",
+          "type": "character",
+          "name": "Cai Tor",
+          "updated_at": "2026-10-01T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000423",
+          "type": "character",
+          "name": "Dun Tor",
+          "updated_at": "2026-10-01T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000424",
+          "type": "character",
+          "name": "Eda Tor",
+          "updated_at": "2026-10-01T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000425",
+          "type": "character",
+          "name": "Fen Tor",
+          "updated_at": "2026-10-01T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000426",
+          "type": "character",
+          "name": "Gil Tor",
+          "friends": [
+            "019a7f00-0000-7000-8000-000000000425"
+          ],
+          "updated_at": "2026-10-02T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000427",
+          "type": "language",
+          "name": "Old Tongue",
+          "updated_at": "2026-10-01T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000430",
+          "type": "construct",
+          "name": "A child on Ash",
+          "supertype": "Lens",
+          "subtype": "",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000420"
+          ],
+          "x_lens": {
+            "depth": 0
+          },
+          "updated_at": "2026-10-08T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000431",
+          "type": "construct",
+          "name": "A child on Dun as an Object",
+          "supertype": "Lens",
+          "subtype": "",
+          "objects": [
+            "019a7f00-0000-7000-8000-000000000423"
+          ],
+          "x_lens": {
+            "depth": 0
+          },
+          "updated_at": "2026-10-08T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000432",
+          "type": "construct",
+          "name": "A child on Eda",
+          "supertype": "Lens",
+          "subtype": "",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000424"
+          ],
+          "x_lens": {
+            "depth": 0
+          },
+          "updated_at": "2026-10-08T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000433",
+          "type": "construct",
+          "name": "A child that keeps Locations",
+          "supertype": "Lens",
+          "subtype": "",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000426"
+          ],
+          "x_lens": {
+            "depth": 1,
+            "types": [
+              "location"
+            ]
+          },
+          "updated_at": "2026-10-08T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000434",
+          "type": "construct",
+          "name": "A child on the Old Tongue",
+          "supertype": "Lens",
+          "subtype": "",
+          "languages": [
+            "019a7f00-0000-7000-8000-000000000427"
+          ],
+          "x_lens": {
+            "depth": 0
+          },
+          "updated_at": "2026-10-08T12:00:00Z"
+        }
+      ]
     }
   },
   "cases": [
@@ -8773,6 +9003,534 @@
           }
         ],
         "edges_cut": {},
+        "cut": {},
+        "unreadable": null
+      }
+    },
+    {
+      "name": "a-public-served-list-leaves-a-proposed-id-out-no-gap",
+      "kind": "resolve",
+      "world": "ledger",
+      "reader": "public",
+      "lens": {
+        "id": "019a7f00-0000-7000-8000-000000000440",
+        "type": "construct",
+        "name": "A lens",
+        "supertype": "Lens",
+        "subtype": "",
+        "characters": [
+          "019a7f00-0000-7000-8000-000000000400"
+        ],
+        "x_lens": {
+          "depth": 1,
+          "show": "full"
+        }
+      },
+      "kept": [
+        "019a7f00-0000-7000-8000-000000000400",
+        "019a7f00-0000-7000-8000-000000000401"
+      ],
+      "cut": {},
+      "rows": [
+        {
+          "id": "019a7f00-0000-7000-8000-000000000400",
+          "type": "character",
+          "name": "Wren Dale",
+          "friends": [
+            "019a7f00-0000-7000-8000-000000000401"
+          ],
+          "updated_at": "2026-10-01T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000401",
+          "type": "character",
+          "name": "Hal Dale",
+          "updated_at": "2026-10-02T12:00:00Z"
+        }
+      ],
+      "note": "A public door never lists, counts, links or serves a proposed element: Wren's friends are served as Hal alone, with no gap where Ula's id was, and Ula is in no view and in no count."
+    },
+    {
+      "name": "a-single-link-stored-empty-serves-empty-below-the-owner",
+      "kind": "resolve",
+      "world": "ledger",
+      "reader": "guest",
+      "lens": {
+        "id": "019a7f00-0000-7000-8000-000000000441",
+        "type": "construct",
+        "name": "A lens",
+        "supertype": "Lens",
+        "subtype": "",
+        "narratives": [
+          "019a7f00-0000-7000-8000-000000000403"
+        ],
+        "x_lens": {
+          "depth": 0,
+          "show": "full"
+        }
+      },
+      "kept": [
+        "019a7f00-0000-7000-8000-000000000403"
+      ],
+      "cut": {},
+      "rows": [
+        {
+          "id": "019a7f00-0000-7000-8000-000000000403",
+          "type": "narrative",
+          "name": "A note to Hal",
+          "supertype": "Message",
+          "narrator": "",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000401"
+          ],
+          "updated_at": "2026-10-04T12:00:00Z"
+        }
+      ],
+      "note": "An empty string is no id and hides nothing: the narrator stored as \"\" is served as \"\" to a guest, never turned to null, and no trimmed mark is set."
+    },
+    {
+      "name": "a-lens-anchored-on-itself-unseen-counts-anchor-not-visible",
+      "kind": "resolve",
+      "world": "ledger",
+      "reader": "owner-as-contributor",
+      "lens": {
+        "id": "019a7f00-0000-7000-8000-000000000410",
+        "type": "construct",
+        "name": "The self lens",
+        "supertype": "Lens",
+        "subtype": "",
+        "characters": [
+          "019a7f00-0000-7000-8000-000000000401"
+        ],
+        "constructs": [
+          "019a7f00-0000-7000-8000-000000000410"
+        ],
+        "x_lens": {
+          "depth": 0
+        },
+        "updated_at": "2026-10-05T12:00:00Z"
+      },
+      "kept": [
+        "019a7f00-0000-7000-8000-000000000401"
+      ],
+      "cut": {
+        "anchor_not_visible": 1
+      },
+      "note": "The lens names itself among its anchors and the contributor's view leaves it out: an anchor the reader cannot see is counted for the owner as anchor_not_visible, before the visited set is asked, never skipped silently."
+    },
+    {
+      "name": "a-lens-anchored-on-itself-unseen-is-not-there-for-a-contributor",
+      "kind": "resolve",
+      "world": "ledger",
+      "reader": "contributor",
+      "lens": {
+        "id": "019a7f00-0000-7000-8000-000000000410",
+        "type": "construct",
+        "name": "The self lens",
+        "supertype": "Lens",
+        "subtype": "",
+        "characters": [
+          "019a7f00-0000-7000-8000-000000000401"
+        ],
+        "constructs": [
+          "019a7f00-0000-7000-8000-000000000410"
+        ],
+        "x_lens": {
+          "depth": 0
+        },
+        "updated_at": "2026-10-05T12:00:00Z"
+      },
+      "kept": [
+        "019a7f00-0000-7000-8000-000000000401"
+      ],
+      "cut": {},
+      "note": "The same reading by the contributor itself: the owner's count never reaches another reader, not even as zero."
+    },
+    {
+      "name": "an-id-an-umbrella-and-its-child-both-anchor-is-kept-once",
+      "kind": "resolve",
+      "world": "ledger",
+      "reader": "owner",
+      "lens": {
+        "id": "019a7f00-0000-7000-8000-000000000442",
+        "type": "construct",
+        "name": "A lens",
+        "supertype": "Lens",
+        "subtype": "",
+        "characters": [
+          "019a7f00-0000-7000-8000-000000000420"
+        ],
+        "constructs": [
+          "019a7f00-0000-7000-8000-000000000430"
+        ],
+        "x_lens": {
+          "depth": 0
+        }
+      },
+      "kept": [
+        "019a7f00-0000-7000-8000-000000000420"
+      ],
+      "cut": {},
+      "note": "Ash is the umbrella's anchor and its child's: the merged reading holds it once."
+    },
+    {
+      "name": "an-id-one-lens-anchors-under-two-fields-is-met-once-under-the-first",
+      "kind": "resolve",
+      "world": "ledger",
+      "reader": "owner",
+      "lens": {
+        "id": "019a7f00-0000-7000-8000-000000000443",
+        "type": "construct",
+        "name": "A lens",
+        "supertype": "Lens",
+        "subtype": "",
+        "characters": [
+          "019a7f00-0000-7000-8000-000000000421"
+        ],
+        "locations": [
+          "019a7f00-0000-7000-8000-000000000421"
+        ],
+        "x_lens": {
+          "depth": 0
+        }
+      },
+      "kept": [
+        "019a7f00-0000-7000-8000-000000000421"
+      ],
+      "cut": {},
+      "note": "An anchor is a field and an id. Bel is a Character named under characters, the first anchor field in the schema's order, and again under locations: one lens meets an id once, under the first field, so Bel is kept and nothing is cut."
+    },
+    {
+      "name": "an-id-two-wrong-fields-anchor-in-an-umbrella-and-its-child-is-counted-once",
+      "kind": "resolve",
+      "world": "ledger",
+      "reader": "owner",
+      "lens": {
+        "id": "019a7f00-0000-7000-8000-000000000444",
+        "type": "construct",
+        "name": "A lens",
+        "supertype": "Lens",
+        "subtype": "",
+        "characters": [
+          "019a7f00-0000-7000-8000-000000000422"
+        ],
+        "locations": [
+          "019a7f00-0000-7000-8000-000000000423"
+        ],
+        "constructs": [
+          "019a7f00-0000-7000-8000-000000000431"
+        ],
+        "x_lens": {
+          "depth": 0
+        }
+      },
+      "kept": [
+        "019a7f00-0000-7000-8000-000000000422"
+      ],
+      "cut": {
+        "anchor_not_visible": 1
+      },
+      "note": "Dun, a Character, is anchored as a Location by the umbrella and as an Object by its child: each anchor reaches nothing, and the cut counts the element once."
+    },
+    {
+      "name": "an-id-a-wrong-field-anchors-and-a-child-keeps-is-kept-and-not-cut",
+      "kind": "resolve",
+      "world": "ledger",
+      "reader": "owner",
+      "lens": {
+        "id": "019a7f00-0000-7000-8000-000000000445",
+        "type": "construct",
+        "name": "A lens",
+        "supertype": "Lens",
+        "subtype": "",
+        "locations": [
+          "019a7f00-0000-7000-8000-000000000424"
+        ],
+        "constructs": [
+          "019a7f00-0000-7000-8000-000000000432"
+        ],
+        "x_lens": {
+          "depth": 0
+        }
+      },
+      "kept": [
+        "019a7f00-0000-7000-8000-000000000424"
+      ],
+      "cut": {},
+      "note": "Eda, a Character, is anchored as a Location by the umbrella, which reaches nothing, and as a Character by its child, which keeps her: a kept element is never also counted as cut."
+    },
+    {
+      "name": "the-first-reason-is-the-first-the-reader-carries-a-contributor",
+      "kind": "resolve",
+      "world": "ledger",
+      "reader": "contributor",
+      "lens": {
+        "id": "019a7f00-0000-7000-8000-000000000446",
+        "type": "construct",
+        "name": "A lens",
+        "supertype": "Lens",
+        "subtype": "",
+        "locations": [
+          "019a7f00-0000-7000-8000-000000000425"
+        ],
+        "constructs": [
+          "019a7f00-0000-7000-8000-000000000433"
+        ],
+        "x_lens": {
+          "depth": 0
+        }
+      },
+      "kept": [
+        "019a7f00-0000-7000-8000-000000000426"
+      ],
+      "cut": {
+        "types": 1
+      },
+      "note": "Fen, a Character, is the umbrella's anchor under locations, which the contributor never counts; the child's hop from Gil reaches Fen and its types cut him, so the contributor counts him once, as types."
+    },
+    {
+      "name": "the-first-reason-is-the-first-the-reader-carries-the-owner",
+      "kind": "resolve",
+      "world": "ledger",
+      "reader": "owner",
+      "lens": {
+        "id": "019a7f00-0000-7000-8000-000000000446",
+        "type": "construct",
+        "name": "A lens",
+        "supertype": "Lens",
+        "subtype": "",
+        "locations": [
+          "019a7f00-0000-7000-8000-000000000425"
+        ],
+        "constructs": [
+          "019a7f00-0000-7000-8000-000000000433"
+        ],
+        "x_lens": {
+          "depth": 0
+        }
+      },
+      "kept": [
+        "019a7f00-0000-7000-8000-000000000426"
+      ],
+      "cut": {
+        "anchor_not_visible": 1
+      },
+      "note": "The same reading by the owner: anchor_not_visible is the owner's first reason, so Fen is counted once there and not again as types."
+    },
+    {
+      "name": "a-lens-whose-anchors-are-empty-strings-is-a-filter",
+      "kind": "resolve",
+      "world": "ledger",
+      "reader": "owner",
+      "lens": {
+        "id": "019a7f00-0000-7000-8000-000000000447",
+        "type": "construct",
+        "name": "A lens",
+        "supertype": "Lens",
+        "subtype": "",
+        "narratives": [
+          "",
+          "  "
+        ],
+        "x_lens": {
+          "types": [
+            "species"
+          ]
+        }
+      },
+      "kept": [
+        "019a7f00-0000-7000-8000-000000000412"
+      ],
+      "cut": {},
+      "note": "An empty string, or one of White_Space alone, is no id, so it is no anchor: a lens whose anchor lists hold only such strings names no anchor and is a filter over the reader's view, here every Species; nothing is counted for the strings."
+    },
+    {
+      "name": "an-owners-full-row-of-a-hidden-element-carries-hidden-true",
+      "kind": "resolve",
+      "world": "ledger",
+      "reader": "owner",
+      "lens": {
+        "id": "019a7f00-0000-7000-8000-000000000448",
+        "type": "construct",
+        "name": "A lens",
+        "supertype": "Lens",
+        "subtype": "",
+        "characters": [
+          "019a7f00-0000-7000-8000-000000000411"
+        ],
+        "x_lens": {
+          "depth": 0,
+          "show": "full"
+        }
+      },
+      "kept": [
+        "019a7f00-0000-7000-8000-000000000411"
+      ],
+      "cut": {},
+      "rows": [
+        {
+          "id": "019a7f00-0000-7000-8000-000000000411",
+          "type": "character",
+          "name": "The Heir",
+          "updated_at": "2026-10-06T12:00:00Z",
+          "hidden": true
+        }
+      ],
+      "note": "A row is the body as the wire serves it to that reader: the owner's body of an element its hidden mark keeps from others carries hidden: true, derived from the world's hidden list by a reader holding a snapshot."
+    },
+    {
+      "name": "an-unresolved-anchors-note-rides-on-no-row",
+      "kind": "resolve",
+      "world": "ledger",
+      "reader": "owner",
+      "lens": {
+        "id": "019a7f00-0000-7000-8000-000000000449",
+        "type": "construct",
+        "name": "A lens",
+        "supertype": "Lens",
+        "subtype": "",
+        "constructs": [
+          "019a7f00-0000-7000-8000-000000000427",
+          "019a7f00-0000-7000-8000-000000000434"
+        ],
+        "x_lens": {
+          "depth": 0,
+          "show": "name",
+          "notes": {
+            "019a7f00-0000-7000-8000-000000000427": "Read it aloud."
+          }
+        }
+      },
+      "kept": [
+        "019a7f00-0000-7000-8000-000000000427"
+      ],
+      "cut": {},
+      "rows": [
+        {
+          "id": "019a7f00-0000-7000-8000-000000000427",
+          "type": "language",
+          "name": "Old Tongue"
+        }
+      ],
+      "note": "The Old Tongue, a Language, is named under constructs, so that anchor reaches nothing; the child keeps it. Its note went with the unresolved anchor and rides on no row, and the kept element is not also counted as cut."
+    },
+    {
+      "name": "a public reader's served list leaves a proposed id out, so the next id's index is 0",
+      "kind": "graph",
+      "world": {
+        "elements": [
+          {
+            "id": "c1",
+            "type": "character",
+            "name": "Ada",
+            "friends": [
+              "c2",
+              "c3"
+            ]
+          },
+          {
+            "id": "c2",
+            "type": "character",
+            "name": "Maybe",
+            "x_review_proposed": {
+              "by": "m1"
+            }
+          },
+          {
+            "id": "c3",
+            "type": "character",
+            "name": "Cy"
+          }
+        ]
+      },
+      "reader": {
+        "rung": "public"
+      },
+      "want": {
+        "nodes": [
+          {
+            "id": "c1",
+            "type": "character",
+            "name": "Ada",
+            "family": "blue",
+            "icon": "person"
+          },
+          {
+            "id": "c3",
+            "type": "character",
+            "name": "Cy",
+            "family": "blue",
+            "icon": "person"
+          }
+        ],
+        "edges": [
+          {
+            "source": "c1",
+            "field": "friends",
+            "target": "c3",
+            "index": 0
+          }
+        ],
+        "edges_cut": {},
+        "cut": {},
+        "unreadable": null
+      }
+    },
+    {
+      "name": "an edge to an id the lens anchored only under a wrong type is outside_lens",
+      "kind": "graph",
+      "world": {
+        "elements": [
+          {
+            "id": "c1",
+            "type": "character",
+            "name": "Ada",
+            "friends": [
+              "c2"
+            ]
+          },
+          {
+            "id": "c2",
+            "type": "character",
+            "name": "Bo"
+          },
+          {
+            "id": "l1",
+            "type": "construct",
+            "name": "A lens",
+            "supertype": "Lens",
+            "characters": [
+              "c1"
+            ],
+            "locations": [
+              "c2"
+            ],
+            "x_lens": {
+              "depth": 0
+            }
+          }
+        ]
+      },
+      "reader": {
+        "rung": "contributor"
+      },
+      "options": {
+        "lens": "l1"
+      },
+      "want": {
+        "nodes": [
+          {
+            "id": "c1",
+            "type": "character",
+            "name": "Ada",
+            "family": "blue",
+            "icon": "person"
+          }
+        ],
+        "edges": [],
+        "edges_cut": {
+          "outside_lens": 1
+        },
         "cut": {},
         "unreadable": null
       }

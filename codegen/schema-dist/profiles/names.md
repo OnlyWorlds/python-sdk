@@ -19,7 +19,7 @@ A **word pair** is an object `{"one": "Employee", "many": "Employees"}`: `one` a
 **How a reader finds the word.** For an element (or a type list, a card header, a count) a reader knows the **type slug** and, for an element, its **supertype**:
 
 1. If the map is not a names map (below), the standard's name, everywhere.
-2. If `supertypes[type]` has an entry whose key equals the element's supertype **trimmed and without regard to case** (the room profile's one definition, `profiles/room.md`), that entry's word. An entry that is ignored (no string `one`) is no entry: the reader goes on to step 3.
+2. If `supertypes[type]` has an entry whose key equals the element's supertype **trimmed and without regard to case** (the room profile's one definition, `profiles/room.md`), that entry's word. An entry that is ignored (no string `one`) is no entry: the reader goes on to step 3. When two keys fold to the supertype, the first in the map's order that is an entry gives the word, since an ignored one is no entry.
 3. Else if `types[type]` has an entry, that entry's word.
 4. Else the standard's name for the type.
 
@@ -35,6 +35,8 @@ The word replaces the **type's display name** wherever the tool shows it: a card
 
 **What a writer must keep.** Everything it did not change, unknown keys included (the folder format's §3.3). The map holds no element ids: a re-key never rewrites it. Who may write it on keel: the owner and a co-builder (the world's settings rung).
 
-**Conformance.** `names.fixture.json`, beside this page: 23 cases of `{map, type, supertype?, many}` → the word a reader prints, or `null` for "the standard's name". **Every tool that implements the lookup runs the fixture as its own test** (two readers disagreeing on one case is the failure this profile exists to prevent): the TypeScript SDK's `typeWord(world, type, {supertype, many})`, the Python package's `type_word(world, element_type, supertype=, many=)` (its Markdown pack prints through it) and the Unity SDK's `OWNames`.
+**Conformance.** `names.fixture.json`, beside this page: 29 cases of `{map, type, supertype?, many}` → the word a reader prints, or `null` for "the standard's name". **Every tool that implements the lookup runs the fixture as its own test** (two readers disagreeing on one case is the failure this profile exists to prevent): the TypeScript SDK's `typeWord(world, type, {supertype, many})`, the Python package's `type_word(world, element_type, supertype=, many=)` (its Markdown pack prints through it) and the Unity SDK's `OWNames`.
 
 Source: Titus's framing, a translation file and nothing more, and the reads of the SDK and app maintainers, 2026-10-22; the first readers the TypeScript SDK and the Python package.
+
+**Ruled**: Skeld, 2026-10-30, serial 94: readings found by porting the lookup, cased: `types` or `supertypes` present as null refuses the map (null is present and not an object); an unknown type slug reads the standard's name; `version` `1.0` is the number 1 and `1.5` is not; of two supertype keys that fold alike, the first entry in the map's order gives the word.

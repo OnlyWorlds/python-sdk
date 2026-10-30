@@ -2,15 +2,20 @@
   "_what": "The recorded pin for the vendored OnlyWorlds schema distribution (codegen/schema-dist/, copied byte-exact). Do not edit by hand; re-vendor from the pinned tag and review the diff. Kept equal to the npm SDK's pin (github.com/OnlyWorlds/sdk, codegen/schema-pin.json) on purpose: two clients, one schema.",
   "_why_manifest_sha256": "Verifying the tree against its own MANIFEST.json only proves internal consistency. If the tag moved, the manifest moved with it. The hash recorded here is the one first accepted, which is what makes a moved tag visible.",
   "repo": "https://github.com/OnlyWorlds/schema-dist",
-  "tag": "v0.33.0-dist.93",
-  "commit": "9f357431094ff311b394aac8a1f9627e10d0ca38",
-  "manifest_sha256": "bc9b8e61d8519d570bb97a3f5b509c45802e65b53bd93727b47ae39a6f685b0c",
+  "tag": "v0.33.0-dist.94",
+  "commit": "ad040665a99e5c739cb953d58d67757113b78974",
+  "manifest_sha256": "899fcb0678c1c8158705b5bfd1b03d1a5b784667a67e200911f31ac6f9112499",
   "canonical_version": "00.33.00",
-  "dist_serial": 93,
+  "dist_serial": 94,
   "published": "2026-10-30",
   "pinned_at": "2026-10-30",
   "pinned_by": "The maintainer: tree from `git archive` of the tag in a schema-dist checkout (197 files, every one the MANIFEST lists); files re-hashed against MANIFEST.json by generate_schema.py; MANIFEST self-hash matched against the raw file GitHub serves at the tag, whose ref resolves to the commit above.",
   "previous_pins": [
+    {
+      "tag": "v0.33.0-dist.93",
+      "manifest_sha256": "bc9b8e61d8519d570bb97a3f5b509c45802e65b53bd93727b47ae39a6f685b0c",
+      "note": "superseded by v0.33.0-dist.94 (profiles/charter.md, names.md and lens.md state twenty-four readings found by porting the readers; charter.fixture.json gains two worlds and three cases, 26 in all: a proposed aid is no reader's, a member reads the Charter whole from a stub, a skill id compares as a UUID whatever its case; names.fixture.json gains six, 29 in all: null types or supertypes refuses the map, an unknown slug reads the standard's name, version 1.0 is 1 and 1.5 refuses, of two supertype keys that fold alike the first wins; lens.fixture.json gains a tenth world and fifteen cases, 186 in all, two of them graph cases; no schema file moved)"
+    },
     {
       "tag": "v0.33.0-dist.92",
       "manifest_sha256": "ab53b4d168b97562738b422b3a621e20b8ca0b0721693b17668fe9af70319465",

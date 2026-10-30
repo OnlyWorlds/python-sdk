@@ -29,7 +29,7 @@ from onlyworlds._schema import LINK_TARGETS
 
 REPO = Path(__file__).resolve().parent.parent
 FIXTURE = REPO / "codegen" / "schema-dist" / "profiles" / "lens.fixture.json"
-KINDS = {"shape": 6, "keys": 25, "resolve": 86, "invariant": 4, "uses": 5, "graph": 45}
+KINDS = {"shape": 6, "keys": 25, "resolve": 99, "invariant": 4, "uses": 5, "graph": 47}
 OWNER = {"rung": "owner"}
 
 
@@ -156,7 +156,7 @@ def test_every_fixture_case_is_answered_as_the_fixture_says() -> None:
     for line in wrong:
         print(line)
     assert wrong == []
-    assert len(cases) == 171, f"the fixture holds {len(cases)} cases, serial 93 has 171"
+    assert len(cases) == 186, f"the fixture holds {len(cases)} cases, serial 94 has 186"
     assert Counter(c["kind"] for c in cases) == KINDS
 
 

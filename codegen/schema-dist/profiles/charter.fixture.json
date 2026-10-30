@@ -702,6 +702,160 @@
           "character": null
         }
       }
+    },
+    "proposed": {
+      "id": "019a7f00-0000-7000-8000-00000000f114",
+      "name": "The Proposed House",
+      "hidden": [],
+      "readers": {
+        "owner": {
+          "rung": "owner",
+          "character": null
+        }
+      },
+      "elements": [
+        {
+          "id": "019a7f00-0000-7000-8000-000000000300",
+          "type": "law",
+          "name": "House Rules",
+          "supertype": "Charter",
+          "x_charter_of": "019a7f00-0000-7000-8000-00000000f114",
+          "created_at": "2026-10-01T12:00:00Z",
+          "description": "The rules of the house.\nRead ow://object/019a7f00-0000-7000-8000-000000000304 and ow://object/019a7f00-0000-7000-8000-000000000305 before you write."
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000301",
+          "type": "law",
+          "name": "House Rules, proposed",
+          "supertype": "Charter",
+          "x_charter_of": "019a7f00-0000-7000-8000-00000000f114",
+          "created_at": "2026-10-10T12:00:00Z",
+          "description": "New rules, not yet settled.",
+          "x_review_proposed": {
+            "by": null,
+            "at": "2026-10-10T12:00:00Z"
+          }
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000302",
+          "type": "construct",
+          "name": "Start here",
+          "supertype": "Guide",
+          "x_charter_of": "019a7f00-0000-7000-8000-00000000f114",
+          "created_at": "2026-10-01T12:00:00Z",
+          "constructs": [
+            "019a7f00-0000-7000-8000-000000000307",
+            "019a7f00-0000-7000-8000-000000000306"
+          ]
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000303",
+          "type": "construct",
+          "name": "Start here, proposed",
+          "supertype": "Guide",
+          "x_charter_of": "019a7f00-0000-7000-8000-00000000f114",
+          "created_at": "2026-10-10T12:00:00Z",
+          "constructs": [
+            "019a7f00-0000-7000-8000-000000000306"
+          ],
+          "x_review_proposed": {
+            "by": null,
+            "at": "2026-10-10T12:00:00Z"
+          }
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000304",
+          "type": "object",
+          "name": "The Ledger"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000305",
+          "type": "object",
+          "name": "The Draft Ledger",
+          "x_review_proposed": {
+            "by": null,
+            "at": "2026-10-10T12:00:00Z"
+          }
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000306",
+          "type": "construct",
+          "name": "The Hall",
+          "supertype": "Domain",
+          "x_charter_of": "019a7f00-0000-7000-8000-00000000f114",
+          "created_at": "2026-10-01T12:00:00Z",
+          "description": "Where the house meets.",
+          "objects": [
+            "019a7f00-0000-7000-8000-000000000305",
+            "019a7f00-0000-7000-8000-000000000304"
+          ]
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000307",
+          "type": "construct",
+          "name": "The Annex",
+          "supertype": "Domain",
+          "x_charter_of": "019a7f00-0000-7000-8000-00000000f114",
+          "created_at": "2026-10-02T12:00:00Z",
+          "description": "A wing someone doubts.",
+          "x_review_proposed": "is this a place?"
+        }
+      ]
+    },
+    "stub": {
+      "id": "019a7f00-0000-7000-8000-00000000f115",
+      "name": "The Stub House",
+      "hidden": [],
+      "readers": {
+        "owner": {
+          "rung": "owner",
+          "character": null
+        },
+        "guest": {
+          "rung": "guest",
+          "character": "019a7f00-0000-7000-8000-000000000312",
+          "whole": [
+            "019a7f00-0000-7000-8000-000000000311",
+            "019a7f00-0000-7000-8000-000000000312"
+          ],
+          "known_of": [
+            "019a7f00-0000-7000-8000-000000000310"
+          ]
+        }
+      },
+      "elements": [
+        {
+          "id": "019a7f00-0000-7000-8000-000000000310",
+          "type": "law",
+          "name": "House Rules",
+          "supertype": "Charter",
+          "x_charter_of": "019a7f00-0000-7000-8000-00000000f115",
+          "created_at": "2026-10-01T12:00:00Z",
+          "description": "The rules of the house.\nRead ow://object/019a7f00-0000-7000-8000-000000000311 first.",
+          "x_checks_rules": [
+            {
+              "rule": "every Character carries a reputation",
+              "where": {
+                "type": "character"
+              },
+              "require": {
+                "field": "reputation",
+                "present": true
+              }
+            }
+          ]
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000311",
+          "type": "object",
+          "name": "The Ledger"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000312",
+          "type": "character",
+          "name": "Ada Venn"
+        }
+      ]
     }
   },
   "cases": [
@@ -1683,6 +1837,115 @@
         ]
       },
       "note": "The guest knows the Guide only as a stub, a name and an id: it is still the Guide, answered as {id, name}. A stub serves no links, so its constructs order nothing: the Domains the guest sees come by folded name and id alone, ash row first, where the Guide's stored order would put the Archive and the Docks first."
+    },
+    {
+      "name": "a-proposed-charter-is-no-readers-charter",
+      "kind": "charter",
+      "world": "proposed",
+      "reader": "owner",
+      "want": {
+        "charter": {
+          "id": "019a7f00-0000-7000-8000-000000000300",
+          "name": "House Rules",
+          "rules": [],
+          "skill": [
+            "019a7f00-0000-7000-8000-000000000304"
+          ]
+        },
+        "guide": {
+          "id": "019a7f00-0000-7000-8000-000000000302",
+          "name": "Start here"
+        },
+        "domains": [
+          {
+            "id": "019a7f00-0000-7000-8000-000000000306",
+            "name": "The Hall",
+            "sentence": "Where the house meets.",
+            "hubs": [
+              {
+                "type": "object",
+                "id": "019a7f00-0000-7000-8000-000000000304"
+              }
+            ]
+          }
+        ]
+      },
+      "note": "A proposed element is in no reader's view, the owner's included (any value but null: a seat's mark or a doubt): the newer Charter and Guide are proposed, so the settled ones lead; the Annex carries a doubt and is no Domain; the Draft Ledger is proposed, so it is kept neither in the skill nor in the Hall's hubs."
+    },
+    {
+      "name": "a-member-reading-the-charter-as-a-stub-reads-it-whole",
+      "kind": "charter",
+      "world": "stub",
+      "reader": "guest",
+      "want": {
+        "charter": {
+          "id": "019a7f00-0000-7000-8000-000000000310",
+          "name": "House Rules",
+          "rules": [
+            {
+              "rule": "every Character carries a reputation",
+              "where": {
+                "type": "character"
+              },
+              "require": {
+                "field": "reputation",
+                "present": true
+              }
+            }
+          ],
+          "skill": [
+            "019a7f00-0000-7000-8000-000000000311"
+          ]
+        },
+        "guide": null,
+        "domains": []
+      },
+      "note": "The guest's slice holds the Charter only as a known-of stub, which serves no extension field: the Charter is every member rung's to read whole, so its rules and its skill come from the Charter itself, not from the stub."
+    },
+    {
+      "name": "a-skill-id-compares-as-a-uuid-whatever-its-case",
+      "kind": "charter",
+      "world": {
+        "id": "019a7f00-0000-7000-8000-00000000f116",
+        "name": "One case 116",
+        "hidden": [],
+        "readers": {
+          "owner": {
+            "rung": "owner",
+            "character": null
+          }
+        },
+        "elements": [
+          {
+            "id": "019a7f00-0000-7000-8000-000000000320",
+            "type": "law",
+            "name": "Rules",
+            "supertype": "Charter",
+            "x_charter_of": "019a7f00-0000-7000-8000-00000000f116",
+            "created_at": "2026-10-01T12:00:00Z",
+            "description": "Read ow://object/019A7F00-0000-7000-8000-0000000003AB first; it is 019a7f00-0000-7000-8000-0000000003ab again."
+          },
+          {
+            "id": "019a7f00-0000-7000-8000-0000000003ab",
+            "type": "object",
+            "name": "The Skill"
+          }
+        ]
+      },
+      "reader": "owner",
+      "want": {
+        "charter": {
+          "id": "019a7f00-0000-7000-8000-000000000320",
+          "name": "Rules",
+          "rules": [],
+          "skill": [
+            "019a7f00-0000-7000-8000-0000000003ab"
+          ]
+        },
+        "guide": null,
+        "domains": []
+      },
+      "note": "An id compares as a UUID, whatever its case: the Object written in uppercase hex and again in lowercase is one Object, kept once, in lowercase."
     }
   ]
 }

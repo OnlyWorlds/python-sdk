@@ -1115,6 +1115,107 @@
       "many": false,
       "word": "AI agent",
       "supertype": "AGENT"
+    },
+    {
+      "name": "types-present-and-null-refuses-the-map",
+      "map": {
+        "version": 1,
+        "types": null,
+        "supertypes": {
+          "character": {
+            "Agent": {
+              "one": "AI agent"
+            }
+          }
+        }
+      },
+      "type": "character",
+      "supertype": "Agent",
+      "many": false,
+      "word": null
+    },
+    {
+      "name": "supertypes-present-and-null-refuses-the-map",
+      "map": {
+        "version": 1,
+        "types": {
+          "character": {
+            "one": "Employee"
+          }
+        },
+        "supertypes": null
+      },
+      "type": "character",
+      "many": false,
+      "word": null
+    },
+    {
+      "name": "an-unknown-type-slug-reads-the-standards-name",
+      "map": {
+        "version": 1,
+        "types": {
+          "character": {
+            "one": "Employee"
+          },
+          "employee": {
+            "one": "Staff"
+          }
+        }
+      },
+      "type": "employee",
+      "many": false,
+      "word": null
+    },
+    {
+      "name": "version-as-an-integral-float-is-the-number-1",
+      "map": {
+        "version": 1.0,
+        "types": {
+          "character": {
+            "one": "Employee"
+          }
+        }
+      },
+      "type": "character",
+      "many": false,
+      "word": "Employee"
+    },
+    {
+      "name": "version-as-a-fraction-refuses-the-map",
+      "map": {
+        "version": 1.5,
+        "types": {
+          "character": {
+            "one": "Employee"
+          }
+        }
+      },
+      "type": "character",
+      "many": false,
+      "word": null
+    },
+    {
+      "name": "two-supertype-keys-that-fold-alike-the-first-entry-in-map-order-wins",
+      "map": {
+        "version": 1,
+        "supertypes": {
+          "character": {
+            "agent": {
+              "many": "Agents"
+            },
+            "AGENT": {
+              "one": "Machine"
+            },
+            "Agent": {
+              "one": "AI agent"
+            }
+          }
+        }
+      },
+      "type": "character",
+      "supertype": "Agent",
+      "many": false,
+      "word": "Machine"
     }
   ]
 }
