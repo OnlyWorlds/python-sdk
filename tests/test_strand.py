@@ -35,11 +35,11 @@ def world_of(c: Mapping[str, Any]) -> dict[str, Any]:
     return copy.deepcopy(DOC["worlds"][world] if isinstance(world, str) else world)
 
 
-def test_the_fixture_holds_serial_98s_cases() -> None:
+def test_the_fixture_holds_serial_99s_cases() -> None:
     assert DOC["profile_page"] == "profiles/strand.md"
     assert DOC["mark"]["field"] == STRAND_FIELD == "x_strand"
     assert DOC["mark"]["members"] == ["narrative", "event", "location"]
-    assert len(CASES) == 17, f"the fixture holds {len(CASES)} cases, serial 98 has 17"
+    assert len(CASES) == 21, f"the fixture holds {len(CASES)} cases, serial 99 has 21"
     assert {c["kind"] for c in CASES} == {"strand"}
 
 
@@ -76,9 +76,20 @@ def test_a_public_reader_reads_no_strand_of_a_world_that_is_not_open_and_the_ope
     assert strand_of({**world, "open": True}, {"rung": "public"}) == owner
 
 
-def test_a_mark_with_a_member_missing_empty_or_not_a_string_is_no_mark() -> None:
+def test_a_mark_with_no_story_or_an_event_or_place_neither_an_id_nor_unset_is_no_mark() -> None:
     world = world_of({"world": "harbour"})
     m = world["x_strand"]
+    no_story = {k: v for k, v in m.items() if k != "narrative"}
     as_list = [m["narrative"], m["event"], m["location"]]
-    for bad in ({**m, "event": None}, {**m, "location": ""}, {**m, "narrative": 7}, as_list, None):
+    bads: list[Any] = [no_story, {**m, "narrative": ""}, {**m, "narrative": 7}, {**m, "narrative": None}]
+    bads += [
+        {**m, "location": ""},
+        {**m, "event": 7},
+        {**m, "event": {}},
+        {**m, "location": False},
+        as_list,
+        m["narrative"],
+        None,
+    ]
+    for bad in bads:
         assert strand_of({**world, "x_strand": bad}, {"rung": "owner"})["narrative"] is None, bad

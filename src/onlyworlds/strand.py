@@ -20,8 +20,6 @@ from .lens import _check_reader, _Reading
 #: The World's field that carries the strand's mark.
 STRAND_FIELD = "x_strand"
 
-_SLOTS = ("narrative", "event", "location")
-
 
 class StrandSlot(TypedDict):
     """A filled slot."""
@@ -52,18 +50,32 @@ def _empty() -> Strand:
     return {"narrative": None, "event": None, "location": None, "character": None, "now": None, "same": None}
 
 
-def _mark(value: Any) -> dict[str, str] | None:
-    """The mark's three ids, or None when the value is not the profile's shape (a mapping whose three members are
-    each a non-empty string)."""
+class _NoMark(Exception):
+    pass
+
+
+def _optional_id(value: Any) -> str | None:
+    """A member the mark may leave unset: its id, None when it is None or absent; anything else is no mark."""
+    if value is None:
+        return None
+    if isinstance(value, str) and value != "":
+        return value
+    raise _NoMark
+
+
+def _mark(value: Any) -> tuple[str, str | None, str | None] | None:
+    """The mark's ids, ``(narrative, event, location)``, or None when the value is not the profile's shape: a mapping
+    whose ``narrative`` is a non-empty string, and whose ``event`` and ``location`` are each a non-empty string, None or
+    absent (read as unset)."""
     if not isinstance(value, Mapping):
         return None
-    out: dict[str, str] = {}
-    for slot in _SLOTS:
-        v = value.get(slot)
-        if not isinstance(v, str) or v == "":
-            return None
-        out[slot] = v
-    return out
+    story = value.get("narrative")
+    if not isinstance(story, str) or story == "":
+        return None
+    try:
+        return story, _optional_id(value.get("event")), _optional_id(value.get("location"))
+    except _NoMark:
+        return None
 
 
 def strand_of(world: Mapping[str, Any], reader: Mapping[str, Any]) -> Strand:
@@ -77,8 +89,11 @@ def strand_of(world: Mapping[str, Any], reader: Mapping[str, Any]) -> Strand:
     ``protagonist`` when it is a Character in the reader's view; ``now`` the hero's ``location`` when it is a Location
     in the reader's view, empty when the hero is. ``same`` is True when ``now`` and ``location`` are both filled with
     one id, False when with two, else None. A list's order is never read, and no slot is filled from another: not the
-    hero from the event's ``characters``, not ``location`` from ``now``, not ``now`` from ``location``. Any mark that
-    is not a mapping of three non-empty strings is no mark, and the strand is empty.
+    hero from the event's ``characters``, not ``location`` from ``now``, not ``now`` from ``location``. Only the story
+    is required: ``event`` and ``location`` None or absent read as unset (a strand begun, its empty slots the next thing
+    to make), and a place with no event is an empty place. A mark whose ``narrative`` is not a non-empty string, or
+    whose ``event`` or ``location`` is anything but a non-empty string, None or absent, is no mark, and the strand is
+    empty.
 
     ``world`` holds the elements as the owner is served them (``elements``), the ids its hidden mark keeps
     (``hidden``, beside each element's own ``hidden``), the World's ``x_strand``, and ``open: true`` for a world open
@@ -108,14 +123,14 @@ def strand_of(world: Mapping[str, Any], reader: Mapping[str, Any]) -> Strand:
         v = r.body(holder).get(field)
         return isinstance(v, list) and eid in v
 
-    story = mark["narrative"]
+    story, event, place = mark
     if not seen(story, "narrative"):
         return out
     out["narrative"] = slot(story)
-    if seen(mark["event"], "event") and listed(story, "events", mark["event"]):
-        out["event"] = slot(mark["event"])
-        if seen(mark["location"], "location") and listed(mark["event"], "locations", mark["location"]):
-            out["location"] = slot(mark["location"])
+    if seen(event, "event") and listed(story, "events", event):
+        out["event"] = slot(event)
+        if seen(place, "location") and listed(event, "locations", place):
+            out["location"] = slot(place)
     hero = r.body(story).get("protagonist")
     if seen(hero, "character"):
         out["character"] = slot(hero)
