@@ -249,6 +249,39 @@ def test_an_edge_to_an_element_the_lens_cut_as_a_wrongly_typed_anchor_reads_the_
     assert (g["edges"], g["edges_cut"], g["cut"]) == ([], {"anchor_not_visible": 1}, {"anchor_not_visible": 1})
 
 
+def test_below_the_owner_an_edge_to_a_wrongly_typed_anchor_a_child_lens_cut_by_types_reads_types() -> None:
+    """The lens profile (serial 94): keel records an anchor the reader cannot see for the owner alone (keel
+    elements/lens.py:705-707), so for any other reader the child lens's reason is the element's reason, and the
+    edge's. The npm SDK holds the same case."""
+    world = {
+        "elements": [
+            {
+                "id": "C",
+                "type": "construct",
+                "name": "C",
+                "supertype": "Lens",
+                "objects": ["o"],
+                "x_lens": {"types": ["object"]},
+            },
+            {"id": "o", "type": "object", "name": "Ledger", "location": "x"},
+            {"id": "x", "type": "location", "name": "Harbour"},
+        ]
+    }
+    lens = {
+        "id": "L",
+        "type": "construct",
+        "name": "L",
+        "supertype": "Lens",
+        "characters": ["x"],
+        "constructs": ["C"],
+        "x_lens": {"depth": 0},
+    }
+    g = world_graph(world, {"rung": "contributor"}, lens=lens)
+    assert ([n["id"] for n in g["nodes"]], g["cut"], g["edges_cut"]) == (["o"], {"types": 1}, {"types": 1})
+    owner = world_graph(world, {"rung": "owner"}, lens=lens)
+    assert (owner["cut"], owner["edges_cut"]) == ({"anchor_not_visible": 1}, {"anchor_not_visible": 1})
+
+
 class _Unread(list[Any]):
     """An elements list that fails the moment anything iterates it."""
 

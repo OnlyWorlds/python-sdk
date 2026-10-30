@@ -788,9 +788,12 @@ def _resolve_one(
     listed: list[str] = []
     frontier: list[str] = []
     for eid in anchors:
-        # Rule 6 before the visited check: an anchor the reader cannot see is counted, the lens's own id included.
+        # Rule 6 before the visited check: an anchor the reader cannot see is counted, the lens's own id included,
+        # for the owner alone; every other reader records it under no reason, as if it were not there, so a reason
+        # a child gives the same element stands (keel's owner_counts).
         if eid not in r.view or eid in unseen:
-            add_cut(eid, "anchor_not_visible")
+            if r.owner:
+                add_cut(eid, "anchor_not_visible")
             continue
         if eid in visited:
             continue
@@ -948,10 +951,12 @@ def resolve_lens(
     ``is_charter_element``) a hop reaches is kept, and hopped on from, only when ``types`` names its pair, while one
     the lens names as an anchor is kept and followed; anchors first in link order, then by type in the schema's
     order, newest first, then by id; an anchor the reader cannot see (one of no element, or of another type than
-    its field's, among them) is never kept, counted for the owner as ``anchor_not_visible``; a template resolves to
-    nothing; the fence is ``as_of`` on each element's own date; ``changed_within`` cuts what a hop or a filter
-    reaches that changed longer ago than that many days before ``clock`` (``stale``), never an anchor. A value
-    outside the profile's table makes the lens unreadable: ``unreadable`` names the key and nothing is resolved.
+    its field's, among them) is never kept, counted for the owner as ``anchor_not_visible`` before any other reason,
+    while for any other reader it is not there at all, so a child lens's cut of the same element counts under the
+    child's reason; a template resolves to nothing; the fence is ``as_of`` on each element's own date;
+    ``changed_within`` cuts what a hop or a filter reaches that changed longer ago than that many days before
+    ``clock`` (``stale``), never an anchor. A value outside the profile's table makes the lens unreadable:
+    ``unreadable`` names the key and nothing is resolved.
     The npm SDK's ``resolveLens`` gives the same answer on the same input."""
     if not isinstance(world, Mapping) or not isinstance(world.get("elements"), list):
         raise TypeError("resolve_lens: world is a mapping with an elements list.")

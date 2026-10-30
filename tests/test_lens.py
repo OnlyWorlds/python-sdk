@@ -597,6 +597,25 @@ def test_an_id_anchored_under_the_wrong_type_and_under_its_own_is_kept_and_never
     assert (own_first["kept"], own_first["cut"]) == ([_id(1)], {})
 
 
+def test_below_the_owner_an_anchor_it_cannot_see_is_recorded_under_no_reason_so_a_childs_cut_counts() -> None:
+    """lens.md rule 6 (serial 94): keel records an anchor the reader cannot see for the owner's counts only (keel
+    elements/lens.py:705-707); every other reader reads on as if the anchor were not there, so a child lens's cut of
+    the same element by ``types`` stands (:758-759). The owner's ``anchor_not_visible`` comes first, the element
+    counted once. The npm SDK holds the same case."""
+    world = {
+        "elements": [
+            {**LENS, "id": "C", "name": "C", "objects": ["o"], "x_lens": {"types": ["object"]}},
+            {"id": "o", "type": "object", "name": "Ledger", "location": "x"},
+            {"id": "x", "type": "location", "name": "Harbour"},
+        ]
+    }
+    lens = _lens_on({"characters": ["x"], "constructs": ["C"]}, {"depth": 0})
+    got = resolve_lens(world, lens, {"rung": "contributor"})
+    assert (got["kept"], got["cut"]) == (["o"], {"types": 1})
+    owner = resolve_lens(world, lens, OWNER)
+    assert (owner["kept"], owner["cut"]) == (["o"], {"anchor_not_visible": 1})
+
+
 def test_a_served_pins_pair_reads_its_type_key_exact() -> None:
     """lens.md (serial 93): a generic pair links only by one of the 22 slugs, compared exact as stored, so a reader
     below the owner is served a pair whose key is ``Character`` as ``""`` and null; ``character`` stays whole."""
