@@ -485,11 +485,46 @@ def test_an_anchor_the_reader_cannot_see_is_counted_before_the_visited_check() -
     misfiled = {**LENS, "characters": [LENS["id"]], "x_lens": {"depth": 0}}
     assert resolve_lens({"elements": [misfiled]}, LENS["id"], OWNER)["cut"] == {"anchor_not_visible": 1}
     ancestor = {**LENS, "hidden": True, "constructs": [_id(901)], "x_lens": {}}
-    child = {"id": _id(901), "type": "construct", "name": "C", "supertype": "Lens", "constructs": [LENS["id"]],
-             "objects": [_id(1)], "x_lens": {"depth": 0}}
-    back = resolve_lens({"elements": [ancestor, child, {"id": _id(1), "type": "object", "name": "o"}]}, ancestor,
-                        as_contributor)
+    child = {
+        "id": _id(901),
+        "type": "construct",
+        "name": "C",
+        "supertype": "Lens",
+        "constructs": [LENS["id"]],
+        "objects": [_id(1)],
+        "x_lens": {"depth": 0},
+    }
+    back = resolve_lens(
+        {"elements": [ancestor, child, {"id": _id(1), "type": "object", "name": "o"}]}, ancestor, as_contributor
+    )
     assert (back["kept"], back["cut"]) == ([_id(1)], {"anchor_not_visible": 1})
+
+
+def test_a_full_row_of_a_hidden_element_carries_hidden_for_a_reader_that_sees_it() -> None:
+    """lens.md (serial 94): a row is the body as the wire serves it, and keel's body of a hidden element carries
+    ``hidden: true`` for a reader that sees it (keel elements/serialize.py:388-391, :494-495; elements/lens.py:454 and
+    :904 serve the full row as that body). A world-level ``hidden`` list reads as the element's own mark; a ``name``
+    or ``first_line`` row carries no ``hidden`` (:895-902); below the owner a hidden element is not in the view, so
+    the key never travels. The world is never written. The npm SDK holds the same case."""
+    lamp = {"id": _id(1), "type": "object", "name": "Lamp", "description": "Brass.\nOld."}
+    cup = {"id": _id(2), "type": "object", "name": "Cup", "hidden": True}
+    world: dict[str, Any] = {"elements": [lamp, cup], "hidden": [_id(1)]}
+    before = json.dumps(world, sort_keys=True)
+    lens = _lens_on({"objects": [_id(1), _id(2)]}, {"depth": 0})
+    want = [{**lamp, "hidden": True}, cup]
+    for reader in (OWNER, {"rung": "owner", "as": {"rung": "owner"}}):
+        assert resolve_lens(world, lens, reader)["rows"] == want, reader
+    assert resolve_lens(world, _lens_on({"objects": [_id(1)]}, {"depth": 0, "show": "name"}), OWNER)["rows"] == [
+        {"id": _id(1), "type": "object", "name": "Lamp"}
+    ]
+    first = resolve_lens(world, _lens_on({"objects": [_id(1)]}, {"depth": 0, "show": "first_line"}), OWNER)
+    assert first["rows"] == [{"id": _id(1), "type": "object", "name": "Lamp", "description": "Brass."}]
+    for reader in ({"rung": "contributor"}, {"rung": "owner", "as": {"rung": "contributor"}}, {"rung": "public"}):
+        assert resolve_lens(world, lens, reader)["rows"] == [], reader
+    # A guest is served a hidden element only as keel's view gives it one (its own making): then with the mark.
+    guest = {"rung": "guest", "whole": [_id(1)], "known_of": []}
+    assert resolve_lens(world, lens, guest)["rows"] == [{**lamp, "hidden": True}]
+    assert json.dumps(world, sort_keys=True) == before
 
 
 def test_a_served_pins_pair_reads_its_type_key_exact() -> None:

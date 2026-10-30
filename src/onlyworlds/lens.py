@@ -77,7 +77,8 @@ class LensReading(TypedDict):
 
     #: The kept elements' ids, in the profile's order.
     kept: list[str]
-    #: The kept elements as ``show`` makes them, in the same order; an anchor's row carries its ``note``.
+    #: The kept elements as ``show`` makes them, in the same order; an anchor's row carries its ``note``, and a full
+    #: row of a hidden element carries ``hidden: true``, as the body is served.
     rows: list[dict[str, Any]]
     #: The cut, counted by reason; a reason with no count is absent, and a reader that is not the owner never
     #: carries the owner's two (``anchor_not_visible``, ``not_visible``).
@@ -523,7 +524,9 @@ class _Reading:
     def body(self, eid: str) -> Body:
         """The body this reader is served: the owner's own body untouched; for any other reader, the body with
         every id outside the view left out (``_trim``), and for a known-of element the stub made from it
-        (``_stub``)."""
+        (``_stub``). A hidden element's body carries ``hidden: true``, the world's ``hidden`` list read as the
+        element's own mark, for any reader it is served to (keel's serialize): the owner, and below it only a guest
+        whose lists name it, since no other rung's view holds a hidden element."""
         cached = self._served.get(eid)
         if cached is not None:
             return cached
@@ -534,6 +537,8 @@ class _Reading:
             self._trim(b, kind)
         if eid in self.stubs:
             b = _stub(b, kind)
+        if eid in self.hidden:
+            b["hidden"] = True
         self._served[eid] = b
         return b
 
