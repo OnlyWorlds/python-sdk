@@ -2,15 +2,20 @@
   "_what": "The recorded pin for the vendored OnlyWorlds schema distribution (codegen/schema-dist/, copied byte-exact). Do not edit by hand; re-vendor from the pinned tag and review the diff. Kept equal to the npm SDK's pin (github.com/OnlyWorlds/sdk, codegen/schema-pin.json) on purpose: two clients, one schema.",
   "_why_manifest_sha256": "Verifying the tree against its own MANIFEST.json only proves internal consistency. If the tag moved, the manifest moved with it. The hash recorded here is the one first accepted, which is what makes a moved tag visible.",
   "repo": "https://github.com/OnlyWorlds/schema-dist",
-  "tag": "v0.33.0-dist.96",
-  "commit": "96afa7ea9fa6efcc9d396e04a9e7228dc600fe47",
-  "manifest_sha256": "c17336c39cdba491cf5b7bd8c0b1d095bb584d1fbc272bb69faf4edaa8ec6a2a",
+  "tag": "v0.33.0-dist.97",
+  "commit": "27588c9aa364844f5790fe36a64f435ea571f880",
+  "manifest_sha256": "a236f055875a97fe97f6ee5a501bb9342d7a6b81192ba701cc185822c627f705",
   "canonical_version": "00.33.00",
-  "dist_serial": 96,
+  "dist_serial": 97,
   "published": "2026-10-30",
   "pinned_at": "2026-10-30",
   "pinned_by": "The maintainer: tree from `git archive` of the tag in a schema-dist checkout (198 files: the 197 the MANIFEST lists, and MANIFEST.json itself); files re-hashed against MANIFEST.json by generate_schema.py; MANIFEST self-hash matched against the raw file GitHub serves at the tag, whose ref resolves to the commit above.",
   "previous_pins": [
+    {
+      "tag": "v0.33.0-dist.96",
+      "manifest_sha256": "c17336c39cdba491cf5b7bd8c0b1d095bb584d1fbc272bb69faf4edaa8ec6a2a",
+      "note": "superseded by v0.33.0-dist.97 (profiles/address.md's writer paragraph: an empty string is never absent, a writer given an empty world, type, id or lens refuses it by that part's own reason, bad_world, unknown_type, bad_id or bad_lens, and only null or a missing key is absent; address.fixture.json gains four format cases, one per part, 137 in all; no schema file moved)"
+    },
     {
       "tag": "v0.33.0-dist.95",
       "manifest_sha256": "eee6f5027d758e91b40b39ca35de940caca6baf907aa4d4688c05dc46d2c921b",

@@ -4,6 +4,10 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+## 0.95.2 (2026-10-30)
+
+- **The schema pin moves to schema-dist serial 97** (`v0.33.0-dist.97`). The address profile's writer paragraph states that an empty string is never absent: an empty world, type, id or lens refuses by that part's own reason (`bad_world`, `unknown_type`, `bad_id`, `bad_lens`), and only `None` or a missing key is absent. Four new format cases witness it, one per part. `element_address` already refuses each of them so; no reader changed.
+
 ## 0.95.1 (2026-10-30)
 
 - **The schema pin moves to schema-dist serial 96** (`v0.33.0-dist.96`). The lens profile's graph section states how its two rules compose on a guest's own hidden creation, and two new graph cases witness it: without a lens, `world_graph` leaves it out with no count and no counted cut edge, as it leaves out any hidden element below the owner; through a lens that keeps it, it is a node marked `hidden`, as it is in the lens's `kept`. Both pass as the readers already read them; no reader changed.

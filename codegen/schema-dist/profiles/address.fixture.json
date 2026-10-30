@@ -1552,6 +1552,55 @@
         "moment": null,
         "canonical": true
       }
+    },
+    {
+      "name": "format-refuse-empty-world",
+      "claim": "an empty world is not absent: it refuses as a bad world",
+      "kind": "format",
+      "address": {
+        "form": "human",
+        "world": "",
+        "type": "character",
+        "id": "019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71"
+      },
+      "refuse": "bad_world"
+    },
+    {
+      "name": "format-refuse-empty-type",
+      "claim": "an empty type is not absent: it refuses as an unknown type",
+      "kind": "format",
+      "address": {
+        "form": "text",
+        "world": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+        "type": "",
+        "id": "019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71"
+      },
+      "refuse": "unknown_type"
+    },
+    {
+      "name": "format-refuse-empty-id",
+      "claim": "an empty id is not absent: it refuses as a bad id",
+      "kind": "format",
+      "address": {
+        "form": "text",
+        "world": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+        "type": "character",
+        "id": ""
+      },
+      "refuse": "bad_id"
+    },
+    {
+      "name": "format-refuse-empty-lens",
+      "claim": "an empty lens is not absent: it refuses as a bad lens",
+      "kind": "format",
+      "address": {
+        "form": "text",
+        "world": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+        "type": "character",
+        "id": "019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71",
+        "lens": ""
+      },
+      "refuse": "bad_lens"
     }
   ]
 }
