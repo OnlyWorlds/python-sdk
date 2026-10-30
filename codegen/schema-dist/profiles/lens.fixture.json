@@ -9667,6 +9667,135 @@
         "cut": {},
         "unreadable": null
       }
+    },
+    {
+      "name": "a guest's own hidden creation is out of an unlensed graph with no count and no cut edge",
+      "kind": "graph",
+      "world": {
+        "elements": [
+          {
+            "id": "c1",
+            "type": "character",
+            "name": "Ada",
+            "friends": [
+              "c2"
+            ]
+          },
+          {
+            "id": "c2",
+            "type": "character",
+            "name": "Spy",
+            "hidden": true,
+            "friends": [
+              "c1"
+            ]
+          },
+          {
+            "id": "c3",
+            "type": "character",
+            "name": "Bo"
+          }
+        ]
+      },
+      "reader": {
+        "rung": "guest",
+        "whole": [
+          "c1",
+          "c2"
+        ],
+        "known_of": []
+      },
+      "want": {
+        "nodes": [
+          {
+            "id": "c1",
+            "type": "character",
+            "name": "Ada",
+            "family": "blue",
+            "icon": "person"
+          }
+        ],
+        "edges": [],
+        "edges_cut": {},
+        "cut": {},
+        "unreadable": null
+      },
+      "note": "Serial 96. Hidden is out of an unlensed graph by default, and its flag and its count are the owner's alone: the guest made the spy and sees its body whole, but no flag below the owner brings it back, so the unlensed graph has no spy node, counts nothing for it, and Ada's edge to it is cut without a count (a guest never carries hidden in edges_cut)."
+    },
+    {
+      "name": "a guest's own hidden creation is a node of a lensed graph, marked hidden",
+      "kind": "graph",
+      "world": {
+        "elements": [
+          {
+            "id": "c1",
+            "type": "character",
+            "name": "Ada",
+            "friends": [
+              "c2"
+            ]
+          },
+          {
+            "id": "c2",
+            "type": "character",
+            "name": "Spy",
+            "hidden": true,
+            "friends": [
+              "c1"
+            ]
+          },
+          {
+            "id": "c3",
+            "type": "character",
+            "name": "Bo"
+          }
+        ]
+      },
+      "reader": {
+        "rung": "guest",
+        "whole": [
+          "c1",
+          "c2"
+        ],
+        "known_of": []
+      },
+      "options": {
+        "lens": {
+          "id": "l1",
+          "type": "construct",
+          "name": "A lens",
+          "supertype": "Lens",
+          "subtype": "",
+          "characters": [
+            "c2"
+          ],
+          "x_lens": {
+            "depth": 0,
+            "show": "full"
+          }
+        }
+      },
+      "want": {
+        "nodes": [
+          {
+            "id": "c2",
+            "type": "character",
+            "name": "Spy",
+            "family": "blue",
+            "icon": "person",
+            "marks": [
+              "hidden"
+            ]
+          }
+        ],
+        "edges": [],
+        "edges_cut": {
+          "outside_lens": 1
+        },
+        "cut": {},
+        "unreadable": null
+      },
+      "note": "Serial 96. A lens's graph has exactly the lens's kept as its nodes, and a flag never widens or narrows a lens: the lens anchors the guest's own spy, resolveLens keeps it (its row carries hidden: true), so it is a node carrying the hidden mark; its edge to Ada, whom the lens never reached, is outside_lens."
     }
   ],
   "graph_links": [

@@ -4,6 +4,10 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+## 0.95.1 (2026-10-30)
+
+- **The schema pin moves to schema-dist serial 96** (`v0.33.0-dist.96`). The lens profile's graph section states how its two rules compose on a guest's own hidden creation, and two new graph cases witness it: without a lens, `world_graph` leaves it out with no count and no counted cut edge, as it leaves out any hidden element below the owner; through a lens that keeps it, it is a node marked `hidden`, as it is in the lens's `kept`. Both pass as the readers already read them; no reader changed.
+
 ## 0.95.0 (2026-10-30)
 
 - **The readers follow schema-dist serial 95** (`v0.33.0-dist.95`), whose five new cases replay in `read_mark_of`, `resolve_lens` and `charter_of`. Two readings change for a caller:
