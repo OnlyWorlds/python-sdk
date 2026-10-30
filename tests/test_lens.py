@@ -640,6 +640,27 @@ def test_a_note_goes_with_its_anchor_so_one_that_reaches_nothing_captions_no_row
         ), reader
 
 
+def test_an_anchor_string_of_white_space_alone_is_no_anchor_so_the_lens_is_a_filter() -> None:
+    """lens.md rule 7 (serial 94): an empty string, or one of White_Space alone, is no id and so no anchor; a lens whose
+    anchor lists hold only such strings is a filter, nothing counted for them. A string of a character outside
+    White_Space (a byte order mark, an information separator) is an id, one naming nothing, so the lens is anchored
+    and the owner counts it. The npm SDK holds the same case."""
+    world = {
+        "elements": [
+            {"id": "o1", "type": "object", "name": "Lamp"},
+            {"id": "c1", "type": "character", "name": "Ada"},
+        ]
+    }
+    blank = ["", "  ", chr(0xA0), chr(0x3000) + "\t", chr(0x2028)]
+    lens = _lens_on({"characters": blank, "objects": [""]}, {"types": ["object"]})
+    for reader in (OWNER, {"rung": "contributor"}):
+        got = resolve_lens(world, lens, reader)
+        assert (got["kept"], got["cut"]) == (["o1"], {}), reader
+    for odd in (chr(0xFEFF), chr(0x1C)):
+        got = resolve_lens(world, _lens_on({"characters": [odd]}, {"types": ["object"]}), OWNER)
+        assert (got["kept"], got["cut"]) == ([], {"anchor_not_visible": 1}), hex(ord(odd))
+
+
 def test_a_served_pins_pair_reads_its_type_key_exact() -> None:
     """lens.md (serial 93): a generic pair links only by one of the 22 slugs, compared exact as stored, so a reader
     below the owner is served a pair whose key is ``Character`` as ``""`` and null; ``character`` stays whole."""

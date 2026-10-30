@@ -30,7 +30,7 @@ from ._schema import FIELD_KINDS, GENERIC_PAIRS, LINK_TARGETS, PUBLIC_FIELDS, RO
 from .folder import is_hidden
 from .message import _instant, is_message, read_mark_of, unread_for
 from .review import hands_on_as_proposed
-from .room import _READING_AID_KEYS, _fold, _reading_aid_key, is_room_element
+from .room import _READING_AID_KEYS, _WHITE_SPACE, _fold, _reading_aid_key, is_room_element
 
 __all__ = [
     "DATE_FIELD",
@@ -737,7 +737,9 @@ def _anchors_of(lens: Mapping[str, Any], r: _Reading) -> tuple[list[str], list[s
 
     A child is a lens in ``constructs`` the reader sees whole; one it knows only as a stub serves no recipe
     and no links, so it is an anchor the reader cannot see (``unseen``), never entered (keel's ``_anchors``).
-    An id that names no element of the world, or an element of another type than its field's, is one too.
+    An id that names no element of the world, or an element of another type than its field's, is one too. An
+    empty string, or one of White_Space alone, is no id and so no anchor: a lens whose lists hold only such
+    strings names none, and is a filter (rule 7).
     """
     anchors: list[str] = []
     children: list[str] = []
@@ -749,7 +751,7 @@ def _anchors_of(lens: Mapping[str, Any], r: _Reading) -> tuple[list[str], list[s
         if not isinstance(v, list):
             continue
         for i in v:
-            if not isinstance(i, str) or i == "" or i in seen:
+            if not isinstance(i, str) or i.strip(_WHITE_SPACE) == "" or i in seen:
                 continue
             seen.add(i)
             if field == "constructs" and i in r.view and is_lens(r.by_id[i]):
