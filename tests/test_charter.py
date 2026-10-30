@@ -103,6 +103,28 @@ def test_the_owner_as_another_reader_reads_that_readers_packet() -> None:
         assert charter_of(world, {"rung": "owner", "as": seen}) == charter_of(world, seen), name
 
 
+def test_a_proposed_object_is_no_hub_for_any_reader() -> None:
+    """charter.md (serial 94): a proposed element is in no reader's view, the owner's included, so a Domain's link to
+    one is no hub, though the owner's and a contributor's served lists keep the id. The npm SDK holds the same case."""
+    world = {
+        "id": "w",
+        "elements": [
+            {
+                "id": "d",
+                "type": "construct",
+                "name": "The Hall",
+                "supertype": "Domain",
+                "x_charter_of": "w",
+                "objects": ["p", "o"],
+            },
+            {"id": "o", "type": "object", "name": "Ledger"},
+            {"id": "p", "type": "object", "name": "Draft", "x_review_proposed": "is this real?"},
+        ],
+    }
+    for reader in ({"rung": "owner"}, {"rung": "contributor"}):
+        assert domains_of(world, reader)[0]["hubs"] == [{"type": "object", "id": "o"}], reader
+
+
 def test_charter_of_refuses_what_is_not_a_reading() -> None:
     with pytest.raises(TypeError):
         charter_of({}, {"rung": "owner"})

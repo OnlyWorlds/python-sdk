@@ -82,7 +82,8 @@ class DomainRead(TypedDict):
     name: str
     #: The description up to its first line break (a carriage return included), trimmed; ``""`` when none.
     sentence: str
-    #: The distinct elements its served link fields name, itself excluded, in the schema's field order; a stub
+    #: The distinct elements its served link fields name that the reader sees (never a proposed one), itself
+    #: excluded, in the schema's field order; a stub
     #: serves no links, so ``[]``.
     hubs: list[CharterHub]
 
@@ -125,13 +126,15 @@ def _skill(r: _Reading, text: Any) -> list[str]:
     return [i for i in found if i in objects][:SKILL_MAX]
 
 
-def _hubs(eid: str, body: Mapping[str, Any]) -> list[CharterHub]:
+def _hubs(r: _Reading, eid: str, body: Mapping[str, Any]) -> list[CharterHub]:
+    """The distinct ids the served link fields name that the reader sees: a served list may keep an id no view
+    holds (a proposed one, for every rung but the public), and such an id is no hub."""
     out: list[CharterHub] = []
     seen = {("construct", eid)}
     for field, target in _HUB_FIELDS:
         value = body.get(field)
         for i in value if isinstance(value, list) else [value]:
-            if isinstance(i, str) and i != "" and (target, i) not in seen:
+            if isinstance(i, str) and i in r.view and (target, i) not in seen:
                 seen.add((target, i))
                 out.append({"type": target, "id": i})
     return out
@@ -199,7 +202,7 @@ def charter_of(world: Mapping[str, Any], reader: Mapping[str, Any]) -> CharterPa
                 "id": d,
                 "name": _name(body.get("name")),
                 "sentence": _first_line(body.get("description")),
-                "hubs": [] if body.get("known_of") is True else _hubs(d, body),
+                "hubs": [] if body.get("known_of") is True else _hubs(r, d, body),
             }
         )
     return packet
