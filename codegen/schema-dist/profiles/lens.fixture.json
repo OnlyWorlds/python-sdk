@@ -4,7 +4,6 @@
   "notes": [
     "pair: construct + supertype Lens, each trimmed and folded like the room profile's pairs; a template is a lens whose subtype, trimmed and folded, is Template.",
     "keys: the legal values of x_lens; a case's legal is what a reader's check answers, and bad names the first key refused (x_lens itself when the value is not an object).",
-    "text_only: a case marked text_only: true holds for a reader that can see a number's text (7.0 beside 7); a reader whose JSON parser gives one number type cannot tell them apart and may skip it, its why says so. Such a reader reads an integral float whole: a platform limit, not a rule.",
     "worlds: each world's elements as its owner is served them, the ids its hidden mark keeps from every reader but the owner, and its readers. A reader's rung is owner (the whole world), contributor (the world less the hidden), guest (exactly the whole and known_of ids it lists; known_of is a stub) or public (the world less the hidden and the room elements). An element whose x_review_proposed holds any value but null is in no reader's view (the review profile's rule for a reader that hands a world on). A reader with as is the owner reading as that reader: the reader's view, and the owner's two counts (anchor_not_visible, not_visible).",
     "resolve: lens is the lens read, a body or the id of a lens in the world; as_of is the reading's date (absent: the world's now; with neither, no fence and the window cuts nothing); clock is the reading's wall clock, for the mail rule and changed_within. kept is the resolved set in order, cut the count by reason (a reason with no count is absent). rows, where given, are the kept rows as show makes them; mail, where given, is the mail rule's part; notes_ignored counts notes on ids that are not anchors.",
     "invariant: subset (each reader's kept is a subset of the owner's, and no secret's id or name appears anywhere in a non-owner result), same_without (each reader's result is identical with the without ids removed from the world), unchanged (the world is identical before and after every reader's reading).",
@@ -1303,6 +1302,247 @@
           "character": null
         }
       }
+    },
+    "fen": {
+      "id": "019a7f00-0000-7000-8000-00000000f009",
+      "name": "Ashfen",
+      "time_basic_unit": "year",
+      "now": 100,
+      "elements": [
+        {
+          "id": "019a7f00-0000-7000-8000-000000000150",
+          "type": "character",
+          "name": "Wren",
+          "friends": [
+            "019a7f00-0000-7000-8000-000000000152"
+          ],
+          "updated_at": "2026-10-01T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000152",
+          "type": "location",
+          "name": "Reed Bank",
+          "updated_at": "2026-10-01T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000153",
+          "type": "character",
+          "name": "Sedge",
+          "updated_at": "2026-10-02T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000154",
+          "type": "pin",
+          "name": "Sedge's mark",
+          "element_type": "character",
+          "element_id": "019a7f00-0000-7000-8000-000000000153",
+          "updated_at": "2026-10-02T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000155",
+          "type": "pin",
+          "name": "A stray mark",
+          "element_type": "wizard",
+          "element_id": "019a7f00-0000-7000-8000-000000000153",
+          "updated_at": "2026-10-02T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000156",
+          "type": "character",
+          "name": "Tansy",
+          "updated_at": "2026-10-03T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000157",
+          "type": "pin",
+          "name": "Tansy's mark",
+          "element_type": "Character",
+          "element_id": "019a7f00-0000-7000-8000-000000000156",
+          "updated_at": "2026-10-03T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000158",
+          "type": "character",
+          "name": "Moss",
+          "updated_at": "2026-10-04T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000159",
+          "type": "character",
+          "name": "Rush",
+          "updated_at": "2026-10-05T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000160",
+          "type": "construct",
+          "name": "Rush's lens",
+          "supertype": "Lens",
+          "subtype": "",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000159"
+          ],
+          "x_lens": {
+            "depth": 0
+          },
+          "updated_at": "2026-10-05T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000161",
+          "type": "character",
+          "name": "Fern",
+          "updated_at": "2026-10-06T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000162",
+          "type": "construct",
+          "name": "Fern's people",
+          "supertype": "Lens",
+          "subtype": "",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000161"
+          ],
+          "x_lens": {
+            "types": [
+              "character"
+            ]
+          },
+          "updated_at": "2026-10-06T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000163",
+          "type": "construct",
+          "name": "Fern's things",
+          "supertype": "Lens",
+          "subtype": "",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000161"
+          ],
+          "x_lens": {
+            "depth": 0
+          },
+          "updated_at": "2026-10-06T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000164",
+          "type": "location",
+          "name": "Wharf",
+          "description": "Salt sheds.\rTar pits beyond.",
+          "updated_at": "2026-10-07T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000165",
+          "type": "object",
+          "name": "Lantern",
+          "updated_at": "2026-10-07T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000166",
+          "type": "character",
+          "name": "The stranger",
+          "description": "Seen at the ferry.",
+          "physicality": "Tall, grey-cloaked.",
+          "birth_date": 40,
+          "abilities": [
+            "019a7f00-0000-7000-8000-000000000167"
+          ],
+          "x_mood": "wary",
+          "updated_at": "2026-10-08T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000167",
+          "type": "ability",
+          "name": "Ferrying",
+          "updated_at": "2026-10-08T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000168",
+          "type": "character",
+          "name": "Alder",
+          "friends": [
+            "019a7f00-0000-7000-8000-000000000169",
+            "019a7f00-0000-7000-8000-000000000170"
+          ],
+          "updated_at": "2026-10-09T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000169",
+          "type": "character",
+          "name": "Birch"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000170",
+          "type": "character",
+          "name": "Cedar",
+          "updated_at": "2026-10-01T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000171",
+          "type": "character",
+          "name": "Hazel",
+          "updated_at": "2026-10-10T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000172",
+          "type": "character",
+          "name": "Ivo",
+          "updated_at": "2026-10-10T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000174",
+          "type": "narrative",
+          "name": "The tide tables",
+          "supertype": "Message",
+          "narrator": "019a7f00-0000-7000-8000-000000000172",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000171"
+          ],
+          "story": "High water at nine.",
+          "created_at": "2026-10-26T09:00:00Z",
+          "updated_at": "2026-10-26T09:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000173",
+          "type": "narrative",
+          "name": "The ferry is late",
+          "supertype": "Message",
+          "narrator": "019a7f00-0000-7000-8000-000000000172",
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000171"
+          ],
+          "story": "Wait at the wharf.",
+          "created_at": "2026-10-26T09:00:00Z",
+          "updated_at": "2026-10-26T09:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000175",
+          "type": "character",
+          "name": "Old Quill",
+          "birth_date": 7.0,
+          "updated_at": "2026-10-11T12:00:00Z"
+        }
+      ],
+      "hidden": [],
+      "readers": {
+        "owner": {
+          "rung": "owner",
+          "character": null
+        },
+        "contributor": {
+          "rung": "contributor",
+          "character": "019a7f00-0000-7000-8000-000000000171"
+        },
+        "guest": {
+          "rung": "guest",
+          "character": null,
+          "whole": [
+            "019a7f00-0000-7000-8000-000000000167",
+            "019a7f00-0000-7000-8000-000000000171"
+          ],
+          "known_of": [
+            "019a7f00-0000-7000-8000-000000000166"
+          ]
+        }
+      }
     }
   },
   "cases": [
@@ -1601,15 +1841,14 @@
       "note": "A fraction is no whole number for any reader: the key is named."
     },
     {
-      "name": "keys-an-integral-float-is-refused-where-the-text-shows",
+      "name": "keys-an-integral-float-reads-whole",
       "kind": "keys",
       "x_lens": {
-        "depth": 7.0
+        "budget": 7.0
       },
-      "legal": false,
-      "bad": "depth",
-      "text_only": true,
-      "why": "a reader whose JSON parser gives one number type reads 7.0 as 7 and may skip this case"
+      "legal": true,
+      "bad": null,
+      "note": "A whole float reads whole in every reader (7.0 is 7); a fraction is refused everywhere."
     },
     {
       "name": "keys-not-an-object-is-refused",
@@ -3124,6 +3363,22 @@
       "membership": null,
       "x_lens_uses": null,
       "lenses": []
+    },
+    {
+      "name": "x-lens-uses-reads-each-id-once-and-drops-an-empty-string",
+      "kind": "uses",
+      "membership": null,
+      "x_lens_uses": [
+        "019a7f00-0000-7000-8000-000000000020",
+        "",
+        "019a7f00-0000-7000-8000-000000000019",
+        "019a7f00-0000-7000-8000-000000000020"
+      ],
+      "lenses": [
+        "019a7f00-0000-7000-8000-000000000020",
+        "019a7f00-0000-7000-8000-000000000019"
+      ],
+      "note": "Each value once, in its first place; an empty string is no lens id."
     },
     {
       "name": "mail-reads-the-message-profile",
@@ -7833,6 +8088,694 @@
         }
       ],
       "note": "The public reader is served the roll with the hidden anchor and both hidden notes left out, and no x_served_trimmed: the mark is never served on the public rung, so the public reading is the same with or without the hidden elements."
+    },
+    {
+      "name": "a-link-to-an-element-of-another-type-reaches-nothing",
+      "kind": "resolve",
+      "world": "fen",
+      "reader": "owner",
+      "lens": {
+        "id": "019a7f00-0000-7000-8000-000000000180",
+        "type": "construct",
+        "name": "A lens",
+        "supertype": "Lens",
+        "subtype": "",
+        "characters": [
+          "019a7f00-0000-7000-8000-000000000150"
+        ]
+      },
+      "kept": [
+        "019a7f00-0000-7000-8000-000000000150"
+      ],
+      "cut": {},
+      "note": "Wren's friends list holds Reed Bank, a Location: a link reaches only an element of its field's target type, so the id reaches nothing and is not counted (a data fault, not a hop)."
+    },
+    {
+      "name": "a-generic-pair-links-only-when-its-type-is-one-of-the-22",
+      "kind": "resolve",
+      "world": "fen",
+      "reader": "owner",
+      "lens": {
+        "id": "019a7f00-0000-7000-8000-000000000181",
+        "type": "construct",
+        "name": "A lens",
+        "supertype": "Lens",
+        "subtype": "",
+        "characters": [
+          "019a7f00-0000-7000-8000-000000000153"
+        ]
+      },
+      "kept": [
+        "019a7f00-0000-7000-8000-000000000153",
+        "019a7f00-0000-7000-8000-000000000154"
+      ],
+      "cut": {},
+      "note": "Both Pins name Sedge in element_id; Sedge's mark's element_type is character, so it links and the hop reaches it; the stray mark's is wizard, not one of the 22, so it links nothing."
+    },
+    {
+      "name": "a-generic-pairs-type-compares-exact-against-the-slugs",
+      "kind": "resolve",
+      "world": "fen",
+      "reader": "owner",
+      "lens": {
+        "id": "019a7f00-0000-7000-8000-000000000182",
+        "type": "construct",
+        "name": "A lens",
+        "supertype": "Lens",
+        "subtype": "",
+        "characters": [
+          "019a7f00-0000-7000-8000-000000000156"
+        ]
+      },
+      "kept": [
+        "019a7f00-0000-7000-8000-000000000156"
+      ],
+      "cut": {},
+      "note": "Tansy's mark's element_type is Character: the type key compares exact against the 22 slugs, as stored, nothing folded, so the pair links nothing."
+    },
+    {
+      "name": "a-dangling-anchor-is-counted-for-the-owner-as-anchor-not-visible",
+      "kind": "resolve",
+      "world": "fen",
+      "reader": "owner",
+      "lens": {
+        "id": "019a7f00-0000-7000-8000-000000000183",
+        "type": "construct",
+        "name": "A lens",
+        "supertype": "Lens",
+        "subtype": "",
+        "characters": [
+          "019a7f00-0000-7000-8000-000000000158",
+          "019a7f00-0000-7000-8000-000000000199"
+        ],
+        "x_lens": {
+          "depth": 0
+        }
+      },
+      "kept": [
+        "019a7f00-0000-7000-8000-000000000158"
+      ],
+      "cut": {
+        "anchor_not_visible": 1
+      },
+      "note": "The second anchor's id is in no element of the world: it is counted for the owner as anchor_not_visible, never skipped silently."
+    },
+    {
+      "name": "umbrella-a-child-its-own-anchors-reach-is-kept-before-it-is-entered",
+      "kind": "resolve",
+      "world": "fen",
+      "reader": "owner",
+      "lens": {
+        "id": "019a7f00-0000-7000-8000-000000000184",
+        "type": "construct",
+        "name": "An umbrella",
+        "supertype": "Lens",
+        "subtype": "",
+        "characters": [
+          "019a7f00-0000-7000-8000-000000000159"
+        ],
+        "constructs": [
+          "019a7f00-0000-7000-8000-000000000160"
+        ]
+      },
+      "kept": [
+        "019a7f00-0000-7000-8000-000000000159",
+        "019a7f00-0000-7000-8000-000000000160"
+      ],
+      "cut": {},
+      "note": "The umbrella's children are not in its own hop's known set: Rush's lens links Rush, so the umbrella's hop from Rush reaches it and keeps it as an element before it is entered as a child."
+    },
+    {
+      "name": "umbrella-a-child-lens-cut-before-it-was-entered-stays-counted",
+      "kind": "resolve",
+      "world": "fen",
+      "reader": "owner",
+      "lens": {
+        "id": "019a7f00-0000-7000-8000-000000000185",
+        "type": "construct",
+        "name": "An umbrella",
+        "supertype": "Lens",
+        "subtype": "",
+        "constructs": [
+          "019a7f00-0000-7000-8000-000000000162",
+          "019a7f00-0000-7000-8000-000000000163"
+        ]
+      },
+      "kept": [
+        "019a7f00-0000-7000-8000-000000000161"
+      ],
+      "cut": {
+        "types": 1
+      },
+      "note": "Fern's people (types: character) reaches its sibling Fern's things by a hop and cuts it as types; entering Fern's things afterwards does not erase that count."
+    },
+    {
+      "name": "show-first-line-cuts-at-a-carriage-return-and-invents-no-description",
+      "kind": "resolve",
+      "world": "fen",
+      "reader": "owner",
+      "lens": {
+        "id": "019a7f00-0000-7000-8000-000000000186",
+        "type": "construct",
+        "name": "A lens",
+        "supertype": "Lens",
+        "subtype": "",
+        "objects": [
+          "019a7f00-0000-7000-8000-000000000165"
+        ],
+        "locations": [
+          "019a7f00-0000-7000-8000-000000000164"
+        ],
+        "x_lens": {
+          "depth": 0,
+          "show": "first_line"
+        }
+      },
+      "kept": [
+        "019a7f00-0000-7000-8000-000000000165",
+        "019a7f00-0000-7000-8000-000000000164"
+      ],
+      "cut": {},
+      "rows": [
+        {
+          "id": "019a7f00-0000-7000-8000-000000000165",
+          "type": "object",
+          "name": "Lantern"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000164",
+          "type": "location",
+          "name": "Wharf",
+          "description": "Salt sheds."
+        }
+      ],
+      "note": "The Wharf's description breaks at a carriage return alone; the Lantern has no description, so its row carries none."
+    },
+    {
+      "name": "a-known-of-stub-keeps-its-base-and-public-fields-every-other-unset",
+      "kind": "resolve",
+      "world": "fen",
+      "reader": "guest",
+      "lens": {
+        "id": "019a7f00-0000-7000-8000-000000000187",
+        "type": "construct",
+        "name": "A lens",
+        "supertype": "Lens",
+        "subtype": "",
+        "characters": [
+          "019a7f00-0000-7000-8000-000000000166"
+        ],
+        "x_lens": {
+          "depth": 0
+        }
+      },
+      "kept": [
+        "019a7f00-0000-7000-8000-000000000166"
+      ],
+      "cut": {},
+      "rows": [
+        {
+          "id": "019a7f00-0000-7000-8000-000000000166",
+          "type": "character",
+          "name": "The stranger",
+          "description": "Seen at the ferry.",
+          "physicality": "Tall, grey-cloaked.",
+          "birth_date": null,
+          "abilities": [],
+          "updated_at": "2026-10-08T12:00:00Z",
+          "known_of": true
+        }
+      ],
+      "note": "The guest holds the stranger only as a stub: the base fields and the type's public fields (physicality) kept, every other field at its unset value (the date null, the link list empty, though the guest sees Ferrying whole), the extension key dropped."
+    },
+    {
+      "name": "an-element-with-no-updated-at-sorts-last-in-its-type",
+      "kind": "resolve",
+      "world": "fen",
+      "reader": "owner",
+      "lens": {
+        "id": "019a7f00-0000-7000-8000-000000000188",
+        "type": "construct",
+        "name": "A lens",
+        "supertype": "Lens",
+        "subtype": "",
+        "characters": [
+          "019a7f00-0000-7000-8000-000000000168"
+        ]
+      },
+      "kept": [
+        "019a7f00-0000-7000-8000-000000000168",
+        "019a7f00-0000-7000-8000-000000000170",
+        "019a7f00-0000-7000-8000-000000000169"
+      ],
+      "cut": {},
+      "note": "Birch carries no updated_at and has the lower id: under rule 5 it sorts after Cedar, which has one, never as now."
+    },
+    {
+      "name": "mail-two-messages-at-one-instant-keep-the-lists-order",
+      "kind": "resolve",
+      "world": "fen",
+      "reader": "contributor",
+      "lens": {
+        "id": "019a7f00-0000-7000-8000-000000000189",
+        "type": "construct",
+        "name": "A lens",
+        "supertype": "Lens",
+        "subtype": "",
+        "x_lens": {
+          "types": [
+            "narrative/message"
+          ],
+          "mail": "unread_full_read_titles"
+        }
+      },
+      "clock": "2026-10-27T12:00:00Z",
+      "kept": [],
+      "cut": {},
+      "mail": {
+        "unread": [
+          "019a7f00-0000-7000-8000-000000000174",
+          "019a7f00-0000-7000-8000-000000000173"
+        ],
+        "read": [],
+        "cut": {},
+        "totals": {
+          "unread": 2,
+          "read": 0
+        }
+      },
+      "note": "Both messages carry the same created_at: they keep the order of the world's list (the message profile's rule), the tide tables first though its id is the higher."
+    },
+    {
+      "name": "a-stored-date-of-an-integral-float-reads-as-its-integer",
+      "kind": "resolve",
+      "world": "fen",
+      "reader": "owner",
+      "lens": {
+        "id": "019a7f00-0000-7000-8000-000000000190",
+        "type": "construct",
+        "name": "A lens",
+        "supertype": "Lens",
+        "subtype": "",
+        "characters": [
+          "019a7f00-0000-7000-8000-000000000175"
+        ],
+        "x_lens": {
+          "depth": 0,
+          "undated": "exclude"
+        }
+      },
+      "kept": [
+        "019a7f00-0000-7000-8000-000000000175"
+      ],
+      "cut": {},
+      "note": "Old Quill's birth_date is written 7.0: an integral float reads as its integer, a date, so undated: exclude does not cut it."
+    },
+    {
+      "name": "hidden: true on a served body and an id in the world's hidden list are the same mark",
+      "kind": "graph",
+      "world": {
+        "elements": [
+          {
+            "id": "c1",
+            "type": "character",
+            "name": "Ada",
+            "friends": [
+              "c2",
+              "c3"
+            ]
+          },
+          {
+            "id": "c2",
+            "type": "character",
+            "name": "Ghost",
+            "hidden": true
+          },
+          {
+            "id": "c3",
+            "type": "character",
+            "name": "Shade"
+          }
+        ],
+        "hidden": [
+          "c3"
+        ]
+      },
+      "reader": {
+        "rung": "owner"
+      },
+      "options": {
+        "hidden": true
+      },
+      "want": {
+        "nodes": [
+          {
+            "id": "c1",
+            "type": "character",
+            "name": "Ada",
+            "family": "blue",
+            "icon": "person"
+          },
+          {
+            "id": "c2",
+            "type": "character",
+            "name": "Ghost",
+            "family": "blue",
+            "icon": "person",
+            "marks": [
+              "hidden"
+            ]
+          },
+          {
+            "id": "c3",
+            "type": "character",
+            "name": "Shade",
+            "family": "blue",
+            "icon": "person",
+            "marks": [
+              "hidden"
+            ]
+          }
+        ],
+        "edges": [
+          {
+            "source": "c1",
+            "field": "friends",
+            "target": "c2",
+            "index": 0
+          },
+          {
+            "source": "c1",
+            "field": "friends",
+            "target": "c3",
+            "index": 1
+          }
+        ],
+        "edges_cut": {},
+        "cut": {},
+        "unreadable": null
+      }
+    },
+    {
+      "name": "an edge to an anchor the reader cannot see is cut as the lens's anchor_not_visible, not not_visible",
+      "kind": "graph",
+      "world": {
+        "elements": [
+          {
+            "id": "c1",
+            "type": "character",
+            "name": "Ada",
+            "friends": [
+              "c2"
+            ]
+          },
+          {
+            "id": "c2",
+            "type": "character",
+            "name": "Ghost",
+            "hidden": true
+          },
+          {
+            "id": "l1",
+            "type": "construct",
+            "name": "Ada's lens",
+            "supertype": "Lens",
+            "characters": [
+              "c1",
+              "c2"
+            ],
+            "x_lens": {
+              "depth": 0
+            }
+          }
+        ]
+      },
+      "reader": {
+        "rung": "owner",
+        "as": {
+          "rung": "contributor"
+        }
+      },
+      "options": {
+        "lens": "l1"
+      },
+      "want": {
+        "nodes": [
+          {
+            "id": "c1",
+            "type": "character",
+            "name": "Ada",
+            "family": "blue",
+            "icon": "person"
+          }
+        ],
+        "edges": [],
+        "edges_cut": {
+          "anchor_not_visible": 1
+        },
+        "cut": {
+          "anchor_not_visible": 1
+        },
+        "unreadable": null
+      }
+    },
+    {
+      "name": "a Pin's generic pair is placement, never an edge; its map link is the edge",
+      "kind": "graph",
+      "world": {
+        "elements": [
+          {
+            "id": "c1",
+            "type": "character",
+            "name": "Ada"
+          },
+          {
+            "id": "m1",
+            "type": "map",
+            "name": "Chart"
+          },
+          {
+            "id": "p1",
+            "type": "pin",
+            "name": "Ada's mark",
+            "map": "m1",
+            "element_type": "character",
+            "element_id": "c1"
+          }
+        ]
+      },
+      "reader": {
+        "rung": "owner"
+      },
+      "options": {
+        "map_space": true
+      },
+      "want": {
+        "nodes": [
+          {
+            "id": "c1",
+            "type": "character",
+            "name": "Ada",
+            "family": "blue",
+            "icon": "person"
+          },
+          {
+            "id": "m1",
+            "type": "map",
+            "name": "Chart",
+            "family": "green",
+            "icon": "map"
+          },
+          {
+            "id": "p1",
+            "type": "pin",
+            "name": "Ada's mark",
+            "family": "green",
+            "icon": "push_pin"
+          }
+        ],
+        "edges": [
+          {
+            "source": "p1",
+            "field": "map",
+            "target": "m1",
+            "index": 0
+          }
+        ],
+        "edges_cut": {},
+        "cut": {},
+        "unreadable": null
+      }
+    },
+    {
+      "name": "a node's name is the stored value, null when absent",
+      "kind": "graph",
+      "world": {
+        "elements": [
+          {
+            "id": "c1",
+            "type": "character"
+          },
+          {
+            "id": "c2",
+            "type": "character",
+            "name": 7
+          }
+        ]
+      },
+      "reader": {
+        "rung": "owner"
+      },
+      "want": {
+        "nodes": [
+          {
+            "id": "c1",
+            "type": "character",
+            "name": null,
+            "family": "blue",
+            "icon": "person"
+          },
+          {
+            "id": "c2",
+            "type": "character",
+            "name": 7,
+            "family": "blue",
+            "icon": "person"
+          }
+        ],
+        "edges": [],
+        "edges_cut": {},
+        "cut": {},
+        "unreadable": null
+      }
+    },
+    {
+      "name": "a contributor's index counts a proposed id its served list keeps",
+      "kind": "graph",
+      "world": {
+        "elements": [
+          {
+            "id": "c1",
+            "type": "character",
+            "name": "Ada",
+            "friends": [
+              "c2",
+              "c3"
+            ]
+          },
+          {
+            "id": "c2",
+            "type": "character",
+            "name": "Maybe",
+            "x_review_proposed": {
+              "by": "m1"
+            }
+          },
+          {
+            "id": "c3",
+            "type": "character",
+            "name": "Cy"
+          }
+        ]
+      },
+      "reader": {
+        "rung": "contributor"
+      },
+      "want": {
+        "nodes": [
+          {
+            "id": "c1",
+            "type": "character",
+            "name": "Ada",
+            "family": "blue",
+            "icon": "person"
+          },
+          {
+            "id": "c3",
+            "type": "character",
+            "name": "Cy",
+            "family": "blue",
+            "icon": "person"
+          }
+        ],
+        "edges": [
+          {
+            "source": "c1",
+            "field": "friends",
+            "target": "c3",
+            "index": 1
+          }
+        ],
+        "edges_cut": {},
+        "cut": {},
+        "unreadable": null
+      }
+    },
+    {
+      "name": "a link to an element of another type draws no edge and is not counted",
+      "kind": "graph",
+      "world": {
+        "elements": [
+          {
+            "id": "c1",
+            "type": "character",
+            "name": "Ada",
+            "friends": [
+              "c2",
+              "z1"
+            ]
+          },
+          {
+            "id": "c2",
+            "type": "character",
+            "name": "Bo"
+          },
+          {
+            "id": "z1",
+            "type": "location",
+            "name": "Keep"
+          }
+        ]
+      },
+      "reader": {
+        "rung": "owner"
+      },
+      "want": {
+        "nodes": [
+          {
+            "id": "c1",
+            "type": "character",
+            "name": "Ada",
+            "family": "blue",
+            "icon": "person"
+          },
+          {
+            "id": "c2",
+            "type": "character",
+            "name": "Bo",
+            "family": "blue",
+            "icon": "person"
+          },
+          {
+            "id": "z1",
+            "type": "location",
+            "name": "Keep",
+            "family": "green",
+            "icon": "castle"
+          }
+        ],
+        "edges": [
+          {
+            "source": "c1",
+            "field": "friends",
+            "target": "c2",
+            "index": 0
+          }
+        ],
+        "edges_cut": {},
+        "cut": {},
+        "unreadable": null
+      }
     }
   ],
   "graph_links": [

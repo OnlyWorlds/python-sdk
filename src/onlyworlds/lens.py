@@ -1,4 +1,4 @@
-"""The lens profile (schema-dist ``profiles/lens.md``, serial 83): a saved way of reading a world.
+"""The lens profile (schema-dist ``profiles/lens.md``, serial 93): a saved way of reading a world.
 
 A lens is a Construct with supertype ``Lens`` (``is_lens``); its links are its anchors, and ``x_lens`` is the
 recipe: how far (``depth``), which types (``types``), how far back (``window``, or ``from`` and ``to``), what
@@ -187,8 +187,11 @@ _STUB_FIELDS: tuple[str, ...] = (
     "image_url",
     "created_at",
     "updated_at",
+    "change_seq",
 )
-"""What a known-of stub serves beside its type's public fields (never a link, never a date)."""
+"""The base fields a known-of stub keeps beside its type's public fields; every other field reads unset."""
+_WHO_FIELDS: tuple[str, ...] = ("created_by", "changed_by", "changed_via", "changed_client")
+"""The server's who and door fields, which a stub serves as null."""
 
 _LINK_FIELDS: dict[str, tuple[tuple[str, bool], ...]] = {
     t: tuple((name, kind == "multi_link") for name, kind in fields.items() if kind in ("single_link", "multi_link"))
@@ -214,10 +217,28 @@ def _whole(value: Any) -> int | None:
 
 
 def _key_whole(value: Any) -> int | None:
-    """A whole-number ``x_lens`` key's value, or ``None``: an int, never a float (``7.0`` is refused as ``7.5`` is,
-    since Python's JSON reader keeps a number's text apart; a date field still reads ``7.0`` whole, ``_whole``) and
-    never a boolean (serial 83)."""
-    return value if isinstance(value, int) and not isinstance(value, bool) else None
+    """A whole-number ``x_lens`` key's value, or ``None``: read as a date is (``_whole``), so a whole float reads
+    as its integer (``7.0`` is 7, in every reader, since a JSON parser with one number type cannot tell the two
+    apart), while a fraction and a boolean are refused."""
+    return _whole(value)
+
+
+def _stub(b: Body, kind: str) -> Body:
+    """A known-of stub, from the body the reader would be served: the base fields and the type's public fields
+    kept, every other field at its unset value (an empty text, an empty list, null; a generic pair ``""`` and null),
+    the who and the door null, no extension key, and ``known_of``."""
+    kinds = FIELD_KINDS.get(kind, {})
+    keep = {*_STUB_FIELDS, *PUBLIC_FIELDS.get(kind, ())}
+    out: Body = {}
+    for k, v in b.items():
+        if k in keep:
+            out[k] = v
+        elif k in kinds:
+            out[k] = "" if kinds[k] == "text" else [] if kinds[k] == "multi_link" else None
+        elif k in _WHO_FIELDS:
+            out[k] = None
+    out["known_of"] = True
+    return out
 
 
 def date_of(element: Any) -> int | None:
@@ -469,14 +490,28 @@ class _Reading:
                     self._in_view.setdefault(t, []).append(eid)
 
     def full_links(self, eid: str) -> list[str]:
-        """The ids the element's owner-served body links to, in the schema's field order."""
+        """The ids the element's owner-served body links to, in the schema's field order, then its generic pair. A
+        link reaches only an element of its field's target type (an id of another type is a data fault, never a
+        hop); a generic pair links only when its type key is one of the 22 slugs, compared exact as stored, and the
+        element is of that type."""
         el = self.by_id[eid]
+        kind = self.type_of[eid]
+        targets = LINK_TARGETS.get(kind, {})
+        pairs = GENERIC_PAIRS.get(kind, ())
+        pair_ids = {id_key for _, id_key in pairs}
         out: list[str] = []
-        for field, many in _LINK_FIELDS.get(self.type_of[eid], ()):
+        for field, many in _LINK_FIELDS.get(kind, ()):
+            if field in pair_ids:
+                continue  # read with its type key, below
             v = el.get(field)
             for t in (v if isinstance(v, list) else []) if many else [v]:
-                if isinstance(t, str) and t != "" and t not in out:
+                if isinstance(t, str) and t in self.type_of and self.type_of[t] == targets.get(field) and t not in out:
                     out.append(t)
+        for type_key, id_key in pairs:
+            of, t = el.get(type_key), el.get(id_key)
+            # One of the 22 slugs, compared exact: type_of holds only the slugs.
+            if isinstance(of, str) and isinstance(t, str) and self.type_of.get(t) == of and t not in out:
+                out.append(t)
         return out
 
     def links(self, eid: str) -> list[str]:
@@ -486,24 +521,19 @@ class _Reading:
         return [t for t in self.full_links(eid) if t in self.view]
 
     def body(self, eid: str) -> Body:
-        """The body this reader is served: the owner's own body untouched; for any other reader, a stub for a
-        known-of element, or the body with every id outside the view left out (``_trim``)."""
+        """The body this reader is served: the owner's own body untouched; for any other reader, the body with
+        every id outside the view left out (``_trim``), and for a known-of element the stub made from it
+        (``_stub``)."""
         cached = self._served.get(eid)
         if cached is not None:
             return cached
-        el = self.by_id[eid]
         kind = self.type_of[eid]
-        b: Body
+        b = copy.deepcopy(self.by_id[eid])
+        b.pop("x_served_trimmed", None)  # keel serves only the mark it adds, never a stored one
+        if self.seen_rung != "owner":
+            self._trim(b, kind)
         if eid in self.stubs:
-            link_names = {f for f, _ in _LINK_FIELDS.get(kind, ())}
-            keep = set(_STUB_FIELDS) | {f for f in PUBLIC_FIELDS.get(kind, ()) if f not in link_names}
-            b = {k: copy.deepcopy(v) for k, v in el.items() if k in keep}
-            b["known_of"] = True
-        else:
-            b = copy.deepcopy(el)
-            b.pop("x_served_trimmed", None)  # keel serves only the mark it adds, never a stored one
-            if self.seen_rung != "owner":
-                self._trim(b, kind)
+            b = _stub(b, kind)
         self._served[eid] = b
         return b
 
@@ -517,8 +547,9 @@ class _Reading:
         """Keel's reading of a body for a reader that is not the owner (``elements/visibility.py`` ``redact``,
         ``elements/serialize.py``), in place: a link to an id outside the view, or to an element that is not the
         field's target type, is left out (a single link reads ``None``, a list keeps its order), a Pin's generic pair
-        whose target is unseen or not of its ``element_type`` reads ``""`` and ``None``, and a lens's ``x_lens.notes``
-        keeps the notes on its served anchors and on other ids the reader sees. Below co-builder and never on the
+        whose target is unseen or not of its ``element_type`` (read exact, nothing folded) reads ``""`` and ``None``,
+        and a lens's ``x_lens.notes`` keeps the notes on its served anchors and on other ids the reader sees. Below
+        co-builder and never on the
         public rung, ``x_served_trimmed`` names what the trim changed the meaning of: a Message's ``characters`` and
         ``narrator``, a lens's anchor fields and, when an anchor's note went with it, ``notes``; names only, never an
         id or a count."""
@@ -526,7 +557,7 @@ class _Reading:
             target, of = b.get(id_key), b.get(type_key)
             if not isinstance(target, str) or target == "":
                 continue
-            if not (isinstance(of, str) and self.served_as(target, _fold(of))):
+            if not (isinstance(of, str) and self.served_as(target, of)):  # the type key exact, nothing folded
                 if type_key in b:
                     b[type_key] = ""
                 b[id_key] = None
@@ -545,7 +576,7 @@ class _Reading:
                 if any(isinstance(t, str) and not self.served_as(t, target_type) for t in v):
                     changed.append(field)
                 b[field] = [t for t in v if isinstance(t, str) and self.served_as(t, target_type)]
-            elif isinstance(v, str) and not self.served_as(v, target_type):
+            elif isinstance(v, str) and v != "" and not self.served_as(v, target_type):  # "" names no id: as stored
                 b[field] = None
                 changed.append(field)
         named: tuple[str, ...] = _ANCHOR_FIELDS if lens else _MESSAGE_TRIMMED if is_message(b) else ()
@@ -696,11 +727,13 @@ def _anchors_of(lens: Mapping[str, Any], r: _Reading) -> tuple[list[str], list[s
 
     A child is a lens in ``constructs`` the reader sees whole; one it knows only as a stub serves no recipe
     and no links, so it is an anchor the reader cannot see (``unseen``), never entered (keel's ``_anchors``).
+    An id that names no element of the world, or an element of another type than its field's, is one too.
     """
     anchors: list[str] = []
     children: list[str] = []
     unseen: set[str] = set()
     seen: set[str] = set()
+    targets = LINK_TARGETS["construct"]
     for field in _ANCHOR_FIELDS:
         v = lens.get(field)
         if not isinstance(v, list):
@@ -713,6 +746,8 @@ def _anchors_of(lens: Mapping[str, Any], r: _Reading) -> tuple[list[str], list[s
                 if i not in r.stubs:
                     children.append(i)
                     continue
+                unseen.add(i)
+            if r.type_of.get(i) != targets[field]:
                 unseen.add(i)
             anchors.append(i)
     mark = lens.get("x_served_trimmed")
@@ -744,7 +779,7 @@ def _resolve_one(
     listed: list[str] = []
     frontier: list[str] = []
     for eid in anchors:
-        if eid in visited or eid not in r.by_id:
+        if eid in visited:
             continue
         if eid not in r.view or eid in unseen:
             add_cut(eid, "anchor_not_visible")
@@ -896,15 +931,18 @@ def resolve_lens(
     rule's thirty days and ``changed_within`` (absent: the machine's time), never the world's now.
 
     The rules, in short: visibility first (a hidden or proposed element is not there to hop through; a known-of
-    stub is kept as served and nothing hops out of it); a hop reaches both ways, and on through a Relation to its
-    parties; an umbrella enters each child lens once; a hop never crosses a room element; a reading aid (the
-    charter, its guide, a domain: ``is_charter_element``) a hop reaches is kept, and hopped on from, only when
-    ``types`` names its pair, while one the lens names as an anchor is kept and followed; anchors first in link
-    order, then by type in the schema's order, newest first, then by id; an anchor the reader cannot see is
-    skipped; a template resolves to nothing; the fence is ``as_of`` on each element's own date; ``changed_within``
-    cuts what a hop or a filter reaches that changed longer ago than that many days before ``clock`` (``stale``),
-    never an anchor. A value outside the profile's table makes the lens unreadable: ``unreadable`` names the key and
-    nothing is resolved. The npm SDK's ``resolveLens`` gives the same answer on the same input."""
+    stub is kept as served, its base and public fields with every other field unset, and nothing hops out of it);
+    a hop reaches both ways, and on through a Relation to its parties, and a link reaches only an element of its
+    field's target type (a generic pair only by one of the 22 slugs, compared exact); an umbrella enters each child
+    lens once; a hop never crosses a room element; a reading aid (the charter, its guide, a domain:
+    ``is_charter_element``) a hop reaches is kept, and hopped on from, only when ``types`` names its pair, while one
+    the lens names as an anchor is kept and followed; anchors first in link order, then by type in the schema's
+    order, newest first, then by id; an anchor the reader cannot see (one of no element, or of another type than
+    its field's, among them) is never kept, counted for the owner as ``anchor_not_visible``; a template resolves to
+    nothing; the fence is ``as_of`` on each element's own date; ``changed_within`` cuts what a hop or a filter
+    reaches that changed longer ago than that many days before ``clock`` (``stale``), never an anchor. A value
+    outside the profile's table makes the lens unreadable: ``unreadable`` names the key and nothing is resolved.
+    The npm SDK's ``resolveLens`` gives the same answer on the same input."""
     if not isinstance(world, Mapping) or not isinstance(world.get("elements"), list):
         raise TypeError("resolve_lens: world is a mapping with an elements list.")
     _check_reader(reader, "resolve_lens: reader")

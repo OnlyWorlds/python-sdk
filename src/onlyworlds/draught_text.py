@@ -226,7 +226,11 @@ def draught_text(draught: Mapping[str, Any]) -> str:
     if now is not None:
         frame += f" (the world's now: {moment(now)})"
     frame += "."
-    if mode == "voice":
+    # The public reader reads as itself in either mode, so ``reader`` (the rung the packet was built through)
+    # names it over ``mode``, which stays what was asked; a packet without ``reader`` reads by ``mode`` alone.
+    if d.get("reader") == "public":
+        frame += " Read as the public reader."
+    elif mode == "voice":
         frame += " Read as the Character's own view."
     elif mode == "act":
         frame += " Read as the caller's view."

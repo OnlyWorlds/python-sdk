@@ -82,3 +82,28 @@ def test_the_float_case_holds_its_floats_as_a_file_writes_them() -> None:
 def test_a_draught_that_is_not_a_mapping_or_has_no_world_mapping_is_a_type_error(bad: Any) -> None:
     with pytest.raises(TypeError):
         draught_text(bad)
+
+
+@pytest.mark.parametrize(
+    ("mode", "reader", "line"),
+    [
+        ("voice", "public", " Read as the public reader."),
+        ("act", "public", " Read as the public reader."),
+        ("voice", "owner", " Read as the Character's own view."),
+        ("act", "contributor", " Read as the caller's view."),
+        ("voice", None, " Read as the Character's own view."),  # a packet from before the API served reader
+    ],
+)
+def test_the_frame_line_names_the_reader_public_over_mode(mode: str, reader: str | None, line: str) -> None:
+    packet: dict[str, Any] = {
+        "world": {"id": "w", "name": "W", "description": ""},
+        "calendar": {},
+        "as_of": None,
+        "now": None,
+        "mode": mode,
+        "policy": {},
+    }
+    if reader is not None:
+        packet["reader"] = reader
+    frame = next(row for row in draught_text(packet).split("\n") if row.startswith("What the record holds"))
+    assert frame.endswith(line), frame

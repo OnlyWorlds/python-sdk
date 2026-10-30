@@ -11,7 +11,7 @@ from __future__ import annotations
 from collections.abc import Callable, Mapping
 from typing import Any, Literal, NotRequired, TypedDict
 
-from ._schema import ELEMENT_GROUPS, ELEMENT_ICONS
+from ._schema import ELEMENT_GROUPS, ELEMENT_ICONS, GENERIC_PAIRS, LINK_TARGETS
 from .lens import (
     _CUT_REASONS,
     _LINK_FIELDS,
@@ -35,7 +35,7 @@ class GraphNode(TypedDict):
     id: str
     #: The element's type, as its slug (``character``).
     type: str
-    #: The element's name, or ``None`` when it has none.
+    #: The element's name as stored, nothing invented; ``None`` when it has none.
     name: str | None
     #: The type's colour group, its colour word (``blue``, ``green``, ``pink`` or ``amber``) from the distribution's
     #: presentation defaults: a key for drawing the 22, never a label. The key keeps the profile's name.
@@ -132,7 +132,9 @@ def world_graph(
     to an element that is not a node is counted in ``edges_cut`` by that element's reason: the lens's cut reason,
     else, with a lens, ``outside_lens`` for one the reader sees that the lens neither kept nor cut (counted for every
     rung); one of the kinds out by default without a lens; and ``not_visible`` for one the reader does not see. A link
-    to an id that is not in the world is left out and not counted.
+    to an id that is not in the world, or to an element of another type than its field's target, is left out and not
+    counted. A Pin's generic pair (``element_type``, ``element_id``) is its placement, never an edge; its ``map``
+    link is the edge. A node's ``name`` is the stored value, ``None`` when absent.
 
     ``hidden`` or ``proposed`` from a reader that is not the owner, or any flag from a public reader, raises
     ``ValueError`` naming the flag before anything is read. An owner reading ``as`` another reader is judged by that
@@ -224,11 +226,10 @@ def world_graph(
     nodes: list[GraphNode] = []
     for eid in ids:
         kind = r.type_of[eid]
-        name = r.by_id[eid].get("name")
         node: GraphNode = {
             "id": eid,
             "type": kind,
-            "name": name if isinstance(name, str) else None,
+            "name": r.by_id[eid].get("name"),
             "family": ELEMENT_GROUPS[kind],
             "icon": ELEMENT_ICONS[kind],
         }
@@ -243,9 +244,11 @@ def world_graph(
     edges: list[GraphEdge] = []
     cut_edges: dict[str, int] = {}
 
-    def visit(source: str, field: str, target: Any, index: int) -> None:
+    def visit(source: str, field: str, target: Any, index: int, target_type: str | None) -> None:
         if not isinstance(target, str) or target not in r.by_id:
             return
+        if target_type is not None and r.type_of[target] != target_type:
+            return  # a link to an element of another type than its field's: a data fault, no edge and no count
         if target in node_ids:
             edges.append({"source": source, "field": field, "target": target, "index": index})
             return
@@ -257,14 +260,20 @@ def world_graph(
         if source in r.stubs:
             continue
         el = r.by_id[source]
-        # A schema link is served whole to the owner; any other view is served it less the ids outside that view.
-        for field, many in _LINK_FIELDS.get(r.type_of[source], ()):
+        kind = r.type_of[source]
+        targets = LINK_TARGETS.get(kind, {})
+        pair_ids = {id_key for _, id_key in GENERIC_PAIRS.get(kind, ())}
+        # A schema link is served whole to the owner; any other view is served it less the ids that view leaves
+        # out (a proposed id it would see stays, and holds its place).
+        for field, many in _LINK_FIELDS.get(kind, ()):
+            if field in pair_ids:
+                continue  # a generic pair (a Pin's element_type and element_id) is placement, never an edge
             v = el.get(field)
             entries: list[Any] = (v if isinstance(v, list) else []) if many else [v]
             served = 0
             for i, t in enumerate(entries):
-                in_served = seen_owner or (isinstance(t, str) and t in r.view)
-                visit(source, field, t, i if seen_owner else served)
+                in_served = seen_owner or (isinstance(t, str) and r.served_as(t, targets.get(field)))
+                visit(source, field, t, i if seen_owner else served, targets.get(field))
                 if in_served:
                     served += 1
         # A declared extension link is served as stored to every reader.
@@ -272,7 +281,7 @@ def world_graph(
             v = el.get(field)
             if isinstance(v, list):
                 for i, t in enumerate(v):
-                    visit(source, field, t, i)
+                    visit(source, field, t, i, None)
     edges.sort(key=lambda e: (e["source"], e["field"], e["index"]))
     return {
         "nodes": nodes,

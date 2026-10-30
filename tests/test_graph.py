@@ -137,7 +137,7 @@ def test_the_fixtures_graph_cases() -> None:
     for line in wrong:
         print(line)
     assert wrong == []
-    assert len(cases) == 39, f"the fixture holds {len(cases)} graph cases, serial 88 has 39"
+    assert len(cases) == 45, f"the fixture holds {len(cases)} graph cases, serial 93 has 45"
 
 
 def test_a_node_s_family_is_its_type_s_colour_word() -> None:

@@ -4,6 +4,17 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+## 0.93.0 (2026-10-30)
+
+- **The lens readers follow schema-dist serial 93** (`v0.33.0-dist.93`), whose nineteen new cases replay in `resolve_lens` and `world_graph`. Five readings change for every caller:
+  - **A link reaches only an element of its field's target type.** An id naming an element of another type reaches nothing (a data fault, not a hop), draws no edge and takes no place in a reader's served list. A generic pair (a Pin's `element_type` and `element_id`) links only when its type key is exactly one of the 22 slugs as stored, nothing trimmed or folded, and in a graph it is placement, never an edge; the Pin's `map` link is the edge.
+  - **An anchor the reader cannot see is counted.** An anchor id that names no element of the world, or an element of another type than its field's, is now counted for the owner as `anchor_not_visible`; it was skipped silently.
+  - **A known-of stub keeps its base and public fields, every other field unset.** The stub is made from the body the reader is served: `change_seq` joins the base fields, a public link (a Character's `species`) is kept as trimmed for that reader, every other field of the type it holds is at its unset value (`""`, `None` or `[]`; the who and door fields `None`), and no extension key is kept.
+  - **A graph node's name is the stored value**, `None` when absent, and an edge's `index` is the target's place in the list as served, which keeps a proposed id the reader's rung sees.
+  - **A whole float reads whole as an `x_lens` key value**: `depth: 7.0` is 7, as it always was in the npm SDK, where JavaScript cannot tell the two apart; a fraction and a boolean are still refused.
+- **An empty single link is served as stored.** A lens row served to a reader below the owner turned a single link stored as `""` into `None` and counted the field as trimmed, so a Message whose `narrator` was `""` carried `x_served_trimmed: ["narrator"]`, a hidden sender where nothing was hidden. `""` names no id, so it is served as `""` and never marked, as the API and the npm SDK serve it. Found by comparing the two packages' readers on 7,000 random worlds, which agree on every one since.
+- **`draught_text` names the public reader.** The API reads a public draught (keyless, or an account with no access in the world) as the public reader in either mode, and a public `voice` packet's text said "Read as the Character's own view." It now says "Read as the public reader." whenever the packet's `reader` is `public` (the rung the API names beside `mode` on every draught since 2026-10-30); every other packet, and one without `reader`, reads by `mode` as before. The shared draught-text fixture, vendored from the npm SDK, gains the case (`public-reader`, 51 cases).
+
 ## 0.92.0 (2026-10-30)
 
 - **A Zone is a node in `world_graph` by default.** schema-dist serial 92 (`v0.33.0-dist.92`) rules that a Zone is not map space: by its definition it is content that gains spatial presence through linked Markers, so the Markers are the geometry and the Zone is an element like any other, in a public reader's graph too. Without a lens, Zones are now nodes and their links edges; Maps, Pins and Markers stay out until `map_space=True` brings them back, and the `map_space` count no longer includes Zones. The fixture's eight graph cases over the shared world replay as the serial gives them. A graph read through a lens is unchanged: its nodes are still exactly what the lens kept.

@@ -25,10 +25,11 @@ from onlyworlds import (
     resolve_lens,
     world_graph,
 )
+from onlyworlds._schema import LINK_TARGETS
 
 REPO = Path(__file__).resolve().parent.parent
 FIXTURE = REPO / "codegen" / "schema-dist" / "profiles" / "lens.fixture.json"
-KINDS = {"shape": 6, "keys": 25, "resolve": 75, "invariant": 4, "uses": 4, "graph": 39}
+KINDS = {"shape": 6, "keys": 25, "resolve": 86, "invariant": 4, "uses": 5, "graph": 45}
 OWNER = {"rung": "owner"}
 
 
@@ -155,7 +156,7 @@ def test_every_fixture_case_is_answered_as_the_fixture_says() -> None:
     for line in wrong:
         print(line)
     assert wrong == []
-    assert len(cases) == 153, f"the fixture holds {len(cases)} cases, serial 88 has 153"
+    assert len(cases) == 171, f"the fixture holds {len(cases)} cases, serial 93 has 171"
     assert Counter(c["kind"] for c in cases) == KINDS
 
 
@@ -171,9 +172,12 @@ def test_the_fixtures_tables_read_back_through_the_reader() -> None:
     assert doc["pair"] == {"type": "construct", "supertype": "Lens"}
     assert is_template({"type": "construct", "supertype": "Lens", "subtype": doc["template_subtype"]})
     assert doc["field"] == "x_lens"
-    # Anchor fields: one element per field, linked in the reverse order; the kept order is the field order.
+    # Anchor fields: one element per field, of the field's target type, linked in the reverse order; the kept order
+    # is the field order.
     fields: list[str] = doc["anchor_fields"]
-    elements: list[dict[str, Any]] = [{"id": _id(i + 1), "type": "object", "name": f} for i, f in enumerate(fields)]
+    elements: list[dict[str, Any]] = [
+        {"id": _id(i + 1), "type": LINK_TARGETS["construct"][f], "name": f} for i, f in enumerate(fields)
+    ]
     lens: dict[str, Any] = {**LENS, "x_lens": {"depth": 0}}
     for f in reversed(fields):
         lens[f] = [_id(fields.index(f) + 1)]
@@ -239,8 +243,8 @@ def test_the_fixtures_tables_read_back_through_the_reader() -> None:
     assert filtered["rows"][0] == many[0]
     assert filtered["mail"] is None
     chain = [
-        {"id": _id(1), "type": "object", "name": "a", "materials": [_id(2)]},
-        {"id": _id(2), "type": "object", "name": "b", "materials": [_id(3)]},
+        {"id": _id(1), "type": "object", "name": "a", "parent_object": _id(2)},
+        {"id": _id(2), "type": "object", "name": "b", "parent_object": _id(3)},
         {"id": _id(3), "type": "object", "name": "c"},
     ]
     assert resolve_lens({"elements": chain}, {**LENS, "objects": [_id(1)]}, OWNER)["kept"] == [_id(1), _id(2)]
@@ -453,6 +457,76 @@ def test_a_lens_a_guest_knows_only_as_a_stub_reads_as_nothing() -> None:
     assert resolve_lens(world, "L", whole)["kept"] == ["c1", "c2"]
 
 
+def test_an_anchor_of_another_type_than_its_field_is_one_the_reader_cannot_see() -> None:
+    """lens.md (serial 93): an anchor id naming an element of another type than its field's is counted for the owner
+    as ``anchor_not_visible``, as a dangling one is; it is never kept, and nothing hops from it."""
+    world = {
+        "elements": [
+            {"id": "z1", "type": "location", "name": "Keep", "buildings": ["o1"]},
+            {"id": "o1", "type": "object", "name": "Lamp"},
+        ]
+    }
+    lens = _lens_on({"characters": ["z1"]})
+    owner = resolve_lens(world, lens, OWNER)
+    assert (owner["kept"], owner["cut"]) == ([], {"anchor_not_visible": 1})
+    contributor = resolve_lens(world, lens, {"rung": "contributor"})
+    assert (contributor["kept"], contributor["cut"]) == ([], {})
+    assert resolve_lens(world, _lens_on({"locations": ["z1"]}), OWNER)["kept"] == ["z1", "o1"]
+
+
+def test_a_served_pins_pair_reads_its_type_key_exact() -> None:
+    """lens.md (serial 93): a generic pair links only by one of the 22 slugs, compared exact as stored, so a reader
+    below the owner is served a pair whose key is ``Character`` as ``""`` and null; ``character`` stays whole."""
+    world = {
+        "elements": [
+            {"id": "c1", "type": "character", "name": "Ada"},
+            {"id": "p1", "type": "pin", "name": "exact", "element_type": "character", "element_id": "c1"},
+            {"id": "p2", "type": "pin", "name": "cased", "element_type": "Character", "element_id": "c1"},
+        ]
+    }
+    guest = {"rung": "guest", "whole": ["c1", "p1", "p2"], "known_of": []}
+    for reader in ({"rung": "contributor"}, guest):
+        rows = resolve_lens(world, _lens_on({}, {"types": ["pin"]}), reader)["rows"]
+        assert [(r["element_type"], r["element_id"]) for r in rows] == [("character", "c1"), ("", None)], reader
+
+
+def test_an_empty_single_link_is_served_as_stored_and_never_marked_trimmed() -> None:
+    """An empty single link names no id, so a reader below the owner is served it as stored, ``""``, and the field
+    is never counted as trimmed: a Message's ``narrator`` of ``""`` gets no ``x_served_trimmed`` (keel's redact
+    leaves a falsy value alone; the npm SDK's trim does too)."""
+    world = {
+        "elements": [
+            {"id": "o1", "type": "object", "name": "Cup", "language": ""},
+            {"id": "c1", "type": "character", "name": "Ada"},
+            {
+                "id": "m1",
+                "type": "narrative",
+                "supertype": "Message",
+                "name": "Hi",
+                "narrator": "",
+                "characters": ["c1"],
+            },
+        ]
+    }
+    rows = resolve_lens(
+        world, _lens_on({"objects": ["o1"], "narratives": ["m1"]}, {"depth": 0}), {"rung": "contributor"}
+    )
+    by_id = {r["id"]: r for r in rows["rows"]}
+    assert by_id["o1"]["language"] == ""
+    assert by_id["m1"]["narrator"] == ""
+    assert "x_served_trimmed" not in by_id["m1"]
+
+
+def test_a_stub_keeps_the_feeds_position() -> None:
+    """A known-of stub keeps ``change_seq`` beside the base fields (the feed's position, not content)."""
+    world = {"elements": [{"id": "c1", "type": "character", "name": "Ada", "change_seq": 7, "background": "x"}]}
+    guest = {"rung": "guest", "whole": [], "known_of": ["c1"]}
+    rows = resolve_lens(world, _lens_on({"characters": ["c1"]}, {"depth": 0}), guest)["rows"]
+    assert rows == [
+        {"id": "c1", "type": "character", "name": "Ada", "change_seq": 7, "background": "", "known_of": True}
+    ]
+
+
 def test_resolve_lens_refuses_what_is_not_a_reading() -> None:
     with pytest.raises(TypeError):
         resolve_lens({"elements": []}, LENS, {"rung": "admin"})
@@ -473,15 +547,20 @@ def test_resolve_lens_refuses_what_is_not_a_reading() -> None:
     assert resolve_lens(world, LENS["id"], OWNER)["kept"] == [_id(1)]
 
 
-def test_a_whole_number_key_refuses_a_float_and_a_date_field_reads_one_whole() -> None:
-    """lens.md (serial 83): a fraction is refused everywhere, an integral float where a reader sees the number's
-    text, as Python's JSON reader does; only x_lens's keys are held to it."""
-    for key, value in [("depth", 1.0), ("budget", 7.0), ("window", 3.0), ("changed_within", 2.0), ("budget", True)]:
+def test_a_whole_number_key_reads_a_whole_float_and_a_date_field_reads_one_whole() -> None:
+    """lens.md (serial 93): a whole float reads as its integer in every reader (``7.0`` is 7), a fraction and a
+    boolean are refused, in an x_lens key as in a date field."""
+    for key, value in [("depth", 1.5), ("budget", 7.5), ("window", 3.5), ("changed_within", 2.5), ("budget", True)]:
         got = resolve_lens({"elements": []}, {**LENS, "x_lens": {key: value}}, OWNER)
         assert got["unreadable"] == key, (key, value)
+    for key, value in [("depth", 1.0), ("budget", 7.0), ("window", 3.0), ("changed_within", 2.0)]:
+        got = resolve_lens({"elements": []}, {**LENS, "x_lens": {key: value}}, OWNER)
+        assert got["unreadable"] is None, (key, value)
     raw = json.loads('{"from": 1.0, "to": 5}')
-    assert resolve_lens({"elements": []}, {**LENS, "x_lens": raw}, OWNER)["unreadable"] == "from"
-    assert resolve_lens({"elements": []}, {**LENS, "x_lens": {"budget": 7}}, OWNER)["unreadable"] is None
+    assert resolve_lens({"elements": []}, {**LENS, "x_lens": raw}, OWNER)["unreadable"] is None
+    # A budget of 7.0 keeps seven, as 7 does.
+    many = {"elements": [{"id": _id(10 + i), "type": "object", "name": f"o{i}"} for i in range(9)]}
+    assert len(resolve_lens(many, {**LENS, "x_lens": {"budget": 7.0}}, OWNER)["kept"]) == 7
     # A date field reading 7.0 is the whole number 7: fenced after an as_of of 6, kept at 7.
     world = {"elements": [{"id": _id(1), "type": "event", "name": "e", "start_date": 7.0}]}
     assert resolve_lens(world, LENS, OWNER, as_of=6)["cut"] == {"after_as_of": 1}
