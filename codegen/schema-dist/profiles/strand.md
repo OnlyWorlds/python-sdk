@@ -1,0 +1,44 @@
+# Convention profile: the strand
+
+**What it is.** A strand is a world in miniature: one story, not THE story, small enough to hold in one look and built from four kinds the standard already has. A Narrative (the story) contains an Event (the happening), which took place at a Location (where, then); the story has a protagonist Character (the hero), who is at a Location now (the same place or another). Five slots on four links, every one an existing field; the one new thing is a pointer saying which story the world's strand is. A world may have one strand or none. An empty strand is a world that has not started its story yet, never a broken one.
+
+**The four links** (each an existing field; the strand reads these and no others):
+
+| Slot | Read from | Field kind |
+|---|---|---|
+| the story | the World's mark names it | a Narrative |
+| the happening | the mark names it; it must be in the story's `events` | a Narrative's multi-link to Events |
+| the place, then | the mark names it; it must be in the happening's `locations` | an Event's multi-link to Locations |
+| the hero | the story's `protagonist` | a Narrative's single link to a Character |
+| the place, now | the hero's `location` | a Character's single link to a Location |
+
+The hero is named on the Narrative, nowhere else. The happening does not have to be about the hero: it is an event in the story. A writer may also add the hero to the Event's `characters` (the mini web is richer for it) and the Event's place to the Narrative's `locations` (where the story is set, which is wider and often many places); the strand requires neither and reads neither. Then and now are two places because the standard already keeps them apart: an Event's places are where it happened, a Character's location is where they are. Neither fills in for the other.
+
+**The mark.** Profile `strand`, one extension field on the World: `x_strand`, an object with three ids:
+
+    "x_strand": {"narrative": "<id>", "event": "<id>", "location": "<id>"}
+
+It names what cannot be reached through a single link (the story, and one of the story's events, and one of the event's places); the hero and now derive from single fields. Three ids and not one, because a multi-link's order is the writer's and a reader's view may strip a list: "the first event" could be a different happening for a guest than for the owner, and a strand is the same strand for everyone who can see it. Any other shape of the value (a bare string, a missing or non-string member) reads as no mark; an id that names no element in the reader's view is simply an empty slot, so a reader needs no format test (the doctor names a malformed id, rule 4). The value is an extension field: a tool that does not understand it carries it byte for byte (folder spec §3.3).
+
+**The reading.** `strandOf(world, reader)`, one reader in the SDK and the Python package from the fixture beside this page (the charter reader's shape: the elements inside the world, the view resolved through the lens profile's one reader, never a second copy of its rule), answers six slots as `reader` sees the world:
+
+1. `narrative`: the element the mark names, when it is a Narrative in the reader's view; else null, and then every other slot is null too (a strand hangs off its story). A reader who knows the story only as a stub (a guest's `known_of`) fills this slot and no other: a stub serves no `events` and no `protagonist`.
+2. `event`: the element the mark names, when it is an Event in the reader's view AND its id is in the narrative's `events`; else null.
+3. `location`: the element the mark names, when it is a Location in the reader's view AND its id is in the event's `locations`; null when the event is null or the test fails. Where it happened, then.
+4. `character`: the narrative's `protagonist`, when set and in the reader's view; else null.
+5. `now`: the character's `location`, when set and in the reader's view; null when the character is null. Where the hero is, now.
+6. `same`: true when `now` and `location` are both set and equal, false when both set and different, null otherwise.
+
+A slot holds only its own kind: an id of another kind, in the mark or in a parent's list, leaves the slot empty; `same` compares ids, never names (two places may share a name). Each filled slot is `{id, name}`. An empty slot is what there is to do: a tool shows it as a slot, never as an error, and never fills one slot from another (no fallback from the Event's `characters` to the hero, none from `now` to `location`). No date is required and none is read: a dated Event shows up on the timeline that already exists.
+
+**What a writer must do.** The owner or a co-builder writes the mark on the World, three ids each the element's own, with the four links already in place or written in the same act; the five slots in the person's own order (story first, or hero first: the data has no order). A slot press that fills the hero writes `protagonist`; a drag never does (the pairs table offers no drag onto `protagonist`), so the strand's writes are its own five, one field each. Choosing a strand for a world that has Narratives is the owner's act, offered once and never made for them; a tool never picks one by itself.
+
+**The rule for readers.**
+1. The server serves `x_strand` to a reader only when the element it names is in that reader's view, in any shape the value takes (an object's `narrative` member, or a bare string): a known-of stub is in view; a stranger or guest who may not see the story gets no key and so no id. A value that names no element in the world is served as stored to every reader, since it leaks nothing; the owner and a co-builder always read the key as stored. A reader that is handed a key it cannot resolve (a folder, an export) answers an empty strand and leaks nothing.
+2. The strand is a front-door aid: a tool's home for a world shows it first when it is set, and an AI's first read of a world may carry it beside the Charter, the Guide and the Domains (the charter profile), as "the story this world is about". It is never a gate: a world with no strand opens as it does today.
+3. A lens, a graph, a list or a count treats the five elements as the ordinary elements they are; the strand marks nothing on them.
+4. A doctor reports, scoped and by name: a mark whose shape is not three ids, or whose id is in no known format; a named id that is not of its kind, not in the world, or not in its parent's list; a hero with no `location`; the same id in two slots. None of these is an error to a person; each is the next thing to make.
+
+**Where it shows.** Three surfaces draw the same five slots: a tool's home for a world (Atlas Home: the slots as the first steps of an empty world, the picture beside them as the world grows), the site's Make door (what a visitor makes before an account is a strand, written with the mark at "keep this world"), and the Constellation's Create door (the same four elements, the same four links). The packages read it; keel serves the key by rule 1. A public page's hero drawn from the strand, a pack shipping a strand's shape, an import proposing one from the most-linked Narrative: later, not now.
+
+**Ruled**: Skeld, 2026-10-30: the concept Titus's (a miniature of a world; a story, not THE story; story first; then and now kept apart), the links read off the standard's YAML files, the three-id mark on a tool author's question about list order, the no-fallback reading; serial 98, with the fixture beside this page.
