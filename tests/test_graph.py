@@ -226,6 +226,29 @@ def test_the_fixtures_graph_tables_read_back_through_the_reader() -> None:
     assert world_graph(other, {"rung": "owner"})["edges"] == []
 
 
+def test_an_edge_to_an_element_the_lens_cut_as_a_wrongly_typed_anchor_reads_the_lens_s_reason() -> None:
+    """The lens profile (serial 94): an Object anchored under ``characters`` is cut as an anchor the reader cannot
+    see, and an edge to it reads the lens's own reason for that element, ``anchor_not_visible`` for the owner, never
+    ``outside_lens``. The npm SDK holds the same case."""
+    world = {
+        "elements": [
+            {"id": "c1", "type": "character", "name": "Ada", "objects": ["o1"]},
+            {"id": "o1", "type": "object", "name": "Lamp"},
+        ]
+    }
+    lens = {
+        "id": "L",
+        "type": "construct",
+        "name": "L",
+        "supertype": "Lens",
+        "characters": ["c1", "o1"],
+        "x_lens": {"depth": 0},
+    }
+    g = world_graph(world, {"rung": "owner"}, lens=lens)
+    assert [n["id"] for n in g["nodes"]] == ["c1"]
+    assert (g["edges"], g["edges_cut"], g["cut"]) == ([], {"anchor_not_visible": 1}, {"anchor_not_visible": 1})
+
+
 class _Unread(list[Any]):
     """An elements list that fails the moment anything iterates it."""
 

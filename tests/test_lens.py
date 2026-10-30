@@ -566,6 +566,37 @@ def test_only_a_served_body_of_a_hidden_element_carries_a_hidden_key() -> None:
     assert json.dumps(world, sort_keys=True) == before
 
 
+def test_an_id_an_umbrella_and_its_child_anchor_under_two_wrong_types_is_one_element_counted_once() -> None:
+    """lens.md (serial 94): an anchor reaches an element only through its field's target type and the id; the cut
+    counts each element once, under its first reason. A Location the umbrella anchors under ``characters`` and its
+    child under ``objects`` is one element the reader cannot see: ``anchor_not_visible`` once. The npm SDK holds the
+    same case."""
+    child = {**LENS, "id": _id(2), "name": "Child", "objects": [_id(1)], "x_lens": {"depth": 0}}
+    umbrella = {**LENS, "id": _id(3), "name": "Umbrella", "characters": [_id(1)], "constructs": [_id(2)]}
+    world = {"elements": [{"id": _id(1), "type": "location", "name": "Keep"}, child, umbrella]}
+    got = resolve_lens(world, _id(3), OWNER)
+    assert (got["kept"], got["cut"]) == ([], {"anchor_not_visible": 1})
+
+
+def test_an_id_anchored_under_the_wrong_type_and_under_its_own_is_kept_and_never_cut() -> None:
+    """lens.md (serial 94): an Object the umbrella anchors under ``characters`` and its child under ``objects`` is
+    kept by the child, and a kept element is never also counted as cut. Within one lens the id is met once, under
+    the first field in the anchor fields' order (keel elements/lens.py:604-609): with ``characters`` first it is
+    met as no Character, so it is cut and not kept (:613-619); with ``objects`` first it is kept. The npm SDK holds
+    the same cases."""
+    child = {**LENS, "id": _id(2), "name": "Child", "objects": [_id(1)], "x_lens": {"depth": 0}}
+    umbrella = {**LENS, "id": _id(3), "name": "Umbrella", "characters": [_id(1)], "constructs": [_id(2)]}
+    world = {"elements": [{"id": _id(1), "type": "object", "name": "Lamp"}, child, umbrella]}
+    got = resolve_lens(world, _id(3), OWNER)
+    assert (got["kept"], got["cut"]) == ([_id(1)], {})
+    wrong_first = resolve_lens(
+        world, {**LENS, "characters": [_id(1)], "objects": [_id(1)], "x_lens": {"depth": 0}}, OWNER
+    )
+    assert (wrong_first["kept"], wrong_first["cut"]) == ([], {"anchor_not_visible": 1})
+    own_first = resolve_lens(world, {**LENS, "objects": [_id(1)], "locations": [_id(1)], "x_lens": {"depth": 0}}, OWNER)
+    assert (own_first["kept"], own_first["cut"]) == ([_id(1)], {})
+
+
 def test_a_served_pins_pair_reads_its_type_key_exact() -> None:
     """lens.md (serial 93): a generic pair links only by one of the 22 slugs, compared exact as stored, so a reader
     below the owner is served a pair whose key is ``Character`` as ``""`` and null; ``character`` stays whole."""
