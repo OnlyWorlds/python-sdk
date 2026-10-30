@@ -779,10 +779,11 @@ def _resolve_one(
     listed: list[str] = []
     frontier: list[str] = []
     for eid in anchors:
-        if eid in visited:
-            continue
+        # Rule 6 before the visited check: an anchor the reader cannot see is counted, the lens's own id included.
         if eid not in r.view or eid in unseen:
             add_cut(eid, "anchor_not_visible")
+            continue
+        if eid in visited:
             continue
         why = r.fence_cut(eid, recipe)
         if why != "after_as_of":
