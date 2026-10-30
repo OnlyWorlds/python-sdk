@@ -476,13 +476,20 @@ def test_an_anchor_of_another_type_than_its_field_is_one_the_reader_cannot_see()
 
 def test_an_anchor_the_reader_cannot_see_is_counted_before_the_visited_check() -> None:
     """lens.md rule 6 (serial 94): an anchor the reader cannot see is counted for the owner whatever it names, the
-    lens itself included. A hidden lens in its own constructs, read as a body through a contributor's view, and a
-    visible lens under a field of another type than its own; the npm SDK holds the same two."""
+    lens itself included, for any anchor. A hidden lens in its own constructs, read as a body through a
+    contributor's view; a visible lens under a field of another type than its own; a child lens pointing back at
+    its hidden umbrella. The npm SDK holds the same three."""
     umbrella = {**LENS, "hidden": True, "constructs": [LENS["id"]], "x_lens": {}}
     as_contributor = {"rung": "owner", "as": {"rung": "contributor"}}
     assert resolve_lens({"elements": [umbrella]}, umbrella, as_contributor)["cut"] == {"anchor_not_visible": 1}
     misfiled = {**LENS, "characters": [LENS["id"]], "x_lens": {"depth": 0}}
     assert resolve_lens({"elements": [misfiled]}, LENS["id"], OWNER)["cut"] == {"anchor_not_visible": 1}
+    ancestor = {**LENS, "hidden": True, "constructs": [_id(901)], "x_lens": {}}
+    child = {"id": _id(901), "type": "construct", "name": "C", "supertype": "Lens", "constructs": [LENS["id"]],
+             "objects": [_id(1)], "x_lens": {"depth": 0}}
+    back = resolve_lens({"elements": [ancestor, child, {"id": _id(1), "type": "object", "name": "o"}]}, ancestor,
+                        as_contributor)
+    assert (back["kept"], back["cut"]) == ([_id(1)], {"anchor_not_visible": 1})
 
 
 def test_a_served_pins_pair_reads_its_type_key_exact() -> None:
