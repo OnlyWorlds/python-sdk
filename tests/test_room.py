@@ -86,7 +86,7 @@ WHITE_SPACE = {
 
 
 def test_trimmed_is_unicode_white_space_at_both_ends_and_nothing_else() -> None:
-    """room.md (dist.47), "Trimmed and without regard to case, defined once"; Skeld's ruling:
+    """room.md (dist.47), "Trimmed and without regard to case, defined once"; as ruled:
     White_Space is stripped at both ends, a byte order mark stays, nothing inside is touched."""
     assert is_room_element({"type": "narrative", "supertype": " Message\u3000", "x_room_of": WORLD}) is True
     assert is_room_element({"type": "\xa0narrative\u2029", "supertype": "Message", "x_room_of": WORLD}) is True

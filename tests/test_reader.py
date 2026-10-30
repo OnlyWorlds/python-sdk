@@ -116,7 +116,7 @@ def test_reader_edges(tmp_path: Path) -> None:
 
 
 def test_a_dotfile_in_a_type_dir_is_skipped_and_a_null_time_current_reads_the_range(tmp_path: Path) -> None:
-    """Skeld's two clarifications (2026-10-17): a dot-prefixed file in a type directory is a tool's
+    """Two clarifications ruled 2026-10-17: a dot-prefixed file in a type directory is a tool's
     litter, not an element, even when it holds a valid body with the same id as a real file; and
     prefer ``time_current`` means a non-null one."""
     eid = "11111111-2222-4333-8444-5555555555c1"

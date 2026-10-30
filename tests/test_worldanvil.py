@@ -1,8 +1,8 @@
 """The World Anvil door (onlyworlds.worldanvil) on two real World Anvil exports.
 
 ``fixtures/worldanvil/the-quay-world-export-1.scrubbed.html`` and ``-2.scrubbed.html`` are the
-page World Anvil's "Export World" gave on 2026-10-23 for a world Seethe made on a free account,
-each scrubbed by Boss's script of the page's scripts, forms, share links and the account's handle
+page World Anvil's "Export World" gave on 2026-10-23 for a world made on a free account,
+each scrubbed by script of the page's scripts, forms, share links and the account's handle
 (``[author]``). Only the scrubbed copies may be fixtures.
 The first: three articles, Ada Quay (a Character, body text, fields Gender Woman and Eyes Grey),
 Riverfolk (a Species), The ferry crossing (a Geographic Location), and an empty Species draft
@@ -61,7 +61,7 @@ TYPES = {"Ada Quay": "character", "Riverfolk": "species", "The ferry crossing": 
 RIVERFOLK_LINK = f'data-article-privacy="public" data-article-id="{RIVERFOLK}"'
 
 #: The export account's handle, by hash (sha256 of the lowercased name), so the name stays out of
-#: the package: no word-ish token of a fixture may hash to it (Boss's find).
+#: the package: no word-ish token of a fixture may hash to it.
 HANDLE_SHA256 = "115bc6ac1c0836fbd92dda1b8a74d16a2d36f56ad66b75c55f43aaa9068a094c"
 
 
@@ -163,13 +163,13 @@ def test_namespace_and_producer_word_are_pinned() -> None:
     assert str(WORLDANVIL_NAMESPACE) == str(uuid.uuid5(uuid.NAMESPACE_URL, "https://onlyworlds.com/ns/worldanvil"))
     assert PRODUCER_INPUT == "worldanvil-export"  # folder spec §4.2's list
     assert set(TEMPLATE_TYPES) >= PROVEN_TEMPLATES
-    # Organization read on a real page 2026-10-26 (Boss)
+    # Organization read on a real page 2026-10-26
     assert {TEMPLATE_TYPES[k] for k in PROVEN_TEMPLATES} == {"character", "species", "location", "institution"}
     assert UNTYPED_SUPERTYPE == "Article"  # what it is, never where it came from
 
 
 def test_the_template_table_is_the_owners_ruling() -> None:
-    """Skeld's ruling: every row of 0.39.0 holds, four added, anything else unknown."""
+    """Ruled: every row of 0.39.0 holds, four added, anything else unknown."""
     assert TEMPLATE_TYPES == {
         "character": "character",
         "person": "character",
@@ -470,7 +470,7 @@ def retemplated(tmp: Path, template: str) -> Path:
 
 
 def test_an_unknown_template_is_an_article_narrative_and_named(tmp_path: Path) -> None:
-    """Skeld's ruling: supertype Article, the template as World Anvil spells it the subtype."""
+    """Ruled: supertype Article, the template as World Anvil spells it the subtype."""
     out, report = run(tmp_path, retemplated(tmp_path, "Technology"))
     riverfolk = by_name(out)["Riverfolk"]
     assert riverfolk["type"] == "narrative"
@@ -519,7 +519,7 @@ def test_the_date_parse_is_exact(printed: str, iso: str | None) -> None:
 
 
 def test_the_author_stays_out_of_the_elements(tmp_path: Path) -> None:
-    """Skeld's ruling: one username for the whole export, named in the report only."""
+    """Ruled: one username for the whole export, named in the report only."""
     out, report = run(tmp_path)
     assert report.authors == {"[author]": 3}
     assert "[author]" not in json.dumps(bodies(out))
@@ -549,7 +549,7 @@ def sections(*pairs: tuple[str, str]) -> str:
 
 
 def test_an_uploaded_portrait_is_the_picture(tmp_path: Path) -> None:
-    """Boss: the Character template prints an uploaded portrait in the right column."""
+    """The Character template prints an uploaded portrait in the right column."""
     two = PORTRAIT.format("face") + PORTRAIT.format("other")
     out, report = run(tmp_path, planted(tmp_path, TWO, (EYES, EYES + two)))
     ada = by_name(out)["Ada Quay"]

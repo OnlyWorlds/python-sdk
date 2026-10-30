@@ -55,7 +55,7 @@ Elements = dict[str, list[dict[str, Any]]]
 
 
 def clean() -> Elements:
-    """A world no flag finds anything in. The Law and the Narrative are Seethe's case: an empty
+    """A world no flag finds anything in. The Law and the Narrative are a real case: an empty
     description, their text in ``declaration`` and ``story``."""
     return {
         "location": [{"id": L1, "name": "Harbor", "description": "A port."}],
@@ -178,7 +178,7 @@ def test_3_an_event_ending_before_it_starts(tmp_path: Path) -> None:
 
 
 def test_3_says_how_little_it_compared(tmp_path: Path) -> None:
-    # Seethe's hand run on the Manifest: 0 of 28 Events carried both dates; a clean count alone reads as a pass
+    # A hand run on a real world: 0 of 28 Events carried both dates; a clean count alone reads as a pass
     r = folder_report(tmp_path, edit(clean(), "event", E1, end_date=None))
     assert found(r, "3") == []
     assert r.compared["3"] == {"n": 0, "of": 1}
@@ -235,7 +235,7 @@ def test_4_never_calls_a_stub_linkless(tmp_path: Path) -> None:
 
 
 def test_fold_name() -> None:
-    assert fold_name("Kael, Inspector") == fold_name("kael   inspector") == "kael inspector"
+    assert fold_name("Ada, Inspector") == fold_name("ada   inspector") == "ada inspector"
     assert fold_name("\uff21\uff4e\uff4e") == "ann"  # NFKC: full-width letters
     assert fold_name("STRASSE") == fold_name("straße")  # casefold, not lower
     assert fold_name(" ... ") == ""
@@ -1552,7 +1552,7 @@ def spine() -> Elements:
         "location": [{"id": REPO_L, "name": "sdk repo", "supertype": "Repo", "x_spine_status": "live"}],
         "construct": [{"id": STD, "name": "the schema", "supertype": "Standard"}],
         "law": [{"id": CHARTER, "name": "Spine Charter", "supertype": "Charter", "declaration": "One owner a row."}],
-        "character": [{"id": KAEL, "name": "Kael", "supertype": "Mind"}],
+        "character": [{"id": KAEL, "name": "Ada", "supertype": "Mind"}],
         "species": [{"id": SPECIES, "name": "Mind", "supertype": "Not on any list"}],
     }
 
@@ -1841,7 +1841,7 @@ def test_13_two_rows_of_one_type_share_a_name_once_trimmed_and_folded(tmp_path: 
 def test_13_name_uniqueness_is_the_rows_not_every_element(tmp_path: Path) -> None:
     """Serial 60: "a row's name unique within its row type once folded (the four row types; a Seat or any
     other element is outside the rule)". Flag 5 still names two Characters, or two Seats, that share a name."""
-    base = with_(spine(), "character", {"id": C1, "name": "kael ", "supertype": "Mind"})
+    base = with_(spine(), "character", {"id": C1, "name": "ada ", "supertype": "Mind"})
     r = folder_report(tmp_path, base)
     assert spine_found(r) == [] and len(found(r, "5")) == 1
     seat_name = spine()["title"][0]["name"]

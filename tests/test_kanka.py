@@ -1,11 +1,11 @@
 """The Kanka door (onlyworlds.kanka) on a real Kanka JSON export.
 
 ``fixtures/kanka/quay-export-world_20261023_074706.zip`` is the file Kanka 3.15 gave on 2026-10-23
-for a campaign Seethe made on a free account and typed in Kanka's own editor (Boss read it for keys,
-tokens, mail and sessions and found none), its account identifiers scrubbed by Boss's script:
+for a campaign made on a free account and typed in Kanka's own editor (read for keys,
+tokens, mail and sessions, none found), its account identifiers scrubbed by script:
 the username, the user id and the campaign id each a placeholder
 of the same length, so the campaign id that keys the ids is 910001; every other byte as exported.
-What she typed: two Characters (Ada Okafor, Ferry clerk; Mara Voss, Route planner), two Locations
+What was typed: two Characters (Ada Okafor, Ferry clerk; Mara Voss, Route planner), two Locations
 (The quay; The ferry crossing, under The quay), one Organisation (The Ferry Guild), one Note (The
 ledger of the first crossing), a two-way "friend" relationship Ada to Mara, and a post on Ada; the
 relationship and the post were made twice by a script rerun. Kanka seeded four starter entries in
@@ -425,7 +425,7 @@ def test_deterministic(tmp_path: Path) -> None:
 
 
 def test_ids_do_not_move_with_the_supertype(tmp_path: Path) -> None:
-    """No tool name in a supertype (Skeld's ruling): the real export's ids are those
+    """No tool name in a supertype (as ruled): the real export's ids are those
     0.41.0 gave (the sha256 of the sorted ids, one a line; 0.41.0 run on the scrubbed file, whose
     campaign id moved the ids from those it gave on the unscrubbed one)."""
     out, _ = run(tmp_path)

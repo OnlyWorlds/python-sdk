@@ -365,7 +365,7 @@ def test_awkward_cases(tmp_path: Path) -> None:
     assert dangling["friends"] == ["urn:uuid:00000000-0000-4000-8000-000000000001"]
 
 
-# --- Kael's review of the branch, one test per finding
+# --- review of the branch, one test per finding
 
 
 class World:
@@ -639,7 +639,7 @@ def test_known_keys_cover_the_dist_lint() -> None:
     assert tuple(lint.EXTENSION_PREFIXES) == EXTENSION_PREFIXES
 
 
-# --- hidden elements: hidden from whoever the world is handed to (folder format §4.8; Skeld's ruling)
+# --- hidden elements: hidden from whoever the world is handed to (folder format §4.8; as ruled)
 
 CONSUL = "068e2ddb-83c6-71a7-8000-a45b8b711e25"
 

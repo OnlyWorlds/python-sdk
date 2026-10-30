@@ -604,7 +604,7 @@ def test_the_label_line_says_a_characters_view_in_the_worlds_word() -> None:
     assert "*Made as the Employee (Character) Ann:" in build_pack(mapped, world(), exported_as=named)[0]["00-world.md"]
 
 
-# --- proposed elements: not canon until a keeper settles them (Skeld's ruling)
+# --- proposed elements: not canon until a keeper settles them (as ruled)
 
 C3 = "c0000000-0000-7000-8000-000000000003"
 C4 = "c0000000-0000-7000-8000-000000000004"
@@ -700,7 +700,7 @@ def test_the_command_line_leaves_proposed_elements_out_unless_asked(tmp_path: Pa
     assert pack.PROPOSED_LINE in (tmp_path / "out-p" / "01-character.md").read_text(encoding="utf-8")
 
 
-# --- hidden elements: hidden from whoever the world is handed to (folder format §4.8; Skeld's ruling)
+# --- hidden elements: hidden from whoever the world is handed to (folder format §4.8; as ruled)
 
 
 def with_hidden() -> Elements:

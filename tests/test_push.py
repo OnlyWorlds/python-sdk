@@ -515,7 +515,7 @@ def test_a_rerun_never_proposes_the_same_patch_twice(tmp_path: Path, make_client
 
 def test_an_element_hidden_only_in_the_folder_is_withheld(tmp_path: Path, make_client: MakeClient) -> None:
     # keel takes the hidden mark only by its own route: a patch would edit a visible element
-    # (Skeld's ruling)
+    # (as ruled)
     base, edit = folders(
         tmp_path,
         {"character": [wire_char(C1, "Gelon"), wire_char(C2, "Hieron")]},

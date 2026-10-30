@@ -1,7 +1,7 @@
-"""The LegendKeeper door (onlyworlds.legendkeeper) on Boss's recorded wire answers.
+"""The LegendKeeper door (onlyworlds.legendkeeper) on recorded wire answers.
 
 The three files in ``fixtures/legendkeeper/`` are real answers of the LegendKeeper API v3, read
-live on 2026-10-22 on Titus's project (made-up content, no key, no email; Boss's findings). They
+live on 2026-10-22 on Titus's project (made-up content, no key, no email). They
 are specimens, not a whole walk, so ``answers()`` composes the walk the door makes from them and says what it fills in:
 
 - the project answer (``getProject``) was not recorded: ``{"id": PID, "name": "Sikelia"}``, the
@@ -57,6 +57,8 @@ from onlyworlds.legendkeeper import (
 ROOT = Path(__file__).resolve().parents[1]
 LINT = ROOT / "codegen" / "schema-dist" / "walk" / "lint_folder.py"
 FIX = Path(__file__).resolve().parent / "fixtures" / "legendkeeper"
+#: An element's name as the recorded project has it.
+WIRE_TEST = "Boss wire test (delete me)"
 PID = "sikelia0"
 P = f"/projects/{PID}"
 KEY = "lk_test_SECRET_never_written"
@@ -161,7 +163,7 @@ def test_the_tree_converts_to_the_element_set(tmp_path: Path) -> None:
     assert aldric["x_legendkeeper_aliases"] == ["Lord Veyra", "the Ash Lord"]
     assert aldric["x_legendkeeper_parent"] == eid(BOSS)
     assert "supertype" not in aldric
-    for name in ("Sikelia", "Boss wire test (delete me)", "Order of the Ash", "Castle Veyra"):
+    for name in ("Sikelia", WIRE_TEST, "Order of the Ash", "Castle Veyra"):
         assert els[name]["type"] == "narrative" and els[name]["supertype"] == "Article", name
     assert "x_legendkeeper_parent" not in els["Sikelia"]
     assert els["Order of the Ash"]["x_legendkeeper_tags"] == ["faction"]
@@ -195,7 +197,7 @@ def test_a_location_under_a_location_gets_its_parent_field(tmp_path: Path) -> No
             item["tags"] = ["Location"]  # a type name, any case
     out, _ = run(tmp_path, ans, type_map=MAP)
     els = by_name(out)
-    assert els["Boss wire test (delete me)"]["type"] == "location"
+    assert els[WIRE_TEST]["type"] == "location"
     assert els["Castle Veyra"]["parent_location"] == eid(BOSS)
     assert els["Castle Veyra"]["x_legendkeeper_parent"] == eid(BOSS)
 
@@ -341,7 +343,7 @@ def visible(out: Path) -> str:
 
 
 def test_a_secret_block_becomes_its_own_hidden_narrative(tmp_path: Path) -> None:
-    """Skeld's rule: what the source hides, we hide, never drop and never publish."""
+    """The rule: what the source hides, we hide, never drop and never publish."""
     out, report = run(tmp_path)
     els = by_name(out)
     secret = els["Aldric Veyra: Secret"]
@@ -462,7 +464,7 @@ def test_the_report_names_everything_not_placed(tmp_path: Path) -> None:
 
 
 def test_ids_do_not_move_with_the_supertype(tmp_path: Path) -> None:
-    """Untyped is supertype Article now (no tool name in a supertype, Skeld's ruling);
+    """Untyped is supertype Article now (no tool name in a supertype, as ruled);
     the ids are those 0.41.0 gave: the sha256 of the sorted ids, one a line. The Region map's Map,
     made since 0.53.0, the timeline's Narrative and its lane's, since 0.56.0, and the Gregorian
     calendar's Construct, since 0.57.0, are the ids added."""
@@ -671,7 +673,7 @@ def test_a_pushed_element_comes_back_with_its_own_id_and_conventions(tmp_path: P
     assert aldric["atlas_aliases"] == ["Al", "the Heir"] and aldric["x_house_motto"] == "Ever onward"
     assert not [k for k in aldric if "onlyworlds" in k]
     assert report.ow_unmapped == ["'Aldric Veyra': rivals: 1 link(s) outside the slice"]
-    assert by_name(out)["Boss wire test (delete me)"]["supertype"] == "Ledger"
+    assert by_name(out)[WIRE_TEST]["supertype"] == "Ledger"
     assert not [tag for tag in report.untyped_tags if tag.startswith("ow-")]
     assert any(n.startswith("1 element take their id from their 'onlyworlds-id' row") for n in report.notes)
     # every link to Aldric uses that id
@@ -692,7 +694,7 @@ def test_an_onlyworlds_id_that_is_not_a_uuid_or_is_claimed_twice_is_not_the_id(t
     assert els["Aldric Veyra"]["id"] == OW_ALDRIC
     assert els["Castle Veyra"]["id"] == eid(CASTLE)
     assert els["Castle Veyra"]["x_legendkeeper_onlyworlds-id"] == OW_ALDRIC  # kept, never dropped
-    boss = els["Boss wire test (delete me)"]
+    boss = els[WIRE_TEST]
     assert boss["id"] == eid(BOSS) and boss["x_legendkeeper_onlyworlds-id"] == "not-a-uuid"
     assert any("is another resource's ('Aldric Veyra')" in n for n in report.notes)
 

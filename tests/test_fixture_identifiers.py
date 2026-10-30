@@ -1,7 +1,7 @@
 """No account identifier of a real export in any fixture or test file, checked by hash.
 
-The fixtures are real exports scrubbed by Boss's script (Skeld's
-doctrine: a fixture carries no account identifier). The identifiers themselves stay
+The fixtures are real exports scrubbed by a script (the
+rule: a fixture carries no account identifier). The identifiers themselves stay
 out of the package: only their sha256 hex digests are here, and every word-start window of each
 file's text, lowercased, of each identifier's length is hashed and compared (so an identifier is
 found inside a longer word too, such as a file name). A zip is read member by member, names and

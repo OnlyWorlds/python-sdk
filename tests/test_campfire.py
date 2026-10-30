@@ -1,8 +1,8 @@
 """The Campfire door (onlyworlds.campfire) on a real Campfire export.
 
 ``fixtures/campfire/campfire-export.html`` is the file Campfire's web app gave on 2026-10-23
-(File, Export Elements, html, Select all Elements) for a project Seethe made on a free account
-(Boss read it: no script, form, image or tracker, no mail, key, token or handle, one Google Fonts import).
+(File, Export Elements, html, Select all Elements) for a project made on a free account
+(read for secrets: no script, form, image or tracker, no mail, key, token or handle, one Google Fonts import).
 Its bytes are kept. Two elements: Ada Okafor (a Character: a description, Full Name, Place of
 Residence "The quay", a Bio naming Mara Voss) and The Ferry Quay (a Location: a description).
 The file names no module, has no ids, no links and no hidden marks; what it does not show runs
@@ -155,7 +155,7 @@ def test_namespace_producer_and_tables_are_pinned() -> None:
 
 
 def test_the_module_table_is_as_ruled() -> None:
-    """Skeld's ruling: the whole table; every other module an Article Narrative."""
+    """Ruled: the whole table; every other module an Article Narrative."""
     assert MODULE_TYPES == {
         "characters": "character",
         "locations": "location",
@@ -276,7 +276,7 @@ def test_nothing_is_hidden_and_the_report_says_the_files_limits(tmp_path: Path) 
 
 
 def test_the_report_names_each_elements_module_evidence(tmp_path: Path) -> None:
-    """Per element: which panel words matched which module (Skeld's ruling)."""
+    """Per element: which panel words matched which module (as ruled)."""
     _, report = run(tmp_path)
     ev = {e.element: e for e in report.evidence}
     assert [e.element for e in report.evidence] == ["Ada Okafor", "The Ferry Quay"]
@@ -379,7 +379,7 @@ def test_an_element_of_no_known_module_is_an_article(tmp_path: Path) -> None:
 
 
 def test_a_magic_module_is_a_construct(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
-    """Skeld's ruling: a magic system is how the world works, so a Construct (believed)."""
+    """Ruled: a magic system is how the world works, so a Construct (believed)."""
     monkeypatch.setitem(campfire.TEMPLATE_MODULES, "magic", frozenset({("rules", "source")}))
     rules = element("Tidecalling", ("Rules", [("Source", "The river")]))
     out, report = run(tmp_path, with_elements(tmp_path, rules))
@@ -475,7 +475,7 @@ def test_a_panel_kind_not_yet_seen_is_read_as_text(tmp_path: Path) -> None:
     assert "'Ada Okafor' / 'Allies': a panel-list panel, not yet seen in a real export; read as text" in report.notes
 
 
-# --- the project name (--project; Skeld's ruling) ---------------
+# --- the project name (--project; as ruled) ---------------
 
 
 def world_of(out: Path) -> dict[str, Any]:

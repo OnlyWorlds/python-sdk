@@ -124,7 +124,7 @@ def test_the_owworld_fixture_set_every_verdict_and_every_cause(tmp_path: Path) -
     assert diffs == []
 
 
-# Serial 58's three cases (Quillon's; ruled by Skeld 2026-10-24), named on their own: the deflate stream read to its
+# Serial 58's three cases (ruled 2026-10-24), named on their own: the deflate stream read to its
 # declared end, and the U+11383 pair two names at Unicode 15.1.
 SERIAL_58_CASES = {
     "fail-OW-14-deflate-early-end.owworld": "not_openable",
@@ -298,7 +298,7 @@ def test_the_nfc_is_unicode_15_1_on_every_line_of_normalization_test() -> None:
 
 
 # The 20 code points Unicode 16.0 assigns with a canonical decomposition and 15.1 leaves unassigned
-# (Quillon's measurement): Todhri, Tulu-Tigalari, Gurung Khema, Kirat Rai.
+# (measured): Todhri, Tulu-Tigalari, Gurung Khema, Kirat Rai.
 UNASSIGNED_IN_15_1 = {
     0x105C9: (0x105D2, 0x0307),
     0x105E4: (0x105DA, 0x0307),
@@ -579,7 +579,7 @@ def test_the_writer_refuses_a_link_where_a_carried_file_would_be(tmp_path: Path)
     assert info.value.reason == "link"
 
 
-# --- hidden elements: kept in a copy, left out of a share (folder format §4.8; Skeld's ruling)
+# --- hidden elements: kept in a copy, left out of a share (folder format §4.8; as ruled)
 
 
 def test_a_hidden_element_travels_byte_for_byte_unless_the_file_is_a_share(tmp_path: Path) -> None:

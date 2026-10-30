@@ -4,7 +4,7 @@ and on two real exports.
 The built tree is what the module's docstring believes (the 32-hex suffix, ``_all.csv``, a
 database's rows in a folder named like its CSV, sub-pages in a folder named like their page,
 relation cells as ``Title (path)``). The real ones, in ``fixtures/notion/``, are a free account's
-page export with sub-pages, Markdown & CSV (Boss, 2026-10-24; invented content, no personal data):
+page export with sub-pages, Markdown & CSV (2026-10-24; invented content, no personal data):
 ``notion-page-export-with-subpages.zip`` with "Create folders for subpages" off, flat, every page
 and CSV in one directory; ``notion-page-export-folders-locations.zip`` with it on, the same
 workspace with Places renamed Locations and Home renamed Location, its folders named by title alone.
@@ -181,7 +181,7 @@ def test_untyped_rows_are_narratives(imported: tuple[Path, ImportReport]) -> Non
 
 
 def test_ids_do_not_move_with_the_supertype(imported: tuple[Path, ImportReport]) -> None:
-    """No tool name in a supertype (Skeld's ruling): the fixture's ids are those 0.41.0
+    """No tool name in a supertype (as ruled): the fixture's ids are those 0.41.0
     gave (the sha256 of the sorted ids, one a line), on the fixture built here."""
     out, _ = imported
     ids = sorted(bodies(out))

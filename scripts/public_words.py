@@ -12,8 +12,9 @@ Usage:
   python scripts/public_words.py --commits A..B   scan the messages of the commits B adds to A
 Exit 1 and one line per finding; exit 0 when the tree is clean.
 
-Not scanned: CHANGELOG.md (the dated record, kept as written), tests/ and their fixtures,
-and codegen/schema-dist/ and codegen/tools/ (vendored and hash-verified).
+Not scanned: CHANGELOG.md (the dated record, kept as written), tests/fixtures/ (world data
+and recorded exports, where a name can match a team word), and codegen/schema-dist/ and
+codegen/tools/ (vendored and hash-verified).
 """
 
 from __future__ import annotations
@@ -35,8 +36,9 @@ PUBLISHED = [
     "AGENTS.md",
     "SECURITY.md",
     "pyproject.toml",
+    "tests",
 ]
-VENDORED = ("codegen/schema-dist/", "codegen/tools/")
+VENDORED = ("codegen/schema-dist/", "codegen/tools/", "tests/fixtures/")
 
 # Each row: a pattern, and what a writer puts instead.
 PATTERNS: list[tuple[re.Pattern[str], str]] = [
@@ -93,6 +95,7 @@ _TOKEN = re.compile(r"[A-Za-z][A-Za-z0-9]*")
 # Lines allowed by their exact text (trimmed; the first 16 hex of its sha256), never by file.
 EXEMPT_LINES = {
     "012d30a55f7b2ad2",  # README: the one line that says who maintains the repository
+    "dede553184687120",  # tests: an element's name in a recorded LegendKeeper project
 }
 
 
