@@ -616,6 +616,30 @@ def test_below_the_owner_an_anchor_it_cannot_see_is_recorded_under_no_reason_so_
     assert (owner["kept"], owner["cut"]) == (["o"], {"anchor_not_visible": 1})
 
 
+def test_a_note_goes_with_its_anchor_so_one_that_reaches_nothing_captions_no_row_and_is_not_counted() -> None:
+    """lens.md rule 6 (serial 94): keel's anchor_ids hold the anchors it resolved only, and ``noted`` adds the unseen
+    (keel elements/lens.py:792-793); a note captions a kept row only when its id is one of anchor_ids (:905), and
+    _notes_ignored counts a note outside ``noted`` alone (:794, :807). A Language in ``constructs`` reaches nothing,
+    so its note goes with it, though a child lens keeps the element. The npm SDK holds the same case."""
+    world = {
+        "elements": [
+            {"id": "e08", "type": "language", "name": "Old Tongue"},
+            {**LENS, "id": "L1", "name": "L1", "languages": ["e08"], "x_lens": {"depth": 0}},
+        ]
+    }
+    lens = _lens_on(
+        {"constructs": ["e08", "L1"]}, {"depth": 0, "show": "name", "notes": {"e08": "spoken in the hills"}}
+    )
+    for reader in (OWNER, {"rung": "contributor"}):
+        got = resolve_lens(world, lens, reader)
+        assert (got["kept"], got["rows"], got["cut"], got["notes_ignored"]) == (
+            ["e08"],
+            [{"id": "e08", "type": "language", "name": "Old Tongue"}],
+            {},
+            0,
+        ), reader
+
+
 def test_a_served_pins_pair_reads_its_type_key_exact() -> None:
     """lens.md (serial 93): a generic pair links only by one of the 22 slugs, compared exact as stored, so a reader
     below the owner is served a pair whose key is ``Character`` as ``""`` and null; ``character`` stays whole."""

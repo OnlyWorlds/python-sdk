@@ -77,8 +77,9 @@ class LensReading(TypedDict):
 
     #: The kept elements' ids, in the profile's order.
     kept: list[str]
-    #: The kept elements as ``show`` makes them, in the same order; an anchor's row carries its ``note``, and a full
-    #: row of a hidden element carries ``hidden: true``, as the body is served.
+    #: The kept elements as ``show`` makes them, in the same order; an anchor's row carries its ``note``, and only an
+    #: anchor the reader can see (a note on one it cannot see goes with the anchor, though another path keeps the
+    #: element); a full row of a hidden element carries ``hidden: true``, as the body is served.
     rows: list[dict[str, Any]]
     #: The cut, counted by reason; a reason with no count is absent, and a reader that is not the owner never
     #: carries the owner's two (``anchor_not_visible``, ``not_visible``).
@@ -1013,13 +1014,15 @@ def _lens_reading(
         n = sum(1 for w in cut.values() if w == why)
         if n:
             counts[why] = n
-    anchors, _, _, _ = _anchors_of(body, r)
+    anchors, _, unseen, _ = _anchors_of(body, r)
     # A note on an id that is not an anchor is counted only where the reader sees that id: a note keyed to an
-    # element it cannot see, or to no element, is no note of its, and counting it would tell a guest it exists.
+    # element it cannot see, or to no element, is no note of its, and counting it would tell a guest it exists. A
+    # note on an anchor the reader cannot see went with the anchor and is not counted either.
     notes_ignored = sum(1 for k in recipe.notes if k not in anchors and k in r.view)
-    # The rows are made once, from the union, by this lens's `show`; a note captions this lens's own anchors only
-    # (a child's notes and `show` stay the child's, rule 3).
-    own = set(anchors)
+    # The rows are made once, from the union, by this lens's `show`; a note captions this lens's own anchors the
+    # reader can see only (a child's notes and `show` stay the child's, rule 3). One the reader cannot see (a wrongly
+    # typed id among them) reaches nothing, and its note goes with it, though another path keeps the element.
+    own = {e for e in anchors if e in r.view and e not in unseen}
     reading: LensReading = {
         "kept": keep,
         "rows": [r.row(e, recipe.show, recipe.notes if e in own else None) for e in keep],
