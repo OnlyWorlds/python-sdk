@@ -30,6 +30,16 @@ def test_every_case_of_the_names_fixture() -> None:
         assert got == c["word"], c["name"]
 
 
+def test_types_or_supertypes_present_as_null_is_refused_whole() -> None:
+    """names.md: ``types`` (or ``supertypes``) "present and not an object" refuses the whole map, and a null is
+    present: the standard's name, as the npm SDK reads it."""
+    supertypes = {"character": {"Agent": {"one": "AI agent"}}}
+    world: dict[str, Any] = {"x_names": {"version": 1, "types": None, "supertypes": supertypes}}
+    assert type_word(world, "character", supertype="Agent") is None
+    world = {"x_names": {"version": 1, "types": {"character": {"one": "Employee"}}, "supertypes": None}}
+    assert type_word(world, "character") is None
+
+
 def test_no_world_or_no_map_is_the_standard_name() -> None:
     assert type_word(None, "character") is None
     assert type_word({}, "character") is None

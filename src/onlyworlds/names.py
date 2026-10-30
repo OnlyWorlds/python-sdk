@@ -49,10 +49,11 @@ def type_word(
     names = world.get("x_names") if isinstance(world, Mapping) else None
     if not isinstance(names, Mapping) or names.get("version") != 1 or isinstance(names.get("version"), bool):
         return None
+    # Present and not an object refuses the whole map, a null included (names.md; the npm SDK reads it so).
     types, supertypes = names.get("types"), names.get("supertypes")
-    if types is not None and not isinstance(types, Mapping):
+    if "types" in names and not isinstance(types, Mapping):
         return None
-    if supertypes is not None and (
+    if "supertypes" in names and (
         not isinstance(supertypes, Mapping) or not all(isinstance(v, Mapping) for v in supertypes.values())
     ):
         return None

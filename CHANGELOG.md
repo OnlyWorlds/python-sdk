@@ -4,6 +4,10 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+## 0.93.1 (2026-10-30)
+
+- **`type_word` refuses a names map whose `types` or `supertypes` is present as null.** The names profile refuses the whole map when either key is present and not an object, and a null is present; the Python reader read a null as absent, so `{"version": 1, "types": null, "supertypes": {...}}` printed a supertype's word where the npm SDK, and every other reader, gives the standard's name. It now gives the standard's name too.
+
 ## 0.93.0 (2026-10-30)
 
 - **The lens readers follow schema-dist serial 93** (`v0.33.0-dist.93`), whose nineteen new cases replay in `resolve_lens` and `world_graph`. Five readings change for every caller:
