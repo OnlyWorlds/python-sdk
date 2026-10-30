@@ -39,7 +39,7 @@ def test_the_fixture_holds_serial_99s_cases() -> None:
     assert DOC["profile_page"] == "profiles/strand.md"
     assert DOC["mark"]["field"] == STRAND_FIELD == "x_strand"
     assert DOC["mark"]["members"] == ["narrative", "event", "location"]
-    assert len(CASES) == 21, f"the fixture holds {len(CASES)} cases, serial 99 has 21"
+    assert len(CASES) == 26, f"the fixture holds {len(CASES)} cases, serial 99 has 26"
     assert {c["kind"] for c in CASES} == {"strand"}
 
 
