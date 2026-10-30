@@ -4,6 +4,8 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+## 0.94.0 (2026-10-30)
+
 - **The readers follow schema-dist serial 94** (`v0.33.0-dist.94`), whose twenty-four new cases replay in `charter_of`, `type_word`, `resolve_lens` and `world_graph`. These readings change for a caller:
   - **A proposed element is no Domain's hub.** A Domain's `hubs` are the elements its link fields name that the reader sees, and a proposed element is in no reader's view, the owner's included. The owner's and a contributor's served lists keep a proposed id, and `charter_of` listed it as a hub; it no longer does, as it already left a proposed element out of the Charter's `skill` and never chose a proposed Charter, Guide or Domain.
   - **An anchor the reader cannot see is counted wherever it is met.** An owner reading `as` another reader now counts as `anchor_not_visible` a lens that names itself among its anchors when that reader cannot see it, and a hidden umbrella its child names back, where both were skipped as already visited. Each cut element is counted once, by its id, under the first reason the reader carries, and never when another path keeps it. Below the owner an unseen anchor is recorded under no reason, so when a child lens cuts the same element by `types` or the window, that reason is the one counted, and the one a graph edge to it is cut by.
