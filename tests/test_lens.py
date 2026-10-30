@@ -29,7 +29,7 @@ from onlyworlds._schema import LINK_TARGETS
 
 REPO = Path(__file__).resolve().parent.parent
 FIXTURE = REPO / "codegen" / "schema-dist" / "profiles" / "lens.fixture.json"
-KINDS = {"shape": 6, "keys": 25, "resolve": 99, "invariant": 4, "uses": 5, "graph": 47}
+KINDS = {"shape": 6, "keys": 25, "resolve": 102, "invariant": 4, "uses": 5, "graph": 47}
 OWNER = {"rung": "owner"}
 
 
@@ -156,7 +156,7 @@ def test_every_fixture_case_is_answered_as_the_fixture_says() -> None:
     for line in wrong:
         print(line)
     assert wrong == []
-    assert len(cases) == 186, f"the fixture holds {len(cases)} cases, serial 94 has 186"
+    assert len(cases) == 189, f"the fixture holds {len(cases)} cases, serial 95 has 189"
     assert Counter(c["kind"] for c in cases) == KINDS
 
 
@@ -528,11 +528,12 @@ def test_a_full_row_of_a_hidden_element_carries_hidden_for_a_reader_that_sees_it
 
 
 def test_only_a_served_body_of_a_hidden_element_carries_a_hidden_key() -> None:
-    """lens.md (serial 94): keel's serialize sets ``hidden: true`` on a body of a hidden element after the stub is
-    made (keel elements/serialize.py:463-464, :492-493), and no other body carries the key: a stored ``hidden: false``
-    or null is dropped. A guest's stub of a hidden element its lists name carries the mark, and so does the owner's
-    mail row of a hidden Message (keel elements/lens.py:955 serves it). The world is never written. The npm SDK
-    holds the same cases."""
+    """lens.md (serial 94): keel's serialize sets ``hidden: true`` on a body of a hidden element (keel
+    elements/serialize.py:463-464, :492-493), and no other body carries the key: a stored ``hidden: false`` or null
+    is dropped. Serial 95: hidden beats ``known_of``, so a guest whose ``known_of`` alone names a hidden element is
+    served nothing of it, no stub, row or count, while its own hidden creation, in its ``whole``, comes with the
+    mark; so does the owner's mail row of a hidden Message (keel elements/lens.py:955 serves it). The world is
+    never written. The npm SDK holds the same cases."""
     lamp = {"id": _id(1), "type": "object", "name": "Lamp", "hidden": False}
     cup = {"id": _id(2), "type": "object", "name": "Cup", "hidden": None}
     vase = {"id": _id(3), "type": "object", "name": "Vase"}
@@ -542,10 +543,10 @@ def test_only_a_served_body_of_a_hidden_element_carries_a_hidden_key() -> None:
     plain = [{"id": _id(1), "type": "object", "name": "Lamp"}, {"id": _id(2), "type": "object", "name": "Cup"}]
     assert resolve_lens(world, lens, OWNER)["rows"] == [*plain, {**vase, "hidden": True}]
     assert resolve_lens(world, lens, {"rung": "contributor"})["rows"] == plain
-    guest = {"rung": "guest", "whole": [], "known_of": [_id(3)]}
-    assert resolve_lens(world, lens, guest)["rows"] == [
-        {"id": _id(3), "type": "object", "name": "Vase", "known_of": True, "hidden": True}
-    ]
+    told = resolve_lens(world, lens, {"rung": "guest", "whole": [], "known_of": [_id(3)]})
+    assert (told["kept"], told["rows"], told["cut"]) == ([], [], {})
+    own = resolve_lens(world, lens, {"rung": "guest", "whole": [_id(3)], "known_of": [_id(3)]})
+    assert own["rows"] == [{**vase, "hidden": True}]
     ada = {"id": _id(4), "type": "character", "name": "Ada"}
     note = {
         "id": _id(5),

@@ -473,8 +473,11 @@ class _Reading:
             elif rung == "public":
                 sees = eid not in hidden and eid not in self.room and not proposed
             else:
-                sees = eid in whole_ids or eid in known_of
-                if not proposed and eid not in whole_ids and eid in known_of:
+                # Hidden beats known_of: the hidden mark comes off the known-of grant too, and only the guest's own
+                # creation, listed in whole, adds a hidden element back.
+                stub = eid not in whole_ids and eid in known_of and eid not in hidden
+                sees = eid in whole_ids or stub
+                if not proposed and stub:
                     self.stubs.add(eid)
             if sees:
                 self.linkable.add(eid)
@@ -527,7 +530,8 @@ class _Reading:
         every id outside the view left out (``_trim``), and for a known-of element the stub made from it
         (``_stub``). A hidden element's body carries ``hidden: true``, the world's ``hidden`` list read as the
         element's own mark, for any reader it is served to (keel's serialize): the owner, and below it only a guest
-        whose lists name it (its stub too), since no other rung's view holds a hidden element. No other body carries
+        of its own hidden creation, listed in its ``whole``, since no other rung's view holds a hidden element (a
+        hidden id in a guest's ``known_of`` alone is not in its view: hidden beats known_of). No other body carries
         a ``hidden`` key: a stored ``false`` or null is dropped."""
         cached = self._served.get(eid)
         if cached is not None:
@@ -947,7 +951,8 @@ def resolve_lens(
     rule's thirty days and ``changed_within`` (absent: the machine's time), never the world's now.
 
     The rules, in short: visibility first (a hidden or proposed element is not there to hop through; a known-of
-    stub is kept as served, its base and public fields with every other field unset, and nothing hops out of it);
+    stub is kept as served, its base and public fields with every other field unset, and nothing hops out of it;
+    a hidden element a guest's ``known_of`` names is not in its view at all, only its own creation in ``whole``);
     a hop reaches both ways, and on through a Relation to its parties, and a link reaches only an element of its
     field's target type (a generic pair only by one of the 22 slugs, compared exact); an umbrella enters each child
     lens once; a hop never crosses a room element; a reading aid (the charter, its guide, a domain:

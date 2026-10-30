@@ -44,7 +44,7 @@ KINDS = {
     "sent_by": 3,
     "sender": 14,
     "unread": 17,
-    "mark": 10,
+    "mark": 11,
     "thread": 4,
     "unseen": 3,
     "everyone": 3,
@@ -105,7 +105,8 @@ def replay(case: dict[str, Any], doc: dict[str, Any]) -> list[str]:
         expect("claimed", got.claimed, case["claimed"])
         expect("written_by", got.written_by, case.get("written_by"))
     elif kind == "mark":
-        mark = read_mark_of(case["relations"], case["reader"], members)
+        # A case without keyless has a credential, or is a folder.
+        mark = read_mark_of(case["relations"], case["reader"], members, keyless=case.get("keyless", False))
         expect("read_mark_of", None if mark is None else mark["id"], case["mark"])
     elif kind == "unread":
         got_unread = unread_for(case["messages"], case["reader"], case["read_mark"], members)
@@ -122,7 +123,7 @@ def test_every_fixture_case_is_answered_as_the_fixture_says() -> None:
     cases = doc["cases"]
     wrong = [line for case in cases for line in replay(case, doc)]
     assert wrong == []
-    assert len(cases) == 87, f"the fixture holds {len(cases)} cases, serial 94 has 87"
+    assert len(cases) == 88, f"the fixture holds {len(cases)} cases, serial 95 has 88"
     assert Counter(c["kind"] for c in cases) == KINDS
 
 
@@ -216,6 +217,22 @@ def test_the_read_mark_supertype_is_folded_and_a_mark_with_no_members_list_has_n
     assert read_mark_of([mark], ADA, load_fixture()["members"]) is mark
     assert read_mark_of([mark], ADA, None) is None  # created_by exists but cannot be checked
     assert read_mark_of([{**mark, "supertype": "Reads"}], ADA, load_fixture()["members"]) is None
+
+
+def test_no_mark_counts_on_a_keyless_body() -> None:
+    """message.md (serial 95): the keyless public reader is served no hands, so a mark there carries neither
+    ``created_by`` nor ``changed_by`` because they were taken off, and ``read_mark_of`` with ``keyless=True``
+    answers none, whatever the mark carries. ``keyless`` is a keyword, True or False, as ``is_to_everyone``
+    takes it."""
+    bare: dict[str, Any] = {"id": "m1", "type": "relation", "supertype": "Read", "actor": ADA, "narratives": []}
+    members = load_fixture()["members"]
+    assert read_mark_of([bare], ADA, None) is bare  # a folder's: no hand to check
+    assert read_mark_of([bare], ADA, None, keyless=True) is None
+    own = {**bare, "created_by": None, "changed_by": None}
+    assert read_mark_of([own], ADA, members) is own
+    assert read_mark_of([own], ADA, members, keyless=True) is None
+    with pytest.raises(TypeError, match="keyless"):
+        read_mark_of([bare], ADA, None, keyless=1)  # type: ignore[arg-type]
 
 
 def test_a_thread_whose_parents_loop_ends() -> None:

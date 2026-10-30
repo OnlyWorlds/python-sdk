@@ -2,15 +2,20 @@
   "_what": "The recorded pin for the vendored OnlyWorlds schema distribution (codegen/schema-dist/, copied byte-exact). Do not edit by hand; re-vendor from the pinned tag and review the diff. Kept equal to the npm SDK's pin (github.com/OnlyWorlds/sdk, codegen/schema-pin.json) on purpose: two clients, one schema.",
   "_why_manifest_sha256": "Verifying the tree against its own MANIFEST.json only proves internal consistency. If the tag moved, the manifest moved with it. The hash recorded here is the one first accepted, which is what makes a moved tag visible.",
   "repo": "https://github.com/OnlyWorlds/schema-dist",
-  "tag": "v0.33.0-dist.94",
-  "commit": "ad040665a99e5c739cb953d58d67757113b78974",
-  "manifest_sha256": "899fcb0678c1c8158705b5bfd1b03d1a5b784667a67e200911f31ac6f9112499",
+  "tag": "v0.33.0-dist.95",
+  "commit": "fb4452b99de2617df07a78413c30c9866149b97f",
+  "manifest_sha256": "eee6f5027d758e91b40b39ca35de940caca6baf907aa4d4688c05dc46d2c921b",
   "canonical_version": "00.33.00",
-  "dist_serial": 94,
+  "dist_serial": 95,
   "published": "2026-10-30",
   "pinned_at": "2026-10-30",
-  "pinned_by": "The maintainer: tree from `git archive` of the tag in a schema-dist checkout (197 files, every one the MANIFEST lists); files re-hashed against MANIFEST.json by generate_schema.py; MANIFEST self-hash matched against the raw file GitHub serves at the tag, whose ref resolves to the commit above.",
+  "pinned_by": "The maintainer: tree from `git archive` of the tag in a schema-dist checkout (198 files: the 197 the MANIFEST lists, and MANIFEST.json itself); files re-hashed against MANIFEST.json by generate_schema.py; MANIFEST self-hash matched against the raw file GitHub serves at the tag, whose ref resolves to the commit above.",
   "previous_pins": [
+    {
+      "tag": "v0.33.0-dist.94",
+      "manifest_sha256": "899fcb0678c1c8158705b5bfd1b03d1a5b784667a67e200911f31ac6f9112499",
+      "note": "superseded by v0.33.0-dist.95 (profiles/message.md: a read mark served without a credential is ignored, readMarkOf taking keyless as isToEveryone does; profiles/lens.md rule 1: hidden beats known_of, a hidden element a guest knows of and did not make is not in its view, no stub and no count, a guest's full row of its own hidden creation carries hidden: true, and the hidden key rides on every served body; message.fixture.json gains one case, 88 in all; lens.fixture.json gains three, 189 in all, the ledger world a hidden creation of the guest's and a guest told of the heir; charter.fixture.json gains one, 27 in all: a skill id named only in uppercase is kept; pairs.json added, the link a drag between two types writes, presentation and not part of the standard; no schema file moved)"
+    },
     {
       "tag": "v0.33.0-dist.93",
       "manifest_sha256": "bc9b8e61d8519d570bb97a3f5b509c45802e65b53bd93727b47ae39a6f685b0c",

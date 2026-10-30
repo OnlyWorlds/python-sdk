@@ -1946,6 +1946,51 @@
         "domains": []
       },
       "note": "An id compares as a UUID, whatever its case: the Object written in uppercase hex and again in lowercase is one Object, kept once, in lowercase."
+    },
+    {
+      "name": "a-skill-id-named-only-in-uppercase-is-kept",
+      "kind": "charter",
+      "world": {
+        "id": "019a7f00-0000-7000-8000-00000000f117",
+        "name": "One case 117",
+        "hidden": [],
+        "readers": {
+          "owner": {
+            "rung": "owner",
+            "character": null
+          }
+        },
+        "elements": [
+          {
+            "id": "019a7f00-0000-7000-8000-000000000321",
+            "type": "law",
+            "name": "Rules",
+            "supertype": "Charter",
+            "x_charter_of": "019a7f00-0000-7000-8000-00000000f117",
+            "created_at": "2026-10-01T12:00:00Z",
+            "description": "Read ow://object/019A7F00-0000-7000-8000-0000000003AC first."
+          },
+          {
+            "id": "019a7f00-0000-7000-8000-0000000003ac",
+            "type": "object",
+            "name": "The Skill"
+          }
+        ]
+      },
+      "reader": "owner",
+      "want": {
+        "charter": {
+          "id": "019a7f00-0000-7000-8000-000000000321",
+          "name": "Rules",
+          "rules": [],
+          "skill": [
+            "019a7f00-0000-7000-8000-0000000003ac"
+          ]
+        },
+        "guide": null,
+        "domains": []
+      },
+      "note": "The only copy of the skill's id in the Charter's text is in uppercase hex: a reader that compares the text as written finds no such Object and drops it; read as a UUID it is the Object, kept, in lowercase."
     }
   ]
 }

@@ -6,7 +6,7 @@
     "characters and members: the world every case reads. characters is the world's Characters (id to name), the names a reader shows; members is the members list as GET members returns its rows (the owner's row has id null, matching a created_by of null).",
     "addressed: isAddressedTo(message, character); an empty character id (\"\") is never addressed, not even by an empty characters. An empty characters addresses every member only when the message's x_served_trimmed (served by keel, a list of field names) does not name characters; with it, the message is addressed to no Character the reader is given. unseen: isAddressedTo as above beside hasUnseenRecipients(message) as unseen_recipients, true when x_served_trimmed names characters (someone the reader cannot see is a recipient; never who or how many). everyone: isToEveryone(message, keyless) as to_everyone and hasUnseenRecipients(message, keyless) as unseen_recipients, keyless true for a body served without a credential (the keyless public reader, which keel never serves the mark): isToEveryone is true only for a message with an empty characters, no mark naming characters, and a credential; hasUnseenRecipients is null (unknown) for a keyless body. A case without keyless (unseen) has a credential. A keyless body's null narrator keeps senderStatus unverifiable, never unseen: with no mark, the reader cannot tell nobody from someone hidden (keyless-null-narrator-is-unverifiable). A Note (note_pair) is not a message and is addressed to nobody. sent_by: isSentBy(message, character), whether narrator is the character; a message with no narrator is sent by nobody.",
     "sender: senderStatus(message, members) is status; a case with members null is a world whose members list the reader cannot read. status unseen is a null narrator beside an x_served_trimmed naming narrator (a sender the reader cannot see, shown as from someone you cannot see), distinct from unverifiable for a null narrator without the mark; claimed is the narrator (null: none, shown as from nobody, or unseen); written_by, on a mismatch, is the author's Character.",
-    "mark: readMarkOf(relations, character, members): of the Read relations given, the id of the reader's mark: actor the reader, written by the reader's own hand (the sender rule on actor: verified) or carrying no created_by at all (a folder, an export: no hand to check), and, where it carries changed_by, last changed by its creator (changed_by equal to created_by; a changed_by with no created_by beside it is ignored); the newest updated_at when there are several, whatever their order in the list; null when the reader has none, and always null for an empty character id.",
+    "mark: readMarkOf(relations, character, members): of the Read relations given, the id of the reader's mark: actor the reader, written by the reader's own hand (the sender rule on actor: verified) or carrying no created_by at all (a folder, an export: no hand to check), and, where it carries changed_by, last changed by its creator (changed_by equal to created_by; a changed_by with no created_by beside it is ignored); the newest updated_at when there are several, whatever their order in the list; null when the reader has none, and always null for an empty character id. keyless true is a body served without a credential (the keyless public reader, served no created_by or changed_by): no mark counts there, so readMarkOf(relations, character, members, keyless) is null; a case without keyless has a credential, or is a folder.",
     "order: created_at, read as an instant (an offset and a fraction of a second count), and two equal created_at keep the order of the list given (the server's list order); a created_at that cannot be read as a date and time (absent, null, 09:61, a word) comes after every readable one, in the order of the list given.",
     "unread: unreadFor(messages, reader, read_mark, members) for reader: messages only (a Note never), addressed to the reader, not sent by the reader, not on the mark; as ids in created_at order; read_mark null is a reader with no mark. Sent by the reader: a message with no created_by key (a folder, an export) is the reader's own when its narrator is the reader; one with created_by is the reader's own only when senderStatus against members is verified (a mismatch, an author off the list, no members list: unread for the Character it claims). A case without members reads the world's members; members null is a reader with no members list.",
     "thread: every message whose chain of parent_narrative reaches root, the root included, as ids in created_at order; a parent_narrative that is not a string (a number, null, an object) ends the chain there.",
@@ -2826,6 +2826,27 @@
         "019a3b10-0000-7000-8000-000000000cab",
         "019a3b10-0000-7000-8000-000000000ca9"
       ]
+    },
+    {
+      "kind": "mark",
+      "name": "mark-on-a-keyless-body-is-ignored",
+      "note": "The same mark as mark-in-a-folder-without-created-by-counts, served without a credential: the keyless public reader is served no created_by or changed_by on any body, so a mark there carries neither because the hands were taken off, not because it is a folder's, and it is ignored.",
+      "relations": [
+        {
+          "id": "019a3b10-0000-7000-8000-0000000000da",
+          "type": "relation",
+          "supertype": "Read",
+          "name": "Read: Mara",
+          "actor": "019a3b10-0000-7000-8000-0000000000a2",
+          "narratives": [
+            "019a3b10-0000-7000-8000-000000000c13"
+          ],
+          "updated_at": "2026-10-26T10:00:00Z"
+        }
+      ],
+      "reader": "019a3b10-0000-7000-8000-0000000000a2",
+      "keyless": true,
+      "mark": null
     }
   ]
 }

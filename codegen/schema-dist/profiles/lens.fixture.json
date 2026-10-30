@@ -4,7 +4,7 @@
   "notes": [
     "pair: construct + supertype Lens, each trimmed and folded like the room profile's pairs; a template is a lens whose subtype, trimmed and folded, is Template.",
     "keys: the legal values of x_lens; a case's legal is what a reader's check answers, and bad names the first key refused (x_lens itself when the value is not an object).",
-    "worlds: each world's elements as its owner is served them, the ids its hidden mark keeps from every reader but the owner, and its readers. A reader's rung is owner (the whole world), contributor (the world less the hidden), guest (exactly the whole and known_of ids it lists; known_of is a stub) or public (the world less the hidden and the room elements). An element whose x_review_proposed holds any value but null is in no reader's view (the review profile's rule for a reader that hands a world on). A reader with as is the owner reading as that reader: the reader's view, and the owner's two counts (anchor_not_visible, not_visible).",
+    "worlds: each world's elements as its owner is served them, the ids its hidden mark keeps from every reader but the owner, and its readers. A reader's rung is owner (the whole world), contributor (the world less the hidden), guest (exactly the whole and known_of ids it lists; known_of is a stub, and a known_of id the hidden mark keeps is not in its view at all: hidden beats known_of, and only a guest's own creation, listed in whole, stays) or public (the world less the hidden and the room elements). An element whose x_review_proposed holds any value but null is in no reader's view (the review profile's rule for a reader that hands a world on). A reader with as is the owner reading as that reader: the reader's view, and the owner's two counts (anchor_not_visible, not_visible).",
     "resolve: lens is the lens read, a body or the id of a lens in the world; as_of is the reading's date (absent: the world's now; with neither, no fence and the window cuts nothing); clock is the reading's wall clock, for the mail rule and changed_within. kept is the resolved set in order, cut the count by reason (a reason with no count is absent). rows, where given, are the kept rows as show makes them; mail, where given, is the mail rule's part; notes_ignored counts notes on ids that are not anchors.",
     "invariant: subset (each reader's kept is a subset of the owner's, and no secret's id or name appears anywhere in a non-owner result), same_without (each reader's result is identical with the without ids removed from the world), unchanged (the world is identical before and after every reader's reading).",
     "uses: which lenses a seat reads, from its membership's choice (null: none made) and its Character's x_lens_uses.",
@@ -735,6 +735,10 @@
         }
       ],
       "readers": {
+        "owner": {
+          "rung": "owner",
+          "character": null
+        },
         "seat": {
           "rung": "contributor",
           "character": "019a7f00-0000-7000-8000-000000000030"
@@ -1551,7 +1555,8 @@
       "now": 100,
       "hidden": [
         "019a7f00-0000-7000-8000-000000000410",
-        "019a7f00-0000-7000-8000-000000000411"
+        "019a7f00-0000-7000-8000-000000000411",
+        "019a7f00-0000-7000-8000-000000000413"
       ],
       "readers": {
         "owner": {
@@ -1572,9 +1577,20 @@
           "character": null,
           "whole": [
             "019a7f00-0000-7000-8000-000000000401",
-            "019a7f00-0000-7000-8000-000000000403"
+            "019a7f00-0000-7000-8000-000000000403",
+            "019a7f00-0000-7000-8000-000000000413"
           ],
           "known_of": []
+        },
+        "guest-told-of-the-heir": {
+          "rung": "guest",
+          "character": null,
+          "whole": [
+            "019a7f00-0000-7000-8000-000000000412"
+          ],
+          "known_of": [
+            "019a7f00-0000-7000-8000-000000000411"
+          ]
         },
         "public": {
           "rung": "public",
@@ -1771,6 +1787,12 @@
             "depth": 0
           },
           "updated_at": "2026-10-08T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000413",
+          "type": "character",
+          "name": "The Guest's Own Spy",
+          "updated_at": "2026-10-06T12:00:00Z"
         }
       ]
     }
@@ -9377,6 +9399,117 @@
         }
       ],
       "note": "A row is the body as the wire serves it to that reader: the owner's body of an element its hidden mark keeps from others carries hidden: true, derived from the world's hidden list by a reader holding a snapshot."
+    },
+    {
+      "name": "a-guests-full-row-of-its-own-hidden-creation-carries-hidden-true",
+      "kind": "resolve",
+      "world": "ledger",
+      "reader": "guest",
+      "lens": {
+        "id": "019a7f00-0000-7000-8000-000000000450",
+        "type": "construct",
+        "name": "A lens",
+        "supertype": "Lens",
+        "subtype": "",
+        "characters": [
+          "019a7f00-0000-7000-8000-000000000413"
+        ],
+        "x_lens": {
+          "depth": 0,
+          "show": "full"
+        }
+      },
+      "kept": [
+        "019a7f00-0000-7000-8000-000000000413"
+      ],
+      "cut": {},
+      "rows": [
+        {
+          "id": "019a7f00-0000-7000-8000-000000000413",
+          "type": "character",
+          "name": "The Guest's Own Spy",
+          "updated_at": "2026-10-06T12:00:00Z",
+          "hidden": true
+        }
+      ],
+      "note": "Below the owner the hidden key travels only on a guest's body of its own hidden creation, which the guest sees whole: the spy is the guest's own and hidden from every other reader, so the guest's row carries hidden: true."
+    },
+    {
+      "name": "a-hidden-element-a-guests-known-of-names-is-not-in-its-view",
+      "kind": "resolve",
+      "world": "ledger",
+      "reader": "guest-told-of-the-heir",
+      "lens": {
+        "id": "019a7f00-0000-7000-8000-000000000451",
+        "type": "construct",
+        "name": "A lens",
+        "supertype": "Lens",
+        "subtype": "",
+        "characters": [
+          "019a7f00-0000-7000-8000-000000000411"
+        ],
+        "species": [
+          "019a7f00-0000-7000-8000-000000000412"
+        ],
+        "x_lens": {
+          "depth": 0,
+          "show": "name"
+        }
+      },
+      "kept": [
+        "019a7f00-0000-7000-8000-000000000412"
+      ],
+      "cut": {},
+      "rows": [
+        {
+          "id": "019a7f00-0000-7000-8000-000000000412",
+          "type": "species",
+          "name": "Grey Gulls"
+        }
+      ],
+      "note": "Hidden beats known_of: the Heir is hidden and not the guest's own creation, so though the guest's known_of names it, it is not in the guest's view: no stub, no row, no count and no mark. The anchor is one the guest cannot see, and that count is the owner's alone."
+    },
+    {
+      "name": "an-owners-full-row-of-a-hidden-message-carries-hidden-true",
+      "kind": "resolve",
+      "world": "post",
+      "reader": "owner",
+      "lens": {
+        "id": "019a7f00-0000-7000-8000-00000000003a",
+        "type": "construct",
+        "name": "A lens",
+        "supertype": "Lens",
+        "subtype": "",
+        "narratives": [
+          "019a7f00-0000-7000-8000-000000000038"
+        ],
+        "x_lens": {
+          "depth": 0,
+          "show": "full"
+        }
+      },
+      "kept": [
+        "019a7f00-0000-7000-8000-000000000038"
+      ],
+      "cut": {},
+      "rows": [
+        {
+          "id": "019a7f00-0000-7000-8000-000000000038",
+          "type": "narrative",
+          "name": "Sealed",
+          "supertype": "Message",
+          "narrator": null,
+          "characters": [
+            "019a7f00-0000-7000-8000-000000000030"
+          ],
+          "story": "Kept back.",
+          "created_by": null,
+          "created_at": "2026-10-24T12:00:00Z",
+          "updated_at": "2026-10-24T12:00:00Z",
+          "hidden": true
+        }
+      ],
+      "note": "The hidden mark is the wire's, on every body it serves, not a lens row's own: the owner's full row of a hidden Message carries hidden: true as any hidden element's does, and so do a mail row and the Guide's body."
     },
     {
       "name": "an-unresolved-anchors-note-rides-on-no-row",

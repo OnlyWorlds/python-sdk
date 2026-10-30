@@ -4,6 +4,14 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+## 0.95.0 (2026-10-30)
+
+- **The readers follow schema-dist serial 95** (`v0.33.0-dist.95`), whose five new cases replay in `read_mark_of`, `resolve_lens` and `charter_of`. Two readings change for a caller:
+  - **`read_mark_of` takes `keyless`.** `read_mark_of(relations, character_id, members, keyless=True)` answers `None` for a body served without a credential, as `is_to_everyone` and `has_unseen_recipients` already take it. The keyless public reader is served no `created_by` or `changed_by` on any body, so its marks carry neither key because the hands were taken off, not because they are a folder's, and no mark counts there. `keyless` is a keyword, `False` by default, so every existing call reads as before; anything but `True` or `False` raises `TypeError`.
+  - **A hidden element a guest only knows of is not in its view.** A hidden element named in a guest's `known_of` that the guest did not make is now left out entirely, in `resolve_lens` and `world_graph`: no known-of stub, no row, no count, no mark. It was served as a stub carrying `hidden: true`. The hidden mark comes off the known-of grant too, and only the guest's own creation, listed in its `whole`, comes back, whole and marked.
+- The other new cases replay as the readers already answered: a guest's `full` row of its own hidden creation carries `hidden: true`; so does the owner's `full` row of a hidden Message, the mark riding on every served body; and a skill id the Charter names only in uppercase hex is the Object, kept, in lowercase.
+- The vendored schema-dist also carries `pairs.json`, the link a drag between two types writes; no reader in this release reads it.
+
 ## 0.94.0 (2026-10-30)
 
 - **The readers follow schema-dist serial 94** (`v0.33.0-dist.94`), whose twenty-four new cases replay in `charter_of`, `type_word`, `resolve_lens` and `world_graph`. These readings change for a caller:

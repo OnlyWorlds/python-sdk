@@ -1,0 +1,572 @@
+{
+ "version": 1,
+ "what": "The link a drag between two kinds writes: the pairs of the 22 types a tool may offer, each with the type that carries the field, the field, and whether the drop puts the dragged element inside the target. Presentation, not the standard. A pair absent here is not offered and draws no line; same-kind pairs and fields that name a role are absent by ruling.",
+ "ruled": "2026-10-30",
+ "pairs": {
+  "ability+character": {
+   "on": "character",
+   "field": "abilities",
+   "holds": false
+  },
+  "ability+collective": {
+   "on": "collective",
+   "field": "abilities",
+   "holds": false
+  },
+  "ability+creature": {
+   "on": "creature",
+   "field": "abilities",
+   "holds": false
+  },
+  "ability+event": {
+   "on": "event",
+   "field": "abilities",
+   "holds": false
+  },
+  "ability+family": {
+   "on": "family",
+   "field": "abilities",
+   "holds": false
+  },
+  "ability+narrative": {
+   "on": "narrative",
+   "field": "abilities",
+   "holds": false
+  },
+  "ability+relation": {
+   "on": "relation",
+   "field": "abilities",
+   "holds": false
+  },
+  "ability+species": {
+   "on": "species",
+   "field": "adaptations",
+   "holds": false
+  },
+  "character+collective": {
+   "on": "collective",
+   "field": "characters",
+   "holds": false
+  },
+  "character+construct": {
+   "on": "construct",
+   "field": "characters",
+   "holds": false
+  },
+  "character+event": {
+   "on": "event",
+   "field": "characters",
+   "holds": false
+  },
+  "character+family": {
+   "on": "character",
+   "field": "family",
+   "holds": false
+  },
+  "character+institution": {
+   "on": "character",
+   "field": "institutions",
+   "holds": false
+  },
+  "character+language": {
+   "on": "character",
+   "field": "languages",
+   "holds": false
+  },
+  "character+location": {
+   "on": "character",
+   "field": "location",
+   "holds": true
+  },
+  "character+narrative": {
+   "on": "narrative",
+   "field": "characters",
+   "holds": false
+  },
+  "character+object": {
+   "on": "character",
+   "field": "objects",
+   "holds": false
+  },
+  "character+relation": {
+   "on": "relation",
+   "field": "characters",
+   "holds": false
+  },
+  "character+species": {
+   "on": "character",
+   "field": "species",
+   "holds": false
+  },
+  "character+title": {
+   "on": "title",
+   "field": "holders",
+   "holds": false
+  },
+  "character+trait": {
+   "on": "character",
+   "field": "traits",
+   "holds": false
+  },
+  "collective+creature": {
+   "on": "collective",
+   "field": "creatures",
+   "holds": false
+  },
+  "collective+event": {
+   "on": "event",
+   "field": "collectives",
+   "holds": false
+  },
+  "collective+location": {
+   "on": "location",
+   "field": "populations",
+   "holds": false
+  },
+  "collective+narrative": {
+   "on": "narrative",
+   "field": "collectives",
+   "holds": false
+  },
+  "collective+object": {
+   "on": "collective",
+   "field": "equipment",
+   "holds": false
+  },
+  "collective+phenomenon": {
+   "on": "collective",
+   "field": "phenomena",
+   "holds": false
+  },
+  "collective+relation": {
+   "on": "relation",
+   "field": "collectives",
+   "holds": false
+  },
+  "collective+species": {
+   "on": "collective",
+   "field": "species",
+   "holds": false
+  },
+  "collective+title": {
+   "on": "title",
+   "field": "collectives",
+   "holds": false
+  },
+  "collective+zone": {
+   "on": "zone",
+   "field": "populations",
+   "holds": false
+  },
+  "construct+creature": {
+   "on": "construct",
+   "field": "creatures",
+   "holds": false
+  },
+  "construct+event": {
+   "on": "construct",
+   "field": "events",
+   "holds": false
+  },
+  "construct+family": {
+   "on": "construct",
+   "field": "families",
+   "holds": false
+  },
+  "construct+institution": {
+   "on": "construct",
+   "field": "institutions",
+   "holds": false
+  },
+  "construct+language": {
+   "on": "construct",
+   "field": "languages",
+   "holds": false
+  },
+  "construct+location": {
+   "on": "construct",
+   "field": "locations",
+   "holds": false
+  },
+  "construct+narrative": {
+   "on": "construct",
+   "field": "narratives",
+   "holds": false
+  },
+  "construct+object": {
+   "on": "construct",
+   "field": "objects",
+   "holds": false
+  },
+  "construct+phenomenon": {
+   "on": "construct",
+   "field": "phenomena",
+   "holds": false
+  },
+  "construct+relation": {
+   "on": "construct",
+   "field": "relations",
+   "holds": false
+  },
+  "construct+species": {
+   "on": "construct",
+   "field": "species",
+   "holds": false
+  },
+  "construct+title": {
+   "on": "construct",
+   "field": "titles",
+   "holds": false
+  },
+  "construct+trait": {
+   "on": "construct",
+   "field": "traits",
+   "holds": false
+  },
+  "construct+zone": {
+   "on": "construct",
+   "field": "zones",
+   "holds": false
+  },
+  "creature+event": {
+   "on": "event",
+   "field": "creatures",
+   "holds": false
+  },
+  "creature+family": {
+   "on": "family",
+   "field": "creatures",
+   "holds": false
+  },
+  "creature+institution": {
+   "on": "institution",
+   "field": "creatures",
+   "holds": false
+  },
+  "creature+language": {
+   "on": "creature",
+   "field": "languages",
+   "holds": false
+  },
+  "creature+location": {
+   "on": "creature",
+   "field": "location",
+   "holds": true
+  },
+  "creature+narrative": {
+   "on": "narrative",
+   "field": "creatures",
+   "holds": false
+  },
+  "creature+relation": {
+   "on": "relation",
+   "field": "creatures",
+   "holds": false
+  },
+  "creature+species": {
+   "on": "creature",
+   "field": "species",
+   "holds": false
+  },
+  "creature+title": {
+   "on": "title",
+   "field": "creatures",
+   "holds": false
+  },
+  "creature+trait": {
+   "on": "creature",
+   "field": "traits",
+   "holds": false
+  },
+  "creature+zone": {
+   "on": "creature",
+   "field": "zone",
+   "holds": true
+  },
+  "event+family": {
+   "on": "event",
+   "field": "families",
+   "holds": false
+  },
+  "event+institution": {
+   "on": "event",
+   "field": "institutions",
+   "holds": false
+  },
+  "event+language": {
+   "on": "event",
+   "field": "languages",
+   "holds": false
+  },
+  "event+location": {
+   "on": "event",
+   "field": "locations",
+   "holds": false
+  },
+  "event+narrative": {
+   "on": "narrative",
+   "field": "events",
+   "holds": true
+  },
+  "event+object": {
+   "on": "event",
+   "field": "objects",
+   "holds": false
+  },
+  "event+phenomenon": {
+   "on": "event",
+   "field": "phenomena",
+   "holds": false
+  },
+  "event+relation": {
+   "on": "event",
+   "field": "relations",
+   "holds": false
+  },
+  "event+species": {
+   "on": "event",
+   "field": "species",
+   "holds": false
+  },
+  "event+title": {
+   "on": "event",
+   "field": "titles",
+   "holds": false
+  },
+  "event+trait": {
+   "on": "event",
+   "field": "traits",
+   "holds": false
+  },
+  "event+zone": {
+   "on": "event",
+   "field": "zones",
+   "holds": false
+  },
+  "family+language": {
+   "on": "family",
+   "field": "languages",
+   "holds": false
+  },
+  "family+location": {
+   "on": "family",
+   "field": "estates",
+   "holds": false
+  },
+  "family+narrative": {
+   "on": "narrative",
+   "field": "families",
+   "holds": false
+  },
+  "family+object": {
+   "on": "family",
+   "field": "heirlooms",
+   "holds": false
+  },
+  "family+relation": {
+   "on": "relation",
+   "field": "families",
+   "holds": false
+  },
+  "family+title": {
+   "on": "title",
+   "field": "families",
+   "holds": false
+  },
+  "family+trait": {
+   "on": "family",
+   "field": "traits",
+   "holds": false
+  },
+  "institution+narrative": {
+   "on": "narrative",
+   "field": "institutions",
+   "holds": false
+  },
+  "institution+object": {
+   "on": "institution",
+   "field": "objects",
+   "holds": false
+  },
+  "institution+relation": {
+   "on": "relation",
+   "field": "institutions",
+   "holds": false
+  },
+  "institution+title": {
+   "on": "title",
+   "field": "institutions",
+   "holds": false
+  },
+  "language+location": {
+   "on": "language",
+   "field": "spread",
+   "holds": false
+  },
+  "language+narrative": {
+   "on": "narrative",
+   "field": "languages",
+   "holds": false
+  },
+  "language+relation": {
+   "on": "relation",
+   "field": "languages",
+   "holds": false
+  },
+  "language+title": {
+   "on": "title",
+   "field": "languages",
+   "holds": false
+  },
+  "law+location": {
+   "on": "law",
+   "field": "locations",
+   "holds": false
+  },
+  "law+narrative": {
+   "on": "narrative",
+   "field": "laws",
+   "holds": false
+  },
+  "law+zone": {
+   "on": "law",
+   "field": "zones",
+   "holds": false
+  },
+  "location+narrative": {
+   "on": "narrative",
+   "field": "locations",
+   "holds": false
+  },
+  "location+object": {
+   "on": "object",
+   "field": "location",
+   "holds": true
+  },
+  "location+phenomenon": {
+   "on": "phenomenon",
+   "field": "environments",
+   "holds": false
+  },
+  "location+relation": {
+   "on": "relation",
+   "field": "locations",
+   "holds": false
+  },
+  "location+species": {
+   "on": "species",
+   "field": "locations",
+   "holds": false
+  },
+  "location+title": {
+   "on": "title",
+   "field": "locations",
+   "holds": false
+  },
+  "location+zone": {
+   "on": "location",
+   "field": "zone",
+   "holds": true
+  },
+  "narrative+object": {
+   "on": "narrative",
+   "field": "objects",
+   "holds": false
+  },
+  "narrative+phenomenon": {
+   "on": "narrative",
+   "field": "phenomena",
+   "holds": false
+  },
+  "narrative+relation": {
+   "on": "narrative",
+   "field": "relations",
+   "holds": false
+  },
+  "narrative+species": {
+   "on": "narrative",
+   "field": "species",
+   "holds": false
+  },
+  "narrative+title": {
+   "on": "narrative",
+   "field": "titles",
+   "holds": false
+  },
+  "narrative+trait": {
+   "on": "narrative",
+   "field": "traits",
+   "holds": false
+  },
+  "narrative+zone": {
+   "on": "narrative",
+   "field": "zones",
+   "holds": false
+  },
+  "object+relation": {
+   "on": "relation",
+   "field": "objects",
+   "holds": false
+  },
+  "object+title": {
+   "on": "title",
+   "field": "symbols",
+   "holds": false
+  },
+  "phenomenon+relation": {
+   "on": "relation",
+   "field": "phenomena",
+   "holds": false
+  },
+  "phenomenon+title": {
+   "on": "title",
+   "field": "phenomena",
+   "holds": false
+  },
+  "phenomenon+zone": {
+   "on": "zone",
+   "field": "phenomena",
+   "holds": false
+  },
+  "relation+species": {
+   "on": "relation",
+   "field": "species",
+   "holds": false
+  },
+  "relation+title": {
+   "on": "relation",
+   "field": "titles",
+   "holds": false
+  },
+  "relation+trait": {
+   "on": "relation",
+   "field": "traits",
+   "holds": false
+  },
+  "relation+zone": {
+   "on": "relation",
+   "field": "zones",
+   "holds": false
+  },
+  "species+title": {
+   "on": "title",
+   "field": "species",
+   "holds": false
+  },
+  "species+trait": {
+   "on": "species",
+   "field": "traits",
+   "holds": false
+  },
+  "species+zone": {
+   "on": "species",
+   "field": "zones",
+   "holds": false
+  },
+  "title+zone": {
+   "on": "title",
+   "field": "zones",
+   "holds": false
+  }
+ }
+}

@@ -312,6 +312,8 @@ def read_mark_of[E: Mapping[str, Any]](
     relations: Iterable[E],
     character_id: str,
     members: Sequence[Mapping[str, Any]] | None,
+    *,
+    keyless: bool = False,
 ) -> E | None:
     """The reader's own read mark among ``relations``, or ``None`` when it has none.
 
@@ -327,7 +329,11 @@ def read_mark_of[E: Mapping[str, Any]](
     export) has no hand to check and counts. Of several that count, the one with the newest ``updated_at``
     wherever it stands in the list (equal times: the first in the list); a newer mark in another's hand is
     ignored and the reader's own older mark stands. A ``character_id`` that is empty or not a string names
-    no reader: ``None``."""
+    no reader: ``None``. A body read keyless (``keyless=True``, as ``is_to_everyone`` takes it: the public
+    reader, served no ``created_by`` or ``changed_by`` on any body) carries no hands because they were taken
+    off, not because it is a folder's, so no mark counts there: ``None``."""
+    if _keyless("read_mark_of", keyless):
+        return None
     if not isinstance(character_id, str) or not character_id:
         return None
     best: E | None = None
