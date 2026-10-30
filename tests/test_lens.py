@@ -502,10 +502,10 @@ def test_an_anchor_the_reader_cannot_see_is_counted_before_the_visited_check() -
 
 def test_a_full_row_of_a_hidden_element_carries_hidden_for_a_reader_that_sees_it() -> None:
     """lens.md (serial 94): a row is the body as the wire serves it, and keel's body of a hidden element carries
-    ``hidden: true`` for a reader that sees it (keel elements/serialize.py:388-391, :494-495; elements/lens.py:454 and
+    ``hidden: true`` for a reader that sees it (keel elements/serialize.py:388-391, :492-493; elements/lens.py:454 and
     :904 serve the full row as that body). A world-level ``hidden`` list reads as the element's own mark; a ``name``
-    or ``first_line`` row carries no ``hidden`` (:895-902); below the owner a hidden element is not in the view, so
-    the key never travels. The world is never written. The npm SDK holds the same case."""
+    or ``first_line`` row carries no ``hidden`` (:895-902); below the owner a hidden element is in no view but a
+    guest's whose lists name it. The world is never written. The npm SDK holds the same case."""
     lamp = {"id": _id(1), "type": "object", "name": "Lamp", "description": "Brass.\nOld."}
     cup = {"id": _id(2), "type": "object", "name": "Cup", "hidden": True}
     world: dict[str, Any] = {"elements": [lamp, cup], "hidden": [_id(1)]}
@@ -524,6 +524,45 @@ def test_a_full_row_of_a_hidden_element_carries_hidden_for_a_reader_that_sees_it
     # A guest is served a hidden element only as keel's view gives it one (its own making): then with the mark.
     guest = {"rung": "guest", "whole": [_id(1)], "known_of": []}
     assert resolve_lens(world, lens, guest)["rows"] == [{**lamp, "hidden": True}]
+    assert json.dumps(world, sort_keys=True) == before
+
+
+def test_only_a_served_body_of_a_hidden_element_carries_a_hidden_key() -> None:
+    """lens.md (serial 94): keel's serialize sets ``hidden: true`` on a body of a hidden element after the stub is
+    made (keel elements/serialize.py:463-464, :492-493), and no other body carries the key: a stored ``hidden: false``
+    or null is dropped. A guest's stub of a hidden element its lists name carries the mark, and so does the owner's
+    mail row of a hidden Message (keel elements/lens.py:955 serves it). The world is never written. The npm SDK
+    holds the same cases."""
+    lamp = {"id": _id(1), "type": "object", "name": "Lamp", "hidden": False}
+    cup = {"id": _id(2), "type": "object", "name": "Cup", "hidden": None}
+    vase = {"id": _id(3), "type": "object", "name": "Vase"}
+    world: dict[str, Any] = {"elements": [lamp, cup, vase], "hidden": [_id(3)]}
+    before = json.dumps(world, sort_keys=True)
+    lens = _lens_on({"objects": [_id(1), _id(2), _id(3)]}, {"depth": 0})
+    plain = [{"id": _id(1), "type": "object", "name": "Lamp"}, {"id": _id(2), "type": "object", "name": "Cup"}]
+    assert resolve_lens(world, lens, OWNER)["rows"] == [*plain, {**vase, "hidden": True}]
+    assert resolve_lens(world, lens, {"rung": "contributor"})["rows"] == plain
+    guest = {"rung": "guest", "whole": [], "known_of": [_id(3)]}
+    assert resolve_lens(world, lens, guest)["rows"] == [
+        {"id": _id(3), "type": "object", "name": "Vase", "known_of": True, "hidden": True}
+    ]
+    ada = {"id": _id(4), "type": "character", "name": "Ada"}
+    note = {
+        "id": _id(5),
+        "type": "narrative",
+        "supertype": "Message",
+        "name": "Hi",
+        "characters": [_id(4)],
+        "created_at": "2026-10-29T00:00:00Z",
+    }
+    post = {"elements": [ada, note], "hidden": [_id(5)]}
+    mail = resolve_lens(
+        post,
+        _lens_on({"characters": [_id(4)]}, {"depth": 0, "mail": "all"}),
+        {"rung": "owner", "character": _id(4)},
+        clock="2026-10-30T00:00:00Z",
+    )["mail"]
+    assert mail is not None and mail["rows"] == [{**note, "hidden": True}]
     assert json.dumps(world, sort_keys=True) == before
 
 

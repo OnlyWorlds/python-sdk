@@ -526,7 +526,8 @@ class _Reading:
         every id outside the view left out (``_trim``), and for a known-of element the stub made from it
         (``_stub``). A hidden element's body carries ``hidden: true``, the world's ``hidden`` list read as the
         element's own mark, for any reader it is served to (keel's serialize): the owner, and below it only a guest
-        whose lists name it, since no other rung's view holds a hidden element."""
+        whose lists name it (its stub too), since no other rung's view holds a hidden element. No other body carries
+        a ``hidden`` key: a stored ``false`` or null is dropped."""
         cached = self._served.get(eid)
         if cached is not None:
             return cached
@@ -537,8 +538,11 @@ class _Reading:
             self._trim(b, kind)
         if eid in self.stubs:
             b = _stub(b, kind)
+        # keel's served body carries the hidden mark as `hidden: true`, and no `hidden` key on any other body.
         if eid in self.hidden:
             b["hidden"] = True
+        else:
+            b.pop("hidden", None)
         self._served[eid] = b
         return b
 
