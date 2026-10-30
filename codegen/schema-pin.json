@@ -2,15 +2,20 @@
   "_what": "The recorded pin for the vendored OnlyWorlds schema distribution (codegen/schema-dist/, copied byte-exact). Do not edit by hand; re-vendor from the pinned tag and review the diff. Kept equal to the npm SDK's pin (github.com/OnlyWorlds/sdk, codegen/schema-pin.json) on purpose: two clients, one schema.",
   "_why_manifest_sha256": "Verifying the tree against its own MANIFEST.json only proves internal consistency. If the tag moved, the manifest moved with it. The hash recorded here is the one first accepted, which is what makes a moved tag visible.",
   "repo": "https://github.com/OnlyWorlds/schema-dist",
-  "tag": "v0.33.0-dist.98",
-  "commit": "dec0ac8fc21f9ef1bcc12748f7861511f5459a12",
-  "manifest_sha256": "0d7393711d1f2eebc615b9c40dd8ffc34e6266f4782d854aaf552fed3264a457",
+  "tag": "v0.33.0-dist.99",
+  "commit": "9f0619bd9ad7348494273320441f75550a415216",
+  "manifest_sha256": "cc7457288f92dcff0abd2d6828637c26c8be0ff5adeaf4ab7ee439622c1412ab",
   "canonical_version": "00.33.00",
-  "dist_serial": 98,
+  "dist_serial": 99,
   "published": "2026-10-30",
   "pinned_at": "2026-10-30",
   "pinned_by": "The maintainer: tree from `git archive` of the tag in a schema-dist checkout (198 files: the 197 the MANIFEST lists, and MANIFEST.json itself); files re-hashed against MANIFEST.json by generate_schema.py; MANIFEST self-hash matched against the raw file GitHub serves at the tag, whose ref resolves to the commit above.",
   "previous_pins": [
+    {
+      "tag": "v0.33.0-dist.98",
+      "manifest_sha256": "0d7393711d1f2eebc615b9c40dd8ffc34e6266f4782d854aaf552fed3264a457",
+      "note": "superseded by v0.33.0-dist.99 (profiles/strand.md: a strand begins when its story is chosen, only narrative required, event and location null or absent read as unset and any other non-string no mark; a non-list multi-link is empty; a nameless slot reads an empty string; the public rung reads only an open world; strand.fixture.json 26 cases; no schema file moved)"
+    },
     {
       "tag": "v0.33.0-dist.97",
       "manifest_sha256": "a236f055875a97fe97f6ee5a501bb9342d7a6b81192ba701cc185822c627f705",

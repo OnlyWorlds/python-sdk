@@ -4,6 +4,11 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+## 0.98.0 (2026-10-31)
+
+- **A strand begins when its story is chosen** (schema-dist serial 99). `x_strand` needs only `narrative`: `event` and `location` may each be `None` or absent, read as unset, so a world whose story is chosen before its happening and place reads as a strand begun, the story, hero and now filled and the other slots empty. A place named with no event is an empty place. The value is still no mark when `narrative` is missing or not a non-empty string, or when `event` or `location` is anything but a non-empty string, `None` or absent (an empty string, a number, a mapping), so a broken writer never shows as a half-built strand. `strand_of` reads every case of the serial's 26-case fixture; the npm SDK's `strandOf` answers the same.
+- **The schema pin moves to schema-dist serial 99** (`v0.33.0-dist.99`). No schema file moved.
+
 ## 0.97.0 (2026-10-30)
 
 - **`strand_of(world, reader)`, the strand profile's reader** (schema-dist serial 98, `profiles/strand.md`). A strand is a world in miniature: one story, one of its happenings, where that happened, the story's hero and where the hero is now, read off four links the standard already has. The World's mark `x_strand` (`STRAND_FIELD`) is a mapping of three ids, `{narrative, event, location}`; any other shape is no mark. `strand_of` answers `{narrative, event, location, character, now, same}` as `reader` sees the world, each filled slot `{id, name}` and an empty one `None`: `narrative` is the marked Narrative; `event` the marked Event when it is in the story's `events`; `location` the marked Location when it is in that event's `locations`; `character` the story's `protagonist`; `now` the hero's `location`; `same` True when `now` and `location` are one place (compared by id), False when two, else `None`. A slot holds only its own kind, no list order is read, and no slot is filled from another. The world and the reader are `resolve_lens`'s, so every slot is read through that reader's view and the bodies it is served: a story the reader knows only as a stub fills its own slot and nothing past it, and a public reader reads nothing of a world that is not open. Types `Strand`, `StrandSlot`. All 17 of the profile's fixture cases are the test; the npm SDK's `strandOf` answers the same.
