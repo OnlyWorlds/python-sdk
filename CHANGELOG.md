@@ -4,6 +4,10 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+## 0.96.0 (2026-10-30)
+
+- **`openers_for` takes `online` on the surface.** With `"online": False`, every row whose href is a web address (its scheme `http:` or `https:`, read from the row's own filled href) says "Needs a connection", the site's own `onlyworlds` row included, which had no word before. The order of words, the first that holds: "You are here" for the surface's own tool, then "Needs a connection", then the account, browser and phone words, then "Opens the world"; so offline, a row that needed a sign-in says the connection. A row whose link opens an app on the device (any other scheme) keeps its own word, and every row keeps its href. `online` defaults to True, which gives the rows as before; anything but True or False raises `TypeError` naming it. The shared fixture gains nine cases (54; the same bytes as the npm SDK's), and the npm SDK's `openersFor` gives the same rows.
+
 ## 0.95.2 (2026-10-30)
 
 - **The schema pin moves to schema-dist serial 97** (`v0.33.0-dist.97`). The address profile's writer paragraph states that an empty string is never absent: an empty world, type, id or lens refuses by that part's own reason (`bad_world`, `unknown_type`, `bad_id`, `bad_lens`), and only `None` or a missing key is absent. Four new format cases witness it, one per part. `element_address` already refuses each of them so; no reader changed.

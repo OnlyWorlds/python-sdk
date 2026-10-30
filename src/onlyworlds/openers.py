@@ -54,9 +54,12 @@ class Opener(TypedDict):
     state: str | None
 
 
-_SURFACE_KEYS = ("tool", "audience", "signed_in", "browser", "phone")
+_SURFACE_KEYS = ("tool", "audience", "signed_in", "browser", "phone", "online")
 _NEEDS = ("account", "device", None)
 _PLACEHOLDER = re.compile(r"\{(world|type|id)\}")
+# A web address: its scheme is http or https. Read from the row's filled href.
+_WEB = re.compile(r"https?:", re.IGNORECASE)
+_OFFLINE = "Needs a connection"
 
 
 def _fail(what: str) -> NoReturn:
@@ -79,10 +82,10 @@ def openers_for(
     """The rows of the Open with menu for a world (``kind="world"``) or one element of it (``"element"``), in order.
 
     First the site's own row (id ``onlyworlds``, name ``onlyworlds.com``, the world's or the element's page on
-    www.onlyworlds.com, never a word, for every audience), then one row per ``tools`` row, in the list's order,
-    that is ``listed`` and has a door for this kind. ``tools`` is the tools list's rows, ``TOOLS`` or the list as
-    served; ``address`` is an ``AddressReading`` from ``parse_ow_link`` or what ``element_address`` takes, with the
-    world's id. A lens and a moment on it ride on no href.
+    www.onlyworlds.com, for every audience, its one word "Needs a connection" when offline), then one row per
+    ``tools`` row, in the list's order, that is ``listed`` and has a door for this kind. ``tools`` is the tools
+    list's rows, ``TOOLS`` or the list as served; ``address`` is an ``AddressReading`` from ``parse_ow_link`` or
+    what ``element_address`` takes, with the world's id. A lens and a moment on it ride on no href.
 
     A row with ``open`` None, or with no door for this kind, is not there. On an element, a tool with only a world
     door is a row to its world door that says "Opens the world". For the ``public`` audience only rows whose
@@ -91,11 +94,13 @@ def openers_for(
     ``surface`` is a mapping of what the surface knows, and nothing is guessed: ``audience`` (``member``, a seat in
     the world, a guest included, or ``public``, the signed-out reader; required), ``signed_in`` (True, False, or
     None or absent when the surface cannot know), ``browser`` (False in a desktop app, which cannot see the
-    browser's sign-in; default True), ``phone`` (default False) and ``tool`` (the client name of the surface's own
-    tool, when it is a listed tool).
+    browser's sign-in; default True), ``phone`` (default False), ``online`` (False when the device has no
+    connection; default True) and ``tool`` (the client name of the surface's own tool, when it is a listed tool).
 
     Each row's ``state``, the first that holds: "You are here" for the surface's own tool (its ``client`` is
-    ``tool``); then what ``needs`` asks of this surface: ``account`` outside a browser "Opens in your browser", in a
+    ``tool``); then, when ``online`` is False, "Needs a connection" for a row whose href is a web address (scheme
+    ``http:`` or ``https:``; a row whose link opens an app on the device is unaffected, and the href stays in the row
+    either way); then what ``needs`` asks of this surface: ``account`` outside a browser "Opens in your browser", in a
     browser signed out "Sign in to <name> first" (none when ``signed_in`` is None: a word shows only when the
     surface knows it is true), ``device`` on a phone "Needs the world on this phone"; then "Opens the world" (a
     world door on an element: a sign-in the row needs is the more urgent word); else None.
@@ -146,6 +151,7 @@ def openers_for(
     signed_in = surface.get("signed_in")
     browser = surface.get("browser", True)
     phone = surface.get("phone", False)
+    online = surface.get("online", True)
     if audience not in ("member", "public"):
         _fail(f"surface audience is 'member' or 'public'; got {audience!r}")
     if tool is not None and not isinstance(tool, str):
@@ -156,12 +162,19 @@ def openers_for(
         _fail("surface browser is a boolean")
     if not isinstance(phone, bool):
         _fail("surface phone is a boolean")
+    if not isinstance(online, bool):
+        _fail("surface online is a boolean")
 
     def fill(template: str) -> str:
         return _PLACEHOLDER.sub(lambda m: values[m.group(1)], template)
 
+    def offline(href: str) -> bool:
+        return not online and _WEB.match(href) is not None
+
     site = page if kind == "element" else element_address({"form": "human", "world": world})
-    rows: list[Opener] = [{"id": "onlyworlds", "name": "onlyworlds.com", "href": site, "state": None}]
+    rows: list[Opener] = [
+        {"id": "onlyworlds", "name": "onlyworlds.com", "href": site, "state": _OFFLINE if offline(site) else None}
+    ]
     for r in tools:
         if not isinstance(r, Mapping) or not isinstance(r.get("id"), str) or not isinstance(r.get("name"), str):
             _fail("each tools row is a mapping with an id and a name")
@@ -184,10 +197,14 @@ def openers_for(
         if template is None:
             continue
         # The first that holds. A word the row needs (it cannot open now) comes before "Opens the world" (it
-        # opens, somewhere else), so a world door alone that needs a sign-in says the sign-in.
+        # opens, somewhere else), so a world door alone that needs a sign-in says the sign-in. With no connection a
+        # web link opens nothing, whatever else it needs.
+        href = fill(template)
         state: str | None = None
         if tool is not None and r.get("client") == tool:
             state = "You are here"
+        elif offline(href):
+            state = _OFFLINE
         elif needs == "account" and not browser:
             state = "Opens in your browser"
         elif needs == "account" and signed_in is False:
@@ -196,5 +213,5 @@ def openers_for(
             state = "Needs the world on this phone"
         elif kind == "element" and element_door is None:
             state = "Opens the world"
-        rows.append({"id": rid, "name": name, "href": fill(template), "state": state})
+        rows.append({"id": rid, "name": name, "href": href, "state": state})
     return rows

@@ -372,7 +372,7 @@ rows = openers_for(TOOLS, "element", parse_ow_link(link), {"audience": "member",
 #  {"id": "atlas", "name": "Atlas", "href": ..., "state": "Sign in to Atlas first"}, ...]
 ```
 
-`surface` says what the page knows and nothing is guessed: `audience` (`member` or `public`; the public sees only rows that need nothing first), `signed_in` (`None` when the page cannot know, and then no row says so), `browser` (False in a desktop app), `phone`, and `tool`, the page's own client name, whose row says "You are here". The npm SDK's `openersFor` gives the same rows.
+`surface` says what the page knows and nothing is guessed: `audience` (`member` or `public`; the public sees only rows that need nothing first), `signed_in` (`None` when the page cannot know, and then no row says so), `browser` (False in a desktop app), `phone`, `online` (False with no connection: every row whose link is a web address then says "Needs a connection"), and `tool`, the page's own client name, whose row says "You are here". The npm SDK's `openersFor` gives the same rows.
 
 ### The spine
 
