@@ -22,6 +22,7 @@ from onlyworlds import (
     resolve_lens,
     world_graph,
 )
+from onlyworlds.lens import _Reading
 
 REPO = Path(__file__).resolve().parent.parent
 FIXTURE = REPO / "codegen" / "schema-dist" / "profiles" / "lens.fixture.json"
@@ -73,9 +74,6 @@ def invariants(g: WorldGraph, c: Mapping[str, Any]) -> None:
         assert g["unreadable"] is None, f"{name}: unreadable is None without a lens"
 
 
-_UNSEEN = ("not_visible", "anchor_not_visible")
-
-
 def links_add_up(g: WorldGraph, c: Mapping[str, Any]) -> None:
     """Every link from a kept node to an element in the world is an edge or counted, read as the owner (the same
     view, the owner's counts); less the links the view leaves out, so is every link of the reader's own."""
@@ -83,11 +81,7 @@ def links_add_up(g: WorldGraph, c: Mapping[str, Any]) -> None:
     owner_view = reader if reader["rung"] == "owner" else {"rung": "owner", "as": reader}
     go = world_graph(c["world"], owner_view, lens=opts["lens"], as_of=opts.get("as_of"), clock=opts.get("clock"))
     by_id = {el["id"]: el for el in reversed(c["world"]["elements"])}
-
-    def linked(v: Any) -> int:
-        return 1 if isinstance(v, str) and v in by_id else 0
-
-    links = 0
+    targets: list[str] = []
     for n in go["nodes"]:
         if n.get("known_of"):
             continue
@@ -95,18 +89,24 @@ def links_add_up(g: WorldGraph, c: Mapping[str, Any]) -> None:
         for field, kind in FIELD_KINDS[n["type"]].items():
             v = el.get(field)
             if kind == "single_link":
-                links += linked(v)
+                targets += [v] if isinstance(v, str) and v in by_id else []
             elif kind == "multi_link" and isinstance(v, list):
-                links += sum(linked(t) for t in v)
+                targets += [t for t in v if isinstance(t, str) and t in by_id]
         for field in ("x_lens_leads_to", "x_spine_depends_on"):
             v = el.get(field)
             if isinstance(v, list):
-                links += sum(linked(t) for t in v)
-    assert len(go["edges"]) + sum(go["edges_cut"].values()) == links, (
+                targets += [t for t in v if isinstance(t, str) and t in by_id]
+    assert len(go["edges"]) + sum(go["edges_cut"].values()) == len(targets), (
         f"{name}: every link from a kept node is an edge or counted"
     )
-    in_view = links - sum(v for k, v in go["edges_cut"].items() if k in _UNSEEN)
-    assert len(g["edges"]) + sum(v for k, v in g["edges_cut"].items() if k not in _UNSEEN) == in_view, (
+    if reader["rung"] == "owner":
+        return  # the owner's own graph is the one just counted
+    # Below the owner: less only the links to an element outside the reader's own view, never every link the owner
+    # counts unseen, since serial 93 a wrongly typed anchor is counted anchor_not_visible for the owner even when its
+    # element is in the reader's view (the reader cuts that link by its own reason, outside_lens or the lens's).
+    view = _Reading(c["world"], reader, None).view
+    in_view = sum(1 for t in targets if t in view)
+    assert len(g["edges"]) + sum(g["edges_cut"].values()) == in_view, (
         f"{name}: every link from a kept node to an element the reader sees is an edge or counted"
     )
 
