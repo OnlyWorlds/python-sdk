@@ -101,6 +101,7 @@ from .push import Patch, PushPlan, PushResult, plan_push, push, verify_level
 from .review import PROPOSED_MARK, ProposedMark, hands_on_as_proposed, proposed_mark_of
 from .room import is_charter_element, is_room_element, reading_aid_of
 from .spine import SPINE_KINDS, SpineRead, read_spine_element
+from .strand import STRAND_FIELD, Strand, StrandSlot, strand_of
 from .worldfile import (
     WORLD_FILE_MEDIA_TYPE,
     WorldFile,
@@ -133,6 +134,7 @@ __all__ = [
     "SCHEMA_VERSION",
     "SKILL_MAX",
     "SPINE_KINDS",
+    "STRAND_FIELD",
     "TOOLS",
     "WORLD_FILE_MEDIA_TYPE",
     "AddressError",
@@ -171,6 +173,8 @@ __all__ = [
     "SkippedFile",
     "SpineRead",
     "StaleProposal",
+    "Strand",
+    "StrandSlot",
     "Tool",
     "ToolOpen",
     "Transport",
@@ -226,6 +230,7 @@ __all__ = [
     "sanitize_payload",
     "sender_status",
     "slugify",
+    "strand_of",
     "thread_of",
     "type_word",
     "unread_for",
