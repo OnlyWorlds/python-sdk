@@ -132,6 +132,8 @@ def test_path_segments_are_checked(make_client: MakeClient) -> None:
         lambda: c.list_page("a b"),
         lambda: c.draught("x/y"),
         lambda: c.world_lenses("w/1"),
+        lambda: c.get("character", "abc\n"),
+        lambda: c.get("character\n", ID),
     )
     for call in refused:
         with pytest.raises(ValueError, match="path segment"):

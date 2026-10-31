@@ -32,7 +32,7 @@ def parse_retry_after(value: str | None, now: float | None = None) -> float | No
     if value is None:
         return None
     text = value.strip()
-    if _DELAY_SECONDS.match(text):
+    if _DELAY_SECONDS.fullmatch(text):
         return float(int(text))
     try:
         parsed = email.utils.parsedate_to_datetime(text)

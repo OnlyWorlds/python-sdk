@@ -190,7 +190,7 @@ def _same_stored(a: Any, b: Any) -> bool:
 
 
 def _segment(value: str, pattern: re.Pattern[str], what: str) -> str:
-    if not isinstance(value, str) or not pattern.match(value):
+    if not isinstance(value, str) or not pattern.fullmatch(value):
         raise ValueError(f"{what} {value!r} is not a valid path segment")
     return value
 

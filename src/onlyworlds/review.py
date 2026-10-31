@@ -58,7 +58,7 @@ def proposed_mark_of(element: Any, today: str | None = None) -> ProposedMark | N
     not an object (a list included).
     ``today`` is a day as the profile writes one (YYYY-MM-DD), by default today in UTC; anything else is
     a TypeError."""
-    if today is not None and not (isinstance(today, str) and _DAY.match(today)):
+    if today is not None and not (isinstance(today, str) and _DAY.fullmatch(today)):
         raise TypeError(f"proposed_mark_of: today is a day as YYYY-MM-DD; got {today!r}.")
     if not isinstance(element, dict):
         return None
@@ -69,7 +69,9 @@ def proposed_mark_of(element: Any, today: str | None = None) -> ProposedMark | N
     by = raw_by.strip(_WHITE_SPACE) if isinstance(raw_by, str) and raw_by.strip(_WHITE_SPACE) else None
     raw_exp = v.get("expires")
     expires = (
-        raw_exp.strip(_WHITE_SPACE) if isinstance(raw_exp, str) and _DAY.match(raw_exp.strip(_WHITE_SPACE)) else None
+        raw_exp.strip(_WHITE_SPACE)
+        if isinstance(raw_exp, str) and _DAY.fullmatch(raw_exp.strip(_WHITE_SPACE))
+        else None
     )
     lapsed = expires is not None and expires <= (today or _today())
     return {"by": by, "expires": expires, "lapsed": lapsed}

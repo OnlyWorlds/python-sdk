@@ -122,4 +122,6 @@ def test_today_must_be_a_day() -> None:
         proposed_mark_of(_el({}), 20261026)  # type: ignore[arg-type]
     with pytest.raises(TypeError):
         proposed_mark_of(_el({}), ARABIC_DAY)
+    with pytest.raises(TypeError):  # Python's $ matches before a final newline; the day is the whole string
+        proposed_mark_of(_el({}), "2026-10-31\n")
     assert proposed_mark_of(_el({"by": "m1"})) is not None  # today in UTC by default
