@@ -193,6 +193,62 @@
     }
    }
   ],
+  "vbscript-link": [
+   {
+    "id": "skiff",
+    "name": "Skiff",
+    "url": "https://skiff.example",
+    "client": "skiff",
+    "rung": "listed",
+    "open": {
+     "world": "vbscript:msgbox({world})",
+     "element": null,
+     "needs": null
+    }
+   }
+  ],
+  "file-link": [
+   {
+    "id": "skiff",
+    "name": "Skiff",
+    "url": "https://skiff.example",
+    "client": "skiff",
+    "rung": "listed",
+    "open": {
+     "world": "https://skiff.example/{world}",
+     "element": "file:///C:/worlds/{id}",
+     "needs": null
+    }
+   }
+  ],
+  "blob-link": [
+   {
+    "id": "skiff",
+    "name": "Skiff",
+    "url": "https://skiff.example",
+    "client": "skiff",
+    "rung": "listed",
+    "open": {
+     "world": "blob:https://skiff.example/{world}",
+     "element": null,
+     "needs": null
+    }
+   }
+  ],
+  "about-link": [
+   {
+    "id": "skiff",
+    "name": "Skiff",
+    "url": "https://skiff.example",
+    "client": "skiff",
+    "rung": "listed",
+    "open": {
+     "world": "https://skiff.example/{world}",
+     "element": "about:blank#{id}",
+     "needs": null
+    }
+   }
+  ],
   "space-first": [
    {
     "id": "skiff",
@@ -2124,6 +2180,78 @@
    "name": "a-data-link-is-refused",
    "why": "the element template is held to the same rule as the world's, on a world menu too",
    "tools": "data-link",
+   "kind": "world",
+   "address": {
+    "form": "human",
+    "world": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f"
+   },
+   "surface": {
+    "audience": "member",
+    "signed_in": true
+   },
+   "refuse": {
+    "error": "type",
+    "names": "opens no app"
+   }
+  },
+  {
+   "name": "a-vbscript-link-is-refused",
+   "why": "each scheme that opens no app has its own case, so a reader that forgets one fails here: vbscript: on the world door",
+   "tools": "vbscript-link",
+   "kind": "world",
+   "address": {
+    "form": "human",
+    "world": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f"
+   },
+   "surface": {
+    "audience": "member",
+    "signed_in": true
+   },
+   "refuse": {
+    "error": "type",
+    "names": "opens no app"
+   }
+  },
+  {
+   "name": "a-file-link-is-refused",
+   "why": "each scheme that opens no app has its own case, so a reader that forgets one fails here: file: on the element door",
+   "tools": "file-link",
+   "kind": "world",
+   "address": {
+    "form": "human",
+    "world": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f"
+   },
+   "surface": {
+    "audience": "member",
+    "signed_in": true
+   },
+   "refuse": {
+    "error": "type",
+    "names": "opens no app"
+   }
+  },
+  {
+   "name": "a-blob-link-is-refused",
+   "why": "each scheme that opens no app has its own case, so a reader that forgets one fails here: blob: on the world door",
+   "tools": "blob-link",
+   "kind": "world",
+   "address": {
+    "form": "human",
+    "world": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f"
+   },
+   "surface": {
+    "audience": "member",
+    "signed_in": true
+   },
+   "refuse": {
+    "error": "type",
+    "names": "opens no app"
+   }
+  },
+  {
+   "name": "a-about-link-is-refused",
+   "why": "each scheme that opens no app has its own case, so a reader that forgets one fails here: about: on the element door",
+   "tools": "about-link",
    "kind": "world",
    "address": {
     "form": "human",
