@@ -4,6 +4,9 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+- **`me()`'s `reading_aids` carries `strand`** (schema-dist serial 100, the strand profile's rule 2): the server's front door serves the world's strand fourth in the reading aids, `strand_of`'s six slots as that key reads the world, every slot `None` when the world has no strand or its story is out of the key's view. The client passes the answer through as before; `me()`'s docstring names the key.
+- **The schema pin moves to schema-dist serial 100** (`v0.33.0-dist.100`). No schema file moved; the strand fixture is unchanged at 26 cases.
+
 ## 0.98.0 (2026-10-31)
 
 - **A strand begins when its story is chosen** (schema-dist serial 99). `x_strand` needs only `narrative`: `event` and `location` may each be `None` or absent, read as unset, so a world whose story is chosen before its happening and place reads as a strand begun, the story, hero and now filled and the other slots empty. A place named with no event is an empty place. The value is still no mark when `narrative` is missing or not a non-empty string, or when `event` or `location` is anything but a non-empty string, `None` or absent (an empty string, a number, a mapping), so a broken writer never shows as a half-built strand. `strand_of` reads every case of the serial's 26-case fixture; the npm SDK's `strandOf` answers the same.

@@ -2,15 +2,20 @@
   "_what": "The recorded pin for the vendored OnlyWorlds schema distribution (codegen/schema-dist/, copied byte-exact). Do not edit by hand; re-vendor from the pinned tag and review the diff. Kept equal to the npm SDK's pin (github.com/OnlyWorlds/sdk, codegen/schema-pin.json) on purpose: two clients, one schema.",
   "_why_manifest_sha256": "Verifying the tree against its own MANIFEST.json only proves internal consistency. If the tag moved, the manifest moved with it. The hash recorded here is the one first accepted, which is what makes a moved tag visible.",
   "repo": "https://github.com/OnlyWorlds/schema-dist",
-  "tag": "v0.33.0-dist.99",
-  "commit": "9f0619bd9ad7348494273320441f75550a415216",
-  "manifest_sha256": "cc7457288f92dcff0abd2d6828637c26c8be0ff5adeaf4ab7ee439622c1412ab",
+  "tag": "v0.33.0-dist.100",
+  "commit": "6ae742c9cfcdfc3f9bdff45891922260dd2501d1",
+  "manifest_sha256": "20cfc3b4bf2098c2bd22be8542cbe770717db1f468ce5e88a1de4929bfe89721",
   "canonical_version": "00.33.00",
-  "dist_serial": 99,
-  "published": "2026-10-30",
-  "pinned_at": "2026-10-30",
+  "dist_serial": 100,
+  "published": "2026-10-31",
+  "pinned_at": "2026-10-31",
   "pinned_by": "The maintainer: tree from `git archive` of the tag in a schema-dist checkout (198 files: the 197 the MANIFEST lists, and MANIFEST.json itself); files re-hashed against MANIFEST.json by generate_schema.py; MANIFEST self-hash matched against the raw file GitHub serves at the tag, whose ref resolves to the commit above.",
   "previous_pins": [
+    {
+      "tag": "v0.33.0-dist.99",
+      "manifest_sha256": "cc7457288f92dcff0abd2d6828637c26c8be0ff5adeaf4ab7ee439622c1412ab",
+      "note": "superseded by v0.33.0-dist.100 (profiles/strand.md rule 2 definite: the server's front door, GET /me and an agent's join reply, serves reading_aids.strand, the six slots of strandOf as that key reads the world, six null slots when the world has no strand or its story is out of view; profiles/charter.md rule 2 orders the aids Charter, Guide, Domains, then the strand; strand.fixture.json unchanged at 26 cases; no schema file moved)"
+    },
     {
       "tag": "v0.33.0-dist.98",
       "manifest_sha256": "0d7393711d1f2eebc615b9c40dd8ffc34e6266f4782d854aaf552fed3264a457",
