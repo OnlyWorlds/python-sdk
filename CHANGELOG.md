@@ -4,6 +4,8 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+## 0.98.1 (2026-10-31)
+
 - **`me()`'s `reading_aids` carries `strand`** (schema-dist serial 100, the strand profile's rule 2): the server's front door serves the world's strand fourth in the reading aids, `strand_of`'s six slots as that key reads the world, every slot `None` when the world has no strand or its story is out of the key's view. The client passes the answer through as before; `me()`'s docstring names the key.
 - **The schema pin moves to schema-dist serial 100** (`v0.33.0-dist.100`). No schema file moved; the strand fixture is unchanged at 26 cases.
 
