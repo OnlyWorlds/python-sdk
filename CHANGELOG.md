@@ -4,6 +4,10 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+## 0.99.2 (2026-10-31)
+
+- **`world_lenses()` refuses a world id that is not one path segment, as every other call does.** It quoted the id into the path, but the API decodes an escaped slash before it routes, so the quote could not keep `/` inside the segment. It now raises `ValueError` before anything is sent. The source scan no longer accepts a quoted value: every value in a path comes from the segment check.
+
 ## 0.99.1 (2026-10-31)
 
 - **`openers_for` refuses a link that opens no app.** A tools list row whose `open` template uses `javascript:`, `data:`, `vbscript:`, `file:`, `blob:` or `about:` (in any case), or does not begin with its scheme, raises `TypeError` naming the row. Four cases in the shared openers fixture (61, the same bytes as the npm SDK's).

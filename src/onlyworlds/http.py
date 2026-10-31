@@ -602,7 +602,7 @@ class Client:
         if resolve is not None and not isinstance(resolve, bool):
             raise TypeError(f"world_lenses: resolve is True or False, not {resolve!r}. Nothing was sent.")
         query = self._query({"resolve": resolve, "read_as": read_as})
-        path = f"world/{urllib.parse.quote(world_id, safe='')}/lenses"
+        path = f"world/{_segment(world_id, _ID, 'world id')}/lenses"
         data = self.call("GET", path + (f"?{query}" if query else ""))
         if not isinstance(data, dict) or not isinstance(data.get("data"), list):
             raise ValueError(f"GET /{path} returned no lens list: {str(data)[:200]}")

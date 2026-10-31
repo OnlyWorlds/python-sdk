@@ -131,6 +131,7 @@ def test_path_segments_are_checked(make_client: MakeClient) -> None:
         lambda: c.edit_links("character", ID, "a?b", add=[]),
         lambda: c.list_page("a b"),
         lambda: c.draught("x/y"),
+        lambda: c.world_lenses("w/1"),
     )
     for call in refused:
         with pytest.raises(ValueError, match="path segment"):
@@ -157,7 +158,7 @@ def test_every_request_path_is_built_from_checked_segments() -> None:
             if isinstance(node, ast.Assign) and isinstance(node.value, ast.Call):
                 f = node.value.func
                 name = f.id if isinstance(f, ast.Name) else f.attr if isinstance(f, ast.Attribute) else ""
-                if name in ("_segment", "quote", "_proposals_path"):
+                if name in ("_segment", "_proposals_path"):
                     out |= {t.id for t in node.targets if isinstance(t, ast.Name)}
         return out
 
@@ -168,9 +169,7 @@ def test_every_request_path_is_built_from_checked_segments() -> None:
                     inner = v.value
                     if isinstance(inner, ast.Name) and inner.id in ok:
                         continue
-                    if isinstance(inner, ast.Call) and (
-                        getattr(inner.func, "id", "") == "_segment" or getattr(inner.func, "attr", "") == "quote"
-                    ):
+                    if isinstance(inner, ast.Call) and getattr(inner.func, "id", "") == "_segment":
                         continue
                     raw.append(f"line {where}: {ast.unparse(inner)}")
         elif isinstance(expr, ast.BinOp):
@@ -444,12 +443,12 @@ def test_world_lenses_sends_resolve_and_read_as_without_the_pin() -> None:
     answer = {"data": [{"id": "l1", "name": "Harbour watch", "chosen": True}], "read_as": "guest"}
     t = FakeTransport(handler=lambda *a: jresp(200, answer))
     client = Client("ow_w_testkey", "1234", transport=t, agent=True, client="atlas")
-    assert client.world_lenses("w 1", resolve=True, read_as="guest") == answer
+    assert client.world_lenses("w1", resolve=True, read_as="guest") == answer
     client.world_lenses("w1")
     client.world_lenses("w1", resolve=False)
     first, second, third = t.calls
     assert first.method == "GET" and first.body is None
-    assert first.url == "https://www.onlyworlds.com/api/v2/world/w%201/lenses?resolve=true&read_as=guest"
+    assert first.url == "https://www.onlyworlds.com/api/v2/world/w1/lenses?resolve=true&read_as=guest"
     assert set(first.headers) == {"API-Key", "Accept", "User-Agent"}, "a read: the key alone, no PIN, no write header"
     assert second.url == "https://www.onlyworlds.com/api/v2/world/w1/lenses"
     assert third.url.endswith("/world/w1/lenses?resolve=false")
