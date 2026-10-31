@@ -82,7 +82,8 @@ def openers_for(
     """The rows of the Open with menu for a world (``kind="world"``) or one element of it (``"element"``), in order.
 
     First the site's own row (id ``onlyworlds``, name ``onlyworlds.com``, the world's or the element's page on
-    www.onlyworlds.com, for every audience, its one word "Needs a connection" when offline), then one row per
+    www.onlyworlds.com, for every audience, its one word "You are here" when ``surface["tool"]`` is ``onlyworlds``
+    (the site itself), else "Needs a connection" when offline), then one row per
     ``tools`` row, in the list's order, that is ``listed`` and has a door for this kind. ``tools`` is the tools
     list's rows, ``TOOLS`` or the list as served; ``address`` is an ``AddressReading`` from ``parse_ow_link`` or
     what ``element_address`` takes, with the world's id. A lens and a moment on it ride on no href.
@@ -173,7 +174,12 @@ def openers_for(
 
     site = page if kind == "element" else element_address({"form": "human", "world": world})
     rows: list[Opener] = [
-        {"id": "onlyworlds", "name": "onlyworlds.com", "href": site, "state": _OFFLINE if offline(site) else None}
+        {
+            "id": "onlyworlds",
+            "name": "onlyworlds.com",
+            "href": site,
+            "state": "You are here" if tool == "onlyworlds" else _OFFLINE if offline(site) else None,
+        }
     ]
     for r in tools:
         if not isinstance(r, Mapping) or not isinstance(r.get("id"), str) or not isinstance(r.get("name"), str):

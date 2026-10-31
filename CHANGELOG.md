@@ -4,6 +4,11 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+## 0.99.0 (2026-10-31)
+
+- **`tool="onlyworlds"` is the site itself.** `openers_for` gives the site's own row "You are here" when the surface names itself `onlyworlds`, before "Needs a connection", as a tool's own row already did. Three cases in the shared openers fixture (57 now, the same bytes as the npm SDK's).
+- **The schema pin moves to schema-dist serial 101** (`v0.33.0-dist.101`): a sentence on the strand page (a surface that only reads may draw the filled slots alone); no schema file moved, the strand fixture unchanged.
+
 ## 0.98.2 (2026-10-31)
 
 - **`draught()` refuses a Character id that is not one path segment, as every other call refuses its type, id and field.** It put `character_id` into the path as given, so an id carrying a `/` or `?` asked a different route; it now raises `ValueError` before anything is sent. A test reads every request path in the client's source and fails on one built from a value that is not checked or quoted.

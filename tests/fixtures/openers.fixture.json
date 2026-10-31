@@ -1370,6 +1370,119 @@
    ]
   },
   {
+   "name": "site-you-are-here",
+   "why": "tool onlyworlds is the site itself: its own row says You are here, every other row as before",
+   "tools": "three",
+   "kind": "world",
+   "address": {
+    "form": "human",
+    "world": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f"
+   },
+   "surface": {
+    "audience": "member",
+    "tool": "onlyworlds",
+    "signed_in": true
+   },
+   "expect": [
+    {
+     "id": "onlyworlds",
+     "name": "onlyworlds.com",
+     "href": "https://www.onlyworlds.com/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+     "state": "You are here"
+    },
+    {
+     "id": "zephyr",
+     "name": "Zephyr",
+     "href": "https://zephyr.example/#/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+     "state": null
+    },
+    {
+     "id": "bramble",
+     "name": "Bramble",
+     "href": "https://bramble.example/open/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+     "state": null
+    },
+    {
+     "id": "corvid",
+     "name": "Corvid",
+     "href": "https://corvid.example/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+     "state": null
+    }
+   ]
+  },
+  {
+   "name": "site-you-are-here-offline",
+   "why": "the site's own row says You are here before Needs a connection, as a tool's own row does",
+   "tools": "three",
+   "kind": "element",
+   "address": {
+    "form": "text",
+    "world": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+    "type": "character",
+    "id": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a"
+   },
+   "surface": {
+    "audience": "member",
+    "tool": "onlyworlds",
+    "signed_in": true,
+    "online": false
+   },
+   "expect": [
+    {
+     "id": "onlyworlds",
+     "name": "onlyworlds.com",
+     "href": "https://www.onlyworlds.com/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/character/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
+     "state": "You are here"
+    },
+    {
+     "id": "zephyr",
+     "name": "Zephyr",
+     "href": "https://zephyr.example/#/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/character/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
+     "state": "Needs a connection"
+    },
+    {
+     "id": "bramble",
+     "name": "Bramble",
+     "href": "https://bramble.example/open/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/e/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
+     "state": "Needs a connection"
+    },
+    {
+     "id": "corvid",
+     "name": "Corvid",
+     "href": "https://corvid.example/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/character/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
+     "state": "Needs a connection"
+    }
+   ]
+  },
+  {
+   "name": "site-you-are-here-public",
+   "why": "the public on the site sees its own row as You are here too",
+   "tools": "three",
+   "kind": "world",
+   "address": {
+    "form": "human",
+    "world": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f"
+   },
+   "surface": {
+    "audience": "public",
+    "tool": "onlyworlds"
+   },
+   "expect": [
+    {
+     "id": "onlyworlds",
+     "name": "onlyworlds.com",
+     "href": "https://www.onlyworlds.com/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+     "state": "You are here"
+    },
+    {
+     "id": "corvid",
+     "name": "Corvid",
+     "href": "https://corvid.example/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+     "state": null
+    }
+   ]
+  },
+  {
    "name": "offline-public",
    "why": "the public's rows say Needs a connection too; the rows that need something are still not there",
    "tools": "three",

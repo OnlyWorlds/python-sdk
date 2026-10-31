@@ -2,15 +2,20 @@
   "_what": "The recorded pin for the vendored OnlyWorlds schema distribution (codegen/schema-dist/, copied byte-exact). Do not edit by hand; re-vendor from the pinned tag and review the diff. Kept equal to the npm SDK's pin (github.com/OnlyWorlds/sdk, codegen/schema-pin.json) on purpose: two clients, one schema.",
   "_why_manifest_sha256": "Verifying the tree against its own MANIFEST.json only proves internal consistency. If the tag moved, the manifest moved with it. The hash recorded here is the one first accepted, which is what makes a moved tag visible.",
   "repo": "https://github.com/OnlyWorlds/schema-dist",
-  "tag": "v0.33.0-dist.100",
-  "commit": "6ae742c9cfcdfc3f9bdff45891922260dd2501d1",
-  "manifest_sha256": "20cfc3b4bf2098c2bd22be8542cbe770717db1f468ce5e88a1de4929bfe89721",
+  "tag": "v0.33.0-dist.101",
+  "commit": "4cfb0a52838042f7ccc2c41bd519fa425b43c582",
+  "manifest_sha256": "c42d43b385da46fcb4bb64df4072bb1a8b404ed028c9536eb9c37c50c33f5036",
   "canonical_version": "00.33.00",
-  "dist_serial": 100,
+  "dist_serial": 101,
   "published": "2026-10-31",
   "pinned_at": "2026-10-31",
   "pinned_by": "The maintainer: tree from `git archive` of the tag in a schema-dist checkout (198 files: the 197 the MANIFEST lists, and MANIFEST.json itself); files re-hashed against MANIFEST.json by generate_schema.py; MANIFEST self-hash matched against the raw file GitHub serves at the tag, whose ref resolves to the commit above.",
   "previous_pins": [
+    {
+      "tag": "v0.33.0-dist.100",
+      "manifest_sha256": "20cfc3b4bf2098c2bd22be8542cbe770717db1f468ce5e88a1de4929bfe89721",
+      "note": "superseded by v0.33.0-dist.101 (profiles/strand.md's Where it shows: the empty slot as the next thing to make is a writer's rule; a read-only surface may draw the filled slots alone, a strand begun still shown; strand.fixture.json unchanged at 26 cases; no schema file moved)"
+    },
     {
       "tag": "v0.33.0-dist.99",
       "manifest_sha256": "cc7457288f92dcff0abd2d6828637c26c8be0ff5adeaf4ab7ee439622c1412ab",
