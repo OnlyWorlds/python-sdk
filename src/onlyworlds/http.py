@@ -1286,7 +1286,8 @@ class Client:
                 "lens": lens,
             }
         )
-        page = self.call("GET", f"character/{character_id}/context" + (f"?{query}" if query else ""))
+        c = _segment(character_id, _ID, "character id")
+        page = self.call("GET", f"character/{c}/context" + (f"?{query}" if query else ""))
         if not isinstance(page, dict):
             raise ValueError(f"GET /character/{character_id}/context returned no packet: {str(page)[:200]}")
         return page

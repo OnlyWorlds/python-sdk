@@ -4,6 +4,10 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+## 0.98.2 (2026-10-31)
+
+- **`draught()` refuses a Character id that is not one path segment, as every other call refuses its type, id and field.** It put `character_id` into the path as given, so an id carrying a `/` or `?` asked a different route; it now raises `ValueError` before anything is sent. A test reads every request path in the client's source and fails on one built from a value that is not checked or quoted.
+
 ## 0.98.1 (2026-10-31)
 
 - **`me()`'s `reading_aids` carries `strand`** (schema-dist serial 100, the strand profile's rule 2): the server's front door serves the world's strand fourth in the reading aids, `strand_of`'s six slots as that key reads the world, every slot `None` when the world has no strand or its story is out of the key's view. The client passes the answer through as before; `me()`'s docstring names the key.

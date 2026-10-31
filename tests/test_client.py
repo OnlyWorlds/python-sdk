@@ -130,10 +130,84 @@ def test_path_segments_are_checked(make_client: MakeClient) -> None:
         lambda: c.get("Character", ID),
         lambda: c.edit_links("character", ID, "a?b", add=[]),
         lambda: c.list_page("a b"),
+        lambda: c.draught("x/y"),
     )
     for call in refused:
         with pytest.raises(ValueError, match="path segment"):
             call()
+
+
+def test_every_request_path_is_built_from_checked_segments() -> None:
+    """A caller's string never changes which route is asked: every value in a path the client
+    builds comes from ``_segment`` (refused before the wire when it is not one segment) or from
+    ``quote``, or is the query string. Read from the source, so a new route joins the scan."""
+    import ast
+    import pathlib
+
+    import onlyworlds.http as http
+
+    tree = ast.parse(pathlib.Path(http.__file__).read_text(encoding="utf-8"))
+    sends = {"call", "send", "_element_write"}
+    seen = 0
+    raw: list[str] = []
+
+    def safe_names(fn: ast.AST) -> set[str]:
+        out = {"query"}
+        for node in ast.walk(fn):
+            if isinstance(node, ast.Assign) and isinstance(node.value, ast.Call):
+                f = node.value.func
+                name = f.id if isinstance(f, ast.Name) else f.attr if isinstance(f, ast.Attribute) else ""
+                if name in ("_segment", "quote", "_proposals_path"):
+                    out |= {t.id for t in node.targets if isinstance(t, ast.Name)}
+        return out
+
+    def check(expr: ast.AST, ok: set[str], where: int) -> None:
+        if isinstance(expr, ast.JoinedStr):
+            for v in expr.values:
+                if isinstance(v, ast.FormattedValue):
+                    inner = v.value
+                    if isinstance(inner, ast.Name) and inner.id in ok:
+                        continue
+                    if isinstance(inner, ast.Call) and (
+                        getattr(inner.func, "id", "") == "_segment" or getattr(inner.func, "attr", "") == "quote"
+                    ):
+                        continue
+                    raw.append(f"line {where}: {ast.unparse(inner)}")
+        elif isinstance(expr, ast.BinOp):
+            check(expr.left, ok, where)
+            right = expr.right
+            if isinstance(right, ast.IfExp):  # the "?query" tail
+                check(right.body, ok, where)
+            else:
+                check(right, ok, where)
+        elif isinstance(expr, ast.Name):
+            if expr.id not in ok | {"path"}:
+                raw.append(f"line {where}: {expr.id}")
+        elif isinstance(expr, ast.Call) and getattr(expr.func, "attr", "") == "_proposals_path":
+            pass
+        elif not isinstance(expr, ast.Constant):
+            raw.append(f"line {where}: {ast.unparse(expr)}")
+
+    for fn in ast.walk(tree):
+        if not isinstance(fn, (ast.FunctionDef, ast.AsyncFunctionDef)):
+            continue
+        ok = safe_names(fn)
+        for node in ast.walk(fn):
+            if isinstance(node, ast.Assign) and any(isinstance(t, ast.Name) and t.id == "path" for t in node.targets):
+                seen += 1
+                check(node.value, ok, node.lineno)
+            if (
+                isinstance(node, ast.Call)
+                and isinstance(node.func, ast.Attribute)
+                and node.func.attr in sends
+                and isinstance(node.func.value, ast.Name)
+                and node.func.value.id == "self"
+                and len(node.args) >= 2
+            ):
+                seen += 1
+                check(node.args[1], ok, node.lineno)
+    assert seen >= 30, f"found {seen} request paths; the scan lost its shape"
+    assert raw == [], raw
 
 
 # --- create, ids and idempotency ----------------------------------------
