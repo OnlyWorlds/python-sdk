@@ -66,11 +66,25 @@ def _fail(what: str) -> NoReturn:
     raise TypeError(f"openers_for: {what}")
 
 
+_NO_APP = ("javascript", "data", "vbscript", "file", "blob", "about")
+_SCHEME = re.compile(r"^([A-Za-z][A-Za-z0-9+.-]*):")
+
+
 def _template(row: str, key: str, value: object) -> str | None:
-    """A template string or None."""
-    if value is None or isinstance(value, str):
-        return value
-    _fail(f"tool {row}: open.{key} is a link template or None")
+    """A template string or None. A template begins with its scheme (a browser drops leading spaces before
+    reading one), and a scheme that opens no app (a press would run what the link carries) is refused, in
+    any case."""
+    if value is None:
+        return None
+    if not isinstance(value, str):
+        _fail(f"tool {row}: open.{key} is a link template or None")
+    m = _SCHEME.match(value)
+    if m is None:
+        _fail(f"tool {row}: open.{key} begins with its scheme")
+    scheme = m.group(1).lower()
+    if scheme in _NO_APP:
+        _fail(f"tool {row}: open.{key} is a {scheme}: link, which opens no app")
+    return value
 
 
 def openers_for(

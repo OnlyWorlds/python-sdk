@@ -150,7 +150,63 @@
     }
    }
   ],
-  "empty": []
+  "empty": [],
+  "script-link": [
+   {
+    "id": "skiff",
+    "name": "Skiff",
+    "url": "https://skiff.example",
+    "client": "skiff",
+    "rung": "listed",
+    "open": {
+     "world": "javascript:alert(1)//{world}",
+     "element": null,
+     "needs": null
+    }
+   }
+  ],
+  "script-link-case": [
+   {
+    "id": "skiff",
+    "name": "Skiff",
+    "url": "https://skiff.example",
+    "client": "skiff",
+    "rung": "listed",
+    "open": {
+     "world": "JavaScript:alert(1)//{world}",
+     "element": null,
+     "needs": null
+    }
+   }
+  ],
+  "data-link": [
+   {
+    "id": "skiff",
+    "name": "Skiff",
+    "url": "https://skiff.example",
+    "client": "skiff",
+    "rung": "listed",
+    "open": {
+     "world": "https://skiff.example/{world}",
+     "element": "data:text/html,{id}",
+     "needs": null
+    }
+   }
+  ],
+  "space-first": [
+   {
+    "id": "skiff",
+    "name": "Skiff",
+    "url": "https://skiff.example",
+    "client": "skiff",
+    "rung": "listed",
+    "open": {
+     "world": " https://skiff.example/{world}",
+     "element": null,
+     "needs": null
+    }
+   }
+  ]
  },
  "cases": [
   {
@@ -2026,6 +2082,78 @@
    "refuse": {
     "error": "type",
     "names": "needs"
+   }
+  },
+  {
+   "name": "a-script-link-is-refused",
+   "why": "a template whose scheme opens no app (javascript:, data:, vbscript:, file:, blob:, about:) is refused, never drawn as a row a press would run",
+   "tools": "script-link",
+   "kind": "world",
+   "address": {
+    "form": "human",
+    "world": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f"
+   },
+   "surface": {
+    "audience": "member",
+    "signed_in": true
+   },
+   "refuse": {
+    "error": "type",
+    "names": "opens no app"
+   }
+  },
+  {
+   "name": "a-script-link-in-any-case-is-refused",
+   "why": "a scheme is read in any case, as a browser reads it",
+   "tools": "script-link-case",
+   "kind": "world",
+   "address": {
+    "form": "human",
+    "world": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f"
+   },
+   "surface": {
+    "audience": "member",
+    "signed_in": true
+   },
+   "refuse": {
+    "error": "type",
+    "names": "opens no app"
+   }
+  },
+  {
+   "name": "a-data-link-is-refused",
+   "why": "the element template is held to the same rule as the world's, on a world menu too",
+   "tools": "data-link",
+   "kind": "world",
+   "address": {
+    "form": "human",
+    "world": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f"
+   },
+   "surface": {
+    "audience": "member",
+    "signed_in": true
+   },
+   "refuse": {
+    "error": "type",
+    "names": "opens no app"
+   }
+  },
+  {
+   "name": "a-template-begins-with-its-scheme",
+   "why": "a browser drops leading spaces before reading a scheme, so a template that does not begin with one is refused",
+   "tools": "space-first",
+   "kind": "world",
+   "address": {
+    "form": "human",
+    "world": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f"
+   },
+   "surface": {
+    "audience": "member",
+    "signed_in": true
+   },
+   "refuse": {
+    "error": "type",
+    "names": "begins with its scheme"
    }
   }
  ]

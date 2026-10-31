@@ -4,6 +4,10 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+## 0.99.1 (2026-10-31)
+
+- **`openers_for` refuses a link that opens no app.** A tools list row whose `open` template uses `javascript:`, `data:`, `vbscript:`, `file:`, `blob:` or `about:` (in any case), or does not begin with its scheme, raises `TypeError` naming the row. Four cases in the shared openers fixture (61, the same bytes as the npm SDK's).
+
 ## 0.99.0 (2026-10-31)
 
 - **`tool="onlyworlds"` is the site itself.** `openers_for` gives the site's own row "You are here" when the surface names itself `onlyworlds`, before "Needs a connection", as a tool's own row already did. Three cases in the shared openers fixture (57 now, the same bytes as the npm SDK's).
