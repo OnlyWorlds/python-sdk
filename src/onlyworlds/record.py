@@ -4,9 +4,10 @@ live in.
 The run is an Event carrying the mark ``x_record`` (``tool`` and ``played_at`` required; ``version``, ``seed``,
 ``outcome`` and ``seats`` optional), the game's own tally beside it under its own prefix. Who took part is the Event's
 ``characters`` alone; a Narrative that lists the Event in ``events`` and names a Character as ``protagonist`` or
-``narrator`` is that Character's story of it. A run or a story still proposed (the review profile's
-``x_review_proposed``, any value but null) is not read until a keeper settles it. ``records_of(character_id,
-elements)`` reads the elements as the reader is served them. Pure: nothing is stored or written. The fixture
+``narrator`` is that Character's story of it. A run or a story the review profile reads as proposed
+(``proposed_mark_of``: an empty mark is settled; serial 103) is not read until a keeper settles it.
+``records_of(character_id, elements)`` reads the elements as the reader is served them. Pure: nothing is stored or
+written. The fixture
 (``codegen/schema-dist/profiles/record.fixture.json``) is replayed whole by ``tests/test_record.py``; the npm SDK's
 ``recordsOf`` gives the same answers on the same input.
 """
@@ -17,6 +18,8 @@ import re
 from collections.abc import Mapping, Sequence
 from datetime import UTC, datetime
 from typing import Any, Literal, TypedDict
+
+from .review import proposed_mark_of
 
 #: The Event's field that carries the record's mark.
 RECORD_FIELD = "x_record"
@@ -66,7 +69,8 @@ def _unset_or(value: Any, ok: bool) -> bool:
 
 
 def _proposed(element: Mapping[str, Any]) -> bool:
-    return element.get("x_review_proposed") is not None
+    """Proposed exactly when the review profile's reader says so (serial 103): an empty mark ({}, "", []) is settled."""
+    return proposed_mark_of(element) is not None
 
 
 def _hashable(value: Any) -> bool:

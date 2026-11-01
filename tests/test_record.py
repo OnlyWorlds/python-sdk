@@ -98,6 +98,14 @@ def test_a_played_at_with_digits_outside_ascii_is_no_mark(played_at: str) -> Non
     assert record_mark_of({"id": "e", "type": "event", "x_record": {"tool": "tangle", "played_at": played_at}}) is None
 
 
+def test_an_empty_proposed_mark_is_settled() -> None:
+    """Staged for serial 103 (an empty proposed mark is settled, as the review profile reads it); the fixture's own
+    case replaces this test and its file at the repin."""
+    staged = json.loads((Path(__file__).parent / "fixtures" / "record-103-staged.json").read_text(encoding="utf-8"))
+    harbour = next(iter(DOC["worlds"].values()))["elements"]
+    assert records_of(staged["character"], [*harbour, *staged["elements"]]) == staged["want"]
+
+
 def test_records_of_refuses_what_is_not_an_id_or_a_list() -> None:
     with pytest.raises(TypeError):
         records_of(None, [])  # type: ignore[arg-type]
