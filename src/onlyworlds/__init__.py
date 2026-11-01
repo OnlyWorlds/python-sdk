@@ -98,6 +98,7 @@ from .message import (
 from .names import type_word
 from .openers import Opener, Tool, ToolOpen, openers_for
 from .push import Patch, PushPlan, PushResult, plan_push, push, verify_level
+from .record import RECORD_FIELD, Record, RecordMark, RecordStory, record_mark_of, records_of
 from .review import PROPOSED_MARK, ProposedMark, hands_on_as_proposed, proposed_mark_of
 from .room import is_charter_element, is_room_element, reading_aid_of
 from .spine import SPINE_KINDS, SpineRead, read_spine_element
@@ -128,6 +129,7 @@ __all__ = [
     "READING_AID_PAIRS",
     "READ_MARK_PAIR",
     "READ_ONLY_FIELDS",
+    "RECORD_FIELD",
     "ROOM_PAIRS",
     "SCHEMA_DIST_TAG",
     "SCHEMA_MANIFEST_SHA256",
@@ -166,6 +168,9 @@ __all__ = [
     "ProposedMark",
     "PushPlan",
     "PushResult",
+    "Record",
+    "RecordMark",
+    "RecordStory",
     "Response",
     "RetryPolicy",
     "SenderRead",
@@ -225,6 +230,8 @@ __all__ = [
     "read_world_file",
     "reading_aid_of",
     "recipients_of",
+    "record_mark_of",
+    "records_of",
     "resolve_filenames",
     "resolve_lens",
     "sanitize_payload",
