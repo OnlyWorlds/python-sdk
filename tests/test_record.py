@@ -86,6 +86,18 @@ def test_a_narrative_naming_an_event_twice_is_one_story_and_no_two_records_share
     assert got[1]["stories"][0]["name"] == "One"
 
 
+@pytest.mark.parametrize(
+    "played_at",
+    [
+        "\uff12\uff10\uff12\uff16-11-01T00:00:00Z",
+        "\u0662\u0660\u0662\u0666-11-01T00:00:00Z",
+        "2026-11-01T00:00:0\u0669Z",
+    ],
+)
+def test_a_played_at_with_digits_outside_ascii_is_no_mark(played_at: str) -> None:
+    assert record_mark_of({"id": "e", "type": "event", "x_record": {"tool": "tangle", "played_at": played_at}}) is None
+
+
 def test_records_of_refuses_what_is_not_an_id_or_a_list() -> None:
     with pytest.raises(TypeError):
         records_of(None, [])  # type: ignore[arg-type]

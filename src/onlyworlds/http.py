@@ -87,7 +87,7 @@ _ID = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_.-]*$")
 #: keel's rule for ``X-OW-Client``, matched whole (``fullmatch``: a trailing newline is outside it).
 _CLIENT_NAME = re.compile(r"[a-z0-9-]{1,32}")
 #: A legacy (v1-era) key: ten digits, matched whole. It sends its PIN on every request.
-_LEGACY_KEY = re.compile(r"\d{10}")
+_LEGACY_KEY = re.compile(r"[0-9]{10}")  # ASCII digits: \d takes any Unicode digit
 #: Namespace for ids derived from a caller's Idempotency-Key (``_minted_id``).
 _KEYED_IDS = uuid.UUID("0199b6a0-6f0e-7c2a-9d1e-3b5c7a8e4f21")
 

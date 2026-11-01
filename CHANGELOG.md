@@ -4,6 +4,10 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+## 0.100.2 (2026-11-01)
+
+- **`record_mark_of` takes only ASCII digits in `played_at`.** Python's `\d` matches any Unicode digit and `int()` reads it, so a full-width or Arabic-Indic year was read as a mark, where the npm SDK and keel refuse it as RFC 3339 does. The 10-digit legacy key check had the same pattern: a key of full-width digits no longer counts as a legacy key.
+
 ## 0.100.1 (2026-11-01)
 
 - **`records_of` reads a world in one pass.** It finds the Character's stories by each Event they name once, then looks each record's stories up, where it scanned every element again for each record. Every answer is the same as 0.100.0's and as the npm SDK's (compared on 20,000 random worlds, including Narratives that name an Event twice and `events` lists holding other values), and each record's stories are its own dicts.

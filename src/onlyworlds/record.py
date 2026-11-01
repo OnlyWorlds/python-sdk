@@ -22,7 +22,8 @@ from typing import Any, Literal, TypedDict
 RECORD_FIELD = "x_record"
 
 _TOOL = re.compile(r"[a-z0-9-]{1,32}")
-_PLAYED_AT = re.compile(r"(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})(?::(\d{2})(?:\.(\d+))?)?Z")
+# ASCII digits only: Python's \d takes any Unicode digit (a full-width year) and int() reads it; npm and keel do not.
+_PLAYED_AT = re.compile(r"([0-9]{4})-([0-9]{2})-([0-9]{2})T([0-9]{2}):([0-9]{2})(?::([0-9]{2})(?:\.([0-9]+))?)?Z")
 _OUTCOME = re.compile(r"[a-z]{1,24}")
 
 

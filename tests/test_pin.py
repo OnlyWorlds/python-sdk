@@ -102,6 +102,12 @@ def test_the_pin_rides_only_where_keel_checks_it() -> None:
         ("ow_w_testkey", "post", "anything/new/", True),
         ("01234567890", "GET", "anything/", False),  # eleven digits: not a legacy key
         ("0123456789", "GET", "anything/", True),
+        (
+            "\uff10\uff11\uff12\uff13\uff14\uff15\uff16\uff17\uff18\uff19",
+            "GET",
+            "anything/",
+            False,
+        ),  # full-width digits: not a legacy key
     ],
 )
 def test_the_rule_is_derived_from_the_request(key: str, method: str, path: str, pinned: bool) -> None:
