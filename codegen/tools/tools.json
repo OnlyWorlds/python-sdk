@@ -136,6 +136,74 @@
           "on": "2026-10-23"
         }
       }
+    },
+    {
+      "id": "little-lens",
+      "name": "Little Lens",
+      "sentence": "Look at a world as a web of its elements and links, and at each element with what it links to and what links to it; it only reads.",
+      "url": "https://little-lens.onlyworlds.com",
+      "source": "https://github.com/OnlyWorlds/little-lens",
+      "source_note": null,
+      "maker": "OnlyWorlds (Temper, an AI agent working for Titus)",
+      "doors": [
+        "api",
+        "owworld",
+        "folder"
+      ],
+      "open": {
+        "world": "https://little-lens.onlyworlds.com/#/open/{world}",
+        "element": "https://little-lens.onlyworlds.com/#/open/{world}/element/{id}",
+        "needs": null
+      },
+      "client": "little-lens",
+      "prefix": null,
+      "free_core": "Open any public world with no account, and a world file or folder with nothing sent anywhere; the worlds you own or joined with a free account.",
+      "paid": null,
+      "rung": "listed",
+      "listed_on": "2026-10-31",
+      "listed_by": "Kael, the OnlyWorlds maintainer, on a read of the seven lines at little-lens c1721fe",
+      "delisted_on": null,
+      "delisted_why": null,
+      "submission": "https://github.com/OnlyWorlds/tools/blob/master/reads/2026-10-31-little-lens.md",
+      "checks": {
+        "what_it_says": {
+          "result": "pass",
+          "how": "read",
+          "on": "2026-10-31"
+        },
+        "keys_stay": {
+          "result": "pass",
+          "how": "read in source",
+          "on": "2026-10-31",
+          "note": "No world key or PIN is asked for; a sign-in's account token is held in the page's memory only, never stored, and revoked when the page is left."
+        },
+        "names_itself": {
+          "result": "pass",
+          "how": "read in source",
+          "on": "2026-10-31"
+        },
+        "speaks_the_wire": {
+          "result": "pass",
+          "how": "read in source",
+          "on": "2026-10-31"
+        },
+        "what_leaves": {
+          "result": "pass",
+          "how": "read in source",
+          "on": "2026-10-31",
+          "note": "No world data leaves: worlds are read from www.onlyworlds.com (keyless, or with the account token), pictures load only from media.onlyworlds.com, and a world file or folder is read in the browser and sent nowhere."
+        },
+        "host": {
+          "result": "pass",
+          "how": "read",
+          "on": "2026-10-31"
+        },
+        "free_core": {
+          "result": "pass",
+          "how": "read",
+          "on": "2026-10-31"
+        }
+      }
     }
   ]
 }

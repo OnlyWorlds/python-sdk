@@ -4,6 +4,10 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+## 0.99.4 (2026-11-01)
+
+- **`TOOLS` carries Little Lens.** The tools list is repinned at `a1573ac` (from `86208c8`), the npm SDK's pin too: Little Lens, a world as a web of its elements and links, read only, is a listed row, so `openers_for` offers it in the Open with menu for a world and for an element. No type or function changed.
+
 ## 0.99.3 (2026-10-31)
 
 - **A trailing newline no longer passes a path segment or a review day.** Python's `$` also matches before a final newline, so the segment check let `abc\n` and `character\n` through to the path, and `proposed_mark_of` took `today="2026-10-31\n"` where the npm SDK refuses it. These checks, and `Retry-After`'s, now use `fullmatch`; every other check in the package already did.
