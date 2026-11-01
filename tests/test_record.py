@@ -65,6 +65,27 @@ def test_records_of_is_pure() -> None:
     assert records_of(who, elements)[0]["event"]["name"] != "planted"
 
 
+def test_a_narrative_naming_an_event_twice_is_one_story_and_no_two_records_share_one() -> None:
+    c = "019a8000-0000-7000-8000-000000000101"
+
+    def ev(i: str, at: str) -> dict[str, Any]:
+        return {"id": i, "type": "event", "name": i, "characters": [c], "x_record": {"tool": "tangle", "played_at": at}}
+
+    world: list[Any] = [
+        ev("e1", "2026-11-02T00:00:00Z"),
+        ev("e2", "2026-11-01T00:00:00Z"),
+        {"id": "n1", "type": "narrative", "name": "One", "protagonist": c, "events": ["e1", "e1", "e2"]},
+        {"id": "n2", "type": "narrative", "name": "Two", "narrator": c, "events": [7, None, {}, ["e1"], "e1"]},
+    ]
+    got = records_of(c, world)
+    assert [(r["event"]["id"], [f"{s['id']}:{s['as']}" for s in r["stories"]]) for r in got] == [
+        ("e1", ["n1:protagonist", "n2:narrator"]),
+        ("e2", ["n1:protagonist"]),
+    ]
+    got[0]["stories"][0]["name"] = "planted"
+    assert got[1]["stories"][0]["name"] == "One"
+
+
 def test_records_of_refuses_what_is_not_an_id_or_a_list() -> None:
     with pytest.raises(TypeError):
         records_of(None, [])  # type: ignore[arg-type]

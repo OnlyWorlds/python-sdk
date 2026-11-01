@@ -4,6 +4,10 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+## 0.100.1 (2026-11-01)
+
+- **`records_of` reads a world in one pass.** It finds the Character's stories by each Event they name once, then looks each record's stories up, where it scanned every element again for each record. Every answer is the same as 0.100.0's and as the npm SDK's (compared on 20,000 random worlds, including Narratives that name an Event twice and `events` lists holding other values), and each record's stories are its own dicts.
+
 ## 0.100.0 (2026-11-01)
 
 - **`records_of(character_id, elements)`, `record_mark_of(element)` and `RECORD_FIELD`: the record profile** (schema-dist `profiles/record.md`, serial 102). A game's run is kept in the world its Characters live in, as an Event carrying the mark `x_record`: `tool` and `played_at` required; `version`, `seed`, `outcome` and `seats` optional. `records_of` reads one Character's records from the elements as the reader is served them, newest first, each with that Character's stories of the run (a Narrative naming them as `protagonist`, `narrator` or both). Who took part is the Event's `characters` alone. A run or a story still proposed is not read. `played_at` must be a real calendar instant, and records order by the instant to the millisecond, a finer fraction truncated as JavaScript reads it. The fixture `profiles/record.fixture.json` (32 cases) is the test; the npm SDK's `recordsOf` (4.124.0) gives the same answers.

@@ -68,6 +68,14 @@ def _proposed(element: Mapping[str, Any]) -> bool:
     return element.get("x_review_proposed") is not None
 
 
+def _hashable(value: Any) -> bool:
+    try:
+        hash(value)
+    except TypeError:
+        return False
+    return True
+
+
 def record_mark_of(element: Any) -> RecordMark | None:
     """The record's mark on an element, or None.
 
@@ -132,6 +140,25 @@ def records_of(character_id: str, elements: Sequence[Any]) -> list[Record]:
         raise TypeError("records_of: character_id must be a string")
     if isinstance(elements, (str, bytes)) or not isinstance(elements, Sequence):
         raise TypeError("records_of: elements must be a list")
+    # This Character's stories, by each Event they name (once per Narrative, however often it names it): one pass over
+    # the world, then a lookup per record, where each record rescanned the whole world through 0.100.0. An id that is
+    # not hashable names no story, as the npm reader's includes() matches no object.
+    stories_of: dict[Any, list[RecordStory]] = {}
+    for n in elements:
+        if not isinstance(n, Mapping) or n.get("type") != "narrative" or _proposed(n):
+            continue
+        events = n.get("events")
+        if not isinstance(events, list):
+            continue
+        p = n.get("protagonist") == character_id
+        r = n.get("narrator") == character_id
+        if not p and not r:
+            continue
+        name = n.get("name")
+        role: Literal["both", "protagonist", "narrator"] = "both" if p and r else "protagonist" if p else "narrator"
+        story: RecordStory = {"id": n["id"], "name": name if isinstance(name, str) else "", "as": role}
+        for e in {e for e in events if _hashable(e)}:
+            stories_of.setdefault(e, []).append(story)
     out: list[Record] = []
     for ev in elements:
         mark = record_mark_of(ev)
@@ -140,20 +167,8 @@ def records_of(character_id: str, elements: Sequence[Any]) -> list[Record]:
         characters = ev.get("characters")
         if not isinstance(characters, list) or character_id not in characters:
             continue
-        stories: list[RecordStory] = []
-        for n in elements:
-            if not isinstance(n, Mapping) or n.get("type") != "narrative" or _proposed(n):
-                continue
-            events = n.get("events")
-            if not isinstance(events, list) or ev["id"] not in events:
-                continue
-            p = n.get("protagonist") == character_id
-            r = n.get("narrator") == character_id
-            if not p and not r:
-                continue
-            name = n.get("name")
-            role: Literal["both", "protagonist", "narrator"] = "both" if p and r else "protagonist" if p else "narrator"
-            stories.append({"id": n["id"], "name": name if isinstance(name, str) else "", "as": role})
+        found = stories_of.get(ev["id"], []) if _hashable(ev["id"]) else []
+        stories: list[RecordStory] = [s.copy() for s in found]
         stories.sort(key=lambda s: s["id"])
         ev_name = ev.get("name")
         seat = mark["seats"].get(character_id)
