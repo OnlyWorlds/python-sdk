@@ -32,10 +32,10 @@ DOC = load_fixture()
 CASES: list[dict[str, Any]] = DOC["cases"]
 
 
-def test_the_fixture_holds_serial_102s_cases() -> None:
+def test_the_fixture_holds_serial_102s_32_cases() -> None:
     assert DOC["mark"]["field"] == RECORD_FIELD == "x_record"
     assert DOC["mark"]["members"] == ["tool", "played_at", "version", "seed", "outcome", "seats"]
-    assert len(CASES) == 24, f"the fixture holds {len(CASES)} cases, serial 102 has 24"
+    assert len(CASES) == 32, f"the fixture holds {len(CASES)} cases, serial 102 has 32"
 
 
 @pytest.mark.parametrize("case", CASES, ids=[c["name"] for c in CASES])
