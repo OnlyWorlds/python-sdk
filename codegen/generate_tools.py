@@ -44,6 +44,9 @@ def literal(value: Any, indent: int) -> str:
     if isinstance(value, dict):
         inner = "".join(f'{pad}    "{k}": {literal(v, indent + 1)},\n' for k, v in value.items())
         return "{\n" + inner + pad + "}"
+    if isinstance(value, list) and all(isinstance(v, str) for v in value):
+        # A list of words (open.element_skips), on one line in the list's own order.
+        return "[" + ", ".join(json.dumps(v) for v in value) + "]"
     raise SystemExit(f"tools: a value this generator does not bake: {value!r}")
 
 

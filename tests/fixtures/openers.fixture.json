@@ -1,6 +1,6 @@
 {
  "what": "The rows of the Open with menu: openersFor (npm SDK) and openers_for (Python package) on the same cases. Every expected row is written by hand. The same bytes in both packages; each test holds this file's sha256.",
- "keys": "tools names a list in lists; kind is world or element; address is what parseOwLink reads or elementAddress takes; surface is the options object with snake_case keys (signed_in), which the npm test spells signedIn. expect is the rows in order, each {id, name, href, state}; refuse is the refusal: error address with the address error's reason, or error type (a TypeError) whose message names names (spelt signedIn in the npm test).",
+ "keys": "tools names a list in lists; kind is world or element; address is what parseOwLink reads or elementAddress takes; surface is the options object with snake_case keys (signed_in), which the npm test spells signedIn. expect is the rows in order, each {id, name, href, state}; refuse is the refusal: error address with the address error's reason, or error type (a TypeError) whose message names names (spelt signedIn in the npm test). options, when present, is the fifth argument as written ({element}: the element as served, the mark flat on it); a row whose open.element_skips names a mark the element carries is not there.",
  "lists": {
   "three": [
    {
@@ -260,6 +260,101 @@
      "world": " https://skiff.example/{world}",
      "element": null,
      "needs": null
+    }
+   }
+  ],
+  "skips": [
+   {
+    "id": "glade",
+    "name": "Glade",
+    "url": "https://glade.example",
+    "client": "glade-web",
+    "rung": "listed",
+    "open": {
+     "world": "https://glade.example/#/w/{world}",
+     "element": "https://glade.example/#/w/{world}/e/{id}",
+     "needs": null,
+     "element_skips": [
+      "room",
+      "hidden",
+      "proposed",
+      "map_space"
+     ]
+    }
+   },
+   {
+    "id": "fern",
+    "name": "Fern",
+    "url": "https://fern.example",
+    "client": "fern-web",
+    "rung": "listed",
+    "open": {
+     "world": "https://fern.example/#/w/{world}",
+     "element": "https://fern.example/#/w/{world}/e/{id}",
+     "needs": null,
+     "element_skips": []
+    }
+   },
+   {
+    "id": "moss",
+    "name": "Moss",
+    "url": "https://moss.example",
+    "client": "moss-web",
+    "rung": "listed",
+    "open": {
+     "world": "https://moss.example/#/w/{world}",
+     "element": null,
+     "needs": null,
+     "element_skips": []
+    }
+   },
+   {
+    "id": "reed",
+    "name": "Reed",
+    "url": "https://reed.example",
+    "client": "reed-web",
+    "rung": "listed",
+    "open": {
+     "world": "https://reed.example/#/w/{world}",
+     "element": "https://reed.example/#/w/{world}/e/{id}",
+     "needs": null,
+     "element_skips": [
+      "reading_aid"
+     ]
+    }
+   }
+  ],
+  "skips-unknown-word": [
+   {
+    "id": "thorn",
+    "name": "Thorn",
+    "url": "https://thorn.example",
+    "client": "thorn-web",
+    "rung": "listed",
+    "open": {
+     "world": "https://thorn.example/#/w/{world}",
+     "element": "https://thorn.example/#/w/{world}/e/{id}",
+     "needs": null,
+     "element_skips": [
+      "private"
+     ]
+    }
+   }
+  ],
+  "skips-world-door": [
+   {
+    "id": "lichen",
+    "name": "Lichen",
+    "url": "https://lichen.example",
+    "client": "lichen-web",
+    "rung": "listed",
+    "open": {
+     "world": "https://lichen.example/#/w/{world}",
+     "element": null,
+     "needs": null,
+     "element_skips": [
+      "hidden"
+     ]
     }
    }
   ]
@@ -2282,6 +2377,1153 @@
    "refuse": {
     "error": "type",
     "names": "begins with its scheme"
+   }
+  },
+  {
+   "name": "skips-without-the-element",
+   "why": "no element given: every row, as before the key",
+   "tools": "skips",
+   "kind": "element",
+   "address": {
+    "form": "human",
+    "world": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+    "type": "narrative",
+    "id": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a"
+   },
+   "surface": {
+    "audience": "member",
+    "signed_in": true
+   },
+   "expect": [
+    {
+     "id": "onlyworlds",
+     "name": "onlyworlds.com",
+     "href": "https://www.onlyworlds.com/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/narrative/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
+     "state": null
+    },
+    {
+     "id": "glade",
+     "name": "Glade",
+     "href": "https://glade.example/#/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/e/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
+     "state": null
+    },
+    {
+     "id": "fern",
+     "name": "Fern",
+     "href": "https://fern.example/#/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/e/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
+     "state": null
+    },
+    {
+     "id": "moss",
+     "name": "Moss",
+     "href": "https://moss.example/#/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+     "state": "Opens the world"
+    },
+    {
+     "id": "reed",
+     "name": "Reed",
+     "href": "https://reed.example/#/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/e/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
+     "state": null
+    }
+   ]
+  },
+  {
+   "name": "skips-settled-element",
+   "why": "an element with no mark: every door opens it",
+   "tools": "skips",
+   "kind": "element",
+   "address": {
+    "form": "human",
+    "world": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+    "type": "character",
+    "id": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a"
+   },
+   "surface": {
+    "audience": "member",
+    "signed_in": true
+   },
+   "options": {
+    "element": {
+     "id": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
+     "type": "character",
+     "name": "The element"
+    }
+   },
+   "expect": [
+    {
+     "id": "onlyworlds",
+     "name": "onlyworlds.com",
+     "href": "https://www.onlyworlds.com/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/character/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
+     "state": null
+    },
+    {
+     "id": "glade",
+     "name": "Glade",
+     "href": "https://glade.example/#/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/e/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
+     "state": null
+    },
+    {
+     "id": "fern",
+     "name": "Fern",
+     "href": "https://fern.example/#/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/e/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
+     "state": null
+    },
+    {
+     "id": "moss",
+     "name": "Moss",
+     "href": "https://moss.example/#/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+     "state": "Opens the world"
+    },
+    {
+     "id": "reed",
+     "name": "Reed",
+     "href": "https://reed.example/#/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/e/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
+     "state": null
+    }
+   ]
+  },
+  {
+   "name": "skips-room",
+   "why": "a room element (the pair and the mark): a door that skips room is not there",
+   "tools": "skips",
+   "kind": "element",
+   "address": {
+    "form": "human",
+    "world": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+    "type": "narrative",
+    "id": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a"
+   },
+   "surface": {
+    "audience": "member",
+    "signed_in": true
+   },
+   "options": {
+    "element": {
+     "id": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
+     "type": "narrative",
+     "name": "The element",
+     "supertype": "Message",
+     "x_room_of": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f"
+    }
+   },
+   "expect": [
+    {
+     "id": "onlyworlds",
+     "name": "onlyworlds.com",
+     "href": "https://www.onlyworlds.com/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/narrative/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
+     "state": null
+    },
+    {
+     "id": "fern",
+     "name": "Fern",
+     "href": "https://fern.example/#/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/e/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
+     "state": null
+    },
+    {
+     "id": "moss",
+     "name": "Moss",
+     "href": "https://moss.example/#/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+     "state": "Opens the world"
+    },
+    {
+     "id": "reed",
+     "name": "Reed",
+     "href": "https://reed.example/#/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/e/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
+     "state": null
+    }
+   ]
+  },
+  {
+   "name": "skips-room-folded",
+   "why": "the pair compared trimmed and case-folded, as isRoomElement reads it",
+   "tools": "skips",
+   "kind": "element",
+   "address": {
+    "form": "human",
+    "world": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+    "type": "narrative",
+    "id": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a"
+   },
+   "surface": {
+    "audience": "member",
+    "signed_in": true
+   },
+   "options": {
+    "element": {
+     "id": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
+     "type": "narrative",
+     "name": "The element",
+     "supertype": "  message ",
+     "x_room_of": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f"
+    }
+   },
+   "expect": [
+    {
+     "id": "onlyworlds",
+     "name": "onlyworlds.com",
+     "href": "https://www.onlyworlds.com/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/narrative/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
+     "state": null
+    },
+    {
+     "id": "fern",
+     "name": "Fern",
+     "href": "https://fern.example/#/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/e/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
+     "state": null
+    },
+    {
+     "id": "moss",
+     "name": "Moss",
+     "href": "https://moss.example/#/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+     "state": "Opens the world"
+    },
+    {
+     "id": "reed",
+     "name": "Reed",
+     "href": "https://reed.example/#/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/e/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
+     "state": null
+    }
+   ]
+  },
+  {
+   "name": "skips-room-pair-without-mark",
+   "why": "the pair without the mark is lore (a novel's letters): every row",
+   "tools": "skips",
+   "kind": "element",
+   "address": {
+    "form": "human",
+    "world": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+    "type": "narrative",
+    "id": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a"
+   },
+   "surface": {
+    "audience": "member",
+    "signed_in": true
+   },
+   "options": {
+    "element": {
+     "id": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
+     "type": "narrative",
+     "name": "The element",
+     "supertype": "Message"
+    }
+   },
+   "expect": [
+    {
+     "id": "onlyworlds",
+     "name": "onlyworlds.com",
+     "href": "https://www.onlyworlds.com/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/narrative/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
+     "state": null
+    },
+    {
+     "id": "glade",
+     "name": "Glade",
+     "href": "https://glade.example/#/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/e/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
+     "state": null
+    },
+    {
+     "id": "fern",
+     "name": "Fern",
+     "href": "https://fern.example/#/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/e/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
+     "state": null
+    },
+    {
+     "id": "moss",
+     "name": "Moss",
+     "href": "https://moss.example/#/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+     "state": "Opens the world"
+    },
+    {
+     "id": "reed",
+     "name": "Reed",
+     "href": "https://reed.example/#/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/e/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
+     "state": null
+    }
+   ]
+  },
+  {
+   "name": "skips-room-blank-mark",
+   "why": "a mark that is White_Space only is no mark: every row",
+   "tools": "skips",
+   "kind": "element",
+   "address": {
+    "form": "human",
+    "world": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+    "type": "narrative",
+    "id": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a"
+   },
+   "surface": {
+    "audience": "member",
+    "signed_in": true
+   },
+   "options": {
+    "element": {
+     "id": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
+     "type": "narrative",
+     "name": "The element",
+     "supertype": "Message",
+     "x_room_of": "   "
+    }
+   },
+   "expect": [
+    {
+     "id": "onlyworlds",
+     "name": "onlyworlds.com",
+     "href": "https://www.onlyworlds.com/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/narrative/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
+     "state": null
+    },
+    {
+     "id": "glade",
+     "name": "Glade",
+     "href": "https://glade.example/#/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/e/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
+     "state": null
+    },
+    {
+     "id": "fern",
+     "name": "Fern",
+     "href": "https://fern.example/#/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/e/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
+     "state": null
+    },
+    {
+     "id": "moss",
+     "name": "Moss",
+     "href": "https://moss.example/#/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+     "state": "Opens the world"
+    },
+    {
+     "id": "reed",
+     "name": "Reed",
+     "href": "https://reed.example/#/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/e/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
+     "state": null
+    }
+   ]
+  },
+  {
+   "name": "skips-room-mark-not-a-string",
+   "why": "the mark read by presence: any value but null counts",
+   "tools": "skips",
+   "kind": "element",
+   "address": {
+    "form": "human",
+    "world": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+    "type": "narrative",
+    "id": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a"
+   },
+   "surface": {
+    "audience": "member",
+    "signed_in": true
+   },
+   "options": {
+    "element": {
+     "id": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
+     "type": "narrative",
+     "name": "The element",
+     "supertype": "Message",
+     "x_room_of": 7
+    }
+   },
+   "expect": [
+    {
+     "id": "onlyworlds",
+     "name": "onlyworlds.com",
+     "href": "https://www.onlyworlds.com/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/narrative/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
+     "state": null
+    },
+    {
+     "id": "fern",
+     "name": "Fern",
+     "href": "https://fern.example/#/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/e/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
+     "state": null
+    },
+    {
+     "id": "moss",
+     "name": "Moss",
+     "href": "https://moss.example/#/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+     "state": "Opens the world"
+    },
+    {
+     "id": "reed",
+     "name": "Reed",
+     "href": "https://reed.example/#/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/e/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
+     "state": null
+    }
+   ]
+  },
+  {
+   "name": "skips-hidden",
+   "why": "the hidden mark on the body: a door that skips hidden is not there",
+   "tools": "skips",
+   "kind": "element",
+   "address": {
+    "form": "human",
+    "world": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+    "type": "location",
+    "id": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a"
+   },
+   "surface": {
+    "audience": "member",
+    "signed_in": true
+   },
+   "options": {
+    "element": {
+     "id": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
+     "type": "location",
+     "name": "The element",
+     "hidden": true
+    }
+   },
+   "expect": [
+    {
+     "id": "onlyworlds",
+     "name": "onlyworlds.com",
+     "href": "https://www.onlyworlds.com/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/location/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
+     "state": null
+    },
+    {
+     "id": "fern",
+     "name": "Fern",
+     "href": "https://fern.example/#/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/e/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
+     "state": null
+    },
+    {
+     "id": "moss",
+     "name": "Moss",
+     "href": "https://moss.example/#/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+     "state": "Opens the world"
+    },
+    {
+     "id": "reed",
+     "name": "Reed",
+     "href": "https://reed.example/#/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/e/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
+     "state": null
+    }
+   ]
+  },
+  {
+   "name": "skips-hidden-false",
+   "why": "hidden false is no mark: every row",
+   "tools": "skips",
+   "kind": "element",
+   "address": {
+    "form": "human",
+    "world": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+    "type": "location",
+    "id": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a"
+   },
+   "surface": {
+    "audience": "member",
+    "signed_in": true
+   },
+   "options": {
+    "element": {
+     "id": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
+     "type": "location",
+     "name": "The element",
+     "hidden": false
+    }
+   },
+   "expect": [
+    {
+     "id": "onlyworlds",
+     "name": "onlyworlds.com",
+     "href": "https://www.onlyworlds.com/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/location/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
+     "state": null
+    },
+    {
+     "id": "glade",
+     "name": "Glade",
+     "href": "https://glade.example/#/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/e/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
+     "state": null
+    },
+    {
+     "id": "fern",
+     "name": "Fern",
+     "href": "https://fern.example/#/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/e/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
+     "state": null
+    },
+    {
+     "id": "moss",
+     "name": "Moss",
+     "href": "https://moss.example/#/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+     "state": "Opens the world"
+    },
+    {
+     "id": "reed",
+     "name": "Reed",
+     "href": "https://reed.example/#/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/e/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
+     "state": null
+    }
+   ]
+  },
+  {
+   "name": "skips-proposed",
+   "why": "a proposed element: a door that skips proposed is not there",
+   "tools": "skips",
+   "kind": "element",
+   "address": {
+    "form": "human",
+    "world": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+    "type": "object",
+    "id": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a"
+   },
+   "surface": {
+    "audience": "member",
+    "signed_in": true
+   },
+   "options": {
+    "element": {
+     "id": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
+     "type": "object",
+     "name": "The element",
+     "x_review_proposed": {
+      "by": "x",
+      "expires": "2099-01-01"
+     }
+    }
+   },
+   "expect": [
+    {
+     "id": "onlyworlds",
+     "name": "onlyworlds.com",
+     "href": "https://www.onlyworlds.com/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/object/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
+     "state": null
+    },
+    {
+     "id": "fern",
+     "name": "Fern",
+     "href": "https://fern.example/#/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/e/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
+     "state": null
+    },
+    {
+     "id": "moss",
+     "name": "Moss",
+     "href": "https://moss.example/#/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+     "state": "Opens the world"
+    },
+    {
+     "id": "reed",
+     "name": "Reed",
+     "href": "https://reed.example/#/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/e/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
+     "state": null
+    }
+   ]
+  },
+  {
+   "name": "skips-proposed-doubt",
+   "why": "a mark that is not a proper one is counted with the proposed (handsOnAsProposed), as the graph reads it",
+   "tools": "skips",
+   "kind": "element",
+   "address": {
+    "form": "human",
+    "world": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+    "type": "object",
+    "id": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a"
+   },
+   "surface": {
+    "audience": "member",
+    "signed_in": true
+   },
+   "options": {
+    "element": {
+     "id": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
+     "type": "object",
+     "name": "The element",
+     "x_review_proposed": "yes"
+    }
+   },
+   "expect": [
+    {
+     "id": "onlyworlds",
+     "name": "onlyworlds.com",
+     "href": "https://www.onlyworlds.com/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/object/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
+     "state": null
+    },
+    {
+     "id": "fern",
+     "name": "Fern",
+     "href": "https://fern.example/#/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/e/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
+     "state": null
+    },
+    {
+     "id": "moss",
+     "name": "Moss",
+     "href": "https://moss.example/#/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+     "state": "Opens the world"
+    },
+    {
+     "id": "reed",
+     "name": "Reed",
+     "href": "https://reed.example/#/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/e/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
+     "state": null
+    }
+   ]
+  },
+  {
+   "name": "skips-proposed-empty",
+   "why": "an empty mark ({}) is settled: every row",
+   "tools": "skips",
+   "kind": "element",
+   "address": {
+    "form": "human",
+    "world": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+    "type": "object",
+    "id": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a"
+   },
+   "surface": {
+    "audience": "member",
+    "signed_in": true
+   },
+   "options": {
+    "element": {
+     "id": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
+     "type": "object",
+     "name": "The element",
+     "x_review_proposed": {}
+    }
+   },
+   "expect": [
+    {
+     "id": "onlyworlds",
+     "name": "onlyworlds.com",
+     "href": "https://www.onlyworlds.com/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/object/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
+     "state": null
+    },
+    {
+     "id": "glade",
+     "name": "Glade",
+     "href": "https://glade.example/#/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/e/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
+     "state": null
+    },
+    {
+     "id": "fern",
+     "name": "Fern",
+     "href": "https://fern.example/#/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/e/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
+     "state": null
+    },
+    {
+     "id": "moss",
+     "name": "Moss",
+     "href": "https://moss.example/#/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+     "state": "Opens the world"
+    },
+    {
+     "id": "reed",
+     "name": "Reed",
+     "href": "https://reed.example/#/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/e/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
+     "state": null
+    }
+   ]
+  },
+  {
+   "name": "skips-map-space-pin",
+   "why": "a Pin is map space: a door that skips it is not there",
+   "tools": "skips",
+   "kind": "element",
+   "address": {
+    "form": "human",
+    "world": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+    "type": "pin",
+    "id": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a"
+   },
+   "surface": {
+    "audience": "member",
+    "signed_in": true
+   },
+   "options": {
+    "element": {
+     "id": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
+     "type": "pin",
+     "name": "The element"
+    }
+   },
+   "expect": [
+    {
+     "id": "onlyworlds",
+     "name": "onlyworlds.com",
+     "href": "https://www.onlyworlds.com/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/pin/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
+     "state": null
+    },
+    {
+     "id": "fern",
+     "name": "Fern",
+     "href": "https://fern.example/#/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/e/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
+     "state": null
+    },
+    {
+     "id": "moss",
+     "name": "Moss",
+     "href": "https://moss.example/#/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+     "state": "Opens the world"
+    },
+    {
+     "id": "reed",
+     "name": "Reed",
+     "href": "https://reed.example/#/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/e/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
+     "state": null
+    }
+   ]
+  },
+  {
+   "name": "skips-zone-is-content",
+   "why": "a Zone is content, never map space: every row",
+   "tools": "skips",
+   "kind": "element",
+   "address": {
+    "form": "human",
+    "world": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+    "type": "zone",
+    "id": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a"
+   },
+   "surface": {
+    "audience": "member",
+    "signed_in": true
+   },
+   "options": {
+    "element": {
+     "id": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
+     "type": "zone",
+     "name": "The element"
+    }
+   },
+   "expect": [
+    {
+     "id": "onlyworlds",
+     "name": "onlyworlds.com",
+     "href": "https://www.onlyworlds.com/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/zone/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
+     "state": null
+    },
+    {
+     "id": "glade",
+     "name": "Glade",
+     "href": "https://glade.example/#/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/e/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
+     "state": null
+    },
+    {
+     "id": "fern",
+     "name": "Fern",
+     "href": "https://fern.example/#/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/e/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
+     "state": null
+    },
+    {
+     "id": "moss",
+     "name": "Moss",
+     "href": "https://moss.example/#/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+     "state": "Opens the world"
+    },
+    {
+     "id": "reed",
+     "name": "Reed",
+     "href": "https://reed.example/#/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/e/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
+     "state": null
+    }
+   ]
+  },
+  {
+   "name": "skips-reading-aid",
+   "why": "a Charter with its mark is a reading aid: only the door that skips reading aids is gone",
+   "tools": "skips",
+   "kind": "element",
+   "address": {
+    "form": "human",
+    "world": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+    "type": "law",
+    "id": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a"
+   },
+   "surface": {
+    "audience": "member",
+    "signed_in": true
+   },
+   "options": {
+    "element": {
+     "id": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
+     "type": "law",
+     "name": "The element",
+     "supertype": "Charter",
+     "x_charter_of": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f"
+    }
+   },
+   "expect": [
+    {
+     "id": "onlyworlds",
+     "name": "onlyworlds.com",
+     "href": "https://www.onlyworlds.com/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/law/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
+     "state": null
+    },
+    {
+     "id": "glade",
+     "name": "Glade",
+     "href": "https://glade.example/#/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/e/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
+     "state": null
+    },
+    {
+     "id": "fern",
+     "name": "Fern",
+     "href": "https://fern.example/#/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/e/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
+     "state": null
+    },
+    {
+     "id": "moss",
+     "name": "Moss",
+     "href": "https://moss.example/#/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+     "state": "Opens the world"
+    }
+   ]
+  },
+  {
+   "name": "skips-two-marks",
+   "why": "a hidden room element: one skipped mark is enough",
+   "tools": "skips",
+   "kind": "element",
+   "address": {
+    "form": "human",
+    "world": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+    "type": "narrative",
+    "id": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a"
+   },
+   "surface": {
+    "audience": "member",
+    "signed_in": true
+   },
+   "options": {
+    "element": {
+     "id": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
+     "type": "narrative",
+     "name": "The element",
+     "supertype": "Board",
+     "x_room_of": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+     "hidden": true
+    }
+   },
+   "expect": [
+    {
+     "id": "onlyworlds",
+     "name": "onlyworlds.com",
+     "href": "https://www.onlyworlds.com/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/narrative/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
+     "state": null
+    },
+    {
+     "id": "fern",
+     "name": "Fern",
+     "href": "https://fern.example/#/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/e/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
+     "state": null
+    },
+    {
+     "id": "moss",
+     "name": "Moss",
+     "href": "https://moss.example/#/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+     "state": "Opens the world"
+    },
+    {
+     "id": "reed",
+     "name": "Reed",
+     "href": "https://reed.example/#/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/e/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
+     "state": null
+    }
+   ]
+  },
+  {
+   "name": "skips-id-case",
+   "why": "the element's id compared without regard to case, as the address's is",
+   "tools": "skips",
+   "kind": "element",
+   "address": {
+    "form": "human",
+    "world": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+    "type": "location",
+    "id": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a"
+   },
+   "surface": {
+    "audience": "member",
+    "signed_in": true
+   },
+   "options": {
+    "element": {
+     "id": "0199C3A1-7B2E-7C3D-8E4F-5A6B7C8D9E1A",
+     "type": "location",
+     "name": "The element",
+     "hidden": true
+    }
+   },
+   "expect": [
+    {
+     "id": "onlyworlds",
+     "name": "onlyworlds.com",
+     "href": "https://www.onlyworlds.com/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/location/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
+     "state": null
+    },
+    {
+     "id": "fern",
+     "name": "Fern",
+     "href": "https://fern.example/#/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/e/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
+     "state": null
+    },
+    {
+     "id": "moss",
+     "name": "Moss",
+     "href": "https://moss.example/#/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+     "state": "Opens the world"
+    },
+    {
+     "id": "reed",
+     "name": "Reed",
+     "href": "https://reed.example/#/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/e/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
+     "state": null
+    }
+   ]
+  },
+  {
+   "name": "skips-element-null",
+   "why": "options.element null is no element: every row",
+   "tools": "skips",
+   "kind": "element",
+   "address": {
+    "form": "human",
+    "world": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+    "type": "location",
+    "id": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a"
+   },
+   "surface": {
+    "audience": "member",
+    "signed_in": true
+   },
+   "options": {
+    "element": null
+   },
+   "expect": [
+    {
+     "id": "onlyworlds",
+     "name": "onlyworlds.com",
+     "href": "https://www.onlyworlds.com/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/location/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
+     "state": null
+    },
+    {
+     "id": "glade",
+     "name": "Glade",
+     "href": "https://glade.example/#/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/e/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
+     "state": null
+    },
+    {
+     "id": "fern",
+     "name": "Fern",
+     "href": "https://fern.example/#/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/e/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
+     "state": null
+    },
+    {
+     "id": "moss",
+     "name": "Moss",
+     "href": "https://moss.example/#/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+     "state": "Opens the world"
+    },
+    {
+     "id": "reed",
+     "name": "Reed",
+     "href": "https://reed.example/#/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/e/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
+     "state": null
+    }
+   ]
+  },
+  {
+   "name": "skips-public",
+   "why": "the public audience: the same rule on the rows that need nothing",
+   "tools": "skips",
+   "kind": "element",
+   "address": {
+    "form": "human",
+    "world": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+    "type": "pin",
+    "id": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a"
+   },
+   "surface": {
+    "audience": "public"
+   },
+   "options": {
+    "element": {
+     "id": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
+     "type": "pin",
+     "name": "The element"
+    }
+   },
+   "expect": [
+    {
+     "id": "onlyworlds",
+     "name": "onlyworlds.com",
+     "href": "https://www.onlyworlds.com/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/pin/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
+     "state": null
+    },
+    {
+     "id": "fern",
+     "name": "Fern",
+     "href": "https://fern.example/#/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/e/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
+     "state": null
+    },
+    {
+     "id": "moss",
+     "name": "Moss",
+     "href": "https://moss.example/#/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+     "state": "Opens the world"
+    },
+    {
+     "id": "reed",
+     "name": "Reed",
+     "href": "https://reed.example/#/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/e/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
+     "state": null
+    }
+   ]
+  },
+  {
+   "name": "skips-element-on-a-world",
+   "why": "an element is for an element's menu",
+   "tools": "skips",
+   "kind": "world",
+   "address": {
+    "form": "human",
+    "world": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f"
+   },
+   "surface": {
+    "audience": "member",
+    "signed_in": true
+   },
+   "options": {
+    "element": {
+     "id": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
+     "type": "location",
+     "name": "The element"
+    }
+   },
+   "refuse": {
+    "error": "type",
+    "names": "a world's menu takes none"
+   }
+  },
+  {
+   "name": "skips-element-another-id",
+   "why": "the element must be the one the address names",
+   "tools": "skips",
+   "kind": "element",
+   "address": {
+    "form": "human",
+    "world": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+    "type": "location",
+    "id": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a"
+   },
+   "surface": {
+    "audience": "member",
+    "signed_in": true
+   },
+   "options": {
+    "element": {
+     "id": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e2b",
+     "type": "location",
+     "name": "Another"
+    }
+   },
+   "refuse": {
+    "error": "type",
+    "names": "its id differs"
+   }
+  },
+  {
+   "name": "skips-element-not-an-object",
+   "why": "the element is a body",
+   "tools": "skips",
+   "kind": "element",
+   "address": {
+    "form": "human",
+    "world": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+    "type": "location",
+    "id": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a"
+   },
+   "surface": {
+    "audience": "member",
+    "signed_in": true
+   },
+   "options": {
+    "element": [
+     "not",
+     "a",
+     "body"
+    ]
+   },
+   "refuse": {
+    "error": "type",
+    "names": "is the element as served"
+   }
+  },
+  {
+   "name": "skips-unknown-option",
+   "why": "the options refuse a key they do not know, by name",
+   "tools": "skips",
+   "kind": "element",
+   "address": {
+    "form": "human",
+    "world": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+    "type": "location",
+    "id": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a"
+   },
+   "surface": {
+    "audience": "member",
+    "signed_in": true
+   },
+   "options": {
+    "lens": "x"
+   },
+   "refuse": {
+    "error": "type",
+    "names": "lens"
+   }
+  },
+  {
+   "name": "skips-unknown-word",
+   "why": "a skip outside the list's words is a row that is not one",
+   "tools": "skips-unknown-word",
+   "kind": "element",
+   "address": {
+    "form": "human",
+    "world": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+    "type": "location",
+    "id": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a"
+   },
+   "surface": {
+    "audience": "member",
+    "signed_in": true
+   },
+   "options": {
+    "element": {
+     "id": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
+     "type": "location",
+     "name": "The element"
+    }
+   },
+   "refuse": {
+    "error": "type",
+    "names": "element_skips"
+   }
+  },
+  {
+   "name": "skips-without-an-element-door",
+   "why": "skips name what an element door leaves out; a world door alone has none, as the list's check says",
+   "tools": "skips-world-door",
+   "kind": "element",
+   "address": {
+    "form": "human",
+    "world": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+    "type": "location",
+    "id": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a"
+   },
+   "surface": {
+    "audience": "member",
+    "signed_in": true
+   },
+   "options": {
+    "element": {
+     "id": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
+     "type": "location",
+     "name": "The element",
+     "hidden": true
+    }
+   },
+   "refuse": {
+    "error": "type",
+    "names": "element_skips"
    }
   }
  ]

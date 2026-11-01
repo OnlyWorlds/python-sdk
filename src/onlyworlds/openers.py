@@ -11,8 +11,9 @@ from __future__ import annotations
 
 import re
 from collections.abc import Mapping, Sequence
-from typing import Any, Literal, NoReturn, TypedDict
+from typing import Any, Literal, NoReturn, NotRequired, TypedDict
 
+from ._marks import ELEMENT_MARKS, marks_of
 from .address import _ADDRESS_KEYS, AddressReading, element_address
 
 __all__ = ["Opener", "Tool", "ToolOpen", "openers_for"]
@@ -28,6 +29,9 @@ class ToolOpen(TypedDict):
     world: str | None
     element: str | None
     needs: Literal["account", "device"] | None
+    #: What the element door does not open, in the graph section's words; absent (a list older than the key) or
+    #: [] when it opens every element.
+    element_skips: NotRequired[list[str]]
 
 
 class Tool(TypedDict):
@@ -92,6 +96,8 @@ def openers_for(
     kind: str,
     address: Mapping[str, Any] | AddressReading,
     surface: Mapping[str, Any],
+    *,
+    element: Mapping[str, Any] | None = None,
 ) -> list[Opener]:
     """The rows of the Open with menu for a world (``kind="world"``) or one element of it (``"element"``), in order.
 
@@ -103,8 +109,11 @@ def openers_for(
     what ``element_address`` takes, with the world's id. A lens and a moment on it ride on no href.
 
     A row with ``open`` None, or with no door for this kind, is not there. On an element, a tool with only a world
-    door is a row to its world door that says "Opens the world". For the ``public`` audience only rows whose
-    ``open.needs`` is None are there: a row that needs anything does not exist for the public.
+    door is a row to its world door that says "Opens the world". On an element given as ``element`` (the element as
+    served, the mark flat on it), a row whose ``open.element_skips`` names a mark the element carries (room, hidden,
+    proposed, map space, a reading aid, each read as ``world_graph`` reads it) is not there: its door cannot open
+    it. Without ``element`` every row is there. For the ``public`` audience only rows whose ``open.needs`` is None
+    are there: a row that needs anything does not exist for the public.
 
     ``surface`` is a mapping of what the surface knows, and nothing is guessed: ``audience`` (``member``, a seat in
     the world, a guest included, or ``public``, the signed-out reader; required), ``signed_in`` (True, False, or
@@ -125,8 +134,10 @@ def openers_for(
     or anything else for the world's id (``bad_world``); and for an address without a world (``no_world``), the
     text form inside a world included, since every row needs one. A ``TypeError`` names the rest: a
     ``kind`` that is neither, an element's openers asked of an address with no element, an unknown key on the
-    address or the surface, a missing or unknown ``audience``, a surface value of the wrong type, a tools row that
-    is not one (a ``needs`` outside the list's format included). The npm SDK's ``openersFor`` gives the same rows.
+    address or the surface, a missing or unknown ``audience``, a surface value of the wrong type, an ``element`` for a
+    world's menu or naming another element than the address, a tools row that is not one (a ``needs`` or an
+    ``element_skips`` word outside the list's format, or skips on a row with no element door, included). The npm
+    SDK's ``openersFor`` gives the same rows.
     """
     if isinstance(tools, str | bytes) or not isinstance(tools, Sequence):
         _fail("tools is the tools list's rows, a sequence")
@@ -180,6 +191,17 @@ def openers_for(
     if not isinstance(online, bool):
         _fail("surface online is a boolean")
 
+    marks: list[str] = []
+    if element is not None:
+        if not isinstance(element, Mapping):
+            _fail("element is the element as served, a mapping, or None")
+        if kind != "element":
+            _fail("element is for an element's menu; a world's menu takes none")
+        eid = element.get("id")
+        if not isinstance(eid, str) or eid.lower() != values["id"]:
+            _fail("element is the element the address names: its id differs")
+        marks = marks_of(element)
+
     def fill(template: str) -> str:
         return _PLACEHOLDER.sub(lambda m: values[m.group(1)], template)
 
@@ -209,12 +231,22 @@ def openers_for(
         needs = o.get("needs")
         if needs not in _NEEDS:
             _fail(f"tool {rid}: open.needs is 'account', 'device' or None; got {needs!r}")
+        skips = o.get("element_skips")
+        skips = [] if skips is None else skips
+        if not isinstance(skips, list) or any(s not in ELEMENT_MARKS for s in skips):
+            words = ", ".join(ELEMENT_MARKS)
+            _fail(f"tool {rid}: open.element_skips is a list of {words}; got {o.get('element_skips')!r}")
+        if element_door is None and skips:
+            _fail(f"tool {rid}: open.element_skips names what an element door leaves out, and the row has none")
         if r.get("rung") != "listed":
             continue
         if audience == "public" and needs is not None:
             continue
         template = world_door if kind == "world" or element_door is None else element_door
         if template is None:
+            continue
+        # An element door that cannot open this element is no door (a row with skips has one: refused above).
+        if kind == "element" and any(m in skips for m in marks):
             continue
         # The first that holds. A word the row needs (it cannot open now) comes before "Opens the world" (it
         # opens, somewhere else), so a world door alone that needs a sign-in says the sign-in. With no connection a

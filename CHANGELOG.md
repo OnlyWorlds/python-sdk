@@ -4,6 +4,11 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+## 0.101.0 (2026-11-01)
+
+- **`openers_for(..., element=...)`: no row for a tool that cannot open the element.** The tools list's `open` now says what a tool's element door does not open, `element_skips`, in the graph reader's words: `room`, `hidden`, `proposed`, `map_space` (a Map, Pin or Marker; a Zone is content) and `reading_aid`. Given the element as served, `openers_for` leaves out a row whose door skips a mark the element carries, each mark read by the readers `world_graph` uses (`is_room_element`, `is_hidden`, `hands_on_as_proposed`, the type, the reading aids), so the menu and the graph give one answer; a test holds the two equal on every element of the lens fixture's worlds. Without `element` every row is there, as before. A world's menu takes no element. Refused by name: an element for a world's menu or naming another id than the address, a skip word outside the list's, and skips on a row with no element door. The shared openers fixture gains 25 cases (90 in all), the same bytes as the npm SDK's 4.126.0. `ToolOpen` gains `element_skips`.
+- **`TOOLS` repinned** at the tools list's `6da4d55` (from `a1573ac`), the npm SDK's pin too: each row carries `element_skips` (Little Lens skips room, hidden, proposed and map space; Atlas and Lantern none until their doors are walked). The tools generator bakes a list of words.
+
 ## 0.100.2 (2026-11-01)
 
 - **`record_mark_of` takes only ASCII digits in `played_at`.** Python's `\d` matches any Unicode digit and `int()` reads it, so a full-width or Arabic-Indic year was read as a mark, where the npm SDK and keel refuse it as RFC 3339 does. The 10-digit legacy key check had the same pattern: a key of full-width digits no longer counts as a legacy key.

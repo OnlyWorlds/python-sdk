@@ -11,6 +11,7 @@ from __future__ import annotations
 from collections.abc import Callable, Mapping
 from typing import Any, Literal, NotRequired, TypedDict
 
+from ._marks import MAP_SPACE
 from ._schema import ELEMENT_GROUPS, ELEMENT_ICONS, GENERIC_PAIRS, LINK_TARGETS
 from .lens import (
     _CUT_REASONS,
@@ -83,7 +84,7 @@ class WorldGraph(TypedDict):
 _DECLARED_LINKS: tuple[str, ...] = ("x_lens_leads_to", "x_spine_depends_on")
 """The extension fields a published profile declares a link, each a list of ids: the lens profile's and the spine
 profile's."""
-_MAP_SPACE = frozenset({"map", "pin", "marker"})
+_MAP_SPACE = MAP_SPACE
 _KINDS: tuple[str, ...] = ("room", "hidden", "proposed", "map_space", "reading_aid")
 """The kinds out of an unlensed graph by default. A reading aid has no flag: only a lens that names its pair keeps
 one."""

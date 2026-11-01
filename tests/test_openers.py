@@ -14,8 +14,8 @@ import pytest
 from onlyworlds import TOOLS, AddressError, openers_for, parse_ow_link
 
 FIXTURE = Path(__file__).resolve().parent / "fixtures" / "openers.fixture.json"
-FIXTURE_SHA256 = "1e84a613a1bca3795ef7ef09bf0c3b8f7e60d2156b185441d60a10933f49a05d"
-CASES = 65
+FIXTURE_SHA256 = "381b3ab03bbb19187a74e830c7236306f9ba1f6128020c8855515ce7a63bb6cc"
+CASES = 90
 WORLD = "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f"
 ELEMENT = "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a"
 
@@ -23,7 +23,8 @@ ELEMENT = "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a"
 def answer(doc: dict[str, Any], c: dict[str, Any]) -> dict[str, Any]:
     """One case's answer in the fixture's own shape: ``{"expect": ...}`` or ``{"refuse": ...}``."""
     try:
-        return {"expect": openers_for(doc["lists"][c["tools"]], c["kind"], c["address"], c["surface"])}
+        options = c.get("options", {})
+        return {"expect": openers_for(doc["lists"][c["tools"]], c["kind"], c["address"], c["surface"], **options)}
     except AddressError as err:
         return {"refuse": {"error": "address", "reason": err.reason}}
     except TypeError as err:
