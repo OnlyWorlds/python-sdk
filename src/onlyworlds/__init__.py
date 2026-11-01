@@ -76,6 +76,7 @@ from .http import (
     check_kinds,
     sanitize_payload,
 )
+from .landing import Landing, LandingCluster, LandingGap, LandingMember, landing_of
 from .lens import DATE_FIELD, LensMail, LensReading, date_of, is_lens, is_template, lenses_in_use, resolve_lens
 from .message import (
     EditRead,
@@ -159,6 +160,10 @@ __all__ = [
     "GraphEdge",
     "GraphNode",
     "GuideRead",
+    "Landing",
+    "LandingCluster",
+    "LandingGap",
+    "LandingMember",
     "LensMail",
     "LensReading",
     "Opener",
@@ -215,6 +220,7 @@ __all__ = [
     "is_sent_by",
     "is_template",
     "is_to_everyone",
+    "landing_of",
     "lenses_in_use",
     "note_of",
     "openers_for",
