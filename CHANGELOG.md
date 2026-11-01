@@ -4,6 +4,11 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+## 0.100.0 (2026-11-01)
+
+- **`records_of(character_id, elements)`, `record_mark_of(element)` and `RECORD_FIELD`: the record profile** (schema-dist `profiles/record.md`, serial 102). A game's run is kept in the world its Characters live in, as an Event carrying the mark `x_record`: `tool` and `played_at` required; `version`, `seed`, `outcome` and `seats` optional. `records_of` reads one Character's records from the elements as the reader is served them, newest first, each with that Character's stories of the run (a Narrative naming them as `protagonist`, `narrator` or both). Who took part is the Event's `characters` alone. A run or a story still proposed is not read. `played_at` must be a real calendar instant, and records order by the instant to the millisecond, a finer fraction truncated as JavaScript reads it. The fixture `profiles/record.fixture.json` (32 cases) is the test; the npm SDK's `recordsOf` (4.124.0) gives the same answers.
+- **Schema repinned to schema-dist `v0.33.0-dist.102`** (from dist.101; canonical 00.33.00 unchanged). Serial 102 adds the record profile; no schema file moved.
+
 ## 0.99.4 (2026-11-01)
 
 - **`TOOLS` carries Little Lens.** The tools list is repinned at `a1573ac` (from `86208c8`), the npm SDK's pin too: Little Lens, a world as a web of its elements and links, read only, is a listed row, so `openers_for` offers it in the Open with menu for a world and for an element. No type or function changed.
