@@ -383,12 +383,12 @@ def test_draught_sends_the_seven_policy_keys_and_list_page_the_two_filters(make_
     ):
         assert part in url, part
     client.draught("c1")
-    assert t.calls[1].url.endswith("/character/c1/context")
+    assert t.calls[1].url.endswith("/character/c1/context?compact=false")
     client.list_page("character", ids=["a", "b"], created_by="owner")
     assert "ids=a,b" in t.calls[2].url and "created_by=owner" in t.calls[2].url
 
 
-def test_draught_compact_is_sent_as_true_or_false_and_absent_sends_nothing(make_client: MakeClient) -> None:
+def test_draught_compact_is_sent_as_true_or_false_and_absent_sends_false(make_client: MakeClient) -> None:
     """As the npm SDK's 'draught: compact' (4.69.0): a refused compact sends nothing."""
     t = FakeTransport(handler=lambda *a: jresp(200, {"world": {"id": "w"}, "character": None}))
     client = make_client(t)
@@ -397,7 +397,7 @@ def test_draught_compact_is_sent_as_true_or_false_and_absent_sends_nothing(make_
     client.draught("c1", compact=False)
     assert t.calls[1].url.endswith("/character/c1/context?compact=false")
     client.draught("c1")
-    assert "compact" not in t.calls[2].url
+    assert t.calls[2].url.endswith("/character/c1/context?compact=false")
     client.draught("c1", mode="act", compact=True)
     assert t.calls[3].url.endswith("?mode=act&compact=true")
     for wrong in ("yes", "true", 1, 0):

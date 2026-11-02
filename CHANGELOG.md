@@ -4,6 +4,10 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+## 0.103.1 (2026-11-02)
+
+- **`draught(id)` without `compact` answers the fixed shape again.** The server now serves the compact packet by default; the client sends `compact=false` when the caller leaves it out, so every section is there (since 0.14.0 a left-out `compact` was sent as nothing). `compact=True` still asks for the short form.
+
 ## 0.103.0 (2026-11-02)
 
 - **`world_graph(world, reader, reading_aids=True)` brings the reading aids back into an unlensed graph** (schema-dist `profiles/lens.md`, serial 104). The reading aids are a world's charter, its guide and its domains, each recognised by its pair and the mark `x_charter_of` (the pair without the mark is lore and a node like any other). They are out of an unlensed graph by default and counted `reading_aid`; with the flag they are nodes, each marked `reading_aid` (last in `marks`), and a link to one is an edge. The flag is a boolean, false by default (`None` reads as false). Any signed reader may ask it; a public reader asking it is refused by name with a `ValueError` before anything is read, and of several refused flags `reading_aids` is named last, after `hidden`, `proposed`, `rooms` and `map_space`. A flag never widens a lens: with a lens the flag adds nothing, and a lens that names the pair (`law/charter`) keeps the charter whatever the flag says.

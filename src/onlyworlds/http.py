@@ -1256,6 +1256,8 @@ class Client:
         them (``components`` joined by commas); nothing is inferred; a non-empty ``cut`` means the
         serving is partial. Served ``Cache-Control: private, no-store``: never cache it shared.
 
+        ``compact`` left out is sent as ``false``, so the answer keeps its fixed shape whatever the
+        server's own default (keel serves the compact packet by default since 2026-11-02).
         ``compact``: ``True`` leaves out every section that is an empty list or object,
         and ``cut`` when it is empty; the frame (``world``, ``calendar``, ``as_of``, ``now``,
         ``mode``, ``policy``) and every null stay, since a null is an answer; and each element body
@@ -1282,7 +1284,7 @@ class Client:
                 "since": since,
                 "budget": budget,
                 "depth": depth,
-                "compact": compact,
+                "compact": False if compact is None else compact,
                 "lens": lens,
             }
         )
