@@ -86,6 +86,21 @@ def test_a_narrative_naming_an_event_twice_is_one_story_and_no_two_records_share
     assert got[1]["stories"][0]["name"] == "One"
 
 
+def test_an_event_or_narrative_whose_id_is_not_a_string_is_never_read() -> None:
+    c = "019a8000-0000-7000-8000-000000000101"
+    mark = {"tool": "tangle", "played_at": "2026-11-01T00:00:00Z"}
+    world: list[Any] = [
+        {"id": "e1", "type": "event", "name": "One", "characters": [c], "x_record": mark},
+        {"id": 7, "type": "event", "name": "Seven", "characters": [c], "x_record": mark},
+        {"type": "event", "name": "None", "characters": [c], "x_record": mark},
+        {"id": ["e1"], "type": "narrative", "name": "Listed", "protagonist": c, "events": ["e1"]},
+        {"type": "narrative", "name": "Unnamed", "narrator": c, "events": ["e1"]},
+        {"id": "n1", "type": "narrative", "name": "Kept", "narrator": c, "events": ["e1", 7]},
+    ]
+    got = records_of(c, world)
+    assert [(r["event"]["id"], [s["id"] for s in r["stories"]]) for r in got] == [("e1", ["n1"])]
+
+
 @pytest.mark.parametrize(
     "played_at",
     [

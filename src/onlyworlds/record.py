@@ -147,10 +147,13 @@ def records_of(character_id: str, elements: Sequence[Any]) -> list[Record]:
         raise TypeError("records_of: elements must be a list")
     # This Character's stories, by each Event they name (once per Narrative, however often it names it): one pass over
     # the world, then a lookup per record, where each record rescanned the whole world through 0.100.0. An id that is
-    # not hashable names no story, as the npm reader's includes() matches no object.
+    # not hashable names no story, as the npm reader's includes() matches no object. An Event or a Narrative whose id
+    # is not a string is never read (serial 103): no entry without an id, and no error sorting one.
     stories_of: dict[Any, list[RecordStory]] = {}
     for n in elements:
-        if not isinstance(n, Mapping) or n.get("type") != "narrative" or _proposed(n):
+        if not isinstance(n, Mapping) or n.get("type") != "narrative" or not isinstance(n.get("id"), str):
+            continue
+        if _proposed(n):  # the review profile's reading: an empty mark is settled
             continue
         events = n.get("events")
         if not isinstance(events, list):
@@ -167,12 +170,12 @@ def records_of(character_id: str, elements: Sequence[Any]) -> list[Record]:
     out: list[Record] = []
     for ev in elements:
         mark = record_mark_of(ev)
-        if mark is None or _proposed(ev):
+        if mark is None or not isinstance(ev.get("id"), str) or _proposed(ev):
             continue
         characters = ev.get("characters")
         if not isinstance(characters, list) or character_id not in characters:
             continue
-        found = stories_of.get(ev["id"], []) if _hashable(ev["id"]) else []
+        found = stories_of.get(ev["id"], [])
         stories: list[RecordStory] = [s.copy() for s in found]
         stories.sort(key=lambda s: s["id"])
         ev_name = ev.get("name")
