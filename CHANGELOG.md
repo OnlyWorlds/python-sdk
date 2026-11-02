@@ -4,6 +4,11 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+## 0.104.1 (2026-11-02)
+
+- **`map_space` reads two Marker rows with one id as the last one served** (schema-dist `profiles/map-space.md`, serial 106, reading I: an element is its id), as it already read Maps, Zones and Pins; until now each row of a repeated Marker id was read as a Marker of its own. The last row wins even when it reads less (no point, or a zone or map that is not served), and is then counted under its reason.
+- **Schema repinned to schema-dist `v0.34.0-dist.106`** (from dist.105); the standard stays **00.34.00** and no schema field moved. Serial 106 words the map-space page's readings I to K and four sharpened rules (a measured frame from placed points only, a `z` that is not a whole number read as 0, `no_markers` for a Zone with no placed Marker, a Pin with neither a served map nor a point counted once as `no_map`), and its fixture holds 34 cases. Apart from reading I, `map_space` already answered every new case as ruled.
+
 ## 0.104.0 (2026-11-02)
 
 - **Schema repinned to schema-dist `v0.34.0-dist.105`** (from dist.104); the standard stays **00.34.00** and no schema field moved. Serial 105 adds the map-space profile (`profiles/map-space.md`) and its fixture of 24 cases, and a sentence on the landing page about which doors may serve its answer.
