@@ -5,6 +5,7 @@ case for case."""
 
 from __future__ import annotations
 
+from types import MappingProxyType
 from typing import Any
 
 import pytest
@@ -125,3 +126,19 @@ def test_today_must_be_a_day() -> None:
     with pytest.raises(TypeError):  # Python's $ matches before a final newline; the day is the whole string
         proposed_mark_of(_el({}), "2026-10-31\n")
     assert proposed_mark_of(_el({"by": "m1"})) is not None  # today in UTC by default
+
+
+def test_a_mapping_that_is_not_a_dict_reads_as_a_dict_does() -> None:
+    # npm reads any object; a read-only view of an element (a MappingProxyType, a frozen record) is still one.
+    mark = {"by": "m1", "expires": "2026-12-01"}
+    for element in (
+        MappingProxyType({"id": "a", PROPOSED_MARK: mark}),
+        {"id": "a", PROPOSED_MARK: MappingProxyType(mark)},
+        MappingProxyType({"id": "a", PROPOSED_MARK: MappingProxyType(mark)}),
+    ):
+        assert proposed_mark_of(element, "2026-11-02") == {"by": "m1", "expires": "2026-12-01", "lapsed": False}
+        assert hands_on_as_proposed(element)
+    # An empty mark is settled whatever mapping holds it.
+    empty = MappingProxyType({"id": "a", PROPOSED_MARK: MappingProxyType({})})
+    assert proposed_mark_of(empty, "2026-11-02") is None
+    assert not hands_on_as_proposed(empty)

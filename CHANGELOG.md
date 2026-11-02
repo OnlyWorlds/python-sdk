@@ -4,6 +4,8 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+- **`proposed_mark_of` and `hands_on_as_proposed` read any mapping**, as the npm SDK reads any object: an element, or its `x_review_proposed`, held in a mapping that is not a `dict` (a `MappingProxyType`, a frozen record) went unread as settled. These two are what the lens and graph readers, the Open with menu's marks, the pack, the draught text and the message readers ask.
+
 ## 0.101.0 (2026-11-01)
 
 - **`openers_for(..., element=...)`: no row for a tool that cannot open the element.** The tools list's `open` now says what a tool's element door does not open, `element_skips`, in the graph reader's words: `room`, `hidden`, `proposed`, `map_space` (a Map, Pin or Marker; a Zone is content) and `reading_aid`. Given the element as served, `openers_for` leaves out a row whose door skips a mark the element carries, each mark read by the readers `world_graph` uses (`is_room_element`, `is_hidden`, `hands_on_as_proposed`, the type, the reading aids), so the menu and the graph give one answer; a test holds the two equal on every element of the lens fixture's worlds. Without `element` every row is there, as before. A world's menu takes no element. Refused by name: an element for a world's menu or naming another id than the address, a skip word outside the list's, and skips on a row with no element door. The shared openers fixture gains 25 cases (90 in all), the same bytes as the npm SDK's 4.126.0. `ToolOpen` gains `element_skips`.

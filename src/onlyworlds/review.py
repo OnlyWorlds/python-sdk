@@ -18,6 +18,7 @@ the same cases as its ``test/review.test.mjs``.
 from __future__ import annotations
 
 import re
+from collections.abc import Mapping
 from datetime import UTC, datetime
 from typing import Any, TypedDict
 
@@ -49,7 +50,7 @@ def _present(value: Any) -> bool:
     """The review profile's presence rule for its mark (rule 1): the room and charter profiles' (``room._has_mark``:
     any value but None, a string only when something is left after trimming White_Space), and an empty list or an
     empty object is absent too."""
-    return _has_mark(value) and not (isinstance(value, (list, dict)) and not value)
+    return _has_mark(value) and not (isinstance(value, (list, Mapping)) and not value)
 
 
 def proposed_mark_of(element: Any, today: str | None = None) -> ProposedMark | None:
@@ -60,10 +61,10 @@ def proposed_mark_of(element: Any, today: str | None = None) -> ProposedMark | N
     a TypeError."""
     if today is not None and not (isinstance(today, str) and _DAY.fullmatch(today)):
         raise TypeError(f"proposed_mark_of: today is a day as YYYY-MM-DD; got {today!r}.")
-    if not isinstance(element, dict):
+    if not isinstance(element, Mapping):
         return None
     v = element.get(PROPOSED_MARK)
-    if not isinstance(v, dict) or not _present(v):
+    if not isinstance(v, Mapping) or not _present(v):
         return None
     raw_by = v.get("by")
     by = raw_by.strip(_WHITE_SPACE) if isinstance(raw_by, str) and raw_by.strip(_WHITE_SPACE) else None
@@ -81,4 +82,4 @@ def hands_on_as_proposed(element: Any) -> bool:
     """Whether a reader that hands a world on (a pack, a context packet, an AI's context) leaves this
     element out as proposed: ``x_review_proposed`` present (not absent, None, a blank string, ``[]`` or
     ``{}``), a value that is not a proper mark included (a doubt, counted with the proposed)."""
-    return isinstance(element, dict) and _present(element.get(PROPOSED_MARK))
+    return isinstance(element, Mapping) and _present(element.get(PROPOSED_MARK))
