@@ -14,8 +14,8 @@ import pytest
 from onlyworlds import TOOLS, AddressError, openers_for, parse_ow_link
 
 FIXTURE = Path(__file__).resolve().parent / "fixtures" / "openers.fixture.json"
-FIXTURE_SHA256 = "381b3ab03bbb19187a74e830c7236306f9ba1f6128020c8855515ce7a63bb6cc"
-CASES = 90
+FIXTURE_SHA256 = "b5c6afb76bf1ab2b95ee50641e2fd36344320d12fe0fd293d4f09fcf8cde7027"
+CASES = 92
 WORLD = "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f"
 ELEMENT = "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a"
 
@@ -67,8 +67,12 @@ def test_tools_gives_the_sites_row_then_each_listed_tool_with_a_door_in_the_list
     for r in member[1:]:
         assert r["href"].startswith("https://") and WORLD in r["href"] and "{" not in r["href"], r["href"]
     public = openers_for(TOOLS, "world", {"form": "human", "world": WORLD}, {"audience": "public"})
-    free = [t["id"] for t in offered if t["open"] is not None and t["open"]["needs"] is None]
-    assert [r["id"] for r in public] == ["onlyworlds", *free]
+    # The public: a tool that needs the device is not there; one that needs an account says so.
+    shown = [t for t in offered if t["open"] is not None and t["open"]["needs"] != "device"]
+    assert [r["id"] for r in public] == ["onlyworlds", *(t["id"] for t in shown)]
+    for r, t in zip(public[1:], shown, strict=True):
+        want = "Needs an account" if t["open"] is not None and t["open"]["needs"] == "account" else None
+        assert r["state"] == want, r["id"]
 
 
 @pytest.mark.parametrize("value", ["no", None, 0, 1, "false"])

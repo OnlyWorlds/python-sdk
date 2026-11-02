@@ -4,6 +4,10 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+## 0.105.0 (2026-11-02)
+
+- **A signed-out visitor sees the tools that need an account.** `openers_for` with `audience: "public"` now gives a row for a tool whose `open.needs` is `account`, with the state word "Needs an account" (whatever `signed_in` says: the public is the signed-out reader); before, the public saw no such row. A tool that needs the device is still not there for the public. The word comes after "You are here" and "Needs a connection", and before "Opens the world". A surface draws the row as one that opens nothing. The shared openers fixture has 92 cases (from 90), the same bytes as the npm SDK's 4.130.0: seven public cases gain their account rows, and two are new (a visitor outside a browser, a visitor on a tool that needs an account).
+
 ## 0.104.1 (2026-11-02)
 
 - **`map_space` reads two Marker rows with one id as the last one served** (schema-dist `profiles/map-space.md`, serial 106, reading I: an element is its id), as it already read Maps, Zones and Pins; until now each row of a repeated Marker id was read as a Marker of its own. The last row wins even when it reads less (no point, or a zone or map that is not served), and is then counted under its reason.

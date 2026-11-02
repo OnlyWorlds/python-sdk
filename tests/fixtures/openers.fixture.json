@@ -444,7 +444,7 @@
   },
   {
    "name": "public-world",
-   "why": "the public sees only rows whose open needs nothing, beside onlyworlds.com",
+   "why": "the public sees the rows whose open needs nothing, and a row that needs an account as one that says so (a row that needs the device is not there), beside onlyworlds.com",
    "tools": "three",
    "kind": "world",
    "address": {
@@ -460,6 +460,12 @@
      "name": "onlyworlds.com",
      "href": "https://www.onlyworlds.com/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
      "state": null
+    },
+    {
+     "id": "zephyr",
+     "name": "Zephyr",
+     "href": "https://zephyr.example/#/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+     "state": "Needs an account"
     },
     {
      "id": "corvid",
@@ -492,6 +498,12 @@
      "state": null
     },
     {
+     "id": "zephyr",
+     "name": "Zephyr",
+     "href": "https://zephyr.example/#/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/character/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
+     "state": "Needs an account"
+    },
+    {
      "id": "corvid",
      "name": "Corvid",
      "href": "https://corvid.example/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/character/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
@@ -501,7 +513,7 @@
   },
   {
    "name": "public-signed-in-still-public",
-   "why": "a row that needs anything does not exist for the public, whatever the surface knows",
+   "why": "the public is the signed-out reader: a row that needs an account says so whatever the surface knows of a sign-in, and a row that needs the device is not there, on a phone too",
    "tools": "three",
    "kind": "world",
    "address": {
@@ -519,6 +531,12 @@
      "name": "onlyworlds.com",
      "href": "https://www.onlyworlds.com/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
      "state": null
+    },
+    {
+     "id": "zephyr",
+     "name": "Zephyr",
+     "href": "https://zephyr.example/#/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+     "state": "Needs an account"
     },
     {
      "id": "corvid",
@@ -1232,7 +1250,7 @@
   },
   {
    "name": "mixed-public-element",
-   "why": "the public sees the rows that need nothing, the world door alone still worded",
+   "why": "the public sees the rows that need nothing, the world door alone still worded; a world door alone that needs an account says the account (the more urgent word)",
    "tools": "mixed",
    "kind": "element",
    "address": {
@@ -1256,6 +1274,12 @@
      "name": "Harbor",
      "href": "https://harbor.example/#/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
      "state": "Opens the world"
+    },
+    {
+     "id": "lumen",
+     "name": "Lumen",
+     "href": "https://lumen.example/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+     "state": "Needs an account"
     },
     {
      "id": "stitch",
@@ -1290,6 +1314,12 @@
      "name": "Harbor",
      "href": "https://harbor.example/#/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
      "state": "You are here"
+    },
+    {
+     "id": "lumen",
+     "name": "Lumen",
+     "href": "https://lumen.example/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+     "state": "Needs an account"
     }
    ]
   },
@@ -1682,6 +1712,12 @@
      "state": "You are here"
     },
     {
+     "id": "zephyr",
+     "name": "Zephyr",
+     "href": "https://zephyr.example/#/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+     "state": "Needs an account"
+    },
+    {
      "id": "corvid",
      "name": "Corvid",
      "href": "https://corvid.example/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
@@ -1691,7 +1727,7 @@
   },
   {
    "name": "offline-public",
-   "why": "the public's rows say Needs a connection too; the rows that need something are still not there",
+   "why": "the public's rows say Needs a connection too, the one that needs an account included (the connection comes first); the row that needs the device is still not there",
    "tools": "three",
    "kind": "world",
    "address": {
@@ -1710,10 +1746,86 @@
      "state": "Needs a connection"
     },
     {
+     "id": "zephyr",
+     "name": "Zephyr",
+     "href": "https://zephyr.example/#/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+     "state": "Needs a connection"
+    },
+    {
      "id": "corvid",
      "name": "Corvid",
      "href": "https://corvid.example/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
      "state": "Needs a connection"
+    }
+   ]
+  },
+  {
+   "name": "public-account-outside-browser",
+   "why": "outside a browser a member's account row says Opens in your browser; the public's says it needs an account, since no browser holds a seat for a visitor",
+   "tools": "three",
+   "kind": "element",
+   "address": {
+    "form": "text",
+    "world": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+    "type": "character",
+    "id": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a"
+   },
+   "surface": {
+    "audience": "public",
+    "browser": false
+   },
+   "expect": [
+    {
+     "id": "onlyworlds",
+     "name": "onlyworlds.com",
+     "href": "https://www.onlyworlds.com/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/character/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
+     "state": null
+    },
+    {
+     "id": "zephyr",
+     "name": "Zephyr",
+     "href": "https://zephyr.example/#/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/character/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
+     "state": "Needs an account"
+    },
+    {
+     "id": "corvid",
+     "name": "Corvid",
+     "href": "https://corvid.example/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/character/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
+     "state": null
+    }
+   ]
+  },
+  {
+   "name": "public-account-you-are-here",
+   "why": "the surface's own tool is You are here for the public too, when the tool is one that needs an account",
+   "tools": "three",
+   "kind": "world",
+   "address": {
+    "form": "human",
+    "world": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f"
+   },
+   "surface": {
+    "audience": "public",
+    "tool": "zephyr-web"
+   },
+   "expect": [
+    {
+     "id": "onlyworlds",
+     "name": "onlyworlds.com",
+     "href": "https://www.onlyworlds.com/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+     "state": null
+    },
+    {
+     "id": "zephyr",
+     "name": "Zephyr",
+     "href": "https://zephyr.example/#/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+     "state": "You are here"
+    },
+    {
+     "id": "corvid",
+     "name": "Corvid",
+     "href": "https://corvid.example/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+     "state": null
     }
    ]
   },

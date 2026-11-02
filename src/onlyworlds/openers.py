@@ -23,8 +23,8 @@ class ToolOpen(TypedDict):
     """A tool's ``open`` in the tools list: its link templates and what they need first. ``world`` holds
     ``{world}`` (the world's id); ``element`` holds ``{id}`` and, if it needs them, ``{world}`` and ``{type}``
     (the type word); either None without one. ``needs`` is what the person must have first: ``account``
-    (signed in to the tool), ``device`` (the world already in the tool on this device), or None for nothing,
-    the one kind of row a public page offers."""
+    (signed in to the tool), ``device`` (the world already in the tool on this device), or None for nothing.
+    A public page offers those rows, and an ``account`` row only as one that opens nothing ("Needs an account")."""
 
     world: str | None
     element: str | None
@@ -64,6 +64,7 @@ _PLACEHOLDER = re.compile(r"\{(world|type|id)\}")
 # A web address: its scheme is http or https. Read from the row's filled href.
 _WEB = re.compile(r"https?:", re.IGNORECASE)
 _OFFLINE = "Needs a connection"
+_NO_ACCOUNT = "Needs an account"
 
 
 def _fail(what: str) -> NoReturn:
@@ -112,8 +113,9 @@ def openers_for(
     door is a row to its world door that says "Opens the world". On an element given as ``element`` (the element as
     served, the mark flat on it), a row whose ``open.element_skips`` names a mark the element carries (room, hidden,
     proposed, map space, a reading aid, each read as ``world_graph`` reads it) is not there: its door cannot open
-    it. Without ``element`` every row is there. For the ``public`` audience only rows whose ``open.needs`` is None
-    are there: a row that needs anything does not exist for the public.
+    it. Without ``element`` every row is there. For the ``public`` audience (the signed-out reader) a row whose
+    ``open.needs`` is ``device`` is not there, since a visitor's device holds no world of this one's, and a row
+    whose ``needs`` is ``account`` is there and says it needs one.
 
     ``surface`` is a mapping of what the surface knows, and nothing is guessed: ``audience`` (``member``, a seat in
     the world, a guest included, or ``public``, the signed-out reader; required), ``signed_in`` (True, False, or
@@ -124,7 +126,9 @@ def openers_for(
     Each row's ``state``, the first that holds: "You are here" for the surface's own tool (its ``client`` is
     ``tool``); then, when ``online`` is False, "Needs a connection" for a row whose href is a web address (scheme
     ``http:`` or ``https:``; a row whose link opens an app on the device is unaffected, and the href stays in the row
-    either way); then what ``needs`` asks of this surface: ``account`` outside a browser "Opens in your browser", in a
+    either way); then, for the ``public`` audience, "Needs an account" for a row whose ``needs`` is ``account``,
+    whatever ``signed_in`` says (the href stays in the row; a surface draws it as a row that opens nothing); then
+    what ``needs`` asks of this surface: ``account`` outside a browser "Opens in your browser", in a
     browser signed out "Sign in to <name> first" (none when ``signed_in`` is None: a word shows only when the
     surface knows it is true), ``device`` on a phone "Needs the world on this phone"; then "Opens the world" (a
     world door on an element: a sign-in the row needs is the more urgent word); else None.
@@ -240,7 +244,7 @@ def openers_for(
             _fail(f"tool {rid}: open.element_skips names what an element door leaves out, and the row has none")
         if r.get("rung") != "listed":
             continue
-        if audience == "public" and needs is not None:
+        if audience == "public" and needs == "device":
             continue
         template = world_door if kind == "world" or element_door is None else element_door
         if template is None:
@@ -257,6 +261,8 @@ def openers_for(
             state = "You are here"
         elif offline(href):
             state = _OFFLINE
+        elif audience == "public" and needs == "account":
+            state = _NO_ACCOUNT
         elif needs == "account" and not browser:
             state = "Opens in your browser"
         elif needs == "account" and signed_in is False:
