@@ -4,6 +4,8 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+- **`map_space(elements)` reads a world's map space** (draft profile, not released): a Map's frame, each Zone's outline from its Markers on a Map, and each Pin's point, as `{maps, zones, pins, out}` in id order, with what it left aside counted in `out` by reason (`no_point`, `no_markers`, `dangling`, `no_map`). Whole numbers only (a boolean or a fraction is no point; `2.0` reads as 2), a row without an id is ignored, a Map's `z_max` is the largest z among its own points beside its `depth`, a Marker without a whole `order` after the ordered ones, a missing `width` or `height` measured from the Map's own points. Types `MapSpace`, `MapSpaceMap`, `MapSpaceOutline`, `MapSpacePin`. The fixture is vendored under `tests/fixtures/`.
+
 ## 0.103.1 (2026-11-02)
 
 - **`draught(id)` without `compact` answers the fixed shape again.** The server now serves the compact packet by default; the client sends `compact=false` when the caller leaves it out, so every section is there (since 0.14.0 a left-out `compact` was sent as nothing). `compact=True` still asks for the short form.

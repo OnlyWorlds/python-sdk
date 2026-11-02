@@ -78,6 +78,7 @@ from .http import (
 )
 from .landing import Landing, LandingCluster, LandingGap, LandingMember, landing_of
 from .lens import DATE_FIELD, LensMail, LensReading, date_of, is_lens, is_template, lenses_in_use, resolve_lens
+from .map_space import MapSpace, MapSpaceMap, MapSpaceOutline, MapSpacePin, map_space
 from .message import (
     EditRead,
     SenderRead,
@@ -166,6 +167,10 @@ __all__ = [
     "LandingMember",
     "LensMail",
     "LensReading",
+    "MapSpace",
+    "MapSpaceMap",
+    "MapSpaceOutline",
+    "MapSpacePin",
     "Opener",
     "Patch",
     "PreconditionFailed",
@@ -222,6 +227,7 @@ __all__ = [
     "is_to_everyone",
     "landing_of",
     "lenses_in_use",
+    "map_space",
     "note_of",
     "openers_for",
     "out_degree_of",

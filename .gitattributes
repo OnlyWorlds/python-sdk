@@ -18,3 +18,5 @@ tests/fixtures/doors.fixture.json -text
 tests/fixtures/author-fields.fixture.json -text
 # The tools list, vendored byte for byte as GitHub serves it at the pinned commit (codegen/tools-pin.json holds its sha256).
 codegen/tools/tools.json -text
+# The map-space profile's cases (draft), vendored byte for byte (its test holds the sha256).
+tests/fixtures/map-space.fixture.json -text
