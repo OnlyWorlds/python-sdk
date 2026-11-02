@@ -1,11 +1,12 @@
-"""The map-space profile: ``map_space`` on every case of ``tests/fixtures/map-space.fixture.json``, every expected
-answer written by hand or, for the whole plan of record, held by a second reader. Key order is part of the answer, so
-each case is compared as serialised text as well as by value. A missing fixture fails, never skips."""
+"""The map-space profile (schema-dist ``profiles/map-space.md``): every conformance case in
+``codegen/schema-dist/profiles/map-space.fixture.json``, vendored with the distribution (the pinned MANIFEST.json holds
+its sha256, checked by ``codegen/generate_schema.py --check``), each its own test, through ``map_space``. Key order is
+part of the answer, so each case is compared as serialised text as well as by value. A missing fixture fails, never
+skips."""
 
 from __future__ import annotations
 
 import copy
-import hashlib
 import json
 from pathlib import Path
 from typing import Any
@@ -14,17 +15,16 @@ import pytest
 
 from onlyworlds import map_space
 
-FIXTURE = Path(__file__).resolve().parent / "fixtures" / "map-space.fixture.json"
-FIXTURE_SHA256 = "0aff4e2317e317583750c977cd24463dc8ed56d67252e3cfcccb103ab8b6a2ec"
+REPO = Path(__file__).resolve().parent.parent
+FIXTURE = REPO / "codegen" / "schema-dist" / "profiles" / "map-space.fixture.json"
 CASES_IN_FIXTURE = 24
 
 
 def load_fixture() -> dict[str, Any]:
     assert FIXTURE.is_file(), f"no map-space fixture at {FIXTURE}"
-    data = FIXTURE.read_bytes()
-    assert hashlib.sha256(data).hexdigest() == FIXTURE_SHA256
-    doc: dict[str, Any] = json.loads(data.decode("utf-8"))
+    doc: dict[str, Any] = json.loads(FIXTURE.read_text(encoding="utf-8"))
     assert doc["profile"] == "map-space"
+    assert doc["profile_page"] == "profiles/map-space.md"
     return doc
 
 

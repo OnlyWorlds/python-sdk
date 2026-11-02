@@ -1,4 +1,5 @@
-"""The map-space profile (draft): how a reader turns a world's Maps, Zones, Markers and Pins into geometry.
+"""The map-space profile (schema-dist ``profiles/map-space.md``): how a reader turns a world's Maps, Zones, Markers
+and Pins into geometry.
 
 ``map_space(elements)`` answers ``{maps, zones, pins, out}`` from the elements as a reader is served them (a folder's
 rows or the API's, so visibility is already applied). Pure: nothing is stored or written. Coordinates count from the
@@ -8,8 +9,8 @@ bottom left of the Map, in the Map's pixels, and are whole numbers; a tool conve
 A Zone's outline is its Markers on one Map in ``order``, a Marker without a whole ``order`` after the ordered ones,
 ties by id in code point order. A row the reading leaves aside is counted in ``out`` by reason (``no_point``,
 ``no_markers``, ``dangling``, ``no_map``); a reason with nothing counted is absent. The same input gives the same
-answer, key order included. The fixture (``tests/fixtures/map-space.fixture.json``) is replayed whole by
-``tests/test_map_space.py``.
+answer, key order included. The fixture (``codegen/schema-dist/profiles/map-space.fixture.json``) is replayed
+whole by ``tests/test_map_space.py``.
 """
 
 from __future__ import annotations
