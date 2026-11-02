@@ -375,7 +375,9 @@ def test_a_marked_domain_a_hop_reaches_is_cut_unless_types_names_its_pair() -> N
     lensed = world_graph(
         AIDS, OWNER, lens=_lens_on({"institutions": ["desk"]}, {"types": ["construct/domain", "institution"]})
     )
-    assert [(n["id"], n.get("marks")) for n in lensed["nodes"]] == [("desk", None), ("domain", None)]
+    # Staged for serial 104: a reading aid a lens keeps carries its mark, as a room element a lens keeps does (the
+    # profile owner's case settles it; until serial 104 this line read no mark).
+    assert [(n["id"], n.get("marks")) for n in lensed["nodes"]] == [("desk", None), ("domain", ["reading_aid"])]
 
 
 def test_an_anchor_that_is_a_marked_guide_is_kept_and_followed() -> None:

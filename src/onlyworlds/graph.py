@@ -27,7 +27,7 @@ from .message import _instant
 
 __all__ = ["GraphEdge", "GraphNode", "WorldGraph", "degree_of", "world_graph"]
 
-GraphMark = Literal["room", "hidden", "proposed"]
+GraphMark = Literal["room", "hidden", "proposed", "reading_aid"]
 
 
 class GraphNode(TypedDict):
@@ -86,9 +86,8 @@ _DECLARED_LINKS: tuple[str, ...] = ("x_lens_leads_to", "x_spine_depends_on")
 profile's."""
 _MAP_SPACE = MAP_SPACE
 _KINDS: tuple[str, ...] = ("room", "hidden", "proposed", "map_space", "reading_aid")
-"""The kinds out of an unlensed graph by default. A reading aid has no flag: only a lens that names its pair keeps
-one."""
-_MARKS: tuple[GraphMark, ...] = ("room", "hidden", "proposed")
+"""The kinds out of an unlensed graph by default, each brought back by its flag."""
+_MARKS: tuple[GraphMark, ...] = ("room", "hidden", "proposed", "reading_aid")
 _GRAPH_REASONS: tuple[str, ...] = (*_CUT_REASONS, *_KINDS, "outside_lens")
 _GRAPH_OWNER_ONLY = frozenset({*_OWNER_ONLY, "hidden", "proposed"})
 
@@ -112,6 +111,7 @@ def world_graph(
     hidden: bool = False,
     proposed: bool = False,
     map_space: bool = False,
+    reading_aids: bool = False,
 ) -> WorldGraph:
     """Read a world as a graph for one reader (the lens profile's graph section): the elements the reader sees as
     nodes, the links between them as edges, and what was left out, counted by reason. Pure: it never writes, and
@@ -119,9 +119,9 @@ def world_graph(
 
     ``world`` and ``reader`` are what ``resolve_lens`` takes. Without ``lens`` the nodes are every element the
     reader sees less what is out by default: room elements, hidden ones, proposed ones and map space (Map, Pin,
-    Marker; a Zone is content and a node like any other), each brought back by its flag (``rooms``, ``hidden``,
-    ``proposed``, ``map_space``) and then marked, and the reading aids (the charter, its guide, its domains:
-    ``is_charter_element``), counted ``reading_aid``, which no flag brings back. With ``lens`` (a lens body, or the
+    Marker; a Zone is content and a node like any other) and the reading aids (the charter, its guide, its domains:
+    ``is_charter_element``), each brought back by its flag (``rooms``, ``hidden``, ``proposed``, ``map_space``,
+    ``reading_aids``) and then marked (map space carries no mark). With ``lens`` (a lens body, or the
     id of a lens the reader can see) the nodes are exactly the lens's ``kept``, its cut rides along unchanged, and a
     flag adds nothing; ``as_of`` and ``clock`` are the lens's, as ``resolve_lens`` takes them, and are read only
     with a lens. A lens whose ``x_lens`` cannot be read gives an empty graph with ``unreadable`` naming the key, as
@@ -138,13 +138,20 @@ def world_graph(
     link is the edge. A node's ``name`` is the stored value, ``None`` when absent.
 
     ``hidden`` or ``proposed`` from a reader that is not the owner, or any flag from a public reader, raises
-    ``ValueError`` naming the flag before anything is read. An owner reading ``as`` another reader is judged by that
+    ``ValueError`` naming the flag before anything is read; of several, the first in the order ``hidden``,
+    ``proposed``, ``rooms``, ``map_space``, ``reading_aids``. An owner reading ``as`` another reader is judged by that
     reader's rung. The npm SDK's ``worldGraph`` gives the same answer on the same input."""
     if not isinstance(world, Mapping) or not isinstance(world.get("elements"), list):
         raise TypeError("world_graph: world is a mapping with an elements list.")
     _check_reader(reader, "world_graph: reader")
-    flags = {"room": rooms, "hidden": hidden, "proposed": proposed, "map_space": map_space}
-    names = {"room": "rooms", "hidden": "hidden", "proposed": "proposed", "map_space": "map_space"}
+    flags = {"room": rooms, "hidden": hidden, "proposed": proposed, "map_space": map_space, "reading_aid": reading_aids}
+    names = {
+        "room": "rooms",
+        "hidden": "hidden",
+        "proposed": "proposed",
+        "map_space": "map_space",
+        "reading_aid": "reading_aids",
+    }
     for kind, value in flags.items():
         if value is not None and not isinstance(value, bool):
             raise TypeError(f"world_graph: {names[kind]} is a boolean; got {value!r}.")
@@ -153,7 +160,7 @@ def world_graph(
         if flags[kind] and seen_rung != "owner":
             raise ValueError(f"world_graph: {names[kind]} is the owner's alone; a {seen_rung} reader may not ask it.")
     if seen_rung == "public":
-        for kind in ("room", "map_space"):
+        for kind in ("room", "map_space", "reading_aid"):
             if flags[kind]:
                 raise ValueError(f"world_graph: a public reader takes no flag; it asked {names[kind]}.")
     if as_of is not None and _whole(as_of) is None:

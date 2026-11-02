@@ -4,6 +4,9 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+- **`world_graph(..., reading_aids=True)` brings the reading aids back into an unlensed graph** (schema-dist serial 104): the charter, its guide and its domains, each by its pair and the mark `x_charter_of`, which are out by default and counted `reading_aid`. A node brought back carries the mark `reading_aid`, last in `marks`; an edge to it is an edge. Any signed reader may ask it; a public reader is refused by name, last in the refusal order after `map_space`. With a lens the flag adds nothing, as every flag.
+- **A reading aid a lens keeps carries the mark `reading_aid`**, as a room element a lens keeps carries `room`; it had no mark.
+
 ## 0.102.0 (2026-11-02)
 
 - **`TOOLS` repinned at the tools list's `f10afdc`**: Tactical Tangle is a listed row (`tangle`). It has no open door, so `openers_for` offers it nowhere, and a record whose `tool` is `tangle` finds its row by id.
