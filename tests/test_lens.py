@@ -18,10 +18,12 @@ import pytest
 from onlyworlds import (
     ROOM_PAIRS,
     LensReading,
+    degree_of,
     is_charter_element,
     is_lens,
     is_template,
     lenses_in_use,
+    out_degree_of,
     resolve_lens,
     world_graph,
 )
@@ -119,6 +121,8 @@ def answer(c: Mapping[str, Any], doc: Mapping[str, Any]) -> dict[str, Any]:
         return {"broken": broken}
     if kind == "uses":
         return {"lenses": lenses_in_use(c["membership"], c["x_lens_uses"])}
+    if kind == "degree":
+        return {"degree": degree_of(c["graph"]), "out_degree": out_degree_of(c["graph"])}
     raise ValueError(f"a case of unknown kind {kind!r}")
 
 
@@ -136,6 +140,8 @@ def want(c: Mapping[str, Any]) -> dict[str, Any]:
         return {"broken": []}
     if kind == "uses":
         return {"lenses": c["lenses"]}
+    if kind == "degree":
+        return dict(c["want"])
     return {"a reader for this kind": True}
 
 
