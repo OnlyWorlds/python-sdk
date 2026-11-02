@@ -24,7 +24,7 @@
    For the last two, the field a button fills is `location` on the Character. `no_place` reads from the graph the visitor is served: a Character whose place is hidden from them reads as having none, since the landing shows a person what they may see and nothing it must keep from them.
 6. **A stable order.** The same graph and options give the same answer, byte for byte. Everything is counted in integers, and ids compare by code point, never by UTF-16 unit.
 
-**Where it shows.** onlyworlds.com's landing, for a signed-in owner's OnlyWorld. Keel bakes the answer as a file of its own beside the world's graph file, carrying the mode and the size it was baked at, and the stage draws it. Any tool may draw it at its own door. Neither lenses as clusters nor graphs beyond one world are in this profile.
+**Where it shows.** onlyworlds.com's landing, for a signed-in owner's OnlyWorld. Keel bakes the answer as a file of its own beside the world's graph file, carrying the mode and the size it was baked at, and the stage draws it. Any door may serve the answer, keyless or signed in, each baked from the graph that door's reader is served; keel serves a public world's keyless file and the owner's own. A key beside the five (keel's `baked`, its `lenses`) is the door's own and outside this profile: a reader reads the five and passes the rest through. Any tool may draw it at its own door. Neither lenses as clusters nor graphs beyond one world are in this profile.
 
 **The fixture.** `landing.fixture.json`: each case is a graph in `worldGraph`'s shape (only the keys the reader reads), its `options`, and a `want` that holds the keys the case tests. A case marked `whole` holds the entire answer, keys in order. A refusal is `{refused: <option>}`. The cases cover:
 - a tie on degree, and ids above U+FFFF that UTF-16 order would sort the other way;
@@ -37,4 +37,4 @@
 - the mode at, under and over the size, and null options;
 - the refusals.
 
-**Ruled**: 2026-11-01, on the first draft. 2026-11-02, serial 104: `orphan` and `near_orphan` by this page's degree (three engine ports read the toolkit's report count and the page's degree apart on a self link and a doubled target); a `heads` past the reader's integer range reads as the largest.
+**Ruled**: 2026-11-01, on the first draft. 2026-11-02, serial 104: `orphan` and `near_orphan` by this page's degree (three engine ports read the toolkit's report count and the page's degree apart on a self link and a doubled target); a `heads` past the reader's integer range reads as the largest. 2026-11-02, the door sentence: any door may serve the answer, and a key beside the five is the door's own (a read of keel's two doors against this page).
