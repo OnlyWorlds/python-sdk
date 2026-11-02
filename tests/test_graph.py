@@ -137,7 +137,7 @@ def test_the_fixtures_graph_cases() -> None:
     for line in wrong:
         print(line)
     assert wrong == []
-    assert len(cases) == 49, f"the fixture holds {len(cases)} graph cases, serial 96 has 49"
+    assert len(cases) == 54, f"the fixture holds {len(cases)} graph cases, serial 104 has 54"
 
 
 def test_a_node_s_family_is_its_type_s_colour_word() -> None:
@@ -192,7 +192,7 @@ def test_the_graph_case_over_empty_review_marks() -> None:
 
 def test_the_fixtures_graph_tables_read_back_through_the_reader() -> None:
     doc = load_fixture()
-    assert doc["graph_flags"] == ["rooms", "hidden", "proposed", "map_space"]
+    assert doc["graph_flags"] == ["rooms", "hidden", "proposed", "map_space", "reading_aids"]
     empty: dict[str, Any] = {"elements": []}
     for f in doc["graph_flags"]:
         flag: dict[str, Any] = {f: True}
@@ -299,6 +299,10 @@ def test_a_refused_flag_is_refused_before_anything_is_read() -> None:
         world_graph(world, {"rung": "public"}, rooms=True)
     with pytest.raises(ValueError, match="it asked map_space"):
         world_graph(world, {"rung": "public"}, map_space=True)
+    with pytest.raises(ValueError, match="it asked reading_aids"):
+        world_graph(world, {"rung": "public"}, reading_aids=True)
+    with pytest.raises(ValueError, match="it asked map_space"):
+        world_graph(world, {"rung": "public"}, map_space=True, reading_aids=True)
     with pytest.raises(ValueError, match="it asked rooms"):
         world_graph(world, {"rung": "owner", "as": {"rung": "public"}}, rooms=True)
     # The same world read without a refused flag does read the elements.

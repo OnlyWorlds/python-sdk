@@ -31,7 +31,7 @@ from onlyworlds._schema import LINK_TARGETS
 
 REPO = Path(__file__).resolve().parent.parent
 FIXTURE = REPO / "codegen" / "schema-dist" / "profiles" / "lens.fixture.json"
-KINDS = {"shape": 6, "keys": 25, "resolve": 102, "invariant": 4, "uses": 5, "graph": 49, "degree": 5}
+KINDS = {"shape": 6, "keys": 25, "resolve": 102, "invariant": 4, "uses": 5, "graph": 54, "degree": 5}
 OWNER = {"rung": "owner"}
 
 
@@ -162,7 +162,7 @@ def test_every_fixture_case_is_answered_as_the_fixture_says() -> None:
     for line in wrong:
         print(line)
     assert wrong == []
-    assert len(cases) == 196, f"the fixture holds {len(cases)} cases, serial 103 has 196"
+    assert len(cases) == 201, f"the fixture holds {len(cases)} cases, serial 104 has 201"
     assert Counter(c["kind"] for c in cases) == KINDS
 
 
@@ -375,8 +375,8 @@ def test_a_marked_domain_a_hop_reaches_is_cut_unless_types_names_its_pair() -> N
     lensed = world_graph(
         AIDS, OWNER, lens=_lens_on({"institutions": ["desk"]}, {"types": ["construct/domain", "institution"]})
     )
-    # Staged for serial 104: a reading aid a lens keeps carries its mark, as a room element a lens keeps does (the
-    # profile owner's case settles it; until serial 104 this line read no mark).
+    # Since serial 104 a reading aid a lens keeps carries its mark, as a room element a lens keeps does (the lens
+    # fixture's case 'a lens that names law/charter keeps the charter, marked reading_aid, whatever the flag says').
     assert [(n["id"], n.get("marks")) for n in lensed["nodes"]] == [("desk", None), ("domain", ["reading_aid"])]
 
 

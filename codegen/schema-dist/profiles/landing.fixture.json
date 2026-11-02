@@ -1699,6 +1699,158 @@
     ]
    },
    "whole": true
+  },
+  {
+   "name": "a node whose only link is to itself is a near orphan: degree 1, by the page's degree",
+   "graph": {
+    "nodes": [
+     {
+      "id": "solo",
+      "type": "character"
+     }
+    ],
+    "edges": [
+     {
+      "source": "solo",
+      "field": "friends",
+      "target": "solo",
+      "index": 0
+     }
+    ]
+   },
+   "want": {
+    "gaps": [
+     {
+      "kind": "near_orphan",
+      "id": "solo"
+     },
+     {
+      "kind": "no_place",
+      "id": "solo"
+     }
+    ]
+   }
+  },
+  {
+   "name": "a list naming one target twice is two edges: degree 2 at both ends, no near orphan",
+   "graph": {
+    "nodes": [
+     {
+      "id": "ev",
+      "type": "event"
+     },
+     {
+      "id": "mara",
+      "type": "character"
+     }
+    ],
+    "edges": [
+     {
+      "source": "ev",
+      "field": "characters",
+      "target": "mara",
+      "index": 0
+     },
+     {
+      "source": "ev",
+      "field": "characters",
+      "target": "mara",
+      "index": 1
+     }
+    ]
+   },
+   "want": {
+    "clusters": [
+     {
+      "head": "mara",
+      "members": [
+       {
+        "id": "mara",
+        "hops": 0,
+        "degree": 2
+       },
+       {
+        "id": "ev",
+        "hops": 1,
+        "degree": 2
+       }
+      ]
+     }
+    ],
+    "unclustered": [],
+    "gaps": [
+     {
+      "kind": "no_place",
+      "id": "mara"
+     }
+    ]
+   }
+  },
+  {
+   "name": "heads past the reader's integer range reads as the largest: every linked Character a head",
+   "options": {
+    "heads": 1000000000000000000000000000000
+   },
+   "graph": {
+    "nodes": [
+     {
+      "id": "p",
+      "type": "character"
+     },
+     {
+      "id": "q",
+      "type": "character"
+     },
+     {
+      "id": "e1",
+      "type": "event"
+     }
+    ],
+    "edges": [
+     {
+      "source": "e1",
+      "field": "characters",
+      "target": "p",
+      "index": 0
+     },
+     {
+      "source": "e1",
+      "field": "characters",
+      "target": "q",
+      "index": 1
+     }
+    ]
+   },
+   "want": {
+    "clusters": [
+     {
+      "head": "p",
+      "members": [
+       {
+        "id": "p",
+        "hops": 0,
+        "degree": 1
+       },
+       {
+        "id": "e1",
+        "hops": 1,
+        "degree": 2
+       }
+      ]
+     },
+     {
+      "head": "q",
+      "members": [
+       {
+        "id": "q",
+        "hops": 0,
+        "degree": 1
+       }
+      ]
+     }
+    ],
+    "unclustered": []
+   }
   }
  ]
 }

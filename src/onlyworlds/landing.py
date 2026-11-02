@@ -72,7 +72,7 @@ def landing_of(
     24), else ``graph``; both parts are always read. Heads: the Characters with an edge, most linked first
     (``degree_of``'s count), ties by id in code point order, at most ``heads`` (default 5), never a known-of node.
     A node within ``hops`` steps of a head (default 1; either way along an edge) joins the nearest head, a tie
-    going to the higher-ranked one. Gaps: the links report's orphans (degree 0) and near-orphans (degree 1), a
+    going to the higher-ranked one. Gaps: an orphan (degree 0) and a near-orphan (degree 1) by that same count, a
     Character whose ``location`` names no Location node (``no_place``), a Location no Character's ``location``
     names (``nobody_here``); a known-of node is never a gap. The same graph and options give the same answer, byte
     for byte. An option that is not a whole number of 1 or more is a ValueError naming it; None is its default."""

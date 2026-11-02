@@ -30,8 +30,8 @@ def load_cases() -> list[dict[str, Any]]:
 CASES = load_cases()
 
 
-def test_the_fixture_holds_serial_103s_30_cases() -> None:
-    assert len(CASES) == 30, f"the fixture holds {len(CASES)} cases, serial 103 has 30"
+def test_the_fixture_holds_serial_104s_33_cases() -> None:
+    assert len(CASES) == 33, f"the fixture holds {len(CASES)} cases, serial 104 has 33"
 
 
 def _dump(v: Any) -> str:

@@ -5260,7 +5260,8 @@
         "rooms": true,
         "hidden": true,
         "proposed": true,
-        "map_space": true
+        "map_space": true,
+        "reading_aids": true
       },
       "want": {
         "nodes": [
@@ -5971,7 +5972,8 @@
         "rooms": true,
         "hidden": true,
         "proposed": true,
-        "map_space": true
+        "map_space": true,
+        "reading_aids": true
       },
       "want": {
         "refused": "hidden"
@@ -6300,7 +6302,8 @@
         "rooms": true,
         "hidden": true,
         "proposed": true,
-        "map_space": true
+        "map_space": true,
+        "reading_aids": true
       },
       "want": {
         "nodes": [
@@ -7755,6 +7758,345 @@
           }
         ],
         "edges_cut": {},
+        "cut": {},
+        "unreadable": null
+      }
+    },
+    {
+      "name": "reading_aids brings the reading aids back, marked",
+      "kind": "graph",
+      "world": {
+        "elements": [
+          {
+            "id": "t1",
+            "type": "title",
+            "name": "Keeper",
+            "laws": [
+              "ch1",
+              "lw1"
+            ]
+          },
+          {
+            "id": "ch1",
+            "type": "law",
+            "name": "House Rules",
+            "supertype": "Charter",
+            "x_charter_of": "w1"
+          },
+          {
+            "id": "lw1",
+            "type": "law",
+            "name": "Harbour Law"
+          }
+        ]
+      },
+      "reader": {
+        "rung": "owner"
+      },
+      "options": {
+        "reading_aids": true
+      },
+      "want": {
+        "nodes": [
+          {
+            "id": "ch1",
+            "type": "law",
+            "name": "House Rules",
+            "family": "pink",
+            "icon": "gpp_bad",
+            "marks": [
+              "reading_aid"
+            ]
+          },
+          {
+            "id": "lw1",
+            "type": "law",
+            "name": "Harbour Law",
+            "family": "pink",
+            "icon": "gpp_bad"
+          },
+          {
+            "id": "t1",
+            "type": "title",
+            "name": "Keeper",
+            "family": "pink",
+            "icon": "military_tech"
+          }
+        ],
+        "edges": [
+          {
+            "source": "t1",
+            "field": "laws",
+            "target": "ch1",
+            "index": 0
+          },
+          {
+            "source": "t1",
+            "field": "laws",
+            "target": "lw1",
+            "index": 1
+          }
+        ],
+        "edges_cut": {},
+        "cut": {},
+        "unreadable": null
+      }
+    },
+    {
+      "name": "reading_aids asked by a contributor is taken: the flag is any signed reader's",
+      "kind": "graph",
+      "world": {
+        "elements": [
+          {
+            "id": "t1",
+            "type": "title",
+            "name": "Keeper",
+            "laws": [
+              "ch1",
+              "lw1"
+            ]
+          },
+          {
+            "id": "ch1",
+            "type": "law",
+            "name": "House Rules",
+            "supertype": "Charter",
+            "x_charter_of": "w1"
+          },
+          {
+            "id": "lw1",
+            "type": "law",
+            "name": "Harbour Law"
+          }
+        ]
+      },
+      "reader": {
+        "rung": "contributor"
+      },
+      "options": {
+        "reading_aids": true
+      },
+      "want": {
+        "nodes": [
+          {
+            "id": "ch1",
+            "type": "law",
+            "name": "House Rules",
+            "family": "pink",
+            "icon": "gpp_bad",
+            "marks": [
+              "reading_aid"
+            ]
+          },
+          {
+            "id": "lw1",
+            "type": "law",
+            "name": "Harbour Law",
+            "family": "pink",
+            "icon": "gpp_bad"
+          },
+          {
+            "id": "t1",
+            "type": "title",
+            "name": "Keeper",
+            "family": "pink",
+            "icon": "military_tech"
+          }
+        ],
+        "edges": [
+          {
+            "source": "t1",
+            "field": "laws",
+            "target": "ch1",
+            "index": 0
+          },
+          {
+            "source": "t1",
+            "field": "laws",
+            "target": "lw1",
+            "index": 1
+          }
+        ],
+        "edges_cut": {},
+        "cut": {},
+        "unreadable": null
+      }
+    },
+    {
+      "name": "a public reader asking reading_aids is refused",
+      "kind": "graph",
+      "world": {
+        "elements": [
+          {
+            "id": "t1",
+            "type": "title",
+            "name": "Keeper",
+            "laws": [
+              "ch1",
+              "lw1"
+            ]
+          },
+          {
+            "id": "ch1",
+            "type": "law",
+            "name": "House Rules",
+            "supertype": "Charter",
+            "x_charter_of": "w1"
+          },
+          {
+            "id": "lw1",
+            "type": "law",
+            "name": "Harbour Law"
+          }
+        ]
+      },
+      "reader": {
+        "rung": "public"
+      },
+      "options": {
+        "reading_aids": true
+      },
+      "want": {
+        "refused": "reading_aids"
+      }
+    },
+    {
+      "name": "reading_aids never widens a lens: a filter lens that does not name the pair leaves the charter out",
+      "kind": "graph",
+      "world": {
+        "elements": [
+          {
+            "id": "t1",
+            "type": "title",
+            "name": "Keeper",
+            "laws": [
+              "ch1",
+              "lw1"
+            ]
+          },
+          {
+            "id": "ch1",
+            "type": "law",
+            "name": "House Rules",
+            "supertype": "Charter",
+            "x_charter_of": "w1"
+          },
+          {
+            "id": "lw1",
+            "type": "law",
+            "name": "Harbour Law"
+          }
+        ]
+      },
+      "reader": {
+        "rung": "owner"
+      },
+      "options": {
+        "lens": {
+          "id": "L9",
+          "type": "construct",
+          "supertype": "Lens",
+          "name": "Laws",
+          "x_lens": {
+            "types": [
+              "law"
+            ]
+          }
+        },
+        "reading_aids": true
+      },
+      "want": {
+        "nodes": [
+          {
+            "id": "lw1",
+            "type": "law",
+            "name": "Harbour Law",
+            "family": "pink",
+            "icon": "gpp_bad"
+          }
+        ],
+        "edges": [],
+        "edges_cut": {},
+        "cut": {},
+        "unreadable": null
+      }
+    },
+    {
+      "name": "a lens that names law/charter keeps the charter, marked reading_aid, whatever the flag says",
+      "kind": "graph",
+      "world": {
+        "elements": [
+          {
+            "id": "t1",
+            "type": "title",
+            "name": "Keeper",
+            "laws": [
+              "ch1",
+              "lw1"
+            ]
+          },
+          {
+            "id": "ch1",
+            "type": "law",
+            "name": "House Rules",
+            "supertype": "Charter",
+            "x_charter_of": "w1"
+          },
+          {
+            "id": "lw1",
+            "type": "law",
+            "name": "Harbour Law"
+          }
+        ]
+      },
+      "reader": {
+        "rung": "owner"
+      },
+      "options": {
+        "lens": {
+          "id": "L8",
+          "type": "construct",
+          "supertype": "Lens",
+          "name": "The house",
+          "x_lens": {
+            "types": [
+              "law/charter",
+              "title"
+            ]
+          }
+        }
+      },
+      "want": {
+        "nodes": [
+          {
+            "id": "ch1",
+            "type": "law",
+            "name": "House Rules",
+            "family": "pink",
+            "icon": "gpp_bad",
+            "marks": [
+              "reading_aid"
+            ]
+          },
+          {
+            "id": "t1",
+            "type": "title",
+            "name": "Keeper",
+            "family": "pink",
+            "icon": "military_tech"
+          }
+        ],
+        "edges": [
+          {
+            "source": "t1",
+            "field": "laws",
+            "target": "ch1",
+            "index": 0
+          }
+        ],
+        "edges_cut": {
+          "outside_lens": 1
+        },
         "cut": {},
         "unreadable": null
       }
@@ -10013,7 +10355,8 @@
     "rooms",
     "hidden",
     "proposed",
-    "map_space"
+    "map_space",
+    "reading_aids"
   ],
   "owner_only_flags": [
     "hidden",

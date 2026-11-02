@@ -5,7 +5,7 @@
 **The reading.** `landingOf(graph, options)`, one reader in the SDK and the Python package (`landing_of`), from the fixture beside this page. `graph` is what the lens profile's `worldGraph` answers for the visitor, so every leave-out is already made: the room, hidden and proposed elements, map space and the reading aids are not in it, and a reader that wants them back asks the graph, never this one. The answer is `{mode, size, clusters, unclustered, gaps}`. All five keys are always present, in that order. It holds structure only, never coordinates: a layout is the drawing tool's, keyed by id.
 
 **Options**, each a whole number, refused by name when it is anything else. An option given as null takes its default, as in `worldGraph`, and an unknown key is refused by name before anything is read:
-- `heads`: how many clusters at most. Default 5, at least 1.
+- `heads`: how many clusters at most. Default 5, at least 1. A whole number too large for the reader to hold reads as the largest it holds: any value past the node count means every head.
 - `hops`: how far a head reaches. Default 1, at least 1.
 - `size`: the node count at which the mode turns from gaps to graph. Default 24, at least 1.
 
@@ -17,7 +17,7 @@
 3. **Clusters.** A node within `hops` steps of a head joins the head it is fewest steps from. A step follows an edge either way, and a mirror pair is one step. When two heads are equally near, the node joins the higher-ranked one, so every node has one home. Each cluster is `{head, members}`, in the heads' order. A member is `{id, hops, degree}`: the head first at 0, then by hops, then by degree (highest first), then by id.
 4. **Unclustered.** Every node no head reaches, as `{id, degree}`, by degree (highest first), then by id: the world around the clusters, which a drawing mutes.
 5. **Gaps.** One entry per gap, `{kind, id}`, in the order of the kinds, then by id. A node can carry several. A known-of node is never a gap, since a stub carries no links. The kinds:
-   - `orphan` and `near_orphan`: the links report's own orphans and near-orphans, as the toolkit's read skill defines them.
+   - `orphan` and `near_orphan`: a node of degree 0, and one of degree 1, by the degree this page defines (an edge counted once at every node it touches: a link to itself once, each place in a list once), never by a report's own count.
    - `no_place`: a Character whose `location` names no Location node.
    - `nobody_here`: a Location that no Character's `location` names. Another type's `location` does not count.
 
@@ -37,4 +37,4 @@
 - the mode at, under and over the size, and null options;
 - the refusals.
 
-**Ruled**: 2026-11-01, on the first draft.
+**Ruled**: 2026-11-01, on the first draft. 2026-11-02, serial 104: `orphan` and `near_orphan` by this page's degree (three engine ports read the toolkit's report count and the page's degree apart on a self link and a doubled target); a `heads` past the reader's integer range reads as the largest.
