@@ -18,7 +18,7 @@ import pytest
 
 from onlyworlds import ApiError, Client, PreconditionFailed
 
-pytestmark = pytest.mark.skipif(not os.environ.get("OW_LIVE"), reason="set OW_LIVE=1 for the live practice-world writes")
+pytestmark = pytest.mark.skipif(not os.environ.get("OW_LIVE"), reason="set OW_LIVE=1 for the practice-world writes")
 
 LITERALS = "https://raw.githubusercontent.com/OnlyWorlds/onlyworlds.github.io/main/contract/practice.json"
 
@@ -26,7 +26,8 @@ LITERALS = "https://raw.githubusercontent.com/OnlyWorlds/onlyworlds.github.io/ma
 @pytest.fixture(scope="module")
 def practice() -> dict[str, str]:
     with urllib.request.urlopen(LITERALS, timeout=20) as r:  # a failure here fails the run: never a silent skip
-        lit = json.load(r)
+        raw = json.load(r)
+    lit = {k: str(raw[k]) for k in ("key", "pin", "world_id")}
     assert lit["key"].startswith("ow_w_") and lit["pin"] and lit["world_id"]
     return lit
 
