@@ -30,6 +30,10 @@ def load_cases() -> list[dict[str, Any]]:
 CASES = load_cases()
 
 
+def test_the_fixture_holds_serial_103s_30_cases() -> None:
+    assert len(CASES) == 30, f"the fixture holds {len(CASES)} cases, serial 103 has 30"
+
+
 def _dump(v: Any) -> str:
     # The npm side compares JSON.stringify's bytes; compact separators and no ASCII escaping match them.
     return json.dumps(v, ensure_ascii=False, separators=(",", ":"))

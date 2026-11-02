@@ -1,6 +1,6 @@
 {
   "format": "onlyworlds-world-export",
-  "schema_version": "00.33.00",
+  "schema_version": "00.34.00",
   "exported_at": "2026-10-19T12:30:00+00:00",
   "world": {
     "id": "01999999-0000-7000-8000-000000000420",
@@ -186,6 +186,7 @@
         "founding_date": null,
         "elevation": null,
         "parent_location": null,
+        "vehicle": null,
         "primary_power": null,
         "governing_title": null,
         "zone": null,
@@ -233,6 +234,7 @@
         "founding_date": null,
         "elevation": null,
         "parent_location": "01999999-0000-7000-8000-000000000001",
+        "vehicle": null,
         "primary_power": null,
         "governing_title": null,
         "zone": null,

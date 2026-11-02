@@ -1,4 +1,4 @@
-"""The record profile (schema-dist ``profiles/record.md``, serial 102): every conformance case in
+"""The record profile (schema-dist ``profiles/record.md``, serial 103): every conformance case in
 ``codegen/schema-dist/profiles/record.fixture.json``, vendored with the distribution, each its own test, through
 ``record_mark_of`` and ``records_of``. The npm SDK's ``recordMarkOf`` and ``recordsOf`` run the same cases.
 ``OW_RECORD_FIXTURE`` points it at another copy of the fixture (a staged branch before the serial)."""
@@ -32,10 +32,10 @@ DOC = load_fixture()
 CASES: list[dict[str, Any]] = DOC["cases"]
 
 
-def test_the_fixture_holds_serial_102s_32_cases() -> None:
+def test_the_fixture_holds_serial_103s_40_cases() -> None:
     assert DOC["mark"]["field"] == RECORD_FIELD == "x_record"
     assert DOC["mark"]["members"] == ["tool", "played_at", "version", "seed", "outcome", "seats"]
-    assert len(CASES) == 32, f"the fixture holds {len(CASES)} cases, serial 102 has 32"
+    assert len(CASES) == 40, f"the fixture holds {len(CASES)} cases, serial 103 has 40"
 
 
 @pytest.mark.parametrize("case", CASES, ids=[c["name"] for c in CASES])
@@ -111,14 +111,6 @@ def test_an_event_or_narrative_whose_id_is_not_a_string_is_never_read() -> None:
 )
 def test_a_played_at_with_digits_outside_ascii_is_no_mark(played_at: str) -> None:
     assert record_mark_of({"id": "e", "type": "event", "x_record": {"tool": "tangle", "played_at": played_at}}) is None
-
-
-def test_an_empty_proposed_mark_is_settled() -> None:
-    """Staged for serial 103 (an empty proposed mark is settled, as the review profile reads it); the fixture's own
-    case replaces this test and its file at the repin."""
-    staged = json.loads((Path(__file__).parent / "fixtures" / "record-103-staged.json").read_text(encoding="utf-8"))
-    harbour = next(iter(DOC["worlds"].values()))["elements"]
-    assert records_of(staged["character"], [*harbour, *staged["elements"]]) == staged["want"]
 
 
 def test_records_of_refuses_what_is_not_an_id_or_a_list() -> None:

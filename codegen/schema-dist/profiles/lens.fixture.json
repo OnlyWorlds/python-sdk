@@ -8,7 +8,8 @@
     "resolve: lens is the lens read, a body or the id of a lens in the world; as_of is the reading's date (absent: the world's now; with neither, no fence and the window cuts nothing); clock is the reading's wall clock, for the mail rule and changed_within. kept is the resolved set in order, cut the count by reason (a reason with no count is absent). rows, where given, are the kept rows as show makes them; mail, where given, is the mail rule's part; notes_ignored counts notes on ids that are not anchors.",
     "invariant: subset (each reader's kept is a subset of the owner's, and no secret's id or name appears anywhere in a non-owner result), same_without (each reader's result is identical with the without ids removed from the world), unchanged (the world is identical before and after every reader's reading).",
     "uses: which lenses a seat reads, from its membership's choice (null: none made) and its Character's x_lens_uses.",
-    "graph: a case carries its own small world (the elements as the owner is served them, hidden: true on an element the hidden mark keeps, a room element by its pair and x_room_of, a proposed one by x_review_proposed) and reader (rung; a guest's whole and known_of; the owner's as), because the order case needs ids above U+FFFF that no uuid can carry; options are the graph's flags and lens (an id, or a lens body); want is the nodes in order with their marks, the edges in order, edges_cut, the lens's cut and unreadable; edges_cut_reasons lists every reason an edge can be cut by, the graph's own first, then a lens's; graph_links is the closed table of extension fields that make an edge."
+    "graph: a case carries its own small world (the elements as the owner is served them, hidden: true on an element the hidden mark keeps, a room element by its pair and x_room_of, a proposed one by x_review_proposed) and reader (rung; a guest's whole and known_of; the owner's as), because the order case needs ids above U+FFFF that no uuid can carry; options are the graph's flags and lens (an id, or a lens body); want is the nodes in order with their marks, the edges in order, edges_cut, the lens's cut and unreadable; edges_cut_reasons lists every reason an edge can be cut by, the graph's own first, then a lens's; graph_links is the closed table of extension fields that make an edge.",
+    "degree: the two counts over a graph; a case's graph is nodes and edges as worldGraph gives them, and its want is degree and out_degree per node, every node a key in the graph's node order."
   ],
   "pair": {
     "type": "construct",
@@ -9796,6 +9797,212 @@
         "unreadable": null
       },
       "note": "Serial 96. A lens's graph has exactly the lens's kept as its nodes, and a flag never widens or narrows a lens: the lens anchors the guest's own spy, resolveLens keeps it (its row carries hidden: true), so it is a node carrying the hidden mark; its edge to Ada, whom the lens never reached, is outside_lens."
+    },
+    {
+      "kind": "degree",
+      "name": "a mirror pair: two edges, 2 at each end; each end points at the other once",
+      "graph": {
+        "nodes": [
+          {
+            "id": "a",
+            "type": "character"
+          },
+          {
+            "id": "b",
+            "type": "character"
+          }
+        ],
+        "edges": [
+          {
+            "source": "a",
+            "field": "friends",
+            "target": "b",
+            "index": 0
+          },
+          {
+            "source": "b",
+            "field": "friends",
+            "target": "a",
+            "index": 0
+          }
+        ]
+      },
+      "want": {
+        "degree": {
+          "a": 2,
+          "b": 2
+        },
+        "out_degree": {
+          "a": 1,
+          "b": 1
+        }
+      }
+    },
+    {
+      "kind": "degree",
+      "name": "a link to itself counts once in degree and not at all out",
+      "graph": {
+        "nodes": [
+          {
+            "id": "a",
+            "type": "character"
+          }
+        ],
+        "edges": [
+          {
+            "source": "a",
+            "field": "friends",
+            "target": "a",
+            "index": 0
+          }
+        ]
+      },
+      "want": {
+        "degree": {
+          "a": 1
+        },
+        "out_degree": {
+          "a": 0
+        }
+      }
+    },
+    {
+      "kind": "degree",
+      "name": "two fields to one target: two edges, one distinct target",
+      "graph": {
+        "nodes": [
+          {
+            "id": "a",
+            "type": "character"
+          },
+          {
+            "id": "l",
+            "type": "location"
+          }
+        ],
+        "edges": [
+          {
+            "source": "a",
+            "field": "birthplace",
+            "target": "l",
+            "index": 0
+          },
+          {
+            "source": "a",
+            "field": "location",
+            "target": "l",
+            "index": 0
+          }
+        ]
+      },
+      "want": {
+        "degree": {
+          "a": 2,
+          "l": 2
+        },
+        "out_degree": {
+          "a": 1,
+          "l": 0
+        }
+      }
+    },
+    {
+      "kind": "degree",
+      "name": "every node a key, 0 included, in the graph's node order",
+      "graph": {
+        "nodes": [
+          {
+            "id": "z",
+            "type": "object"
+          },
+          {
+            "id": "a",
+            "type": "character"
+          },
+          {
+            "id": "m",
+            "type": "event"
+          }
+        ],
+        "edges": [
+          {
+            "source": "m",
+            "field": "characters",
+            "target": "a",
+            "index": 0
+          }
+        ]
+      },
+      "want": {
+        "degree": {
+          "z": 0,
+          "a": 1,
+          "m": 1
+        },
+        "out_degree": {
+          "z": 0,
+          "a": 0,
+          "m": 1
+        }
+      }
+    },
+    {
+      "kind": "degree",
+      "name": "a list of three: three edges out, three targets",
+      "graph": {
+        "nodes": [
+          {
+            "id": "e",
+            "type": "event"
+          },
+          {
+            "id": "a",
+            "type": "character"
+          },
+          {
+            "id": "b",
+            "type": "character"
+          },
+          {
+            "id": "c",
+            "type": "character"
+          }
+        ],
+        "edges": [
+          {
+            "source": "e",
+            "field": "characters",
+            "target": "a",
+            "index": 0
+          },
+          {
+            "source": "e",
+            "field": "characters",
+            "target": "b",
+            "index": 1
+          },
+          {
+            "source": "e",
+            "field": "characters",
+            "target": "c",
+            "index": 2
+          }
+        ]
+      },
+      "want": {
+        "degree": {
+          "e": 3,
+          "a": 1,
+          "b": 1,
+          "c": 1
+        },
+        "out_degree": {
+          "e": 3,
+          "a": 0,
+          "b": 0,
+          "c": 0
+        }
+      }
     }
   ],
   "graph_links": [

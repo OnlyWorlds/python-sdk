@@ -1,0 +1,1704 @@
+{
+ "profile": "landing",
+ "profile_page": "profiles/landing.md",
+ "notes": [
+  "Each case's graph is in worldGraph's shape with only the keys the reader reads.",
+  "A case's want holds the keys it tests; a case marked whole holds the entire answer, keys in order.",
+  "Every want was worked by hand from the page's rules.",
+  "A graph is what worldGraph serves the visitor, so a link to an element they may not see is no edge here (the graph never holds an edge to a non-node): the place-not-seen case is a Character with no location edge.",
+  "Why hops defaults to 1 (measured 2026-11-01 on four public graphs, five heads): with no reach limit the top head takes most of a world (7,347 of Sikelia's 8,899 nodes, 84 of Blood Meridian's 101, 89 of Moppetopia's 163); at one hop the clusters are Moppetopia 28, 11, 7, 5, 3 and Sikelia 57, 29, 27, 25, 17."
+ ],
+ "cases": [
+  {
+   "name": "rank by degree, a tie on hops to the higher-ranked head",
+   "graph": {
+    "nodes": [
+     {
+      "id": "ada",
+      "type": "character"
+     },
+     {
+      "id": "brin",
+      "type": "character"
+     },
+     {
+      "id": "e1",
+      "type": "event"
+     },
+     {
+      "id": "e2",
+      "type": "event"
+     }
+    ],
+    "edges": [
+     {
+      "source": "e1",
+      "field": "characters",
+      "target": "ada",
+      "index": 0
+     },
+     {
+      "source": "e1",
+      "field": "characters",
+      "target": "brin",
+      "index": 1
+     },
+     {
+      "source": "e2",
+      "field": "characters",
+      "target": "brin",
+      "index": 0
+     }
+    ]
+   },
+   "want": {
+    "clusters": [
+     {
+      "head": "brin",
+      "members": [
+       {
+        "id": "brin",
+        "hops": 0,
+        "degree": 2
+       },
+       {
+        "id": "e1",
+        "hops": 1,
+        "degree": 2
+       },
+       {
+        "id": "e2",
+        "hops": 1,
+        "degree": 1
+       }
+      ]
+     },
+     {
+      "head": "ada",
+      "members": [
+       {
+        "id": "ada",
+        "hops": 0,
+        "degree": 1
+       }
+      ]
+     }
+    ],
+    "unclustered": []
+   }
+  },
+  {
+   "name": "equal degree: heads by id in code point order",
+   "graph": {
+    "nodes": [
+     {
+      "id": "b",
+      "type": "character"
+     },
+     {
+      "id": "a",
+      "type": "character"
+     },
+     {
+      "id": "e1",
+      "type": "event"
+     },
+     {
+      "id": "e2",
+      "type": "event"
+     }
+    ],
+    "edges": [
+     {
+      "source": "e1",
+      "field": "characters",
+      "target": "a",
+      "index": 0
+     },
+     {
+      "source": "e2",
+      "field": "characters",
+      "target": "b",
+      "index": 0
+     }
+    ]
+   },
+   "want": {
+    "clusters": [
+     {
+      "head": "a",
+      "members": [
+       {
+        "id": "a",
+        "hops": 0,
+        "degree": 1
+       },
+       {
+        "id": "e1",
+        "hops": 1,
+        "degree": 1
+       }
+      ]
+     },
+     {
+      "head": "b",
+      "members": [
+       {
+        "id": "b",
+        "hops": 0,
+        "degree": 1
+       },
+       {
+        "id": "e2",
+        "hops": 1,
+        "degree": 1
+       }
+      ]
+     }
+    ],
+    "unclustered": []
+   }
+  },
+  {
+   "name": "a head reaches one hop by default; what lies further is unclustered",
+   "graph": {
+    "nodes": [
+     {
+      "id": "A",
+      "type": "character"
+     },
+     {
+      "id": "B",
+      "type": "character"
+     },
+     {
+      "id": "ea1",
+      "type": "event"
+     },
+     {
+      "id": "ea2",
+      "type": "event"
+     },
+     {
+      "id": "ea3",
+      "type": "event"
+     },
+     {
+      "id": "eb1",
+      "type": "event"
+     },
+     {
+      "id": "m",
+      "type": "object"
+     },
+     {
+      "id": "z",
+      "type": "object"
+     }
+    ],
+    "edges": [
+     {
+      "source": "ea1",
+      "field": "characters",
+      "target": "A",
+      "index": 0
+     },
+     {
+      "source": "ea1",
+      "field": "objects",
+      "target": "m",
+      "index": 0
+     },
+     {
+      "source": "ea2",
+      "field": "characters",
+      "target": "A",
+      "index": 0
+     },
+     {
+      "source": "ea3",
+      "field": "characters",
+      "target": "A",
+      "index": 0
+     },
+     {
+      "source": "eb1",
+      "field": "characters",
+      "target": "B",
+      "index": 0
+     },
+     {
+      "source": "eb1",
+      "field": "objects",
+      "target": "z",
+      "index": 0
+     },
+     {
+      "source": "m",
+      "field": "parent_object",
+      "target": "z",
+      "index": 0
+     }
+    ]
+   },
+   "want": {
+    "clusters": [
+     {
+      "head": "A",
+      "members": [
+       {
+        "id": "A",
+        "hops": 0,
+        "degree": 3
+       },
+       {
+        "id": "ea1",
+        "hops": 1,
+        "degree": 2
+       },
+       {
+        "id": "ea2",
+        "hops": 1,
+        "degree": 1
+       },
+       {
+        "id": "ea3",
+        "hops": 1,
+        "degree": 1
+       }
+      ]
+     },
+     {
+      "head": "B",
+      "members": [
+       {
+        "id": "B",
+        "hops": 0,
+        "degree": 1
+       },
+       {
+        "id": "eb1",
+        "hops": 1,
+        "degree": 2
+       }
+      ]
+     }
+    ],
+    "unclustered": [
+     {
+      "id": "m",
+      "degree": 2
+     },
+     {
+      "id": "z",
+      "degree": 2
+     }
+    ]
+   }
+  },
+  {
+   "name": "the nearest head wins over the higher-ranked one: both reach z, B nearer",
+   "options": {
+    "hops": 3
+   },
+   "graph": {
+    "nodes": [
+     {
+      "id": "A",
+      "type": "character"
+     },
+     {
+      "id": "B",
+      "type": "character"
+     },
+     {
+      "id": "ea1",
+      "type": "event"
+     },
+     {
+      "id": "ea2",
+      "type": "event"
+     },
+     {
+      "id": "ea3",
+      "type": "event"
+     },
+     {
+      "id": "eb1",
+      "type": "event"
+     },
+     {
+      "id": "m",
+      "type": "object"
+     },
+     {
+      "id": "z",
+      "type": "object"
+     }
+    ],
+    "edges": [
+     {
+      "source": "ea1",
+      "field": "characters",
+      "target": "A",
+      "index": 0
+     },
+     {
+      "source": "ea1",
+      "field": "objects",
+      "target": "m",
+      "index": 0
+     },
+     {
+      "source": "ea2",
+      "field": "characters",
+      "target": "A",
+      "index": 0
+     },
+     {
+      "source": "ea3",
+      "field": "characters",
+      "target": "A",
+      "index": 0
+     },
+     {
+      "source": "eb1",
+      "field": "characters",
+      "target": "B",
+      "index": 0
+     },
+     {
+      "source": "eb1",
+      "field": "objects",
+      "target": "z",
+      "index": 0
+     },
+     {
+      "source": "m",
+      "field": "parent_object",
+      "target": "z",
+      "index": 0
+     }
+    ]
+   },
+   "want": {
+    "clusters": [
+     {
+      "head": "A",
+      "members": [
+       {
+        "id": "A",
+        "hops": 0,
+        "degree": 3
+       },
+       {
+        "id": "ea1",
+        "hops": 1,
+        "degree": 2
+       },
+       {
+        "id": "ea2",
+        "hops": 1,
+        "degree": 1
+       },
+       {
+        "id": "ea3",
+        "hops": 1,
+        "degree": 1
+       },
+       {
+        "id": "m",
+        "hops": 2,
+        "degree": 2
+       }
+      ]
+     },
+     {
+      "head": "B",
+      "members": [
+       {
+        "id": "B",
+        "hops": 0,
+        "degree": 1
+       },
+       {
+        "id": "eb1",
+        "hops": 1,
+        "degree": 2
+       },
+       {
+        "id": "z",
+        "hops": 2,
+        "degree": 2
+       }
+      ]
+     }
+    ],
+    "unclustered": []
+   }
+  },
+  {
+   "name": "equal hops from two heads: the higher-ranked head; members by hops, then degree",
+   "graph": {
+    "nodes": [
+     {
+      "id": "A",
+      "type": "character"
+     },
+     {
+      "id": "B",
+      "type": "character"
+     },
+     {
+      "id": "e1",
+      "type": "event"
+     },
+     {
+      "id": "e2",
+      "type": "event"
+     },
+     {
+      "id": "eb",
+      "type": "event"
+     },
+     {
+      "id": "ex",
+      "type": "event"
+     }
+    ],
+    "edges": [
+     {
+      "source": "e1",
+      "field": "characters",
+      "target": "A",
+      "index": 0
+     },
+     {
+      "source": "e2",
+      "field": "characters",
+      "target": "A",
+      "index": 0
+     },
+     {
+      "source": "eb",
+      "field": "characters",
+      "target": "B",
+      "index": 0
+     },
+     {
+      "source": "ex",
+      "field": "characters",
+      "target": "A",
+      "index": 0
+     },
+     {
+      "source": "ex",
+      "field": "characters",
+      "target": "B",
+      "index": 1
+     }
+    ]
+   },
+   "want": {
+    "clusters": [
+     {
+      "head": "A",
+      "members": [
+       {
+        "id": "A",
+        "hops": 0,
+        "degree": 3
+       },
+       {
+        "id": "ex",
+        "hops": 1,
+        "degree": 2
+       },
+       {
+        "id": "e1",
+        "hops": 1,
+        "degree": 1
+       },
+       {
+        "id": "e2",
+        "hops": 1,
+        "degree": 1
+       }
+      ]
+     },
+     {
+      "head": "B",
+      "members": [
+       {
+        "id": "B",
+        "hops": 0,
+        "degree": 2
+       },
+       {
+        "id": "eb",
+        "hops": 1,
+        "degree": 1
+       }
+      ]
+     }
+    ],
+    "unclustered": []
+   }
+  },
+  {
+   "name": "what no head reaches is unclustered, by degree then id; a Character with no link is no head",
+   "graph": {
+    "nodes": [
+     {
+      "id": "A",
+      "type": "character"
+     },
+     {
+      "id": "c2",
+      "type": "character"
+     },
+     {
+      "id": "e1",
+      "type": "event"
+     },
+     {
+      "id": "l1",
+      "type": "location"
+     },
+     {
+      "id": "o1",
+      "type": "object"
+     },
+     {
+      "id": "o2",
+      "type": "object"
+     }
+    ],
+    "edges": [
+     {
+      "source": "e1",
+      "field": "characters",
+      "target": "A",
+      "index": 0
+     },
+     {
+      "source": "o1",
+      "field": "location",
+      "target": "l1",
+      "index": 0
+     }
+    ]
+   },
+   "want": {
+    "clusters": [
+     {
+      "head": "A",
+      "members": [
+       {
+        "id": "A",
+        "hops": 0,
+        "degree": 1
+       },
+       {
+        "id": "e1",
+        "hops": 1,
+        "degree": 1
+       }
+      ]
+     }
+    ],
+    "unclustered": [
+     {
+      "id": "l1",
+      "degree": 1
+     },
+     {
+      "id": "o1",
+      "degree": 1
+     },
+     {
+      "id": "c2",
+      "degree": 0
+     },
+     {
+      "id": "o2",
+      "degree": 0
+     }
+    ]
+   }
+  },
+  {
+   "name": "no Character: no clusters",
+   "graph": {
+    "nodes": [
+     {
+      "id": "o1",
+      "type": "object"
+     },
+     {
+      "id": "o2",
+      "type": "object"
+     }
+    ],
+    "edges": [
+     {
+      "source": "o1",
+      "field": "parent_object",
+      "target": "o2",
+      "index": 0
+     }
+    ]
+   },
+   "want": {
+    "clusters": [],
+    "unclustered": [
+     {
+      "id": "o1",
+      "degree": 1
+     },
+     {
+      "id": "o2",
+      "degree": 1
+     }
+    ]
+   }
+  },
+  {
+   "name": "heads caps the heads; a Character past the cap is a member",
+   "options": {
+    "heads": 2,
+    "hops": 2
+   },
+   "graph": {
+    "nodes": [
+     {
+      "id": "p",
+      "type": "character"
+     },
+     {
+      "id": "q",
+      "type": "character"
+     },
+     {
+      "id": "r",
+      "type": "character"
+     },
+     {
+      "id": "e1",
+      "type": "event"
+     },
+     {
+      "id": "e2",
+      "type": "event"
+     },
+     {
+      "id": "e3",
+      "type": "event"
+     }
+    ],
+    "edges": [
+     {
+      "source": "e1",
+      "field": "characters",
+      "target": "p",
+      "index": 0
+     },
+     {
+      "source": "e1",
+      "field": "characters",
+      "target": "q",
+      "index": 1
+     },
+     {
+      "source": "e1",
+      "field": "characters",
+      "target": "r",
+      "index": 2
+     },
+     {
+      "source": "e2",
+      "field": "characters",
+      "target": "p",
+      "index": 0
+     },
+     {
+      "source": "e2",
+      "field": "characters",
+      "target": "q",
+      "index": 1
+     },
+     {
+      "source": "e3",
+      "field": "characters",
+      "target": "p",
+      "index": 0
+     }
+    ]
+   },
+   "want": {
+    "clusters": [
+     {
+      "head": "p",
+      "members": [
+       {
+        "id": "p",
+        "hops": 0,
+        "degree": 3
+       },
+       {
+        "id": "e1",
+        "hops": 1,
+        "degree": 3
+       },
+       {
+        "id": "e2",
+        "hops": 1,
+        "degree": 2
+       },
+       {
+        "id": "e3",
+        "hops": 1,
+        "degree": 1
+       },
+       {
+        "id": "r",
+        "hops": 2,
+        "degree": 1
+       }
+      ]
+     },
+     {
+      "head": "q",
+      "members": [
+       {
+        "id": "q",
+        "hops": 0,
+        "degree": 2
+       }
+      ]
+     }
+    ],
+    "unclustered": []
+   }
+  },
+  {
+   "name": "a known-of Character is never a head",
+   "graph": {
+    "nodes": [
+     {
+      "id": "A",
+      "type": "character"
+     },
+     {
+      "id": "k",
+      "type": "character",
+      "known_of": true
+     },
+     {
+      "id": "e1",
+      "type": "event"
+     },
+     {
+      "id": "e2",
+      "type": "event"
+     },
+     {
+      "id": "e3",
+      "type": "event"
+     }
+    ],
+    "edges": [
+     {
+      "source": "e1",
+      "field": "characters",
+      "target": "k",
+      "index": 0
+     },
+     {
+      "source": "e2",
+      "field": "characters",
+      "target": "k",
+      "index": 0
+     },
+     {
+      "source": "e3",
+      "field": "characters",
+      "target": "A",
+      "index": 0
+     }
+    ]
+   },
+   "want": {
+    "clusters": [
+     {
+      "head": "A",
+      "members": [
+       {
+        "id": "A",
+        "hops": 0,
+        "degree": 1
+       },
+       {
+        "id": "e3",
+        "hops": 1,
+        "degree": 1
+       }
+      ]
+     }
+    ],
+    "unclustered": [
+     {
+      "id": "k",
+      "degree": 2
+     },
+     {
+      "id": "e1",
+      "degree": 1
+     },
+     {
+      "id": "e2",
+      "degree": 1
+     }
+    ]
+   }
+  },
+  {
+   "name": "a mirror pair counts at both ends, a self link once, and walks as one step",
+   "graph": {
+    "nodes": [
+     {
+      "id": "A",
+      "type": "character"
+     },
+     {
+      "id": "B",
+      "type": "character"
+     },
+     {
+      "id": "e1",
+      "type": "event"
+     }
+    ],
+    "edges": [
+     {
+      "source": "A",
+      "field": "friends",
+      "target": "A",
+      "index": 0
+     },
+     {
+      "source": "A",
+      "field": "friends",
+      "target": "B",
+      "index": 1
+     },
+     {
+      "source": "B",
+      "field": "friends",
+      "target": "A",
+      "index": 0
+     },
+     {
+      "source": "e1",
+      "field": "characters",
+      "target": "B",
+      "index": 0
+     }
+    ]
+   },
+   "want": {
+    "clusters": [
+     {
+      "head": "A",
+      "members": [
+       {
+        "id": "A",
+        "hops": 0,
+        "degree": 3
+       }
+      ]
+     },
+     {
+      "head": "B",
+      "members": [
+       {
+        "id": "B",
+        "hops": 0,
+        "degree": 3
+       },
+       {
+        "id": "e1",
+        "hops": 1,
+        "degree": 1
+       }
+      ]
+     }
+    ],
+    "unclustered": []
+   }
+  },
+  {
+   "name": "ids above U+FFFF: code point order, never UTF-16",
+   "graph": {
+    "nodes": [
+     {
+      "id": "\ud83d\ude00",
+      "type": "character"
+     },
+     {
+      "id": "\uff00",
+      "type": "character"
+     },
+     {
+      "id": "e1",
+      "type": "event"
+     },
+     {
+      "id": "e2",
+      "type": "event"
+     },
+     {
+      "id": "\ud83d\ude01",
+      "type": "object"
+     },
+     {
+      "id": "\uff01",
+      "type": "object"
+     }
+    ],
+    "edges": [
+     {
+      "source": "e1",
+      "field": "characters",
+      "target": "\uff00",
+      "index": 0
+     },
+     {
+      "source": "e2",
+      "field": "characters",
+      "target": "\ud83d\ude00",
+      "index": 0
+     }
+    ]
+   },
+   "want": {
+    "clusters": [
+     {
+      "head": "\uff00",
+      "members": [
+       {
+        "id": "\uff00",
+        "hops": 0,
+        "degree": 1
+       },
+       {
+        "id": "e1",
+        "hops": 1,
+        "degree": 1
+       }
+      ]
+     },
+     {
+      "head": "\ud83d\ude00",
+      "members": [
+       {
+        "id": "\ud83d\ude00",
+        "hops": 0,
+        "degree": 1
+       },
+       {
+        "id": "e2",
+        "hops": 1,
+        "degree": 1
+       }
+      ]
+     }
+    ],
+    "unclustered": [
+     {
+      "id": "\uff01",
+      "degree": 0
+     },
+     {
+      "id": "\ud83d\ude01",
+      "degree": 0
+     }
+    ]
+   }
+  },
+  {
+   "name": "an empty graph",
+   "graph": {
+    "nodes": [],
+    "edges": []
+   },
+   "want": {
+    "clusters": [],
+    "unclustered": []
+   }
+  },
+  {
+   "name": "refused: {\"lens\": \"x\"}",
+   "options": {
+    "lens": "x"
+   },
+   "graph": {
+    "nodes": [],
+    "edges": []
+   },
+   "want": {
+    "refused": "lens"
+   }
+  },
+  {
+   "name": "refused: {\"heads\": 0}",
+   "options": {
+    "heads": 0
+   },
+   "graph": {
+    "nodes": [],
+    "edges": []
+   },
+   "want": {
+    "refused": "heads"
+   }
+  },
+  {
+   "name": "refused: {\"heads\": 1.5}",
+   "options": {
+    "heads": 1.5
+   },
+   "graph": {
+    "nodes": [],
+    "edges": []
+   },
+   "want": {
+    "refused": "heads"
+   }
+  },
+  {
+   "name": "refused: {\"heads\": \"5\"}",
+   "options": {
+    "heads": "5"
+   },
+   "graph": {
+    "nodes": [],
+    "edges": []
+   },
+   "want": {
+    "refused": "heads"
+   }
+  },
+  {
+   "name": "refused: {\"hops\": 0}",
+   "options": {
+    "hops": 0
+   },
+   "graph": {
+    "nodes": [],
+    "edges": []
+   },
+   "want": {
+    "refused": "hops"
+   }
+  },
+  {
+   "name": "refused: {\"hops\": 2.5}",
+   "options": {
+    "hops": 2.5
+   },
+   "graph": {
+    "nodes": [],
+    "edges": []
+   },
+   "want": {
+    "refused": "hops"
+   }
+  },
+  {
+   "name": "a tiny strand: every gap the scene can offer",
+   "graph": {
+    "nodes": [
+     {
+      "id": "mara",
+      "type": "character"
+     },
+     {
+      "id": "hollow",
+      "type": "location"
+     },
+     {
+      "id": "ev",
+      "type": "event"
+     },
+     {
+      "id": "cup",
+      "type": "object"
+     }
+    ],
+    "edges": [
+     {
+      "source": "ev",
+      "field": "characters",
+      "target": "mara",
+      "index": 0
+     },
+     {
+      "source": "ev",
+      "field": "locations",
+      "target": "hollow",
+      "index": 0
+     }
+    ]
+   },
+   "want": {
+    "gaps": [
+     {
+      "kind": "orphan",
+      "id": "cup"
+     },
+     {
+      "kind": "near_orphan",
+      "id": "hollow"
+     },
+     {
+      "kind": "near_orphan",
+      "id": "mara"
+     },
+     {
+      "kind": "no_place",
+      "id": "mara"
+     },
+     {
+      "kind": "nobody_here",
+      "id": "hollow"
+     }
+    ]
+   }
+  },
+  {
+   "name": "a Character's location places it and fills the Location",
+   "graph": {
+    "nodes": [
+     {
+      "id": "mara",
+      "type": "character"
+     },
+     {
+      "id": "hollow",
+      "type": "location"
+     },
+     {
+      "id": "ev",
+      "type": "event"
+     }
+    ],
+    "edges": [
+     {
+      "source": "ev",
+      "field": "characters",
+      "target": "mara",
+      "index": 0
+     },
+     {
+      "source": "mara",
+      "field": "location",
+      "target": "hollow",
+      "index": 0
+     }
+    ]
+   },
+   "want": {
+    "gaps": [
+     {
+      "kind": "near_orphan",
+      "id": "ev"
+     },
+     {
+      "kind": "near_orphan",
+      "id": "hollow"
+     }
+    ]
+   }
+  },
+  {
+   "name": "an Object's location does not fill a Location",
+   "graph": {
+    "nodes": [
+     {
+      "id": "mara",
+      "type": "character"
+     },
+     {
+      "id": "hollow",
+      "type": "location"
+     },
+     {
+      "id": "cup",
+      "type": "object"
+     }
+    ],
+    "edges": [
+     {
+      "source": "cup",
+      "field": "location",
+      "target": "hollow",
+      "index": 0
+     }
+    ]
+   },
+   "want": {
+    "gaps": [
+     {
+      "kind": "orphan",
+      "id": "mara"
+     },
+     {
+      "kind": "near_orphan",
+      "id": "cup"
+     },
+     {
+      "kind": "near_orphan",
+      "id": "hollow"
+     },
+     {
+      "kind": "no_place",
+      "id": "mara"
+     },
+     {
+      "kind": "nobody_here",
+      "id": "hollow"
+     }
+    ]
+   }
+  },
+  {
+   "name": "a place the visitor may not see is no edge in their graph: no_place",
+   "graph": {
+    "nodes": [
+     {
+      "id": "mara",
+      "type": "character"
+     },
+     {
+      "id": "ev",
+      "type": "event"
+     }
+    ],
+    "edges": [
+     {
+      "source": "ev",
+      "field": "characters",
+      "target": "mara",
+      "index": 0
+     }
+    ]
+   },
+   "want": {
+    "gaps": [
+     {
+      "kind": "near_orphan",
+      "id": "ev"
+     },
+     {
+      "kind": "near_orphan",
+      "id": "mara"
+     },
+     {
+      "kind": "no_place",
+      "id": "mara"
+     }
+    ]
+   }
+  },
+  {
+   "name": "a known-of element is no gap",
+   "graph": {
+    "nodes": [
+     {
+      "id": "a",
+      "type": "character"
+     },
+     {
+      "id": "k",
+      "type": "character",
+      "known_of": true
+     }
+    ],
+    "edges": []
+   },
+   "want": {
+    "gaps": [
+     {
+      "kind": "orphan",
+      "id": "a"
+     },
+     {
+      "kind": "no_place",
+      "id": "a"
+     }
+    ]
+   }
+  },
+  {
+   "name": "refused: {\"size\": 0}",
+   "options": {
+    "size": 0
+   },
+   "graph": {
+    "nodes": [],
+    "edges": []
+   },
+   "want": {
+    "refused": "size"
+   }
+  },
+  {
+   "name": "an option given as null is its default, as in worldGraph",
+   "options": {
+    "size": null,
+    "heads": null,
+    "hops": null
+   },
+   "graph": {
+    "nodes": [
+     {
+      "id": "A",
+      "type": "character"
+     },
+     {
+      "id": "B",
+      "type": "character"
+     },
+     {
+      "id": "ea1",
+      "type": "event"
+     },
+     {
+      "id": "ea2",
+      "type": "event"
+     },
+     {
+      "id": "ea3",
+      "type": "event"
+     },
+     {
+      "id": "eb1",
+      "type": "event"
+     },
+     {
+      "id": "m",
+      "type": "object"
+     },
+     {
+      "id": "z",
+      "type": "object"
+     }
+    ],
+    "edges": [
+     {
+      "source": "ea1",
+      "field": "characters",
+      "target": "A",
+      "index": 0
+     },
+     {
+      "source": "ea1",
+      "field": "objects",
+      "target": "m",
+      "index": 0
+     },
+     {
+      "source": "ea2",
+      "field": "characters",
+      "target": "A",
+      "index": 0
+     },
+     {
+      "source": "ea3",
+      "field": "characters",
+      "target": "A",
+      "index": 0
+     },
+     {
+      "source": "eb1",
+      "field": "characters",
+      "target": "B",
+      "index": 0
+     },
+     {
+      "source": "eb1",
+      "field": "objects",
+      "target": "z",
+      "index": 0
+     },
+     {
+      "source": "m",
+      "field": "parent_object",
+      "target": "z",
+      "index": 0
+     }
+    ]
+   },
+   "want": {
+    "mode": "gaps",
+    "size": 24,
+    "clusters": [
+     {
+      "head": "A",
+      "members": [
+       {
+        "id": "A",
+        "hops": 0,
+        "degree": 3
+       },
+       {
+        "id": "ea1",
+        "hops": 1,
+        "degree": 2
+       },
+       {
+        "id": "ea2",
+        "hops": 1,
+        "degree": 1
+       },
+       {
+        "id": "ea3",
+        "hops": 1,
+        "degree": 1
+       }
+      ]
+     },
+     {
+      "head": "B",
+      "members": [
+       {
+        "id": "B",
+        "hops": 0,
+        "degree": 1
+       },
+       {
+        "id": "eb1",
+        "hops": 1,
+        "degree": 2
+       }
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "name": "the mode: below the size, gaps (24 by default)",
+   "graph": {
+    "nodes": [
+     {
+      "id": "mara",
+      "type": "character"
+     },
+     {
+      "id": "hollow",
+      "type": "location"
+     },
+     {
+      "id": "ev",
+      "type": "event"
+     }
+    ],
+    "edges": [
+     {
+      "source": "ev",
+      "field": "characters",
+      "target": "mara",
+      "index": 0
+     },
+     {
+      "source": "ev",
+      "field": "locations",
+      "target": "hollow",
+      "index": 0
+     }
+    ]
+   },
+   "want": {
+    "mode": "gaps",
+    "size": 24
+   }
+  },
+  {
+   "name": "the mode: at the size, the graph",
+   "graph": {
+    "nodes": [
+     {
+      "id": "mara",
+      "type": "character"
+     },
+     {
+      "id": "hollow",
+      "type": "location"
+     },
+     {
+      "id": "ev",
+      "type": "event"
+     }
+    ],
+    "edges": [
+     {
+      "source": "ev",
+      "field": "characters",
+      "target": "mara",
+      "index": 0
+     },
+     {
+      "source": "ev",
+      "field": "locations",
+      "target": "hollow",
+      "index": 0
+     }
+    ]
+   },
+   "options": {
+    "size": 3
+   },
+   "want": {
+    "mode": "graph",
+    "size": 3
+   }
+  },
+  {
+   "name": "the mode: one under the size, gaps",
+   "graph": {
+    "nodes": [
+     {
+      "id": "mara",
+      "type": "character"
+     },
+     {
+      "id": "hollow",
+      "type": "location"
+     },
+     {
+      "id": "ev",
+      "type": "event"
+     }
+    ],
+    "edges": [
+     {
+      "source": "ev",
+      "field": "characters",
+      "target": "mara",
+      "index": 0
+     },
+     {
+      "source": "ev",
+      "field": "locations",
+      "target": "hollow",
+      "index": 0
+     }
+    ]
+   },
+   "options": {
+    "size": 4
+   },
+   "want": {
+    "mode": "gaps",
+    "size": 4
+   }
+  },
+  {
+   "name": "the mode: an empty graph is gaps; every part present and empty",
+   "graph": {
+    "nodes": [],
+    "edges": []
+   },
+   "want": {
+    "mode": "gaps",
+    "size": 24,
+    "clusters": [],
+    "unclustered": [],
+    "gaps": []
+   }
+  },
+  {
+   "name": "a whole answer: the parts in one object, in their order",
+   "graph": {
+    "nodes": [
+     {
+      "id": "mara",
+      "type": "character"
+     },
+     {
+      "id": "hollow",
+      "type": "location"
+     },
+     {
+      "id": "ev",
+      "type": "event"
+     }
+    ],
+    "edges": [
+     {
+      "source": "ev",
+      "field": "characters",
+      "target": "mara",
+      "index": 0
+     },
+     {
+      "source": "ev",
+      "field": "locations",
+      "target": "hollow",
+      "index": 0
+     }
+    ]
+   },
+   "options": {
+    "size": 2
+   },
+   "want": {
+    "mode": "graph",
+    "size": 2,
+    "clusters": [
+     {
+      "head": "mara",
+      "members": [
+       {
+        "id": "mara",
+        "hops": 0,
+        "degree": 1
+       },
+       {
+        "id": "ev",
+        "hops": 1,
+        "degree": 2
+       }
+      ]
+     }
+    ],
+    "unclustered": [
+     {
+      "id": "hollow",
+      "degree": 1
+     }
+    ],
+    "gaps": [
+     {
+      "kind": "near_orphan",
+      "id": "hollow"
+     },
+     {
+      "kind": "near_orphan",
+      "id": "mara"
+     },
+     {
+      "kind": "no_place",
+      "id": "mara"
+     },
+     {
+      "kind": "nobody_here",
+      "id": "hollow"
+     }
+    ]
+   },
+   "whole": true
+  }
+ ]
+}
