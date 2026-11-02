@@ -4,6 +4,8 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+## 0.101.1 (2026-11-02)
+
 - **`proposed_mark_of` and `hands_on_as_proposed` read any mapping**, as the npm SDK reads any object: an element, or its `x_review_proposed`, held in a mapping that is not a `dict` (a `MappingProxyType`, a frozen record) went unread as settled. These two are what the lens and graph readers, the Open with menu's marks, the pack, the draught text and the message readers ask.
 
 ## 0.101.0 (2026-11-01)
