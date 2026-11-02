@@ -103,7 +103,7 @@ def _by_type(elements: Iterable[Any]) -> dict[str, list[Mapping[str, Any]]]:
 
 
 def _served(rows: list[Mapping[str, Any]]) -> dict[str, Mapping[str, Any]]:
-    """The rows by id."""
+    """The rows by id, the last served of each (serial 106, reading I: an element is its id)."""
     return {row["id"]: row for row in rows}
 
 
@@ -122,7 +122,7 @@ def map_space(elements: Iterable[Mapping[str, Any]]) -> MapSpace:
 
     # A Marker whose Zone or Map is not served is dangling, checked before its point: one reason per row.
     placed: dict[tuple[str, str], list[tuple[tuple[int, int, str], list[int]]]] = {}
-    for marker in by_type.get("marker", []):
+    for marker in _served(by_type.get("marker", [])).values():
         zone, map_id = _id(marker.get("zone")), _id(marker.get("map"))
         if zone is None or map_id is None or zone not in zones or map_id not in maps:
             out["dangling"] += 1

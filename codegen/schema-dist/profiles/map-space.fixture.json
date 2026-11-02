@@ -2004,6 +2004,920 @@
    "choice": "H"
   },
   {
+   "name": "last-row-wins-pin",
+   "claim": "two Pin rows with one id: the last served is the Pin, its point and its element",
+   "elements": [
+    {
+     "type": "map",
+     "id": "019a9000-0000-7000-8000-00000000aa01",
+     "name": "deck",
+     "width": 100,
+     "height": 50,
+     "depth": 30
+    },
+    {
+     "type": "object",
+     "id": "019a9000-0000-7000-8000-0000000e0001",
+     "name": "door"
+    },
+    {
+     "type": "pin",
+     "id": "019a9000-0000-7000-8000-0000000d0001",
+     "name": "pin",
+     "map": "019a9000-0000-7000-8000-00000000aa01",
+     "x": 10,
+     "y": 10
+    },
+    {
+     "type": "pin",
+     "id": "019a9000-0000-7000-8000-0000000d0001",
+     "name": "pin",
+     "map": "019a9000-0000-7000-8000-00000000aa01",
+     "x": 20,
+     "y": 20,
+     "element_type": "object",
+     "element_id": "019a9000-0000-7000-8000-0000000e0001"
+    }
+   ],
+   "want": {
+    "maps": [
+     {
+      "id": "019a9000-0000-7000-8000-00000000aa01",
+      "width": 100,
+      "height": 50,
+      "depth": 30,
+      "z_max": 0,
+      "scale": null,
+      "location": null,
+      "parent_map": null
+     }
+    ],
+    "zones": [],
+    "pins": [
+     {
+      "pin": "019a9000-0000-7000-8000-0000000d0001",
+      "map": "019a9000-0000-7000-8000-00000000aa01",
+      "element_type": "object",
+      "element_id": "019a9000-0000-7000-8000-0000000e0001",
+      "x": 20,
+      "y": 20,
+      "z": 0
+     }
+    ],
+    "out": {}
+   },
+   "choice": "I"
+  },
+  {
+   "name": "last-row-wins-marker",
+   "claim": "two Marker rows with one id: the last served is the Marker, in its own Zone and order",
+   "elements": [
+    {
+     "type": "map",
+     "id": "019a9000-0000-7000-8000-00000000aa01",
+     "name": "deck",
+     "width": 100,
+     "height": 50,
+     "depth": 30
+    },
+    {
+     "type": "zone",
+     "id": "019a9000-0000-7000-8000-0000000b0001",
+     "name": "zone"
+    },
+    {
+     "type": "zone",
+     "id": "019a9000-0000-7000-8000-0000000b0002",
+     "name": "zone"
+    },
+    {
+     "type": "marker",
+     "id": "019a9000-0000-7000-8000-0000000c0001",
+     "name": "corner",
+     "map": "019a9000-0000-7000-8000-00000000aa01",
+     "zone": "019a9000-0000-7000-8000-0000000b0001",
+     "x": 1,
+     "y": 1,
+     "order": 0
+    },
+    {
+     "type": "marker",
+     "id": "019a9000-0000-7000-8000-0000000c0002",
+     "name": "corner",
+     "map": "019a9000-0000-7000-8000-00000000aa01",
+     "zone": "019a9000-0000-7000-8000-0000000b0001",
+     "x": 2,
+     "y": 2,
+     "order": 1
+    },
+    {
+     "type": "marker",
+     "id": "019a9000-0000-7000-8000-0000000c0001",
+     "name": "corner",
+     "map": "019a9000-0000-7000-8000-00000000aa01",
+     "zone": "019a9000-0000-7000-8000-0000000b0002",
+     "x": 9,
+     "y": 9,
+     "order": 0
+    }
+   ],
+   "want": {
+    "maps": [
+     {
+      "id": "019a9000-0000-7000-8000-00000000aa01",
+      "width": 100,
+      "height": 50,
+      "depth": 30,
+      "z_max": 0,
+      "scale": null,
+      "location": null,
+      "parent_map": null
+     }
+    ],
+    "zones": [
+     {
+      "zone": "019a9000-0000-7000-8000-0000000b0001",
+      "map": "019a9000-0000-7000-8000-00000000aa01",
+      "shape": "polygon",
+      "points": [
+       [
+        2,
+        2,
+        0
+       ]
+      ]
+     },
+     {
+      "zone": "019a9000-0000-7000-8000-0000000b0002",
+      "map": "019a9000-0000-7000-8000-00000000aa01",
+      "shape": "polygon",
+      "points": [
+       [
+        9,
+        9,
+        0
+       ]
+      ]
+     }
+    ],
+    "pins": [],
+    "out": {}
+   },
+   "choice": "I"
+  },
+  {
+   "name": "last-row-wins-map-and-zone",
+   "claim": "two Map rows and two Zone rows with one id each: the last served of each is read",
+   "elements": [
+    {
+     "type": "map",
+     "id": "019a9000-0000-7000-8000-00000000aa01",
+     "name": "deck",
+     "width": 10,
+     "height": 10
+    },
+    {
+     "type": "map",
+     "id": "019a9000-0000-7000-8000-00000000aa01",
+     "name": "deck",
+     "width": 100,
+     "height": 50,
+     "depth": 30
+    },
+    {
+     "type": "zone",
+     "id": "019a9000-0000-7000-8000-0000000b0001",
+     "name": "zone",
+     "shape": "line"
+    },
+    {
+     "type": "zone",
+     "id": "019a9000-0000-7000-8000-0000000b0001",
+     "name": "zone"
+    },
+    {
+     "type": "marker",
+     "id": "019a9000-0000-7000-8000-0000000c0001",
+     "name": "corner",
+     "map": "019a9000-0000-7000-8000-00000000aa01",
+     "zone": "019a9000-0000-7000-8000-0000000b0001",
+     "x": 1,
+     "y": 1
+    }
+   ],
+   "want": {
+    "maps": [
+     {
+      "id": "019a9000-0000-7000-8000-00000000aa01",
+      "width": 100,
+      "height": 50,
+      "depth": 30,
+      "z_max": 0,
+      "scale": null,
+      "location": null,
+      "parent_map": null
+     }
+    ],
+    "zones": [
+     {
+      "zone": "019a9000-0000-7000-8000-0000000b0001",
+      "map": "019a9000-0000-7000-8000-00000000aa01",
+      "shape": "polygon",
+      "points": [
+       [
+        1,
+        1,
+        0
+       ]
+      ]
+     }
+    ],
+    "pins": [],
+    "out": {}
+   },
+   "choice": "I"
+  },
+  {
+   "name": "last-row-wins-when-it-reads-less",
+   "claim": "the last row wins though it is unplaced or names no served map: never the last that reads",
+   "elements": [
+    {
+     "type": "map",
+     "id": "019a9000-0000-7000-8000-00000000aa01",
+     "name": "deck",
+     "width": 100,
+     "height": 50,
+     "depth": 30
+    },
+    {
+     "type": "zone",
+     "id": "019a9000-0000-7000-8000-0000000b0001",
+     "name": "zone"
+    },
+    {
+     "type": "marker",
+     "id": "019a9000-0000-7000-8000-0000000c0001",
+     "name": "corner",
+     "map": "019a9000-0000-7000-8000-00000000aa01",
+     "zone": "019a9000-0000-7000-8000-0000000b0001",
+     "x": 1,
+     "y": 1,
+     "order": 0
+    },
+    {
+     "type": "marker",
+     "id": "019a9000-0000-7000-8000-0000000c0002",
+     "name": "corner",
+     "map": "019a9000-0000-7000-8000-00000000aa01",
+     "zone": "019a9000-0000-7000-8000-0000000b0001",
+     "x": 2,
+     "y": 2,
+     "order": 1
+    },
+    {
+     "type": "marker",
+     "id": "019a9000-0000-7000-8000-0000000c0002",
+     "map": "019a9000-0000-7000-8000-00000000aa01",
+     "zone": "019a9000-0000-7000-8000-0000000b0001"
+    },
+    {
+     "type": "pin",
+     "id": "019a9000-0000-7000-8000-0000000d0001",
+     "name": "pin",
+     "map": "019a9000-0000-7000-8000-00000000aa01",
+     "x": 5,
+     "y": 5
+    },
+    {
+     "type": "pin",
+     "id": "019a9000-0000-7000-8000-0000000d0001",
+     "name": "pin",
+     "map": "019a9000-0000-7000-8000-00000000aa03",
+     "x": 6,
+     "y": 6
+    }
+   ],
+   "want": {
+    "maps": [
+     {
+      "id": "019a9000-0000-7000-8000-00000000aa01",
+      "width": 100,
+      "height": 50,
+      "depth": 30,
+      "z_max": 0,
+      "scale": null,
+      "location": null,
+      "parent_map": null
+     }
+    ],
+    "zones": [
+     {
+      "zone": "019a9000-0000-7000-8000-0000000b0001",
+      "map": "019a9000-0000-7000-8000-00000000aa01",
+      "shape": "polygon",
+      "points": [
+       [
+        1,
+        1,
+        0
+       ]
+      ]
+     }
+    ],
+    "pins": [],
+    "out": {
+     "no_point": 1,
+     "no_map": 1
+    }
+   },
+   "choice": "I"
+  },
+  {
+   "name": "measured-frame-from-placed-points",
+   "claim": "a measured width or height reads only placed points: a dangling or unplaced point measures nothing",
+   "elements": [
+    {
+     "type": "map",
+     "id": "019a9000-0000-7000-8000-00000000aa01",
+     "name": "deck",
+     "depth": 30
+    },
+    {
+     "type": "zone",
+     "id": "019a9000-0000-7000-8000-0000000b0001",
+     "name": "zone"
+    },
+    {
+     "type": "marker",
+     "id": "019a9000-0000-7000-8000-0000000c0001",
+     "name": "corner",
+     "map": "019a9000-0000-7000-8000-00000000aa01",
+     "zone": "019a9000-0000-7000-8000-0000000b0001",
+     "x": 40,
+     "y": 20,
+     "order": 0
+    },
+    {
+     "type": "marker",
+     "id": "019a9000-0000-7000-8000-0000000c0002",
+     "name": "corner",
+     "map": "019a9000-0000-7000-8000-00000000aa01",
+     "zone": "019a9000-0000-7000-8000-0000000b0009",
+     "x": 500,
+     "y": 500
+    },
+    {
+     "type": "marker",
+     "id": "019a9000-0000-7000-8000-0000000c0003",
+     "map": "019a9000-0000-7000-8000-00000000aa01",
+     "zone": "019a9000-0000-7000-8000-0000000b0001",
+     "x": 600
+    },
+    {
+     "type": "marker",
+     "id": "019a9000-0000-7000-8000-0000000c0004",
+     "name": "corner",
+     "map": "019a9000-0000-7000-8000-00000000aa01",
+     "zone": "019a9000-0000-7000-8000-0000000b0001",
+     "x": 700.5,
+     "y": 1,
+     "order": 1
+    },
+    {
+     "type": "pin",
+     "id": "019a9000-0000-7000-8000-0000000d0001",
+     "name": "pin",
+     "map": "019a9000-0000-7000-8000-00000000aa01",
+     "x": 30,
+     "y": 45
+    },
+    {
+     "type": "pin",
+     "id": "019a9000-0000-7000-8000-0000000d0002",
+     "map": "019a9000-0000-7000-8000-00000000aa01",
+     "x": 800
+    }
+   ],
+   "want": {
+    "maps": [
+     {
+      "id": "019a9000-0000-7000-8000-00000000aa01",
+      "width": 40,
+      "height": 45,
+      "depth": 30,
+      "z_max": 0,
+      "scale": null,
+      "location": null,
+      "parent_map": null,
+      "extent": "points"
+     }
+    ],
+    "zones": [
+     {
+      "zone": "019a9000-0000-7000-8000-0000000b0001",
+      "map": "019a9000-0000-7000-8000-00000000aa01",
+      "shape": "polygon",
+      "points": [
+       [
+        40,
+        20,
+        0
+       ]
+      ]
+     }
+    ],
+    "pins": [
+     {
+      "pin": "019a9000-0000-7000-8000-0000000d0001",
+      "map": "019a9000-0000-7000-8000-00000000aa01",
+      "element_type": null,
+      "element_id": null,
+      "x": 30,
+      "y": 45,
+      "z": 0
+     }
+    ],
+    "out": {
+     "no_point": 3,
+     "dangling": 1
+    }
+   },
+   "choice": "D"
+  },
+  {
+   "name": "z-not-whole-reads-0",
+   "claim": "a `z` that is a string, a fraction or null reads 0 and the point stays placed; `2.0` is 2",
+   "elements": [
+    {
+     "type": "map",
+     "id": "019a9000-0000-7000-8000-00000000aa01",
+     "name": "deck",
+     "width": 100,
+     "height": 50,
+     "depth": 30
+    },
+    {
+     "type": "zone",
+     "id": "019a9000-0000-7000-8000-0000000b0001",
+     "name": "zone"
+    },
+    {
+     "type": "marker",
+     "id": "019a9000-0000-7000-8000-0000000c0001",
+     "name": "corner",
+     "map": "019a9000-0000-7000-8000-00000000aa01",
+     "zone": "019a9000-0000-7000-8000-0000000b0001",
+     "x": 1,
+     "y": 1,
+     "z": "3",
+     "order": 0
+    },
+    {
+     "type": "marker",
+     "id": "019a9000-0000-7000-8000-0000000c0002",
+     "name": "corner",
+     "map": "019a9000-0000-7000-8000-00000000aa01",
+     "zone": "019a9000-0000-7000-8000-0000000b0001",
+     "x": 2,
+     "y": 2,
+     "z": null,
+     "order": 1
+    },
+    {
+     "type": "pin",
+     "id": "019a9000-0000-7000-8000-0000000d0001",
+     "name": "pin",
+     "map": "019a9000-0000-7000-8000-00000000aa01",
+     "x": 3,
+     "y": 3,
+     "z": 1.5
+    },
+    {
+     "type": "pin",
+     "id": "019a9000-0000-7000-8000-0000000d0002",
+     "name": "pin",
+     "map": "019a9000-0000-7000-8000-00000000aa01",
+     "x": 4,
+     "y": 4,
+     "z": "5"
+    },
+    {
+     "type": "pin",
+     "id": "019a9000-0000-7000-8000-0000000d0003",
+     "name": "pin",
+     "map": "019a9000-0000-7000-8000-00000000aa01",
+     "x": 5,
+     "y": 5,
+     "z": 2.0
+    }
+   ],
+   "want": {
+    "maps": [
+     {
+      "id": "019a9000-0000-7000-8000-00000000aa01",
+      "width": 100,
+      "height": 50,
+      "depth": 30,
+      "z_max": 2,
+      "scale": null,
+      "location": null,
+      "parent_map": null
+     }
+    ],
+    "zones": [
+     {
+      "zone": "019a9000-0000-7000-8000-0000000b0001",
+      "map": "019a9000-0000-7000-8000-00000000aa01",
+      "shape": "polygon",
+      "points": [
+       [
+        1,
+        1,
+        0
+       ],
+       [
+        2,
+        2,
+        0
+       ]
+      ]
+     }
+    ],
+    "pins": [
+     {
+      "pin": "019a9000-0000-7000-8000-0000000d0001",
+      "map": "019a9000-0000-7000-8000-00000000aa01",
+      "element_type": null,
+      "element_id": null,
+      "x": 3,
+      "y": 3,
+      "z": 0
+     },
+     {
+      "pin": "019a9000-0000-7000-8000-0000000d0002",
+      "map": "019a9000-0000-7000-8000-00000000aa01",
+      "element_type": null,
+      "element_id": null,
+      "x": 4,
+      "y": 4,
+      "z": 0
+     },
+     {
+      "pin": "019a9000-0000-7000-8000-0000000d0003",
+      "map": "019a9000-0000-7000-8000-00000000aa01",
+      "element_type": null,
+      "element_id": null,
+      "x": 5,
+      "y": 5,
+      "z": 2
+     }
+    ],
+    "out": {}
+   }
+  },
+  {
+   "name": "no-placed-marker",
+   "claim": "a Zone whose Markers are all unplaced or dangling is counted `no_markers`, each Marker under its own reason",
+   "elements": [
+    {
+     "type": "map",
+     "id": "019a9000-0000-7000-8000-00000000aa01",
+     "name": "deck",
+     "width": 100,
+     "height": 50,
+     "depth": 30
+    },
+    {
+     "type": "zone",
+     "id": "019a9000-0000-7000-8000-0000000b0001",
+     "name": "zone"
+    },
+    {
+     "type": "marker",
+     "id": "019a9000-0000-7000-8000-0000000c0001",
+     "map": "019a9000-0000-7000-8000-00000000aa01",
+     "zone": "019a9000-0000-7000-8000-0000000b0001",
+     "y": 1
+    },
+    {
+     "type": "marker",
+     "id": "019a9000-0000-7000-8000-0000000c0002",
+     "name": "corner",
+     "map": "019a9000-0000-7000-8000-00000000aa01",
+     "zone": "019a9000-0000-7000-8000-0000000b0001",
+     "x": 1.5,
+     "y": 2
+    },
+    {
+     "type": "zone",
+     "id": "019a9000-0000-7000-8000-0000000b0002",
+     "name": "zone"
+    },
+    {
+     "type": "marker",
+     "id": "019a9000-0000-7000-8000-0000000c0003",
+     "name": "corner",
+     "map": "019a9000-0000-7000-8000-00000000aa01",
+     "zone": "019a9000-0000-7000-8000-0000000b0002",
+     "x": 3,
+     "y": 3
+    },
+    {
+     "type": "zone",
+     "id": "019a9000-0000-7000-8000-0000000b0003",
+     "name": "zone"
+    },
+    {
+     "type": "marker",
+     "id": "019a9000-0000-7000-8000-0000000c0004",
+     "name": "corner",
+     "map": "019a9000-0000-7000-8000-00000000aa03",
+     "zone": "019a9000-0000-7000-8000-0000000b0003",
+     "x": 4,
+     "y": 4
+    }
+   ],
+   "want": {
+    "maps": [
+     {
+      "id": "019a9000-0000-7000-8000-00000000aa01",
+      "width": 100,
+      "height": 50,
+      "depth": 30,
+      "z_max": 0,
+      "scale": null,
+      "location": null,
+      "parent_map": null
+     }
+    ],
+    "zones": [
+     {
+      "zone": "019a9000-0000-7000-8000-0000000b0002",
+      "map": "019a9000-0000-7000-8000-00000000aa01",
+      "shape": "polygon",
+      "points": [
+       [
+        3,
+        3,
+        0
+       ]
+      ]
+     }
+    ],
+    "pins": [],
+    "out": {
+     "no_point": 2,
+     "no_markers": 2,
+     "dangling": 1
+    }
+   }
+  },
+  {
+   "name": "marker-dangling-before-no-point",
+   "claim": "a Marker both dangling and without a point counts once, as `dangling`",
+   "elements": [
+    {
+     "type": "map",
+     "id": "019a9000-0000-7000-8000-00000000aa01",
+     "name": "deck",
+     "width": 100,
+     "height": 50,
+     "depth": 30
+    },
+    {
+     "type": "zone",
+     "id": "019a9000-0000-7000-8000-0000000b0001",
+     "name": "zone"
+    },
+    {
+     "type": "marker",
+     "id": "019a9000-0000-7000-8000-0000000c0001",
+     "map": "019a9000-0000-7000-8000-00000000aa01",
+     "zone": "019a9000-0000-7000-8000-0000000b0009"
+    },
+    {
+     "type": "marker",
+     "id": "019a9000-0000-7000-8000-0000000c0002",
+     "map": "019a9000-0000-7000-8000-00000000aa03",
+     "zone": "019a9000-0000-7000-8000-0000000b0001",
+     "x": "1",
+     "y": 1
+    },
+    {
+     "type": "marker",
+     "id": "019a9000-0000-7000-8000-0000000c0003",
+     "name": "corner",
+     "map": "019a9000-0000-7000-8000-00000000aa01",
+     "zone": "019a9000-0000-7000-8000-0000000b0001",
+     "x": 1,
+     "y": 1
+    },
+    {
+     "type": "marker",
+     "id": "019a9000-0000-7000-8000-0000000c0004",
+     "map": "019a9000-0000-7000-8000-00000000aa01",
+     "zone": "019a9000-0000-7000-8000-0000000b0001",
+     "x": 2
+    }
+   ],
+   "want": {
+    "maps": [
+     {
+      "id": "019a9000-0000-7000-8000-00000000aa01",
+      "width": 100,
+      "height": 50,
+      "depth": 30,
+      "z_max": 0,
+      "scale": null,
+      "location": null,
+      "parent_map": null
+     }
+    ],
+    "zones": [
+     {
+      "zone": "019a9000-0000-7000-8000-0000000b0001",
+      "map": "019a9000-0000-7000-8000-00000000aa01",
+      "shape": "polygon",
+      "points": [
+       [
+        1,
+        1,
+        0
+       ]
+      ]
+     }
+    ],
+    "pins": [],
+    "out": {
+     "no_point": 1,
+     "dangling": 2
+    }
+   },
+   "choice": "A"
+  },
+  {
+   "name": "pin-no-map-before-no-point",
+   "claim": "a Pin with neither a served map nor a point counts once, as `no_map`",
+   "elements": [
+    {
+     "type": "map",
+     "id": "019a9000-0000-7000-8000-00000000aa01",
+     "name": "deck",
+     "width": 100,
+     "height": 50,
+     "depth": 30
+    },
+    {
+     "type": "pin",
+     "id": "019a9000-0000-7000-8000-0000000d0001",
+     "map": "019a9000-0000-7000-8000-00000000aa03"
+    },
+    {
+     "type": "pin",
+     "id": "019a9000-0000-7000-8000-0000000d0002"
+    },
+    {
+     "type": "pin",
+     "id": "019a9000-0000-7000-8000-0000000d0003",
+     "name": "pin",
+     "map": "019a9000-0000-7000-8000-00000000aa01",
+     "x": 1.5,
+     "y": 1
+    }
+   ],
+   "want": {
+    "maps": [
+     {
+      "id": "019a9000-0000-7000-8000-00000000aa01",
+      "width": 100,
+      "height": 50,
+      "depth": 30,
+      "z_max": null,
+      "scale": null,
+      "location": null,
+      "parent_map": null
+     }
+    ],
+    "zones": [],
+    "pins": [],
+    "out": {
+     "no_point": 1,
+     "no_map": 2
+    }
+   },
+   "choice": "J"
+  },
+  {
+   "name": "type-and-shape-case-exact",
+   "claim": "`type` and `shape` are read as written: `Map`, `Zone`, `Marker` and `PIN` are none of the four, `Line` is a polygon",
+   "elements": [
+    {
+     "type": "Map",
+     "id": "019a9000-0000-7000-8000-00000000aa01",
+     "name": "deck",
+     "width": 100,
+     "height": 50,
+     "depth": 30
+    },
+    {
+     "type": "map",
+     "id": "019a9000-0000-7000-8000-00000000aa02",
+     "name": "deck",
+     "width": 10,
+     "height": 10,
+     "depth": 5
+    },
+    {
+     "type": "zone",
+     "id": "019a9000-0000-7000-8000-0000000b0001",
+     "name": "zone",
+     "shape": "Line"
+    },
+    {
+     "type": "Zone",
+     "id": "019a9000-0000-7000-8000-0000000b0002",
+     "name": "zone"
+    },
+    {
+     "type": "marker",
+     "id": "019a9000-0000-7000-8000-0000000c0001",
+     "name": "corner",
+     "map": "019a9000-0000-7000-8000-00000000aa02",
+     "zone": "019a9000-0000-7000-8000-0000000b0001",
+     "x": 1,
+     "y": 1
+    },
+    {
+     "type": "Marker",
+     "id": "019a9000-0000-7000-8000-0000000c0002",
+     "name": "corner",
+     "map": "019a9000-0000-7000-8000-00000000aa02",
+     "zone": "019a9000-0000-7000-8000-0000000b0001",
+     "x": 2,
+     "y": 2
+    },
+    {
+     "type": "marker",
+     "id": "019a9000-0000-7000-8000-0000000c0003",
+     "name": "corner",
+     "map": "019a9000-0000-7000-8000-00000000aa01",
+     "zone": "019a9000-0000-7000-8000-0000000b0001",
+     "x": 3,
+     "y": 3
+    },
+    {
+     "type": "PIN",
+     "id": "019a9000-0000-7000-8000-0000000d0001",
+     "name": "pin",
+     "map": "019a9000-0000-7000-8000-00000000aa02",
+     "x": 1,
+     "y": 1
+    },
+    {
+     "type": "pin",
+     "id": "019a9000-0000-7000-8000-0000000d0002",
+     "name": "pin",
+     "map": "019a9000-0000-7000-8000-00000000aa01",
+     "x": 4,
+     "y": 4
+    }
+   ],
+   "want": {
+    "maps": [
+     {
+      "id": "019a9000-0000-7000-8000-00000000aa02",
+      "width": 10,
+      "height": 10,
+      "depth": 5,
+      "z_max": 0,
+      "scale": null,
+      "location": null,
+      "parent_map": null
+     }
+    ],
+    "zones": [
+     {
+      "zone": "019a9000-0000-7000-8000-0000000b0001",
+      "map": "019a9000-0000-7000-8000-00000000aa02",
+      "shape": "polygon",
+      "points": [
+       [
+        1,
+        1,
+        0
+       ]
+      ]
+     }
+    ],
+    "pins": [],
+    "out": {
+     "dangling": 1,
+     "no_map": 1
+    }
+   },
+   "choice": "K"
+  },
+  {
    "name": "plan-airlock",
    "claim": "the plan of record's airlock: four corners in order, its outside door's Pin with its Object",
    "elements": [
