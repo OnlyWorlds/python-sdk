@@ -418,8 +418,9 @@ class _Reading:
         #: The reading aids (the charter, its guide, its domains: the pair and the mark), each id to its pair word.
         self.aid: dict[str, str] = {}
         self._served: dict[str, Body] = {}
-        self._in_view: dict[str, list[str]] = {}
-        self._in_full: dict[str, list[str]] = {}
+        # Who links to each element, in the reader's view and in the owner's world: built on the first hop that asks
+        # (`_linked_from`), since a reading with no lens never reads it. Everything it reads is set here.
+        self._incoming: tuple[dict[str, list[str]], dict[str, list[str]]] | None = None
         hidden_v = world.get("hidden")
         hidden: set[str] = {i for i in hidden_v if isinstance(i, str)} if isinstance(hidden_v, list) else set()
         #: The ids under the hidden mark: the world's ``hidden`` list and each element's own ``hidden``.
@@ -486,13 +487,21 @@ class _Reading:
         members = world.get("members")
         self.members: list[Mapping[str, Any]] | None = members if isinstance(members, list) else None
         self.as_of = as_of
-        for eid in self.order:
-            for t in self.full_links(eid):
-                if t in self.by_id:
-                    self._in_full.setdefault(t, []).append(eid)
-            if eid in self.view:
-                for t in self.links(eid):
-                    self._in_view.setdefault(t, []).append(eid)
+
+    def _linked_from(self) -> tuple[dict[str, list[str]], dict[str, list[str]]]:
+        """The reverse links (in the view, in the owner's world), built once on first ask."""
+        if self._incoming is None:
+            in_view: dict[str, list[str]] = {}
+            in_full: dict[str, list[str]] = {}
+            for eid in self.order:
+                for t in self.full_links(eid):
+                    if t in self.by_id:
+                        in_full.setdefault(t, []).append(eid)
+                if eid in self.view:
+                    for t in self.links(eid):
+                        in_view.setdefault(t, []).append(eid)
+            self._incoming = (in_view, in_full)
+        return self._incoming
 
     def full_links(self, eid: str) -> list[str]:
         """The ids the element's owner-served body links to, in the schema's field order, then its generic pair. A
@@ -618,7 +627,7 @@ class _Reading:
         for f in start:
             if f in self.stubs or f in self.room or (stops is not None and stops(f)):
                 continue
-            for t in [*self.links(f), *self._in_view.get(f, [])]:
+            for t in [*self.links(f), *self._linked_from()[0].get(f, [])]:
                 if not excluded(t):
                     landed.add(t)
         reached = set(landed)
@@ -646,7 +655,7 @@ class _Reading:
                 continue
             for t in self.full_links(f):
                 consider(t)
-            for t in self._in_full.get(f, []):
+            for t in self._linked_from()[1].get(f, []):
                 consider(t)
         for r in edges:
             for t in self.full_links(r):

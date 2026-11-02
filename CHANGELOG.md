@@ -4,6 +4,8 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+- **A reading builds its reverse link index only when a lens hop asks for it.** `world_graph` without a lens, and every other reading that walks no hop, no longer pays for it; no answer changes. On a 20,573-element world the index was about a third of an owner's `world_graph` (a median 313 ms with it, 208 ms without).
+
 ## 0.101.1 (2026-11-02)
 
 - **`proposed_mark_of` and `hands_on_as_proposed` read any mapping**, as the npm SDK reads any object: an element, or its `x_review_proposed`, held in a mapping that is not a `dict` (a `MappingProxyType`, a frozen record) went unread as settled. These two are what the lens and graph readers, the Open with menu's marks, the pack, the draught text and the message readers ask.
