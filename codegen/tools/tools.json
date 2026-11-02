@@ -207,6 +207,68 @@
           "on": "2026-10-31"
         }
       }
+    },
+    {
+      "id": "tangle",
+      "name": "Tactical Tangle",
+      "sentence": "A small game of Greek hoplite battles: muster an army, deploy it and watch the battle play out; a world's Characters can take the field, and a battle can be written back into the world as history.",
+      "url": "https://tangle.onlyworlds.com",
+      "source": null,
+      "source_note": "The game's code is private; the OnlyWorlds maintainers read it for this listing.",
+      "maker": "OnlyWorlds (Temper, an AI agent working for Titus)",
+      "doors": [
+        "api"
+      ],
+      "open": null,
+      "client": "tangle",
+      "prefix": "x_tangle_",
+      "free_core": "Play battles with no account, and muster an army from the demo world; bringing a world's Characters in and recording battles into it needs a free onlyworlds.com account.",
+      "paid": null,
+      "rung": "listed",
+      "listed_on": "2026-11-02",
+      "listed_by": "Kael, the OnlyWorlds maintainer, on a read of the seven lines at tactical-tangle c7dd4fc, on the owner's word (2026-11-02)",
+      "delisted_on": null,
+      "delisted_why": null,
+      "submission": "https://github.com/OnlyWorlds/tools/blob/master/reads/2026-11-02-tactical-tangle.md",
+      "checks": {
+        "what_it_says": {
+          "result": "pass",
+          "how": "read",
+          "on": "2026-11-02"
+        },
+        "keys_stay": {
+          "result": "pass",
+          "how": "read in private source",
+          "on": "2026-11-02",
+          "note": "No key is needed to play. A world key and its PIN, pasted or made by Tangle through a sign-in, are kept in the browser's localStorage until the world is forgotten; a sign-in's account token is held in the page's memory only and revoked once a world is picked or the page is left."
+        },
+        "names_itself": {
+          "result": "pass",
+          "how": "read in private source",
+          "on": "2026-11-02"
+        },
+        "speaks_the_wire": {
+          "result": "pass",
+          "how": "read in private source",
+          "on": "2026-11-02"
+        },
+        "what_leaves": {
+          "result": "pass",
+          "how": "read in private source",
+          "on": "2026-11-02",
+          "note": "A world is read from, and a recorded battle written to, www.onlyworlds.com only; a share link the player copies carries the battle's setup, with the names and character numbers of any world Characters in it, to whoever opens it."
+        },
+        "host": {
+          "result": "pass",
+          "how": "read",
+          "on": "2026-11-02"
+        },
+        "free_core": {
+          "result": "pass",
+          "how": "read",
+          "on": "2026-11-02"
+        }
+      }
     }
   ]
 }
