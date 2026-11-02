@@ -4,7 +4,10 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
-- **`map_space(elements)` reads a world's map space** (draft profile, not released): a Map's frame, each Zone's outline from its Markers on a Map, and each Pin's point, as `{maps, zones, pins, out}` in id order, with what it left aside counted in `out` by reason (`no_point`, `no_markers`, `dangling`, `no_map`). Whole numbers only (a boolean or a fraction is no point; `2.0` reads as 2), a row without an id is ignored, a Map's `z_max` is the largest z among its own points beside its `depth`, a Marker without a whole `order` after the ordered ones, a missing `width` or `height` measured from the Map's own points. Types `MapSpace`, `MapSpaceMap`, `MapSpaceOutline`, `MapSpacePin`. The fixture is vendored under `tests/fixtures/`.
+## 0.104.0 (2026-11-02)
+
+- **Schema repinned to schema-dist `v0.34.0-dist.105`** (from dist.104); the standard stays **00.34.00** and no schema field moved. Serial 105 adds the map-space profile (`profiles/map-space.md`) and its fixture of 24 cases, and a sentence on the landing page about which doors may serve its answer.
+- **`map_space(elements)`, the map-space profile's reader** (schema-dist `profiles/map-space.md`, serial 105): how a world's Maps, Zones, Markers and Pins turn into geometry, read from the elements as a reader is served them. The answer is `{maps, zones, pins, out}`, each in id order: a Map's frame (`width`, `height`, `depth`, `z_max`, `scale`, `location`, `parent_map`; a missing `width` or `height` is measured from the Map's own points, with `extent: "points"`), each Zone's outline per Map from its Markers in `order` (one without a whole `order` after the ordered ones, then by id in code point order), and each Pin's point with its element; what the reading left aside is counted in `out` by reason (`no_point`, `no_markers`, `dangling`, `no_map`). Whole numbers only (a boolean or a fraction is no point; `2.0` reads as 2), and a row without an id is ignored. Types `MapSpace`, `MapSpaceMap`, `MapSpaceOutline`, `MapSpacePin`. All 24 fixture cases are the test, compared by value and as serialised text so key order is held.
 
 ## 0.103.1 (2026-11-02)
 
