@@ -222,7 +222,19 @@
       "doors": [
         "api"
       ],
-      "open": null,
+      "open": {
+        "world": "https://tangle.onlyworlds.com/#/open/{world}",
+        "element": "https://tangle.onlyworlds.com/#/open/{world}/element/{id}",
+        "needs": "account",
+        "element_skips": [
+          "room",
+          "hidden",
+          "proposed"
+        ],
+        "element_types": [
+          "character"
+        ]
+      },
       "client": "tangle",
       "prefix": "x_tangle_",
       "free_core": "Play battles with no account, and muster an army from the demo world; bringing a world's Characters in and recording battles into it needs a free onlyworlds.com account.",
