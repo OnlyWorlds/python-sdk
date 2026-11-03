@@ -14,7 +14,7 @@ import pytest
 from onlyworlds import TOOLS, AddressError, openers_for, parse_ow_link
 
 FIXTURE = Path(__file__).resolve().parent / "fixtures" / "openers.fixture.json"
-FIXTURE_SHA256 = "b5c6afb76bf1ab2b95ee50641e2fd36344320d12fe0fd293d4f09fcf8cde7027"
+FIXTURE_SHA256 = "6b1911bd207220c6679ee9ac2e927e6b93f8cf54178aff115c60923ca5707eae"
 CASES = 92
 WORLD = "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f"
 ELEMENT = "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a"
@@ -30,7 +30,13 @@ def answer(doc: dict[str, Any], c: dict[str, Any]) -> dict[str, Any]:
     except TypeError as err:
         refuse = c.get("refuse")
         if refuse is not None and refuse["error"] == "type":
-            return {"refuse": refuse if refuse["names"] in str(err) else {"error": "type", "message": str(err)}}
+            # This package's own words for a key it does not take (the options are keywords, so Python's
+            # own words for an unknown one); any other refusal is of a value.
+            unknown = (f"unknown key '{refuse['names']}'", f"unexpected keyword argument '{refuse['names']}'")
+            kind = "unknown_key" if any(w in str(err) for w in unknown) else "bad_value"
+            if refuse["names"] in str(err):
+                return {"refuse": {"error": "type", "names": refuse["names"], "kind": kind}}
+            return {"refuse": {"error": "type", "message": str(err)}}
         return {"threw": repr(err)}
 
 

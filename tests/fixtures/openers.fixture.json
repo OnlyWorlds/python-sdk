@@ -1,6 +1,6 @@
 {
  "what": "The rows of the Open with menu: openersFor (npm SDK) and openers_for (Python package) on the same cases. Every expected row is written by hand. The same bytes in both packages; each test holds this file's sha256.",
- "keys": "tools names a list in lists; kind is world or element; address is what parseOwLink reads or elementAddress takes; surface is the options object with snake_case keys (signed_in), which the npm test spells signedIn. expect is the rows in order, each {id, name, href, state}; refuse is the refusal: error address with the address error's reason, or error type (a TypeError) whose message names names (spelt signedIn in the npm test). options, when present, is the fifth argument as written ({element}: the element as served, the mark flat on it); a row whose open.element_skips names a mark the element carries is not there.",
+ "keys": "tools names a list in lists; kind is world or element; address is what parseOwLink reads or elementAddress takes; surface is the options object with snake_case keys (signed_in), which the npm test spells signedIn. expect is the rows in order, each {id, name, href, state}; refuse is the refusal: error address with the address error's reason, or error type (a TypeError) whose message names names (spelt signedIn in the npm test), with its kind: unknown_key, a key the object does not take, refused by name; bad_value, a key it takes whose value it refuses, a missing value included. Each package tells the two apart by its own message, so a reader that refuses a known key as unknown fails the case. options, when present, is the fifth argument as written ({element}: the element as served, the mark flat on it); a row whose open.element_skips names a mark the element carries is not there.",
  "lists": {
   "three": [
    {
@@ -2183,7 +2183,8 @@
    },
    "refuse": {
     "error": "type",
-    "names": "type"
+    "names": "type",
+    "kind": "bad_value"
    }
   },
   {
@@ -2202,7 +2203,8 @@
    },
    "refuse": {
     "error": "type",
-    "names": "wrold"
+    "names": "wrold",
+    "kind": "unknown_key"
    }
   },
   {
@@ -2220,7 +2222,8 @@
    },
    "refuse": {
     "error": "type",
-    "names": "kind"
+    "names": "kind",
+    "kind": "bad_value"
    }
   },
   {
@@ -2238,7 +2241,8 @@
    },
    "refuse": {
     "error": "type",
-    "names": "colour"
+    "names": "colour",
+    "kind": "unknown_key"
    }
   },
   {
@@ -2255,7 +2259,8 @@
    },
    "refuse": {
     "error": "type",
-    "names": "audience"
+    "names": "audience",
+    "kind": "bad_value"
    }
   },
   {
@@ -2272,7 +2277,8 @@
    },
    "refuse": {
     "error": "type",
-    "names": "audience"
+    "names": "audience",
+    "kind": "bad_value"
    }
   },
   {
@@ -2290,7 +2296,8 @@
    },
    "refuse": {
     "error": "type",
-    "names": "signed_in"
+    "names": "signed_in",
+    "kind": "bad_value"
    }
   },
   {
@@ -2308,7 +2315,8 @@
    },
    "refuse": {
     "error": "type",
-    "names": "browser"
+    "names": "browser",
+    "kind": "bad_value"
    }
   },
   {
@@ -2326,7 +2334,8 @@
    },
    "refuse": {
     "error": "type",
-    "names": "online"
+    "names": "online",
+    "kind": "bad_value"
    }
   },
   {
@@ -2344,7 +2353,8 @@
    },
    "refuse": {
     "error": "type",
-    "names": "needs"
+    "names": "needs",
+    "kind": "bad_value"
    }
   },
   {
@@ -2362,7 +2372,8 @@
    },
    "refuse": {
     "error": "type",
-    "names": "opens no app"
+    "names": "opens no app",
+    "kind": "bad_value"
    }
   },
   {
@@ -2380,7 +2391,8 @@
    },
    "refuse": {
     "error": "type",
-    "names": "opens no app"
+    "names": "opens no app",
+    "kind": "bad_value"
    }
   },
   {
@@ -2398,7 +2410,8 @@
    },
    "refuse": {
     "error": "type",
-    "names": "opens no app"
+    "names": "opens no app",
+    "kind": "bad_value"
    }
   },
   {
@@ -2416,7 +2429,8 @@
    },
    "refuse": {
     "error": "type",
-    "names": "opens no app"
+    "names": "opens no app",
+    "kind": "bad_value"
    }
   },
   {
@@ -2434,7 +2448,8 @@
    },
    "refuse": {
     "error": "type",
-    "names": "opens no app"
+    "names": "opens no app",
+    "kind": "bad_value"
    }
   },
   {
@@ -2452,7 +2467,8 @@
    },
    "refuse": {
     "error": "type",
-    "names": "opens no app"
+    "names": "opens no app",
+    "kind": "bad_value"
    }
   },
   {
@@ -2470,7 +2486,8 @@
    },
    "refuse": {
     "error": "type",
-    "names": "opens no app"
+    "names": "opens no app",
+    "kind": "bad_value"
    }
   },
   {
@@ -2488,7 +2505,8 @@
    },
    "refuse": {
     "error": "type",
-    "names": "begins with its scheme"
+    "names": "begins with its scheme",
+    "kind": "bad_value"
    }
   },
   {
@@ -3503,7 +3521,8 @@
    },
    "refuse": {
     "error": "type",
-    "names": "a world's menu takes none"
+    "names": "a world's menu takes none",
+    "kind": "bad_value"
    }
   },
   {
@@ -3530,7 +3549,8 @@
    },
    "refuse": {
     "error": "type",
-    "names": "its id differs"
+    "names": "its id differs",
+    "kind": "bad_value"
    }
   },
   {
@@ -3557,7 +3577,8 @@
    },
    "refuse": {
     "error": "type",
-    "names": "is the element as served"
+    "names": "is the element as served",
+    "kind": "bad_value"
    }
   },
   {
@@ -3580,7 +3601,8 @@
    },
    "refuse": {
     "error": "type",
-    "names": "lens"
+    "names": "lens",
+    "kind": "unknown_key"
    }
   },
   {
@@ -3607,7 +3629,8 @@
    },
    "refuse": {
     "error": "type",
-    "names": "element_skips"
+    "names": "element_skips",
+    "kind": "bad_value"
    }
   },
   {
@@ -3635,7 +3658,8 @@
    },
    "refuse": {
     "error": "type",
-    "names": "element_skips"
+    "names": "element_skips",
+    "kind": "bad_value"
    }
   }
  ]

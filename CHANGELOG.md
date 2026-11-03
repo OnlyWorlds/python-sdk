@@ -4,6 +4,8 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+- The shared openers fixture's 24 type refusals each name their kind beside the name: `unknown_key` (a key the object does not take, refused by name) or `bad_value` (a key it takes whose value it refuses). Each package's test tells the two apart by its own message (here an unknown keyword argument counts as an unknown key), so a reader that refuses a known key as unknown, or the other way round, fails the case where before the name alone passed it. The same bytes as the npm SDK's; nothing shipped changes.
+
 ## 0.105.0 (2026-11-02)
 
 - **A signed-out visitor sees the tools that need an account.** `openers_for` with `audience: "public"` now gives a row for a tool whose `open.needs` is `account`, with the state word "Needs an account" (whatever `signed_in` says: the public is the signed-out reader); before, the public saw no such row. A tool that needs the device is still not there for the public. The word comes after "You are here" and "Needs a connection", and before "Opens the world". A surface draws the row as one that opens nothing. The shared openers fixture has 92 cases (from 90), the same bytes as the npm SDK's 4.130.0: seven public cases gain their account rows, and two are new (a visitor outside a browser, a visitor on a tool that needs an account).
