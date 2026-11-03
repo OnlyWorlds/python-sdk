@@ -4,6 +4,10 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+## 0.106.2 (2026-11-03)
+
+- The schema pin moves to schema-dist `v0.34.0-dist.107` (canonical `00.34.00` unchanged, so `SCHEMA_VERSION` is the same). Two profile sentences changed and no fixture: the charter profile names what open means to a public reader (the World's `public_read`), and the map-space profile's whole-number range sentence is dated. No reader changed; the same pin as the npm SDK's 4.132.2.
+
 ## 0.106.1 (2026-11-03)
 
 - `TOOLS` repinned at the tools list's `60a590e`: Tactical Tangle opens a world or a Character. Its row gains a world door and an element door (`needs: "account"`, `element_types: ["character"]`, skipping rooms, hidden and proposed elements), so `openers_for` now offers it on a world's menu and on a Character's, and on no other type. No code changed; the same list as the npm SDK's 4.132.1.
