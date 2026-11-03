@@ -1,6 +1,6 @@
 {
  "what": "The rows of the Open with menu: openersFor (npm SDK) and openers_for (Python package) on the same cases. Every expected row is written by hand. The same bytes in both packages; each test holds this file's sha256.",
- "keys": "tools names a list in lists; kind is world or element; address is what parseOwLink reads or elementAddress takes; surface is the options object with snake_case keys (signed_in), which the npm test spells signedIn. expect is the rows in order, each {id, name, href, state}; refuse is the refusal: error address with the address error's reason, or error type (a TypeError) whose message names names (spelt signedIn in the npm test), with its kind: unknown_key, a key the object does not take, refused by name; bad_value, a key it takes whose value it refuses, a missing value included. Each package tells the two apart by its own message, so a reader that refuses a known key as unknown fails the case. options, when present, is the fifth argument as written ({element}: the element as served, the mark flat on it); a row whose open.element_skips names a mark the element carries is not there.",
+ "keys": "tools names a list in lists; kind is world or element; address is what parseOwLink reads or elementAddress takes; surface is the options object with snake_case keys (signed_in), which the npm test spells signedIn. expect is the rows in order, each {id, name, href, state}; refuse is the refusal: error address with the address error's reason, or error type (a TypeError) whose message names names (spelt signedIn in the npm test), with its kind: unknown_key, a key the object does not take, refused by name; bad_value, a key it takes whose value it refuses, a missing value included. Each package tells the two apart by its own message, so a reader that refuses a known key as unknown fails the case. options, when present, is the fifth argument as written ({element}: the element as served, the mark flat on it); a row whose open.element_skips names a mark the element carries is not there. A row whose open.element_types is a list that does not hold the address's type word is not there on an element's menu, and a world's menu reads no element types.",
  "lists": {
   "three": [
    {
@@ -354,6 +354,139 @@
      "needs": null,
      "element_skips": [
       "hidden"
+     ]
+    }
+   }
+  ],
+  "types": [
+   {
+    "id": "lark",
+    "name": "Lark",
+    "url": "https://lark.example",
+    "client": null,
+    "rung": "listed",
+    "open": {
+     "world": null,
+     "element": "https://lark.example/#/v/{world}/{id}",
+     "needs": null,
+     "element_skips": [],
+     "element_types": [
+      "character"
+     ]
+    }
+   },
+   {
+    "id": "heron",
+    "name": "Heron",
+    "url": "https://heron.example",
+    "client": null,
+    "rung": "listed",
+    "open": {
+     "world": "https://heron.example/w/{world}",
+     "element": "https://heron.example/w/{world}/{type}/{id}",
+     "needs": null,
+     "element_skips": [],
+     "element_types": [
+      "character",
+      "creature"
+     ]
+    }
+   },
+   {
+    "id": "wren",
+    "name": "Wren",
+    "url": "https://wren.example",
+    "client": null,
+    "rung": "listed",
+    "open": {
+     "world": null,
+     "element": "https://wren.example/e/{world}/{id}",
+     "needs": null,
+     "element_skips": [],
+     "element_types": null
+    }
+   },
+   {
+    "id": "kite",
+    "name": "Kite",
+    "url": "https://kite.example",
+    "client": null,
+    "rung": "listed",
+    "open": {
+     "world": null,
+     "element": "https://kite.example/#/{world}/{id}",
+     "needs": null,
+     "element_skips": [
+      "hidden"
+     ],
+     "element_types": [
+      "character"
+     ]
+    }
+   },
+   {
+    "id": "owl",
+    "name": "Owl",
+    "url": "https://owl.example",
+    "client": null,
+    "rung": "listed",
+    "open": {
+     "world": "https://owl.example/{world}",
+     "element": null,
+     "needs": null,
+     "element_skips": [],
+     "element_types": null
+    }
+   }
+  ],
+  "types-unknown-word": [
+   {
+    "id": "lark",
+    "name": "Lark",
+    "url": "https://lark.example",
+    "client": null,
+    "rung": "listed",
+    "open": {
+     "world": null,
+     "element": "https://lark.example/#/v/{world}/{id}",
+     "needs": null,
+     "element_skips": [],
+     "element_types": [
+      "captain"
+     ]
+    }
+   }
+  ],
+  "types-empty": [
+   {
+    "id": "lark",
+    "name": "Lark",
+    "url": "https://lark.example",
+    "client": null,
+    "rung": "listed",
+    "open": {
+     "world": null,
+     "element": "https://lark.example/#/v/{world}/{id}",
+     "needs": null,
+     "element_skips": [],
+     "element_types": []
+    }
+   }
+  ],
+  "types-world-door": [
+   {
+    "id": "owl",
+    "name": "Owl",
+    "url": "https://owl.example",
+    "client": null,
+    "rung": "listed",
+    "open": {
+     "world": "https://owl.example/{world}",
+     "element": null,
+     "needs": null,
+     "element_skips": [],
+     "element_types": [
+      "character"
      ]
     }
    }
@@ -3659,6 +3792,289 @@
    "refuse": {
     "error": "type",
     "names": "element_skips",
+    "kind": "bad_value"
+   }
+  },
+  {
+   "name": "types-leaves-out-another-type",
+   "why": "a door that opens Characters is not offered on a Location, and a row with an element door offers no world fallback there",
+   "tools": "types",
+   "kind": "element",
+   "address": {
+    "form": "human",
+    "world": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+    "type": "location",
+    "id": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a"
+   },
+   "surface": {
+    "audience": "member",
+    "signed_in": true
+   },
+   "expect": [
+    {
+     "id": "onlyworlds",
+     "name": "onlyworlds.com",
+     "href": "https://www.onlyworlds.com/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/location/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
+     "state": null
+    },
+    {
+     "id": "wren",
+     "name": "Wren",
+     "href": "https://wren.example/e/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
+     "state": null
+    },
+    {
+     "id": "owl",
+     "name": "Owl",
+     "href": "https://owl.example/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+     "state": "Opens the world"
+    }
+   ]
+  },
+  {
+   "name": "types-holds-the-type",
+   "why": "on a Character every door that opens Characters is offered; with no element given, the skips do not apply, and the type is read from the address",
+   "tools": "types",
+   "kind": "element",
+   "address": {
+    "form": "human",
+    "world": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+    "type": "character",
+    "id": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a"
+   },
+   "surface": {
+    "audience": "member",
+    "signed_in": true
+   },
+   "expect": [
+    {
+     "id": "onlyworlds",
+     "name": "onlyworlds.com",
+     "href": "https://www.onlyworlds.com/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/character/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
+     "state": null
+    },
+    {
+     "id": "lark",
+     "name": "Lark",
+     "href": "https://lark.example/#/v/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
+     "state": null
+    },
+    {
+     "id": "heron",
+     "name": "Heron",
+     "href": "https://heron.example/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/character/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
+     "state": null
+    },
+    {
+     "id": "wren",
+     "name": "Wren",
+     "href": "https://wren.example/e/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
+     "state": null
+    },
+    {
+     "id": "kite",
+     "name": "Kite",
+     "href": "https://kite.example/#/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
+     "state": null
+    },
+    {
+     "id": "owl",
+     "name": "Owl",
+     "href": "https://owl.example/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+     "state": "Opens the world"
+    }
+   ]
+  },
+  {
+   "name": "types-two-words",
+   "why": "a list of two types opens either",
+   "tools": "types",
+   "kind": "element",
+   "address": {
+    "form": "human",
+    "world": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+    "type": "creature",
+    "id": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a"
+   },
+   "surface": {
+    "audience": "member",
+    "signed_in": true
+   },
+   "expect": [
+    {
+     "id": "onlyworlds",
+     "name": "onlyworlds.com",
+     "href": "https://www.onlyworlds.com/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/creature/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
+     "state": null
+    },
+    {
+     "id": "heron",
+     "name": "Heron",
+     "href": "https://heron.example/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/creature/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
+     "state": null
+    },
+    {
+     "id": "wren",
+     "name": "Wren",
+     "href": "https://wren.example/e/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
+     "state": null
+    },
+    {
+     "id": "owl",
+     "name": "Owl",
+     "href": "https://owl.example/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+     "state": "Opens the world"
+    }
+   ]
+  },
+  {
+   "name": "types-on-a-world-menu",
+   "why": "a world's menu is unchanged: each row with a world door, whatever its element types",
+   "tools": "types",
+   "kind": "world",
+   "address": {
+    "form": "human",
+    "world": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f"
+   },
+   "surface": {
+    "audience": "member",
+    "signed_in": true
+   },
+   "expect": [
+    {
+     "id": "onlyworlds",
+     "name": "onlyworlds.com",
+     "href": "https://www.onlyworlds.com/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+     "state": null
+    },
+    {
+     "id": "heron",
+     "name": "Heron",
+     "href": "https://heron.example/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+     "state": null
+    },
+    {
+     "id": "owl",
+     "name": "Owl",
+     "href": "https://owl.example/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+     "state": null
+    }
+   ]
+  },
+  {
+   "name": "types-and-skips",
+   "why": "both rules hold: a hidden Character is left out by the door that skips hidden ones, and offered by the others that open Characters",
+   "tools": "types",
+   "kind": "element",
+   "address": {
+    "form": "human",
+    "world": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+    "type": "character",
+    "id": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a"
+   },
+   "surface": {
+    "audience": "member",
+    "signed_in": true
+   },
+   "options": {
+    "element": {
+     "id": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
+     "type": "character",
+     "name": "The element",
+     "hidden": true
+    }
+   },
+   "expect": [
+    {
+     "id": "onlyworlds",
+     "name": "onlyworlds.com",
+     "href": "https://www.onlyworlds.com/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/character/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
+     "state": null
+    },
+    {
+     "id": "lark",
+     "name": "Lark",
+     "href": "https://lark.example/#/v/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
+     "state": null
+    },
+    {
+     "id": "heron",
+     "name": "Heron",
+     "href": "https://heron.example/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/character/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
+     "state": null
+    },
+    {
+     "id": "wren",
+     "name": "Wren",
+     "href": "https://wren.example/e/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
+     "state": null
+    },
+    {
+     "id": "owl",
+     "name": "Owl",
+     "href": "https://owl.example/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+     "state": "Opens the world"
+    }
+   ]
+  },
+  {
+   "name": "types-unknown-word",
+   "why": "a type word outside the 22 is a row that is not one",
+   "tools": "types-unknown-word",
+   "kind": "element",
+   "address": {
+    "form": "human",
+    "world": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+    "type": "character",
+    "id": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a"
+   },
+   "surface": {
+    "audience": "member",
+    "signed_in": true
+   },
+   "refuse": {
+    "error": "type",
+    "names": "element_types",
+    "kind": "bad_value"
+   }
+  },
+  {
+   "name": "types-empty-list",
+   "why": "an empty list would open nothing: a door that opens every type says null",
+   "tools": "types-empty",
+   "kind": "element",
+   "address": {
+    "form": "human",
+    "world": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+    "type": "character",
+    "id": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a"
+   },
+   "surface": {
+    "audience": "member",
+    "signed_in": true
+   },
+   "refuse": {
+    "error": "type",
+    "names": "element_types",
+    "kind": "bad_value"
+   }
+  },
+  {
+   "name": "types-without-an-element-door",
+   "why": "element types name what an element door opens; a world door alone has none, as the list's check says",
+   "tools": "types-world-door",
+   "kind": "world",
+   "address": {
+    "form": "human",
+    "world": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f"
+   },
+   "surface": {
+    "audience": "member",
+    "signed_in": true
+   },
+   "refuse": {
+    "error": "type",
+    "names": "element_types",
     "kind": "bad_value"
    }
   }

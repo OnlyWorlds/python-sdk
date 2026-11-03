@@ -14,6 +14,7 @@ from collections.abc import Mapping, Sequence
 from typing import Any, Literal, NoReturn, NotRequired, TypedDict
 
 from ._marks import ELEMENT_MARKS, marks_of
+from ._schema import ELEMENT_TYPES
 from .address import _ADDRESS_KEYS, AddressReading, element_address
 
 __all__ = ["Opener", "Tool", "ToolOpen", "openers_for"]
@@ -32,6 +33,9 @@ class ToolOpen(TypedDict):
     #: What the element door does not open, in the graph section's words; absent (a list older than the key) or
     #: [] when it opens every element.
     element_skips: NotRequired[list[str]]
+    #: The element types the element door opens, as type words (``character``); None or absent (a list older than the
+    #: key) when it opens every type.
+    element_types: NotRequired[list[str] | None]
 
 
 class Tool(TypedDict):
@@ -113,7 +117,10 @@ def openers_for(
     door is a row to its world door that says "Opens the world". On an element given as ``element`` (the element as
     served, the mark flat on it), a row whose ``open.element_skips`` names a mark the element carries (room, hidden,
     proposed, map space, a reading aid, each read as ``world_graph`` reads it) is not there: its door cannot open
-    it. Without ``element`` every row is there. For the ``public`` audience (the signed-out reader) a row whose
+    it. Without ``element`` every row is there. On an element's menu, a row whose ``open.element_types`` is a list
+    that does not hold the address's type word is not there either, world door or not: the tool opens other kinds of
+    element (read from the address, so no element body is needed; a world's menu reads no element types). For the
+    ``public`` audience (the signed-out reader) a row whose
     ``open.needs`` is ``device`` is not there, since a visitor's device holds no world of this one's, and a row
     whose ``needs`` is ``account`` is there and says it needs one.
 
@@ -140,7 +147,8 @@ def openers_for(
     ``kind`` that is neither, an element's openers asked of an address with no element, an unknown key on the
     address or the surface, a missing or unknown ``audience``, a surface value of the wrong type, an ``element`` for a
     world's menu or naming another element than the address, a tools row that is not one (a ``needs`` or an
-    ``element_skips`` word outside the list's format, or skips on a row with no element door, included). The npm
+    ``element_skips`` or ``element_types`` word outside the list's format, an empty ``element_types``, or skips or
+    types on a row with no element door, included). The npm
     SDK's ``openersFor`` gives the same rows.
     """
     if isinstance(tools, str | bytes) or not isinstance(tools, Sequence):
@@ -242,6 +250,20 @@ def openers_for(
             _fail(f"tool {rid}: open.element_skips is a list of {words}; got {o.get('element_skips')!r}")
         if element_door is None and skips:
             _fail(f"tool {rid}: open.element_skips names what an element door leaves out, and the row has none")
+        types = o.get("element_types")
+        if types is not None and (
+            not isinstance(types, list)
+            or not types
+            or len(set(map(repr, types))) != len(types)
+            or any(not isinstance(t, str) or t not in ELEMENT_TYPES for t in types)
+        ):
+            words = ", ".join(ELEMENT_TYPES)
+            _fail(
+                f"tool {rid}: open.element_types is None or a non-empty list of distinct type words ({words}); "
+                f"got {types!r}"
+            )
+        if element_door is None and types is not None:
+            _fail(f"tool {rid}: open.element_types names what an element door opens, and the row has none")
         if r.get("rung") != "listed":
             continue
         if audience == "public" and needs == "device":
@@ -251,6 +273,9 @@ def openers_for(
             continue
         # An element door that cannot open this element is no door (a row with skips has one: refused above).
         if kind == "element" and any(m in skips for m in marks):
+            continue
+        # A tool that opens other kinds of element is no door for this one, and offers no world fallback either.
+        if kind == "element" and types is not None and values["type"] not in types:
             continue
         # The first that holds. A word the row needs (it cannot open now) comes before "Opens the world" (it
         # opens, somewhere else), so a world door alone that needs a sign-in says the sign-in. With no connection a
