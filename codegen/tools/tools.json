@@ -18,7 +18,8 @@
         "world": "https://atlas.onlyworlds.com/#/open/{world}",
         "element": "https://atlas.onlyworlds.com/#/open/{world}/element/{id}",
         "needs": "account",
-        "element_skips": []
+        "element_skips": [],
+        "element_types": null
       },
       "client": "atlas",
       "prefix": "atlas_",
@@ -87,7 +88,8 @@
         "world": "https://lantern.onlyworlds.com/#/open/{world}",
         "element": "https://lantern.onlyworlds.com/#/open/{world}/element/{id}",
         "needs": "account",
-        "element_skips": []
+        "element_skips": [],
+        "element_types": null
       },
       "client": "lantern",
       "prefix": null,
@@ -156,7 +158,8 @@
         "world": "https://little-lens.onlyworlds.com/#/open/{world}",
         "element": "https://little-lens.onlyworlds.com/#/open/{world}/element/{id}",
         "needs": null,
-        "element_skips": ["room", "hidden", "proposed", "map_space"]
+        "element_skips": ["room", "hidden", "proposed", "map_space"],
+        "element_types": null
       },
       "client": "little-lens",
       "prefix": null,
