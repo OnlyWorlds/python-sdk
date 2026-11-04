@@ -490,6 +490,61 @@
      ]
     }
    }
+  ],
+  "types-repeated": [
+   {
+    "id": "lark",
+    "name": "Lark",
+    "url": "https://lark.example",
+    "client": null,
+    "rung": "listed",
+    "open": {
+     "world": null,
+     "element": "https://lark.example/#/v/{world}/{id}",
+     "needs": null,
+     "element_skips": [],
+     "element_types": [
+      "character",
+      "character"
+     ]
+    }
+   }
+  ],
+  "types-other-case": [
+   {
+    "id": "lark",
+    "name": "Lark",
+    "url": "https://lark.example",
+    "client": null,
+    "rung": "listed",
+    "open": {
+     "world": null,
+     "element": "https://lark.example/#/v/{world}/{id}",
+     "needs": null,
+     "element_skips": [],
+     "element_types": [
+      "Character"
+     ]
+    }
+   }
+  ],
+  "types-not-a-string": [
+   {
+    "id": "lark",
+    "name": "Lark",
+    "url": "https://lark.example",
+    "client": null,
+    "rung": "listed",
+    "open": {
+     "world": null,
+     "element": "https://lark.example/#/v/{world}/{id}",
+     "needs": null,
+     "element_skips": [],
+     "element_types": [
+      7
+     ]
+    }
+   }
   ]
  },
  "cases": [
@@ -4067,6 +4122,69 @@
    "address": {
     "form": "human",
     "world": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f"
+   },
+   "surface": {
+    "audience": "member",
+    "signed_in": true
+   },
+   "refuse": {
+    "error": "type",
+    "names": "element_types",
+    "kind": "bad_value"
+   }
+  },
+  {
+   "name": "types-repeated-word",
+   "why": "a type word given twice is a list that is not distinct",
+   "tools": "types-repeated",
+   "kind": "element",
+   "address": {
+    "form": "human",
+    "world": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+    "type": "character",
+    "id": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a"
+   },
+   "surface": {
+    "audience": "member",
+    "signed_in": true
+   },
+   "refuse": {
+    "error": "type",
+    "names": "element_types",
+    "kind": "bad_value"
+   }
+  },
+  {
+   "name": "types-word-in-another-case",
+   "why": "type words are lower case, as the 22 are written; another case is no type word",
+   "tools": "types-other-case",
+   "kind": "element",
+   "address": {
+    "form": "human",
+    "world": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+    "type": "character",
+    "id": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a"
+   },
+   "surface": {
+    "audience": "member",
+    "signed_in": true
+   },
+   "refuse": {
+    "error": "type",
+    "names": "element_types",
+    "kind": "bad_value"
+   }
+  },
+  {
+   "name": "types-word-not-a-string",
+   "why": "a type word is a string; a number in the list is a row that is not one",
+   "tools": "types-not-a-string",
+   "kind": "element",
+   "address": {
+    "form": "human",
+    "world": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+    "type": "character",
+    "id": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a"
    },
    "surface": {
     "audience": "member",
