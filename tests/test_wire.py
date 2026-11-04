@@ -430,12 +430,20 @@ def test_a_write_never_carries_what_the_write_schema_refuses(doc: dict[str, Any]
         "hidden": True,  # a create takes it, so the write schema must name it
     }
     for ty in ELEMENT_TYPES:
-        c.upsert(ty, ID, body)
+        # Every property the read schema returns is offered too, so a field the document turns
+        # read-only is caught (a fixed body saw only the fields known when it was written).
+        full = {**{k: None for k in schemas[ty.capitalize()]["properties"]}, **body, "known_of": False}
+        c.upsert(ty, ID, full)
         refused = set(schemas[ty.capitalize()]["properties"]) - set(schemas[ty.capitalize() + "Write"]["properties"])
         leaked = refused & set(t.calls[-1].body)
         assert not leaked, f"{ty}: a write still carries {sorted(leaked)}"
         assert t.calls[-1].body["hidden"] is True
         assert "boolean" in schemas[ty.capitalize() + "Write"]["properties"]["hidden"]["type"], ty
+        # The same body through patch(), against the type's own Patch schema.
+        c.patch(ty, ID, full)
+        patchable = set(schemas[ty.capitalize() + "Patch"]["properties"])
+        leaked_p = set(t.calls[-1].body) - patchable
+        assert not leaked_p, f"{ty}: a patch still carries {sorted(leaked_p)}"
 
 
 def test_patch_world_takes_back_every_key_the_world_body_serves(doc: dict[str, Any]) -> None:
