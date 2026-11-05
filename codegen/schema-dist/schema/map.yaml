@@ -1,7 +1,7 @@
 $schema: "http://json-schema.org/draft-07/schema#"
 title: "Map"
 type: "object"
-properties: 
+properties:
   Details:
     type: "object"
     properties:
@@ -10,16 +10,16 @@ properties:
         description: "Color of the space around the map when zoomed out"
       hierarchy:
         type: "integer"
-        description: "To associate or differentiate between maps with a common parent"
+        description: "An integer to order or group the maps that share a parent; how a tool reads it is the tool's own"
       width:
         type: "integer"
-        description: "In pixels" 
+        description: "In pixels"
       height:
         type: "integer"
-        description: "In pixels" 
+        description: "In pixels"
       depth:
         type: "integer"
-        description: "In pixels" 
+        description: "In pixels"
       parent_map:
         type: "single-link"
         description: "Map within which this map is contained"

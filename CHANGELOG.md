@@ -4,6 +4,10 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+## 0.106.3 (2026-11-05)
+
+- The schema pin moves to schema-dist `v0.34.0-dist.108` (canonical `00.34.00` unchanged, so `SCHEMA_VERSION` is the same). Three description fixes across 19 fields, no field added or removed: `Event.constructs` says concepts, systems or built entities (no longer laws); the seventeen time fields say in one phrasing that they count in the World's `time_basic_unit`; `Map.hierarchy` says it is an integer to order or group the maps that share a parent, read as each tool chooses; three map descriptions lose a trailing space. The vendored `schema.json` that `onlyworlds.lint` reads carries the new words; no check changed. The same pin as the npm SDK's 4.132.4.
+
 ## 0.106.2 (2026-11-03)
 
 - The schema pin moves to schema-dist `v0.34.0-dist.107` (canonical `00.34.00` unchanged, so `SCHEMA_VERSION` is the same). Two profile sentences changed and no fixture: the charter profile names what open means to a public reader (the World's `public_read`), and the map-space profile's whole-number range sentence is dated. No reader changed; the same pin as the npm SDK's 4.132.2.

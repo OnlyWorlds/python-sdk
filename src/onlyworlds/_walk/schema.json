@@ -64,7 +64,7 @@
       {
         "name": "duration",
         "kind": "scalar_int",
-        "desc": "Length of time the ability remains active or its effects persist, measured in TIME units",
+        "desc": "Length of time the ability remains active or its effects persist, in the world's time unit (World time_basic_unit)",
         "section": "Mechanics",
         "required": false
       },
@@ -181,7 +181,7 @@
       {
         "name": "formation_date",
         "kind": "scalar_int",
-        "desc": "Date the collective was formed, using world TIME units",
+        "desc": "Date the collective was formed, in the world's time unit (World time_basic_unit)",
         "section": "Formation",
         "required": false
       },
@@ -341,7 +341,7 @@
       {
         "name": "birth_date",
         "kind": "scalar_int",
-        "desc": "Moment of birth, expressed in the world's TIME units",
+        "desc": "Moment of birth, in the world's time unit (World time_basic_unit)",
         "section": "Origins",
         "required": false
       },
@@ -559,7 +559,7 @@
       {
         "name": "start_date",
         "kind": "scalar_int",
-        "desc": "The point in time when the construct began or was first established (uses world's TIME definition)",
+        "desc": "The point in time when the construct began or was first established, in the world's time unit (World time_basic_unit)",
         "section": "Nature",
         "required": false
       },
@@ -809,7 +809,7 @@
       {
         "name": "birth_date",
         "kind": "scalar_int",
-        "desc": "The time of the creature's birth, recorded in the world's defined TIME unit",
+        "desc": "The time of the creature's birth, in the world's time unit (World time_basic_unit)",
         "section": "World",
         "required": false
       },
@@ -1034,7 +1034,7 @@
         "name": "constructs",
         "kind": "multi",
         "target": "construct",
-        "desc": "Concepts, laws, or built entities relevant to the event",
+        "desc": "Concepts, systems or built entities relevant to the event",
         "section": "Involves",
         "required": false
       }
@@ -1145,7 +1145,7 @@
       {
         "name": "founding_date",
         "kind": "scalar_int",
-        "desc": "Date when the institution was established, in the world's TIME format",
+        "desc": "Date when the institution was established, in the world's time unit (World time_basic_unit)",
         "section": "Foundation",
         "required": false
       },
@@ -1292,7 +1292,7 @@
       {
         "name": "date",
         "kind": "scalar_int",
-        "desc": "Date the law was formally established, in world TIME units",
+        "desc": "Date the law was formally established, in the world's time unit (World time_basic_unit)",
         "section": "Code",
         "required": false
       },
@@ -1621,7 +1621,7 @@
       {
         "name": "hierarchy",
         "kind": "scalar_int",
-        "desc": "To associate or differentiate between maps with a common parent",
+        "desc": "An integer to order or group the maps that share a parent; how a tool reads it is the tool's own",
         "section": "Details",
         "required": false
       },
@@ -1727,14 +1727,14 @@
       {
         "name": "start_date",
         "kind": "scalar_int",
-        "desc": "Date when the narrative is first told or recorded, measured in world TIME units; the span it recounts lives on its events",
+        "desc": "Date when the narrative is first told or recorded, in the world's time unit (World time_basic_unit); the span it recounts lives on its events",
         "section": "Context",
         "required": false
       },
       {
         "name": "end_date",
         "kind": "scalar_int",
-        "desc": "Date when the narrative stops being told, measured in world TIME units; empty while it is still told",
+        "desc": "Date when the narrative stops being told, in the world's time unit (World time_basic_unit); empty while it is still told",
         "section": "Context",
         "required": false
       },
@@ -2057,7 +2057,7 @@
       {
         "name": "duration",
         "kind": "scalar_int",
-        "desc": "The amount of time the phenomenon lasts, measured in world TIME units",
+        "desc": "The amount of time the phenomenon lasts, in the world's time unit (World time_basic_unit)",
         "section": "Mechanics",
         "required": false
       },
@@ -2168,14 +2168,14 @@
       {
         "name": "start_date",
         "kind": "scalar_int",
-        "desc": "Date when the relation began, defined in world TIME units",
+        "desc": "Date when the relation began, in the world's time unit (World time_basic_unit)",
         "section": "Nature",
         "required": false
       },
       {
         "name": "end_date",
         "kind": "scalar_int",
-        "desc": "Date when the relation ended if any, defined in world TIME units",
+        "desc": "Date when the relation ended if any, in the world's time unit (World time_basic_unit)",
         "section": "Nature",
         "required": false
       },
@@ -2344,7 +2344,7 @@
       {
         "name": "life_span",
         "kind": "scalar_int",
-        "desc": "Average or typical life expectancy of an individual, defined in world TIME units",
+        "desc": "Average or typical life expectancy of an individual, in the world's time unit (World time_basic_unit)",
         "section": "Biology",
         "required": false
       },
@@ -2482,14 +2482,14 @@
       {
         "name": "grant_date",
         "kind": "scalar_int",
-        "desc": "Date on which the title was created or first granted, defined in world TIME units; a holder's own span is a Relation, not this field",
+        "desc": "Date on which the title was created or first granted, in the world's time unit (World time_basic_unit); a holder's own span is a Relation, not this field",
         "section": "Mandate",
         "required": false
       },
       {
         "name": "revoke_date",
         "kind": "scalar_int",
-        "desc": "Date on which the title ended or was abolished, defined in world TIME units; a holder's own span is a Relation, not this field",
+        "desc": "Date on which the title ended or was abolished, in the world's time unit (World time_basic_unit); a holder's own span is a Relation, not this field",
         "section": "Mandate",
         "required": false
       },
@@ -2784,14 +2784,14 @@
       {
         "name": "start_date",
         "kind": "scalar_int",
-        "desc": "Date when the zone becomes extant or relevant, defined in world TIME units",
+        "desc": "Date when the zone becomes extant or relevant, in the world's time unit (World time_basic_unit)",
         "section": "Scope",
         "required": false
       },
       {
         "name": "end_date",
         "kind": "scalar_int",
-        "desc": "Date when the zone ceases to be meaningful or enforced, defined in world TIME units",
+        "desc": "Date when the zone ceases to be meaningful or enforced, in the world's time unit (World time_basic_unit)",
         "section": "Scope",
         "required": false
       },
