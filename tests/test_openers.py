@@ -77,7 +77,12 @@ def test_tools_gives_the_sites_row_then_each_listed_tool_with_a_door_in_the_list
     shown = [t for t in offered if t["open"] is not None and t["open"]["needs"] != "device"]
     assert [r["id"] for r in public] == ["onlyworlds", *(t["id"] for t in shown)]
     for r, t in zip(public[1:], shown, strict=True):
-        want = "Needs an account" if t["open"] is not None and t["open"]["needs"] == "account" else None
+        o = t["open"]
+        want = (
+            "Needs an account"
+            if o is not None and o["needs"] == "account" and o.get("opens_public") is not True
+            else None
+        )
         assert r["state"] == want, r["id"]
 
 

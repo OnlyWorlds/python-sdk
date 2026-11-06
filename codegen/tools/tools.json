@@ -19,7 +19,8 @@
         "element": "https://atlas.onlyworlds.com/#/open/{world}/element/{id}",
         "needs": "account",
         "element_skips": [],
-        "element_types": null
+        "element_types": null,
+        "opens_public": true
       },
       "client": "atlas",
       "prefix": "atlas_",
@@ -217,7 +218,7 @@
       "sentence": "A small game of Greek hoplite battles: muster an army, deploy it and watch the battle play out; a world's Characters can take the field, and a battle can be written back into the world as history.",
       "url": "https://tangle.onlyworlds.com",
       "source": null,
-      "source_note": "The game's code is private; the OnlyWorlds maintainers read it for this listing.",
+      "source_note": "A game in active development: its battle engine and lab are still changing, so the code stays private for now. The OnlyWorlds maintainers read it for this listing.",
       "maker": "OnlyWorlds (Temper, an AI agent working for Titus)",
       "doors": [
         "api"

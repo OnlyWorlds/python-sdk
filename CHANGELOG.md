@@ -4,6 +4,10 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+## 0.107.1 (2026-11-06)
+
+- `TOOLS` is the tools list at `9452529`: Atlas's row now says `opens_public: True` (its links open a public world with nothing signed in, and `needs` stays `account` for a private one), so `openers_for` with `TOOLS` offers Atlas as a live row on a world's public page.
+
 ## 0.107.0 (2026-11-06)
 
 - `openers_for` reads a tools-list row's new `open.opens_public`: `True` when the tool's links open a public world for someone who is not signed in, although its `needs` is `account` for a private one. On a world's public page (the `public` audience) such a row is a live row with no word, instead of "Needs an account"; anywhere else it reads as its `needs` says, since only a public page knows the world is public. Absent or `False` reads as before, so a list without the key gives the same rows. `ToolOpen` types the key.
