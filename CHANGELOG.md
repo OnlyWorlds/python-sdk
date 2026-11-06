@@ -4,6 +4,11 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+## 0.107.0 (2026-11-06)
+
+- `openers_for` reads a tools-list row's new `open.opens_public`: `True` when the tool's links open a public world for someone who is not signed in, although its `needs` is `account` for a private one. On a world's public page (the `public` audience) such a row is a live row with no word, instead of "Needs an account"; anywhere else it reads as its `needs` says, since only a public page knows the world is public. Absent or `False` reads as before, so a list without the key gives the same rows. `ToolOpen` types the key.
+- `openers_for` refuses an `opens_public` that is not `True` or `False`, and `True` beside a `needs` other than `account` (a row that needs nothing already opens a public world, and a row that needs the device never reaches a public page), as the tools list's own check does. Seven new cases in the shared openers fixture (110 in all, the same bytes as the npm SDK's).
+
 ## 0.106.3 (2026-11-05)
 
 - The schema pin moves to schema-dist `v0.34.0-dist.108` (canonical `00.34.00` unchanged, so `SCHEMA_VERSION` is the same). Three description fixes across 19 fields, no field added or removed: `Event.constructs` says concepts, systems or built entities (no longer laws); the seventeen time fields say in one phrasing that they count in the World's `time_basic_unit`; `Map.hierarchy` says it is an integer to order or group the maps that share a parent, read as each tool chooses; three map descriptions lose a trailing space. The vendored `schema.json` that `onlyworlds.lint` reads carries the new words; no check changed. The same pin as the npm SDK's 4.132.4.

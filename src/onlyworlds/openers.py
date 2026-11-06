@@ -36,6 +36,10 @@ class ToolOpen(TypedDict):
     #: The element types the element door opens, as type words (``character``); None or absent (a list older than the
     #: key) when it opens every type.
     element_types: NotRequired[list[str] | None]
+    #: True when the links open a public world for someone not signed in, though ``needs`` is ``account`` for a
+    #: private one: a public page offers the row live. Only beside ``needs: account``; absent or False: as
+    #: ``needs`` says.
+    opens_public: NotRequired[bool]
 
 
 class Tool(TypedDict):
@@ -122,7 +126,9 @@ def openers_for(
     element (read from the address, so no element body is needed; a world's menu reads no element types). For the
     ``public`` audience (the signed-out reader) a row whose
     ``open.needs`` is ``device`` is not there, since a visitor's device holds no world of this one's, and a row
-    whose ``needs`` is ``account`` is there and says it needs one.
+    whose ``needs`` is ``account`` is there and says it needs one, unless its ``open.opens_public`` is True: its links
+    open a public world with nothing signed in, so on a public page it needs nothing and reads as a live row.
+    Anywhere else the row reads as its ``needs`` says.
 
     ``surface`` is a mapping of what the surface knows, and nothing is guessed: ``audience`` (``member``, a seat in
     the world, a guest included, or ``public``, the signed-out reader; required), ``signed_in`` (True, False, or
@@ -147,8 +153,9 @@ def openers_for(
     ``kind`` that is neither, an element's openers asked of an address with no element, an unknown key on the
     address or the surface, a missing or unknown ``audience``, a surface value of the wrong type, an ``element`` for a
     world's menu or naming another element than the address, a tools row that is not one (a ``needs`` or an
-    ``element_skips`` or ``element_types`` word outside the list's format, an empty ``element_types``, or skips or
-    types on a row with no element door, included). The npm
+    ``element_skips`` or ``element_types`` word outside the list's format, an empty ``element_types``, skips or
+    types on a row with no element door, or an ``opens_public`` that is not True or False, or True beside a
+    ``needs`` other than ``account``, included). The npm
     SDK's ``openersFor`` gives the same rows.
     """
     if isinstance(tools, str | bytes) or not isinstance(tools, Sequence):
@@ -243,6 +250,11 @@ def openers_for(
         needs = o.get("needs")
         if needs not in _NEEDS:
             _fail(f"tool {rid}: open.needs is 'account', 'device' or None; got {needs!r}")
+        opens_public = o.get("opens_public", False)
+        if not isinstance(opens_public, bool):
+            _fail(f"tool {rid}: open.opens_public is True or False; got {opens_public!r}")
+        if opens_public and needs != "account":
+            _fail(f"tool {rid}: open.opens_public is True only beside needs 'account'; got needs {needs!r}")
         skips = o.get("element_skips")
         skips = [] if skips is None else skips
         if not isinstance(skips, list) or any(s not in ELEMENT_MARKS for s in skips):
@@ -281,18 +293,21 @@ def openers_for(
         # opens, somewhere else), so a world door alone that needs a sign-in says the sign-in. With no connection a
         # web link opens nothing, whatever else it needs.
         href = fill(template)
+        # What the row needs on this surface: a public page shows a public world, which a row that opens one opens
+        # with nothing signed in.
+        need = None if audience == "public" and opens_public else needs
         state: str | None = None
         if tool is not None and r.get("client") == tool:
             state = "You are here"
         elif offline(href):
             state = _OFFLINE
-        elif audience == "public" and needs == "account":
+        elif audience == "public" and need == "account":
             state = _NO_ACCOUNT
-        elif needs == "account" and not browser:
+        elif need == "account" and not browser:
             state = "Opens in your browser"
-        elif needs == "account" and signed_in is False:
+        elif need == "account" and signed_in is False:
             state = f"Sign in to {name} first"
-        elif needs == "device" and phone:
+        elif need == "device" and phone:
             state = "Needs the world on this phone"
         elif kind == "element" and element_door is None:
             state = "Opens the world"

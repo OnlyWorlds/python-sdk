@@ -1,6 +1,6 @@
 {
  "what": "The rows of the Open with menu: openersFor (npm SDK) and openers_for (Python package) on the same cases. Every expected row is written by hand. The same bytes in both packages; each test holds this file's sha256.",
- "keys": "tools names a list in lists; kind is world or element; address is what parseOwLink reads or elementAddress takes; surface is the options object with snake_case keys (signed_in), which the npm test spells signedIn. expect is the rows in order, each {id, name, href, state}; refuse is the refusal: error address with the address error's reason, or error type (a TypeError) whose message names names (spelt signedIn in the npm test), with its kind: unknown_key, a key the object does not take, refused by name; bad_value, a key it takes whose value it refuses, a missing value included. Each package tells the two apart by its own message, so a reader that refuses a known key as unknown fails the case. options, when present, is the fifth argument as written ({element}: the element as served, the mark flat on it); a row whose open.element_skips names a mark the element carries is not there. A row whose open.element_types is a list that does not hold the address's type word is not there on an element's menu, and a world's menu reads no element types.",
+ "keys": "tools names a list in lists; kind is world or element; address is what parseOwLink reads or elementAddress takes; surface is the options object with snake_case keys (signed_in), which the npm test spells signedIn. expect is the rows in order, each {id, name, href, state}; refuse is the refusal: error address with the address error's reason, or error type (a TypeError) whose message names names (spelt signedIn in the npm test), with its kind: unknown_key, a key the object does not take, refused by name; bad_value, a key it takes whose value it refuses, a missing value included. Each package tells the two apart by its own message, so a reader that refuses a known key as unknown fails the case. options, when present, is the fifth argument as written ({element}: the element as served, the mark flat on it); a row whose open.element_skips names a mark the element carries is not there. A row whose open.element_types is a list that does not hold the address's type word is not there on an element's menu, and a world's menu reads no element types. A row whose open.opens_public is true opens a public world for someone not signed in although its needs is account for a private one: on a world's public page it is a live row with no word; anywhere else it reads as its needs says. Absent or false is the same; true is refused beside any needs but account, and a value that is not true or false is refused.",
  "lists": {
   "three": [
    {
@@ -543,6 +543,91 @@
      "element_types": [
       7
      ]
+    }
+   }
+  ],
+  "opens-public": [
+   {
+    "id": "tern",
+    "name": "Tern",
+    "url": "https://tern.example",
+    "client": "tern",
+    "rung": "listed",
+    "open": {
+     "world": "https://tern.example/w/{world}",
+     "element": "https://tern.example/w/{world}/e/{id}",
+     "needs": "account",
+     "opens_public": true
+    }
+   },
+   {
+    "id": "gull",
+    "name": "Gull",
+    "url": "https://gull.example",
+    "client": "gull",
+    "rung": "listed",
+    "open": {
+     "world": "https://gull.example/w/{world}",
+     "element": "https://gull.example/w/{world}/e/{id}",
+     "needs": "account"
+    }
+   },
+   {
+    "id": "petrel",
+    "name": "Petrel",
+    "url": "https://petrel.example",
+    "client": "petrel",
+    "rung": "listed",
+    "open": {
+     "world": "https://petrel.example/w/{world}",
+     "element": "https://petrel.example/w/{world}/e/{id}",
+     "needs": "account",
+     "opens_public": false
+    }
+   }
+  ],
+  "opens-public-not-bool": [
+   {
+    "id": "tern",
+    "name": "Tern",
+    "url": "https://tern.example",
+    "client": "tern",
+    "rung": "listed",
+    "open": {
+     "world": "https://tern.example/w/{world}",
+     "element": "https://tern.example/w/{world}/e/{id}",
+     "needs": "account",
+     "opens_public": "yes"
+    }
+   }
+  ],
+  "opens-public-needs-null": [
+   {
+    "id": "tern",
+    "name": "Tern",
+    "url": "https://tern.example",
+    "client": "tern",
+    "rung": "listed",
+    "open": {
+     "world": "https://tern.example/w/{world}",
+     "element": "https://tern.example/w/{world}/e/{id}",
+     "needs": null,
+     "opens_public": true
+    }
+   }
+  ],
+  "opens-public-needs-device": [
+   {
+    "id": "tern",
+    "name": "Tern",
+    "url": "https://tern.example",
+    "client": "tern",
+    "rung": "listed",
+    "open": {
+     "world": "https://tern.example/w/{world}",
+     "element": "https://tern.example/w/{world}/e/{id}",
+     "needs": "device",
+     "opens_public": true
     }
    }
   ]
@@ -4193,6 +4278,222 @@
    "refuse": {
     "error": "type",
     "names": "element_types",
+    "kind": "bad_value"
+   }
+  },
+  {
+   "name": "opens-public-on-the-public-page",
+   "why": "a row that opens a public world with nothing signed in is live on its public page; beside it a row with the key absent and one with it false read as their needs says",
+   "tools": "opens-public",
+   "kind": "world",
+   "address": {
+    "form": "human",
+    "world": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f"
+   },
+   "surface": {
+    "audience": "public"
+   },
+   "expect": [
+    {
+     "id": "onlyworlds",
+     "name": "onlyworlds.com",
+     "href": "https://www.onlyworlds.com/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+     "state": null
+    },
+    {
+     "id": "tern",
+     "name": "Tern",
+     "href": "https://tern.example/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+     "state": null
+    },
+    {
+     "id": "gull",
+     "name": "Gull",
+     "href": "https://gull.example/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+     "state": "Needs an account"
+    },
+    {
+     "id": "petrel",
+     "name": "Petrel",
+     "href": "https://petrel.example/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+     "state": "Needs an account"
+    }
+   ]
+  },
+  {
+   "name": "opens-public-on-a-public-element",
+   "why": "the same on an element's public page: the element door, live",
+   "tools": "opens-public",
+   "kind": "element",
+   "address": {
+    "form": "text",
+    "world": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+    "type": "character",
+    "id": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a"
+   },
+   "surface": {
+    "audience": "public",
+    "signed_in": null
+   },
+   "expect": [
+    {
+     "id": "onlyworlds",
+     "name": "onlyworlds.com",
+     "href": "https://www.onlyworlds.com/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/character/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
+     "state": null
+    },
+    {
+     "id": "tern",
+     "name": "Tern",
+     "href": "https://tern.example/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/e/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
+     "state": null
+    },
+    {
+     "id": "gull",
+     "name": "Gull",
+     "href": "https://gull.example/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/e/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
+     "state": "Needs an account"
+    },
+    {
+     "id": "petrel",
+     "name": "Petrel",
+     "href": "https://petrel.example/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/e/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
+     "state": "Needs an account"
+    }
+   ]
+  },
+  {
+   "name": "opens-public-member-signed-out",
+   "why": "outside a public page nothing says the world is public, so a member signed out reads every row as its needs says, the key or not",
+   "tools": "opens-public",
+   "kind": "world",
+   "address": {
+    "form": "human",
+    "world": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f"
+   },
+   "surface": {
+    "audience": "member",
+    "signed_in": false
+   },
+   "expect": [
+    {
+     "id": "onlyworlds",
+     "name": "onlyworlds.com",
+     "href": "https://www.onlyworlds.com/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+     "state": null
+    },
+    {
+     "id": "tern",
+     "name": "Tern",
+     "href": "https://tern.example/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+     "state": "Sign in to Tern first"
+    },
+    {
+     "id": "gull",
+     "name": "Gull",
+     "href": "https://gull.example/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+     "state": "Sign in to Gull first"
+    },
+    {
+     "id": "petrel",
+     "name": "Petrel",
+     "href": "https://petrel.example/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+     "state": "Sign in to Petrel first"
+    }
+   ]
+  },
+  {
+   "name": "opens-public-member-signed-in",
+   "why": "signed in, every row opens: the key changes nothing for a member",
+   "tools": "opens-public",
+   "kind": "world",
+   "address": {
+    "form": "human",
+    "world": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f"
+   },
+   "surface": {
+    "audience": "member",
+    "signed_in": true
+   },
+   "expect": [
+    {
+     "id": "onlyworlds",
+     "name": "onlyworlds.com",
+     "href": "https://www.onlyworlds.com/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+     "state": null
+    },
+    {
+     "id": "tern",
+     "name": "Tern",
+     "href": "https://tern.example/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+     "state": null
+    },
+    {
+     "id": "gull",
+     "name": "Gull",
+     "href": "https://gull.example/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+     "state": null
+    },
+    {
+     "id": "petrel",
+     "name": "Petrel",
+     "href": "https://petrel.example/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+     "state": null
+    }
+   ]
+  },
+  {
+   "name": "opens-public-not-a-boolean",
+   "why": "opens_public is true or false; a string is a row that is not one",
+   "tools": "opens-public-not-bool",
+   "kind": "world",
+   "address": {
+    "form": "human",
+    "world": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f"
+   },
+   "surface": {
+    "audience": "public"
+   },
+   "refuse": {
+    "error": "type",
+    "names": "opens_public",
+    "kind": "bad_value"
+   }
+  },
+  {
+   "name": "opens-public-beside-needs-nothing",
+   "why": "a row that needs nothing already opens a public world: true there says nothing the row does not",
+   "tools": "opens-public-needs-null",
+   "kind": "world",
+   "address": {
+    "form": "human",
+    "world": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f"
+   },
+   "surface": {
+    "audience": "public"
+   },
+   "refuse": {
+    "error": "type",
+    "names": "opens_public",
+    "kind": "bad_value"
+   }
+  },
+  {
+   "name": "opens-public-beside-needs-device",
+   "why": "a row that needs the device never reaches a public page, so true there is a contradiction",
+   "tools": "opens-public-needs-device",
+   "kind": "world",
+   "address": {
+    "form": "human",
+    "world": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f"
+   },
+   "surface": {
+    "audience": "member",
+    "signed_in": true
+   },
+   "refuse": {
+    "error": "type",
+    "names": "opens_public",
     "kind": "bad_value"
    }
   }
