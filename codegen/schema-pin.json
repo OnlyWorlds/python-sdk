@@ -2,15 +2,20 @@
   "_what": "The recorded pin for the vendored OnlyWorlds schema distribution (codegen/schema-dist/, copied byte-exact). Do not edit by hand; re-vendor from the pinned tag and review the diff. Kept equal to the npm SDK's pin (github.com/OnlyWorlds/sdk, codegen/schema-pin.json) on purpose: two clients, one schema.",
   "_why_manifest_sha256": "Verifying the tree against its own MANIFEST.json only proves internal consistency. If the tag moved, the manifest moved with it. The hash recorded here is the one first accepted, which is what makes a moved tag visible.",
   "repo": "https://github.com/OnlyWorlds/schema-dist",
-  "tag": "v0.34.0-dist.108",
-  "commit": "c618b9db474e9f77a9626cf55a1cc0b5256be154",
-  "manifest_sha256": "077a53b463e562b729ba96e941d8ba82403e7cd7184b95450ee57b7b6edbf6ed",
+  "tag": "v0.34.0-dist.109",
+  "commit": "bc306267916638a3386effd7561ae76cbdb0dc99",
+  "manifest_sha256": "1aa35790618aa99ca22989bc07b4054f6e35f7fca18a435da48646533f6d3f1c",
   "canonical_version": "00.34.00",
-  "dist_serial": 108,
-  "published": "2026-11-04",
-  "pinned_at": "2026-11-05",
+  "dist_serial": 109,
+  "published": "2026-11-07",
+  "pinned_at": "2026-11-08",
   "pinned_by": "The maintainer: tree from `git archive` of the tag in a schema-dist checkout (206 files: the 205 the MANIFEST lists, and MANIFEST.json itself); files re-hashed against MANIFEST.json by generate_schema.py; MANIFEST self-hash matched against the raw file GitHub serves at the tag, whose ref resolves to the commit above.",
   "previous_pins": [
+    {
+      "tag": "v0.34.0-dist.108",
+      "manifest_sha256": "077a53b463e562b729ba96e941d8ba82403e7cd7184b95450ee57b7b6edbf6ed",
+      "note": "superseded by v0.34.0-dist.109 (canonical 00.34.00 unchanged, no schema file moved; calendar.md's refusal clause reads an era's year_base present and not 0 or 1, as its field table says, and calendar.fixture.json gains refuse-year-base-five, 77 cases and 43 refusals)"
+    },
     {
       "tag": "v0.34.0-dist.107",
       "manifest_sha256": "6b8917461a4af7100017845ec32dc196b4e03733b30547a9a06b30f2aa6a242d",

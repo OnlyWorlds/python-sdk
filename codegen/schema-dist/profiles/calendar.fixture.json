@@ -515,6 +515,22 @@
       "valid": false
     },
     {
+      "name": "refuse-year-base-five",
+      "why": "a year_base that is a whole number but not 0 or 1 (5): the field table's range, serial 109",
+      "value": {
+        "version": 1,
+        "grain": "year",
+        "eras": [
+          {
+            "name": "Age",
+            "start": 0,
+            "year_base": 5
+          }
+        ]
+      },
+      "valid": false
+    },
+    {
       "name": "refuse-month-name-not-string",
       "why": "a month name that is not a string",
       "value": {

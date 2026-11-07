@@ -4,6 +4,10 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+## 0.107.2 (2026-11-08)
+
+- The schema pin moves to schema-dist `v0.34.0-dist.109` (canonical `00.34.00` unchanged, so `SCHEMA_VERSION` is the same; no schema file moved). The calendar profile now refuses an era whose `year_base` is present and not 0 or 1, as its field table always said, and its fixture gains `refuse-year-base-five` (77 cases, 43 refusals). `onlyworlds.calendar` already refused such an era; the replayed fixture now holds it.
+
 ## 0.107.1 (2026-11-06)
 
 - `TOOLS` is the tools list at `9452529`: Atlas's row now says `opens_public: True` (its links open a public world with nothing signed in, and `needs` stays `account` for a private one), so `openers_for` with `TOOLS` offers Atlas as a live row on a world's public page.
