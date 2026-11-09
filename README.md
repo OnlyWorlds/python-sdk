@@ -30,7 +30,7 @@ Moppetopia
 
 ## Your own world
 
-Create a world at [onlyworlds.com](https://www.onlyworlds.com); its keys are on the world's page. A new key is shown once, so copy it then.
+Create a world at [onlyworlds.com](https://www.onlyworlds.com); its keys are on its world page. A new key is shown once, so copy it then.
 
 - An `ow_r_` key reads, with no PIN: `Client("ow_r_…")`.
 - An `ow_w_` key reads and writes. Writes also send a PIN: `Client("ow_w_…", "…")`.
