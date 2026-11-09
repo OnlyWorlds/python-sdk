@@ -4,6 +4,10 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+## 0.108.0 (2026-11-09)
+
+- `trail_by_place(input)`: the first layout method, a world laid out along a route on a ground map, answered as a Map frame (`width`, `height`, `depth`), one Pin per element (whole numbers in the Map's pixels, which `map_space` reads back), the route, and the recipe (`method: "trail-by-place"` and the settings it ran with). The places come in travel order, each at its own pin plus a margin, evenly between two pinned places, or on a ring inside a parent place; every other element hangs on one spiral round the place it belongs to, the hero first, at its floor's height (`TRAIL_TIERS` is the default floors). Nothing shares a place's own point and no two Pins share a point; a row of the frame with no free point left is refused. The method places and does not read: the travel order and what hangs where are the caller's. The input and the recipe are the same JSON as the npm SDK's `trailByPlace` (4.135.1), and the answers agree: the two packages hold one shared fixture by sha256 (a whole world laid out pin for pin and eight small cases) and gave the same answer on 5,000 random inputs. An input it cannot place is a `TypeError` naming what.
+
 ## 0.107.2 (2026-11-08)
 
 - The schema pin moves to schema-dist `v0.34.0-dist.109` (canonical `00.34.00` unchanged, so `SCHEMA_VERSION` is the same; no schema file moved). The calendar profile now refuses an era whose `year_base` is present and not 0 or 1, as its field table always said, and its fixture gains `refuse-year-base-five` (77 cases, 43 refusals). `onlyworlds.calendar` already refused such an era; the replayed fixture now holds it.

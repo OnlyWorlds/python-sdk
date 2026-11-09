@@ -18,3 +18,5 @@ tests/fixtures/doors.fixture.json -text
 tests/fixtures/author-fields.fixture.json -text
 # The tools list, vendored byte for byte as GitHub serves it at the pinned commit (codegen/tools-pin.json holds its sha256).
 codegen/tools/tools.json -text
+# The layout methods' shared cases, the same bytes as the npm SDK's copy (both tests hold its sha256).
+tests/fixtures/layout/** -text

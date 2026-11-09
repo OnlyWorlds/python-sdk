@@ -77,6 +77,18 @@ from .http import (
     sanitize_payload,
 )
 from .landing import Landing, LandingCluster, LandingGap, LandingMember, landing_of
+from .layout_trail import (
+    TRAIL_TIERS,
+    TrailHanger,
+    TrailLayout,
+    TrailPin,
+    TrailPlace,
+    TrailRecipe,
+    TrailSettings,
+    TrailSpiral,
+    TrailTier,
+    trail_by_place,
+)
 from .lens import DATE_FIELD, LensMail, LensReading, date_of, is_lens, is_template, lenses_in_use, resolve_lens
 from .map_space import MapSpace, MapSpaceMap, MapSpaceOutline, MapSpacePin, map_space
 from .message import (
@@ -140,6 +152,7 @@ __all__ = [
     "SPINE_KINDS",
     "STRAND_FIELD",
     "TOOLS",
+    "TRAIL_TIERS",
     "WORLD_FILE_MEDIA_TYPE",
     "AddressError",
     "AddressForm",
@@ -192,6 +205,14 @@ __all__ = [
     "StrandSlot",
     "Tool",
     "ToolOpen",
+    "TrailHanger",
+    "TrailLayout",
+    "TrailPin",
+    "TrailPlace",
+    "TrailRecipe",
+    "TrailSettings",
+    "TrailSpiral",
+    "TrailTier",
     "Transport",
     "UrllibTransport",
     "WorldFile",
@@ -251,6 +272,7 @@ __all__ = [
     "slugify",
     "strand_of",
     "thread_of",
+    "trail_by_place",
     "type_word",
     "unread_for",
     "uuid7",

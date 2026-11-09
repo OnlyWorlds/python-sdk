@@ -1,0 +1,1641 @@
+{
+ "about": "trail-by-place on Blood Meridian (world 721d154b): the input is what the world's own reading computes (places in travel order, what hangs where), the want is the frame, pins and route of the reference run that laid it out (the caller's words in `by` as in the input; the method's own words after them).",
+ "input": {
+  "ground": {
+   "width": 3462,
+   "height": 4676
+  },
+  "margin": 300,
+  "depth": 900,
+  "tiers": [
+   {
+    "name": "ground: places and things",
+    "z": 0,
+    "kinds": [
+     "location",
+     "object",
+     "zone"
+    ]
+   },
+   {
+    "name": "people and the living",
+    "z": 240,
+    "kinds": [
+     "character",
+     "collective",
+     "creature",
+     "species"
+    ]
+   },
+   {
+    "name": "what happened",
+    "z": 480,
+    "kinds": [
+     "event"
+    ]
+   },
+   {
+    "name": "told or abstract",
+    "z": 720,
+    "kinds": [
+     "ability",
+     "construct",
+     "family",
+     "institution",
+     "language",
+     "law",
+     "narrative",
+     "phenomenon",
+     "relation",
+     "title",
+     "trait"
+    ]
+   }
+  ],
+  "spiral": {
+   "r0": 140,
+   "c": 20,
+   "angle": 2.399963
+  },
+  "places": [
+   {
+    "id": "01a196c7-5700-7a30-bc8e-38c2f60ce01c",
+    "type": "location",
+    "name": "The scullery",
+    "pin": [
+     2766,
+     2728
+    ],
+    "by": "no pin: between the start and Memphis (the text names it before Memphis); set 600 px east of it (he wanders west as far as Memphis)"
+   },
+   {
+    "id": "01a1b17c-f4a2-740c-8e45-525cf7d16ec5",
+    "type": "location",
+    "name": "Memphis",
+    "pin": [
+     2166,
+     2728
+    ],
+    "by": "its pin on The way south, 1847-49 (2166, 2728; its order 1), plus the 300 px margin"
+   },
+   {
+    "id": "01a1b17c-f4a2-75a6-b5f9-e33e59812c5d",
+    "type": "location",
+    "name": "Saint Louis",
+    "pin": [
+     2118,
+     4313
+    ],
+    "by": "its pin on The way south, 1847-49 (2118, 4313; its order 2), plus the 300 px margin"
+   },
+   {
+    "id": "01a1b17c-f4a2-7a89-8637-b99340e80005",
+    "type": "location",
+    "name": "The Mississippi",
+    "between": [
+     "01a1b17c-f4a2-75a6-b5f9-e33e59812c5d",
+     "01a1b17c-f4a2-7454-9ea7-4856206d416f"
+    ],
+    "by": "the event 'Forty-two days on the river' lists it between them"
+   },
+   {
+    "id": "01a1b17c-f4a2-7454-9ea7-4856206d416f",
+    "type": "location",
+    "name": "New Orleans",
+    "pin": [
+     2163,
+     484
+    ],
+    "by": "its pin on The way south, 1847-49 (2163, 484; its order 3), plus the 300 px margin"
+   },
+   {
+    "id": "01a1b17c-f4a2-7dca-96c5-0b632d1470db",
+    "type": "location",
+    "name": "The tavern",
+    "parent": "01a1b17c-f4a2-7454-9ea7-4856206d416f"
+   },
+   {
+    "id": "01a1b17c-f4a2-71f1-b262-2b8c29d295c4",
+    "type": "location",
+    "name": "The room above the courtyard",
+    "parent": "01a1b17c-f4a2-7dca-96c5-0b632d1470db"
+   },
+   {
+    "id": "01a1b17c-f4a2-79a4-8914-fe056b1676d8",
+    "type": "location",
+    "name": "Galveston",
+    "pin": [
+     440,
+     213
+    ],
+    "by": "its pin on The way south, 1847-49 (440, 213; its order 4), plus the 300 px margin"
+   },
+   {
+    "id": "01a19651-8e95-7e9b-ad93-568b9bae4347",
+    "type": "location",
+    "name": "The sawmill",
+    "between": [
+     "01a1b17c-f4a2-79a4-8914-fe056b1676d8",
+     "01a13c6f-879d-732e-af8c-32cf00051da0"
+    ],
+    "by": "the text names it before Nacogdoches"
+   },
+   {
+    "id": "01a19651-8e95-74a2-8a5e-31dec2d0289b",
+    "type": "location",
+    "name": "The diphtheria pesthouse",
+    "between": [
+     "01a1b17c-f4a2-79a4-8914-fe056b1676d8",
+     "01a13c6f-879d-732e-af8c-32cf00051da0"
+    ],
+    "by": "the text names it before Nacogdoches"
+   },
+   {
+    "id": "01a13c6f-879d-732e-af8c-32cf00051da0",
+    "type": "location",
+    "name": "Nacogdoches",
+    "pin": [
+     491,
+     1183
+    ],
+    "by": "its pin on The way south, 1847-49 (491, 1183; its order 5), plus the 300 px margin"
+   }
+  ],
+  "hangers": [
+   {
+    "id": "01a196ba-bfa4-710c-be61-e340492adb68",
+    "type": "character",
+    "name": "The kid's father",
+    "at": [
+     "01a196c7-5700-7a30-bc8e-38c2f60ce01c"
+    ],
+    "by": "the text is at The scullery when chapter 1 first names it"
+   },
+   {
+    "id": "01a1942b-4326-74f7-a0e4-0cb350016b64",
+    "type": "object",
+    "name": "The linen shirt",
+    "at": [
+     "01a196c7-5700-7a30-bc8e-38c2f60ce01c"
+    ],
+    "by": "first named in k1 before its text names a place: at The scullery, where the scene opens"
+   },
+   {
+    "id": "01a1942b-45d6-79db-bcae-9a3dc391cda1",
+    "type": "creature",
+    "name": "The last wolves",
+    "at": [
+     "01a196c7-5700-7a30-bc8e-38c2f60ce01c"
+    ],
+    "by": "the text is at The scullery when chapter 1 first names it"
+   },
+   {
+    "id": "01a196ba-bfa4-7862-aa9e-78b6d17cd52b",
+    "type": "trait",
+    "name": "Lies in drink",
+    "at": [
+     "01a196c7-5700-7a30-bc8e-38c2f60ce01c"
+    ],
+    "by": "the text is at The scullery when chapter 1 first names it"
+   },
+   {
+    "id": "01a1942b-44f3-75ec-a796-264ec4397974",
+    "type": "zone",
+    "name": "The fields with rags of snow",
+    "at": [
+     "01a196c7-5700-7a30-bc8e-38c2f60ce01c"
+    ],
+    "by": "the text is at The scullery when chapter 1 first names it"
+   },
+   {
+    "id": "01a1942b-47a5-744f-a7ef-ca1b0e4dea2e",
+    "type": "ability",
+    "name": "Hewing wood and drawing water",
+    "at": [
+     "01a196c7-5700-7a30-bc8e-38c2f60ce01c"
+    ],
+    "by": "the text is at The scullery when chapter 1 first names it"
+   },
+   {
+    "id": "01a1942b-4414-702f-b59c-9bc3f6ea8bff",
+    "type": "phenomenon",
+    "name": "The scullery fire",
+    "at": [
+     "01a196c7-5700-7a30-bc8e-38c2f60ce01c"
+    ],
+    "by": "its own link to The scullery"
+   },
+   {
+    "id": "01a1942b-4ac1-7ca0-b465-9a9383d22e05",
+    "type": "language",
+    "name": "The lost poets' tongue",
+    "at": [
+     "01a196c7-5700-7a30-bc8e-38c2f60ce01c"
+    ],
+    "by": "the text is at The scullery when chapter 1 first names it"
+   },
+   {
+    "id": "01a1942b-46bb-705c-8f42-4a93ea62e8cd",
+    "type": "family",
+    "name": "The kid's folk",
+    "at": [
+     "01a196c7-5700-7a30-bc8e-38c2f60ce01c"
+    ],
+    "by": "the text is at The scullery when chapter 1 first names it"
+   },
+   {
+    "id": "01a1942b-48be-7a76-bd9a-dce83f8a84de",
+    "type": "relation",
+    "name": "The kid and his father",
+    "at": [
+     "01a196c7-5700-7a30-bc8e-38c2f60ce01c"
+    ],
+    "by": "the text is at The scullery when chapter 1 first names it"
+   },
+   {
+    "id": "01a1942b-49d8-7083-8b3d-528732460e33",
+    "type": "construct",
+    "name": "The schoolmaster",
+    "at": [
+     "01a196c7-5700-7a30-bc8e-38c2f60ce01c"
+    ],
+    "by": "the text is at The scullery when chapter 1 first names it"
+   },
+   {
+    "id": "01a1b17c-f4a2-7350-999b-c2555947a762",
+    "type": "event",
+    "name": "The night of his birth",
+    "at": [
+     "01a196c7-5700-7a30-bc8e-38c2f60ce01c"
+    ],
+    "by": "first named in k2 before its text names a place: at The scullery, where the scene opens"
+   },
+   {
+    "id": "01a1b17c-f4a2-7d32-a779-9032d5fb9dc2",
+    "type": "event",
+    "name": "The mother's death",
+    "at": [
+     "01a196c7-5700-7a30-bc8e-38c2f60ce01c"
+    ],
+    "by": "first named in k2 before its text names a place: at The scullery, where the scene opens"
+   },
+   {
+    "id": "01a1b17c-f4a2-71da-bb0b-b2081a269062",
+    "type": "character",
+    "name": "The mother",
+    "at": [
+     "01a196c7-5700-7a30-bc8e-38c2f60ce01c"
+    ],
+    "by": "first named in k2 before its text names a place: at The scullery, where the scene opens"
+   },
+   {
+    "id": "01a1b17c-f4a2-7c71-b461-0ef234ecd7b1",
+    "type": "character",
+    "name": "The sister",
+    "at": [
+     "01a196c7-5700-7a30-bc8e-38c2f60ce01c"
+    ],
+    "by": "first named in k2 before its text names a place: at The scullery, where the scene opens"
+   },
+   {
+    "id": "01a1b17c-f4a2-70ac-9312-73121d80b45c",
+    "type": "trait",
+    "name": "Can neither read nor write",
+    "at": [
+     "01a196c7-5700-7a30-bc8e-38c2f60ce01c"
+    ],
+    "by": "first named in k2 before its text names a place: at The scullery, where the scene opens"
+   },
+   {
+    "id": "01a1b17c-f4a2-7d37-889f-a9ecd3a5b6c2",
+    "type": "trait",
+    "name": "A taste for mindless violence",
+    "at": [
+     "01a196c7-5700-7a30-bc8e-38c2f60ce01c"
+    ],
+    "by": "first named in k2 before its text names a place: at The scullery, where the scene opens"
+   },
+   {
+    "id": "01a1b17c-f4a2-72b4-8e0d-77dde9a35d52",
+    "type": "phenomenon",
+    "name": "The Leonids",
+    "at": [
+     "01a196c7-5700-7a30-bc8e-38c2f60ce01c"
+    ],
+    "by": "first named in k2 before its text names a place: at The scullery, where the scene opens"
+   },
+   {
+    "id": "01a1b17c-f4a2-7489-a9ed-082be5ffbc36",
+    "type": "event",
+    "name": "He runs away",
+    "at": [
+     "01a196c7-5700-7a30-bc8e-38c2f60ce01c"
+    ],
+    "by": "its own link to The scullery"
+   },
+   {
+    "id": "01a1b17c-f4a2-78fa-8fb2-d1abbbd3ee43",
+    "type": "event",
+    "name": "Forty-two days on the river",
+    "at": [
+     "01a1b17c-f4a2-75a6-b5f9-e33e59812c5d",
+     "01a1b17c-f4a2-7a89-8637-b99340e80005",
+     "01a1b17c-f4a2-7454-9ea7-4856206d416f"
+    ],
+    "by": "its own link to Saint Louis, The Mississippi, New Orleans"
+   },
+   {
+    "id": "01a1b17c-f4a2-75cf-b2c9-b6b27fbfbb51",
+    "type": "object",
+    "name": "The flatboat",
+    "at": [
+     "01a1b17c-f4a2-7a89-8637-b99340e80005"
+    ],
+    "by": "its own link to The Mississippi"
+   },
+   {
+    "id": "01a1b17c-f4a2-726a-bdbb-9a06c16301cc",
+    "type": "language",
+    "name": "Tongues he has not heard before",
+    "at": [
+     "01a1b17c-f4a2-7454-9ea7-4856206d416f"
+    ],
+    "by": "the text is at New Orleans when chapter 3 first names it"
+   },
+   {
+    "id": "01a1b17c-f4a2-7e26-b3e6-a269378df0ad",
+    "type": "event",
+    "name": "He is shot",
+    "at": [
+     "01a1b17c-f4a2-7dca-96c5-0b632d1470db"
+    ],
+    "by": "its own link to The tavern"
+   },
+   {
+    "id": "01a1b17c-f4a2-7356-9658-ae45fbcf422f",
+    "type": "character",
+    "name": "The Maltese boatswain",
+    "at": [
+     "01a1b17c-f4a2-71f1-b262-2b8c29d295c4"
+    ],
+    "by": "the text is at The room above the courtyard when chapter 4 first names it"
+   },
+   {
+    "id": "01a1b17c-f4a2-7d82-a875-b7459bc8ec47",
+    "type": "character",
+    "name": "The tavernkeeper’s wife",
+    "at": [
+     "01a1b17c-f4a2-7dca-96c5-0b632d1470db"
+    ],
+    "by": "its location, The tavern"
+   },
+   {
+    "id": "01a1b17c-f4a2-77d6-9f7e-2bc38d4eaf6c",
+    "type": "object",
+    "name": "The small pistol",
+    "at": [
+     "01a1b17c-f4a2-71f1-b262-2b8c29d295c4"
+    ],
+    "by": "the text is at The room above the courtyard when chapter 4 first names it"
+   },
+   {
+    "id": "01a1b17c-f4a2-7cca-ae75-ca7fef9dd348",
+    "type": "object",
+    "name": "The boat for Texas",
+    "at": [
+     "01a1b17c-f4a2-71f1-b262-2b8c29d295c4"
+    ],
+    "by": "the text is at The room above the courtyard when chapter 4 first names it"
+   },
+   {
+    "id": "01a1b17c-f4a2-7515-9428-57a387101cff",
+    "type": "collective",
+    "name": "The sailors",
+    "at": [
+     "01a1b17c-f4a2-71f1-b262-2b8c29d295c4"
+    ],
+    "by": "the text is at The room above the courtyard when chapter 4 first names it"
+   },
+   {
+    "id": "01a1b17c-f4a2-7034-8d0a-dc8741f2d5f6",
+    "type": "ability",
+    "name": "Fighting",
+    "at": [
+     "01a1b17c-f4a2-71f1-b262-2b8c29d295c4"
+    ],
+    "by": "the text is at The room above the courtyard when chapter 4 first names it"
+   },
+   {
+    "id": "01a1b17c-f4a2-7f49-a60c-64e3bf155017",
+    "type": "relation",
+    "name": "The tavernkeeper’s wife and the kid",
+    "at": [
+     "01a1b17c-f4a2-71f1-b262-2b8c29d295c4"
+    ],
+    "by": "its own link to The room above the courtyard"
+   },
+   {
+    "id": "01a1b17c-f4a2-7c1a-b2bc-f75ddd28203a",
+    "type": "event",
+    "name": "The hanging of the parricide",
+    "at": [
+     "01a1b17c-f4a2-79a4-8914-fe056b1676d8"
+    ],
+    "by": "the text is at Galveston when chapter 6 first names it"
+   },
+   {
+    "id": "01a196ba-bfa4-76e6-af1b-cf0c8cf57ece",
+    "type": "event",
+    "name": "The mule taken as pay",
+    "at": [
+     "01a13c6f-879d-732e-af8c-32cf00051da0"
+    ],
+    "by": "the text is at Nacogdoches when chapter 6 first names it"
+   },
+   {
+    "id": "01a1942b-4bac-7b33-9c8a-5aa8192294a4",
+    "type": "event",
+    "name": "He rides up",
+    "at": [
+     "01a19651-8e95-7e9b-ad93-568b9bae4347",
+     "01a19651-8e95-74a2-8a5e-31dec2d0289b",
+     "01a13c6f-879d-732e-af8c-32cf00051da0"
+    ],
+    "by": "its own link to The sawmill, The diphtheria pesthouse, Nacogdoches"
+   },
+   {
+    "id": "01a1b17c-f4a2-76be-9268-ea351280ffc0",
+    "type": "character",
+    "name": "The parricide",
+    "at": [
+     "01a1b17c-f4a2-79a4-8914-fe056b1676d8"
+    ],
+    "by": "the text is at Galveston when chapter 6 first names it"
+   },
+   {
+    "id": "01a19651-8e95-70d5-9292-727e49426b59",
+    "type": "character",
+    "name": "The farmer",
+    "at": [
+     "01a19651-8e95-74a2-8a5e-31dec2d0289b"
+    ],
+    "by": "the text is at The diphtheria pesthouse when chapter 6 first names it"
+   },
+   {
+    "id": "01a1b17c-f4a2-7c16-a1cb-0fc6f2fd9850",
+    "type": "object",
+    "name": "The lighter",
+    "at": [
+     "01a1b17c-f4a2-79a4-8914-fe056b1676d8"
+    ],
+    "by": "first named in k6 before its text names a place: at Galveston, where the scene opens"
+   },
+   {
+    "id": "01a19651-8e95-7edb-804a-771356a47c1c",
+    "type": "creature",
+    "name": "The aged mule",
+    "at": [
+     "01a19651-8e95-74a2-8a5e-31dec2d0289b"
+    ],
+    "by": "the text is at The diphtheria pesthouse when chapter 6 first names it"
+   },
+   {
+    "id": "01a1942b-4ca1-78aa-aad3-76d88f2c50da",
+    "type": "institution",
+    "name": "The republic of Fredonia",
+    "at": [
+     "01a19651-8e95-74a2-8a5e-31dec2d0289b"
+    ],
+    "by": "the text is at The diphtheria pesthouse when chapter 6 first names it"
+   },
+   {
+    "id": "01a1b17c-f4a2-7f5b-be0a-3228ae4870ab",
+    "type": "collective",
+    "name": "The passengers",
+    "at": [
+     "01a1b17c-f4a2-79a4-8914-fe056b1676d8"
+    ],
+    "by": "first named in k6 before its text names a place: at Galveston, where the scene opens"
+   }
+  ],
+  "hero": {
+   "id": "01a13c6f-8746-7bfa-8ed6-f1f5a91bbe82",
+   "type": "character",
+   "name": "The Kid",
+   "at": [
+    "01a13c6f-879d-732e-af8c-32cf00051da0"
+   ],
+   "by": "the hero: at the last place the text reaches, Nacogdoches"
+  }
+ },
+ "want": {
+  "map": {
+   "width": 4062,
+   "height": 5276,
+   "depth": 900
+  },
+  "pins": [
+   {
+    "element_type": "character",
+    "element_id": "01a13c6f-8746-7bfa-8ed6-f1f5a91bbe82",
+    "name": "The Kid",
+    "x": 931,
+    "y": 1483,
+    "z": 240,
+    "by": "the hero: at the last place the text reaches, Nacogdoches; tier people and the living; 1 of 2 on the spiral round it"
+   },
+   {
+    "element_type": "location",
+    "element_id": "01a13c6f-879d-732e-af8c-32cf00051da0",
+    "name": "Nacogdoches",
+    "x": 791,
+    "y": 1483,
+    "z": 0,
+    "by": "its pin on The way south, 1847-49 (491, 1183; its order 5), plus the 300 px margin"
+   },
+   {
+    "element_type": "object",
+    "element_id": "01a1942b-4326-74f7-a0e4-0cb350016b64",
+    "name": "The linen shirt",
+    "x": 3206,
+    "y": 3028,
+    "z": 0,
+    "by": "first named in k1 before its text names a place: at The scullery, where the scene opens; tier ground: places and things; 1 of 19 on the spiral round it"
+   },
+   {
+    "element_type": "phenomenon",
+    "element_id": "01a1942b-4414-702f-b59c-9bc3f6ea8bff",
+    "name": "The scullery fire",
+    "x": 2881,
+    "y": 3104,
+    "z": 720,
+    "by": "its own link to The scullery; tier told or abstract; 10 of 19 on the spiral round it"
+   },
+   {
+    "element_type": "zone",
+    "element_id": "01a1942b-44f3-75ec-a796-264ec4397974",
+    "name": "The fields with rags of snow",
+    "x": 2948,
+    "y": 3136,
+    "z": 0,
+    "by": "the text is at The scullery when chapter 1 first names it; tier ground: places and things; 2 of 19 on the spiral round it"
+   },
+   {
+    "element_type": "creature",
+    "element_id": "01a1942b-45d6-79db-bcae-9a3dc391cda1",
+    "name": "The last wolves",
+    "x": 3081,
+    "y": 2860,
+    "z": 240,
+    "by": "the text is at The scullery when chapter 1 first names it; tier people and the living; 3 of 19 on the spiral round it"
+   },
+   {
+    "element_type": "family",
+    "element_id": "01a1942b-46bb-705c-8f42-4a93ea62e8cd",
+    "name": "The kid's folk",
+    "x": 3152,
+    "y": 2844,
+    "z": 720,
+    "by": "the text is at The scullery when chapter 1 first names it; tier told or abstract; 11 of 19 on the spiral round it"
+   },
+   {
+    "element_type": "ability",
+    "element_id": "01a1942b-47a5-744f-a7ef-ca1b0e4dea2e",
+    "name": "Hewing wood and drawing water",
+    "x": 3128,
+    "y": 3225,
+    "z": 720,
+    "by": "the text is at The scullery when chapter 1 first names it; tier told or abstract; 12 of 19 on the spiral round it"
+   },
+   {
+    "element_type": "relation",
+    "element_id": "01a1942b-48be-7a76-bd9a-dce83f8a84de",
+    "name": "The kid and his father",
+    "x": 2885,
+    "y": 2923,
+    "z": 720,
+    "by": "the text is at The scullery when chapter 1 first names it; tier told or abstract; 13 of 19 on the spiral round it"
+   },
+   {
+    "element_type": "construct",
+    "element_id": "01a1942b-49d8-7083-8b3d-528732460e33",
+    "name": "The schoolmaster",
+    "x": 3273,
+    "y": 2982,
+    "z": 720,
+    "by": "the text is at The scullery when chapter 1 first names it; tier told or abstract; 14 of 19 on the spiral round it"
+   },
+   {
+    "element_type": "language",
+    "element_id": "01a1942b-4ac1-7ca0-b465-9a9383d22e05",
+    "name": "The lost poets' tongue",
+    "x": 2942,
+    "y": 3204,
+    "z": 720,
+    "by": "the text is at The scullery when chapter 1 first names it; tier told or abstract; 15 of 19 on the spiral round it"
+   },
+   {
+    "element_type": "event",
+    "element_id": "01a1942b-4bac-7b33-9c8a-5aa8192294a4",
+    "name": "He rides up",
+    "x": 789,
+    "y": 992,
+    "z": 480,
+    "by": "its own link to The sawmill, The diphtheria pesthouse, Nacogdoches; tier what happened; 3 of 4 on the spiral round it"
+   },
+   {
+    "element_type": "institution",
+    "element_id": "01a1942b-4ca1-78aa-aad3-76d88f2c50da",
+    "name": "The republic of Fredonia",
+    "x": 880,
+    "y": 1299,
+    "z": 720,
+    "by": "the text is at The diphtheria pesthouse when chapter 6 first names it; tier told or abstract; 4 of 4 on the spiral round it"
+   },
+   {
+    "element_type": "character",
+    "element_id": "01a19651-8e95-70d5-9292-727e49426b59",
+    "name": "The farmer",
+    "x": 914,
+    "y": 1160,
+    "z": 240,
+    "by": "the text is at The diphtheria pesthouse when chapter 6 first names it; tier people and the living; 1 of 4 on the spiral round it"
+   },
+   {
+    "element_type": "location",
+    "element_id": "01a19651-8e95-74a2-8a5e-31dec2d0289b",
+    "name": "The diphtheria pesthouse",
+    "x": 774,
+    "y": 1160,
+    "z": 0,
+    "by": "no pin: between Galveston and Nacogdoches (the text names it before Nacogdoches)"
+   },
+   {
+    "element_type": "location",
+    "element_id": "01a19651-8e95-7e9b-ad93-568b9bae4347",
+    "name": "The sawmill",
+    "x": 757,
+    "y": 836,
+    "z": 0,
+    "by": "no pin: between Galveston and Nacogdoches (the text names it before Nacogdoches)"
+   },
+   {
+    "element_type": "creature",
+    "element_id": "01a19651-8e95-7edb-804a-771356a47c1c",
+    "name": "The aged mule",
+    "x": 656,
+    "y": 1268,
+    "z": 240,
+    "by": "the text is at The diphtheria pesthouse when chapter 6 first names it; tier people and the living; 2 of 4 on the spiral round it"
+   },
+   {
+    "element_type": "character",
+    "element_id": "01a196ba-bfa4-710c-be61-e340492adb68",
+    "name": "The kid's father",
+    "x": 3172,
+    "y": 3167,
+    "z": 240,
+    "by": "the text is at The scullery when chapter 1 first names it; tier people and the living; 4 of 19 on the spiral round it"
+   },
+   {
+    "element_type": "event",
+    "element_id": "01a196ba-bfa4-76e6-af1b-cf0c8cf57ece",
+    "name": "The mule taken as pay",
+    "x": 673,
+    "y": 1591,
+    "z": 480,
+    "by": "the text is at Nacogdoches when chapter 6 first names it; tier what happened; 2 of 2 on the spiral round it"
+   },
+   {
+    "element_type": "trait",
+    "element_id": "01a196ba-bfa4-7862-aa9e-78b6d17cd52b",
+    "name": "Lies in drink",
+    "x": 3038,
+    "y": 2812,
+    "z": 720,
+    "by": "the text is at The scullery when chapter 1 first names it; tier told or abstract; 16 of 19 on the spiral round it"
+   },
+   {
+    "element_type": "location",
+    "element_id": "01a196c7-5700-7a30-bc8e-38c2f60ce01c",
+    "name": "The scullery",
+    "x": 3066,
+    "y": 3028,
+    "z": 0,
+    "by": "no pin: between the start and Memphis (the text names it before Memphis); set 600 px east of it (he wanders west as far as Memphis)"
+   },
+   {
+    "element_type": "ability",
+    "element_id": "01a1b17c-f4a2-7034-8d0a-dc8741f2d5f6",
+    "name": "Fighting",
+    "x": 2484,
+    "y": 951,
+    "z": 720,
+    "by": "the text is at The room above the courtyard when chapter 4 first names it; tier told or abstract; 5 of 6 on the spiral round it"
+   },
+   {
+    "element_type": "trait",
+    "element_id": "01a1b17c-f4a2-70ac-9312-73121d80b45c",
+    "name": "Can neither read nor write",
+    "x": 3234,
+    "y": 3170,
+    "z": 720,
+    "by": "first named in k2 before its text names a place: at The scullery, where the scene opens; tier told or abstract; 17 of 19 on the spiral round it"
+   },
+   {
+    "element_type": "character",
+    "element_id": "01a1b17c-f4a2-71da-bb0b-b2081a269062",
+    "name": "The mother",
+    "x": 2889,
+    "y": 2997,
+    "z": 240,
+    "by": "first named in k2 before its text names a place: at The scullery, where the scene opens; tier people and the living; 5 of 19 on the spiral round it"
+   },
+   {
+    "element_type": "location",
+    "element_id": "01a1b17c-f4a2-71f1-b262-2b8c29d295c4",
+    "name": "The room above the courtyard",
+    "x": 2661,
+    "y": 982,
+    "z": 0,
+    "by": "no pin: inside The tavern (its parent_location), beside it"
+   },
+   {
+    "element_type": "language",
+    "element_id": "01a1b17c-f4a2-726a-bdbb-9a06c16301cc",
+    "name": "Tongues he has not heard before",
+    "x": 2603,
+    "y": 784,
+    "z": 720,
+    "by": "the text is at New Orleans when chapter 3 first names it; tier told or abstract; 1 of 1 on the spiral round it"
+   },
+   {
+    "element_type": "phenomenon",
+    "element_id": "01a1b17c-f4a2-72b4-8e0d-77dde9a35d52",
+    "name": "The Leonids",
+    "x": 2844,
+    "y": 3037,
+    "z": 720,
+    "by": "first named in k2 before its text names a place: at The scullery, where the scene opens; tier told or abstract; 18 of 19 on the spiral round it"
+   },
+   {
+    "element_type": "event",
+    "element_id": "01a1b17c-f4a2-7350-999b-c2555947a762",
+    "name": "The night of his birth",
+    "x": 3017,
+    "y": 3211,
+    "z": 480,
+    "by": "first named in k2 before its text names a place: at The scullery, where the scene opens; tier what happened; 7 of 19 on the spiral round it"
+   },
+   {
+    "element_type": "character",
+    "element_id": "01a1b17c-f4a2-7356-9658-ae45fbcf422f",
+    "name": "The Maltese boatswain",
+    "x": 2676,
+    "y": 814,
+    "z": 240,
+    "by": "the text is at The room above the courtyard when chapter 4 first names it; tier people and the living; 3 of 6 on the spiral round it"
+   },
+   {
+    "element_type": "location",
+    "element_id": "01a1b17c-f4a2-740c-8e45-525cf7d16ec5",
+    "name": "Memphis",
+    "x": 2466,
+    "y": 3028,
+    "z": 0,
+    "by": "its pin on The way south, 1847-49 (2166, 2728; its order 1), plus the 300 px margin"
+   },
+   {
+    "element_type": "location",
+    "element_id": "01a1b17c-f4a2-7454-9ea7-4856206d416f",
+    "name": "New Orleans",
+    "x": 2463,
+    "y": 784,
+    "z": 0,
+    "by": "its pin on The way south, 1847-49 (2163, 484; its order 3), plus the 300 px margin"
+   },
+   {
+    "element_type": "event",
+    "element_id": "01a1b17c-f4a2-7489-a9ed-082be5ffbc36",
+    "name": "He runs away",
+    "x": 2977,
+    "y": 2857,
+    "z": 480,
+    "by": "its own link to The scullery; tier what happened; 8 of 19 on the spiral round it"
+   },
+   {
+    "element_type": "collective",
+    "element_id": "01a1b17c-f4a2-7515-9428-57a387101cff",
+    "name": "The sailors",
+    "x": 2767,
+    "y": 1121,
+    "z": 240,
+    "by": "the text is at The room above the courtyard when chapter 4 first names it; tier people and the living; 4 of 6 on the spiral round it"
+   },
+   {
+    "element_type": "location",
+    "element_id": "01a1b17c-f4a2-75a6-b5f9-e33e59812c5d",
+    "name": "Saint Louis",
+    "x": 2418,
+    "y": 4613,
+    "z": 0,
+    "by": "its pin on The way south, 1847-49 (2118, 4313; its order 2), plus the 300 px margin"
+   },
+   {
+    "element_type": "object",
+    "element_id": "01a1b17c-f4a2-75cf-b2c9-b6b27fbfbb51",
+    "name": "The flatboat",
+    "x": 2580,
+    "y": 2698,
+    "z": 0,
+    "by": "its own link to The Mississippi; tier ground: places and things; 1 of 2 on the spiral round it"
+   },
+   {
+    "element_type": "character",
+    "element_id": "01a1b17c-f4a2-76be-9268-ea351280ffc0",
+    "name": "The parricide",
+    "x": 622,
+    "y": 621,
+    "z": 240,
+    "by": "the text is at Galveston when chapter 6 first names it; tier people and the living; 2 of 4 on the spiral round it"
+   },
+   {
+    "element_type": "object",
+    "element_id": "01a1b17c-f4a2-77d6-9f7e-2bc38d4eaf6c",
+    "name": "The small pistol",
+    "x": 2801,
+    "y": 982,
+    "z": 0,
+    "by": "the text is at The room above the courtyard when chapter 4 first names it; tier ground: places and things; 1 of 6 on the spiral round it"
+   },
+   {
+    "element_type": "event",
+    "element_id": "01a1b17c-f4a2-78fa-8fb2-d1abbbd3ee43",
+    "name": "Forty-two days on the river",
+    "x": 2322,
+    "y": 2806,
+    "z": 480,
+    "by": "its own link to Saint Louis, The Mississippi, New Orleans; tier what happened; 2 of 2 on the spiral round it"
+   },
+   {
+    "element_type": "location",
+    "element_id": "01a1b17c-f4a2-79a4-8914-fe056b1676d8",
+    "name": "Galveston",
+    "x": 740,
+    "y": 513,
+    "z": 0,
+    "by": "its pin on The way south, 1847-49 (440, 213; its order 4), plus the 300 px margin"
+   },
+   {
+    "element_type": "location",
+    "element_id": "01a1b17c-f4a2-7a89-8637-b99340e80005",
+    "name": "The Mississippi",
+    "x": 2440,
+    "y": 2698,
+    "z": 0,
+    "by": "no pin: between Saint Louis and New Orleans (the event 'Forty-two days on the river' lists it between them)"
+   },
+   {
+    "element_type": "object",
+    "element_id": "01a1b17c-f4a2-7c16-a1cb-0fc6f2fd9850",
+    "name": "The lighter",
+    "x": 880,
+    "y": 513,
+    "z": 0,
+    "by": "first named in k6 before its text names a place: at Galveston, where the scene opens; tier ground: places and things; 1 of 4 on the spiral round it"
+   },
+   {
+    "element_type": "event",
+    "element_id": "01a1b17c-f4a2-7c1a-b2bc-f75ddd28203a",
+    "name": "The hanging of the parricide",
+    "x": 846,
+    "y": 652,
+    "z": 480,
+    "by": "the text is at Galveston when chapter 6 first names it; tier what happened; 4 of 4 on the spiral round it"
+   },
+   {
+    "element_type": "character",
+    "element_id": "01a1b17c-f4a2-7c71-b461-0ef234ecd7b1",
+    "name": "The sister",
+    "x": 3222,
+    "y": 2929,
+    "z": 240,
+    "by": "first named in k2 before its text names a place: at The scullery, where the scene opens; tier people and the living; 6 of 19 on the spiral round it"
+   },
+   {
+    "element_type": "object",
+    "element_id": "01a1b17c-f4a2-7cca-ae75-ca7fef9dd348",
+    "name": "The boat for Texas",
+    "x": 2543,
+    "y": 1090,
+    "z": 0,
+    "by": "the text is at The room above the courtyard when chapter 4 first names it; tier ground: places and things; 2 of 6 on the spiral round it"
+   },
+   {
+    "element_type": "event",
+    "element_id": "01a1b17c-f4a2-7d32-a779-9032d5fb9dc2",
+    "name": "The mother's death",
+    "x": 3251,
+    "y": 3095,
+    "z": 480,
+    "by": "first named in k2 before its text names a place: at The scullery, where the scene opens; tier what happened; 9 of 19 on the spiral round it"
+   },
+   {
+    "element_type": "trait",
+    "element_id": "01a1b17c-f4a2-7d37-889f-a9ecd3a5b6c2",
+    "name": "A taste for mindless violence",
+    "x": 3225,
+    "y": 2869,
+    "z": 720,
+    "by": "first named in k2 before its text names a place: at The scullery, where the scene opens; tier told or abstract; 19 of 19 on the spiral round it"
+   },
+   {
+    "element_type": "character",
+    "element_id": "01a1b17c-f4a2-7d82-a875-b7459bc8ec47",
+    "name": "The tavernkeeper’s wife",
+    "x": 2702,
+    "y": 883,
+    "z": 240,
+    "by": "its location, The tavern; tier people and the living; 1 of 2 on the spiral round it"
+   },
+   {
+    "element_type": "location",
+    "element_id": "01a1b17c-f4a2-7dca-96c5-0b632d1470db",
+    "name": "The tavern",
+    "x": 2562,
+    "y": 883,
+    "z": 0,
+    "by": "no pin: inside New Orleans (its parent_location), beside it"
+   },
+   {
+    "element_type": "event",
+    "element_id": "01a1b17c-f4a2-7e26-b3e6-a269378df0ad",
+    "name": "He is shot",
+    "x": 2444,
+    "y": 991,
+    "z": 480,
+    "by": "its own link to The tavern; tier what happened; 2 of 2 on the spiral round it"
+   },
+   {
+    "element_type": "relation",
+    "element_id": "01a1b17c-f4a2-7f49-a60c-64e3bf155017",
+    "name": "The tavernkeeper’s wife and the kid",
+    "x": 2817,
+    "y": 883,
+    "z": 720,
+    "by": "its own link to The room above the courtyard; tier told or abstract; 6 of 6 on the spiral round it"
+   },
+   {
+    "element_type": "collective",
+    "element_id": "01a1b17c-f4a2-7f5b-be0a-3228ae4870ab",
+    "name": "The passengers",
+    "x": 755,
+    "y": 345,
+    "z": 240,
+    "by": "first named in k6 before its text names a place: at Galveston, where the scene opens; tier people and the living; 3 of 4 on the spiral round it"
+   }
+  ],
+  "route": [
+   [
+    3066,
+    3028,
+    0
+   ],
+   [
+    2466,
+    3028,
+    0
+   ],
+   [
+    2418,
+    4613,
+    0
+   ],
+   [
+    2440,
+    2698,
+    0
+   ],
+   [
+    2463,
+    784,
+    0
+   ],
+   [
+    2562,
+    883,
+    0
+   ],
+   [
+    2661,
+    982,
+    0
+   ],
+   [
+    740,
+    513,
+    0
+   ],
+   [
+    757,
+    836,
+    0
+   ],
+   [
+    774,
+    1160,
+    0
+   ],
+   [
+    791,
+    1483,
+    0
+   ]
+  ]
+ },
+ "cases": [
+  {
+   "name": "the hero stands first on its spiral, whatever its tier and id",
+   "input": {
+    "ground": {
+     "width": 1000,
+     "height": 1000
+    },
+    "margin": 0,
+    "depth": 900,
+    "places": [
+     {
+      "id": "p",
+      "type": "location",
+      "name": "P",
+      "pin": [
+       500,
+       500
+      ]
+     }
+    ],
+    "hangers": [
+     {
+      "id": "a-thing",
+      "type": "object",
+      "name": "A thing",
+      "at": [
+       "p"
+      ]
+     }
+    ],
+    "hero": {
+     "id": "z-hero",
+     "type": "character",
+     "name": "Z",
+     "at": [
+      "p"
+     ]
+    }
+   },
+   "want": {
+    "map": {
+     "width": 1000,
+     "height": 1000,
+     "depth": 900
+    },
+    "pins": [
+     {
+      "element_type": "object",
+      "element_id": "a-thing",
+      "name": "A thing",
+      "x": 382,
+      "y": 608,
+      "z": 0,
+      "by": "tier ground: places and things; 2 of 2 on the spiral round it"
+     },
+     {
+      "element_type": "location",
+      "element_id": "p",
+      "name": "P",
+      "x": 500,
+      "y": 500,
+      "z": 0,
+      "by": "its pin on the ground (500, 500), plus the 0 px margin"
+     },
+     {
+      "element_type": "character",
+      "element_id": "z-hero",
+      "name": "Z",
+      "x": 640,
+      "y": 500,
+      "z": 240,
+      "by": "tier people and the living; 1 of 2 on the spiral round it"
+     }
+    ],
+    "route": [
+     [
+      500,
+      500,
+      0
+     ]
+    ],
+    "nudged": 0,
+    "clamped": 0
+   }
+  },
+  {
+   "name": "places inside one parent sit on its ring by id, not by travel order",
+   "input": {
+    "ground": {
+     "width": 1000,
+     "height": 1000
+    },
+    "margin": 0,
+    "depth": 900,
+    "places": [
+     {
+      "id": "p",
+      "type": "location",
+      "name": "P",
+      "pin": [
+       500,
+       500
+      ]
+     },
+     {
+      "id": "c-b",
+      "type": "location",
+      "name": "B",
+      "parent": "p"
+     },
+     {
+      "id": "c-a",
+      "type": "location",
+      "name": "A",
+      "parent": "p"
+     }
+    ],
+    "hangers": []
+   },
+   "want": {
+    "map": {
+     "width": 1000,
+     "height": 1000,
+     "depth": 900
+    },
+    "pins": [
+     {
+      "element_type": "location",
+      "element_id": "c-a",
+      "name": "A",
+      "x": 599,
+      "y": 599,
+      "z": 0,
+      "by": "no pin: inside P (its parent_location), beside it"
+     },
+     {
+      "element_type": "location",
+      "element_id": "c-b",
+      "name": "B",
+      "x": 401,
+      "y": 401,
+      "z": 0,
+      "by": "no pin: inside P (its parent_location), beside it"
+     },
+     {
+      "element_type": "location",
+      "element_id": "p",
+      "name": "P",
+      "x": 500,
+      "y": 500,
+      "z": 0,
+      "by": "its pin on the ground (500, 500), plus the 0 px margin"
+     }
+    ],
+    "route": [
+     [
+      500,
+      500,
+      0
+     ],
+     [
+      401,
+      401,
+      0
+     ],
+     [
+      599,
+      599,
+      0
+     ]
+    ],
+    "nudged": 0,
+    "clamped": 0
+   }
+  },
+  {
+   "name": "a taken point moves one pixel along x, the later id moving",
+   "input": {
+    "ground": {
+     "width": 100,
+     "height": 100
+    },
+    "margin": 0,
+    "depth": 10,
+    "places": [
+     {
+      "id": "b",
+      "type": "location",
+      "name": "B",
+      "pin": [
+       10,
+       10
+      ]
+     },
+     {
+      "id": "a",
+      "type": "location",
+      "name": "A",
+      "pin": [
+       10,
+       10
+      ]
+     },
+     {
+      "id": "c",
+      "type": "location",
+      "name": "C",
+      "pin": [
+       10,
+       10
+      ]
+     }
+    ],
+    "hangers": []
+   },
+   "want": {
+    "map": {
+     "width": 100,
+     "height": 100,
+     "depth": 10
+    },
+    "pins": [
+     {
+      "element_type": "location",
+      "element_id": "a",
+      "name": "A",
+      "x": 10,
+      "y": 10,
+      "z": 0,
+      "by": "its pin on the ground (10, 10), plus the 0 px margin"
+     },
+     {
+      "element_type": "location",
+      "element_id": "b",
+      "name": "B",
+      "x": 11,
+      "y": 10,
+      "z": 0,
+      "by": "its pin on the ground (10, 10), plus the 0 px margin"
+     },
+     {
+      "element_type": "location",
+      "element_id": "c",
+      "name": "C",
+      "x": 9,
+      "y": 10,
+      "z": 0,
+      "by": "its pin on the ground (10, 10), plus the 0 px margin"
+     }
+    ],
+    "route": [
+     [
+      10,
+      10,
+      0
+     ],
+     [
+      10,
+      10,
+      0
+     ],
+     [
+      10,
+      10,
+      0
+     ]
+    ],
+    "nudged": 3,
+    "clamped": 0
+   }
+  },
+  {
+   "name": "a point past the frame comes back to its edge",
+   "input": {
+    "ground": {
+     "width": 100,
+     "height": 100
+    },
+    "margin": 0,
+    "depth": 10,
+    "places": [
+     {
+      "id": "a",
+      "type": "location",
+      "name": "A",
+      "pin": [
+       150,
+       -20
+      ]
+     }
+    ],
+    "hangers": []
+   },
+   "want": {
+    "map": {
+     "width": 100,
+     "height": 100,
+     "depth": 10
+    },
+    "pins": [
+     {
+      "element_type": "location",
+      "element_id": "a",
+      "name": "A",
+      "x": 100,
+      "y": 0,
+      "z": 0,
+      "by": "its pin on the ground (150, -20), plus the 0 px margin"
+     }
+    ],
+    "route": [
+     [
+      150,
+      -20,
+      0
+     ]
+    ],
+    "nudged": 0,
+    "clamped": 2
+   }
+  },
+  {
+   "name": "halfway rounds to even",
+   "input": {
+    "ground": {
+     "width": 100,
+     "height": 100
+    },
+    "margin": 0,
+    "depth": 10,
+    "places": [
+     {
+      "id": "a",
+      "type": "location",
+      "name": "A",
+      "pin": [
+       0,
+       0
+      ]
+     },
+     {
+      "id": "m",
+      "type": "location",
+      "name": "M",
+      "between": [
+       "a",
+       "b"
+      ],
+      "by": "halfway"
+     },
+     {
+      "id": "b",
+      "type": "location",
+      "name": "B",
+      "pin": [
+       5,
+       7
+      ]
+     }
+    ],
+    "hangers": []
+   },
+   "want": {
+    "map": {
+     "width": 100,
+     "height": 100,
+     "depth": 10
+    },
+    "pins": [
+     {
+      "element_type": "location",
+      "element_id": "a",
+      "name": "A",
+      "x": 0,
+      "y": 0,
+      "z": 0,
+      "by": "its pin on the ground (0, 0), plus the 0 px margin"
+     },
+     {
+      "element_type": "location",
+      "element_id": "b",
+      "name": "B",
+      "x": 5,
+      "y": 7,
+      "z": 0,
+      "by": "its pin on the ground (5, 7), plus the 0 px margin"
+     },
+     {
+      "element_type": "location",
+      "element_id": "m",
+      "name": "M",
+      "x": 2,
+      "y": 4,
+      "z": 0,
+      "by": "no pin: between A and B (halfway)"
+     }
+    ],
+    "route": [
+     [
+      0,
+      0,
+      0
+     ],
+     [
+      2,
+      4,
+      0
+     ],
+     [
+      5,
+      7,
+      0
+     ]
+    ],
+    "nudged": 0,
+    "clamped": 0
+   }
+  },
+  {
+   "name": "a full row still fits: two on one point in a frame 1 wide",
+   "input": {
+    "ground": {
+     "width": 1,
+     "height": 1
+    },
+    "margin": 0,
+    "depth": 1,
+    "places": [
+     {
+      "id": "a",
+      "type": "location",
+      "name": "A",
+      "pin": [
+       0,
+       0
+      ]
+     },
+     {
+      "id": "b",
+      "type": "location",
+      "name": "B",
+      "pin": [
+       0,
+       0
+      ]
+     }
+    ],
+    "hangers": []
+   },
+   "want": {
+    "map": {
+     "width": 1,
+     "height": 1,
+     "depth": 1
+    },
+    "pins": [
+     {
+      "element_type": "location",
+      "element_id": "a",
+      "name": "A",
+      "x": 0,
+      "y": 0,
+      "z": 0,
+      "by": "its pin on the ground (0, 0), plus the 0 px margin"
+     },
+     {
+      "element_type": "location",
+      "element_id": "b",
+      "name": "B",
+      "x": 1,
+      "y": 0,
+      "z": 0,
+      "by": "its pin on the ground (0, 0), plus the 0 px margin"
+     }
+    ],
+    "route": [
+     [
+      0,
+      0,
+      0
+     ],
+     [
+      0,
+      0,
+      0
+     ]
+    ],
+    "nudged": 1,
+    "clamped": 0
+   }
+  },
+  {
+   "name": "a row with no free point left is refused",
+   "input": {
+    "ground": {
+     "width": 1,
+     "height": 1
+    },
+    "margin": 0,
+    "depth": 1,
+    "places": [
+     {
+      "id": "a",
+      "type": "location",
+      "name": "A",
+      "pin": [
+       0,
+       0
+      ]
+     },
+     {
+      "id": "b",
+      "type": "location",
+      "name": "B",
+      "pin": [
+       0,
+       0
+      ]
+     },
+     {
+      "id": "c",
+      "type": "location",
+      "name": "C",
+      "pin": [
+       0,
+       0
+      ]
+     }
+    ],
+    "hangers": []
+   },
+   "refuse": "no free point left for C (c) on its row (y 0, z 0): the frame is 1 wide"
+  },
+  {
+   "name": "a pin of whole floats reads as whole numbers in its words",
+   "input": {
+    "ground": {
+     "width": 10,
+     "height": 10
+    },
+    "margin": 0,
+    "depth": 1,
+    "places": [
+     {
+      "id": "a",
+      "type": "location",
+      "name": "A",
+      "pin": [
+       7.0,
+       3.0
+      ]
+     }
+    ],
+    "hangers": []
+   },
+   "want": {
+    "map": {
+     "width": 10,
+     "height": 10,
+     "depth": 1
+    },
+    "pins": [
+     {
+      "element_type": "location",
+      "element_id": "a",
+      "name": "A",
+      "x": 7,
+      "y": 3,
+      "z": 0,
+      "by": "its pin on the ground (7, 3), plus the 0 px margin"
+     }
+    ],
+    "route": [
+     [
+      7,
+      3,
+      0
+     ]
+    ],
+    "nudged": 0,
+    "clamped": 0
+   }
+  }
+ ]
+}
