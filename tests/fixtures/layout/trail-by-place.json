@@ -2,6 +2,7 @@
  "about": "trail-by-place on Blood Meridian (world 721d154b): the input is what the world's own reading computes (places in travel order, what hangs where), the want is the frame, pins and route of the reference run that laid it out (the caller's words in `by` as in the input; the method's own words after them).",
  "input": {
   "ground": {
+   "map": "01a1b2d8-cf2d-7cef-a8c5-ef2da3662ca8",
    "width": 3462,
    "height": 4676
   },

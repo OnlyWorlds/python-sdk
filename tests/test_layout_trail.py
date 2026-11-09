@@ -16,7 +16,7 @@ import pytest
 from onlyworlds import TRAIL_TIERS, map_space, trail_by_place
 
 FIXTURE = Path(__file__).resolve().parent / "fixtures" / "layout" / "trail-by-place.json"
-FIXTURE_SHA = "da0c565f6a12debd"
+FIXTURE_SHA = "546ca817f7f74f81"
 BYTES = FIXTURE.read_bytes()
 FX: dict[str, Any] = json.loads(BYTES.decode("utf-8"))
 
@@ -66,7 +66,15 @@ def test_the_recipe_runs_the_layout_again() -> None:
         }
     )
     assert first["recipe"]["method"] == "trail-by-place"
+    assert first["recipe"]["settings"]["ground"] == FX["input"]["ground"]
+    assert isinstance(first["recipe"]["settings"]["ground"]["map"], str)
     assert dumps(again) == dumps(first)
+
+
+def test_a_ground_without_its_map_id_carries_none_in_the_recipe() -> None:
+    inp = copy.deepcopy(FX["input"])
+    del inp["ground"]["map"]
+    assert list(trail_by_place(inp)["recipe"]["settings"]["ground"]) == ["width", "height"]
 
 
 def test_the_order_hangers_come_in_does_not_move_a_point() -> None:
@@ -123,6 +131,8 @@ def _places_with(d: dict[str, Any], key: str) -> list[dict[str, Any]]:
 REFUSALS: list[tuple[str, Callable[[dict[str, Any]], None], str]] = [
     ("ground key", lambda i: i["ground"].update(widht=1), r"ground: unknown key 'widht'"),
     ("top key", lambda i: i.update(spirall={}), r"trail_by_place: unknown key 'spirall'"),
+    ("empty ground map", lambda i: i["ground"].update(map=""), r"ground\.map is the ground Map's element id"),
+    ("number ground map", lambda i: i["ground"].update(map=7), r"ground\.map is the ground Map's element id"),
     ("place key", lambda i: i["places"][1].update(pinn=[0, 0]), r"place 1: unknown key 'pinn'"),
     ("hanger key", lambda i: i["hangers"][0].update(where="x"), r"hanger 0: unknown key 'where'"),
     ("two rules", lambda i: i["places"][1].update(parent=i["places"][0]["id"]), r"it has pin, parent"),

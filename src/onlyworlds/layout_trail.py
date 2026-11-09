@@ -41,7 +41,8 @@ class TrailSpiral(TypedDict):
 class TrailSettings(TypedDict):
     """What a Map's recipe carries, so the layout runs again from the Map alone."""
 
-    ground: dict[str, int]
+    #: The ground map's frame, and ``map``, the ground Map's element id, when the caller gives one.
+    ground: dict[str, Any]
     margin: int
     depth: int
     tiers: list[TrailTier]
@@ -186,7 +187,9 @@ def trail_by_place(input: Mapping[str, Any]) -> TrailLayout:
     g = input.get("ground")
     if not isinstance(g, Mapping):
         raise _fail("no ground")
-    _refuse_unknown("ground", g, ("width", "height"))
+    _refuse_unknown("ground", g, ("map", "width", "height"))
+    if "map" in g and (not isinstance(g["map"], str) or not g["map"]):
+        raise _fail("ground.map is the ground Map's element id, a non-empty string")
     if not _whole_above(g.get("width"), 0) or not _whole_above(g.get("height"), 0):
         raise _fail("the ground's width and height are whole numbers above 0")
     gw, gh = int(g["width"]), int(g["height"])
@@ -398,7 +401,7 @@ def trail_by_place(input: Mapping[str, Any]) -> TrailLayout:
         for p in raw
     ]
     settings: TrailSettings = {
-        "ground": {"width": gw, "height": gh},
+        "ground": {"map": g["map"], "width": gw, "height": gh} if "map" in g else {"width": gw, "height": gh},
         "margin": M,
         "depth": D,
         "tiers": [{"name": t["name"], "z": t["z"], "kinds": list(t["kinds"])} for t in tiers],

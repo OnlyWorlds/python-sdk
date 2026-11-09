@@ -4,6 +4,10 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+## 0.109.0 (2026-11-09)
+
+- `trail_by_place`: the ground Map's element id, `ground.map`, travels in the recipe: given in the input, the recipe's `settings.ground` carries it back as `{map, width, height}`, so a tool reading a laid-out Map finds the picture its pins stand on. Optional; a ground given without it carries none. A `map` that is not a non-empty string is refused. The shared fixture's whole-world case now names its ground map. The same as the npm SDK 4.136.0.
+
 ## 0.108.0 (2026-11-09)
 
 - `trail_by_place(input)`: the first layout method, a world laid out along a route on a ground map, answered as a Map frame (`width`, `height`, `depth`), one Pin per element (whole numbers in the Map's pixels, which `map_space` reads back), the route, and the recipe (`method: "trail-by-place"` and the settings it ran with). The places come in travel order, each at its own pin plus a margin, evenly between two pinned places, or on a ring inside a parent place; every other element hangs on one spiral round the place it belongs to, the hero first, at its floor's height (`TRAIL_TIERS` is the default floors). Nothing shares a place's own point and no two Pins share a point; a row of the frame with no free point left is refused. The method places and does not read: the travel order and what hangs where are the caller's. The input and the recipe are the same JSON as the npm SDK's `trailByPlace` (4.135.1), and the answers agree: the two packages hold one shared fixture by sha256 (a whole world laid out pin for pin and eight small cases) and gave the same answer on 5,000 random inputs. An input it cannot place is a `TypeError` naming what.
