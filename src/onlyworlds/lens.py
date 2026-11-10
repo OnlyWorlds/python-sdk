@@ -79,7 +79,9 @@ class LensReading(TypedDict):
     kept: list[str]
     #: The kept elements as ``show`` makes them, in the same order; an anchor's row carries its ``note``, and only an
     #: anchor the reader can see (a note on one it cannot see goes with the anchor, though another path keeps the
-    #: element); a full row of a hidden element carries ``hidden: true``, as the body is served.
+    #: element); a full row of a hidden element carries ``hidden: true``, as the body is served. A short row
+    #: (``first_line`` or ``name``) carries ``supertype`` and ``subtype`` each only when the served body holds it as a
+    #: string with something left after trimming White_Space, as stored, never trimmed (a known-of stub's too).
     rows: list[dict[str, Any]]
     #: The cut, counted by reason; a reason with no count is absent, and a reader that is not the owner never
     #: carries the owner's two (``anchor_not_visible``, ``not_visible``).
@@ -738,6 +740,10 @@ class _Reading:
             row = copy.deepcopy(b)
         else:
             row = {"id": b.get("id"), "type": b.get("type"), "name": b.get("name")}
+            for field in ("supertype", "subtype"):
+                value = b.get(field)
+                if isinstance(value, str) and value.strip(_WHITE_SPACE) != "":
+                    row[field] = value
             description = b.get("description")
             if show == "first_line" and isinstance(description, str):
                 m = _LINE_BREAK.search(description)

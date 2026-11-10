@@ -2,15 +2,20 @@
   "_what": "The recorded pin for the vendored OnlyWorlds schema distribution (codegen/schema-dist/, copied byte-exact). Do not edit by hand; re-vendor from the pinned tag and review the diff. Kept equal to the npm SDK's pin (github.com/OnlyWorlds/sdk, codegen/schema-pin.json) on purpose: two clients, one schema.",
   "_why_manifest_sha256": "Verifying the tree against its own MANIFEST.json only proves internal consistency. If the tag moved, the manifest moved with it. The hash recorded here is the one first accepted, which is what makes a moved tag visible.",
   "repo": "https://github.com/OnlyWorlds/schema-dist",
-  "tag": "v0.34.0-dist.113",
-  "commit": "e3e249912cb74cbdb7a60e701256bdcc69ab2ac5",
-  "manifest_sha256": "b645c8da0985ccedf538941218f31f922b62fe5ec2d5be14d4d6b2b52dca4478",
+  "tag": "v0.34.0-dist.114",
+  "commit": "428227ab934c3aab35ca50cd92aebd36400faa46",
+  "manifest_sha256": "a42a1d57907f45b0c696db4b86731531903f0c91060b05f9cf7767d43bd5bbea",
   "canonical_version": "00.34.00",
-  "dist_serial": 113,
+  "dist_serial": 114,
   "published": "2026-11-10",
   "pinned_at": "2026-11-10",
-  "pinned_by": "The maintainer: tree from `git archive` of the tag in a schema-dist checkout (206 files: the 205 the MANIFEST lists, and MANIFEST.json itself); files re-hashed against MANIFEST.json by generate_schema.py; MANIFEST self-hash matched against the raw file GitHub serves at the tag, whose ref resolves to the commit above.",
+  "pinned_by": "The maintainer: tree from `git archive` of the tag in a schema-dist checkout (209 files: the 208 the MANIFEST lists, and MANIFEST.json itself); files re-hashed against MANIFEST.json by generate_schema.py; MANIFEST self-hash matched against the raw file GitHub serves at the tag, whose ref resolves to the commit above.",
   "previous_pins": [
+    {
+      "tag": "v0.34.0-dist.113",
+      "manifest_sha256": "b645c8da0985ccedf538941218f31f922b62fe5ec2d5be14d4d6b2b52dca4478",
+      "note": "superseded by v0.34.0-dist.114 (canonical 00.34.00 unchanged, no schema file moved; lens.md's short rows carry supertype and subtype where the served body holds them, lens.fixture.json nine cases more, 210 in all; review.md's rule 5, an object with a key is a mark whatever its keys; report.md's rule 8, a consequences line may name many elements by kind and count; views.json version 2 and its fixture's new cases; room.fixture.json's order sentence)"
+    },
     {
       "tag": "v0.34.0-dist.112",
       "manifest_sha256": "8dc2266f011656225a3a4b61174c4afc6d34b71d6e685912ca357fd6c27f7e7a",

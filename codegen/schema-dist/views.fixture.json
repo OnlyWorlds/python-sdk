@@ -1,9 +1,10 @@
 {
   "views": "views.json",
   "notes": [
-    "Each case: an element as a tool is served it, and what a reader of views.json answers: the row's id (null: no row, the type draws as today), the one sentence (null when no row or no field holds anything), and the banners at the head in order.",
+    "Each case: an element as a tool is served it, and what a reader of views.json answers: the row's id (null: no row, the type draws as today), the one sentence (null when no row or no field holds anything), and the banners at the head in order. A case with an `order` also names the fields drawn, in the order drawn (layouts.document); a reader compares `order` only where a case gives one.",
     "Matching a pair with its mark is the profile's own reader and its own fixture (room.fixture.json, the charter cases); these cases only test which row wins and what a row gives.",
-    "cites: every field a row names (sentence, lead, fold, layout.by), quoted from the page that defines the kind at its line; a reader of this file checks each quote at its line, and that each named field is one the row's type has in the standard."
+    "cites: every field a row names (sentence, lead, fold, layout.by), quoted from the page that defines the kind at its line; a reader of this file checks each quote at its line, and that each named field is one the row's type has in the standard.",
+    "tables: a table that is not views.json, read by the cases that name it and never by any other. `two-rows-one-kind` is at fault on purpose: two rows hold narrative/Message, which a build of the file refuses. It exists only to pin what a page does with such a table: the first row wins, and the page is drawn. `lead-and-fold` is well formed: its one row names `story` in both lead and fold, which no row of views.json does, to pin that such a field is drawn in the lead, once."
   ],
   "cases": [
     {
@@ -423,6 +424,287 @@
           "known_of"
         ]
       }
+    },
+    {
+      "name": "message-served-trimmed-blanks-is-no-banner",
+      "element": {
+        "type": "narrative",
+        "supertype": "Message",
+        "story": "Hello.",
+        "x_served_trimmed": [
+          "",
+          " \t"
+        ]
+      },
+      "expect": {
+        "row": "message",
+        "sentence": "Hello.",
+        "banners": []
+      }
+    },
+    {
+      "name": "message-served-trimmed-one-name-among-blanks",
+      "element": {
+        "type": "narrative",
+        "supertype": "Message",
+        "story": "Hello.",
+        "x_served_trimmed": [
+          " ",
+          "characters"
+        ]
+      },
+      "expect": {
+        "row": "message",
+        "sentence": "Hello.",
+        "banners": [
+          "x_served_trimmed"
+        ]
+      }
+    },
+    {
+      "name": "message-served-trimmed-non-strings-is-no-banner",
+      "element": {
+        "type": "narrative",
+        "supertype": "Message",
+        "story": "Hello.",
+        "x_served_trimmed": [
+          3,
+          null
+        ]
+      },
+      "expect": {
+        "row": "message",
+        "sentence": "Hello.",
+        "banners": []
+      }
+    },
+    {
+      "name": "room-line-own-banner-by-presence-a-number",
+      "element": {
+        "type": "narrative",
+        "supertype": "Message",
+        "story": "Taking this one.",
+        "x_room_of": 7
+      },
+      "expect": {
+        "row": "room-line",
+        "sentence": "Taking this one.",
+        "banners": [
+          "x_room_of"
+        ]
+      }
+    },
+    {
+      "name": "faulty-table-first-row-wins",
+      "table": "two-rows-one-kind",
+      "element": {
+        "type": "narrative",
+        "supertype": "Message",
+        "story": "See you at the gate.",
+        "description": "About the gate"
+      },
+      "expect": {
+        "row": "first",
+        "sentence": "See you at the gate.",
+        "banners": []
+      }
+    },
+    {
+      "name": "message-proposed-object-without-expires",
+      "element": {
+        "type": "narrative",
+        "supertype": "Message",
+        "story": "Hello.",
+        "x_review_proposed": {
+          "by": "0199c3a1-0000-7000-8000-000000000021"
+        }
+      },
+      "expect": {
+        "row": "message",
+        "sentence": "Hello.",
+        "banners": [
+          "x_review_proposed"
+        ]
+      }
+    },
+    {
+      "name": "message-checked-object-with-only-by",
+      "element": {
+        "type": "narrative",
+        "supertype": "Message",
+        "story": "Hello.",
+        "x_review_checked": {
+          "by": "0199c3a1-0000-7000-8000-000000000022"
+        }
+      },
+      "expect": {
+        "row": "message",
+        "sentence": "Hello.",
+        "banners": [
+          "x_review_checked"
+        ]
+      }
+    },
+    {
+      "name": "document-order-report",
+      "element": {
+        "type": "narrative",
+        "supertype": "Report",
+        "subtype": "completed",
+        "name": "The Shrike Temple watch",
+        "x_room_of": "0199c3a1-0000-7000-8000-000000000001",
+        "description": "Kept the watch at the Shrike Temple.\nNothing came.",
+        "consequences": "Moved the watch to the Time Tombs: ow://location/0199c3a1-0000-7000-8000-000000000031",
+        "story": "The whole night, hour by hour.",
+        "start_date": 412,
+        "order": 0,
+        "protagonist": null,
+        "narrator": "   ",
+        "conservator": {},
+        "events": [],
+        "characters": [
+          "0199c3a1-0000-7000-8000-000000000041"
+        ]
+      },
+      "expect": {
+        "row": "report",
+        "sentence": "Kept the watch at the Shrike Temple.",
+        "banners": [],
+        "order": [
+          "description",
+          "consequences",
+          "start_date",
+          "order",
+          "characters",
+          "story"
+        ]
+      }
+    },
+    {
+      "name": "document-empty-lead-and-empty-fold",
+      "element": {
+        "type": "narrative",
+        "supertype": "Report",
+        "subtype": "completed",
+        "name": "The Shrike Temple watch",
+        "x_room_of": "0199c3a1-0000-7000-8000-000000000001",
+        "description": " ",
+        "consequences": "Sol stays at the Sphinx.",
+        "story": "\n ",
+        "locations": [
+          "0199c3a1-0000-7000-8000-000000000051"
+        ]
+      },
+      "expect": {
+        "row": "report",
+        "sentence": null,
+        "banners": [],
+        "order": [
+          "consequences",
+          "locations"
+        ]
+      }
+    },
+    {
+      "name": "document-no-row-draws-the-sections",
+      "element": {
+        "type": "narrative",
+        "supertype": "Chronicle",
+        "name": "The pilgrimage",
+        "description": "Seven pilgrims.",
+        "story": "They set out.",
+        "consequences": "",
+        "characters": [
+          "0199c3a1-0000-7000-8000-000000000061"
+        ]
+      },
+      "expect": {
+        "row": null,
+        "sentence": null,
+        "banners": [],
+        "order": [
+          "story",
+          "characters"
+        ]
+      }
+    },
+    {
+      "name": "conversation-order-message",
+      "element": {
+        "type": "narrative",
+        "supertype": "Message",
+        "story": "Can we meet on Thursday?",
+        "description": "About the mocks",
+        "parent_narrative": "0199c3a1-0000-7000-8000-000000000071",
+        "characters": [
+          "0199c3a1-0000-7000-8000-000000000072"
+        ],
+        "consequences": ""
+      },
+      "expect": {
+        "row": "message",
+        "sentence": "About the mocks",
+        "banners": [],
+        "order": [
+          "story",
+          "parent_narrative",
+          "characters"
+        ]
+      }
+    },
+    {
+      "name": "table-a-field-in-lead-and-fold-drawn-in-the-lead",
+      "table": "lead-and-fold",
+      "element": {
+        "type": "narrative",
+        "supertype": "Report",
+        "name": "The watch",
+        "description": "Kept the watch.",
+        "story": "The whole night.",
+        "characters": [
+          "0199c3a1-0000-7000-8000-000000000081"
+        ]
+      },
+      "expect": {
+        "row": "lead-and-fold",
+        "sentence": "Kept the watch.",
+        "banners": [],
+        "order": [
+          "description",
+          "story",
+          "characters"
+        ]
+      }
+    },
+    {
+      "name": "document-order-mixed-type-character",
+      "element": {
+        "type": "character",
+        "name": "Martin Silenus",
+        "description": "A poet.",
+        "mentality": "",
+        "charisma": 40,
+        "location": "0199c3a1-0000-7000-8000-000000000091",
+        "background": "Born on Old Earth.",
+        "species": [
+          "0199c3a1-0000-7000-8000-000000000092"
+        ],
+        "height": 180,
+        "physicality": "Old, and loud."
+      },
+      "expect": {
+        "row": null,
+        "sentence": null,
+        "banners": [],
+        "order": [
+          "physicality",
+          "height",
+          "species",
+          "background",
+          "location",
+          "charisma"
+        ]
+      }
     }
   ],
   "cites": [
@@ -496,5 +778,114 @@
       "line": 16,
       "quote": "| `parent_narrative` | the message this one answers; a thread is the chain of these |"
     }
-  ]
+  ],
+  "tables": {
+    "two-rows-one-kind": {
+      "banners": [
+        {
+          "mark": "known_of",
+          "defined_by": "onlyworlds.com, not the standard: a known-of stub, known_of: true (the API document, https://www.onlyworlds.com/api/v2/openapi.json)"
+        },
+        {
+          "mark": "hidden",
+          "defined_by": "onlyworlds.com, not the standard: hidden: true, served only to readers who still see the element (the API document, https://www.onlyworlds.com/api/v2/openapi.json)"
+        },
+        {
+          "mark": "x_review_proposed",
+          "defined_by": "profiles/review.md"
+        },
+        {
+          "mark": "x_review_checked",
+          "defined_by": "profiles/review.md"
+        },
+        {
+          "mark": "x_served_trimmed",
+          "defined_by": "onlyworlds.com, not the standard: ids the server left out of a list, the field named (the API document, https://www.onlyworlds.com/api/v2/openapi.json; profiles/message.md reads it)"
+        }
+      ],
+      "rows": [
+        {
+          "id": "first",
+          "kind": {
+            "type": "narrative",
+            "supertype": "Message"
+          },
+          "sentence": [
+            "story"
+          ],
+          "lead": [
+            "story"
+          ],
+          "layout": {
+            "name": "document"
+          }
+        },
+        {
+          "id": "second",
+          "kind": {
+            "type": "narrative",
+            "supertype": "message"
+          },
+          "sentence": [
+            "description"
+          ],
+          "lead": [
+            "description"
+          ],
+          "layout": {
+            "name": "document"
+          }
+        }
+      ]
+    },
+    "lead-and-fold": {
+      "banners": [
+        {
+          "mark": "known_of",
+          "defined_by": "onlyworlds.com, not the standard: a known-of stub, known_of: true (the API document, https://www.onlyworlds.com/api/v2/openapi.json)"
+        },
+        {
+          "mark": "hidden",
+          "defined_by": "onlyworlds.com, not the standard: hidden: true, served only to readers who still see the element (the API document, https://www.onlyworlds.com/api/v2/openapi.json)"
+        },
+        {
+          "mark": "x_review_proposed",
+          "defined_by": "profiles/review.md"
+        },
+        {
+          "mark": "x_review_checked",
+          "defined_by": "profiles/review.md"
+        },
+        {
+          "mark": "x_served_trimmed",
+          "defined_by": "onlyworlds.com, not the standard: ids the server left out of a list, the field named (the API document, https://www.onlyworlds.com/api/v2/openapi.json; profiles/message.md reads it)"
+        }
+      ],
+      "rows": [
+        {
+          "id": "lead-and-fold",
+          "kind": {
+            "type": "narrative",
+            "supertype": "Report"
+          },
+          "sentence": [
+            "description"
+          ],
+          "lead": [
+            "description",
+            "story"
+          ],
+          "fold": [
+            {
+              "field": "story",
+              "label": "The full report"
+            }
+          ],
+          "layout": {
+            "name": "document"
+          }
+        }
+      ]
+    }
+  }
 }

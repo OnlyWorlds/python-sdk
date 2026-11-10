@@ -31,7 +31,7 @@ from onlyworlds._schema import LINK_TARGETS
 
 REPO = Path(__file__).resolve().parent.parent
 FIXTURE = REPO / "codegen" / "schema-dist" / "profiles" / "lens.fixture.json"
-KINDS = {"shape": 6, "keys": 25, "resolve": 102, "invariant": 4, "uses": 5, "graph": 54, "degree": 5}
+KINDS = {"shape": 6, "keys": 25, "resolve": 111, "invariant": 4, "uses": 5, "graph": 54, "degree": 5}
 OWNER = {"rung": "owner"}
 
 
@@ -158,12 +158,28 @@ def test_every_fixture_case_is_answered_as_the_fixture_says() -> None:
             got = {"threw": repr(err)}
         if got != want(c):
             wrong.append(f"{c['kind']}/{c['name']}: gave {got!r}, the fixture says {want(c)!r}")
+        elif _short_row_keys(got) != _short_row_keys(want(c)):
+            wrong.append(
+                f"{c['kind']}/{c['name']}: a short row's keys in {_short_row_keys(got)}, the fixture's in order"
+            )
     print(f"the lens fixture: {len(cases)} cases run, {len(wrong)} disagreeing, from {FIXTURE}")
     for line in wrong:
         print(line)
     assert wrong == []
-    assert len(cases) == 201, f"the fixture holds {len(cases)} cases, serial 104 has 201"
+    assert len(cases) == 210, f"the fixture holds {len(cases)} cases, serial 114 has 210"
     assert Counter(c["kind"] for c in cases) == KINDS
+
+
+def _short_row_keys(out: Mapping[str, Any]) -> list[list[str]]:
+    """The key order of each row holding only a short row's keys (``first_line`` or ``name``), which dict equality
+    does not see: ``id``, ``type``, ``name``, then ``supertype`` and ``subtype`` where held, then ``description``."""
+    rows = out.get("rows")
+    if not isinstance(rows, list):
+        return []
+    return [list(r) for r in rows if isinstance(r, dict) and set(r) <= _SHORT_ROW_KEYS]
+
+
+_SHORT_ROW_KEYS = {"id", "type", "name", "supertype", "subtype", "description", "note"}
 
 
 def _id(n: int) -> str:

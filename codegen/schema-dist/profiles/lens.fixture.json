@@ -4,7 +4,7 @@
   "notes": [
     "pair: construct + supertype Lens, each trimmed and folded like the room profile's pairs; a template is a lens whose subtype, trimmed and folded, is Template.",
     "keys: the legal values of x_lens; a case's legal is what a reader's check answers, and bad names the first key refused (x_lens itself when the value is not an object).",
-    "worlds: each world's elements as its owner is served them, the ids its hidden mark keeps from every reader but the owner, and its readers. A reader's rung is owner (the whole world), contributor (the world less the hidden), guest (exactly the whole and known_of ids it lists; known_of is a stub, and a known_of id the hidden mark keeps is not in its view at all: hidden beats known_of, and only a guest's own creation, listed in whole, stays) or public (the world less the hidden and the room elements). An element whose x_review_proposed holds any value but null is in no reader's view (the review profile's rule for a reader that hands a world on). A reader with as is the owner reading as that reader: the reader's view, and the owner's two counts (anchor_not_visible, not_visible).",
+    "worlds: each world's elements as its owner is served them, the ids its hidden mark keeps from every reader but the owner, and its readers. A reader's rung is owner (the whole world), contributor (the world less the hidden), guest (exactly the whole and known_of ids it lists; known_of is a stub, and a known_of id the hidden mark keeps is not in its view at all: hidden beats known_of, and only a guest's own creation, listed in whole, stays) or public (the world less the hidden and the room elements). An element whose x_review_proposed counts as present by the review profile's rule 1 (a mark or a doubt; null and an empty value, an empty or White_Space-only string, [] or {}, are none) is in no reader's view (the review profile's rule for a reader that hands a world on). A reader with as is the owner reading as that reader: the reader's view, and the owner's two counts (anchor_not_visible, not_visible).",
     "resolve: lens is the lens read, a body or the id of a lens in the world; as_of is the reading's date (absent: the world's now; with neither, no fence and the window cuts nothing); clock is the reading's wall clock, for the mail rule and changed_within. kept is the resolved set in order, cut the count by reason (a reason with no count is absent). rows, where given, are the kept rows as show makes them; mail, where given, is the mail rule's part; notes_ignored counts notes on ids that are not anchors.",
     "invariant: subset (each reader's kept is a subset of the owner's, and no secret's id or name appears anywhere in a non-owner result), same_without (each reader's result is identical with the without ids removed from the world), unchanged (the world is identical before and after every reader's reading).",
     "uses: which lenses a seat reads, from its membership's choice and its Character's x_lens_uses. membership null means there is no membership (a folder world), and then the Character's x_lens_uses is read; a membership that exists and never chose is not this reading's case (keel gives that seat its Titles' lenses and never reads x_lens_uses).",
@@ -1525,6 +1525,75 @@
           "name": "Old Quill",
           "birth_date": 7.0,
           "updated_at": "2026-10-11T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000176",
+          "type": "object",
+          "name": "Ferry bell",
+          "supertype": "Bell",
+          "subtype": "Cracked",
+          "description": "Rung for every crossing.\nCracked in the cold year.",
+          "updated_at": "2026-10-12T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000177",
+          "type": "object",
+          "name": "Tow rope",
+          "supertype": "Rope",
+          "updated_at": "2026-10-12T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000178",
+          "type": "object",
+          "name": "Pole hook",
+          "subtype": "Ash",
+          "updated_at": "2026-10-12T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000179",
+          "type": "object",
+          "name": "Bailing pail",
+          "updated_at": "2026-10-12T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-00000000017a",
+          "type": "object",
+          "name": "Spare oar",
+          "supertype": "",
+          "subtype": "",
+          "updated_at": "2026-10-12T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-00000000017b",
+          "type": "object",
+          "name": "Toll box",
+          "supertype": "Box",
+          "subtype": "Iron",
+          "description": "Kept under the ferryman's bench.",
+          "updated_at": "2026-10-12T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-00000000017c",
+          "type": "object",
+          "name": "Mooring post",
+          "supertype": null,
+          "subtype": " \t ",
+          "updated_at": "2026-10-12T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-00000000017d",
+          "type": "object",
+          "name": "Ferry flag",
+          "supertype": 7,
+          "updated_at": "2026-10-12T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-00000000017e",
+          "type": "object",
+          "name": "Rope ladder",
+          "supertype": "  Ladder ",
+          "subtype": "Hemp\t",
+          "updated_at": "2026-10-12T12:00:00Z"
         }
       ],
       "hidden": [],
@@ -1545,7 +1614,8 @@
             "019a7f00-0000-7000-8000-000000000171"
           ],
           "known_of": [
-            "019a7f00-0000-7000-8000-000000000166"
+            "019a7f00-0000-7000-8000-000000000166",
+            "019a7f00-0000-7000-8000-00000000017b"
           ]
         }
       }
@@ -8903,6 +8973,366 @@
         }
       ],
       "note": "The guest holds the stranger only as a stub: the base fields and the type's public fields (physicality) kept, every other field at its unset value (the date null, the link list empty, though the guest sees Ferrying whole), the extension key dropped."
+    },
+    {
+      "name": "show-first-line-carries-supertype-and-subtype-only-where-the-body-holds-them",
+      "kind": "resolve",
+      "world": "fen",
+      "reader": "owner",
+      "lens": {
+        "id": "019a7f00-0000-7000-8000-000000000191",
+        "type": "construct",
+        "name": "A lens",
+        "supertype": "Lens",
+        "subtype": "",
+        "objects": [
+          "019a7f00-0000-7000-8000-000000000176",
+          "019a7f00-0000-7000-8000-000000000177",
+          "019a7f00-0000-7000-8000-000000000178",
+          "019a7f00-0000-7000-8000-000000000179",
+          "019a7f00-0000-7000-8000-00000000017a"
+        ],
+        "x_lens": {
+          "depth": 0,
+          "show": "first_line"
+        }
+      },
+      "kept": [
+        "019a7f00-0000-7000-8000-000000000176",
+        "019a7f00-0000-7000-8000-000000000177",
+        "019a7f00-0000-7000-8000-000000000178",
+        "019a7f00-0000-7000-8000-000000000179",
+        "019a7f00-0000-7000-8000-00000000017a"
+      ],
+      "cut": {},
+      "rows": [
+        {
+          "id": "019a7f00-0000-7000-8000-000000000176",
+          "type": "object",
+          "name": "Ferry bell",
+          "supertype": "Bell",
+          "subtype": "Cracked",
+          "description": "Rung for every crossing."
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000177",
+          "type": "object",
+          "name": "Tow rope",
+          "supertype": "Rope"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000178",
+          "type": "object",
+          "name": "Pole hook",
+          "subtype": "Ash"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000179",
+          "type": "object",
+          "name": "Bailing pail"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-00000000017a",
+          "type": "object",
+          "name": "Spare oar"
+        }
+      ],
+      "note": "A first_line row carries supertype and subtype each only where the served body holds something in it: the bell both, the rope a supertype only, the hook a subtype only, the pail neither, and the oar, whose two are stored as empty strings, neither (an empty text is unset, never a key on the row)."
+    },
+    {
+      "name": "show-name-carries-supertype-and-subtype-only-where-the-body-holds-them",
+      "kind": "resolve",
+      "world": "fen",
+      "reader": "owner",
+      "lens": {
+        "id": "019a7f00-0000-7000-8000-000000000192",
+        "type": "construct",
+        "name": "A lens",
+        "supertype": "Lens",
+        "subtype": "",
+        "objects": [
+          "019a7f00-0000-7000-8000-000000000176",
+          "019a7f00-0000-7000-8000-000000000177",
+          "019a7f00-0000-7000-8000-000000000178",
+          "019a7f00-0000-7000-8000-000000000179",
+          "019a7f00-0000-7000-8000-00000000017a"
+        ],
+        "x_lens": {
+          "depth": 0,
+          "show": "name"
+        }
+      },
+      "kept": [
+        "019a7f00-0000-7000-8000-000000000176",
+        "019a7f00-0000-7000-8000-000000000177",
+        "019a7f00-0000-7000-8000-000000000178",
+        "019a7f00-0000-7000-8000-000000000179",
+        "019a7f00-0000-7000-8000-00000000017a"
+      ],
+      "cut": {},
+      "rows": [
+        {
+          "id": "019a7f00-0000-7000-8000-000000000176",
+          "type": "object",
+          "name": "Ferry bell",
+          "supertype": "Bell",
+          "subtype": "Cracked"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000177",
+          "type": "object",
+          "name": "Tow rope",
+          "supertype": "Rope"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000178",
+          "type": "object",
+          "name": "Pole hook",
+          "subtype": "Ash"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000179",
+          "type": "object",
+          "name": "Bailing pail"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-00000000017a",
+          "type": "object",
+          "name": "Spare oar"
+        }
+      ],
+      "note": "A name row carries supertype and subtype by the same test as a first_line row, and no description."
+    },
+    {
+      "name": "a-known-of-stubs-short-row-carries-the-supertype-and-subtype-it-is-served",
+      "kind": "resolve",
+      "world": "fen",
+      "reader": "guest",
+      "lens": {
+        "id": "019a7f00-0000-7000-8000-000000000193",
+        "type": "construct",
+        "name": "A lens",
+        "supertype": "Lens",
+        "subtype": "",
+        "objects": [
+          "019a7f00-0000-7000-8000-00000000017b"
+        ],
+        "x_lens": {
+          "depth": 0,
+          "show": "first_line"
+        }
+      },
+      "kept": [
+        "019a7f00-0000-7000-8000-00000000017b"
+      ],
+      "cut": {},
+      "rows": [
+        {
+          "id": "019a7f00-0000-7000-8000-00000000017b",
+          "type": "object",
+          "name": "Toll box",
+          "supertype": "Box",
+          "subtype": "Iron",
+          "description": "Kept under the ferryman's bench."
+        }
+      ],
+      "note": "The guest holds the toll box only as a stub; a stub is served supertype and subtype among its base fields, so its short row carries them, read from the served body like any other."
+    },
+    {
+      "name": "show-first-line-gives-no-supertype-or-subtype-for-null-or-white-space-only",
+      "kind": "resolve",
+      "world": "fen",
+      "reader": "owner",
+      "lens": {
+        "id": "019a7f00-0000-7000-8000-000000000194",
+        "type": "construct",
+        "name": "A lens",
+        "supertype": "Lens",
+        "subtype": "",
+        "objects": [
+          "019a7f00-0000-7000-8000-00000000017c"
+        ],
+        "x_lens": {
+          "depth": 0,
+          "show": "first_line"
+        }
+      },
+      "kept": [
+        "019a7f00-0000-7000-8000-00000000017c"
+      ],
+      "cut": {},
+      "rows": [
+        {
+          "id": "019a7f00-0000-7000-8000-00000000017c",
+          "type": "object",
+          "name": "Mooring post"
+        }
+      ],
+      "note": "A stored null and a string of White_Space alone (the room profile's set) give no key."
+    },
+    {
+      "name": "show-first-line-gives-no-supertype-for-a-value-that-is-not-a-string",
+      "kind": "resolve",
+      "world": "fen",
+      "reader": "owner",
+      "lens": {
+        "id": "019a7f00-0000-7000-8000-000000000195",
+        "type": "construct",
+        "name": "A lens",
+        "supertype": "Lens",
+        "subtype": "",
+        "objects": [
+          "019a7f00-0000-7000-8000-00000000017d"
+        ],
+        "x_lens": {
+          "depth": 0,
+          "show": "first_line"
+        }
+      },
+      "kept": [
+        "019a7f00-0000-7000-8000-00000000017d"
+      ],
+      "cut": {},
+      "rows": [
+        {
+          "id": "019a7f00-0000-7000-8000-00000000017d",
+          "type": "object",
+          "name": "Ferry flag"
+        }
+      ],
+      "note": "A supertype stored as a number is no string, so the row carries no key: nothing is turned into text."
+    },
+    {
+      "name": "show-first-line-carries-supertype-and-subtype-as-stored-untrimmed",
+      "kind": "resolve",
+      "world": "fen",
+      "reader": "owner",
+      "lens": {
+        "id": "019a7f00-0000-7000-8000-000000000196",
+        "type": "construct",
+        "name": "A lens",
+        "supertype": "Lens",
+        "subtype": "",
+        "objects": [
+          "019a7f00-0000-7000-8000-00000000017e"
+        ],
+        "x_lens": {
+          "depth": 0,
+          "show": "first_line"
+        }
+      },
+      "kept": [
+        "019a7f00-0000-7000-8000-00000000017e"
+      ],
+      "cut": {},
+      "rows": [
+        {
+          "id": "019a7f00-0000-7000-8000-00000000017e",
+          "type": "object",
+          "name": "Rope ladder",
+          "supertype": "  Ladder ",
+          "subtype": "Hemp\t"
+        }
+      ],
+      "note": "A value with something left after trimming is carried as stored, its spaces and tab kept: the trim decides whether the key is there, never what it holds."
+    },
+    {
+      "name": "show-name-gives-no-supertype-or-subtype-for-null-or-white-space-only",
+      "kind": "resolve",
+      "world": "fen",
+      "reader": "owner",
+      "lens": {
+        "id": "019a7f00-0000-7000-8000-000000000197",
+        "type": "construct",
+        "name": "A lens",
+        "supertype": "Lens",
+        "subtype": "",
+        "objects": [
+          "019a7f00-0000-7000-8000-00000000017c"
+        ],
+        "x_lens": {
+          "depth": 0,
+          "show": "name"
+        }
+      },
+      "kept": [
+        "019a7f00-0000-7000-8000-00000000017c"
+      ],
+      "cut": {},
+      "rows": [
+        {
+          "id": "019a7f00-0000-7000-8000-00000000017c",
+          "type": "object",
+          "name": "Mooring post"
+        }
+      ],
+      "note": "A stored null and a string of White_Space alone (the room profile's set) give no key."
+    },
+    {
+      "name": "show-name-gives-no-supertype-for-a-value-that-is-not-a-string",
+      "kind": "resolve",
+      "world": "fen",
+      "reader": "owner",
+      "lens": {
+        "id": "019a7f00-0000-7000-8000-000000000198",
+        "type": "construct",
+        "name": "A lens",
+        "supertype": "Lens",
+        "subtype": "",
+        "objects": [
+          "019a7f00-0000-7000-8000-00000000017d"
+        ],
+        "x_lens": {
+          "depth": 0,
+          "show": "name"
+        }
+      },
+      "kept": [
+        "019a7f00-0000-7000-8000-00000000017d"
+      ],
+      "cut": {},
+      "rows": [
+        {
+          "id": "019a7f00-0000-7000-8000-00000000017d",
+          "type": "object",
+          "name": "Ferry flag"
+        }
+      ],
+      "note": "A supertype stored as a number is no string, so the row carries no key: nothing is turned into text."
+    },
+    {
+      "name": "show-name-carries-supertype-and-subtype-as-stored-untrimmed",
+      "kind": "resolve",
+      "world": "fen",
+      "reader": "owner",
+      "lens": {
+        "id": "019a7f00-0000-7000-8000-00000000019b",
+        "type": "construct",
+        "name": "A lens",
+        "supertype": "Lens",
+        "subtype": "",
+        "objects": [
+          "019a7f00-0000-7000-8000-00000000017e"
+        ],
+        "x_lens": {
+          "depth": 0,
+          "show": "name"
+        }
+      },
+      "kept": [
+        "019a7f00-0000-7000-8000-00000000017e"
+      ],
+      "cut": {},
+      "rows": [
+        {
+          "id": "019a7f00-0000-7000-8000-00000000017e",
+          "type": "object",
+          "name": "Rope ladder",
+          "supertype": "  Ladder ",
+          "subtype": "Hemp\t"
+        }
+      ],
+      "note": "A value with something left after trimming is carried as stored, its spaces and tab kept: the trim decides whether the key is there, never what it holds."
     },
     {
       "name": "an-element-with-no-updated-at-sorts-last-in-its-type",
