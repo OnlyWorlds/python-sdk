@@ -4,6 +4,8 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+- The schema pin moves to schema-dist `v0.34.0-dist.110` (canonical `00.34.00` unchanged, so `SCHEMA_VERSION` is the same; no schema file moved). The map-space profile gains rules 8 to 10, the layout keys: `x_layout` on a Map (its Pins were laid out, by which method; `"hand"` is a board), the ground Map its layout stands on, and `x_hand: true` on a Pin placed by hand, which a new lay-out keeps. Its fixture gains `layout_cases` (17) beside the 34 `cases`, which do not change, and neither does `map_space`.
+
 ## 0.109.0 (2026-11-09)
 
 - `trail_by_place`: the ground Map's element id, `ground.map`, travels in the recipe: given in the input, the recipe's `settings.ground` carries it back as `{map, width, height}`, so a tool reading a laid-out Map finds the picture its pins stand on. Optional; a ground given without it carries none. A `map` that is not a non-empty string is refused. The shared fixture's whole-world case now names its ground map. The same as the npm SDK 4.136.0.

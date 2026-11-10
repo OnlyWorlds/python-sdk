@@ -8068,5 +8068,687 @@
     "out": {}
    }
   }
+ ],
+ "layout_cases": [
+  {
+   "name": "layout-absent",
+   "claim": "a Map with no `x_layout` is no layout map: a marked Pin on it is in no `hand`",
+   "map": "019a9100-0000-7000-8000-00000000aa01",
+   "elements": [
+    {
+     "type": "map",
+     "id": "019a9100-0000-7000-8000-00000000aa01",
+     "name": "field"
+    },
+    {
+     "type": "pin",
+     "id": "019a9100-0000-7000-8000-0000000d0001",
+     "name": "pin",
+     "map": "019a9100-0000-7000-8000-00000000aa01",
+     "x": 10,
+     "y": 10,
+     "x_hand": true
+    }
+   ],
+   "want": {
+    "layout": null,
+    "ground": null,
+    "hand": []
+   }
+  },
+  {
+   "name": "layout-null",
+   "claim": "`x_layout` null is no layout",
+   "map": "019a9100-0000-7000-8000-00000000aa01",
+   "elements": [
+    {
+     "type": "map",
+     "id": "019a9100-0000-7000-8000-00000000aa01",
+     "name": "field",
+     "x_layout": null
+    },
+    {
+     "type": "pin",
+     "id": "019a9100-0000-7000-8000-0000000d0001",
+     "name": "pin",
+     "map": "019a9100-0000-7000-8000-00000000aa01",
+     "x": 10,
+     "y": 10,
+     "x_hand": true
+    }
+   ],
+   "want": {
+    "layout": null,
+    "ground": null,
+    "hand": []
+   }
+  },
+  {
+   "name": "layout-a-string",
+   "claim": "`x_layout` that is not an object is no layout, even when the string is a method's name",
+   "map": "019a9100-0000-7000-8000-00000000aa01",
+   "elements": [
+    {
+     "type": "map",
+     "id": "019a9100-0000-7000-8000-00000000aa01",
+     "name": "field",
+     "x_layout": "trail-by-place"
+    },
+    {
+     "type": "pin",
+     "id": "019a9100-0000-7000-8000-0000000d0001",
+     "name": "pin",
+     "map": "019a9100-0000-7000-8000-00000000aa01",
+     "x": 10,
+     "y": 10,
+     "x_hand": true
+    }
+   ],
+   "want": {
+    "layout": null,
+    "ground": null,
+    "hand": []
+   }
+  },
+  {
+   "name": "layout-without-method",
+   "claim": "an object without `method` is no layout, and its ground is not read",
+   "map": "019a9100-0000-7000-8000-00000000aa01",
+   "elements": [
+    {
+     "type": "map",
+     "id": "019a9100-0000-7000-8000-00000000aa01",
+     "name": "field",
+     "x_layout": {
+      "settings": {
+       "ground": {
+        "map": "019a9100-0000-7000-8000-00000000aa02"
+       }
+      }
+     }
+    },
+    {
+     "type": "map",
+     "id": "019a9100-0000-7000-8000-00000000aa02",
+     "name": "ground",
+     "width": 3462,
+     "height": 4676
+    },
+    {
+     "type": "pin",
+     "id": "019a9100-0000-7000-8000-0000000d0001",
+     "name": "pin",
+     "map": "019a9100-0000-7000-8000-00000000aa01",
+     "x": 10,
+     "y": 10,
+     "x_hand": true
+    }
+   ],
+   "want": {
+    "layout": null,
+    "ground": null,
+    "hand": []
+   }
+  },
+  {
+   "name": "layout-method-empty",
+   "claim": "a `method` of `\"\"` is no layout",
+   "map": "019a9100-0000-7000-8000-00000000aa01",
+   "elements": [
+    {
+     "type": "map",
+     "id": "019a9100-0000-7000-8000-00000000aa01",
+     "name": "field",
+     "x_layout": {
+      "method": ""
+     }
+    },
+    {
+     "type": "pin",
+     "id": "019a9100-0000-7000-8000-0000000d0001",
+     "name": "pin",
+     "map": "019a9100-0000-7000-8000-00000000aa01",
+     "x": 10,
+     "y": 10,
+     "x_hand": true
+    }
+   ],
+   "want": {
+    "layout": null,
+    "ground": null,
+    "hand": []
+   }
+  },
+  {
+   "name": "layout-method-not-a-string",
+   "claim": "a `method` that is not a string is no layout: no ground is read, and no Pin is in `hand`",
+   "map": "019a9100-0000-7000-8000-00000000aa01",
+   "elements": [
+    {
+     "type": "map",
+     "id": "019a9100-0000-7000-8000-00000000aa01",
+     "name": "field",
+     "x_layout": {
+      "method": 5,
+      "settings": {
+       "ground": {
+        "map": "019a9100-0000-7000-8000-00000000aa02"
+       }
+      }
+     }
+    },
+    {
+     "type": "map",
+     "id": "019a9100-0000-7000-8000-00000000aa02",
+     "name": "ground",
+     "width": 3462,
+     "height": 4676
+    },
+    {
+     "type": "pin",
+     "id": "019a9100-0000-7000-8000-0000000d0001",
+     "name": "pin",
+     "map": "019a9100-0000-7000-8000-00000000aa01",
+     "x": 10,
+     "y": 10,
+     "x_hand": true
+    }
+   ],
+   "want": {
+    "layout": null,
+    "ground": null,
+    "hand": []
+   }
+  },
+  {
+   "name": "board-every-pin-is-hand",
+   "claim": "on a board (`method` `\"hand\"`) every Pin of the Map is in `hand`, marked or not; a Pin whose element is not served is still a Pin",
+   "map": "019a9100-0000-7000-8000-00000000aa01",
+   "elements": [
+    {
+     "type": "map",
+     "id": "019a9100-0000-7000-8000-00000000aa01",
+     "name": "board",
+     "x_layout": {
+      "method": "hand"
+     }
+    },
+    {
+     "type": "pin",
+     "id": "019a9100-0000-7000-8000-0000000d0001",
+     "name": "pin",
+     "map": "019a9100-0000-7000-8000-00000000aa01",
+     "x": 10,
+     "y": 10
+    },
+    {
+     "type": "pin",
+     "id": "019a9100-0000-7000-8000-0000000d0002",
+     "name": "pin",
+     "map": "019a9100-0000-7000-8000-00000000aa01",
+     "element_type": "character",
+     "element_id": "019a9100-0000-7000-8000-0000000e0001",
+     "x": 20,
+     "y": 20
+    },
+    {
+     "type": "pin",
+     "id": "019a9100-0000-7000-8000-0000000d0003",
+     "name": "pin",
+     "map": "019a9100-0000-7000-8000-00000000aa01",
+     "x": 30,
+     "y": 30,
+     "x_hand": true
+    }
+   ],
+   "want": {
+    "layout": "hand",
+    "ground": null,
+    "hand": [
+     "019a9100-0000-7000-8000-0000000d0001",
+     "019a9100-0000-7000-8000-0000000d0002",
+     "019a9100-0000-7000-8000-0000000d0003"
+    ]
+   }
+  },
+  {
+   "name": "only-true-is-the-mark",
+   "claim": "on a layout map of a known method, only `x_hand` exactly `true` puts a Pin in `hand`: `\"true\"`, `1`, `false` and absent read as placed by the method",
+   "map": "019a9100-0000-7000-8000-00000000aa01",
+   "elements": [
+    {
+     "type": "map",
+     "id": "019a9100-0000-7000-8000-00000000aa01",
+     "name": "trail",
+     "x_layout": {
+      "method": "trail-by-place"
+     }
+    },
+    {
+     "type": "pin",
+     "id": "019a9100-0000-7000-8000-0000000d0001",
+     "name": "pin",
+     "map": "019a9100-0000-7000-8000-00000000aa01",
+     "x": 10,
+     "y": 10,
+     "x_hand": true
+    },
+    {
+     "type": "pin",
+     "id": "019a9100-0000-7000-8000-0000000d0002",
+     "name": "pin",
+     "map": "019a9100-0000-7000-8000-00000000aa01",
+     "x": 20,
+     "y": 20,
+     "x_hand": "true"
+    },
+    {
+     "type": "pin",
+     "id": "019a9100-0000-7000-8000-0000000d0003",
+     "name": "pin",
+     "map": "019a9100-0000-7000-8000-00000000aa01",
+     "x": 30,
+     "y": 30,
+     "x_hand": 1
+    },
+    {
+     "type": "pin",
+     "id": "019a9100-0000-7000-8000-0000000d0004",
+     "name": "pin",
+     "map": "019a9100-0000-7000-8000-00000000aa01",
+     "x": 40,
+     "y": 40,
+     "x_hand": false
+    },
+    {
+     "type": "pin",
+     "id": "019a9100-0000-7000-8000-0000000d0005",
+     "name": "pin",
+     "map": "019a9100-0000-7000-8000-00000000aa01",
+     "x": 50,
+     "y": 50
+    }
+   ],
+   "want": {
+    "layout": "trail-by-place",
+    "ground": null,
+    "hand": [
+     "019a9100-0000-7000-8000-0000000d0001"
+    ]
+   }
+  },
+  {
+   "name": "pin-of-a-hidden-element",
+   "claim": "a Pin served with its element link null (its element hidden from this reader) is still a Pin: marked on a layout map, it is in `hand`",
+   "map": "019a9100-0000-7000-8000-00000000aa01",
+   "elements": [
+    {
+     "type": "map",
+     "id": "019a9100-0000-7000-8000-00000000aa01",
+     "name": "trail",
+     "x_layout": {
+      "method": "trail-by-place"
+     }
+    },
+    {
+     "type": "pin",
+     "id": "019a9100-0000-7000-8000-0000000d0001",
+     "name": "pin",
+     "map": "019a9100-0000-7000-8000-00000000aa01",
+     "element_type": null,
+     "element_id": null,
+     "x": 10,
+     "y": 10,
+     "x_hand": true
+    },
+    {
+     "type": "pin",
+     "id": "019a9100-0000-7000-8000-0000000d0002",
+     "name": "pin",
+     "map": "019a9100-0000-7000-8000-00000000aa01",
+     "element_type": "location",
+     "element_id": "019a9100-0000-7000-8000-0000000e0002",
+     "x": 20,
+     "y": 20
+    }
+   ],
+   "want": {
+    "layout": "trail-by-place",
+    "ground": null,
+    "hand": [
+     "019a9100-0000-7000-8000-0000000d0001"
+    ]
+   }
+  },
+  {
+   "name": "unknown-method-answers-itself",
+   "claim": "a method string no page names is a layout map all the same: `layout` is the string, and its marked Pins are in `hand`",
+   "map": "019a9100-0000-7000-8000-00000000aa01",
+   "elements": [
+    {
+     "type": "map",
+     "id": "019a9100-0000-7000-8000-00000000aa01",
+     "name": "spiral",
+     "x_layout": {
+      "method": "spiral-by-age",
+      "settings": {
+       "turns": 3
+      }
+     }
+    },
+    {
+     "type": "pin",
+     "id": "019a9100-0000-7000-8000-0000000d0001",
+     "name": "pin",
+     "map": "019a9100-0000-7000-8000-00000000aa01",
+     "x": 10,
+     "y": 10,
+     "x_hand": true
+    },
+    {
+     "type": "pin",
+     "id": "019a9100-0000-7000-8000-0000000d0002",
+     "name": "pin",
+     "map": "019a9100-0000-7000-8000-00000000aa01",
+     "x": 20,
+     "y": 20
+    }
+   ],
+   "want": {
+    "layout": "spiral-by-age",
+    "ground": null,
+    "hand": [
+     "019a9100-0000-7000-8000-0000000d0001"
+    ]
+   }
+  },
+  {
+   "name": "ground-served",
+   "claim": "a ground naming a served Map answers its id; its size is not returned (the served Map's own `width` and `height` win, and the caller holds it); a Pin on the ground Map is not this Map's",
+   "map": "019a9100-0000-7000-8000-00000000aa01",
+   "elements": [
+    {
+     "type": "map",
+     "id": "019a9100-0000-7000-8000-00000000aa01",
+     "name": "trail",
+     "x_layout": {
+      "method": "trail-by-place",
+      "settings": {
+       "ground": {
+        "map": "019a9100-0000-7000-8000-00000000aa02",
+        "width": 3000,
+        "height": 2000
+       }
+      }
+     }
+    },
+    {
+     "type": "map",
+     "id": "019a9100-0000-7000-8000-00000000aa02",
+     "name": "ground",
+     "width": 3462,
+     "height": 4676
+    },
+    {
+     "type": "pin",
+     "id": "019a9100-0000-7000-8000-0000000d0001",
+     "name": "pin",
+     "map": "019a9100-0000-7000-8000-00000000aa02",
+     "x": 10,
+     "y": 10,
+     "x_hand": true
+    }
+   ],
+   "want": {
+    "layout": "trail-by-place",
+    "ground": "019a9100-0000-7000-8000-00000000aa02",
+    "hand": []
+   }
+  },
+  {
+   "name": "ground-not-served",
+   "claim": "a ground naming a Map the reader is not served is no ground",
+   "map": "019a9100-0000-7000-8000-00000000aa01",
+   "elements": [
+    {
+     "type": "map",
+     "id": "019a9100-0000-7000-8000-00000000aa01",
+     "name": "trail",
+     "x_layout": {
+      "method": "trail-by-place",
+      "settings": {
+       "ground": {
+        "map": "019a9100-0000-7000-8000-00000000aa09",
+        "width": 3000,
+        "height": 2000
+       }
+      }
+     }
+    }
+   ],
+   "want": {
+    "layout": "trail-by-place",
+    "ground": null,
+    "hand": []
+   }
+  },
+  {
+   "name": "ground-without-map",
+   "claim": "a ground with no `map` is no ground",
+   "map": "019a9100-0000-7000-8000-00000000aa01",
+   "elements": [
+    {
+     "type": "map",
+     "id": "019a9100-0000-7000-8000-00000000aa01",
+     "name": "trail",
+     "x_layout": {
+      "method": "trail-by-place",
+      "settings": {
+       "ground": {
+        "width": 3000,
+        "height": 2000
+       }
+      }
+     }
+    },
+    {
+     "type": "map",
+     "id": "019a9100-0000-7000-8000-00000000aa02",
+     "name": "ground",
+     "width": 3462,
+     "height": 4676
+    }
+   ],
+   "want": {
+    "layout": "trail-by-place",
+    "ground": null,
+    "hand": []
+   }
+  },
+  {
+   "name": "ground-is-the-layout-map",
+   "claim": "a ground whose `map` is the layout Map itself is no ground",
+   "map": "019a9100-0000-7000-8000-00000000aa01",
+   "elements": [
+    {
+     "type": "map",
+     "id": "019a9100-0000-7000-8000-00000000aa01",
+     "name": "trail",
+     "x_layout": {
+      "method": "trail-by-place",
+      "settings": {
+       "ground": {
+        "map": "019a9100-0000-7000-8000-00000000aa01"
+       }
+      }
+     }
+    }
+   ],
+   "want": {
+    "layout": "trail-by-place",
+    "ground": null,
+    "hand": []
+   }
+  },
+  {
+   "name": "plain-map-keeps-its-marks",
+   "claim": "a Map whose `x_layout` was removed reads plain: its Pins keep `x_hand: true`, and the mark means nothing there",
+   "map": "019a9100-0000-7000-8000-00000000aa01",
+   "elements": [
+    {
+     "type": "map",
+     "id": "019a9100-0000-7000-8000-00000000aa01",
+     "name": "field"
+    },
+    {
+     "type": "pin",
+     "id": "019a9100-0000-7000-8000-0000000d0001",
+     "name": "pin",
+     "map": "019a9100-0000-7000-8000-00000000aa01",
+     "x": 10,
+     "y": 10,
+     "x_hand": true
+    },
+    {
+     "type": "pin",
+     "id": "019a9100-0000-7000-8000-0000000d0002",
+     "name": "pin",
+     "map": "019a9100-0000-7000-8000-00000000aa01",
+     "x": 20,
+     "y": 20,
+     "x_hand": true
+    },
+    {
+     "type": "pin",
+     "id": "019a9100-0000-7000-8000-0000000d0003",
+     "name": "pin",
+     "map": "019a9100-0000-7000-8000-00000000aa01",
+     "x": 30,
+     "y": 30,
+     "x_hand": true
+    }
+   ],
+   "want": {
+    "layout": null,
+    "ground": null,
+    "hand": []
+   }
+  },
+  {
+   "name": "map-gains-a-method",
+   "claim": "a Map with three Pins placed by hand gains a method: the writer marks all three before it writes `x_layout`, so a new lay-out keeps all three",
+   "map": "019a9100-0000-7000-8000-00000000aa01",
+   "elements": [
+    {
+     "type": "map",
+     "id": "019a9100-0000-7000-8000-00000000aa01",
+     "name": "field",
+     "x_layout": {
+      "method": "trail-by-place"
+     }
+    },
+    {
+     "type": "pin",
+     "id": "019a9100-0000-7000-8000-0000000d0001",
+     "name": "pin",
+     "map": "019a9100-0000-7000-8000-00000000aa01",
+     "x": 10,
+     "y": 10,
+     "x_hand": true
+    },
+    {
+     "type": "pin",
+     "id": "019a9100-0000-7000-8000-0000000d0002",
+     "name": "pin",
+     "map": "019a9100-0000-7000-8000-00000000aa01",
+     "x": 20,
+     "y": 20,
+     "x_hand": true
+    },
+    {
+     "type": "pin",
+     "id": "019a9100-0000-7000-8000-0000000d0003",
+     "name": "pin",
+     "map": "019a9100-0000-7000-8000-00000000aa01",
+     "x": 30,
+     "y": 30,
+     "x_hand": true
+    }
+   ],
+   "want": {
+    "layout": "trail-by-place",
+    "ground": null,
+    "hand": [
+     "019a9100-0000-7000-8000-0000000d0001",
+     "019a9100-0000-7000-8000-0000000d0002",
+     "019a9100-0000-7000-8000-0000000d0003"
+    ]
+   }
+  },
+  {
+   "name": "hand-in-id-order",
+   "claim": "`hand` is by id in code point order whatever order the Pins are held in; a marked Pin on another Map is not this Map's",
+   "map": "019a9100-0000-7000-8000-00000000aa01",
+   "elements": [
+    {
+     "type": "map",
+     "id": "019a9100-0000-7000-8000-00000000aa01",
+     "name": "trail",
+     "x_layout": {
+      "method": "trail-by-place"
+     }
+    },
+    {
+     "type": "map",
+     "id": "019a9100-0000-7000-8000-00000000aa03",
+     "name": "other"
+    },
+    {
+     "type": "pin",
+     "id": "019a9100-0000-7000-8000-0000000d0003",
+     "name": "pin",
+     "map": "019a9100-0000-7000-8000-00000000aa01",
+     "x": 30,
+     "y": 30,
+     "x_hand": true
+    },
+    {
+     "type": "pin",
+     "id": "019a9100-0000-7000-8000-0000000d0004",
+     "name": "pin",
+     "map": "019a9100-0000-7000-8000-00000000aa03",
+     "x": 40,
+     "y": 40,
+     "x_hand": true
+    },
+    {
+     "type": "pin",
+     "id": "019a9100-0000-7000-8000-0000000d0001",
+     "name": "pin",
+     "map": "019a9100-0000-7000-8000-00000000aa01",
+     "x": 10,
+     "y": 10,
+     "x_hand": true
+    },
+    {
+     "type": "pin",
+     "id": "019a9100-0000-7000-8000-0000000d0002",
+     "name": "pin",
+     "map": "019a9100-0000-7000-8000-00000000aa01",
+     "x": 20,
+     "y": 20,
+     "x_hand": true
+    }
+   ],
+   "want": {
+    "layout": "trail-by-place",
+    "ground": null,
+    "hand": [
+     "019a9100-0000-7000-8000-0000000d0001",
+     "019a9100-0000-7000-8000-0000000d0002",
+     "019a9100-0000-7000-8000-0000000d0003"
+    ]
+   }
+  }
  ]
 }
