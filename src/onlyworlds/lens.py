@@ -293,10 +293,12 @@ def is_template(element: Any) -> bool:
 
 
 def lenses_in_use(membership: Sequence[str] | None, x_lens_uses: Any) -> list[str]:
-    """The lenses a seat reads, by id: its membership's choice when it has made one (a list, an empty list
-    included: a membership that chose no lenses has made a choice), otherwise its Character's ``x_lens_uses``
-    (a folder world has no membership). Never both: the membership wins. Strings only, each once, in the order
-    given; anything that is not a list is no choice."""
+    """The lenses a seat reads, by id: its membership's choice (a list, an empty list included: a membership
+    that chose no lenses has made a choice), or, when ``membership`` is None, its Character's ``x_lens_uses``.
+    None means there is no membership, as in a folder world. A membership that exists and never chose is not
+    this reading's case: onlyworlds.com gives that seat its Titles' lenses and never reads ``x_lens_uses``.
+    Never both: the membership wins. Strings only, each once, in the order given; anything that is not a list
+    is no choice."""
     chosen: Any = membership if isinstance(membership, list) else x_lens_uses
     if not isinstance(chosen, list):
         return []

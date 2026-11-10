@@ -4,6 +4,8 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+- `lenses_in_use`'s docstring says what a None membership means, in the lens profile's words since serial 112: there is no membership (a folder world), and then the Character's `x_lens_uses` is read. Behaviour unchanged
+
 ## 0.112.0 (2026-11-10)
 
 - `ApiError.refusals`: on a 422 `answer_not_parsed` from an AI use the server reads itself, each answer it refused, in order, as `{"word", "stop_reason", "output_tokens"}`, as the API document now declares the error envelope (the npm SDK's `err.refusals`, 4.145.0). A row not in that shape is left out; None for any other error, or when the server sends none. The wire test allows the envelope's `refusals` only where the document declares it, and then requires it read
