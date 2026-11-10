@@ -4,6 +4,8 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+- The Kanka and LegendKeeper modules' notes say when what they state about the other app was read (the Kanka export of 2026-10-23; LegendKeeper's dates before an era, probed 2026-10-25). A LegendKeeper map's report line says only that the picture stays on LegendKeeper's host, where it said how long it would load.
+
 ## 0.114.0 (2026-11-10)
 
 - Schema repinned to schema-dist v0.34.0-dist.114 (canonical 00.34.00 unchanged, no schema file moved).

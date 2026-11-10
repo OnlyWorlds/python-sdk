@@ -179,8 +179,9 @@ What becomes what:
   year as shown). Scrolls is not: its later eras restart their years, which no probe has
   witnessed. The report names each calendar made, exact or kept raw
   with its reasons, and counts the calendars no timeline names, which are not made. On an exact
-  calendar it also counts the Events dated before every era (LegendKeeper still names them; the
-  calendar profile reads no era there); their dates are as any other's. A calendar id
+  calendar it also counts the Events dated before every era (LegendKeeper still names them, as the
+  probe of 2026-10-25 read on its own dates before the epoch; the calendar profile reads no era
+  there); their dates are as any other's. A calendar id
   not among the calendars is a report line, and its events keep their minutes only. The Construct
   is hidden while only hidden timelines name it.
 - **A map document** (from either road) **becomes a Map** (ruled
@@ -188,8 +189,8 @@ What becomes what:
   ``max_x - min_x`` and ``height`` ``max_y - min_y`` from the document's ``map`` bounds (whole
   numbers), the bounds kept as ``x_legendkeeper_bounds`` and ``max_zoom`` as
   ``x_legendkeeper_max_zoom``. ``image_url`` is the map's ``mapId`` only when it is an http(s)
-  address, as given and never copied (ruled 2026-10-23): the image lives on LegendKeeper's host and
-  loads only as long as that account's asset does, which the report says; a bare asset id
+  address, as given and never copied (ruled 2026-10-23): the image stays on LegendKeeper's host,
+  which the report says; a bare asset id
   (LegendKeeper's tutorial map's) is kept as ``x_legendkeeper_map_id``, never written as a URL. A
   ``locatorId`` equal to the ``mapId`` is not kept; any other key of the ``map`` object is kept in
   ``x_legendkeeper_map``. The Map links its resource as ``location`` when the resource became a
@@ -2085,8 +2086,8 @@ class ImportReport:
                 lines.append(f"  - {m.name!r}{' (hidden)' if m.hidden else ''}: {what}")
             if any(m.image == "url" for m in self.maps):
                 lines.append(
-                    "  A Map's image_url is LegendKeeper's own address, as given, never copied: the image lives on"
-                    " LegendKeeper's host and loads only as long as that account's asset does."
+                    "  A Map's image_url is LegendKeeper's own address, as given, never copied: the image stays on"
+                    " LegendKeeper's host, so it is theirs to keep."
                 )
         if self.boards:
             lines.append(

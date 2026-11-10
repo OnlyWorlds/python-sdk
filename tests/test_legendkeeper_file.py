@@ -554,7 +554,7 @@ def test_the_quay_map_and_its_two_pins(tmp_path: Path) -> None:
     assert "'The quay map: Main': 800 x 600, 2 pins, image_url LegendKeeper's address, positions scaled by 2^2 = 4" in (
         text
     )
-    assert "loads only as long as that account's asset does" in text
+    assert "the image stays on LegendKeeper's host, so it is theirs to keep" in text
 
 
 def test_the_bare_id_map_and_its_unnamed_pins(tmp_path: Path) -> None:

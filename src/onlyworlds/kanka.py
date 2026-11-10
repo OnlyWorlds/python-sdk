@@ -140,7 +140,8 @@ whole and links what carries it, hidden or not; a tag row's ``is_hidden`` is kep
 ``x_kanka_is_hidden`` and hides nothing (believed: Kanka's flag for not showing a tag on its
 entities, beside ``is_private`` on the same row).
 
-**Starter entries travel.** A new Kanka campaign seeds template entries (``[Your Character
+**Starter entries travel.** In the export read when this door was built (2026-10-23), a new
+Kanka campaign held template entries (``[Your Character
 Name]``, ``[Your Kingdom Name]``, ...), and they are in the export. Nothing in the data marks
 them: ``is_template`` is false, ``marketplace_uuid`` null and ``created_by`` the person's own id
 on all of them, as on what the person typed. Their only tells are their bracketed names and a
