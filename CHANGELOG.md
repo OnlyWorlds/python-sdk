@@ -4,6 +4,10 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+## 0.111.0 (2026-11-10)
+
+- `TRAIL_TIERS`, `trail_by_place`'s default floors: each default tier is named by its own kinds: `location, object, zone` at 0, `character, collective, creature, species` at 240, `event` at 480, and the other eleven kinds at 720. The heights and the kinds are unchanged, so every point is the same; what moves is the text a tier's name reaches, each hanging Pin's `by` (`tier event; 3 of 7 on the spiral round it`) and the recipe's `settings.tiers`. The old names were group names for sets of kinds that no source holds. A caller that passes its own `tiers` sees no change. The shared trail fixture moves with it, the same bytes as the npm package's.
+
 ## 0.110.0 (2026-11-10)
 
 - The schema pin moves to schema-dist `v0.34.0-dist.110` (canonical `00.34.00` unchanged, so `SCHEMA_VERSION` is the same; no schema file moved). The map-space profile gains rules 8 to 10, the layout keys: `x_layout` on a Map (its Pins were laid out, by which method; `"hand"` is a board), the ground Map its layout stands on, and `x_hand: true` on a Pin placed by hand, which a new lay-out keeps. Its fixture gains `layout_cases` (17) beside the 34 `cases`, which do not change, and neither does `map_space`.

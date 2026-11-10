@@ -10,7 +10,7 @@
   "depth": 900,
   "tiers": [
    {
-    "name": "ground: places and things",
+    "name": "location, object, zone",
     "z": 0,
     "kinds": [
      "location",
@@ -19,7 +19,7 @@
     ]
    },
    {
-    "name": "people and the living",
+    "name": "character, collective, creature, species",
     "z": 240,
     "kinds": [
      "character",
@@ -29,14 +29,14 @@
     ]
    },
    {
-    "name": "what happened",
+    "name": "event",
     "z": 480,
     "kinds": [
      "event"
     ]
    },
    {
-    "name": "told or abstract",
+    "name": "ability, construct, family, institution, language, law, narrative, phenomenon, relation, title, trait",
     "z": 720,
     "kinds": [
      "ability",
@@ -543,7 +543,7 @@
     "x": 931,
     "y": 1483,
     "z": 240,
-    "by": "the hero: at the last place the text reaches, Nacogdoches; tier people and the living; 1 of 2 on the spiral round it"
+    "by": "the hero: at the last place the text reaches, Nacogdoches; tier character, collective, creature, species; 1 of 2 on the spiral round it"
    },
    {
     "element_type": "location",
@@ -561,7 +561,7 @@
     "x": 3206,
     "y": 3028,
     "z": 0,
-    "by": "first named in k1 before its text names a place: at The scullery, where the scene opens; tier ground: places and things; 1 of 19 on the spiral round it"
+    "by": "first named in k1 before its text names a place: at The scullery, where the scene opens; tier location, object, zone; 1 of 19 on the spiral round it"
    },
    {
     "element_type": "phenomenon",
@@ -570,7 +570,7 @@
     "x": 2881,
     "y": 3104,
     "z": 720,
-    "by": "its own link to The scullery; tier told or abstract; 10 of 19 on the spiral round it"
+    "by": "its own link to The scullery; tier ability, construct, family, institution, language, law, narrative, phenomenon, relation, title, trait; 10 of 19 on the spiral round it"
    },
    {
     "element_type": "zone",
@@ -579,7 +579,7 @@
     "x": 2948,
     "y": 3136,
     "z": 0,
-    "by": "the text is at The scullery when chapter 1 first names it; tier ground: places and things; 2 of 19 on the spiral round it"
+    "by": "the text is at The scullery when chapter 1 first names it; tier location, object, zone; 2 of 19 on the spiral round it"
    },
    {
     "element_type": "creature",
@@ -588,7 +588,7 @@
     "x": 3081,
     "y": 2860,
     "z": 240,
-    "by": "the text is at The scullery when chapter 1 first names it; tier people and the living; 3 of 19 on the spiral round it"
+    "by": "the text is at The scullery when chapter 1 first names it; tier character, collective, creature, species; 3 of 19 on the spiral round it"
    },
    {
     "element_type": "family",
@@ -597,7 +597,7 @@
     "x": 3152,
     "y": 2844,
     "z": 720,
-    "by": "the text is at The scullery when chapter 1 first names it; tier told or abstract; 11 of 19 on the spiral round it"
+    "by": "the text is at The scullery when chapter 1 first names it; tier ability, construct, family, institution, language, law, narrative, phenomenon, relation, title, trait; 11 of 19 on the spiral round it"
    },
    {
     "element_type": "ability",
@@ -606,7 +606,7 @@
     "x": 3128,
     "y": 3225,
     "z": 720,
-    "by": "the text is at The scullery when chapter 1 first names it; tier told or abstract; 12 of 19 on the spiral round it"
+    "by": "the text is at The scullery when chapter 1 first names it; tier ability, construct, family, institution, language, law, narrative, phenomenon, relation, title, trait; 12 of 19 on the spiral round it"
    },
    {
     "element_type": "relation",
@@ -615,7 +615,7 @@
     "x": 2885,
     "y": 2923,
     "z": 720,
-    "by": "the text is at The scullery when chapter 1 first names it; tier told or abstract; 13 of 19 on the spiral round it"
+    "by": "the text is at The scullery when chapter 1 first names it; tier ability, construct, family, institution, language, law, narrative, phenomenon, relation, title, trait; 13 of 19 on the spiral round it"
    },
    {
     "element_type": "construct",
@@ -624,7 +624,7 @@
     "x": 3273,
     "y": 2982,
     "z": 720,
-    "by": "the text is at The scullery when chapter 1 first names it; tier told or abstract; 14 of 19 on the spiral round it"
+    "by": "the text is at The scullery when chapter 1 first names it; tier ability, construct, family, institution, language, law, narrative, phenomenon, relation, title, trait; 14 of 19 on the spiral round it"
    },
    {
     "element_type": "language",
@@ -633,7 +633,7 @@
     "x": 2942,
     "y": 3204,
     "z": 720,
-    "by": "the text is at The scullery when chapter 1 first names it; tier told or abstract; 15 of 19 on the spiral round it"
+    "by": "the text is at The scullery when chapter 1 first names it; tier ability, construct, family, institution, language, law, narrative, phenomenon, relation, title, trait; 15 of 19 on the spiral round it"
    },
    {
     "element_type": "event",
@@ -642,7 +642,7 @@
     "x": 789,
     "y": 992,
     "z": 480,
-    "by": "its own link to The sawmill, The diphtheria pesthouse, Nacogdoches; tier what happened; 3 of 4 on the spiral round it"
+    "by": "its own link to The sawmill, The diphtheria pesthouse, Nacogdoches; tier event; 3 of 4 on the spiral round it"
    },
    {
     "element_type": "institution",
@@ -651,7 +651,7 @@
     "x": 880,
     "y": 1299,
     "z": 720,
-    "by": "the text is at The diphtheria pesthouse when chapter 6 first names it; tier told or abstract; 4 of 4 on the spiral round it"
+    "by": "the text is at The diphtheria pesthouse when chapter 6 first names it; tier ability, construct, family, institution, language, law, narrative, phenomenon, relation, title, trait; 4 of 4 on the spiral round it"
    },
    {
     "element_type": "character",
@@ -660,7 +660,7 @@
     "x": 914,
     "y": 1160,
     "z": 240,
-    "by": "the text is at The diphtheria pesthouse when chapter 6 first names it; tier people and the living; 1 of 4 on the spiral round it"
+    "by": "the text is at The diphtheria pesthouse when chapter 6 first names it; tier character, collective, creature, species; 1 of 4 on the spiral round it"
    },
    {
     "element_type": "location",
@@ -687,7 +687,7 @@
     "x": 656,
     "y": 1268,
     "z": 240,
-    "by": "the text is at The diphtheria pesthouse when chapter 6 first names it; tier people and the living; 2 of 4 on the spiral round it"
+    "by": "the text is at The diphtheria pesthouse when chapter 6 first names it; tier character, collective, creature, species; 2 of 4 on the spiral round it"
    },
    {
     "element_type": "character",
@@ -696,7 +696,7 @@
     "x": 3172,
     "y": 3167,
     "z": 240,
-    "by": "the text is at The scullery when chapter 1 first names it; tier people and the living; 4 of 19 on the spiral round it"
+    "by": "the text is at The scullery when chapter 1 first names it; tier character, collective, creature, species; 4 of 19 on the spiral round it"
    },
    {
     "element_type": "event",
@@ -705,7 +705,7 @@
     "x": 673,
     "y": 1591,
     "z": 480,
-    "by": "the text is at Nacogdoches when chapter 6 first names it; tier what happened; 2 of 2 on the spiral round it"
+    "by": "the text is at Nacogdoches when chapter 6 first names it; tier event; 2 of 2 on the spiral round it"
    },
    {
     "element_type": "trait",
@@ -714,7 +714,7 @@
     "x": 3038,
     "y": 2812,
     "z": 720,
-    "by": "the text is at The scullery when chapter 1 first names it; tier told or abstract; 16 of 19 on the spiral round it"
+    "by": "the text is at The scullery when chapter 1 first names it; tier ability, construct, family, institution, language, law, narrative, phenomenon, relation, title, trait; 16 of 19 on the spiral round it"
    },
    {
     "element_type": "location",
@@ -732,7 +732,7 @@
     "x": 2484,
     "y": 951,
     "z": 720,
-    "by": "the text is at The room above the courtyard when chapter 4 first names it; tier told or abstract; 5 of 6 on the spiral round it"
+    "by": "the text is at The room above the courtyard when chapter 4 first names it; tier ability, construct, family, institution, language, law, narrative, phenomenon, relation, title, trait; 5 of 6 on the spiral round it"
    },
    {
     "element_type": "trait",
@@ -741,7 +741,7 @@
     "x": 3234,
     "y": 3170,
     "z": 720,
-    "by": "first named in k2 before its text names a place: at The scullery, where the scene opens; tier told or abstract; 17 of 19 on the spiral round it"
+    "by": "first named in k2 before its text names a place: at The scullery, where the scene opens; tier ability, construct, family, institution, language, law, narrative, phenomenon, relation, title, trait; 17 of 19 on the spiral round it"
    },
    {
     "element_type": "character",
@@ -750,7 +750,7 @@
     "x": 2889,
     "y": 2997,
     "z": 240,
-    "by": "first named in k2 before its text names a place: at The scullery, where the scene opens; tier people and the living; 5 of 19 on the spiral round it"
+    "by": "first named in k2 before its text names a place: at The scullery, where the scene opens; tier character, collective, creature, species; 5 of 19 on the spiral round it"
    },
    {
     "element_type": "location",
@@ -768,7 +768,7 @@
     "x": 2603,
     "y": 784,
     "z": 720,
-    "by": "the text is at New Orleans when chapter 3 first names it; tier told or abstract; 1 of 1 on the spiral round it"
+    "by": "the text is at New Orleans when chapter 3 first names it; tier ability, construct, family, institution, language, law, narrative, phenomenon, relation, title, trait; 1 of 1 on the spiral round it"
    },
    {
     "element_type": "phenomenon",
@@ -777,7 +777,7 @@
     "x": 2844,
     "y": 3037,
     "z": 720,
-    "by": "first named in k2 before its text names a place: at The scullery, where the scene opens; tier told or abstract; 18 of 19 on the spiral round it"
+    "by": "first named in k2 before its text names a place: at The scullery, where the scene opens; tier ability, construct, family, institution, language, law, narrative, phenomenon, relation, title, trait; 18 of 19 on the spiral round it"
    },
    {
     "element_type": "event",
@@ -786,7 +786,7 @@
     "x": 3017,
     "y": 3211,
     "z": 480,
-    "by": "first named in k2 before its text names a place: at The scullery, where the scene opens; tier what happened; 7 of 19 on the spiral round it"
+    "by": "first named in k2 before its text names a place: at The scullery, where the scene opens; tier event; 7 of 19 on the spiral round it"
    },
    {
     "element_type": "character",
@@ -795,7 +795,7 @@
     "x": 2676,
     "y": 814,
     "z": 240,
-    "by": "the text is at The room above the courtyard when chapter 4 first names it; tier people and the living; 3 of 6 on the spiral round it"
+    "by": "the text is at The room above the courtyard when chapter 4 first names it; tier character, collective, creature, species; 3 of 6 on the spiral round it"
    },
    {
     "element_type": "location",
@@ -822,7 +822,7 @@
     "x": 2977,
     "y": 2857,
     "z": 480,
-    "by": "its own link to The scullery; tier what happened; 8 of 19 on the spiral round it"
+    "by": "its own link to The scullery; tier event; 8 of 19 on the spiral round it"
    },
    {
     "element_type": "collective",
@@ -831,7 +831,7 @@
     "x": 2767,
     "y": 1121,
     "z": 240,
-    "by": "the text is at The room above the courtyard when chapter 4 first names it; tier people and the living; 4 of 6 on the spiral round it"
+    "by": "the text is at The room above the courtyard when chapter 4 first names it; tier character, collective, creature, species; 4 of 6 on the spiral round it"
    },
    {
     "element_type": "location",
@@ -849,7 +849,7 @@
     "x": 2580,
     "y": 2698,
     "z": 0,
-    "by": "its own link to The Mississippi; tier ground: places and things; 1 of 2 on the spiral round it"
+    "by": "its own link to The Mississippi; tier location, object, zone; 1 of 2 on the spiral round it"
    },
    {
     "element_type": "character",
@@ -858,7 +858,7 @@
     "x": 622,
     "y": 621,
     "z": 240,
-    "by": "the text is at Galveston when chapter 6 first names it; tier people and the living; 2 of 4 on the spiral round it"
+    "by": "the text is at Galveston when chapter 6 first names it; tier character, collective, creature, species; 2 of 4 on the spiral round it"
    },
    {
     "element_type": "object",
@@ -867,7 +867,7 @@
     "x": 2801,
     "y": 982,
     "z": 0,
-    "by": "the text is at The room above the courtyard when chapter 4 first names it; tier ground: places and things; 1 of 6 on the spiral round it"
+    "by": "the text is at The room above the courtyard when chapter 4 first names it; tier location, object, zone; 1 of 6 on the spiral round it"
    },
    {
     "element_type": "event",
@@ -876,7 +876,7 @@
     "x": 2322,
     "y": 2806,
     "z": 480,
-    "by": "its own link to Saint Louis, The Mississippi, New Orleans; tier what happened; 2 of 2 on the spiral round it"
+    "by": "its own link to Saint Louis, The Mississippi, New Orleans; tier event; 2 of 2 on the spiral round it"
    },
    {
     "element_type": "location",
@@ -903,7 +903,7 @@
     "x": 880,
     "y": 513,
     "z": 0,
-    "by": "first named in k6 before its text names a place: at Galveston, where the scene opens; tier ground: places and things; 1 of 4 on the spiral round it"
+    "by": "first named in k6 before its text names a place: at Galveston, where the scene opens; tier location, object, zone; 1 of 4 on the spiral round it"
    },
    {
     "element_type": "event",
@@ -912,7 +912,7 @@
     "x": 846,
     "y": 652,
     "z": 480,
-    "by": "the text is at Galveston when chapter 6 first names it; tier what happened; 4 of 4 on the spiral round it"
+    "by": "the text is at Galveston when chapter 6 first names it; tier event; 4 of 4 on the spiral round it"
    },
    {
     "element_type": "character",
@@ -921,7 +921,7 @@
     "x": 3222,
     "y": 2929,
     "z": 240,
-    "by": "first named in k2 before its text names a place: at The scullery, where the scene opens; tier people and the living; 6 of 19 on the spiral round it"
+    "by": "first named in k2 before its text names a place: at The scullery, where the scene opens; tier character, collective, creature, species; 6 of 19 on the spiral round it"
    },
    {
     "element_type": "object",
@@ -930,7 +930,7 @@
     "x": 2543,
     "y": 1090,
     "z": 0,
-    "by": "the text is at The room above the courtyard when chapter 4 first names it; tier ground: places and things; 2 of 6 on the spiral round it"
+    "by": "the text is at The room above the courtyard when chapter 4 first names it; tier location, object, zone; 2 of 6 on the spiral round it"
    },
    {
     "element_type": "event",
@@ -939,7 +939,7 @@
     "x": 3251,
     "y": 3095,
     "z": 480,
-    "by": "first named in k2 before its text names a place: at The scullery, where the scene opens; tier what happened; 9 of 19 on the spiral round it"
+    "by": "first named in k2 before its text names a place: at The scullery, where the scene opens; tier event; 9 of 19 on the spiral round it"
    },
    {
     "element_type": "trait",
@@ -948,7 +948,7 @@
     "x": 3225,
     "y": 2869,
     "z": 720,
-    "by": "first named in k2 before its text names a place: at The scullery, where the scene opens; tier told or abstract; 19 of 19 on the spiral round it"
+    "by": "first named in k2 before its text names a place: at The scullery, where the scene opens; tier ability, construct, family, institution, language, law, narrative, phenomenon, relation, title, trait; 19 of 19 on the spiral round it"
    },
    {
     "element_type": "character",
@@ -957,7 +957,7 @@
     "x": 2702,
     "y": 883,
     "z": 240,
-    "by": "its location, The tavern; tier people and the living; 1 of 2 on the spiral round it"
+    "by": "its location, The tavern; tier character, collective, creature, species; 1 of 2 on the spiral round it"
    },
    {
     "element_type": "location",
@@ -975,7 +975,7 @@
     "x": 2444,
     "y": 991,
     "z": 480,
-    "by": "its own link to The tavern; tier what happened; 2 of 2 on the spiral round it"
+    "by": "its own link to The tavern; tier event; 2 of 2 on the spiral round it"
    },
    {
     "element_type": "relation",
@@ -984,7 +984,7 @@
     "x": 2817,
     "y": 883,
     "z": 720,
-    "by": "its own link to The room above the courtyard; tier told or abstract; 6 of 6 on the spiral round it"
+    "by": "its own link to The room above the courtyard; tier ability, construct, family, institution, language, law, narrative, phenomenon, relation, title, trait; 6 of 6 on the spiral round it"
    },
    {
     "element_type": "collective",
@@ -993,7 +993,7 @@
     "x": 755,
     "y": 345,
     "z": 240,
-    "by": "first named in k6 before its text names a place: at Galveston, where the scene opens; tier people and the living; 3 of 4 on the spiral round it"
+    "by": "first named in k6 before its text names a place: at Galveston, where the scene opens; tier character, collective, creature, species; 3 of 4 on the spiral round it"
    }
   ],
   "route": [
@@ -1108,7 +1108,7 @@
       "x": 382,
       "y": 608,
       "z": 0,
-      "by": "tier ground: places and things; 2 of 2 on the spiral round it"
+      "by": "tier location, object, zone; 2 of 2 on the spiral round it"
      },
      {
       "element_type": "location",
@@ -1126,7 +1126,7 @@
       "x": 640,
       "y": 500,
       "z": 240,
-      "by": "tier people and the living; 1 of 2 on the spiral round it"
+      "by": "tier character, collective, creature, species; 1 of 2 on the spiral round it"
      }
     ],
     "route": [

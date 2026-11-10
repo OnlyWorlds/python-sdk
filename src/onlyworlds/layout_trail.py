@@ -95,13 +95,18 @@ class TrailHanger(TypedDict):
     by: NotRequired[str]
 
 
-#: The default floors: places and things on the ground, the living above, what happened higher, what is told highest.
+#: The default floors, each named by its own kinds: location, object and zone on the ground; character,
+#: collective, creature and species at 240; event at 480; the other eleven kinds at 720.
 TRAIL_TIERS: tuple[TrailTier, ...] = (
-    {"name": "ground: places and things", "z": 0, "kinds": ["location", "object", "zone"]},
-    {"name": "people and the living", "z": 240, "kinds": ["character", "collective", "creature", "species"]},
-    {"name": "what happened", "z": 480, "kinds": ["event"]},
+    {"name": "location, object, zone", "z": 0, "kinds": ["location", "object", "zone"]},
     {
-        "name": "told or abstract",
+        "name": "character, collective, creature, species",
+        "z": 240,
+        "kinds": ["character", "collective", "creature", "species"],
+    },
+    {"name": "event", "z": 480, "kinds": ["event"]},
+    {
+        "name": "ability, construct, family, institution, language, law, narrative, phenomenon, relation, title, trait",
         "z": 720,
         "kinds": [
             "ability",

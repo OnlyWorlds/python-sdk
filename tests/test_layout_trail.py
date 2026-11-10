@@ -16,7 +16,7 @@ import pytest
 from onlyworlds import TRAIL_TIERS, map_space, trail_by_place
 
 FIXTURE = Path(__file__).resolve().parent / "fixtures" / "layout" / "trail-by-place.json"
-FIXTURE_SHA = "546ca817f7f74f81"
+FIXTURE_SHA = "73dd976db27891d7"
 BYTES = FIXTURE.read_bytes()
 FX: dict[str, Any] = json.loads(BYTES.decode("utf-8"))
 
