@@ -1198,7 +1198,7 @@ def fernhollow_world(rules: Any = None, *, key: bool = True) -> Elements:
             "name": "Fund A",
             "supertype": "Funding",
             "subtype": "in talks",
-            "description": "Roles: Jasper leads.\nNext: the call.",
+            "description": "Roles: Bo leads.\nNext: the call.",
             "actor": C1,
         },
         {
