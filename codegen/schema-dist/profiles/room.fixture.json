@@ -2,7 +2,7 @@
   "profile": "room",
   "profile_page": "profiles/room.md",
   "notes": [
-    "pairs: the ten type-and-supertype pairs a reader matches, each trimmed and compared without regard to case.",
+    "pairs: the ten type-and-supertype pairs a reader matches, each trimmed and compared without regard to case. The order is the table's and carries no meaning: a reader matches a pair and may keep them as a set.",
     "mark: x_room_of, the id of the world or the sitting the room belongs to; a room element carries it, a lore element never does.",
     "item: x_room_item, written only on a Take, the id of the work item the take is on; it makes nothing a room element, the pair and the mark do.",
     "cases: element gives type, supertype and x_room_of as a body might carry them; in_room is what isRoomElement must answer: the pair AND the mark."

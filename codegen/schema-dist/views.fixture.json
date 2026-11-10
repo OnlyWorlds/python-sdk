@@ -1,0 +1,500 @@
+{
+  "views": "views.json",
+  "notes": [
+    "Each case: an element as a tool is served it, and what a reader of views.json answers: the row's id (null: no row, the type draws as today), the one sentence (null when no row or no field holds anything), and the banners at the head in order.",
+    "Matching a pair with its mark is the profile's own reader and its own fixture (room.fixture.json, the charter cases); these cases only test which row wins and what a row gives.",
+    "cites: every field a row names (sentence, lead, fold, layout.by), quoted from the page that defines the kind at its line; a reader of this file checks each quote at its line, and that each named field is one the row's type has in the standard."
+  ],
+  "cases": [
+    {
+      "name": "report-marked",
+      "element": {
+        "type": "narrative",
+        "supertype": "Report",
+        "subtype": "completed",
+        "x_room_of": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+        "description": "Sat with the Consul at the Steinway.\nTwo songs, one name for the tree-ship.",
+        "story": "The whole evening.",
+        "consequences": "Renamed the Consul's ship: ow://object/0199c3a1-0000-7000-8000-000000000001"
+      },
+      "expect": {
+        "row": "report",
+        "sentence": "Sat with the Consul at the Steinway.",
+        "banners": []
+      }
+    },
+    {
+      "name": "report-handed-in-description-empty",
+      "element": {
+        "type": "narrative",
+        "supertype": "Report",
+        "subtype": "handed in",
+        "x_room_of": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+        "description": "",
+        "story": "Walked the Time Tombs with Sol.\nSeven questions came out of it."
+      },
+      "expect": {
+        "row": "report",
+        "sentence": "Walked the Time Tombs with Sol.",
+        "banners": []
+      }
+    },
+    {
+      "name": "report-description-only-spaces",
+      "element": {
+        "type": "narrative",
+        "supertype": "Report",
+        "x_room_of": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+        "description": "   ",
+        "story": "  Line one  \nLine two"
+      },
+      "expect": {
+        "row": "report",
+        "sentence": "Line one",
+        "banners": []
+      }
+    },
+    {
+      "name": "report-lore-no-mark",
+      "element": {
+        "type": "narrative",
+        "supertype": "Report",
+        "description": "The scout's report on the northern pass."
+      },
+      "expect": {
+        "row": null,
+        "sentence": null,
+        "banners": []
+      }
+    },
+    {
+      "name": "charter-marked",
+      "element": {
+        "type": "law",
+        "supertype": "Charter",
+        "x_charter_of": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+        "description": "How we work in this world.\nOne: every AI session ends with a report."
+      },
+      "expect": {
+        "row": "charter",
+        "sentence": "How we work in this world.",
+        "banners": []
+      }
+    },
+    {
+      "name": "charter-lore-no-mark",
+      "element": {
+        "type": "law",
+        "supertype": "Charter",
+        "description": "The free city's charter of 1204."
+      },
+      "expect": {
+        "row": null,
+        "sentence": null,
+        "banners": []
+      }
+    },
+    {
+      "name": "message",
+      "element": {
+        "type": "narrative",
+        "supertype": "Message",
+        "description": null,
+        "story": "Can we meet on Thursday?\nI have the mocks."
+      },
+      "expect": {
+        "row": "message",
+        "sentence": "Can we meet on Thursday?",
+        "banners": []
+      }
+    },
+    {
+      "name": "message-supertype-trimmed-and-folded",
+      "element": {
+        "type": "Narrative",
+        "supertype": " message ",
+        "story": "Hello."
+      },
+      "expect": {
+        "row": "message",
+        "sentence": "Hello.",
+        "banners": []
+      }
+    },
+    {
+      "name": "message-description-leads-the-sentence",
+      "element": {
+        "type": "narrative",
+        "supertype": "Message",
+        "description": "About the mocks",
+        "story": "Long text."
+      },
+      "expect": {
+        "row": "message",
+        "sentence": "About the mocks",
+        "banners": []
+      }
+    },
+    {
+      "name": "message-carriage-return-line-break",
+      "element": {
+        "type": "narrative",
+        "supertype": "Message",
+        "story": "First line\r\nSecond line"
+      },
+      "expect": {
+        "row": "message",
+        "sentence": "First line",
+        "banners": []
+      }
+    },
+    {
+      "name": "message-nothing-to-say",
+      "element": {
+        "type": "narrative",
+        "supertype": "Message",
+        "description": null,
+        "story": ""
+      },
+      "expect": {
+        "row": "message",
+        "sentence": null,
+        "banners": []
+      }
+    },
+    {
+      "name": "room-line-beats-message",
+      "element": {
+        "type": "narrative",
+        "supertype": "Message",
+        "x_room_of": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+        "story": "Taking this one."
+      },
+      "expect": {
+        "row": "room-line",
+        "sentence": "Taking this one.",
+        "banners": [
+          "x_room_of"
+        ]
+      }
+    },
+    {
+      "name": "room-line-proposed-banner-order",
+      "element": {
+        "type": "narrative",
+        "supertype": "Message",
+        "x_room_of": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+        "x_review_proposed": {
+          "by": "0199c3a1-0000-7000-8000-00000000000a",
+          "evidence": "a seat's write",
+          "expires": "2026-12-10"
+        },
+        "story": "Proposed line."
+      },
+      "expect": {
+        "row": "room-line",
+        "sentence": "Proposed line.",
+        "banners": [
+          "x_review_proposed",
+          "x_room_of"
+        ]
+      }
+    },
+    {
+      "name": "message-hidden-and-trimmed",
+      "element": {
+        "type": "narrative",
+        "supertype": "Message",
+        "hidden": true,
+        "x_served_trimmed": [
+          "characters"
+        ],
+        "characters": [],
+        "story": "To someone you cannot see."
+      },
+      "expect": {
+        "row": "message",
+        "sentence": "To someone you cannot see.",
+        "banners": [
+          "hidden",
+          "x_served_trimmed"
+        ]
+      }
+    },
+    {
+      "name": "message-hidden-false-is-no-banner",
+      "element": {
+        "type": "narrative",
+        "supertype": "Message",
+        "hidden": false,
+        "story": "Plain."
+      },
+      "expect": {
+        "row": "message",
+        "sentence": "Plain.",
+        "banners": []
+      }
+    },
+    {
+      "name": "known-of-stub",
+      "element": {
+        "type": "narrative",
+        "supertype": "Message",
+        "known_of": true,
+        "description": "A letter someone sent."
+      },
+      "expect": {
+        "row": "message",
+        "sentence": "A letter someone sent.",
+        "banners": [
+          "known_of"
+        ]
+      }
+    },
+    {
+      "name": "no-row-type-alone",
+      "element": {
+        "type": "character",
+        "name": "Ada",
+        "description": "A founder."
+      },
+      "expect": {
+        "row": null,
+        "sentence": null,
+        "banners": []
+      }
+    },
+    {
+      "name": "no-row-still-carries-banners",
+      "element": {
+        "type": "character",
+        "name": "Ada",
+        "hidden": true
+      },
+      "expect": {
+        "row": null,
+        "sentence": null,
+        "banners": [
+          "hidden"
+        ]
+      }
+    },
+    {
+      "name": "message-lone-carriage-return",
+      "element": {
+        "type": "narrative",
+        "supertype": "Message",
+        "story": "One.\rTwo."
+      },
+      "expect": {
+        "row": "message",
+        "sentence": "One.",
+        "banners": []
+      }
+    },
+    {
+      "name": "message-opens-with-a-line-break",
+      "element": {
+        "type": "narrative",
+        "supertype": "Message",
+        "story": "\nFirst line\nSecond line"
+      },
+      "expect": {
+        "row": "message",
+        "sentence": "First line",
+        "banners": []
+      }
+    },
+    {
+      "name": "message-non-string-sentence-field",
+      "element": {
+        "type": "narrative",
+        "supertype": "Message",
+        "description": 42,
+        "story": "Plain text."
+      },
+      "expect": {
+        "row": "message",
+        "sentence": "Plain text.",
+        "banners": []
+      }
+    },
+    {
+      "name": "message-line-separator-is-no-cut",
+      "element": {
+        "type": "narrative",
+        "supertype": "Message",
+        "story": "One\u2028Two\nThree"
+      },
+      "expect": {
+        "row": "message",
+        "sentence": "One\u2028Two",
+        "banners": []
+      }
+    },
+    {
+      "name": "message-empty-served-trimmed-is-no-banner",
+      "element": {
+        "type": "narrative",
+        "supertype": "Message",
+        "story": "Hello.",
+        "x_served_trimmed": []
+      },
+      "expect": {
+        "row": "message",
+        "sentence": "Hello.",
+        "banners": []
+      }
+    },
+    {
+      "name": "message-hidden-not-true-is-no-banner",
+      "element": {
+        "type": "narrative",
+        "supertype": "Message",
+        "story": "Hello.",
+        "hidden": "true"
+      },
+      "expect": {
+        "row": "message",
+        "sentence": "Hello.",
+        "banners": []
+      }
+    },
+    {
+      "name": "message-checked-banner",
+      "element": {
+        "type": "narrative",
+        "supertype": "Message",
+        "story": "Hello.",
+        "x_review_checked": {
+          "by": "0199c3a1-0000-7000-8000-00000000000a",
+          "at": "2026-11-10",
+          "against": "the Consul's own account of the Hegira"
+        }
+      },
+      "expect": {
+        "row": "message",
+        "sentence": "Hello.",
+        "banners": [
+          "x_review_checked"
+        ]
+      }
+    },
+    {
+      "name": "message-proposed-empty-object-is-no-banner",
+      "element": {
+        "type": "narrative",
+        "supertype": "Message",
+        "story": "Hello.",
+        "x_review_proposed": {}
+      },
+      "expect": {
+        "row": "message",
+        "sentence": "Hello.",
+        "banners": []
+      }
+    },
+    {
+      "name": "message-proposed-string-is-no-banner",
+      "element": {
+        "type": "narrative",
+        "supertype": "Message",
+        "story": "Hello.",
+        "x_review_proposed": "yes"
+      },
+      "expect": {
+        "row": "message",
+        "sentence": "Hello.",
+        "banners": []
+      }
+    },
+    {
+      "name": "room-line-known-of-falls-to-message",
+      "element": {
+        "type": "narrative",
+        "supertype": "Message",
+        "known_of": true,
+        "description": "A line in a room."
+      },
+      "expect": {
+        "row": "message",
+        "sentence": "A line in a room.",
+        "banners": [
+          "known_of"
+        ]
+      }
+    }
+  ],
+  "cites": [
+    {
+      "row": "report",
+      "field": "story",
+      "page": "profiles/report.md",
+      "line": 17,
+      "quote": "| `story` | the reporter's own text, whole, and never changed after step 1 |"
+    },
+    {
+      "row": "report",
+      "field": "description",
+      "page": "profiles/report.md",
+      "line": 21,
+      "quote": "| `description` | the short human part"
+    },
+    {
+      "row": "report",
+      "field": "consequences",
+      "page": "profiles/report.md",
+      "line": 23,
+      "quote": "| `consequences` | what was changed in the world because of it"
+    },
+    {
+      "row": "charter",
+      "field": "description",
+      "page": "profiles/charter.md",
+      "line": 9,
+      "quote": "its description, read whole on first entry"
+    },
+    {
+      "row": "message",
+      "field": "story",
+      "page": "profiles/message.md",
+      "line": 14,
+      "quote": "| `story` | the body, verbatim |"
+    },
+    {
+      "row": "message",
+      "field": "description",
+      "page": "profiles/message.md",
+      "line": 15,
+      "quote": "| `description` | optional: a one-line summary, or empty |"
+    },
+    {
+      "row": "message",
+      "field": "parent_narrative",
+      "page": "profiles/message.md",
+      "line": 16,
+      "quote": "| `parent_narrative` | the message this one answers; a thread is the chain of these |"
+    },
+    {
+      "row": "room-line",
+      "field": "story",
+      "page": "profiles/message.md",
+      "line": 14,
+      "quote": "| `story` | the body, verbatim |"
+    },
+    {
+      "row": "room-line",
+      "field": "description",
+      "page": "profiles/message.md",
+      "line": 15,
+      "quote": "| `description` | optional: a one-line summary, or empty |"
+    },
+    {
+      "row": "room-line",
+      "field": "parent_narrative",
+      "page": "profiles/message.md",
+      "line": 16,
+      "quote": "| `parent_narrative` | the message this one answers; a thread is the chain of these |"
+    }
+  ]
+}

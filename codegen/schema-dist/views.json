@@ -1,0 +1,121 @@
+{
+  "_meta": {
+    "name": "views",
+    "version": 1,
+    "what": "How an element is shown, by its kind. Presentation data, not the standard. A kind with no row draws as its type draws today, in the standard's section order. Each tool keeps its own drawing and reads the row; nothing here says who may see or do what (that is the server's, by what it serves).",
+    "match": "A row's kind is a type alone, a type with a supertype, or a profile's pair, which matches only with that profile's mark, by that profile's own reader (room: isRoomElement in npm, is_room_element in Python; charter: isCharterElement, is_charter_element). Types and supertypes are trimmed and folded as profiles/room.md defines once. The most specific row wins: a profile's pair, then a type with a supertype, then a type alone. No two rows hold the same kind: a file where two do is at fault. An element no row matches has no row and draws as its type; the banners still show.",
+    "sentence": "The card's, a list row's and a hover's one sentence: the first field named in the row's `sentence` whose value is a string that holds something after trimming; that value trimmed, cut at its first line break (U+000A or U+000D), and trimmed again, whitespace being the room profile's White_Space set. A field whose value is not a string holds nothing. No field holds anything: no sentence.",
+    "banners": "Marks a served body carries, shown at the head of every kind's page in this order, each read as the page or document named defines it: `hidden` and `known_of` only when true, `x_served_trimmed` only when it names a field, and the two review marks only when the value is an object with something in it (profiles/review.md rules 1 and 4: an empty mark is settled, and a reader that shows a world to its people ignores a value that is not an object). A row's own `banner` adds to them, after them. Three of them are onlyworlds.com's own, not the standard's, and say so: a reader on another platform may never see them."
+  },
+  "banners": [
+    {
+      "mark": "known_of",
+      "defined_by": "onlyworlds.com, not the standard: a known-of stub, known_of: true (the API document, https://www.onlyworlds.com/api/v2/openapi.json)"
+    },
+    {
+      "mark": "hidden",
+      "defined_by": "onlyworlds.com, not the standard: hidden: true, served only to readers who still see the element (the API document, https://www.onlyworlds.com/api/v2/openapi.json)"
+    },
+    {
+      "mark": "x_review_proposed",
+      "defined_by": "profiles/review.md"
+    },
+    {
+      "mark": "x_review_checked",
+      "defined_by": "profiles/review.md"
+    },
+    {
+      "mark": "x_served_trimmed",
+      "defined_by": "onlyworlds.com, not the standard: ids the server left out of a list, the field named (the API document, https://www.onlyworlds.com/api/v2/openapi.json; profiles/message.md reads it)"
+    }
+  ],
+  "layouts": {
+    "document": "the fields in the row's order: lead open, then the rest in the standard's sections, then fold; a kind with no row is a document",
+    "conversation": "the element within its chain by the named link, oldest first by created_at, stopping at an id already visited"
+  },
+  "rows": [
+    {
+      "id": "report",
+      "kind": {
+        "profile": "room",
+        "pair": "narrative/Report"
+      },
+      "from": "profiles/report.md (serial 112)",
+      "sentence": [
+        "description",
+        "story"
+      ],
+      "lead": [
+        "description",
+        "consequences"
+      ],
+      "fold": [
+        {
+          "field": "story",
+          "label": "The full report"
+        }
+      ],
+      "layout": {
+        "name": "document"
+      }
+    },
+    {
+      "id": "charter",
+      "kind": {
+        "profile": "charter",
+        "pair": "law/Charter"
+      },
+      "from": "profiles/charter.md",
+      "sentence": [
+        "description"
+      ],
+      "lead": [
+        "description"
+      ],
+      "layout": {
+        "name": "document"
+      }
+    },
+    {
+      "id": "message",
+      "kind": {
+        "type": "narrative",
+        "supertype": "Message"
+      },
+      "from": "profiles/message.md",
+      "sentence": [
+        "description",
+        "story"
+      ],
+      "lead": [
+        "story"
+      ],
+      "layout": {
+        "name": "conversation",
+        "by": "parent_narrative"
+      }
+    },
+    {
+      "id": "room-line",
+      "kind": {
+        "profile": "room",
+        "pair": "narrative/Message"
+      },
+      "from": "profiles/room.md, profiles/message.md",
+      "sentence": [
+        "description",
+        "story"
+      ],
+      "lead": [
+        "story"
+      ],
+      "layout": {
+        "name": "conversation",
+        "by": "parent_narrative"
+      },
+      "banner": [
+        "x_room_of"
+      ]
+    }
+  ]
+}

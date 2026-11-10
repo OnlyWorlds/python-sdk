@@ -4,6 +4,9 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+## 0.112.1 (2026-11-10)
+
+- Schema repinned to schema-dist v0.34.0-dist.113 (canonical 00.34.00 unchanged, no schema file moved): the distribution adds `views.json` and its fixture (how an element is shown by its kind; read in TypeScript by `viewOf`, not read here); the room profile says its pairs' order carries no meaning (no pair moved); two examples reworded. The room and checks fixtures are replayed unchanged.
 - `lenses_in_use`'s docstring says what a None membership means, in the lens profile's words since serial 112: there is no membership (a folder world), and then the Character's `x_lens_uses` is read. Behaviour unchanged
 
 ## 0.112.0 (2026-11-10)
