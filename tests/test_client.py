@@ -1175,3 +1175,26 @@ def test_refusals_leaves_out_a_row_not_in_its_shape() -> None:
         {"word": "x", "stop_reason": "y", "output_tokens": 2**53},
     ]
     assert _refused([*bad, good]).refusals == [good]
+
+
+def test_search_sends_q_and_each_option_under_its_wire_name(make_client: MakeClient) -> None:
+    """As the npm SDK's search (4.150.0): GET /search, q always, type, limit and as only when given."""
+    answer = {"query": "APP-142", "results": [], "count": 0, "truncated": False}
+    t = FakeTransport(handler=lambda *a: jresp(200, answer))
+    client = make_client(t)
+    assert client.search("APP-142") == answer
+    assert t.calls[0].method == "GET"
+    assert t.calls[0].url.endswith("/search?q=APP-142")
+    client.search("copper mine", element_type="location", limit=200, view_as="public")
+    assert t.calls[1].url.endswith("/search?q=copper%20mine&type=location&limit=200&as=public")
+
+
+def test_search_refuses_a_q_that_is_not_a_string_before_sending(make_client: MakeClient) -> None:
+    t = FakeTransport(handler=lambda *a: jresp(200, {}))
+    client = make_client(t)
+    for bad in (None, 42, ["harbour"]):
+        with pytest.raises(TypeError):
+            client.search(bad)  # type: ignore[arg-type]
+    with pytest.raises(ValueError):
+        client.search("harbour", element_type="locations/../me")
+    assert t.calls == []

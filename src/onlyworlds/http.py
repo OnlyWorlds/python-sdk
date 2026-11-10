@@ -762,6 +762,36 @@ class Client:
         )
         return self._element(self.call("GET", f"{t}/{i}/" + (f"?{query}" if query else "")), "GET", t)
 
+    def search(
+        self,
+        q: str,
+        *,
+        element_type: str | None = None,
+        limit: int | None = None,
+        view_as: str | None = None,
+    ) -> dict[str, Any]:
+        """``GET /search``: the world's elements whose ``name`` or text fields (``description`` and
+        the type's other prose fields; never supertype, subtype or image_url) hold every word of
+        ``q`` as a whole word, ignoring case. ``{query, results, count, truncated}``; each result
+        ``{type, id, name, supertype, subtype, field, snippet}``, and ``known_of: True`` on one the
+        reader knows of without seeing it whole.
+
+        A word is a run of letters, digits or underscores, so ``APP-142`` is searched as the two
+        words ``APP`` and ``142``; a ``snippet`` is a piece of one field, so read the element to
+        keep only those that hold a key whole. No stemming and no pages: ``truncated`` says more
+        matched than ``limit`` (1 to 200; the server's default 50) let through. ``element_type``
+        (sent as ``type``) searches one type; ``view_as`` (sent as ``as``): see ``list_page``.
+        ``q`` must hold 2 to 200 characters once trimmed, else keel answers 422.
+        """
+        if not isinstance(q, str):
+            raise TypeError(f"search: q is the words to find, a string; got {type(q).__name__}. Nothing was sent.")
+        t = _segment(element_type, _TYPE, "element type") if element_type is not None else None
+        query = self._query({"q": q, "type": t, "limit": limit, "as": view_as})
+        page = self.call("GET", f"search?{query}")
+        if not isinstance(page, dict):
+            raise ValueError(f"GET /search returned no answer: {str(page)[:200]}")
+        return page
+
     def create(
         self, element_type: str, element: Mapping[str, Any], *, idempotency_key: str | None = None
     ) -> dict[str, Any]:

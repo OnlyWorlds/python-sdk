@@ -4,6 +4,10 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+## 0.113.0 (2026-11-10)
+
+- `Client.search(q, element_type=, limit=, view_as=)`: `GET /search`, the world's elements whose name or text fields hold every word of `q` as a whole word, ignoring case, answered as `{query, results, count, truncated}` (each result with its `type`, `id`, `name`, `supertype`, `subtype`, the `field` the words were found in, a `snippet` of it, and `known_of` on a row read as known of). A word is a run of letters, digits or underscores, so `APP-142` is searched as two words; a snippet is a piece of one field, so read the element to keep only those that hold a key whole. No pages: `truncated` says more matched than `limit` (1 to 200) let through. A `q` that is not a string, or an element type outside the rule, sends nothing. As the npm SDK's `search` (4.150.0).
+
 ## 0.112.1 (2026-11-10)
 
 - Schema repinned to schema-dist v0.34.0-dist.113 (canonical 00.34.00 unchanged, no schema file moved): the distribution adds `views.json` and its fixture (how an element is shown by its kind; read in TypeScript by `viewOf`, not read here); the room profile says its pairs' order carries no meaning (no pair moved); two examples reworded. The room and checks fixtures are replayed unchanged.

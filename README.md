@@ -47,6 +47,8 @@ for character in client.iter_elements("character", expand=["species"]):
     print(character["name"])
 ```
 
+`client.search("APP-142", limit=200)` finds the elements whose name or text holds every word you give, as whole words. A word is a run of letters, digits or underscores, so `APP-142` is two words, and each result carries only a `snippet` of one field: read an element before relying on a key it must hold whole. There are no pages: `truncated` means more matched than `limit` (at most 200) let through.
+
 An element can be created hidden from its first moment: `writer.create("narrative", {"name": "The plot", "hidden": True})`, and the same on `upsert` (a PUT whose id is new) and each `bulk` item. Only the owner's keys and a co-builder's may; any other key gets `ApiError` 403 `hidden_not_allowed` (`err.is_hidden_not_allowed`), and nothing is created. On an update the mark is never sent: `patch` leaves it out, a PUT that replaces ignores it, and an existing element is hidden or shown through its own route on the site.
 
 ## World folders
