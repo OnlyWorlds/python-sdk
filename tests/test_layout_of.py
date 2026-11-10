@@ -109,3 +109,15 @@ def test_a_ground_map_that_is_no_id_is_no_ground() -> None:
             "x_layout": {"method": "trail-by-place", "settings": {"ground": {"map": named}}},
         }
         assert layout_of(this, [this, ground], [])["ground"] is None, named
+
+
+def test_a_map_row_without_a_string_id_is_no_map() -> None:
+    # reading H, ruled for the Map row too: the empty answer whatever the row carries, as the npm reading does
+    ground = {"type": "map", "id": "g"}
+    recipe = {"method": "hand", "settings": {"ground": {"map": "g"}}}
+    for no_id in ("", 7, True, None, ["m"]):
+        this: dict[str, Any] = {"type": "map", "x_layout": recipe}
+        if no_id is not None:
+            this["id"] = no_id
+        pins = [{"type": "pin", "id": "p", "map": no_id, "x_hand": True}]
+        assert layout_of(this, [this, ground], pins) == {"layout": None, "ground": None, "hand": []}, no_id

@@ -229,7 +229,10 @@ def layout_of(
     """Read the layout keys of one Map: ``map`` the Map, ``maps`` the Maps the reader is served, ``pins`` every Pin
     the caller holds, of any Map (the reading keeps those whose ``map`` names this Map)."""
     this = _id(map.get("id")) if isinstance(map, Mapping) else None
-    recipe = map.get("x_layout") if isinstance(map, Mapping) else None
+    if this is None:
+        # A Map row without a string id is no Map (reading H), whatever it carries: the empty answer.
+        return {"layout": None, "ground": None, "hand": []}
+    recipe = map.get("x_layout")
     method = recipe.get("method") if isinstance(recipe, Mapping) else None
     if not isinstance(recipe, Mapping) or not isinstance(method, str) or method == "":
         return {"layout": None, "ground": None, "hand": []}

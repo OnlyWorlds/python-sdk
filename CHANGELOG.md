@@ -6,6 +6,7 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## 0.111.0 (2026-11-10)
 
+- `layout_of` answers the empty reading (`{layout: None, ground: None, hand: []}`) for a Map row without a string id, whatever it carries, as the npm package does: such a row is no Map (the map-space profile's reading H, now ruled for the Map row). Before, it answered the row's method and ground.
 - `TRAIL_TIERS`, `trail_by_place`'s default floors: each default tier is named by its own kinds: `location, object, zone` at 0, `character, collective, creature, species` at 240, `event` at 480, and the other eleven kinds at 720. The heights and the kinds are unchanged, so every point is the same; what moves is the text a tier's name reaches, each hanging Pin's `by` (`tier event; 3 of 7 on the spiral round it`) and the recipe's `settings.tiers`. The old names were group names for sets of kinds that no source holds. A caller that passes its own `tiers` sees no change. The shared trail fixture moves with it, the same bytes as the npm package's.
 
 ## 0.110.0 (2026-11-10)
