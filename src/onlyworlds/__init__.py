@@ -90,7 +90,7 @@ from .layout_trail import (
     trail_by_place,
 )
 from .lens import DATE_FIELD, LensMail, LensReading, date_of, is_lens, is_template, lenses_in_use, resolve_lens
-from .map_space import MapSpace, MapSpaceMap, MapSpaceOutline, MapSpacePin, map_space
+from .map_space import MapLayout, MapSpace, MapSpaceMap, MapSpaceOutline, MapSpacePin, layout_of, map_space
 from .message import (
     EditRead,
     SenderRead,
@@ -180,6 +180,7 @@ __all__ = [
     "LandingMember",
     "LensMail",
     "LensReading",
+    "MapLayout",
     "MapSpace",
     "MapSpaceMap",
     "MapSpaceOutline",
@@ -247,6 +248,7 @@ __all__ = [
     "is_template",
     "is_to_everyone",
     "landing_of",
+    "layout_of",
     "lenses_in_use",
     "map_space",
     "note_of",

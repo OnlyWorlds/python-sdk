@@ -11,6 +11,11 @@ ties by id in code point order. A row the reading leaves aside is counted in ``o
 ``no_markers``, ``dangling``, ``no_map``); a reason with nothing counted is absent. The same input gives the same
 answer, key order included. The fixture (``codegen/schema-dist/profiles/map-space.fixture.json``) is replayed
 whole by ``tests/test_map_space.py``.
+
+``layout_of(map, maps, pins)`` is the page's second, small reading (rules 8 to 10): whether one Map is a layout map
+(``x_layout`` with a non-empty string ``method``; ``"hand"`` is a board), the served Map its layout stands on, and
+the Pins a new lay-out keeps where they are. ``map_space`` reads none of these keys. The fixture's ``layout_cases``
+are replayed whole by ``tests/test_layout_of.py``.
 """
 
 from __future__ import annotations
@@ -71,6 +76,20 @@ class MapSpace(TypedDict):
     zones: list[MapSpaceOutline]
     pins: list[MapSpacePin]
     out: dict[str, int]
+
+
+class MapLayout(TypedDict):
+    """The layout reading of one Map (rules 8 to 10)."""
+
+    #: The ``x_layout`` method when the Map is a layout map (``"hand"`` for a board), else None. A method no page
+    #: names answers itself.
+    layout: str | None
+    #: When ``layout`` is not None, the id ``x_layout.settings.ground.map`` names when it is a served Map other than
+    #: this one, else None. Its size is not returned: the caller holds the served Map.
+    ground: str | None
+    #: The ids of the Pins a new lay-out keeps where they are, in code point order: every Pin of a board, the Pins
+    #: whose ``x_hand`` is exactly ``True`` on any other layout map, and none on a Map that is not a layout map.
+    hand: list[str]
 
 
 def _id(value: Any) -> str | None:
@@ -196,3 +215,37 @@ def map_space(elements: Iterable[Mapping[str, Any]]) -> MapSpace:
         frames.append(frame)
 
     return {"maps": frames, "zones": outlines, "pins": pins, "out": {k: n for k, n in out.items() if n}}
+
+
+def _rows(rows: Iterable[Any]) -> dict[str, Mapping[str, Any]]:
+    """Rows by id as the map-space reading takes them: a row without a string id is none (reading H), and the last
+    row served for an id wins (reading I)."""
+    return {row["id"]: row for row in rows if isinstance(row, Mapping) and _id(row.get("id"))}
+
+
+def layout_of(
+    map: Mapping[str, Any], maps: Iterable[Mapping[str, Any]], pins: Iterable[Mapping[str, Any]]
+) -> MapLayout:
+    """Read the layout keys of one Map: ``map`` the Map, ``maps`` the Maps the reader is served, ``pins`` every Pin
+    the caller holds, of any Map (the reading keeps those whose ``map`` names this Map)."""
+    this = _id(map.get("id")) if isinstance(map, Mapping) else None
+    recipe = map.get("x_layout") if isinstance(map, Mapping) else None
+    method = recipe.get("method") if isinstance(recipe, Mapping) else None
+    if not isinstance(recipe, Mapping) or not isinstance(method, str) or method == "":
+        return {"layout": None, "ground": None, "hand": []}
+
+    ground: str | None = None
+    settings = recipe.get("settings")
+    named = settings.get("ground") if isinstance(settings, Mapping) else None
+    if isinstance(named, Mapping):
+        ground = _id(named.get("map"))
+        if ground is not None and (ground == this or ground not in _rows(maps)):
+            ground = None
+
+    # A board's Pins are all placed by hand; on any other method only a Pin marked exactly true (never 1 or "true").
+    hand = sorted(
+        pin_id
+        for pin_id, pin in _rows(pins).items()
+        if this is not None and pin.get("map") == this and (method == "hand" or pin.get("x_hand") is True)
+    )
+    return {"layout": method, "ground": ground, "hand": hand}

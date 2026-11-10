@@ -5,6 +5,7 @@ The package version runs on its own semver; the schema it is generated from is `
 ## Unreleased
 
 - The schema pin moves to schema-dist `v0.34.0-dist.110` (canonical `00.34.00` unchanged, so `SCHEMA_VERSION` is the same; no schema file moved). The map-space profile gains rules 8 to 10, the layout keys: `x_layout` on a Map (its Pins were laid out, by which method; `"hand"` is a board), the ground Map its layout stands on, and `x_hand: true` on a Pin placed by hand, which a new lay-out keeps. Its fixture gains `layout_cases` (17) beside the 34 `cases`, which do not change, and neither does `map_space`.
+- `layout_of(map, maps, pins)`, the map-space profile's layout reading of one Map, answered as `{layout, ground, hand}` (`MapLayout`). `layout` is the `x_layout` method when it is a non-empty string, else `None` (a method no page names answers itself). `ground` is, on a layout map, the id `x_layout.settings.ground.map` names when it is a served Map other than this one, else `None`; its size is not returned. `hand` is the ids of the Pins a new lay-out keeps, in code point order: on a board every Pin of the Map, on any other layout map the Pins whose `x_hand` is exactly `True` (not `1` or `"true"`), on a plain Map none. `pins` may hold every Pin the caller has: the reader keeps those whose `map` is this Map, rows read as `map_space` reads them. The fixture's 17 `layout_cases` are replayed whole.
 
 ## 0.109.0 (2026-11-09)
 
