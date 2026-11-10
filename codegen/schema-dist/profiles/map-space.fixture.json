@@ -8749,6 +8749,217 @@
      "019a9100-0000-7000-8000-0000000d0003"
     ]
    }
+  },
+  {
+   "name": "hand-in-code-point-order",
+   "claim": "`hand` is by id in code point order, never by UTF-16 unit: an id holding a character above U+FFFF sorts after one holding U+FFFF, though its first UTF-16 unit is lower",
+   "map": "019a9100-0000-7000-8000-00000000aa01",
+   "elements": [
+    {
+     "type": "map",
+     "id": "019a9100-0000-7000-8000-00000000aa01",
+     "name": "trail",
+     "x_layout": {
+      "method": "trail-by-place"
+     }
+    },
+    {
+     "type": "pin",
+     "id": "p🚢",
+     "name": "pin",
+     "map": "019a9100-0000-7000-8000-00000000aa01",
+     "x": 10,
+     "y": 10,
+     "x_hand": true
+    },
+    {
+     "type": "pin",
+     "id": "p￿",
+     "name": "pin",
+     "map": "019a9100-0000-7000-8000-00000000aa01",
+     "x": 10,
+     "y": 10,
+     "x_hand": true
+    }
+   ],
+   "want": {
+    "layout": "trail-by-place",
+    "ground": null,
+    "hand": [
+     "p￿",
+     "p🚢"
+    ]
+   }
+  },
+  {
+   "name": "repeated-pin-id-last-row-wins",
+   "claim": "two rows with one Pin id are one Pin, and the last row served is the one read (reading I): a Pin marked in its first row and not in its last is not in `hand`, and one unmarked in its first row and marked in its last is",
+   "map": "019a9100-0000-7000-8000-00000000aa01",
+   "elements": [
+    {
+     "type": "map",
+     "id": "019a9100-0000-7000-8000-00000000aa01",
+     "name": "trail",
+     "x_layout": {
+      "method": "trail-by-place"
+     }
+    },
+    {
+     "type": "pin",
+     "id": "019a9100-0000-7000-8000-0000000d0001",
+     "name": "pin",
+     "map": "019a9100-0000-7000-8000-00000000aa01",
+     "x": 10,
+     "y": 10,
+     "x_hand": true
+    },
+    {
+     "type": "pin",
+     "id": "019a9100-0000-7000-8000-0000000d0002",
+     "name": "pin",
+     "map": "019a9100-0000-7000-8000-00000000aa01",
+     "x": 20,
+     "y": 20
+    },
+    {
+     "type": "pin",
+     "id": "019a9100-0000-7000-8000-0000000d0001",
+     "name": "pin",
+     "map": "019a9100-0000-7000-8000-00000000aa01",
+     "x": 11,
+     "y": 11
+    },
+    {
+     "type": "pin",
+     "id": "019a9100-0000-7000-8000-0000000d0002",
+     "name": "pin",
+     "map": "019a9100-0000-7000-8000-00000000aa01",
+     "x": 21,
+     "y": 21,
+     "x_hand": true
+    }
+   ],
+   "want": {
+    "layout": "trail-by-place",
+    "ground": null,
+    "hand": [
+     "019a9100-0000-7000-8000-0000000d0002"
+    ]
+   }
+  },
+  {
+   "name": "pin-without-a-string-id",
+   "claim": "a Pin row with no id, and one whose id is a number, is no Pin (reading H): neither is in `hand`, and the reading does not fail on them",
+   "map": "019a9100-0000-7000-8000-00000000aa01",
+   "elements": [
+    {
+     "type": "map",
+     "id": "019a9100-0000-7000-8000-00000000aa01",
+     "name": "trail",
+     "x_layout": {
+      "method": "trail-by-place"
+     }
+    },
+    {
+     "type": "pin",
+     "id": "019a9100-0000-7000-8000-0000000d0001",
+     "name": "pin",
+     "map": "019a9100-0000-7000-8000-00000000aa01",
+     "x": 10,
+     "y": 10,
+     "x_hand": true
+    },
+    {
+     "type": "pin",
+     "name": "pin",
+     "map": "019a9100-0000-7000-8000-00000000aa01",
+     "x": 20,
+     "y": 20,
+     "x_hand": true
+    },
+    {
+     "type": "pin",
+     "id": 7,
+     "name": "pin",
+     "map": "019a9100-0000-7000-8000-00000000aa01",
+     "x": 30,
+     "y": 30,
+     "x_hand": true
+    }
+   ],
+   "want": {
+    "layout": "trail-by-place",
+    "ground": null,
+    "hand": [
+     "019a9100-0000-7000-8000-0000000d0001"
+    ]
+   }
+  },
+  {
+   "name": "map-without-a-string-id",
+   "claim": "a Map row with no `id`, and one whose `id` is a number, is no Map (reading H): the reading answers `layout` and `ground` null and `hand` empty for either, whatever the row carries and whichever marked Pins are held, one with no `map` and one whose `map` is the number among them",
+   "map_index": [
+    0,
+    1
+   ],
+   "elements": [
+    {
+     "type": "map",
+     "name": "trail",
+     "x_layout": {
+      "method": "trail-by-place",
+      "settings": {
+       "ground": {
+        "map": "019a9100-0000-7000-8000-00000000aa02",
+        "width": 100,
+        "height": 50
+       }
+      }
+     }
+    },
+    {
+     "type": "map",
+     "id": 7,
+     "name": "trail",
+     "x_layout": {
+      "method": "trail-by-place",
+      "settings": {
+       "ground": {
+        "map": "019a9100-0000-7000-8000-00000000aa02",
+        "width": 100,
+        "height": 50
+       }
+      }
+     }
+    },
+    {
+     "type": "map",
+     "id": "019a9100-0000-7000-8000-00000000aa02",
+     "name": "ground"
+    },
+    {
+     "type": "pin",
+     "id": "019a9100-0000-7000-8000-0000000d0001",
+     "name": "pin",
+     "x": 10,
+     "y": 10,
+     "x_hand": true
+    },
+    {
+     "type": "pin",
+     "id": "019a9100-0000-7000-8000-0000000d0002",
+     "name": "pin",
+     "map": 7,
+     "x": 20,
+     "y": 20,
+     "x_hand": true
+    }
+   ],
+   "want": {
+    "layout": null,
+    "ground": null,
+    "hand": []
+   }
   }
  ]
 }

@@ -18,7 +18,7 @@ from onlyworlds import layout_of, map_space
 
 REPO = Path(__file__).resolve().parent.parent
 FIXTURE = REPO / "codegen" / "schema-dist" / "profiles" / "map-space.fixture.json"
-LAYOUT_CASES_IN_FIXTURE = 17
+LAYOUT_CASES_IN_FIXTURE = 21
 
 
 def load_fixture() -> dict[str, Any]:
@@ -42,15 +42,31 @@ def test_the_fixture_holds_every_layout_case() -> None:
     assert len({c["name"] for c in CASES}) == LAYOUT_CASES_IN_FIXTURE
 
 
+def rows_read(case: dict[str, Any], elements: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """The Map rows a case reads: the one its ``map`` id names, or, for a row with no string id, each position
+    ``map_index`` lists (serial 111); the answer is the case's ``want`` for each."""
+    if "map_index" in case:
+        assert "map" not in case, f"{case['name']}: both map and map_index"
+        index = case["map_index"]
+        assert isinstance(index, list) and index, f"{case['name']}: map_index is a list of positions"
+        rows = [elements[i] for i in index]
+        assert all(r["type"] == "map" for r in rows), f"{case['name']}: a map_index position is no Map row"
+        return rows
+    assert isinstance(case.get("map"), str) and case["map"], f"{case['name']}: neither a map id nor map_index"
+    rows = [e for e in elements if e["type"] == "map" and e.get("id") == case["map"]]
+    assert len(rows) == 1, f"{case['name']}: no one Map row with the case's id"
+    return rows
+
+
 @pytest.mark.parametrize("case", CASES, ids=lambda c: c["name"])
 def test_layout_of(case: dict[str, Any]) -> None:
     elements = copy.deepcopy(case["elements"])
     maps = [e for e in elements if e["type"] == "map"]
     pins = [e for e in elements if e["type"] == "pin"]
-    (this,) = [m for m in maps if m["id"] == case["map"]]
-    got = layout_of(this, maps, pins)
-    assert got == case["want"], case.get("claim")
-    assert text(got) == text(case["want"]), "the same answer in another key order"
+    for this in rows_read(case, elements):
+        got = layout_of(this, maps, pins)
+        assert got == case["want"], case.get("claim")
+        assert text(got) == text(case["want"]), "the same answer in another key order"
     assert elements == case["elements"], "layout_of moved its input"
 
 

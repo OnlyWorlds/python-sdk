@@ -2,15 +2,20 @@
   "_what": "The recorded pin for the vendored OnlyWorlds schema distribution (codegen/schema-dist/, copied byte-exact). Do not edit by hand; re-vendor from the pinned tag and review the diff. Kept equal to the npm SDK's pin (github.com/OnlyWorlds/sdk, codegen/schema-pin.json) on purpose: two clients, one schema.",
   "_why_manifest_sha256": "Verifying the tree against its own MANIFEST.json only proves internal consistency. If the tag moved, the manifest moved with it. The hash recorded here is the one first accepted, which is what makes a moved tag visible.",
   "repo": "https://github.com/OnlyWorlds/schema-dist",
-  "tag": "v0.34.0-dist.110",
-  "commit": "533a581f4ab3b3bd9a7e9212db657720dbd8709c",
-  "manifest_sha256": "cd20696a05a8e6e80367ec3ebcf1cc9a910cc77de65a840de89e39dec1edfbe6",
+  "tag": "v0.34.0-dist.111",
+  "commit": "bfc90b419b4f7e7de01f345f5e348a7b648c0bad",
+  "manifest_sha256": "b662309bf0c910b08bd530097ade51dc50a55eaef95b023c1cc57a720d63b8b7",
   "canonical_version": "00.34.00",
-  "dist_serial": 110,
+  "dist_serial": 111,
   "published": "2026-11-10",
   "pinned_at": "2026-11-10",
   "pinned_by": "The maintainer: tree from `git archive` of the tag in a schema-dist checkout (206 files: the 205 the MANIFEST lists, and MANIFEST.json itself); files re-hashed against MANIFEST.json by generate_schema.py; MANIFEST self-hash matched against the raw file GitHub serves at the tag, whose ref resolves to the commit above.",
   "previous_pins": [
+    {
+      "tag": "v0.34.0-dist.110",
+      "manifest_sha256": "cd20696a05a8e6e80367ec3ebcf1cc9a910cc77de65a840de89e39dec1edfbe6",
+      "note": "superseded by v0.34.0-dist.111 (canonical 00.34.00 unchanged, no schema file moved; map-space.fixture.json gains four layout_cases, an id above U+FFFF beside one in U+E000..U+FFFF, a repeated Pin id where the last row wins, a Pin row without a string id and a Map row without a string id, 21 in all, and map-space.md says reading H holds for the Map row too)"
+    },
     {
       "tag": "v0.34.0-dist.109",
       "manifest_sha256": "1aa35790618aa99ca22989bc07b4054f6e35f7fca18a435da48646533f6d3f1c",

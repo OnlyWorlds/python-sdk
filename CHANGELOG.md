@@ -4,6 +4,10 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+## 0.111.1 (2026-11-10)
+
+- Schema repinned to schema-dist v0.34.0-dist.111 (canonical 00.34.00 unchanged, no schema file moved): the map-space fixture gains four layout cases, 21 in all: an id above U+FFFF beside one in U+E000..U+FFFF, a repeated Pin id where the last row wins, a Pin row without a string id, and a Map row without a string id; the page says reading H holds for the Map row too. `layout_of` answers all four (the Map row's since 0.111.0). The layout cases are replayed by their `map` id, or, for a Map row with no string id, at each position the case's `map_index` lists, the answer the case's `want` for each; a case with neither fails by name.
+
 ## 0.111.0 (2026-11-10)
 
 - `layout_of` answers the empty reading (`{layout: None, ground: None, hand: []}`) for a Map row without a string id, whatever it carries, as the npm package does: such a row is no Map (the map-space profile's reading H, now ruled for the Map row). Before, it answered the row's method and ground.
