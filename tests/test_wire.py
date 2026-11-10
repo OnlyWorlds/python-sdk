@@ -286,6 +286,7 @@ def test_the_202_and_the_five_codes_are_what_the_client_reads(doc: dict[str, Any
         "proposed_only": (403, "is_proposed_only"),
         "own_proposal": (403, "is_own_proposal"),
         "not_proposed": (422, "is_not_proposed"),
+        "review_by_another": (403, "is_review_by_another"),
     }
     for code, (status, flag) in predicates.items():
         assert codes[code]["status"] == status, code

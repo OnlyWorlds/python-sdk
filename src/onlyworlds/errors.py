@@ -268,6 +268,15 @@ class ApiError(Exception):
         another keeper decides it."""
         return self.status == 403 and self.code == "own_proposal"
 
+    @property
+    def is_review_by_another(self) -> bool:
+        """A write from a key below co-builder (a contributor's or a guest's, a person's or an AI seat's)
+        set an ``x_review_proposed`` or ``x_review_checked`` mark whose ``by`` is not the writer's own
+        membership id (403 ``review_by_another``, ``param`` the mark; nothing written). Send your own
+        membership id as ``by``, or the mark exactly as the element holds it. A Character's id is refused
+        too. Retrying will not help."""
+        return self.status == 403 and self.code == "review_by_another"
+
 
 class PreconditionFailed(ApiError):
     """412 ``precondition_failed``: the element changed since the ``change_seq`` sent as

@@ -308,6 +308,7 @@ CODES = [
     (403, "permission_error", "proposed_only", "is_proposed_only"),
     (403, "permission_error", "own_proposal", "is_own_proposal"),
     (422, "invalid_request", "not_proposed", "is_not_proposed"),  # a review of an unmarked element
+    (403, "permission_error", "review_by_another", "is_review_by_another"),  # a mark's by not the writer's own
 ]
 
 
