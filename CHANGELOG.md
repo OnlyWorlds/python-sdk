@@ -4,6 +4,13 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+## 0.114.0 (2026-11-10)
+
+- Schema repinned to schema-dist v0.34.0-dist.114 (canonical 00.34.00 unchanged, no schema file moved).
+- `resolve_lens`: a short row (`show` of `first_line` or `name`) now carries `supertype` and `subtype`, after `name` and before `description`, so a reader of short rows can tell each row's kind and state without a second read. Each is carried only when the body the reader is served holds it as a string with something left after trimming White_Space, and then as stored, never trimmed; absent, null, an empty string, White_Space alone and a value that is not a string give no key. A known-of stub is served its supertype and subtype, so its short row carries them by the same rule. A `full` row is unchanged. The lens fixture's 210 cases (9 new) are replayed, the short rows' key order with them.
+- The review profile's rule 5: an `x_review_proposed` object with at least one key is a mark whatever its keys and their values (`{"note": "x"}`, `{"by": null}`), shown as proposed with no proposer named and, without an `expires` day, never lapsed. `proposed_mark_of` and `hands_on_as_proposed` already read it so; new test cases hold it, beside `1`, `true` and `["a"]` read as a doubt. Behaviour unchanged.
+- The distribution's other moves are read elsewhere or by nothing here: the report profile lets one `consequences` line name many elements by kind and count with no address (this package reads no report's `consequences`), and `views.json` moves to version 2 (read by the npm SDK, not here).
+
 ## 0.113.0 (2026-11-10)
 
 - `Client.search(q, element_type=, limit=, view_as=)`: `GET /search`, the world's elements whose name or text fields hold every word of `q` as a whole word, ignoring case, answered as `{query, results, count, truncated}` (each result with its `type`, `id`, `name`, `supertype`, `subtype`, the `field` the words were found in, a `snippet` of it, and `known_of` on a row read as known of). A word is a run of letters, digits or underscores, so `APP-142` is searched as two words; a snippet is a piece of one field, so read the element to keep only those that hold a key whole. No pages: `truncated` says more matched than `limit` (1 to 200) let through. A `q` that is not a string, or an element type outside the rule, sends nothing. As the npm SDK's `search` (4.150.0).

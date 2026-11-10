@@ -39,6 +39,21 @@ CASES: list[tuple[str, Any, Any, bool]] = [
         True,
     ),
     (
+        "an object holding only a key the profile does not name: a mark (rule 5)",
+        {"note": "x"},
+        {"by": None, "expires": None, "lapsed": False},
+        True,
+    ),
+    (
+        "an object whose by is null: a mark, no proposer named (rule 5)",
+        {"by": None},
+        {"by": None, "expires": None, "lapsed": False},
+        True,
+    ),
+    ("one: a value, a doubt", 1, None, True),
+    ("true: a value, a doubt", True, None, True),
+    ("a list holding a string: present, not a mark, a doubt", ["a"], None, True),
+    (
         "a whole mark, open",
         {"by": "m1", "evidence": "seen", "expires": "2026-11-01"},
         {"by": "m1", "expires": "2026-11-01", "lapsed": False},

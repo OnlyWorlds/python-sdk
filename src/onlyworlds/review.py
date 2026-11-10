@@ -6,9 +6,11 @@ decline deletes the element.
 
 The mark is read by presence, as the room and charter profiles read theirs (rule 1, serial 87): absent,
 None, a string with nothing left after trimming White_Space, an empty list and an empty object are all no
-mark, and the element is settled. Any other value is present. Two readings of a present value, as rules 1
-and 4 give them. A reader that shows a world to its people shows the mark when it is an object
-(``proposed_mark_of``); any other value is not a mark and is reported by a lint, never repaired. A reader
+mark, and the element is settled. Any other value is present. Two readings of a present value, as rules 1,
+4 and 5 give them. A reader that shows a world to its people shows the mark when it is an object, and an
+object with at least one key is a mark whatever its keys and their values (rule 5: ``{"note": "x"}`` and
+``{"by": None}`` are proposed, with no proposer named and no lapse day) (``proposed_mark_of``); any other
+value is not a mark and is reported by a lint, never repaired. A reader
 that hands a world on leaves out every element whose mark is present (``hands_on_as_proposed``), so a doubt
 never reaches an AI as canon. The npm
 SDK's ``proposedMarkOf`` and ``handsOnAsProposed`` are the same readers, and ``tests/test_review.py`` holds
@@ -56,7 +58,9 @@ def _present(value: Any) -> bool:
 def proposed_mark_of(element: Any, today: str | None = None) -> ProposedMark | None:
     """The proposed mark of an element as a reader that shows a world shows it, or None for a settled
     element: ``x_review_proposed`` absent, None, empty (a blank string, ``[]``, ``{}``), or a value that is
-    not an object (a list included).
+    not an object (a list included). An object with at least one key is a mark whatever its keys (rule 5): a
+    ``by`` that is not a string with something in it names no proposer, and an ``expires`` not shaped as a day
+    never lapses.
     ``today`` is a day as the profile writes one (YYYY-MM-DD), by default today in UTC; anything else is
     a TypeError."""
     if today is not None and not (isinstance(today, str) and _DAY.fullmatch(today)):
