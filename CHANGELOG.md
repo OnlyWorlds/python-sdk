@@ -4,6 +4,11 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+## 0.112.0 (2026-11-10)
+
+- `ApiError.refusals`: on a 422 `answer_not_parsed` from an AI use the server reads itself, each answer it refused, in order, as `{"word", "stop_reason", "output_tokens"}`, as the API document now declares the error envelope (the npm SDK's `err.refusals`, 4.145.0). A row not in that shape is left out; None for any other error, or when the server sends none. The wire test allows the envelope's `refusals` only where the document declares it, and then requires it read
+- Schema repinned to schema-dist v0.34.0-dist.112 (canonical 00.34.00 unchanged, no schema file moved): `ROOM_PAIRS` gains the room profile's tenth pair, `narrative`/`Report`, the new report profile's pair (`profiles/report.md`), so `is_room_element` counts a marked report and every reader that leaves the room out of a lore view leaves it out too (the pack, the lens readers unless a lens's `types` names `narrative/report`); a Narrative with supertype `Report` and no mark stays lore. The room fixture's 35 cases (3 new) and the lens fixture are replayed
+
 ## 0.111.1 (2026-11-10)
 
 - Schema repinned to schema-dist v0.34.0-dist.111 (canonical 00.34.00 unchanged, no schema file moved): the map-space fixture gains four layout cases, 21 in all: an id above U+FFFF beside one in U+E000..U+FFFF, a repeated Pin id where the last row wins, a Pin row without a string id, and a Map row without a string id; the page says reading H holds for the Map row too. `layout_of` answers all four (the Map row's since 0.111.0). The layout cases are replayed by their `map` id, or, for a Map row with no string id, at each position the case's `map_index` lists, the answer the case's `want` for each; a case with neither fails by name.

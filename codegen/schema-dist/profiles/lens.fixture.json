@@ -7,7 +7,7 @@
     "worlds: each world's elements as its owner is served them, the ids its hidden mark keeps from every reader but the owner, and its readers. A reader's rung is owner (the whole world), contributor (the world less the hidden), guest (exactly the whole and known_of ids it lists; known_of is a stub, and a known_of id the hidden mark keeps is not in its view at all: hidden beats known_of, and only a guest's own creation, listed in whole, stays) or public (the world less the hidden and the room elements). An element whose x_review_proposed holds any value but null is in no reader's view (the review profile's rule for a reader that hands a world on). A reader with as is the owner reading as that reader: the reader's view, and the owner's two counts (anchor_not_visible, not_visible).",
     "resolve: lens is the lens read, a body or the id of a lens in the world; as_of is the reading's date (absent: the world's now; with neither, no fence and the window cuts nothing); clock is the reading's wall clock, for the mail rule and changed_within. kept is the resolved set in order, cut the count by reason (a reason with no count is absent). rows, where given, are the kept rows as show makes them; mail, where given, is the mail rule's part; notes_ignored counts notes on ids that are not anchors.",
     "invariant: subset (each reader's kept is a subset of the owner's, and no secret's id or name appears anywhere in a non-owner result), same_without (each reader's result is identical with the without ids removed from the world), unchanged (the world is identical before and after every reader's reading).",
-    "uses: which lenses a seat reads, from its membership's choice (null: none made) and its Character's x_lens_uses.",
+    "uses: which lenses a seat reads, from its membership's choice and its Character's x_lens_uses. membership null means there is no membership (a folder world), and then the Character's x_lens_uses is read; a membership that exists and never chose is not this reading's case (keel gives that seat its Titles' lenses and never reads x_lens_uses).",
     "graph: a case carries its own small world (the elements as the owner is served them, hidden: true on an element the hidden mark keeps, a room element by its pair and x_room_of, a proposed one by x_review_proposed) and reader (rung; a guest's whole and known_of; the owner's as), because the order case needs ids above U+FFFF that no uuid can carry; options are the graph's flags and lens (an id, or a lens body); want is the nodes in order with their marks, the edges in order, edges_cut, the lens's cut and unreadable; edges_cut_reasons lists every reason an edge can be cut by, the graph's own first, then a lens's; graph_links is the closed table of extension fields that make an edge.",
     "degree: the two counts over a graph; a case's graph is nodes and edges as worldGraph gives them, and its want is degree and out_degree per node, every node a key in the graph's node order."
   ],
@@ -78,6 +78,7 @@
   "room_pairs": [
     "narrative/message",
     "narrative/board",
+    "narrative/report",
     "relation/work item",
     "construct/spec",
     "relation/heart",

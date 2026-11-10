@@ -2,15 +2,20 @@
   "_what": "The recorded pin for the vendored OnlyWorlds schema distribution (codegen/schema-dist/, copied byte-exact). Do not edit by hand; re-vendor from the pinned tag and review the diff. Kept equal to the npm SDK's pin (github.com/OnlyWorlds/sdk, codegen/schema-pin.json) on purpose: two clients, one schema.",
   "_why_manifest_sha256": "Verifying the tree against its own MANIFEST.json only proves internal consistency. If the tag moved, the manifest moved with it. The hash recorded here is the one first accepted, which is what makes a moved tag visible.",
   "repo": "https://github.com/OnlyWorlds/schema-dist",
-  "tag": "v0.34.0-dist.111",
-  "commit": "bfc90b419b4f7e7de01f345f5e348a7b648c0bad",
-  "manifest_sha256": "b662309bf0c910b08bd530097ade51dc50a55eaef95b023c1cc57a720d63b8b7",
+  "tag": "v0.34.0-dist.112",
+  "commit": "04ce83d4c6604319c730ad63683d5b3134b5c328",
+  "manifest_sha256": "8dc2266f011656225a3a4b61174c4afc6d34b71d6e685912ca357fd6c27f7e7a",
   "canonical_version": "00.34.00",
-  "dist_serial": 111,
+  "dist_serial": 112,
   "published": "2026-11-10",
   "pinned_at": "2026-11-10",
   "pinned_by": "The maintainer: tree from `git archive` of the tag in a schema-dist checkout (206 files: the 205 the MANIFEST lists, and MANIFEST.json itself); files re-hashed against MANIFEST.json by generate_schema.py; MANIFEST self-hash matched against the raw file GitHub serves at the tag, whose ref resolves to the commit above.",
   "previous_pins": [
+    {
+      "tag": "v0.34.0-dist.111",
+      "manifest_sha256": "b662309bf0c910b08bd530097ade51dc50a55eaef95b023c1cc57a720d63b8b7",
+      "note": "superseded by v0.34.0-dist.112 (canonical 00.34.00 unchanged, no schema file moved; the room profile's tenth pair narrative/Report with three cases, 35 in all; lens.fixture.json's room_pairs gains narrative/report; profiles/report.md new; packet.md gains x_packet_for)"
+    },
     {
       "tag": "v0.34.0-dist.110",
       "manifest_sha256": "cd20696a05a8e6e80367ec3ebcf1cc9a910cc77de65a840de89e39dec1edfbe6",

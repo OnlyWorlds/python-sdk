@@ -184,6 +184,33 @@ class ApiError(Exception):
         return reason if reason in ("role", "view") else None
 
     @property
+    def refusals(self) -> list[dict[str, Any]] | None:
+        """The answers an AI use refused, in order, from a 422 ``answer_not_parsed`` envelope's
+        ``refusals``: each ``{"word", "stop_reason", "output_tokens"}``, so an answer cut off at
+        ``max_tokens`` reads apart from one in the wrong shape. None for any other error, or when the
+        server sends none; a row not in that shape is left out (as the npm SDK's ``err.refusals``)."""
+        if not (self.status == 422 and self.code == "answer_not_parsed"):
+            return None
+        raw_error = _envelope(self.response.body).get("error")
+        rows = raw_error.get("refusals") if isinstance(raw_error, dict) else None
+        if not isinstance(rows, list):
+            return None
+        out: list[dict[str, Any]] = []
+        for r in rows:
+            if not isinstance(r, dict):
+                continue
+            word, stop, tokens = r.get("word"), r.get("stop_reason"), r.get("output_tokens")
+            if (
+                isinstance(word, str)
+                and isinstance(stop, str)
+                and isinstance(tokens, int)
+                and not isinstance(tokens, bool)
+                and abs(tokens) <= 2**53 - 1
+            ):
+                out.append({"word": word, "stop_reason": stop, "output_tokens": tokens})
+        return out
+
+    @property
     def is_busy(self) -> bool:
         """keel's admission control turned the request away (503 ``server_busy``); see ``retry_after``."""
         return self.status == 503 and self.code == "server_busy"

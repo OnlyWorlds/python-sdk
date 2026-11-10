@@ -23,7 +23,7 @@ The list holds two groups. **The row kinds** (the Object, Location, Construct an
 
 A Character, an Institution and a Collective take any supertype: they are drawn by their type. A supertype is in the list only with its own type (`Page` on an Object is off the list). An element of a listed type whose supertype is off the list, or empty, is **off-list**: a picture draws it as a plain dot and a key names it as missing, never silently. The subtype is the owner's finer word and free.
 
-`Charter` is the one Law that is the world's Charter (keel's front door and the checks profile read the newest Law with that supertype made by the owner or a co-builder); a project's charter is `Project charter`, so it never becomes the world's.
+`Charter` is the one Law that is the world's Charter (keel's front door and the checks profile read it as the charter profile selects it: "the newest marked Charter Law, newest by `created_at` and then by the higher id", a Law with that supertype carrying the mark `x_charter_of`; the pair without the mark is lore); a project's charter is `Project charter`, so it never becomes the world's.
 
 **The keys.** Machine values are lowercase, and a reader compares them trimmed and without regard to case, as above.
 

@@ -484,8 +484,23 @@ def test_the_list_envelope_names_are_the_ones_iter_elements_follows(doc: dict[st
 def test_every_key_of_the_error_envelope_reaches_apierror(doc: dict[str, Any]) -> None:
     err = doc["components"]["schemas"]["Error"]["properties"]["error"]
     five = {"type", "code", "message", "param", "doc_url"}
-    # With the hidden mark on, a 409 resync_required's envelope also carries `reason`.
-    assert set(err["properties"]) in (five, five | {"reason"})
+    # With the hidden mark on, a 409 resync_required's envelope also carries `reason`; an AI use's
+    # 422 answer_not_parsed carries `refusals`. Each is allowed only when declared, and then read.
+    assert set(err["properties"]) - five <= {"reason", "refusals"}
+    assert five <= set(err["properties"])
+    if "refusals" in err["properties"]:
+        refused = {
+            "error": {
+                "type": "invalid_request",
+                "code": "answer_not_parsed",
+                "message": "m",
+                "param": None,
+                "doc_url": "https://x/e",
+                "refusals": [{"word": "not_json", "stop_reason": "max_tokens", "output_tokens": 512}],
+            }
+        }
+        got = ApiError("POST", "x", jresp(422, refused)).refusals
+        assert got == [{"word": "not_json", "stop_reason": "max_tokens", "output_tokens": 512}]
     if "reason" in err["properties"]:
         resync = {
             "error": {

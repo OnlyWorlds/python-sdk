@@ -1139,3 +1139,39 @@ def test_me_keeps_an_empty_my_seats_for_a_seats_own_key() -> None:
     got = Client("ow_w_testkey", "1234", transport=t).me()
     assert got["front_door"]["my_seats"] == []
     assert got == body
+
+
+def _refused(rows: Any, code: str = "answer_not_parsed", status: int = 422) -> ApiError:
+    env = {"error": {"type": "invalid_request", "code": code, "message": "m", "param": None, "doc_url": "https://x/e"}}
+    if rows is not ...:
+        env["error"]["refusals"] = rows
+    return ApiError("POST", "x", jresp(status, env))
+
+
+def test_refusals_reads_an_answer_not_parsed_envelope_in_order() -> None:
+    rows = [
+        {"word": "empty", "stop_reason": "end_turn", "output_tokens": 0},
+        {"word": "not_json", "stop_reason": "max_tokens", "output_tokens": 1024},
+    ]
+    assert _refused(rows).refusals == rows
+
+
+def test_refusals_is_none_for_any_other_error_and_when_none_is_sent() -> None:
+    row = [{"word": "empty", "stop_reason": "end_turn", "output_tokens": 0}]
+    assert _refused(row, code="ask_failed", status=502).refusals is None
+    assert _refused(row, status=400).refusals is None
+    assert _refused(...).refusals is None
+    assert _refused("not a list").refusals is None
+
+
+def test_refusals_leaves_out_a_row_not_in_its_shape() -> None:
+    good = {"word": "not_json", "stop_reason": "max_tokens", "output_tokens": 7}
+    bad = [
+        "a string",
+        {"word": "x", "stop_reason": "y"},
+        {"word": 1, "stop_reason": "y", "output_tokens": 1},
+        {"word": "x", "stop_reason": "y", "output_tokens": True},
+        {"word": "x", "stop_reason": "y", "output_tokens": 1.5},
+        {"word": "x", "stop_reason": "y", "output_tokens": 2**53},
+    ]
+    assert _refused([*bad, good]).refusals == [good]
