@@ -551,6 +551,45 @@ def test_a_full_row_of_a_hidden_element_carries_hidden_for_a_reader_that_sees_it
     assert json.dumps(world, sort_keys=True) == before
 
 
+@pytest.mark.parametrize(
+    ("description", "expected"),
+    [
+        ("One.\nTwo.", "One."),
+        ("\n  Rung for every crossing.\nMore.", "  Rung for every crossing."),
+        ("\r\n \t\r\n\u00a0\r\nThird.\r\nFourth.", "Third."),
+        ("\rAfter the return.", "After the return."),
+        ("  Only line  ", "  Only line  "),
+        ("\n \n\t\r\n", None),
+        (" \u3000 ", None),
+        ("", None),
+    ],
+    ids=[
+        "plain",
+        "leading-break-then-spaces",
+        "blank-lines-crlf",
+        "carriage-return",
+        "one-line-spaces",
+        "blank-lines-only",
+        "white-space-alone",
+        "empty",
+    ],
+)
+def test_a_first_line_row_carries_the_first_line_holding_something(description: str, expected: str | None) -> None:
+    """The lens profile's first-line rule (schema-dist serial 115): trimming White_Space decides which line is the first that holds
+    something; the line is carried as stored, its leading spaces kept; a description with no such line gets no
+    ``description``, never an invented empty one. The npm SDK holds the same eight cases."""
+    world = {
+        "elements": [
+            {"id": "a", "type": "institution", "name": "Anchor", "objects": ["o"]},
+            {"id": "o", "type": "object", "name": "Ledger", "description": description},
+        ]
+    }
+    rows = resolve_lens(world, _lens_on({"institutions": ["a"]}, {"show": "first_line"}), OWNER)["rows"]
+    row = next(r for r in rows if r["id"] == "o")
+    assert row.get("description") == expected
+    assert ("description" in row) == (expected is not None)
+
+
 def test_only_a_served_body_of_a_hidden_element_carries_a_hidden_key() -> None:
     """lens.md (serial 94): keel's serialize sets ``hidden: true`` on a body of a hidden element (keel
     elements/serialize.py:463-464, :492-493), and no other body carries the key: a stored ``hidden: false`` or null

@@ -745,9 +745,12 @@ class _Reading:
                 if isinstance(value, str) and value.strip(_WHITE_SPACE) != "":
                     row[field] = value
             description = b.get("description")
+            # serial 115: the first line (split at a carriage return or a line feed) with something left
+            # after trimming White_Space, carried as stored with its spaces; no such line gives no key
             if show == "first_line" and isinstance(description, str):
-                m = _LINE_BREAK.search(description)
-                row["description"] = description if m is None else description[: m.start()]
+                line = next((s for s in _LINE_BREAK.split(description) if s.strip(_WHITE_SPACE) != ""), None)
+                if line is not None:
+                    row["description"] = line
         if notes is not None and eid in notes:
             row["note"] = notes[eid]
         return row
