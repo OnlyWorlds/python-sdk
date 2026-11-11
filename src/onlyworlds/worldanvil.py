@@ -121,7 +121,7 @@ from typing import Any
 
 from ._schema import FIELD_KINDS, LINK_TARGETS
 from ._version import __version__
-from .folder import FORMAT_VERSION, write_folder
+from .folder import FORMAT_VERSION, ONE_SOURCE_ONE_WORLD, write_folder
 from .kanka import _blocks, _clean, _inline, _Node, _norm, _Tree
 
 __all__ = [
@@ -1202,7 +1202,9 @@ def main(argv: list[str] | None = None) -> int:
     for stream in (sys.stdout, sys.stderr):
         if isinstance(stream, io.TextIOWrapper):
             stream.reconfigure(encoding="utf-8")
-    ap = argparse.ArgumentParser(prog="python -m onlyworlds.worldanvil", description=(__doc__ or "").splitlines()[0])
+    ap = argparse.ArgumentParser(
+        prog="python -m onlyworlds.worldanvil", description=(__doc__ or "").splitlines()[0], epilog=ONE_SOURCE_ONE_WORLD
+    )
     ap.add_argument("out", type=Path, nargs="?", help="the world folder to create; must not exist or be empty")
     ap.add_argument("--file", type=Path, help="World Anvil's export page (/world/<slug>/export, saved as HTML)")
     ap.add_argument("--plan", action="store_true", help="print what would become what and write nothing")

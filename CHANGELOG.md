@@ -4,6 +4,10 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+## 0.118.2 (2026-11-12)
+
+- Every importer's `--help` (Campfire, Kanka, LegendKeeper, Notion, World Anvil) now ends with one source, one world: the world's id and every element's id are made from the source, so importing it again gives the same ids, and onlyworlds.com refuses an id another world already holds. The sentence is `onlyworlds.folder.ONE_SOURCE_ONE_WORLD`. Nothing an importer writes changed.
+
 ## 0.118.1 (2026-11-11)
 
 - Schema repinned to schema-dist v0.34.0-dist.118 (canonical 00.34.00 unchanged, no schema file moved, `views.json` still version 3). The checks profile gains rules 7 and 8 with eight cases (a work item and a report carry the room's mark, read by `present`), and its page now says that `present` trims by the room profile's White_Space set, so a unit separator alone is set; the doctor replays the new fixture and already answered every case so. The room profile says a sitting's own mark holds the world's id and that a sitting names its winning spec in `x_star`; the views table's `conversation` layout says a tool that shows one element and no thread draws it as a document. No answer of the package moved.

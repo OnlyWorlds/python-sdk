@@ -121,6 +121,14 @@ WORLD_FILE = "world.json"
 LEGACY_SPATIAL_DIR = "spatial"
 LEGACY_SPATIAL_TYPES: tuple[str, ...] = ("map", "pin", "zone", "marker")
 
+#: What every importer's --help ends with: the ids an import writes are its source's, so a source goes
+#: online as one world (the folder spec's draft world; onlyworlds.com refuses an id another world holds).
+ONE_SOURCE_ONE_WORLD = (
+    "One source, one world: the world's id and every element's id are made from the source, so importing it "
+    "again gives the same ids, and onlyworlds.com refuses an id another world already holds. A source goes "
+    "online as one world."
+)
+
 #: §5 (v0.3.5): ``world.json`` keys follow the CANONICAL SCHEMA, not the wire. One rename today.
 WIRE_TO_DISK_WORLD_KEYS: Mapping[str, str] = {"time_range_current": "time_current"}
 

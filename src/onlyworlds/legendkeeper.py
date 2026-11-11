@@ -384,7 +384,7 @@ from ._schema import ELEMENT_TYPES, FIELD_KINDS, LINK_TARGETS
 from ._version import __version__
 from .calendar import CALENDAR_FIELD, CALENDAR_SUPERTYPE
 from .errors import parse_retry_after
-from .folder import FORMAT_VERSION, write_folder
+from .folder import FORMAT_VERSION, ONE_SOURCE_ONE_WORLD, write_folder
 from .http import Response, Transport, UrllibTransport
 from .worldfile import RECORDS_MANIFEST
 
@@ -3985,7 +3985,11 @@ def main(argv: list[str] | None = None, *, source: Source | None = None, transpo
     for stream in (sys.stdout, sys.stderr):
         if isinstance(stream, io.TextIOWrapper):
             stream.reconfigure(encoding="utf-8")
-    ap = argparse.ArgumentParser(prog="python -m onlyworlds.legendkeeper", description=(__doc__ or "").splitlines()[0])
+    ap = argparse.ArgumentParser(
+        prog="python -m onlyworlds.legendkeeper",
+        description=(__doc__ or "").splitlines()[0],
+        epilog=ONE_SOURCE_ONE_WORLD,
+    )
     ap.add_argument("out", type=Path, nargs="?", help="the world folder to create; must not exist or be empty")
     ap.add_argument(
         "--project", help="the LegendKeeper project id (the API key is bound to it; with --file, it keys the ids)"

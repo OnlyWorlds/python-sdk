@@ -93,7 +93,7 @@ from pathlib import Path
 from typing import Any
 
 from ._version import __version__
-from .folder import FORMAT_VERSION, write_folder
+from .folder import FORMAT_VERSION, ONE_SOURCE_ONE_WORLD, write_folder
 from .kanka import _blocks, _Node, _Tree
 
 __all__ = [
@@ -751,7 +751,9 @@ def main(argv: list[str] | None = None) -> int:
     for stream in (sys.stdout, sys.stderr):
         if isinstance(stream, io.TextIOWrapper):
             stream.reconfigure(encoding="utf-8")
-    ap = argparse.ArgumentParser(prog="python -m onlyworlds.campfire", description=(__doc__ or "").splitlines()[0])
+    ap = argparse.ArgumentParser(
+        prog="python -m onlyworlds.campfire", description=(__doc__ or "").splitlines()[0], epilog=ONE_SOURCE_ONE_WORLD
+    )
     ap.add_argument("out", type=Path, nargs="?", help="the world folder to create; must not exist or be empty")
     ap.add_argument("--file", type=Path, help="Campfire's export (File, Export Elements, html)")
     ap.add_argument(
