@@ -2,15 +2,20 @@
   "_what": "The recorded pin for the vendored OnlyWorlds schema distribution (codegen/schema-dist/, copied byte-exact). Do not edit by hand; re-vendor from the pinned tag and review the diff. Kept equal to the npm SDK's pin (github.com/OnlyWorlds/sdk, codegen/schema-pin.json) on purpose: two clients, one schema.",
   "_why_manifest_sha256": "Verifying the tree against its own MANIFEST.json only proves internal consistency. If the tag moved, the manifest moved with it. The hash recorded here is the one first accepted, which is what makes a moved tag visible.",
   "repo": "https://github.com/OnlyWorlds/schema-dist",
-  "tag": "v0.34.0-dist.117",
-  "commit": "8f16a18b758d8850ac38e6fda8e03181d8cbdf5d",
-  "manifest_sha256": "c56d3acb3797191fbe4fb4ca120ab6d1791cc3c64f41e5abf347cb75940e0fe0",
+  "tag": "v0.34.0-dist.118",
+  "commit": "cf708c8833fba629374edcb729eb31c67602c3cc",
+  "manifest_sha256": "37f856a2235c24732fe75ef24f1ba3a2c51310041a31c0917891959d4528e83e",
   "canonical_version": "00.34.00",
-  "dist_serial": 117,
+  "dist_serial": 118,
   "published": "2026-11-11",
   "pinned_at": "2026-11-11",
   "pinned_by": "The maintainer: tree from `git archive` of the tag in a schema-dist checkout (209 files: the 208 the MANIFEST lists, and MANIFEST.json itself); files re-hashed against MANIFEST.json by generate_schema.py; MANIFEST self-hash matched against the raw file GitHub serves at the tag, whose ref resolves to the commit above.",
   "previous_pins": [
+    {
+      "tag": "v0.34.0-dist.117",
+      "manifest_sha256": "c56d3acb3797191fbe4fb4ca120ab6d1791cc3c64f41e5abf347cb75940e0fe0",
+      "note": "superseded by v0.34.0-dist.118 (canonical 00.34.00 unchanged, no schema file moved, the views table still version 3; views.json's layouts.conversation says a tool that shows one element and no thread draws it as a document; checks.fixture.json gains rules 7 and 8 (a work item and a report carry the room's mark, read by present) with eight cases; checks.md says present's whitespace is the room profile's White_Space set; room.md says a sitting's own mark holds the world's id and its x_star names the winning spec)"
+    },
     {
       "tag": "v0.34.0-dist.116",
       "manifest_sha256": "7e604e9c976500bd0d3b9781d947da8ed0785980ac92709861a48421f4af53c3",

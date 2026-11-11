@@ -357,6 +357,6 @@
   ],
   "mark": {
     "field": "x_room_of",
-    "value": "the world id (a world's parlor) or the sitting's id (a workshop)"
+    "value": "the world id (a world's parlor) or the sitting's id (a workshop); a sitting's own mark holds the world's id"
   }
 }

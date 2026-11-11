@@ -4,6 +4,10 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+## 0.118.1 (2026-11-11)
+
+- Schema repinned to schema-dist v0.34.0-dist.118 (canonical 00.34.00 unchanged, no schema file moved, `views.json` still version 3). The checks profile gains rules 7 and 8 with eight cases (a work item and a report carry the room's mark, read by `present`), and its page now says that `present` trims by the room profile's White_Space set, so a unit separator alone is set; the doctor replays the new fixture and already answered every case so. The room profile says a sitting's own mark holds the world's id and that a sitting names its winning spec in `x_star`; the views table's `conversation` layout says a tool that shows one element and no thread draws it as a document. No answer of the package moved.
+
 ## 0.118.0 (2026-11-11)
 
 - **The doctor tells a room thing by the profiles, not by a list of supertypes.** A finding is listed with the messages and room things (`kind: "message"`) when its element is a message (`is_message`) or a room element (`is_room_element`: one of the room profile's pairs, `ROOM_PAIRS`, and the mark `x_room_of`). It read a supertype list of seven before, written before the mark existed, so a work item or a report made by hand without the mark, which every reader treats as lore, was listed apart from the facts, and a marked Report, Take or Member was not. A house rule that asks for the mark (`"require": {"field": "x_room_of", "present": true}` on the Charter) now lists each element made without it with the things to look at. `MESSAGE_SUPERTYPES` stays importable; the doctor no longer reads it.
