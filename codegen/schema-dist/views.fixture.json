@@ -717,6 +717,28 @@
       }
     },
     {
+      "name": "document-a-generic-link-with-one-key-white-space-alone-holds-nothing",
+      "element": {
+        "type": "pin",
+        "name": "The ferry landing",
+        "map": "0199c3a1-0000-7000-8000-000000000081",
+        "element_type": "location",
+        "element_id": " \t",
+        "x": 120,
+        "y": 48
+      },
+      "expect": {
+        "row": null,
+        "sentence": null,
+        "banners": [],
+        "order": [
+          "map",
+          "x",
+          "y"
+        ]
+      }
+    },
+    {
       "name": "conversation-order-message",
       "element": {
         "type": "narrative",
