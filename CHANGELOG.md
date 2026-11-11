@@ -4,6 +4,8 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+- **The doctor tells a room thing by the profiles, not by a list of supertypes.** A finding is listed with the messages and room things (`kind: "message"`) when its element is a message (`is_message`) or a room element (`is_room_element`: one of the room profile's pairs, `ROOM_PAIRS`, and the mark `x_room_of`). It read a supertype list of seven before, written before the mark existed, so a work item or a report made by hand without the mark, which every reader treats as lore, was listed apart from the facts, and a marked Report, Take or Member was not. A house rule that asks for the mark (`"require": {"field": "x_room_of", "present": true}` on the Charter) now lists each element made without it with the things to look at. `MESSAGE_SUPERTYPES` stays importable; the doctor no longer reads it.
+
 ## 0.117.2 (2026-11-11)
 
 - Schema repinned to schema-dist v0.34.0-dist.117 (canonical 00.34.00 unchanged, no schema file moved, `views.json` still version 3): the views table's own description now says that a tool's own words for a heading or a fold are its drawing, and that a fold's label is the word a tool uses where it has none of its own; the views fixture gains a 46th case, a Pin whose generic link has one key holding and the other White_Space alone, which holds nothing. The package has no views reader yet, so no answer moved.

@@ -114,10 +114,12 @@ and every flag that ran says how much it could compare (``compared: {n, of}``): 
 count over nothing compared is not a pass. A known-of stub's absent fields are unknown,
 not empty (folder spec §4.4), so a stub is never counted as linkless or textless.
 
-A finding on a parlor- or message-shaped element (supertype Message, Board, Work item, Spec,
-Heart, Vote or Sitting) carries ``"kind": "message"``: it is about a room, not a fact about
-the world. The prose groups those last and leaves them out of the "things to look at" count;
-they still make the exit code 1.
+A finding on a message (the message profile, ``is_message``) or a room element (the room
+profile, ``is_room_element``: one of its pairs and the mark ``x_room_of``) carries
+``"kind": "message"``: it is about a room, not a fact about the world. A room pair without the
+mark is lore to every reader, so a finding on it is a fact about the world. The prose groups
+the room findings last and leaves them out of the "things to look at" count; they still make
+the exit code 1.
 
 What the feed can show was measured, not assumed: keel serves each element's upsert from
 its row at its latest ``change_seq`` (keel ``core/changes.py``, spec §8: "every live element
@@ -164,7 +166,8 @@ from .checks import CHECKS_FIELD, apply_checks
 from .errors import ApiError
 from .folder import FORMAT_VERSION, HIDDEN, WORLD_FILE, Folder, is_hidden, is_known_of, read_folder
 from .http import API_BASE, Client
-from .room import _fold, _reading_aid_key
+from .message import is_message
+from .room import _fold, _reading_aid_key, is_room_element
 from .spine import SPINE_OFF_LIST, SPINE_PREFIX, SpineRead, read_spine_element
 
 __all__ = [
@@ -216,8 +219,8 @@ FLAGS: dict[str, str] = {
     AIDS_FLAG: "A Guide or Domain entry that names a hidden or deleted element",
 }
 
-#: A finding on an element of these supertypes (compared case-folded) is ``kind: "message"``
-#: (ruled 2026-10-21): a world's own parlor, messages and room things, not facts about the world.
+#: The supertypes the doctor read as messages and room things from 2026-10-21 until 0.118.0. Kept for
+#: callers that import it; the doctor reads ``is_message`` and ``is_room_element`` instead (``_is_room_finding``).
 MESSAGE_SUPERTYPES: frozenset[str] = frozenset({"message", "board", "work item", "spec", "heart", "vote", "sitting"})
 
 #: What each flag's ``compared`` counts, for the prose report.
@@ -356,6 +359,13 @@ class _El:
         return {"type": self.type, "id": self.id, "name": self.name}
 
 
+def _is_room_finding(element: _El) -> bool:
+    """A message by the message profile, or a room element by the room profile (its pair and the mark),
+    read with the element's own type, which a folder may give by its directory alone."""
+    body = {**element.body, "type": element.type}
+    return is_message(body) or is_room_element(body)
+
+
 class _Run:
     """Collects one report in flag order, whatever order the checks run in."""
 
@@ -380,7 +390,7 @@ class _Run:
             "reason": reason,
             "evidence": dict(evidence),
         }
-        if element is not None and _folded(element.body.get("supertype")) in MESSAGE_SUPERTYPES:
+        if element is not None and _is_room_finding(element):
             finding["kind"] = "message"  # additive: a finding on anything else has no `kind`
         self._findings[flag].append(finding)
 

@@ -22,6 +22,8 @@ from conftest import FakeTransport, jresp
 
 from onlyworlds import (
     FORMAT_VERSION,
+    MESSAGE_PAIR,
+    ROOM_PAIRS,
     ApiError,
     CheckRow,
     Client,
@@ -341,13 +343,57 @@ def test_a_finding_on_a_message_is_kind_message(tmp_path: Path) -> None:
     assert "Messages and room things" not in render_prose(twin)
 
 
-def test_every_parlor_supertype_is_a_message(tmp_path: Path) -> None:
-    for supertype in ("Message", "Board", "Work item", "Spec", "Heart", "Vote", "Sitting", "work ITEM"):
-        lone = {"id": N1.replace("1", "9"), "name": "Lone", "supertype": supertype, "story": "Text."}
-        (f,) = found(folder_report(tmp_path, with_(clean(), "narrative", lone)), "4")
-        assert f.get("kind") == "message", supertype
-    (f,) = found(folder_report(tmp_path, with_(clean(), "narrative", {**lone, "supertype": "Chronicle"})), "4")
+def test_a_room_element_by_its_pair_and_mark_is_a_message(tmp_path: Path) -> None:
+    # The room profile's own pairs (ROOM_PAIRS, from the distribution), never a list kept here: each
+    # pair with the mark is a room thing, the same pair without it is lore, as every reader reads it.
+    lone_id = N1.replace("1", "9")
+    for etype, supertype in ROOM_PAIRS:
+        for spelled in (supertype, supertype.upper()):
+            marked = {"id": lone_id, "name": "Lone", "supertype": spelled, "x_room_of": WORLD["id"]}
+            (f,) = found(folder_report(tmp_path, with_(clean(), etype, marked)), "4")
+            assert f.get("kind") == "message", (etype, spelled)
+        bare = {"id": lone_id, "name": "Lone", "supertype": supertype}
+        (f,) = found(folder_report(tmp_path, with_(clean(), etype, bare)), "4")
+        if (etype, supertype) == MESSAGE_PAIR:
+            assert f.get("kind") == "message"  # a message is one by its pair alone (the message profile)
+        else:
+            assert "kind" not in f, (etype, supertype)
+        blank = {**bare, "x_room_of": "  "}
+        (f,) = found(folder_report(tmp_path, with_(clean(), etype, blank)), "4")
+        assert (f.get("kind") == "message") == ((etype, supertype) == MESSAGE_PAIR), (etype, "blank mark")
+    # a room supertype on a type its pair does not name is no room element, marked or not
+    wrong = {"id": lone_id, "name": "Lone", "supertype": "Work item", "x_room_of": WORLD["id"]}
+    (f,) = found(folder_report(tmp_path, with_(clean(), "narrative", wrong)), "4")
     assert "kind" not in f
+    (f,) = found(folder_report(tmp_path, with_(clean(), "narrative", {**wrong, "supertype": "Chronicle"})), "4")
+    assert "kind" not in f
+
+
+def test_a_house_rule_on_the_missing_room_mark_is_a_fact_about_the_world(tmp_path: Path) -> None:
+    # A team pack's rule: a work item or a report made by hand without x_room_of is lore to every reader,
+    # so the finding that names it is listed with the facts, not with the room things.
+    rules = [
+        {
+            "rule": "every work item carries the room's mark",
+            "where": {"type": "relation", "supertype": "Work item"},
+            "require": {"field": "x_room_of", "present": True},
+        },
+        {
+            "rule": "every report carries the room's mark",
+            "where": {"type": "narrative", "supertype": "Report"},
+            "require": {"field": "x_room_of", "present": True},
+        },
+    ]
+    base = clean()
+    (charter,) = [law for law in base["law"] if law["id"] == LAW1]  # the world's own marked Charter
+    charter["x_checks_rules"] = rules
+    marked = {"id": R1.replace("1", "7"), "name": "Marked", "supertype": "Work item", "x_room_of": WORLD["id"]}
+    by_hand = {"id": R1.replace("1", "8"), "name": "By hand", "supertype": "Work item"}
+    report = {"id": N1.replace("1", "8"), "name": "A report", "supertype": "Report", "story": "Done."}
+    world = with_(with_(base, "relation", marked, by_hand), "narrative", report)
+    got = found(folder_report(tmp_path, world), doctor.CHECKS_FLAG)
+    assert sorted(f["element"]["id"] for f in got) == sorted([by_hand["id"], report["id"]])
+    assert all("kind" not in f for f in got)
 
 
 # --- 9 and 10. the file side ----------------------------------------------------
