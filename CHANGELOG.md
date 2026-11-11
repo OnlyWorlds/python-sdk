@@ -4,6 +4,9 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+## 0.115.0 (2026-11-11)
+
+- `ApiError.is_review_by_another`: true for 403 `review_by_another`. A write from a key below co-builder (a contributor's or a guest's, a person's or an AI seat's) that sets an `x_review_proposed` or `x_review_checked` mark is refused when the mark's `by` is not the writer's own membership id and the mark is not exactly the one the element holds; `param` names the mark, and nothing is written. Send your own membership id as `by`, or the mark as the element holds it. A Character's id is refused too.
 - The Kanka and LegendKeeper modules' notes say when what they state about the other app was read (the Kanka export of 2026-10-23; LegendKeeper's dates before an era, probed 2026-10-25). A LegendKeeper map's report line says only that the picture stays on LegendKeeper's host, where it said how long it would load.
 
 ## 0.114.0 (2026-11-10)
