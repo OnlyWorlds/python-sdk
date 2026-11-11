@@ -629,6 +629,94 @@
       }
     },
     {
+      "name": "document-a-list-of-blank-strings-is-drawn-and-shows-no-banner",
+      "element": {
+        "type": "character",
+        "name": "Wren",
+        "traits": [
+          "  "
+        ],
+        "x_served_trimmed": [
+          "  "
+        ]
+      },
+      "expect": {
+        "row": null,
+        "sentence": null,
+        "banners": [],
+        "order": [
+          "traits"
+        ]
+      }
+    },
+    {
+      "name": "document-a-generic-link-is-one-field-at-its-place",
+      "element": {
+        "type": "pin",
+        "name": "The ferry landing",
+        "map": "0199c3a1-0000-7000-8000-000000000081",
+        "element_type": "location",
+        "element_id": "0199c3a1-0000-7000-8000-000000000082",
+        "x": 120,
+        "y": 48
+      },
+      "expect": {
+        "row": null,
+        "sentence": null,
+        "banners": [],
+        "order": [
+          "map",
+          "element",
+          "x",
+          "y"
+        ]
+      }
+    },
+    {
+      "name": "document-a-generic-link-with-one-key-holds-nothing",
+      "element": {
+        "type": "pin",
+        "name": "The ferry landing",
+        "map": "0199c3a1-0000-7000-8000-000000000081",
+        "element_type": "location",
+        "element_id": null,
+        "x": 120,
+        "y": 48
+      },
+      "expect": {
+        "row": null,
+        "sentence": null,
+        "banners": [],
+        "order": [
+          "map",
+          "x",
+          "y"
+        ]
+      }
+    },
+    {
+      "name": "document-a-generic-link-with-both-keys-blank-holds-nothing",
+      "element": {
+        "type": "pin",
+        "name": "The ferry landing",
+        "map": "0199c3a1-0000-7000-8000-000000000081",
+        "element_type": "",
+        "element_id": "  ",
+        "x": 120,
+        "y": 48
+      },
+      "expect": {
+        "row": null,
+        "sentence": null,
+        "banners": [],
+        "order": [
+          "map",
+          "x",
+          "y"
+        ]
+      }
+    },
+    {
       "name": "conversation-order-message",
       "element": {
         "type": "narrative",

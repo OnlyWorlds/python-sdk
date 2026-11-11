@@ -31,7 +31,7 @@ from onlyworlds._schema import LINK_TARGETS
 
 REPO = Path(__file__).resolve().parent.parent
 FIXTURE = REPO / "codegen" / "schema-dist" / "profiles" / "lens.fixture.json"
-KINDS = {"shape": 6, "keys": 25, "resolve": 111, "invariant": 4, "uses": 5, "graph": 54, "degree": 5}
+KINDS = {"shape": 6, "keys": 25, "resolve": 121, "invariant": 4, "uses": 5, "graph": 54, "degree": 5}
 OWNER = {"rung": "owner"}
 
 
@@ -166,7 +166,7 @@ def test_every_fixture_case_is_answered_as_the_fixture_says() -> None:
     for line in wrong:
         print(line)
     assert wrong == []
-    assert len(cases) == 210, f"the fixture holds {len(cases)} cases, serial 114 has 210"
+    assert len(cases) == 220, f"the fixture holds {len(cases)} cases, serial 115 has 220"
     assert Counter(c["kind"] for c in cases) == KINDS
 
 
@@ -575,9 +575,9 @@ def test_a_full_row_of_a_hidden_element_carries_hidden_for_a_reader_that_sees_it
     ],
 )
 def test_a_first_line_row_carries_the_first_line_holding_something(description: str, expected: str | None) -> None:
-    """The lens profile's first-line rule (schema-dist serial 115): trimming White_Space decides which line is the first that holds
-    something; the line is carried as stored, its leading spaces kept; a description with no such line gets no
-    ``description``, never an invented empty one. The npm SDK holds the same eight cases."""
+    """The lens profile's first-line rule (schema-dist serial 115): trimming White_Space decides which line is the
+    first that holds something; the line is carried as stored, its leading spaces kept; a description with no such
+    line gets no ``description``, never an invented empty one. The npm SDK holds the same eight cases."""
     world = {
         "elements": [
             {"id": "a", "type": "institution", "name": "Anchor", "objects": ["o"]},

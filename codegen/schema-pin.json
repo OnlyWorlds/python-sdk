@@ -2,15 +2,20 @@
   "_what": "The recorded pin for the vendored OnlyWorlds schema distribution (codegen/schema-dist/, copied byte-exact). Do not edit by hand; re-vendor from the pinned tag and review the diff. Kept equal to the npm SDK's pin (github.com/OnlyWorlds/sdk, codegen/schema-pin.json) on purpose: two clients, one schema.",
   "_why_manifest_sha256": "Verifying the tree against its own MANIFEST.json only proves internal consistency. If the tag moved, the manifest moved with it. The hash recorded here is the one first accepted, which is what makes a moved tag visible.",
   "repo": "https://github.com/OnlyWorlds/schema-dist",
-  "tag": "v0.34.0-dist.114",
-  "commit": "428227ab934c3aab35ca50cd92aebd36400faa46",
-  "manifest_sha256": "a42a1d57907f45b0c696db4b86731531903f0c91060b05f9cf7767d43bd5bbea",
+  "tag": "v0.34.0-dist.115",
+  "commit": "9652e1b8a7e50e58d72dfc30866b7a94a90dcdb7",
+  "manifest_sha256": "bd1cb0491222c928305463181da61e424beac08cc0bf35fafc85cff141ea1a80",
   "canonical_version": "00.34.00",
-  "dist_serial": 114,
-  "published": "2026-11-10",
-  "pinned_at": "2026-11-10",
+  "dist_serial": 115,
+  "published": "2026-11-11",
+  "pinned_at": "2026-11-11",
   "pinned_by": "The maintainer: tree from `git archive` of the tag in a schema-dist checkout (209 files: the 208 the MANIFEST lists, and MANIFEST.json itself); files re-hashed against MANIFEST.json by generate_schema.py; MANIFEST self-hash matched against the raw file GitHub serves at the tag, whose ref resolves to the commit above.",
   "previous_pins": [
+    {
+      "tag": "v0.34.0-dist.114",
+      "manifest_sha256": "a42a1d57907f45b0c696db4b86731531903f0c91060b05f9cf7767d43bd5bbea",
+      "note": "superseded by v0.34.0-dist.115 (canonical 00.34.00 unchanged, no schema file moved; lens.md's first_line row is the first line holding something after trimming, carried as stored, lens.fixture.json ten cases more, 220 in all; charter.md's proposed element by the review page's rule 1 and a Domain's sentence trimmed, cut, trimmed again, 31 cases; report.md's keeper's one write and reader rule 4; packet.md's producer version; walk/lint_folder.py reads the two review marks as warnings; views.json version 3 and its 45 cases)"
+    },
     {
       "tag": "v0.34.0-dist.113",
       "manifest_sha256": "b645c8da0985ccedf538941218f31f922b62fe5ec2d5be14d4d6b2b52dca4478",

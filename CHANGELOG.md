@@ -4,6 +4,12 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+## 0.116.0 (2026-11-11)
+
+- Schema repinned to schema-dist v0.34.0-dist.115 (canonical 00.34.00 unchanged, no schema file moved). The lens fixture's 220 cases (ten new) and the charter fixture's 31 (four new) replay.
+- `resolve_lens`: a `first_line` row carries the first line that holds something. The description is split at every carriage return and every line feed, and its first line with something left after trimming White_Space is the row's `description`, carried as stored with its own spaces. A description with no such line (empty, blank lines, White_Space alone) gets no `description` key. 0.115.0 cut at the first line break, so a description opening with a blank line gave an empty `description`, and one of White_Space alone was carried as it stood.
+- `onlyworlds.lint` (the distribution's folder checker, vendored byte for byte): the review profile's two marks, `x_review_proposed` and `x_review_checked`, are read as warnings that never fail a folder: a value that counts as present and is not an object (rule 4), and each key the profile names that an object mark lacks (rule 5), one line per key.
+
 ## 0.115.0 (2026-11-11)
 
 - `ApiError.is_review_by_another`: true for 403 `review_by_another`. A write from a key below co-builder (a contributor's or a guest's, a person's or an AI seat's) that sets an `x_review_proposed` or `x_review_checked` mark is refused when the mark's `by` is not the writer's own membership id and the mark is not exactly the one the element holds; `param` names the mark, and nothing is written. Send your own membership id as `by`, or the mark as the element holds it. A Character's id is refused too.

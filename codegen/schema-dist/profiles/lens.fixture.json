@@ -1594,6 +1594,125 @@
           "supertype": "  Ladder ",
           "subtype": "Hemp\t",
           "updated_at": "2026-10-12T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-0000000001a0",
+          "type": "object",
+          "name": "Ferry chain",
+          "description": "\nRung for every crossing.",
+          "updated_at": "2026-10-12T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-0000000001a1",
+          "type": "object",
+          "name": "Signal horn",
+          "description": "\n  Rung for every crossing.",
+          "updated_at": "2026-10-12T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-0000000001a2",
+          "type": "object",
+          "name": "Tar bucket",
+          "description": "\r\nTar for the hull.\r\nKept by the sheds.",
+          "updated_at": "2026-10-12T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-0000000001a3",
+          "type": "object",
+          "name": "Net float",
+          "description": "Bobs at the stern.\nTied with hemp.",
+          "updated_at": "2026-10-12T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-0000000001a4",
+          "type": "object",
+          "name": "Spare thole",
+          "description": "\n\n\r\n",
+          "updated_at": "2026-10-12T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-0000000001a5",
+          "type": "object",
+          "name": "Old oarlock",
+          "description": " \t  ",
+          "updated_at": "2026-10-12T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-0000000001a8",
+          "type": "object",
+          "name": "Bell rope",
+          "description": "Tar\u2028Pitch.\nRung at dusk.",
+          "updated_at": "2026-10-12T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-0000000001a9",
+          "type": "object",
+          "name": "Boat hook",
+          "description": "Tar\u0085Pitch.\nHung by the door.",
+          "updated_at": "2026-10-12T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-0000000001aa",
+          "type": "object",
+          "name": "Oar lock",
+          "description": "Tar\u000bPitch\fKept.\nGreased weekly.",
+          "updated_at": "2026-10-12T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-0000000001ab",
+          "type": "object",
+          "name": "Ferry token",
+          "description": "\ufeff\nStamped brass.",
+          "updated_at": "2026-10-12T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-0000000001ac",
+          "type": "object",
+          "name": "Ferry ticket",
+          "description": "\u200b\nPunched once.",
+          "updated_at": "2026-10-12T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-0000000001ad",
+          "type": "object",
+          "name": "Rudder",
+          "description": "Tar\rPitch.",
+          "updated_at": "2026-10-12T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-0000000001ae",
+          "type": "object",
+          "name": "Ferry log",
+          "description": 7,
+          "updated_at": "2026-10-12T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-0000000001b7",
+          "type": "object",
+          "name": "Mooring ring",
+          "description": "\u2028\nRung at dawn.",
+          "updated_at": "2026-10-12T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-0000000001b8",
+          "type": "object",
+          "name": "Tide board",
+          "description": "\u0085\nRead at noon.",
+          "updated_at": "2026-10-12T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-0000000001b9",
+          "type": "object",
+          "name": "Rope coil",
+          "description": "\u000b\nCoiled at dusk.",
+          "updated_at": "2026-10-12T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-0000000001ba",
+          "type": "object",
+          "name": "Lamp hook",
+          "description": "\f\nLit at night.",
+          "updated_at": "2026-10-12T12:00:00Z"
         }
       ],
       "hidden": [],
@@ -9299,6 +9418,389 @@
         }
       ],
       "note": "A supertype stored as a number is no string, so the row carries no key: nothing is turned into text."
+    },
+    {
+      "name": "show-first-line-takes-the-first-line-that-holds-something-as-stored",
+      "kind": "resolve",
+      "world": "fen",
+      "reader": "owner",
+      "lens": {
+        "id": "019a7f00-0000-7000-8000-0000000001a6",
+        "type": "construct",
+        "name": "A lens",
+        "supertype": "Lens",
+        "subtype": "",
+        "objects": [
+          "019a7f00-0000-7000-8000-0000000001a0",
+          "019a7f00-0000-7000-8000-0000000001a1",
+          "019a7f00-0000-7000-8000-0000000001a2",
+          "019a7f00-0000-7000-8000-0000000001a3"
+        ],
+        "x_lens": {
+          "depth": 0,
+          "show": "first_line"
+        }
+      },
+      "kept": [
+        "019a7f00-0000-7000-8000-0000000001a0",
+        "019a7f00-0000-7000-8000-0000000001a1",
+        "019a7f00-0000-7000-8000-0000000001a2",
+        "019a7f00-0000-7000-8000-0000000001a3"
+      ],
+      "cut": {},
+      "rows": [
+        {
+          "id": "019a7f00-0000-7000-8000-0000000001a0",
+          "type": "object",
+          "name": "Ferry chain",
+          "description": "Rung for every crossing."
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-0000000001a1",
+          "type": "object",
+          "name": "Signal horn",
+          "description": "  Rung for every crossing."
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-0000000001a2",
+          "type": "object",
+          "name": "Tar bucket",
+          "description": "Tar for the hull."
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-0000000001a3",
+          "type": "object",
+          "name": "Net float",
+          "description": "Bobs at the stern."
+        }
+      ],
+      "note": "The first line is the first that holds something after trimming White_Space, the description split at every carriage return and every line feed: the chain's leading line feed is passed over; the horn's line keeps its two leading spaces, since trimming only decides which line and the line is carried as stored; the bucket's leading carriage return and line feed are passed over; the float's ordinary description is cut at its first line feed, as before."
+    },
+    {
+      "name": "show-first-line-gives-no-description-when-no-line-holds-anything",
+      "kind": "resolve",
+      "world": "fen",
+      "reader": "owner",
+      "lens": {
+        "id": "019a7f00-0000-7000-8000-0000000001a7",
+        "type": "construct",
+        "name": "A lens",
+        "supertype": "Lens",
+        "subtype": "",
+        "objects": [
+          "019a7f00-0000-7000-8000-0000000001a4",
+          "019a7f00-0000-7000-8000-0000000001a5"
+        ],
+        "x_lens": {
+          "depth": 0,
+          "show": "first_line"
+        }
+      },
+      "kept": [
+        "019a7f00-0000-7000-8000-0000000001a4",
+        "019a7f00-0000-7000-8000-0000000001a5"
+      ],
+      "cut": {},
+      "rows": [
+        {
+          "id": "019a7f00-0000-7000-8000-0000000001a4",
+          "type": "object",
+          "name": "Spare thole"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-0000000001a5",
+          "type": "object",
+          "name": "Old oarlock"
+        }
+      ],
+      "note": "A description of line breaks alone (the thole's) and one of White_Space alone (the oarlock's: a space, a tab and a no-break space) hold no line with something in it, so neither row carries a description, never an invented empty one."
+    },
+    {
+      "name": "show-first-line-does-not-split-at-a-line-separator",
+      "kind": "resolve",
+      "world": "fen",
+      "reader": "owner",
+      "lens": {
+        "id": "019a7f00-0000-7000-8000-0000000001b0",
+        "type": "construct",
+        "name": "A lens",
+        "supertype": "Lens",
+        "subtype": "",
+        "objects": [
+          "019a7f00-0000-7000-8000-0000000001a8"
+        ],
+        "x_lens": {
+          "depth": 0,
+          "show": "first_line"
+        }
+      },
+      "kept": [
+        "019a7f00-0000-7000-8000-0000000001a8"
+      ],
+      "cut": {},
+      "rows": [
+        {
+          "id": "019a7f00-0000-7000-8000-0000000001a8",
+          "type": "object",
+          "name": "Bell rope",
+          "description": "Tar\u2028Pitch."
+        }
+      ],
+      "note": "U+2028 is White_Space but no line break here: the description is split at a carriage return and a line feed only, so the first line runs past it (a reader that splits at every Unicode line boundary is red)."
+    },
+    {
+      "name": "show-first-line-does-not-split-at-a-next-line",
+      "kind": "resolve",
+      "world": "fen",
+      "reader": "owner",
+      "lens": {
+        "id": "019a7f00-0000-7000-8000-0000000001b1",
+        "type": "construct",
+        "name": "A lens",
+        "supertype": "Lens",
+        "subtype": "",
+        "objects": [
+          "019a7f00-0000-7000-8000-0000000001a9"
+        ],
+        "x_lens": {
+          "depth": 0,
+          "show": "first_line"
+        }
+      },
+      "kept": [
+        "019a7f00-0000-7000-8000-0000000001a9"
+      ],
+      "cut": {},
+      "rows": [
+        {
+          "id": "019a7f00-0000-7000-8000-0000000001a9",
+          "type": "object",
+          "name": "Boat hook",
+          "description": "Tar\u0085Pitch."
+        }
+      ],
+      "note": "U+0085 (next line) is White_Space but no line break here: the first line runs past it."
+    },
+    {
+      "name": "show-first-line-does-not-split-at-a-line-tab-or-a-form-feed",
+      "kind": "resolve",
+      "world": "fen",
+      "reader": "owner",
+      "lens": {
+        "id": "019a7f00-0000-7000-8000-0000000001b2",
+        "type": "construct",
+        "name": "A lens",
+        "supertype": "Lens",
+        "subtype": "",
+        "objects": [
+          "019a7f00-0000-7000-8000-0000000001aa"
+        ],
+        "x_lens": {
+          "depth": 0,
+          "show": "first_line"
+        }
+      },
+      "kept": [
+        "019a7f00-0000-7000-8000-0000000001aa"
+      ],
+      "cut": {},
+      "rows": [
+        {
+          "id": "019a7f00-0000-7000-8000-0000000001aa",
+          "type": "object",
+          "name": "Oar lock",
+          "description": "Tar\u000bPitch\fKept."
+        }
+      ],
+      "note": "U+000B (line tab) and U+000C (form feed) are White_Space but no line break here: the first line runs past both."
+    },
+    {
+      "name": "show-first-line-carries-a-line-of-a-byte-order-mark-alone",
+      "kind": "resolve",
+      "world": "fen",
+      "reader": "owner",
+      "lens": {
+        "id": "019a7f00-0000-7000-8000-0000000001b3",
+        "type": "construct",
+        "name": "A lens",
+        "supertype": "Lens",
+        "subtype": "",
+        "objects": [
+          "019a7f00-0000-7000-8000-0000000001ab"
+        ],
+        "x_lens": {
+          "depth": 0,
+          "show": "first_line"
+        }
+      },
+      "kept": [
+        "019a7f00-0000-7000-8000-0000000001ab"
+      ],
+      "cut": {},
+      "rows": [
+        {
+          "id": "019a7f00-0000-7000-8000-0000000001ab",
+          "type": "object",
+          "name": "Ferry token",
+          "description": "\ufeff"
+        }
+      ],
+      "note": "U+FEFF is not White_Space, so a line of it alone holds something and is the first line, carried as stored (a trim that strips it, as some languages' default trim does, is red)."
+    },
+    {
+      "name": "show-first-line-carries-a-line-of-a-zero-width-space-alone",
+      "kind": "resolve",
+      "world": "fen",
+      "reader": "owner",
+      "lens": {
+        "id": "019a7f00-0000-7000-8000-0000000001b4",
+        "type": "construct",
+        "name": "A lens",
+        "supertype": "Lens",
+        "subtype": "",
+        "objects": [
+          "019a7f00-0000-7000-8000-0000000001ac"
+        ],
+        "x_lens": {
+          "depth": 0,
+          "show": "first_line"
+        }
+      },
+      "kept": [
+        "019a7f00-0000-7000-8000-0000000001ac"
+      ],
+      "cut": {},
+      "rows": [
+        {
+          "id": "019a7f00-0000-7000-8000-0000000001ac",
+          "type": "object",
+          "name": "Ferry ticket",
+          "description": "\u200b"
+        }
+      ],
+      "note": "U+200B is not White_Space, so a line of it alone holds something and is the first line, carried as stored."
+    },
+    {
+      "name": "show-first-line-cuts-at-a-lone-carriage-return-between-two-texts",
+      "kind": "resolve",
+      "world": "fen",
+      "reader": "owner",
+      "lens": {
+        "id": "019a7f00-0000-7000-8000-0000000001b5",
+        "type": "construct",
+        "name": "A lens",
+        "supertype": "Lens",
+        "subtype": "",
+        "objects": [
+          "019a7f00-0000-7000-8000-0000000001ad"
+        ],
+        "x_lens": {
+          "depth": 0,
+          "show": "first_line"
+        }
+      },
+      "kept": [
+        "019a7f00-0000-7000-8000-0000000001ad"
+      ],
+      "cut": {},
+      "rows": [
+        {
+          "id": "019a7f00-0000-7000-8000-0000000001ad",
+          "type": "object",
+          "name": "Rudder",
+          "description": "Tar"
+        }
+      ],
+      "note": "A carriage return alone between two texts is a line break: the first line is the text before it."
+    },
+    {
+      "name": "show-first-line-gives-no-description-for-a-value-that-is-not-a-string",
+      "kind": "resolve",
+      "world": "fen",
+      "reader": "owner",
+      "lens": {
+        "id": "019a7f00-0000-7000-8000-0000000001b6",
+        "type": "construct",
+        "name": "A lens",
+        "supertype": "Lens",
+        "subtype": "",
+        "objects": [
+          "019a7f00-0000-7000-8000-0000000001ae"
+        ],
+        "x_lens": {
+          "depth": 0,
+          "show": "first_line"
+        }
+      },
+      "kept": [
+        "019a7f00-0000-7000-8000-0000000001ae"
+      ],
+      "cut": {},
+      "rows": [
+        {
+          "id": "019a7f00-0000-7000-8000-0000000001ae",
+          "type": "object",
+          "name": "Ferry log"
+        }
+      ],
+      "note": "A description stored as a number is no string, so the row carries no description: nothing is turned into text."
+    },
+    {
+      "name": "show-first-line-skips-a-line-of-a-white-space-separator-alone",
+      "kind": "resolve",
+      "world": "fen",
+      "reader": "owner",
+      "lens": {
+        "id": "019a7f00-0000-7000-8000-0000000001bb",
+        "type": "construct",
+        "name": "A lens",
+        "supertype": "Lens",
+        "subtype": "",
+        "objects": [
+          "019a7f00-0000-7000-8000-0000000001b7",
+          "019a7f00-0000-7000-8000-0000000001b8",
+          "019a7f00-0000-7000-8000-0000000001b9",
+          "019a7f00-0000-7000-8000-0000000001ba"
+        ],
+        "x_lens": {
+          "depth": 0,
+          "show": "first_line"
+        }
+      },
+      "kept": [
+        "019a7f00-0000-7000-8000-0000000001b7",
+        "019a7f00-0000-7000-8000-0000000001b8",
+        "019a7f00-0000-7000-8000-0000000001b9",
+        "019a7f00-0000-7000-8000-0000000001ba"
+      ],
+      "cut": {},
+      "rows": [
+        {
+          "id": "019a7f00-0000-7000-8000-0000000001b7",
+          "type": "object",
+          "name": "Mooring ring",
+          "description": "Rung at dawn."
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-0000000001b8",
+          "type": "object",
+          "name": "Tide board",
+          "description": "Read at noon."
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-0000000001b9",
+          "type": "object",
+          "name": "Rope coil",
+          "description": "Coiled at dusk."
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-0000000001ba",
+          "type": "object",
+          "name": "Lamp hook",
+          "description": "Lit at night."
+        }
+      ],
+      "note": "A first line that is U+2028, U+0085, a line tab or a form feed alone holds nothing once White_Space is trimmed (each is in the set, and none is a line break here), so it is skipped and the row's first line is the second."
     },
     {
       "name": "show-name-carries-supertype-and-subtype-as-stored-untrimmed",

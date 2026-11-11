@@ -7,7 +7,7 @@
     "worlds: each world's elements as its owner is served them, the ids its hidden mark keeps from every reader but the owner, and its readers, in the lens fixture's shape. A reader's rung is owner (the whole world), contributor (the world less the hidden), guest (exactly the whole and known_of ids it lists; known_of is a stub: a name, its description and its dates, no link and no extension field) or public (the world less the hidden and the room elements, and nothing at all unless the world carries open: true, a world open to anyone). A case's world is a name in worlds or, as a graph case's is, a world of its own.",
     "a stub's standing: a stub serves no extension field, so whether an element the reader holds only as a stub is a reading aid is read from the element as the owner is served it; what the reading shows of it is what the stub serves.",
     "charter: want is charterOf(world, reader). charter is {id, name, rules, skill} or null: the newest marked Charter the reader sees, by created_at compared as instants (none sorts oldest), then the higher id by code point; rules the rules_field list as stored, [] when absent or null; skill the ids its description names (any id written as 8-4-4-4-12 hex, so every ow:// form, a site address and a bare id), in lowercase, each once in the order written, kept when it is an Object of this world the reader sees (served whole to every reader who reads the Charter; a hidden one is not seen and not kept), the first skill_max of those kept. guide is {id, name} or null, chosen the same way among marked Guides. domains is every marked Domain the reader sees, each {id, name, sentence, hubs}: in the order of the Guide's constructs as the reader is served them first (an id named twice keeps its first place, an entry that is no marked Domain is skipped), then the rest by folded name and then id; with no Guide seen, by folded name and id alone.",
-    "sentence: the description as served up to its first line break (a line feed or a carriage return), trimmed of White_Space; an empty string when there is none. hubs: the distinct {type, id} the Domain's served link fields name, in hub_fields' order (the Construct's link fields, the schema's order) and each list's own order, the Domain itself excluded; a stub serves no links, so a stub Domain's hubs are []."
+    "sentence: the description as served, trimmed of White_Space at both ends, cut at its first line break (a line feed or a carriage return) and trimmed again, so its first line that holds something; an empty string when there is none. hubs: the distinct {type, id} the Domain's served link fields name, in hub_fields' order (the Construct's link fields, the schema's order) and each list's own order, the Domain itself excluded; a stub serves no links, so a stub Domain's hubs are []."
   ],
   "pairs": [
     {
@@ -1870,7 +1870,7 @@
           }
         ]
       },
-      "note": "A proposed element is in no reader's view, the owner's included (any value but null: a seat's mark or a doubt): the newer Charter and Guide are proposed, so the settled ones lead; the Annex carries a doubt and is no Domain; the Draft Ledger is proposed, so it is kept neither in the skill nor in the Hall's hubs."
+      "note": "A proposed element is in no reader's view, the owner's included (one whose x_review_proposed counts as present by the review profile's rule 1, a seat's mark or a doubt; an empty mark is settled): the newer Charter and Guide are proposed, so the settled ones lead; the Annex carries a doubt and is no Domain; the Draft Ledger is proposed, so it is kept neither in the skill nor in the Hall's hubs."
     },
     {
       "name": "a-member-reading-the-charter-as-a-stub-reads-it-whole",
@@ -1991,6 +1991,182 @@
         "domains": []
       },
       "note": "The only copy of the skill's id in the Charter's text is in uppercase hex: a reader that compares the text as written finds no such Object and drops it; read as a UUID it is the Object, kept, in lowercase."
+    },
+    {
+      "name": "a-charter-with-an-empty-object-mark-is-settled-and-leads",
+      "kind": "charter",
+      "world": {
+        "id": "019a7f00-0000-7000-8000-00000000f118",
+        "name": "One case 118",
+        "hidden": [],
+        "readers": {
+          "owner": {
+            "rung": "owner",
+            "character": null
+          }
+        },
+        "elements": [
+          {
+            "id": "019a7f00-0000-7000-8000-000000000330",
+            "type": "law",
+            "name": "Rules",
+            "supertype": "Charter",
+            "x_charter_of": "019a7f00-0000-7000-8000-00000000f118",
+            "created_at": "2026-10-01T12:00:00Z",
+            "description": "The first rules."
+          },
+          {
+            "id": "019a7f00-0000-7000-8000-000000000331",
+            "type": "law",
+            "name": "Rules, newer",
+            "supertype": "Charter",
+            "x_charter_of": "019a7f00-0000-7000-8000-00000000f118",
+            "created_at": "2026-10-10T12:00:00Z",
+            "description": "The newer rules.",
+            "x_review_proposed": {}
+          }
+        ]
+      },
+      "reader": "owner",
+      "want": {
+        "charter": {
+          "id": "019a7f00-0000-7000-8000-000000000331",
+          "name": "Rules, newer",
+          "rules": [],
+          "skill": []
+        },
+        "guide": null,
+        "domains": []
+      },
+      "note": "The newer Charter's x_review_proposed is an empty object, {}: an empty mark, which counts as no proposal by the review profile's rule 1, so the newer Charter is settled and leads."
+    },
+    {
+      "name": "a-charter-with-an-empty-string-mark-is-settled-and-leads",
+      "kind": "charter",
+      "world": {
+        "id": "019a7f00-0000-7000-8000-00000000f119",
+        "name": "One case 119",
+        "hidden": [],
+        "readers": {
+          "owner": {
+            "rung": "owner",
+            "character": null
+          }
+        },
+        "elements": [
+          {
+            "id": "019a7f00-0000-7000-8000-000000000332",
+            "type": "law",
+            "name": "Rules",
+            "supertype": "Charter",
+            "x_charter_of": "019a7f00-0000-7000-8000-00000000f119",
+            "created_at": "2026-10-01T12:00:00Z",
+            "description": "The first rules."
+          },
+          {
+            "id": "019a7f00-0000-7000-8000-000000000333",
+            "type": "law",
+            "name": "Rules, newer",
+            "supertype": "Charter",
+            "x_charter_of": "019a7f00-0000-7000-8000-00000000f119",
+            "created_at": "2026-10-10T12:00:00Z",
+            "description": "The newer rules.",
+            "x_review_proposed": ""
+          }
+        ]
+      },
+      "reader": "owner",
+      "want": {
+        "charter": {
+          "id": "019a7f00-0000-7000-8000-000000000333",
+          "name": "Rules, newer",
+          "rules": [],
+          "skill": []
+        },
+        "guide": null,
+        "domains": []
+      },
+      "note": "The newer Charter's x_review_proposed is an empty string, \"\": an empty mark, which counts as no proposal by the review profile's rule 1, so the newer Charter is settled and leads."
+    },
+    {
+      "name": "a-domains-sentence-trims-before-it-cuts-so-a-leading-line-break-is-passed-over",
+      "kind": "charter",
+      "world": {
+        "id": "019a7f00-0000-7000-8000-00000000f11a",
+        "name": "One case 11a",
+        "hidden": [],
+        "readers": {
+          "owner": {
+            "rung": "owner",
+            "character": null
+          }
+        },
+        "elements": [
+          {
+            "id": "019a7f00-0000-7000-8000-000000000334",
+            "type": "construct",
+            "name": "The Docks",
+            "supertype": "Domain",
+            "x_charter_of": "019a7f00-0000-7000-8000-00000000f11a",
+            "created_at": "2026-10-01T12:00:00Z",
+            "description": "\n\n  Where the ferries tie up.  \nAnd the tar sheds."
+          }
+        ]
+      },
+      "reader": "owner",
+      "want": {
+        "charter": null,
+        "guide": null,
+        "domains": [
+          {
+            "id": "019a7f00-0000-7000-8000-000000000334",
+            "name": "The Docks",
+            "sentence": "Where the ferries tie up.",
+            "hubs": []
+          }
+        ]
+      },
+      "note": "The sentence is the description trimmed of White_Space, cut at its first line break and trimmed again: the two leading line feeds and the spaces go with the first trim, so the sentence is the first line that holds something, trimmed. A reader that cuts before it trims answers an empty sentence here and is red."
+    },
+    {
+      "name": "a-domains-sentence-of-white-space-and-line-breaks-alone-is-the-empty-string",
+      "kind": "charter",
+      "world": {
+        "id": "019a7f00-0000-7000-8000-00000000f11b",
+        "name": "One case 11b",
+        "hidden": [],
+        "readers": {
+          "owner": {
+            "rung": "owner",
+            "character": null
+          }
+        },
+        "elements": [
+          {
+            "id": "019a7f00-0000-7000-8000-000000000335",
+            "type": "construct",
+            "name": "The Docks",
+            "supertype": "Domain",
+            "x_charter_of": "019a7f00-0000-7000-8000-00000000f11b",
+            "created_at": "2026-10-01T12:00:00Z",
+            "description": " \n\t\r\n "
+          }
+        ]
+      },
+      "reader": "owner",
+      "want": {
+        "charter": null,
+        "guide": null,
+        "domains": [
+          {
+            "id": "019a7f00-0000-7000-8000-000000000335",
+            "name": "The Docks",
+            "sentence": "",
+            "hubs": []
+          }
+        ]
+      },
+      "note": "A description of White_Space and line breaks alone leaves nothing after the trim: the sentence is the empty string, never null and never a key left out."
     }
   ]
 }

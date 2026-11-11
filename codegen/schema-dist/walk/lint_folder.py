@@ -16,7 +16,10 @@ disk (read as "", the unset string). A known-of stub (`known_of: true`, folder
 spec 4.4) passes with only the keys it keeps; one that writes an unset field
 is reported. `records/` (spec 4.5) is not elements and is not read. A `world.json`
 whose `format_version` is newer than FORMAT_VERSION below gets one warning line,
-never a problem; an older or absent stamp passes. The last line is the count it checked, so an empty
+never a problem; an older or absent stamp passes. The review profile's two marks
+(`x_review_proposed`, `x_review_checked`) are read too, as warnings that never fail a
+folder: a value that counts as present and is not an object (its rule 4), and each key the
+profile's table names that an object mark lacks (its rule 5). The last line is the count it checked, so an empty
 report is a result and not a silence. Exit 0 clean, 1 with problems, 2 when
 the folder is not a world folder.
 
@@ -63,6 +66,17 @@ EXTENSION_PREFIXES = ("x_", "atlas_", "shadow_")
 # what rule 1 forbids outright: an unset value written into a stub.
 STUB_KEEPS = {"id", "type", "name", "description", "supertype", "subtype", "image_url",
               "created_at", "updated_at", "change_seq"}
+# The review profile's two marks (profiles/review.md) and the keys its table names for
+# each. A value that counts as present and is not an object (rule 4), and an object mark
+# that lacks a key the table names (rule 5), are each a warning: "nothing repairs it", so
+# neither ever fails a folder.
+REVIEW_MARKS = {"x_review_proposed": ("by", "evidence", "expires"),
+                "x_review_checked": ("by", "at", "against")}
+# White_Space as the room profile defines it: the 25 code points with Unicode's
+# White_Space property (keel's core.room.WHITE_SPACE; Python's str.strip() strips more).
+WHITE_SPACE = ("\u0009\u000a\u000b\u000c\u000d \u0085  "
+               "           "
+               "    　")
 
 
 class Report:
@@ -177,6 +191,7 @@ def lint_folder(src: Path, decoded: dict) -> Report:
                 fields[f["name"]] = f
         if body.get("type", slug) != slug:
             report.add(f"{rel}: `type` is {body['type']!r}, folder says {slug!r}")
+        _review_warnings(report, rel, body)
         if "known_of" in body:
             if body["known_of"] is not True:
                 report.add(f"{rel}: `known_of` is {body['known_of']!r}; a stub says true, a whole element leaves it out")
@@ -227,6 +242,29 @@ def lint_folder(src: Path, decoded: dict) -> Report:
                             if f["kind"] == "generic" and f["id_key"] == key)
                 _check_link(report, rel, key, value, body.get(tkey), bodies)
     return report
+
+
+def _review_warnings(report, rel, body) -> None:
+    """The review profile's marks, as warnings (never problems). Rule 1: absent, null and an
+    empty value (a string with nothing left after trimming White_Space, [] or {}) are no
+    mark, and say nothing. Rule 4: any other value that is not an object is a doubt, never
+    repaired. Rule 5: an object mark that lacks a key the table names, one line per key."""
+    for key, names in REVIEW_MARKS.items():
+        if key not in body:
+            continue
+        value = body[key]
+        if value is None or (isinstance(value, str) and not value.strip(WHITE_SPACE)) or (
+                isinstance(value, (list, dict)) and not value):
+            continue
+        if not isinstance(value, dict):
+            report.warnings.append(
+                f"{rel}: `{key}` holds {value!r}, not an object: a doubt, never repaired "
+                "(review profile, rule 4)")
+            continue
+        for name in names:
+            if name not in value:
+                report.warnings.append(
+                    f"{rel}: `{key}` has no `{name}` (review profile, rule 5)")
 
 
 def _check_link(report, rel, key, value, target, bodies) -> None:
