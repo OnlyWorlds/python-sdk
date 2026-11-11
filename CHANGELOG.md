@@ -4,6 +4,10 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+## 0.117.1 (2026-11-11)
+
+- The Markdown pack's opening line says how many elements were "marked proposed and not yet reviewed by a keeper", where it said "proposed by an AI agent": a review mark says an element is proposed, never who made it (the review profile, serial 116), and a person's tool can write one too.
+
 ## 0.117.0 (2026-11-11)
 
 - Schema repinned to schema-dist v0.34.0-dist.116 (canonical 00.34.00 unchanged; no schema file and no fixture moved, only `profiles/review.md`).

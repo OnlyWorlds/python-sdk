@@ -184,13 +184,13 @@ def proposed_line(left_out: int, kept: int) -> str | None:
     if left_out:
         many = left_out != 1
         return (
-            f"*{left_out:,} element{'s' if many else ''} proposed by an AI agent and not yet reviewed by a keeper "
+            f"*{left_out:,} element{'s' if many else ''} marked proposed and not yet reviewed by a keeper "
             f"{'are' if many else 'is'} left out of this pack.*"
         )
     if kept:
         n = "1 element here was" if kept == 1 else f"{kept:,} elements here were"
         return (
-            f"*{n} proposed by an AI agent and not yet reviewed by a keeper; each is labelled "
+            f"*{n} marked proposed and not yet reviewed by a keeper; each is labelled "
             f'"{PROPOSED_LABEL}" and is not canon yet.*'
         )
     return None
