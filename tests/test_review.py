@@ -60,9 +60,15 @@ CASES: list[tuple[str, Any, Any, bool]] = [
         True,
     ),
     (
-        "trimmed by and expires",
+        "a by read as stored, never trimmed; expires trimmed",
         {"by": "  m1 ", "expires": " 2026-11-01 "},
-        {"by": "m1", "expires": "2026-11-01", "lapsed": False},
+        {"by": "  m1 ", "expires": "2026-11-01", "lapsed": False},
+        True,
+    ),
+    (
+        "a by of owner with White_Space around it is not the word owner",
+        {"by": " owner\n"},
+        {"by": " owner\n", "expires": None, "lapsed": False},
         True,
     ),
     ("lapses on its own day", {"by": "m1", "expires": TODAY}, {"by": "m1", "expires": TODAY, "lapsed": True}, True),
@@ -79,7 +85,14 @@ CASES: list[tuple[str, Any, Any, bool]] = [
         True,
     ),
     ("a blank or non-string by", {"by": "   ", "expires": 7}, {"by": None, "expires": None, "lapsed": False}, True),
-    # The two languages' own defaults disagree here (see the npm test): both trim by White_Space and read ASCII digits.
+    (
+        "a by that is not a string names nobody",
+        {"by": 7, "expires": "2026-11-01"},
+        {"by": None, "expires": "2026-11-01", "lapsed": False},
+        True,
+    ),
+    # The two languages' own defaults disagree here (see the npm test): both test presence by White_Space, trim
+    # expires by it, read ASCII digits and keep a by as stored.
     ("U+3000 only: White_Space, an empty mark, settled", chr(0x3000), None, False),
     ("U+001C only: not White_Space, present, a doubt", FS, None, True),
     ("a byte order mark only: not White_Space, present, a doubt", BOM, None, True),

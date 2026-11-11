@@ -34,8 +34,15 @@ _DAY = re.compile(r"^[0-9]{4}-[0-9]{2}-[0-9]{2}$")
 class ProposedMark(TypedDict):
     """A proposed element's mark as a reader shows it."""
 
-    #: The membership or seat that proposed it, trimmed of Unicode White_Space as the room profile trims,
-    #: when the mark names one.
+    #: Who made the mark, in the writer's own word: a claim, with no format to rely on, and never proof of who wrote the
+    #: mark or the element. Read as stored, never trimmed: a ``by`` that is not a string, or is White_Space alone, names
+    #: nobody (None); White_Space around a word or an id makes it neither. Show it as the mark's word (for example "the
+    #: mark names Ada"), in a form that keeps the name visibly the mark's, never as a fact ("proposed by Ada"). Put a
+    #: name in its place in two cases only: your platform resolves it to a member on its roster or to the world's owner,
+    #: comparing ids as ids, with the name it serves this reader (the id where it serves none) and the owner, an AI's
+    #: seat or a player's seat said beside it; otherwise, it is the id of a Character of the same world this reader is
+    #: served, said as that Character with its type, never as the member who plays it. Every other ``by`` is shown only
+    #: as the raw value, apart, never where a name stands.
     by: str | None
     #: The day it lapses (YYYY-MM-DD), trimmed, when the mark gives one in that shape.
     expires: str | None
@@ -71,7 +78,7 @@ def proposed_mark_of(element: Any, today: str | None = None) -> ProposedMark | N
     if not isinstance(v, Mapping) or not _present(v):
         return None
     raw_by = v.get("by")
-    by = raw_by.strip(_WHITE_SPACE) if isinstance(raw_by, str) and raw_by.strip(_WHITE_SPACE) else None
+    by = raw_by if isinstance(raw_by, str) and raw_by.strip(_WHITE_SPACE) else None
     raw_exp = v.get("expires")
     expires = (
         raw_exp.strip(_WHITE_SPACE)
