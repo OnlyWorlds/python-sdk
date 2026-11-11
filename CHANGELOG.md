@@ -4,6 +4,11 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+## 0.117.0 (2026-11-11)
+
+- Schema repinned to schema-dist v0.34.0-dist.116 (canonical 00.34.00 unchanged; no schema file and no fixture moved, only `profiles/review.md`).
+- `proposed_mark_of`'s `by` is read as stored, never trimmed (the review profile's Who `by` names): a `by` that is not a string, or is White_Space alone, names nobody (`None`), and White_Space around a word or an id makes it neither. 0.116.0 trimmed it, so `" owner "` came back as `owner`. `ProposedMark.by` says how a reader shows it: as the mark's word ("the mark names Ada"), never as a fact ("proposed by Ada"); a name in its place only where the platform resolves it to a member on its roster or to the owner, comparing ids as ids, or where it is the id of a Character of the same world this reader is served, said as that Character; otherwise the raw value, apart.
+
 ## 0.116.0 (2026-11-11)
 
 - Schema repinned to schema-dist v0.34.0-dist.115 (canonical 00.34.00 unchanged, no schema file moved). The lens fixture's 220 cases (ten new) and the charter fixture's 31 (four new) replay.
