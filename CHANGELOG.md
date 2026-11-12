@@ -4,6 +4,7 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+- **`report_threads_of`, the report profile's rule 9** (serial 120): groups the reports in a list of Narratives, and only reports, by `parent_narrative`, read as written (absent, null or blank once trimmed is no parent). A report is the pair `narrative` + `Report` and the room's mark `x_room_of`; a board entry is `narrative` + `Board` and the mark. It answers each report's parent (`none`, `report`, `board`, `missing`, `other` or `self`), the groups (a report's thread, or the reports of the talks under a board entry, each in `created_at` order as the message profile orders messages, never by id), and the lints (`chain` for a report whose parent names another report the reader holds as its own parent, `self` for one that names itself; a report that names itself reads as naming no parent, so a report under it is no chain). It never walks further up a chain. Every element is read as served: a known-of stub without the pair and the mark is neither a report nor a board entry. The fixture's thread cases replay in `tests/test_report.py`.
 - `list_page`'s notes name the Pin list's `element` filter (served since 2026-11-12): `list_page("pin", filter={"element": id}, expand=["map"])` gives an element its maps in one call. It was already sent as given; only the words are new.
 
 ## 0.119.0 (2026-11-12)

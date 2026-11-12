@@ -410,7 +410,7 @@ def thread_of[E: Mapping[str, Any]](messages: Iterable[E], root_id: str) -> list
     object); a parent not among ``messages`` ends the chain (unless it is the root). A
     message whose id is not a string is in no thread, and a ``root_id`` that is empty or not a string
     has none. A Note is in no thread: it is never listed, though a chain walks through its
-    ``parent_narrative`` like any other."""
+    ``parent_narrative`` like any other. It reads messages; reports group by ``report_threads_of``."""
     if not isinstance(root_id, str) or not root_id:
         return []
     listed = list(messages)
