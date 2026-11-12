@@ -285,6 +285,80 @@
           "on": "2026-11-02"
         }
       }
+    },
+    {
+      "id": "subs",
+      "name": "Subs",
+      "sentence": "A convoy-escort game of the Second World War, destroyers against U-boats seen from above: a world's Character can captain a ship, and the voyage is written back into the world as a record.",
+      "url": "https://subs.onlyworlds.com",
+      "source": null,
+      "source_note": "The game is private while it is being built; the OnlyWorlds maintainers read its code for this listing.",
+      "maker": "OnlyWorlds (Quillon, an AI agent working for Titus)",
+      "doors": [
+        "api"
+      ],
+      "open": {
+        "world": null,
+        "element": "https://subs.onlyworlds.com/#/open/{world}/element/{id}",
+        "needs": "account",
+        "element_skips": [
+          "room",
+          "hidden",
+          "proposed"
+        ],
+        "element_types": [
+          "character"
+        ]
+      },
+      "client": "subs",
+      "prefix": "x_subs_",
+      "free_core": "Sail the convoy with no account; seating a world's Character as captain and writing the crossing back needs a free onlyworlds.com account that owns the world, or a write key for it.",
+      "paid": null,
+      "rung": "listed",
+      "listed_on": "2026-11-12",
+      "listed_by": "Kael, the OnlyWorlds maintainer, on a read of the seven lines at subs 5e0d764 (served as build 20b, its comments rewritten), on the owner's word (2026-11-12)",
+      "delisted_on": null,
+      "delisted_why": null,
+      "submission": "https://github.com/OnlyWorlds/tools/blob/master/reads/2026-11-12-subs.md",
+      "checks": {
+        "what_it_says": {
+          "result": "pass",
+          "how": "read",
+          "on": "2026-11-12"
+        },
+        "keys_stay": {
+          "result": "pass",
+          "how": "read in private source",
+          "on": "2026-11-12",
+          "note": "No key is needed to play. A world key, pasted or made by Subs through a sign-in, is kept in the browser's localStorage for that world and handed to the game in the page's memory; a sign-in's account token is held in the page's memory only and revoked once a world is picked or the page is left."
+        },
+        "names_itself": {
+          "result": "pass",
+          "how": "read in private source",
+          "on": "2026-11-12"
+        },
+        "speaks_the_wire": {
+          "result": "pass",
+          "how": "read in private source",
+          "on": "2026-11-12"
+        },
+        "what_leaves": {
+          "result": "pass",
+          "how": "read in private source",
+          "on": "2026-11-12",
+          "note": "A world's Characters are read from, and a saved crossing written to, www.onlyworlds.com only, and only after the person opens Subs from a Character and connects the world; with no world nothing is sent anywhere."
+        },
+        "host": {
+          "result": "pass",
+          "how": "read",
+          "on": "2026-11-12"
+        },
+        "free_core": {
+          "result": "pass",
+          "how": "read",
+          "on": "2026-11-12"
+        }
+      }
     }
   ]
 }

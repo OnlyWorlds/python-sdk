@@ -1,0 +1,923 @@
+{
+  "profile": "report",
+  "profile_page": "profiles/report.md",
+  "notes": [
+    "pair: narrative + supertype Report, each trimmed and folded like the room profile's pairs; a report carries the pair and the mark. board_pair: a board entry, the room profile's pair narrative + Board; every board entry here carries the mark too.",
+    "mark: x_room_of, read by presence as the room profile reads it. Every room element in the cases carries the world id below; a Narrative with supertype Report and no mark is lore and no report.",
+    "thread_cases: each case is the narratives as one reader is given them, in the order given, and a want of three parts, worked by hand from the page's rule 9.",
+    "Only reports are in the want: a Narrative that is no report (a message that answers one, a board entry, a lore Narrative) may be among the narratives and is in no part of it.",
+    "parents: for each report in the case, in the order given, what its parent is: none (no parent: the field absent, null or empty once trimmed), report, board, missing (an id whose element the case does not hold), other (a Narrative that is neither a report nor a board entry) or self. Of these, board is the only kind that is a talk's anchor: a report as a parent never is.",
+    "groups: each {parent, kind, reports}: the parent's id, report or board, and the ids of the reports that name it, ordered by created_at as the message profile orders messages (read as an instant; equal ones keep the order given; one that cannot be read after every one that can, in the order given). The parent itself is not in reports. A report in no group and heading none is not listed.",
+    "lints: each {kind, report}: chain on a report whose parent is a report that itself has a report for its parent (one the reader holds, the pair and the mark); self on a report that names itself. A report that names itself is read as naming no parent, so a report that names it is no chain. These are the only lints: a parent that is missing or of no kind is no lint.",
+    "The page rules the order inside a group and none between groups: groups and lints each compare as a set. Here groups are listed in the order their parent is first named in the list given, and lints in the order of their reports.",
+    "A case's note is prose for the reader of the fixture, never an input."
+  ],
+  "pair": {
+    "type": "narrative",
+    "supertype": "Report"
+  },
+  "board_pair": {
+    "type": "narrative",
+    "supertype": "Board"
+  },
+  "mark": {
+    "field": "x_room_of",
+    "value": "019a7120-0000-7000-8000-000000000000"
+  },
+  "thread_cases": [
+    {
+      "name": "thread-given-out-of-created-at-order",
+      "note": "Two reports name the first. created_at is read as an instant: 10:59:59.999+02:00 is 08:59:59.999Z, before 09:00:00.500Z. Compared as text, and in the list's order, the other report would come first.",
+      "narratives": [
+        {
+          "id": "019a7120-0000-7000-8000-000000000102",
+          "type": "narrative",
+          "supertype": "Report",
+          "x_room_of": "019a7120-0000-7000-8000-000000000000",
+          "parent_narrative": "019a7120-0000-7000-8000-000000000101",
+          "relations": [],
+          "created_at": "2026-10-26T09:00:00.500Z"
+        },
+        {
+          "id": "019a7120-0000-7000-8000-000000000101",
+          "type": "narrative",
+          "supertype": "Report",
+          "x_room_of": "019a7120-0000-7000-8000-000000000000",
+          "parent_narrative": null,
+          "relations": [],
+          "created_at": "2026-10-26T08:30:00Z"
+        },
+        {
+          "id": "019a7120-0000-7000-8000-000000000103",
+          "type": "narrative",
+          "supertype": "Report",
+          "x_room_of": "019a7120-0000-7000-8000-000000000000",
+          "parent_narrative": "019a7120-0000-7000-8000-000000000101",
+          "relations": [],
+          "created_at": "2026-10-26T10:59:59.999+02:00"
+        }
+      ],
+      "want": {
+        "parents": {
+          "019a7120-0000-7000-8000-000000000102": "report",
+          "019a7120-0000-7000-8000-000000000101": "none",
+          "019a7120-0000-7000-8000-000000000103": "report"
+        },
+        "groups": [
+          {
+            "parent": "019a7120-0000-7000-8000-000000000101",
+            "kind": "report",
+            "reports": [
+              "019a7120-0000-7000-8000-000000000103",
+              "019a7120-0000-7000-8000-000000000102"
+            ]
+          }
+        ],
+        "lints": []
+      }
+    },
+    {
+      "name": "thread-same-created-at-keeps-list-order",
+      "note": "Two reports that name the first carry the same created_at: they keep the order of the list given, which is not the order of their ids.",
+      "narratives": [
+        {
+          "id": "019a7120-0000-7000-8000-000000000201",
+          "type": "narrative",
+          "supertype": "Report",
+          "x_room_of": "019a7120-0000-7000-8000-000000000000",
+          "parent_narrative": null,
+          "relations": [],
+          "created_at": "2026-10-26T09:30:00Z"
+        },
+        {
+          "id": "019a7120-0000-7000-8000-000000000203",
+          "type": "narrative",
+          "supertype": "Report",
+          "x_room_of": "019a7120-0000-7000-8000-000000000000",
+          "parent_narrative": "019a7120-0000-7000-8000-000000000201",
+          "relations": [],
+          "created_at": "2026-10-26T09:40:00Z"
+        },
+        {
+          "id": "019a7120-0000-7000-8000-000000000202",
+          "type": "narrative",
+          "supertype": "Report",
+          "x_room_of": "019a7120-0000-7000-8000-000000000000",
+          "parent_narrative": "019a7120-0000-7000-8000-000000000201",
+          "relations": [],
+          "created_at": "2026-10-26T09:40:00Z"
+        }
+      ],
+      "want": {
+        "parents": {
+          "019a7120-0000-7000-8000-000000000201": "none",
+          "019a7120-0000-7000-8000-000000000203": "report",
+          "019a7120-0000-7000-8000-000000000202": "report"
+        },
+        "groups": [
+          {
+            "parent": "019a7120-0000-7000-8000-000000000201",
+            "kind": "report",
+            "reports": [
+              "019a7120-0000-7000-8000-000000000203",
+              "019a7120-0000-7000-8000-000000000202"
+            ]
+          }
+        ],
+        "lints": []
+      }
+    },
+    {
+      "name": "thread-unreadable-created-at-absent",
+      "note": "Three reports name the first; the one listed first has no created_at, which cannot be read as a date and time: it comes after every one that can.",
+      "narratives": [
+        {
+          "id": "019a7120-0000-7000-8000-000000000301",
+          "type": "narrative",
+          "supertype": "Report",
+          "x_room_of": "019a7120-0000-7000-8000-000000000000",
+          "parent_narrative": null,
+          "relations": [],
+          "created_at": "2026-10-26T09:00:00Z"
+        },
+        {
+          "id": "019a7120-0000-7000-8000-000000000302",
+          "type": "narrative",
+          "supertype": "Report",
+          "x_room_of": "019a7120-0000-7000-8000-000000000000",
+          "parent_narrative": "019a7120-0000-7000-8000-000000000301",
+          "relations": []
+        },
+        {
+          "id": "019a7120-0000-7000-8000-000000000303",
+          "type": "narrative",
+          "supertype": "Report",
+          "x_room_of": "019a7120-0000-7000-8000-000000000000",
+          "parent_narrative": "019a7120-0000-7000-8000-000000000301",
+          "relations": [],
+          "created_at": "2026-10-26T10:20:00Z"
+        },
+        {
+          "id": "019a7120-0000-7000-8000-000000000304",
+          "type": "narrative",
+          "supertype": "Report",
+          "x_room_of": "019a7120-0000-7000-8000-000000000000",
+          "parent_narrative": "019a7120-0000-7000-8000-000000000301",
+          "relations": [],
+          "created_at": "2026-10-26T09:00:00.500Z"
+        }
+      ],
+      "want": {
+        "parents": {
+          "019a7120-0000-7000-8000-000000000301": "none",
+          "019a7120-0000-7000-8000-000000000302": "report",
+          "019a7120-0000-7000-8000-000000000303": "report",
+          "019a7120-0000-7000-8000-000000000304": "report"
+        },
+        "groups": [
+          {
+            "parent": "019a7120-0000-7000-8000-000000000301",
+            "kind": "report",
+            "reports": [
+              "019a7120-0000-7000-8000-000000000304",
+              "019a7120-0000-7000-8000-000000000303",
+              "019a7120-0000-7000-8000-000000000302"
+            ]
+          }
+        ],
+        "lints": []
+      }
+    },
+    {
+      "name": "thread-unreadable-created-at-null",
+      "note": "Three reports name the first; the one listed first has created_at null, which cannot be read as a date and time: it comes after every one that can.",
+      "narratives": [
+        {
+          "id": "019a7120-0000-7000-8000-000000000401",
+          "type": "narrative",
+          "supertype": "Report",
+          "x_room_of": "019a7120-0000-7000-8000-000000000000",
+          "parent_narrative": null,
+          "relations": [],
+          "created_at": "2026-10-26T09:00:00Z"
+        },
+        {
+          "id": "019a7120-0000-7000-8000-000000000402",
+          "type": "narrative",
+          "supertype": "Report",
+          "x_room_of": "019a7120-0000-7000-8000-000000000000",
+          "parent_narrative": "019a7120-0000-7000-8000-000000000401",
+          "relations": [],
+          "created_at": null
+        },
+        {
+          "id": "019a7120-0000-7000-8000-000000000403",
+          "type": "narrative",
+          "supertype": "Report",
+          "x_room_of": "019a7120-0000-7000-8000-000000000000",
+          "parent_narrative": "019a7120-0000-7000-8000-000000000401",
+          "relations": [],
+          "created_at": "2026-10-26T10:20:00Z"
+        },
+        {
+          "id": "019a7120-0000-7000-8000-000000000404",
+          "type": "narrative",
+          "supertype": "Report",
+          "x_room_of": "019a7120-0000-7000-8000-000000000000",
+          "parent_narrative": "019a7120-0000-7000-8000-000000000401",
+          "relations": [],
+          "created_at": "2026-10-26T09:00:00.500Z"
+        }
+      ],
+      "want": {
+        "parents": {
+          "019a7120-0000-7000-8000-000000000401": "none",
+          "019a7120-0000-7000-8000-000000000402": "report",
+          "019a7120-0000-7000-8000-000000000403": "report",
+          "019a7120-0000-7000-8000-000000000404": "report"
+        },
+        "groups": [
+          {
+            "parent": "019a7120-0000-7000-8000-000000000401",
+            "kind": "report",
+            "reports": [
+              "019a7120-0000-7000-8000-000000000404",
+              "019a7120-0000-7000-8000-000000000403",
+              "019a7120-0000-7000-8000-000000000402"
+            ]
+          }
+        ],
+        "lints": []
+      }
+    },
+    {
+      "name": "thread-unreadable-created-at-a-word",
+      "note": "Three reports name the first; the one listed first has the created_at yesterday, which cannot be read as a date and time: it comes after every one that can.",
+      "narratives": [
+        {
+          "id": "019a7120-0000-7000-8000-000000000501",
+          "type": "narrative",
+          "supertype": "Report",
+          "x_room_of": "019a7120-0000-7000-8000-000000000000",
+          "parent_narrative": null,
+          "relations": [],
+          "created_at": "2026-10-26T09:00:00Z"
+        },
+        {
+          "id": "019a7120-0000-7000-8000-000000000502",
+          "type": "narrative",
+          "supertype": "Report",
+          "x_room_of": "019a7120-0000-7000-8000-000000000000",
+          "parent_narrative": "019a7120-0000-7000-8000-000000000501",
+          "relations": [],
+          "created_at": "yesterday"
+        },
+        {
+          "id": "019a7120-0000-7000-8000-000000000503",
+          "type": "narrative",
+          "supertype": "Report",
+          "x_room_of": "019a7120-0000-7000-8000-000000000000",
+          "parent_narrative": "019a7120-0000-7000-8000-000000000501",
+          "relations": [],
+          "created_at": "2026-10-26T10:20:00Z"
+        },
+        {
+          "id": "019a7120-0000-7000-8000-000000000504",
+          "type": "narrative",
+          "supertype": "Report",
+          "x_room_of": "019a7120-0000-7000-8000-000000000000",
+          "parent_narrative": "019a7120-0000-7000-8000-000000000501",
+          "relations": [],
+          "created_at": "2026-10-26T09:00:00.500Z"
+        }
+      ],
+      "want": {
+        "parents": {
+          "019a7120-0000-7000-8000-000000000501": "none",
+          "019a7120-0000-7000-8000-000000000502": "report",
+          "019a7120-0000-7000-8000-000000000503": "report",
+          "019a7120-0000-7000-8000-000000000504": "report"
+        },
+        "groups": [
+          {
+            "parent": "019a7120-0000-7000-8000-000000000501",
+            "kind": "report",
+            "reports": [
+              "019a7120-0000-7000-8000-000000000504",
+              "019a7120-0000-7000-8000-000000000503",
+              "019a7120-0000-7000-8000-000000000502"
+            ]
+          }
+        ],
+        "lints": []
+      }
+    },
+    {
+      "name": "board-entry-two-closed-talks",
+      "note": "Two closed talks' reports hang on one board entry: one group, the entry's, in created_at order.",
+      "narratives": [
+        {
+          "id": "019a7120-0000-7000-8000-000000000601",
+          "type": "narrative",
+          "supertype": "Board",
+          "x_room_of": "019a7120-0000-7000-8000-000000000000",
+          "parent_narrative": null,
+          "relations": [],
+          "created_at": "2026-10-26T08:00:00Z"
+        },
+        {
+          "id": "019a7120-0000-7000-8000-000000000602",
+          "type": "narrative",
+          "supertype": "Report",
+          "x_room_of": "019a7120-0000-7000-8000-000000000000",
+          "parent_narrative": "019a7120-0000-7000-8000-000000000601",
+          "relations": [],
+          "created_at": "2026-10-26T09:10:00Z"
+        },
+        {
+          "id": "019a7120-0000-7000-8000-000000000603",
+          "type": "narrative",
+          "supertype": "Report",
+          "x_room_of": "019a7120-0000-7000-8000-000000000000",
+          "parent_narrative": "019a7120-0000-7000-8000-000000000601",
+          "relations": [],
+          "created_at": "2026-10-26T09:05:00Z"
+        }
+      ],
+      "want": {
+        "parents": {
+          "019a7120-0000-7000-8000-000000000602": "board",
+          "019a7120-0000-7000-8000-000000000603": "board"
+        },
+        "groups": [
+          {
+            "parent": "019a7120-0000-7000-8000-000000000601",
+            "kind": "board",
+            "reports": [
+              "019a7120-0000-7000-8000-000000000603",
+              "019a7120-0000-7000-8000-000000000602"
+            ]
+          }
+        ],
+        "lints": []
+      }
+    },
+    {
+      "name": "board-entry-report-continues-a-report",
+      "note": "A closed talk's report keeps its board entry in parent_narrative; its description says which report it continues. A reader never guesses a thread from that text: the report is in the entry's group and in no report's group, and the first report heads no group.",
+      "narratives": [
+        {
+          "id": "019a7120-0000-7000-8000-000000000701",
+          "type": "narrative",
+          "supertype": "Report",
+          "x_room_of": "019a7120-0000-7000-8000-000000000000",
+          "parent_narrative": null,
+          "relations": [],
+          "created_at": "2026-10-26T09:00:00Z"
+        },
+        {
+          "id": "019a7120-0000-7000-8000-000000000702",
+          "type": "narrative",
+          "supertype": "Board",
+          "x_room_of": "019a7120-0000-7000-8000-000000000000",
+          "parent_narrative": null,
+          "relations": [],
+          "created_at": "2026-10-26T08:00:00Z"
+        },
+        {
+          "id": "019a7120-0000-7000-8000-000000000703",
+          "type": "narrative",
+          "supertype": "Report",
+          "x_room_of": "019a7120-0000-7000-8000-000000000000",
+          "parent_narrative": "019a7120-0000-7000-8000-000000000702",
+          "relations": [],
+          "description": "Continues the report ow://narrative/019a7120-0000-7000-8000-000000000701.",
+          "created_at": "2026-10-26T10:00:00Z"
+        }
+      ],
+      "want": {
+        "parents": {
+          "019a7120-0000-7000-8000-000000000701": "none",
+          "019a7120-0000-7000-8000-000000000703": "board"
+        },
+        "groups": [
+          {
+            "parent": "019a7120-0000-7000-8000-000000000702",
+            "kind": "board",
+            "reports": [
+              "019a7120-0000-7000-8000-000000000703"
+            ]
+          }
+        ],
+        "lints": []
+      }
+    },
+    {
+      "name": "chain-as-written",
+      "note": "C names B and B names A. A reader never walks further up: B is in A's group, C in B's, and C carries a chain lint, never repaired.",
+      "narratives": [
+        {
+          "id": "019a7120-0000-7000-8000-000000000801",
+          "type": "narrative",
+          "supertype": "Report",
+          "x_room_of": "019a7120-0000-7000-8000-000000000000",
+          "parent_narrative": null,
+          "relations": [],
+          "created_at": "2026-10-26T09:00:00Z"
+        },
+        {
+          "id": "019a7120-0000-7000-8000-000000000802",
+          "type": "narrative",
+          "supertype": "Report",
+          "x_room_of": "019a7120-0000-7000-8000-000000000000",
+          "parent_narrative": "019a7120-0000-7000-8000-000000000801",
+          "relations": [],
+          "created_at": "2026-10-26T09:10:00Z"
+        },
+        {
+          "id": "019a7120-0000-7000-8000-000000000803",
+          "type": "narrative",
+          "supertype": "Report",
+          "x_room_of": "019a7120-0000-7000-8000-000000000000",
+          "parent_narrative": "019a7120-0000-7000-8000-000000000802",
+          "relations": [],
+          "created_at": "2026-10-26T09:20:00Z"
+        }
+      ],
+      "want": {
+        "parents": {
+          "019a7120-0000-7000-8000-000000000801": "none",
+          "019a7120-0000-7000-8000-000000000802": "report",
+          "019a7120-0000-7000-8000-000000000803": "report"
+        },
+        "groups": [
+          {
+            "parent": "019a7120-0000-7000-8000-000000000801",
+            "kind": "report",
+            "reports": [
+              "019a7120-0000-7000-8000-000000000802"
+            ]
+          },
+          {
+            "parent": "019a7120-0000-7000-8000-000000000802",
+            "kind": "report",
+            "reports": [
+              "019a7120-0000-7000-8000-000000000803"
+            ]
+          }
+        ],
+        "lints": [
+          {
+            "kind": "chain",
+            "report": "019a7120-0000-7000-8000-000000000803"
+          }
+        ]
+      }
+    },
+    {
+      "name": "first-report-hangs-on-a-board-entry",
+      "note": "C names B, and B names a board entry. B's parent is no report, so C is no chain: C is in B's group, B in the entry's, and there is no lint.",
+      "narratives": [
+        {
+          "id": "019a7120-0000-7000-8000-000000000901",
+          "type": "narrative",
+          "supertype": "Board",
+          "x_room_of": "019a7120-0000-7000-8000-000000000000",
+          "parent_narrative": null,
+          "relations": [],
+          "created_at": "2026-10-26T08:00:00Z"
+        },
+        {
+          "id": "019a7120-0000-7000-8000-000000000902",
+          "type": "narrative",
+          "supertype": "Report",
+          "x_room_of": "019a7120-0000-7000-8000-000000000000",
+          "parent_narrative": "019a7120-0000-7000-8000-000000000901",
+          "relations": [],
+          "created_at": "2026-10-26T09:00:00Z"
+        },
+        {
+          "id": "019a7120-0000-7000-8000-000000000903",
+          "type": "narrative",
+          "supertype": "Report",
+          "x_room_of": "019a7120-0000-7000-8000-000000000000",
+          "parent_narrative": "019a7120-0000-7000-8000-000000000902",
+          "relations": [],
+          "created_at": "2026-10-26T09:30:00Z"
+        }
+      ],
+      "want": {
+        "parents": {
+          "019a7120-0000-7000-8000-000000000902": "board",
+          "019a7120-0000-7000-8000-000000000903": "report"
+        },
+        "groups": [
+          {
+            "parent": "019a7120-0000-7000-8000-000000000901",
+            "kind": "board",
+            "reports": [
+              "019a7120-0000-7000-8000-000000000902"
+            ]
+          },
+          {
+            "parent": "019a7120-0000-7000-8000-000000000902",
+            "kind": "report",
+            "reports": [
+              "019a7120-0000-7000-8000-000000000903"
+            ]
+          }
+        ],
+        "lints": []
+      }
+    },
+    {
+      "name": "report-names-itself",
+      "note": "A report whose parent_narrative is its own id is shown under no parent, with a lint.",
+      "narratives": [
+        {
+          "id": "019a7120-0000-7000-8000-000000001001",
+          "type": "narrative",
+          "supertype": "Report",
+          "x_room_of": "019a7120-0000-7000-8000-000000000000",
+          "parent_narrative": "019a7120-0000-7000-8000-000000001001",
+          "relations": [],
+          "created_at": "2026-10-26T09:00:00Z"
+        }
+      ],
+      "want": {
+        "parents": {
+          "019a7120-0000-7000-8000-000000001001": "self"
+        },
+        "groups": [],
+        "lints": [
+          {
+            "kind": "self",
+            "report": "019a7120-0000-7000-8000-000000001001"
+          }
+        ]
+      }
+    },
+    {
+      "name": "report-names-a-report-that-names-itself",
+      "note": "B names itself and C names B. A report that names itself is read as naming no parent, with a lint: B is self, with a self lint, and is not one of the reports that name it. B still heads the thread of C, which names it. B names no report, so C is no chain.",
+      "narratives": [
+        {
+          "id": "019a7120-0000-7000-8000-000000001601",
+          "type": "narrative",
+          "supertype": "Report",
+          "x_room_of": "019a7120-0000-7000-8000-000000000000",
+          "parent_narrative": "019a7120-0000-7000-8000-000000001601",
+          "relations": [],
+          "created_at": "2026-10-26T09:00:00Z"
+        },
+        {
+          "id": "019a7120-0000-7000-8000-000000001602",
+          "type": "narrative",
+          "supertype": "Report",
+          "x_room_of": "019a7120-0000-7000-8000-000000000000",
+          "parent_narrative": "019a7120-0000-7000-8000-000000001601",
+          "relations": [],
+          "created_at": "2026-10-26T09:10:00Z"
+        }
+      ],
+      "want": {
+        "parents": {
+          "019a7120-0000-7000-8000-000000001601": "self",
+          "019a7120-0000-7000-8000-000000001602": "report"
+        },
+        "groups": [
+          {
+            "parent": "019a7120-0000-7000-8000-000000001601",
+            "kind": "report",
+            "reports": [
+              "019a7120-0000-7000-8000-000000001602"
+            ]
+          }
+        ],
+        "lints": [
+          {
+            "kind": "self",
+            "report": "019a7120-0000-7000-8000-000000001601"
+          }
+        ]
+      }
+    },
+    {
+      "name": "report-names-a-report-whose-parent-is-not-held",
+      "note": "B names an id whose element is not among the narratives given, and C names B. B is missing and is shown under no parent; it still heads the thread of C. A chain needs the parent's own parent to be a report the reader holds, and B's is not: no lint.",
+      "narratives": [
+        {
+          "id": "019a7120-0000-7000-8000-000000001701",
+          "type": "narrative",
+          "supertype": "Report",
+          "x_room_of": "019a7120-0000-7000-8000-000000000000",
+          "parent_narrative": "019a7120-0000-7000-8000-000000001799",
+          "relations": [],
+          "created_at": "2026-10-26T09:00:00Z"
+        },
+        {
+          "id": "019a7120-0000-7000-8000-000000001702",
+          "type": "narrative",
+          "supertype": "Report",
+          "x_room_of": "019a7120-0000-7000-8000-000000000000",
+          "parent_narrative": "019a7120-0000-7000-8000-000000001701",
+          "relations": [],
+          "created_at": "2026-10-26T09:10:00Z"
+        }
+      ],
+      "want": {
+        "parents": {
+          "019a7120-0000-7000-8000-000000001701": "missing",
+          "019a7120-0000-7000-8000-000000001702": "report"
+        },
+        "groups": [
+          {
+            "parent": "019a7120-0000-7000-8000-000000001701",
+            "kind": "report",
+            "reports": [
+              "019a7120-0000-7000-8000-000000001702"
+            ]
+          }
+        ],
+        "lints": []
+      }
+    },
+    {
+      "name": "report-names-a-report-whose-parent-is-a-report-without-the-mark",
+      "note": "B names a Narrative with supertype Report and no x_room_of (lore, no report), and C names B. B is other and is shown under no parent; it still heads the thread of C. B's parent is no report, so C is no chain.",
+      "narratives": [
+        {
+          "id": "019a7120-0000-7000-8000-000000001801",
+          "type": "narrative",
+          "supertype": "Report",
+          "parent_narrative": null,
+          "relations": [],
+          "created_at": "2026-10-26T08:00:00Z"
+        },
+        {
+          "id": "019a7120-0000-7000-8000-000000001802",
+          "type": "narrative",
+          "supertype": "Report",
+          "x_room_of": "019a7120-0000-7000-8000-000000000000",
+          "parent_narrative": "019a7120-0000-7000-8000-000000001801",
+          "relations": [],
+          "created_at": "2026-10-26T09:00:00Z"
+        },
+        {
+          "id": "019a7120-0000-7000-8000-000000001803",
+          "type": "narrative",
+          "supertype": "Report",
+          "x_room_of": "019a7120-0000-7000-8000-000000000000",
+          "parent_narrative": "019a7120-0000-7000-8000-000000001802",
+          "relations": [],
+          "created_at": "2026-10-26T09:10:00Z"
+        }
+      ],
+      "want": {
+        "parents": {
+          "019a7120-0000-7000-8000-000000001802": "other",
+          "019a7120-0000-7000-8000-000000001803": "report"
+        },
+        "groups": [
+          {
+            "parent": "019a7120-0000-7000-8000-000000001802",
+            "kind": "report",
+            "reports": [
+              "019a7120-0000-7000-8000-000000001803"
+            ]
+          }
+        ],
+        "lints": []
+      }
+    },
+    {
+      "name": "parent-not-held",
+      "note": "The parent's id is in the body and its element is not among the narratives given (a folder or an export without it, an id that dangles): the report is shown under no parent; no lint.",
+      "narratives": [
+        {
+          "id": "019a7120-0000-7000-8000-000000001101",
+          "type": "narrative",
+          "supertype": "Report",
+          "x_room_of": "019a7120-0000-7000-8000-000000000000",
+          "parent_narrative": "019a7120-0000-7000-8000-000000001199",
+          "relations": [],
+          "created_at": "2026-10-26T09:00:00Z"
+        }
+      ],
+      "want": {
+        "parents": {
+          "019a7120-0000-7000-8000-000000001101": "missing"
+        },
+        "groups": [],
+        "lints": []
+      }
+    },
+    {
+      "name": "parent-is-a-report-without-the-mark",
+      "note": "The parent is a Narrative with supertype Report and no x_room_of: lore, neither a report nor a board entry. It groups nothing, it is not itself a report, and there is no lint.",
+      "narratives": [
+        {
+          "id": "019a7120-0000-7000-8000-000000001201",
+          "type": "narrative",
+          "supertype": "Report",
+          "parent_narrative": null,
+          "relations": [],
+          "created_at": "2026-10-26T08:00:00Z"
+        },
+        {
+          "id": "019a7120-0000-7000-8000-000000001202",
+          "type": "narrative",
+          "supertype": "Report",
+          "x_room_of": "019a7120-0000-7000-8000-000000000000",
+          "parent_narrative": "019a7120-0000-7000-8000-000000001201",
+          "relations": [],
+          "created_at": "2026-10-26T09:00:00Z"
+        }
+      ],
+      "want": {
+        "parents": {
+          "019a7120-0000-7000-8000-000000001202": "other"
+        },
+        "groups": [],
+        "lints": []
+      }
+    },
+    {
+      "name": "parent-is-a-board-without-the-mark",
+      "note": "The parent is a Narrative with supertype Board and no x_room_of: lore, since a board entry is the room profile's pair and the mark, as every room element is. It groups nothing, and there is no lint.",
+      "narratives": [
+        {
+          "id": "019a7120-0000-7000-8000-000000001501",
+          "type": "narrative",
+          "supertype": "Board",
+          "parent_narrative": null,
+          "relations": [],
+          "created_at": "2026-10-26T08:00:00Z"
+        },
+        {
+          "id": "019a7120-0000-7000-8000-000000001502",
+          "type": "narrative",
+          "supertype": "Report",
+          "x_room_of": "019a7120-0000-7000-8000-000000000000",
+          "parent_narrative": "019a7120-0000-7000-8000-000000001501",
+          "relations": [],
+          "created_at": "2026-10-26T09:00:00Z"
+        }
+      ],
+      "want": {
+        "parents": {
+          "019a7120-0000-7000-8000-000000001502": "other"
+        },
+        "groups": [],
+        "lints": []
+      }
+    },
+    {
+      "name": "report-with-no-parent",
+      "note": "A report with no parent is a thread of one: no group.",
+      "narratives": [
+        {
+          "id": "019a7120-0000-7000-8000-000000001301",
+          "type": "narrative",
+          "supertype": "Report",
+          "x_room_of": "019a7120-0000-7000-8000-000000000000",
+          "parent_narrative": null,
+          "relations": [],
+          "created_at": "2026-10-26T09:00:00Z"
+        }
+      ],
+      "want": {
+        "parents": {
+          "019a7120-0000-7000-8000-000000001301": "none"
+        },
+        "groups": [],
+        "lints": []
+      }
+    },
+    {
+      "name": "report-with-an-empty-or-blank-parent",
+      "note": "A report has no parent when the field is absent, null or empty once trimmed: one names an empty string, one only spaces. Each is none, a thread of one; no lint.",
+      "narratives": [
+        {
+          "id": "019a7120-0000-7000-8000-000000002001",
+          "type": "narrative",
+          "supertype": "Report",
+          "x_room_of": "019a7120-0000-7000-8000-000000000000",
+          "parent_narrative": "",
+          "relations": [],
+          "created_at": "2026-10-26T09:00:00Z"
+        },
+        {
+          "id": "019a7120-0000-7000-8000-000000002002",
+          "type": "narrative",
+          "supertype": "Report",
+          "x_room_of": "019a7120-0000-7000-8000-000000000000",
+          "parent_narrative": "   ",
+          "relations": [],
+          "created_at": "2026-10-26T09:10:00Z"
+        }
+      ],
+      "want": {
+        "parents": {
+          "019a7120-0000-7000-8000-000000002001": "none",
+          "019a7120-0000-7000-8000-000000002002": "none"
+        },
+        "groups": [],
+        "lints": []
+      }
+    },
+    {
+      "name": "second-report-on-a-work-item",
+      "note": "Both reports name the work item in relations (a Relation, not among the narratives). The second names the first in parent_narrative: it is in the first report's group, and the work item still holds it, where a reader shows it too. A report in parent_narrative is never a talk's anchor, so the want names no anchor for it.",
+      "narratives": [
+        {
+          "id": "019a7120-0000-7000-8000-000000001401",
+          "type": "narrative",
+          "supertype": "Report",
+          "x_room_of": "019a7120-0000-7000-8000-000000000000",
+          "parent_narrative": null,
+          "relations": [
+            "019a7120-0000-7000-8000-000000001490"
+          ],
+          "created_at": "2026-10-26T09:00:00Z"
+        },
+        {
+          "id": "019a7120-0000-7000-8000-000000001402",
+          "type": "narrative",
+          "supertype": "Report",
+          "x_room_of": "019a7120-0000-7000-8000-000000000000",
+          "parent_narrative": "019a7120-0000-7000-8000-000000001401",
+          "relations": [
+            "019a7120-0000-7000-8000-000000001490"
+          ],
+          "created_at": "2026-11-02T09:00:00Z"
+        }
+      ],
+      "want": {
+        "parents": {
+          "019a7120-0000-7000-8000-000000001401": "none",
+          "019a7120-0000-7000-8000-000000001402": "report"
+        },
+        "groups": [
+          {
+            "parent": "019a7120-0000-7000-8000-000000001401",
+            "kind": "report",
+            "reports": [
+              "019a7120-0000-7000-8000-000000001402"
+            ]
+          }
+        ],
+        "lints": []
+      }
+    },
+    {
+      "name": "message-names-the-first-report",
+      "note": "A message (supertype Message, with the room's mark) answers the first report and names it as its parent, beside a later report that does. Only reports are grouped: the message is no part of the thread and in no part of the want.",
+      "narratives": [
+        {
+          "id": "019a7120-0000-7000-8000-000000001901",
+          "type": "narrative",
+          "supertype": "Report",
+          "x_room_of": "019a7120-0000-7000-8000-000000000000",
+          "parent_narrative": null,
+          "relations": [],
+          "created_at": "2026-10-26T09:00:00Z"
+        },
+        {
+          "id": "019a7120-0000-7000-8000-000000001902",
+          "type": "narrative",
+          "supertype": "Message",
+          "x_room_of": "019a7120-0000-7000-8000-000000000000",
+          "parent_narrative": "019a7120-0000-7000-8000-000000001901",
+          "relations": [],
+          "created_at": "2026-10-26T09:05:00Z"
+        },
+        {
+          "id": "019a7120-0000-7000-8000-000000001903",
+          "type": "narrative",
+          "supertype": "Report",
+          "x_room_of": "019a7120-0000-7000-8000-000000000000",
+          "parent_narrative": "019a7120-0000-7000-8000-000000001901",
+          "relations": [],
+          "created_at": "2026-10-26T09:10:00Z"
+        }
+      ],
+      "want": {
+        "parents": {
+          "019a7120-0000-7000-8000-000000001901": "none",
+          "019a7120-0000-7000-8000-000000001903": "report"
+        },
+        "groups": [
+          {
+            "parent": "019a7120-0000-7000-8000-000000001901",
+            "kind": "report",
+            "reports": [
+              "019a7120-0000-7000-8000-000000001903"
+            ]
+          }
+        ],
+        "lints": []
+      }
+    }
+  ]
+}

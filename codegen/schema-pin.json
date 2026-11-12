@@ -2,15 +2,20 @@
   "_what": "The recorded pin for the vendored OnlyWorlds schema distribution (codegen/schema-dist/, copied byte-exact). Do not edit by hand; re-vendor from the pinned tag and review the diff. Kept equal to the npm SDK's pin (github.com/OnlyWorlds/sdk, codegen/schema-pin.json) on purpose: two clients, one schema.",
   "_why_manifest_sha256": "Verifying the tree against its own MANIFEST.json only proves internal consistency. If the tag moved, the manifest moved with it. The hash recorded here is the one first accepted, which is what makes a moved tag visible.",
   "repo": "https://github.com/OnlyWorlds/schema-dist",
-  "tag": "v0.34.0-dist.119",
-  "commit": "00369ea3a88441a965023031da63c1be8371d7fe",
-  "manifest_sha256": "7d00af2b9776f20ae5f1245a0f225e42d7425fc7c3e6f39df41d964da9ae60df",
+  "tag": "v0.34.0-dist.120",
+  "commit": "39d516326c6edea6e4b7f5141b19d78a7a6ff383",
+  "manifest_sha256": "e585dea71352d0d4ff6c71fa316a11510f0bf0c8fcf5801fbc30815d1bc0e6c3",
   "canonical_version": "00.34.00",
-  "dist_serial": 119,
+  "dist_serial": 120,
   "published": "2026-11-12",
   "pinned_at": "2026-11-12",
-  "pinned_by": "The maintainer: tree from `git archive` of the tag in a schema-dist checkout (209 files: the 208 the MANIFEST lists, and MANIFEST.json itself); files re-hashed against MANIFEST.json by generate_schema.py; MANIFEST self-hash matched against the raw file GitHub serves at the tag, whose ref resolves to the commit above.",
+  "pinned_by": "The maintainer: tree from `git archive` of the tag in a schema-dist checkout (210 files: the 209 the MANIFEST lists, and MANIFEST.json itself); files re-hashed against MANIFEST.json by generate_schema.py; MANIFEST self-hash matched against the raw file GitHub serves at the tag, whose ref resolves to the commit above.",
   "previous_pins": [
+    {
+      "tag": "v0.34.0-dist.119",
+      "manifest_sha256": "7d00af2b9776f20ae5f1245a0f225e42d7425fc7c3e6f39df41d964da9ae60df",
+      "note": "superseded by v0.34.0-dist.120 (canonical 00.34.00 unchanged, no schema file moved; the report profile gains rule 9 (threads: a report that continues earlier work names the first report in parent_narrative, and a reader groups reports by it, never walking further up) and its first fixture, report.fixture.json, with 20 thread cases; views.fixture.json's two line numbers follow the page)"
+    },
     {
       "tag": "v0.34.0-dist.118",
       "manifest_sha256": "37f856a2235c24732fe75ef24f1ba3a2c51310041a31c0917891959d4528e83e",
