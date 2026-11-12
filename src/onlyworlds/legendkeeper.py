@@ -246,7 +246,8 @@ What becomes what:
   ``<resource>: <document>``, with no image; ``location`` and ``x_legendkeeper_document`` as a
   map's. It is marked a board, ``x_layout`` ``{"method": "hand"}`` (map-space rule 8): a layout
   map, so a tool that picks a Map for the world's space leaves it out, and its Pins are places in
-  the drawing, never in the world. **The board's records are kept whole** (``{shapes, bindings, assets, pages}``, each list
+  the drawing, never in the world.
+  **The board's records are kept whole** (``{shapes, bindings, assets, pages}``, each list
   in the order read), so a push back can restore the canvas and nothing the elements below do not
   carry (styles, rotation, the shapes that make nothing) is lost: not on the Map (the tutorial
   board's are 110 KB, past what an element may carry online) but in the folder's records (folder
