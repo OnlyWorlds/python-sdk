@@ -4,6 +4,8 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+- `list_page`'s notes name the Pin list's `element` filter (served since 2026-11-12): `list_page("pin", filter={"element": id}, expand=["map"])` gives an element its maps in one call. It was already sent as given; only the words are new.
+
 ## 0.119.0 (2026-11-12)
 
 - Schema repinned to schema-dist v0.34.0-dist.119 (canonical 00.34.00 unchanged, no schema file moved, `views.json` still version 3). The map-space profile gains rule 11: a layout map is never a candidate when a tool picks the Map that stands for the world's space, and a Pin or a Marker on a layout map is a place in that drawing, never in the world. `map_space` and `layout_of` answer as before (they still read a layout map, its Pins and its Markers; the rule is on the tool that picks or places from their answers); the fixture's two new layout cases (23) and one new map-space case (35) read the same. Reading H says a row's id is a non-empty string, as the package already read it.

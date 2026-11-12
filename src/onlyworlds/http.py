@@ -685,7 +685,9 @@ class Client:
         ``expand`` replaces the named links' ids with stubs one level deep; ``fields`` keeps
         only the named keys. ``filter`` takes ``name``, ``name__icontains``, ``supertype``,
         ``subtype``, ``characters`` on a type with that link, and each single link of the type
-        (``parent_location``, ``birthplace``, ...); anything else is a 422 naming the filters.
+        (``parent_location``, ``birthplace``, ...), and on the Pin list ``element`` (since
+        2026-11-12: ``list_page("pin", filter={"element": id}, expand=["map"])`` gives an element
+        its maps in one call); anything else is a 422 naming the filters.
         An empty value is sent as ``key=``, a filter of its own (``supertype=""`` lists the
         elements with none, ``characters=""`` a Message to everyone; until 0.89.1 it was dropped
         and the list came back whole). ``ordering`` is a 422 too: sort here.
