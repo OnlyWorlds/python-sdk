@@ -4,6 +4,11 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+## 0.119.0 (2026-11-12)
+
+- Schema repinned to schema-dist v0.34.0-dist.119 (canonical 00.34.00 unchanged, no schema file moved, `views.json` still version 3). The map-space profile gains rule 11: a layout map is never a candidate when a tool picks the Map that stands for the world's space, and a Pin or a Marker on a layout map is a place in that drawing, never in the world. `map_space` and `layout_of` answer as before (they still read a layout map, its Pins and its Markers; the rule is on the tool that picks or places from their answers); the fixture's two new layout cases (23) and one new map-space case (35) read the same. Reading H says a row's id is a non-empty string, as the package already read it.
+- The folder writers stamp folder format 0.3.22 (`FORMAT_VERSION`), now that the vendored folder lint knows it. Version 0.3.22 rules a draft world and that a writer adds no `world` to an element file, which the writers never did, so no file's contents change beyond the stamp.
+
 ## 0.118.3 (2026-11-12)
 
 - The LegendKeeper importer marks each board's Map as a board, `x_layout` `{"method": "hand"}` (the map-space profile's rule 8). A board is a layout map: a tool that picks a Map for the world's space leaves it out, and the Pins on it are places on the board, never positions in the world. Maps from LegendKeeper map documents are unchanged. Ids are unchanged, so importing again adds the mark to boards already imported.

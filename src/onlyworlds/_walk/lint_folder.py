@@ -42,8 +42,13 @@ from pathlib import Path
 
 # The folder format's version this lint was written against: the folder spec's
 # own version line, the one source. It moves when the spec's version moves, and
-# publish_dist.py writes the dist README's version sentence from it.
-FORMAT_VERSION = "0.3.21"
+# publish_dist.py writes the dist README's version sentence from it. 0.3.22
+# (2026-11-12) says what a draft world is (a world no host holds yet, kept by the
+# tool as a world folder or a world file's content; element ids are kept through a
+# hand-over and the host gives the world its id) and that a writer adds no `world`
+# key to an element file and a reader gives one no meaning; this lint gains no check
+# (a `world` key in an element file was already reported as no field of its type).
+FORMAT_VERSION = "0.3.22"
 
 # Keys an element body carries that the schema does not declare: the type
 # slug and the server-managed fields (elements/serialize.py READONLY_FIELDS

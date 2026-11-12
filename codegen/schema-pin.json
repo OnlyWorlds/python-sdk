@@ -2,15 +2,20 @@
   "_what": "The recorded pin for the vendored OnlyWorlds schema distribution (codegen/schema-dist/, copied byte-exact). Do not edit by hand; re-vendor from the pinned tag and review the diff. Kept equal to the npm SDK's pin (github.com/OnlyWorlds/sdk, codegen/schema-pin.json) on purpose: two clients, one schema.",
   "_why_manifest_sha256": "Verifying the tree against its own MANIFEST.json only proves internal consistency. If the tag moved, the manifest moved with it. The hash recorded here is the one first accepted, which is what makes a moved tag visible.",
   "repo": "https://github.com/OnlyWorlds/schema-dist",
-  "tag": "v0.34.0-dist.118",
-  "commit": "cf708c8833fba629374edcb729eb31c67602c3cc",
-  "manifest_sha256": "37f856a2235c24732fe75ef24f1ba3a2c51310041a31c0917891959d4528e83e",
+  "tag": "v0.34.0-dist.119",
+  "commit": "00369ea3a88441a965023031da63c1be8371d7fe",
+  "manifest_sha256": "7d00af2b9776f20ae5f1245a0f225e42d7425fc7c3e6f39df41d964da9ae60df",
   "canonical_version": "00.34.00",
-  "dist_serial": 118,
-  "published": "2026-11-11",
-  "pinned_at": "2026-11-11",
+  "dist_serial": 119,
+  "published": "2026-11-12",
+  "pinned_at": "2026-11-12",
   "pinned_by": "The maintainer: tree from `git archive` of the tag in a schema-dist checkout (209 files: the 208 the MANIFEST lists, and MANIFEST.json itself); files re-hashed against MANIFEST.json by generate_schema.py; MANIFEST self-hash matched against the raw file GitHub serves at the tag, whose ref resolves to the commit above.",
   "previous_pins": [
+    {
+      "tag": "v0.34.0-dist.118",
+      "manifest_sha256": "37f856a2235c24732fe75ef24f1ba3a2c51310041a31c0917891959d4528e83e",
+      "note": "superseded by v0.34.0-dist.119 (canonical 00.34.00 unchanged, no schema file moved; the map-space profile gains rule 11 (a layout map is no candidate when a tool picks the world's Map; a Pin or Marker on one is never a place in the world), two layout cases (23) and one map-space case (35); reading H says a non-empty string id; the folder lint's FORMAT_VERSION is 0.3.22)"
+    },
     {
       "tag": "v0.34.0-dist.117",
       "manifest_sha256": "c56d3acb3797191fbe4fb4ca120ab6d1791cc3c64f41e5abf347cb75940e0fe0",

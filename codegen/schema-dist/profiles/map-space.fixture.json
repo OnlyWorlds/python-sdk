@@ -8067,6 +8067,164 @@
     ],
     "out": {}
    }
+  },
+  {
+   "name": "layout-map-read-as-before",
+   "claim": "rule 11: the map-space reading answers a layout map as any Map (rule 8's x_layout and x_hand are not read here): its frame, its Zone's outline from the Markers on it and its Pin, beside the ground's, every key as for a plain Map",
+   "elements": [
+    {
+     "type": "map",
+     "id": "019a9000-0000-7000-8000-00000000aa01",
+     "name": "board",
+     "width": 200,
+     "height": 100,
+     "x_layout": {
+      "method": "hand"
+     }
+    },
+    {
+     "type": "map",
+     "id": "019a9000-0000-7000-8000-00000000aa02",
+     "name": "ground",
+     "width": 400,
+     "height": 300
+    },
+    {
+     "type": "character",
+     "id": "019a9000-0000-7000-8000-0000000e0001",
+     "name": "captain"
+    },
+    {
+     "type": "location",
+     "id": "019a9000-0000-7000-8000-0000000e0002",
+     "name": "harbour"
+    },
+    {
+     "type": "zone",
+     "id": "019a9000-0000-7000-8000-0000000b0001",
+     "name": "frame"
+    },
+    {
+     "type": "marker",
+     "id": "019a9000-0000-7000-8000-0000000c0001",
+     "name": "frame: corner 1",
+     "map": "019a9000-0000-7000-8000-00000000aa01",
+     "zone": "019a9000-0000-7000-8000-0000000b0001",
+     "x": 10,
+     "y": 90,
+     "order": 0
+    },
+    {
+     "type": "marker",
+     "id": "019a9000-0000-7000-8000-0000000c0002",
+     "name": "frame: corner 2",
+     "map": "019a9000-0000-7000-8000-00000000aa01",
+     "zone": "019a9000-0000-7000-8000-0000000b0001",
+     "x": 60,
+     "y": 90,
+     "order": 1
+    },
+    {
+     "type": "marker",
+     "id": "019a9000-0000-7000-8000-0000000c0003",
+     "name": "frame: corner 3",
+     "map": "019a9000-0000-7000-8000-00000000aa01",
+     "zone": "019a9000-0000-7000-8000-0000000b0001",
+     "x": 60,
+     "y": 40,
+     "order": 2
+    },
+    {
+     "type": "pin",
+     "id": "019a9000-0000-7000-8000-0000000d0001",
+     "name": "captain on the board",
+     "map": "019a9000-0000-7000-8000-00000000aa01",
+     "x": 30,
+     "y": 70,
+     "element_type": "character",
+     "element_id": "019a9000-0000-7000-8000-0000000e0001",
+     "x_hand": true
+    },
+    {
+     "type": "pin",
+     "id": "019a9000-0000-7000-8000-0000000d0002",
+     "name": "harbour",
+     "map": "019a9000-0000-7000-8000-00000000aa02",
+     "x": 250,
+     "y": 120,
+     "element_type": "location",
+     "element_id": "019a9000-0000-7000-8000-0000000e0002"
+    }
+   ],
+   "want": {
+    "maps": [
+     {
+      "id": "019a9000-0000-7000-8000-00000000aa01",
+      "width": 200,
+      "height": 100,
+      "depth": null,
+      "z_max": 0,
+      "scale": null,
+      "location": null,
+      "parent_map": null
+     },
+     {
+      "id": "019a9000-0000-7000-8000-00000000aa02",
+      "width": 400,
+      "height": 300,
+      "depth": null,
+      "z_max": 0,
+      "scale": null,
+      "location": null,
+      "parent_map": null
+     }
+    ],
+    "zones": [
+     {
+      "zone": "019a9000-0000-7000-8000-0000000b0001",
+      "map": "019a9000-0000-7000-8000-00000000aa01",
+      "shape": "polygon",
+      "points": [
+       [
+        10,
+        90,
+        0
+       ],
+       [
+        60,
+        90,
+        0
+       ],
+       [
+        60,
+        40,
+        0
+       ]
+      ]
+     }
+    ],
+    "pins": [
+     {
+      "pin": "019a9000-0000-7000-8000-0000000d0001",
+      "map": "019a9000-0000-7000-8000-00000000aa01",
+      "element_type": "character",
+      "element_id": "019a9000-0000-7000-8000-0000000e0001",
+      "x": 30,
+      "y": 70,
+      "z": 0
+     },
+     {
+      "pin": "019a9000-0000-7000-8000-0000000d0002",
+      "map": "019a9000-0000-7000-8000-00000000aa02",
+      "element_type": "location",
+      "element_id": "019a9000-0000-7000-8000-0000000e0002",
+      "x": 250,
+      "y": 120,
+      "z": 0
+     }
+    ],
+    "out": {}
+   }
   }
  ],
  "layout_cases": [
@@ -8953,6 +9111,142 @@
      "x": 20,
      "y": 20,
      "x_hand": true
+    }
+   ],
+   "want": {
+    "layout": null,
+    "ground": null,
+    "hand": []
+   }
+  },
+  {
+   "name": "parentless-layout-beside-ground",
+   "claim": "rule 8, the reading rule 11 rests on: a layout map with no `parent_map` that holds more Pins than the ground is still the layout map; neither a missing parent nor a Pin count makes or unmakes a layout (rule 8 reads the key alone)",
+   "map": "019a9100-0000-7000-8000-00000000aa01",
+   "elements": [
+    {
+     "type": "map",
+     "id": "019a9100-0000-7000-8000-00000000aa01",
+     "name": "layout",
+     "parent_map": null,
+     "x_layout": {
+      "method": "trail-by-place",
+      "settings": {
+       "ground": {
+        "map": "019a9100-0000-7000-8000-00000000aa02",
+        "width": 3000,
+        "height": 2000
+       }
+      }
+     }
+    },
+    {
+     "type": "map",
+     "id": "019a9100-0000-7000-8000-00000000aa02",
+     "name": "ground",
+     "parent_map": null,
+     "width": 3000,
+     "height": 2000
+    },
+    {
+     "type": "pin",
+     "id": "019a9100-0000-7000-8000-0000000d0001",
+     "name": "pin 1",
+     "map": "019a9100-0000-7000-8000-00000000aa01",
+     "x": 100,
+     "y": 100
+    },
+    {
+     "type": "pin",
+     "id": "019a9100-0000-7000-8000-0000000d0002",
+     "name": "pin 2",
+     "map": "019a9100-0000-7000-8000-00000000aa01",
+     "x": 200,
+     "y": 100
+    },
+    {
+     "type": "pin",
+     "id": "019a9100-0000-7000-8000-0000000d0003",
+     "name": "pin 3",
+     "map": "019a9100-0000-7000-8000-00000000aa01",
+     "x": 300,
+     "y": 100
+    },
+    {
+     "type": "pin",
+     "id": "019a9100-0000-7000-8000-0000000d0004",
+     "name": "pin 4",
+     "map": "019a9100-0000-7000-8000-00000000aa02",
+     "x": 50,
+     "y": 50
+    }
+   ],
+   "want": {
+    "layout": "trail-by-place",
+    "ground": "019a9100-0000-7000-8000-00000000aa02",
+    "hand": []
+   }
+  },
+  {
+   "name": "ground-beside-parentless-layout",
+   "claim": "rule 8, the reading rule 11 rests on: the ground beside it, with no `parent_map` and fewer Pins, is no layout map: the reading answers it as a plain Map",
+   "map": "019a9100-0000-7000-8000-00000000aa02",
+   "elements": [
+    {
+     "type": "map",
+     "id": "019a9100-0000-7000-8000-00000000aa01",
+     "name": "layout",
+     "parent_map": null,
+     "x_layout": {
+      "method": "trail-by-place",
+      "settings": {
+       "ground": {
+        "map": "019a9100-0000-7000-8000-00000000aa02",
+        "width": 3000,
+        "height": 2000
+       }
+      }
+     }
+    },
+    {
+     "type": "map",
+     "id": "019a9100-0000-7000-8000-00000000aa02",
+     "name": "ground",
+     "parent_map": null,
+     "width": 3000,
+     "height": 2000
+    },
+    {
+     "type": "pin",
+     "id": "019a9100-0000-7000-8000-0000000d0001",
+     "name": "pin 1",
+     "map": "019a9100-0000-7000-8000-00000000aa01",
+     "x": 100,
+     "y": 100
+    },
+    {
+     "type": "pin",
+     "id": "019a9100-0000-7000-8000-0000000d0002",
+     "name": "pin 2",
+     "map": "019a9100-0000-7000-8000-00000000aa01",
+     "x": 200,
+     "y": 100
+    },
+    {
+     "type": "pin",
+     "id": "019a9100-0000-7000-8000-0000000d0003",
+     "name": "pin 3",
+     "map": "019a9100-0000-7000-8000-00000000aa01",
+     "x": 300,
+     "y": 100
+    },
+    {
+     "type": "pin",
+     "id": "019a9100-0000-7000-8000-0000000d0004",
+     "name": "pin 4",
+     "map": "019a9100-0000-7000-8000-00000000aa02",
+     "x": 50,
+     "y": 50
     }
    ],
    "want": {
