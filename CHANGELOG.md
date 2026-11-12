@@ -4,6 +4,10 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+## 0.118.3 (2026-11-12)
+
+- The LegendKeeper importer marks each board's Map as a board, `x_layout` `{"method": "hand"}` (the map-space profile's rule 8). A board is a layout map: a tool that picks a Map for the world's space leaves it out, and the Pins on it are places on the board, never positions in the world. Maps from LegendKeeper map documents are unchanged. Ids are unchanged, so importing again adds the mark to boards already imported.
+
 ## 0.118.2 (2026-11-12)
 
 - Every importer's `--help` (Campfire, Kanka, LegendKeeper, Notion, World Anvil) now ends with one source, one world: the world's id and every element's id are made from the source, so importing it again gives the same ids, and onlyworlds.com refuses an id another world already holds. The sentence is `onlyworlds.folder.ONE_SOURCE_ONE_WORLD`. Nothing an importer writes changed.

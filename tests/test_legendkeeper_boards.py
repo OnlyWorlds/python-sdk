@@ -37,6 +37,7 @@ from onlyworlds.legendkeeper import (
     SourceError,
     import_legendkeeper,
 )
+from onlyworlds.map_space import layout_of
 from onlyworlds.worldfile import RECORDS_MANIFEST
 
 FIX = Path(__file__).resolve().parent / "fixtures" / "legendkeeper"
@@ -186,6 +187,11 @@ def test_the_tutorial_board_becomes_a_map_and_what_its_shapes_make(tmp_path: Pat
     assert (the_map["width"], the_map["height"]) == (board.width, board.height) == (4109, 4780)
     assert "image_url" not in the_map and "hidden" not in the_map and "parent_map" not in the_map
     assert the_map["x_legendkeeper_document"] == MAIN and the_map["x_legendkeeper_resource"] == uid(BASTION)
+    # a board is a layout map placed by hand (map-space rule 8), read so by the layout reading: every Pin is hand
+    assert the_map["x_layout"] == {"method": "hand"}
+    pins = [e for e in made.values() if e["type"] == "pin"]
+    read = layout_of(the_map, [the_map], pins)
+    assert read["layout"] == "hand" and read["ground"] is None and len(read["hand"]) == 51
     # the board's records, whole and as read (the shapesV2 records split by typeName, in the order read), in
     # the folder's records/, the Map naming the file; the Map's extension keys fit under keel's 64 KB
     assert the_map["x_legendkeeper_board_record"] == RECORD and "x_legendkeeper_board" not in the_map

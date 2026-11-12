@@ -244,7 +244,9 @@ What becomes what:
   Another feature type is named, not read.
 - **A board document becomes a Map with supertype Board** (ruled 2026-10-25), named
   ``<resource>: <document>``, with no image; ``location`` and ``x_legendkeeper_document`` as a
-  map's. **The board's records are kept whole** (``{shapes, bindings, assets, pages}``, each list
+  map's. It is marked a board, ``x_layout`` ``{"method": "hand"}`` (map-space rule 8): a layout
+  map, so a tool that picks a Map for the world's space leaves it out, and its Pins are places in
+  the drawing, never in the world. **The board's records are kept whole** (``{shapes, bindings, assets, pages}``, each list
   in the order read), so a push back can restore the canvas and nothing the elements below do not
   carry (styles, rotation, the shapes that make nothing) is lost: not on the Map (the tutorial
   board's are 110 KB, past what an element may carry online) but in the folder's records (folder
@@ -3486,7 +3488,13 @@ class _Converter:
         self.board_records[made.record] = recs
         if hidden:
             self.report.records_private = True
-        ext: dict[str, Any] = {f"{EXT_PREFIX}document": did, f"{EXT_PREFIX}board_record": made.record}
+        # a board is a layout map placed by hand (map-space rule 8: `x_layout.method` "hand"), so a tool that
+        # picks a Map for the world's space never takes it and every Pin on it is a place in the drawing
+        ext: dict[str, Any] = {
+            "x_layout": {"method": "hand"},
+            f"{EXT_PREFIX}document": did,
+            f"{EXT_PREFIX}board_record": made.record,
+        }
         if box is not None:
             made.width, made.height = _whole(box[2] - box[0]), _whole(box[3] - box[1])
             fields.update(width=made.width, height=made.height)
