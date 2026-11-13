@@ -2,15 +2,20 @@
   "_what": "The recorded pin for the vendored OnlyWorlds schema distribution (codegen/schema-dist/, copied byte-exact). Do not edit by hand; re-vendor from the pinned tag and review the diff. Kept equal to the npm SDK's pin (github.com/OnlyWorlds/sdk, codegen/schema-pin.json) on purpose: two clients, one schema.",
   "_why_manifest_sha256": "Verifying the tree against its own MANIFEST.json only proves internal consistency. If the tag moved, the manifest moved with it. The hash recorded here is the one first accepted, which is what makes a moved tag visible.",
   "repo": "https://github.com/OnlyWorlds/schema-dist",
-  "tag": "v0.34.0-dist.121",
-  "commit": "f8909749767411f81031a5630a54b6fc1a4373ea",
-  "manifest_sha256": "35e1f6d73cb99ee3a4683f3e78e8996e1a8ccc7357d597de000fab4f5c8df460",
+  "tag": "v0.34.0-dist.122",
+  "commit": "2888214672ba06d07096c3f76f4db48cbe986a76",
+  "manifest_sha256": "067eeba68bb30d36e8d20e58f5a0dd575e84ee8488018e81507b78cf32b24b45",
   "canonical_version": "00.34.00",
-  "dist_serial": 121,
+  "dist_serial": 122,
   "published": "2026-11-13",
   "pinned_at": "2026-11-13",
   "pinned_by": "The maintainer: tree from `git archive` of the tag in a schema-dist checkout (210 files: the 209 the MANIFEST lists, and MANIFEST.json itself); files re-hashed against MANIFEST.json by generate_schema.py; MANIFEST self-hash matched against the raw file GitHub serves at the tag, whose ref resolves to the commit above.",
   "previous_pins": [
+    {
+      "tag": "v0.34.0-dist.121",
+      "manifest_sha256": "35e1f6d73cb99ee3a4683f3e78e8996e1a8ccc7357d597de000fab4f5c8df460",
+      "note": "superseded by v0.34.0-dist.122 (canonical 00.34.00 unchanged, no schema file moved; the same id: inside a world an id is written lowercase and compared as written, read in either case at an address and in a text a profile searches, as the charter profile searches a Charter's description; the lens key is lens exactly; ten pages and six fixtures, sixteen cases; views.json's conversation layout orders as the message profile; the folder lint warns on an id not lowercase)"
+    },
     {
       "tag": "v0.34.0-dist.120",
       "manifest_sha256": "e585dea71352d0d4ff6c71fa316a11510f0bf0c8fcf5801fbc30815d1bc0e6c3",

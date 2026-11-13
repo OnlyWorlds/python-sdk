@@ -892,6 +892,45 @@
       "refuse": "bad_lens"
     },
     {
+      "name": "human-lens-id-uppercase",
+      "claim": "the lens id is read in either case, as every id in an address is, and taken in lowercase; written so, the address is not canonical",
+      "kind": "parse",
+      "text": "https://www.onlyworlds.com/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/character/019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71?lens=019A2B7E-4C1D-7F20-9B3E-1A2C3D4E5F60",
+      "expect": {
+        "form": "human",
+        "world": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+        "world_is_slug": false,
+        "type": "character",
+        "id": "019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71",
+        "lens": "019a2b7e-4c1d-7f20-9b3e-1a2c3d4e5f60",
+        "moment": null,
+        "canonical": false
+      }
+    },
+    {
+      "name": "human-refuse-lens-key-capitalised",
+      "claim": "the key is lens, in lowercase: Lens, another case of it, refuses",
+      "kind": "parse",
+      "text": "https://www.onlyworlds.com/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/character/019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71?Lens=019a2b7e-4c1d-7f20-9b3e-1a2c3d4e5f60",
+      "refuse": "bad_lens"
+    },
+    {
+      "name": "human-lens-key-with-a-space-is-another-key",
+      "claim": "a key is compared as written, nothing trimmed: ' lens' is another key, ignored like any other, so the address reads with no lens and is not canonical",
+      "kind": "parse",
+      "text": "https://www.onlyworlds.com/w/0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f/character/019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71? lens=019a2b7e-4c1d-7f20-9b3e-1a2c3d4e5f60",
+      "expect": {
+        "form": "human",
+        "world": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+        "world_is_slug": false,
+        "type": "character",
+        "id": "019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71",
+        "lens": null,
+        "moment": null,
+        "canonical": false
+      }
+    },
+    {
       "name": "moment-refuse-empty",
       "claim": "an @ with nothing after it refuses",
       "kind": "parse",

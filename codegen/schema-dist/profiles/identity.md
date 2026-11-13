@@ -9,8 +9,8 @@
 **The value.** A UUID string, minted fresh by the tool that casts the being into a second world. Never an element's id, never a name.
 
 **How a reader uses it.**
-1. Two elements carrying the same key, in the same world or in different worlds, are the same being. Nothing else is read from the value.
-2. A value that is not a UUID is ignored. A person who types "Identity key: 1" on two Characters has merged nothing.
+1. Two elements carrying the same key, written the same (the address profile's "The same id"), in the same world or in different worlds, are the same being. Nothing else is read from the value.
+2. A value that is not, the whole of it with nothing before it or after it, in the address profile's form (its letters in either case) is ignored. A person who types "Identity key: 1" on two Characters has merged nothing.
 3. An element with no key is one being in one world. No tool may infer otherwise.
 4. The key joins; it never merges. Events, Relations, locations and dates stay in the world they happened in, and a tool that joins two of a being's appearances reads two elements and writes to each in its own world.
 5. The key says who, never when. Two worlds' dates do not compare; a tool that lines them up keeps its own map from each world's time to its own.
@@ -30,3 +30,5 @@
 ```
 
 Readers today: the tools that cast beings between worlds. The profile is new; this line names each tool that reads it as one ships.
+
+**Ruled**: 2026-11-13, serial 122: two keys are the same when they are written the same, as the address profile's "The same id" says, and a value that is not, the whole of it, in its form is ignored.

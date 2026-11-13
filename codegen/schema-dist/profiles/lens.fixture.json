@@ -1713,6 +1713,35 @@
           "name": "Lamp hook",
           "description": "\f\nLit at night.",
           "updated_at": "2026-10-12T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-0000000007a0",
+          "type": "family",
+          "name": "The Reed Kin",
+          "languages": [
+            "019a7f00-0000-7000-8000-0000000007a1",
+            "019a7f00-0000-7000-8000-0000000007a2",
+            "019a7f00-0000-7000-8000-0000000007a3"
+          ],
+          "updated_at": "2026-11-01T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-0000000007a1",
+          "type": "language",
+          "name": "Reedspeech",
+          "updated_at": "2026-11-12 10:00:01Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-0000000007a2",
+          "type": "language",
+          "name": "Ferry cant",
+          "updated_at": "2026-11-12T10:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-0000000007a3",
+          "type": "language",
+          "name": "Bank talk",
+          "updated_at": "2026-11-12T10:00:00.5"
         }
       ],
       "hidden": [],
@@ -9858,6 +9887,30 @@
       ],
       "cut": {},
       "note": "Birch carries no updated_at and has the lower id: under rule 5 it sorts after Cedar, which has one, never as now."
+    },
+    {
+      "name": "an-updated-at-is-read-as-an-instant-and-one-that-cannot-be-read-comes-last",
+      "kind": "resolve",
+      "world": "fen",
+      "reader": "owner",
+      "lens": {
+        "id": "019a7f00-0000-7000-8000-0000000007a9",
+        "type": "construct",
+        "name": "A lens",
+        "supertype": "Lens",
+        "subtype": "",
+        "families": [
+          "019a7f00-0000-7000-8000-0000000007a0"
+        ]
+      },
+      "kept": [
+        "019a7f00-0000-7000-8000-0000000007a0",
+        "019a7f00-0000-7000-8000-0000000007a3",
+        "019a7f00-0000-7000-8000-0000000007a2",
+        "019a7f00-0000-7000-8000-0000000007a1"
+      ],
+      "cut": {},
+      "note": "Three Languages one hop from the Reed Kin. Bank talk's updated_at has no offset and is read as UTC, half a second after Ferry cant's: as text it sorts before it. Reedspeech's has a space where the T is, which the message profile's one form does not read, so it is read as absent and comes last, though a lenient parser reads it as the newest of the three. Its id is the lowest, so neither the text nor the ids give the order."
     },
     {
       "name": "mail-two-messages-at-one-instant-keep-the-lists-order",

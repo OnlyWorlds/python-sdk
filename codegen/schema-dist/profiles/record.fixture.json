@@ -186,7 +186,12 @@
          "events": ["019a8000-0000-7000-8000-000000000225"]},
         {"id": "019a8000-0000-7000-8000-000000000312", "type": "narrative", "name": 7,
          "protagonist": "019a8000-0000-7000-8000-000000000108",
-         "events": ["019a8000-0000-7000-8000-000000000227"]}
+         "events": ["019a8000-0000-7000-8000-000000000227"]},
+        {"id": "019a8000-0000-7000-8000-00000000010a", "type": "character", "name": "Ada Lark"},
+        {"id": "019a8000-0000-7000-8000-0000000002a0", "type": "event", "name": "The night watch",
+         "characters": ["019a8000-0000-7000-8000-00000000010a"],
+         "x_record": {"tool": "subs", "played_at": "2026-11-07T00:00:00Z",
+                      "seats": {"019A8000-0000-7000-8000-00000000010A": "Lookout"}}}
       ]
     }
   },
@@ -359,6 +364,13 @@
     {"name": "no-records", "claim": "a Character no record names reads an empty list", "kind": "records", "world": "harbour",
      "character": "019a8000-0000-7000-8000-000000000103", "want": []},
     {"name": "unknown-character", "claim": "an id in no element reads an empty list, never an error", "kind": "records",
-     "world": "harbour", "character": "019a8000-0000-7000-8000-000000000999", "want": []}
+     "world": "harbour", "character": "019a8000-0000-7000-8000-000000000999", "want": []},
+    {"name": "seat-keyed-by-the-id-in-upper-case-names-nobody",
+     "claim": "a key of seats is an id as the key of an object, read as written (the address profile's \"The same id\"): Ada Lark took part, and the seat keyed by her id in upper case is not hers, so her seat is null; a reader that folds the case of a key reads Lookout",
+     "kind": "records", "world": "harbour", "character": "019a8000-0000-7000-8000-00000000010a",
+     "want": [
+       {"event": {"id": "019a8000-0000-7000-8000-0000000002a0", "name": "The night watch"},
+        "tool": "subs", "played_at": "2026-11-07T00:00:00Z", "version": null, "seed": null, "outcome": null, "seat": null, "stories": []}
+     ]}
   ]
 }

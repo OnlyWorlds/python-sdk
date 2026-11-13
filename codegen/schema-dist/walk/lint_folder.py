@@ -19,7 +19,11 @@ whose `format_version` is newer than FORMAT_VERSION below gets one warning line,
 never a problem; an older or absent stamp passes. The review profile's two marks
 (`x_review_proposed`, `x_review_checked`) are read too, as warnings that never fail a
 folder: a value that counts as present and is not an object (its rule 4), and each key the
-profile's table names that an object mark lacks (its rule 5). The last line is the count it checked, so an empty
+profile's table names that an object mark lacks (its rule 5). An element's `id`, the
+world's `id` and a link that is a UUID written other than lowercase in the hyphenated
+8-4-4-4-12 form (upper case, no hyphens, braces, `urn:uuid:`) get one warning line each,
+never a problem (the address profile's "The same id": inside a world it is another id);
+the lookups stay as written. The last line is the count it checked, so an empty
 report is a result and not a silence. Exit 0 clean, 1 with problems, 2 when
 the folder is not a world folder.
 
@@ -35,6 +39,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import subprocess
 import sys
 import uuid
@@ -83,6 +88,12 @@ WHITE_SPACE = ("\u0009\u000a\u000b\u000c\u000d \u0085  "
                "           "
                "    　")
 
+# An id as a writer writes it (the address profile's "The same id"): the address profile's
+# form, lowercase, hyphenated 8-4-4-4-12. An `id`, the world's `id` or
+# a link that is a UUID in another spelling (upper case, no hyphens, braces, `urn:uuid:`)
+# is a warning, never a problem: the lookups below stay as written.
+ID_FORM = re.compile(r"[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}")
+
 
 class Report:
     """What a lint found: the problems, one line each, and what it looked at."""
@@ -110,6 +121,19 @@ def is_uuid(value) -> bool:
     except ValueError:
         return False
     return True
+
+
+INSIDE = ("inside a world it is another id than the lowercase one (address profile, The same id)")
+WORLD_ID = "a world's id is a UUID in that form, and a writer writes it lowercase (address profile)"
+
+
+def _spelling_warning(report, where: str, field: str, value, why: str = INSIDE) -> None:
+    """One warning line when `value` is a UUID written other than lowercase in the
+    hyphenated form; nothing for one in the form, and nothing for a value that is no UUID
+    (a problem elsewhere says that)."""
+    if is_uuid(value) and not ID_FORM.fullmatch(value):
+        report.warnings.append(
+            f"{where}: `{field}` {value!r} is not lowercase in the 8-4-4-4-12 form: {why}")
 
 
 def version_tuple(value) -> tuple[int, ...] | None:
@@ -147,6 +171,8 @@ def lint_folder(src: Path, decoded: dict) -> Report:
             report.add(f"world.json: not JSON ({e})")
         if not isinstance(world, dict) or not world.get("id") or "name" not in world:
             report.add("world.json: needs `id` and `name`")
+        else:
+            _spelling_warning(report, "world.json", "id", world["id"], WORLD_ID)
         if isinstance(world, dict) and world.get("api") and git_tracks(world_path):
             report.add("world.json: carries an `api` block and git tracks it; a linked "
                        "folder is never committed (folder spec 4.6 d), keep the key "
@@ -181,6 +207,7 @@ def lint_folder(src: Path, decoded: dict) -> Report:
         if not is_uuid(body.get("id")):
             report.add(f"{rel}: no UUID `id`")
             continue
+        _spelling_warning(report, rel, "id", body["id"])
         if body["id"] in bodies:
             report.add(f"{rel}: duplicate id {body['id']} (also {bodies[body['id']][2]})")
             continue
@@ -273,6 +300,7 @@ def _review_warnings(report, rel, body) -> None:
 
 
 def _check_link(report, rel, key, value, target, bodies) -> None:
+    _spelling_warning(report, rel, key, value)
     if not is_uuid(value):
         report.add(f"{rel}: `{key}` holds {value!r}, not a UUID")
     elif value not in bodies:

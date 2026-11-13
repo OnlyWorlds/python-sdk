@@ -1297,6 +1297,88 @@
         ],
         "lints": []
       }
+    },
+    {
+      "name": "parent-in-upper-case-names-no-report",
+      "note": "B names A's id in upper case. Inside a world two ids are the same id when they are written the same (the address profile's \"The same id\"), and no report here is written so: B's parent is missing, and B is shown under no parent. A reader that folds the case of a parent before it looks it up puts B in A's thread.",
+      "narratives": [
+        {
+          "id": "019a7120-0000-7000-8000-000000002801",
+          "type": "narrative",
+          "supertype": "Report",
+          "x_room_of": "019a7120-0000-7000-8000-000000000000",
+          "parent_narrative": null,
+          "relations": [],
+          "created_at": "2026-11-12T09:00:00Z"
+        },
+        {
+          "id": "019a7120-0000-7000-8000-000000002802",
+          "type": "narrative",
+          "supertype": "Report",
+          "x_room_of": "019a7120-0000-7000-8000-000000000000",
+          "parent_narrative": "019A7120-0000-7000-8000-000000002801",
+          "relations": [],
+          "created_at": "2026-11-12T09:10:00Z"
+        }
+      ],
+      "want": {
+        "parents": {
+          "019a7120-0000-7000-8000-000000002801": "none",
+          "019a7120-0000-7000-8000-000000002802": "missing"
+        },
+        "groups": [],
+        "lints": []
+      }
+    },
+    {
+      "name": "the-same-digits-in-two-cases-are-two-ids",
+      "note": "A is given, and then A's id again in upper case, as a writer that broke the writer's rule may leave it. Written another way, it is another id (the address profile's \"The same id\"): both reports are kept, each read by rule 9, and C, which names A in lowercase, is in A's group alone. A reader that folds the case of an id before it keeps the first copy reads one report where there are two.",
+      "narratives": [
+        {
+          "id": "019a7120-0000-7000-8000-000000002901",
+          "type": "narrative",
+          "supertype": "Report",
+          "x_room_of": "019a7120-0000-7000-8000-000000000000",
+          "parent_narrative": null,
+          "relations": [],
+          "created_at": "2026-11-12T09:00:00Z"
+        },
+        {
+          "id": "019A7120-0000-7000-8000-000000002901",
+          "type": "narrative",
+          "supertype": "Report",
+          "x_room_of": "019a7120-0000-7000-8000-000000000000",
+          "parent_narrative": null,
+          "relations": [],
+          "created_at": "2026-11-12T09:05:00Z"
+        },
+        {
+          "id": "019a7120-0000-7000-8000-000000002902",
+          "type": "narrative",
+          "supertype": "Report",
+          "x_room_of": "019a7120-0000-7000-8000-000000000000",
+          "parent_narrative": "019a7120-0000-7000-8000-000000002901",
+          "relations": [],
+          "created_at": "2026-11-12T09:10:00Z"
+        }
+      ],
+      "want": {
+        "parents": {
+          "019a7120-0000-7000-8000-000000002901": "none",
+          "019A7120-0000-7000-8000-000000002901": "none",
+          "019a7120-0000-7000-8000-000000002902": "report"
+        },
+        "groups": [
+          {
+            "parent": "019a7120-0000-7000-8000-000000002901",
+            "kind": "report",
+            "reports": [
+              "019a7120-0000-7000-8000-000000002902"
+            ]
+          }
+        ],
+        "lints": []
+      }
     }
   ]
 }

@@ -1945,7 +1945,7 @@
         "guide": null,
         "domains": []
       },
-      "note": "An id compares as a UUID, whatever its case: the Object written in uppercase hex and again in lowercase is one Object, kept once, in lowercase."
+      "note": "An id found in the text is taken in lowercase, in whichever case it is written: the Object written in uppercase hex and again in lowercase is one Object, kept once, in lowercase."
     },
     {
       "name": "a-skill-id-named-only-in-uppercase-is-kept",
@@ -2167,6 +2167,359 @@
         ]
       },
       "note": "A description of White_Space and line breaks alone leaves nothing after the trim: the sentence is the empty string, never null and never a key left out."
+    },
+    {
+      "name": "a-skill-object-whose-own-id-is-in-upper-case-is-not-kept",
+      "kind": "charter",
+      "world": {
+        "id": "019a7f00-0000-7000-8000-00000000f122",
+        "name": "One case 122",
+        "hidden": [],
+        "readers": {
+          "owner": {
+            "rung": "owner",
+            "character": null
+          }
+        },
+        "elements": [
+          {
+            "id": "019a7f00-0000-7000-8000-000000000340",
+            "type": "law",
+            "name": "Rules",
+            "supertype": "Charter",
+            "x_charter_of": "019a7f00-0000-7000-8000-00000000f122",
+            "created_at": "2026-10-01T12:00:00Z",
+            "description": "Read ow://object/019a7f00-0000-7000-8000-000000000341 first, then ow://object/019a7f00-0000-7000-8000-000000000342."
+          },
+          {
+            "id": "019A7F00-0000-7000-8000-000000000341",
+            "type": "object",
+            "name": "The Ledger"
+          },
+          {
+            "id": "019a7f00-0000-7000-8000-000000000342",
+            "type": "object",
+            "name": "The Map"
+          }
+        ]
+      },
+      "reader": "owner",
+      "want": {
+        "charter": {
+          "id": "019a7f00-0000-7000-8000-000000000340",
+          "name": "Rules",
+          "rules": [],
+          "skill": [
+            "019a7f00-0000-7000-8000-000000000342"
+          ]
+        },
+        "guide": null,
+        "domains": []
+      },
+      "note": "The Charter names both Objects in lowercase; the Ledger's own id is held in upper case. An id found in the text is taken in lowercase and matched as written against the world's Objects (the address profile's \"The same id\"), so the Ledger is not kept and the Map is. A reader that folds the case of the Objects' ids too keeps both."
+    },
+    {
+      "name": "a-skill-id-is-found-wherever-it-stands-in-the-text",
+      "kind": "charter",
+      "world": {
+        "id": "019a7f00-0000-7000-8000-00000000f123",
+        "name": "One case 123",
+        "hidden": [],
+        "readers": {
+          "owner": {
+            "rung": "owner",
+            "character": null
+          }
+        },
+        "elements": [
+          {
+            "id": "019a7f00-0000-7000-8000-000000000350",
+            "type": "law",
+            "name": "Rules",
+            "supertype": "Charter",
+            "x_charter_of": "019a7f00-0000-7000-8000-00000000f123",
+            "created_at": "2026-10-01T12:00:00Z",
+            "description": "Read f019a7f00-0000-7000-8000-000000000351 first, then 019a7f00-0000-7000-8000-000000000352f, then skill019a7f00-0000-7000-8000-000000000353s, then {019a7f00-0000-7000-8000-000000000354}, then urn:uuid:019a7f00-0000-7000-8000-000000000355."
+          },
+          {
+            "id": "019a7f00-0000-7000-8000-000000000351",
+            "type": "object",
+            "name": "The Ledger"
+          },
+          {
+            "id": "019a7f00-0000-7000-8000-000000000352",
+            "type": "object",
+            "name": "The Map"
+          },
+          {
+            "id": "019a7f00-0000-7000-8000-000000000353",
+            "type": "object",
+            "name": "The Lantern"
+          },
+          {
+            "id": "019a7f00-0000-7000-8000-000000000354",
+            "type": "object",
+            "name": "The Key"
+          },
+          {
+            "id": "019a7f00-0000-7000-8000-000000000355",
+            "type": "object",
+            "name": "The Bell"
+          }
+        ]
+      },
+      "reader": "owner",
+      "want": {
+        "charter": {
+          "id": "019a7f00-0000-7000-8000-000000000350",
+          "name": "Rules",
+          "rules": [],
+          "skill": [
+            "019a7f00-0000-7000-8000-000000000351",
+            "019a7f00-0000-7000-8000-000000000352",
+            "019a7f00-0000-7000-8000-000000000353",
+            "019a7f00-0000-7000-8000-000000000354",
+            "019a7f00-0000-7000-8000-000000000355"
+          ]
+        },
+        "guide": null,
+        "domains": []
+      },
+      "note": "Five Objects, each named once in the form: with a hex digit before it, with one after it, inside a word, in braces, after urn:uuid:. An id found in a text is the form wherever it stands, whatever stands before it or after it (the address profile's \"The same id\"): all five are kept, in the order written. A reader that asks for a boundary around the id keeps fewer."
+    },
+    {
+      "name": "two-ids-that-share-characters-the-first-found-is-kept",
+      "kind": "charter",
+      "world": {
+        "id": "019a7f00-0000-7000-8000-00000000f127",
+        "name": "One case 127",
+        "hidden": [],
+        "readers": {
+          "owner": {
+            "rung": "owner",
+            "character": null
+          }
+        },
+        "elements": [
+          {
+            "id": "019a7f00-0000-7000-8000-0000000003c0",
+            "type": "law",
+            "name": "Rules",
+            "supertype": "Charter",
+            "x_charter_of": "019a7f00-0000-7000-8000-00000000f127",
+            "created_at": "2026-10-01T12:00:00Z",
+            "description": "Read 019a7f00-0000-7000-8000-0000019a7f00-0000-7000-8000-0000000003c2 first."
+          },
+          {
+            "id": "019a7f00-0000-7000-8000-0000019a7f00",
+            "type": "object",
+            "name": "The Ledger"
+          },
+          {
+            "id": "019a7f00-0000-7000-8000-0000000003c2",
+            "type": "object",
+            "name": "The Map"
+          }
+        ]
+      },
+      "reader": "owner",
+      "want": {
+        "charter": {
+          "id": "019a7f00-0000-7000-8000-0000000003c0",
+          "name": "Rules",
+          "rules": [],
+          "skill": [
+            "019a7f00-0000-7000-8000-0000019a7f00"
+          ]
+        },
+        "guide": null,
+        "domains": []
+      },
+      "note": "The text holds 64 characters of id: the first form is its first 36, and a second form begins at the first's 29th character (the first's last eight digits, then the rest). A text is read from its start and the characters of one id found are part of no other (the address profile's \"The same id\"), so only the first is found. Both are Objects of the world: the Ledger is kept, the Map is not. A reader that tries every position in the text keeps both."
+    },
+    {
+      "name": "two-ids-that-share-characters-the-second-alone-is-not-found",
+      "kind": "charter",
+      "world": {
+        "id": "019a7f00-0000-7000-8000-00000000f128",
+        "name": "One case 128",
+        "hidden": [],
+        "readers": {
+          "owner": {
+            "rung": "owner",
+            "character": null
+          }
+        },
+        "elements": [
+          {
+            "id": "019a7f00-0000-7000-8000-0000000003c0",
+            "type": "law",
+            "name": "Rules",
+            "supertype": "Charter",
+            "x_charter_of": "019a7f00-0000-7000-8000-00000000f128",
+            "created_at": "2026-10-01T12:00:00Z",
+            "description": "Read 019a7f00-0000-7000-8000-0000019a7f00-0000-7000-8000-0000000003c2 first."
+          },
+          {
+            "id": "019a7f00-0000-7000-8000-0000000003c2",
+            "type": "object",
+            "name": "The Map"
+          }
+        ]
+      },
+      "reader": "owner",
+      "want": {
+        "charter": {
+          "id": "019a7f00-0000-7000-8000-0000000003c0",
+          "name": "Rules",
+          "rules": [],
+          "skill": []
+        },
+        "guide": null,
+        "domains": []
+      },
+      "note": "The text holds 64 characters of id: the first form is its first 36, and a second form begins at the first's 29th character (the first's last eight digits, then the rest). A text is read from its start and the characters of one id found are part of no other (the address profile's \"The same id\"), so only the first is found. Only the second is an Object of the world: the first names nothing, and the second's characters still belong to it, so nothing is kept. A reader that looks for a second id where the first names nothing keeps the Map."
+    },
+    {
+      "name": "two-charters-at-one-instant-the-higher-id-as-written-leads",
+      "kind": "charter",
+      "world": {
+        "id": "019a7f00-0000-7000-8000-00000000f124",
+        "name": "One case 124",
+        "hidden": [],
+        "readers": {
+          "owner": {
+            "rung": "owner",
+            "character": null
+          }
+        },
+        "elements": [
+          {
+            "id": "019B7F00-0000-7000-8000-000000000360",
+            "type": "law",
+            "name": "Rules B",
+            "supertype": "Charter",
+            "x_charter_of": "019a7f00-0000-7000-8000-00000000f124",
+            "created_at": "2026-10-10T12:00:00Z",
+            "description": "The rules."
+          },
+          {
+            "id": "019a7f00-0000-7000-8000-000000000361",
+            "type": "law",
+            "name": "Rules A",
+            "supertype": "Charter",
+            "x_charter_of": "019a7f00-0000-7000-8000-00000000f124",
+            "created_at": "2026-10-10T12:00:00Z",
+            "description": "The rules."
+          }
+        ]
+      },
+      "reader": "owner",
+      "want": {
+        "charter": {
+          "id": "019a7f00-0000-7000-8000-000000000361",
+          "name": "Rules A",
+          "rules": [],
+          "skill": []
+        },
+        "guide": null,
+        "domains": []
+      },
+      "note": "Two Charters at one instant, their ids 019B7F00-... and 019a7f00-...: the higher id by code point leads, of the ids as written, and a lowercase a comes after an upper-case B, so Rules A leads. A reader that folds the case first reads 019b above 019a and puts Rules B first."
+    },
+    {
+      "name": "a-created-at-with-no-offset-is-read-as-utc",
+      "kind": "charter",
+      "world": {
+        "id": "019a7f00-0000-7000-8000-00000000f125",
+        "name": "One case 125",
+        "hidden": [],
+        "readers": {
+          "owner": {
+            "rung": "owner",
+            "character": null
+          }
+        },
+        "elements": [
+          {
+            "id": "019a7f00-0000-7000-8000-000000000370",
+            "type": "law",
+            "name": "Rules A",
+            "supertype": "Charter",
+            "x_charter_of": "019a7f00-0000-7000-8000-00000000f125",
+            "created_at": "2026-11-12T10:00:00",
+            "description": "The rules."
+          },
+          {
+            "id": "019a7f00-0000-7000-8000-000000000371",
+            "type": "law",
+            "name": "Rules B",
+            "supertype": "Charter",
+            "x_charter_of": "019a7f00-0000-7000-8000-00000000f125",
+            "created_at": "2026-11-12T11:30:00+02:00",
+            "description": "The rules."
+          }
+        ]
+      },
+      "reader": "owner",
+      "want": {
+        "charter": {
+          "id": "019a7f00-0000-7000-8000-000000000370",
+          "name": "Rules A",
+          "rules": [],
+          "skill": []
+        },
+        "guide": null,
+        "domains": []
+      },
+      "note": "Rules A's created_at has no offset and is read as UTC, 10:00 UTC; Rules B's is 09:30 UTC. The instant puts A later, so A leads, where a comparison of the text puts B later, and so does a reader that reads a time with no offset as its own local time east of UTC. B has the higher id. The case cannot catch a reader whose own clock is UTC."
+    },
+    {
+      "name": "a-created-at-that-is-a-date-alone-is-read-as-absent",
+      "kind": "charter",
+      "world": {
+        "id": "019a7f00-0000-7000-8000-00000000f126",
+        "name": "One case 126",
+        "hidden": [],
+        "readers": {
+          "owner": {
+            "rung": "owner",
+            "character": null
+          }
+        },
+        "elements": [
+          {
+            "id": "019a7f00-0000-7000-8000-000000000380",
+            "type": "law",
+            "name": "Rules",
+            "supertype": "Charter",
+            "x_charter_of": "019a7f00-0000-7000-8000-00000000f126",
+            "created_at": "2026-11-10T12:00:00Z",
+            "description": "The rules."
+          },
+          {
+            "id": "019a7f00-0000-7000-8000-000000000381",
+            "type": "law",
+            "name": "Rules, dated by day",
+            "supertype": "Charter",
+            "x_charter_of": "019a7f00-0000-7000-8000-00000000f126",
+            "created_at": "2026-11-12",
+            "description": "The rules."
+          }
+        ]
+      },
+      "reader": "owner",
+      "want": {
+        "charter": {
+          "id": "019a7f00-0000-7000-8000-000000000380",
+          "name": "Rules",
+          "rules": [],
+          "skill": []
+        },
+        "guide": null,
+        "domains": []
+      },
+      "note": "Rules, dated by day, carries the created_at 2026-11-12, a date with no time, which is not the one form a created_at is read in: it is read as absent and sorts as the oldest, so the older readable Rules leads. A reader that hands the text to its language's own parser may read it as that day's midnight and put it first."
     }
   ]
 }

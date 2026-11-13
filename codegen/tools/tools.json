@@ -159,7 +159,12 @@
         "world": "https://little-lens.onlyworlds.com/#/open/{world}",
         "element": "https://little-lens.onlyworlds.com/#/open/{world}/element/{id}",
         "needs": null,
-        "element_skips": ["room", "hidden", "proposed", "map_space"],
+        "element_skips": [
+          "room",
+          "hidden",
+          "proposed",
+          "map_space"
+        ],
         "element_types": null
       },
       "client": "little-lens",
@@ -357,6 +362,70 @@
           "result": "pass",
           "how": "read",
           "on": "2026-11-12"
+        }
+      }
+    },
+    {
+      "id": "windrose",
+      "name": "Windrose",
+      "sentence": "A map of one world, Moppetopia, in the browser: pan and zoom the map, open the Index and any element's card and follow its links, take the guided tour; it only reads.",
+      "url": "https://windrose.onlyworlds.com",
+      "source": null,
+      "source_note": "A map tool in active development: the desktop app this browser view is cut from is still changing, so the code stays private for now. The OnlyWorlds maintainers read it for this listing.",
+      "maker": "OnlyWorlds (Quillon, an AI agent working for Titus)",
+      "doors": [
+        "owworld"
+      ],
+      "open": null,
+      "client": null,
+      "prefix": null,
+      "free_core": "Explore Moppetopia on its map, with its Index and every element's card, with no account and no key; the page opens that one world only.",
+      "paid": null,
+      "rung": "listed",
+      "listed_on": "2026-11-13",
+      "listed_by": "Kael, the OnlyWorlds maintainer, on a read of the seven lines at windrose e7f57c5 (served as build 9), on the owner's word (2026-11-12)",
+      "delisted_on": null,
+      "delisted_why": null,
+      "submission": "https://github.com/OnlyWorlds/tools/blob/master/reads/2026-11-13-windrose.md",
+      "checks": {
+        "what_it_says": {
+          "result": "pass",
+          "how": "read",
+          "on": "2026-11-13"
+        },
+        "keys_stay": {
+          "result": "pass",
+          "how": "read in private source",
+          "on": "2026-11-13",
+          "note": "No key, PIN or token is asked for, stored or sent: the page has no sign-in and makes no OnlyWorlds call."
+        },
+        "names_itself": {
+          "result": "pass",
+          "how": "read in private source",
+          "on": "2026-11-13",
+          "note": "It writes nothing to any world, so it has no client name, field prefix or producer line."
+        },
+        "speaks_the_wire": {
+          "result": "pass",
+          "how": "read in private source",
+          "on": "2026-11-13",
+          "note": "It makes no API call and writes no folder or world file; the world file it serves opens in the TypeScript SDK's reader."
+        },
+        "what_leaves": {
+          "result": "pass",
+          "how": "read in private source",
+          "on": "2026-11-13",
+          "note": "Nothing of the page's leaves the browser: it loads its own copy of Moppetopia from its own host and its code from static.onlyworlds.com, and sends no world data anywhere; the host's network error logging may report a request that failed to its provider, never one that succeeded."
+        },
+        "host": {
+          "result": "pass",
+          "how": "read",
+          "on": "2026-11-13"
+        },
+        "free_core": {
+          "result": "pass",
+          "how": "read",
+          "on": "2026-11-13"
         }
       }
     }

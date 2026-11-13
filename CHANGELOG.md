@@ -4,6 +4,14 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+## 0.121.0 (2026-11-13)
+
+- Schema repinned to schema-dist v0.34.0-dist.122 (canonical 00.34.00 unchanged, no schema file moved). The address profile's "The same id": inside a world an id is written one way, lowercase, and two ids are the same id when they are written the same. A reader reads an id in either case, and takes it in lowercase, only at an address and in a text a profile searches for ids (the charter profile's Charter description). What it is matched against is read as written. The lens key in an address is `lens` exactly. Sixteen new fixture cases across the address, charter, checks, lens, record and report profiles, each passing here. The vendored folder checker (`onlyworlds.lint`) now warns on an `id`, the world's `id` or a link written other than lowercase in the hyphenated form, never as a problem.
+- `openers_for` reads the element's own `id` as written. The address's id is still read in either case, so an element held in upper case is now refused (`its id differs`). The shared openers fixture's id-case case is now two, the same bytes as the npm SDK's.
+- `charter_of` matches the ids found in a Charter's description (taken in lowercase) against each Object's `id` as written. An Object held in upper case is no longer kept.
+- The pack's prose links (`onlyworlds.pack`, `onlyworlds.okf`) compare a link's world with the World's own id as written. An in-world link `ow://<type>/<id>` takes its id in lowercase when it is in the form, as an address does; a value not in the form stays as written.
+- The baked tools list (`TOOLS`) is at the tools list's `53a05e4`, which adds Windrose, a map of one world in the browser. It only reads, so it offers no Open with row.
+
 ## 0.120.1 (2026-11-13)
 
 - Schema repinned to schema-dist v0.34.0-dist.121 (canonical 00.34.00 unchanged, no schema file moved). The report profile states what rule 9 left unsaid: a parent that is no string, padded, or one id given twice; a thread whose report has a date alone; a ring of reports, which hides no report. The message profile states the whole time grammar, a `created_at` with no offset read as UTC and the years 0000 to 9999 included. `report_threads_of` and every message reader already answered each new case as ruled, so no reader changed: the report fixture's 27 thread cases replay in `tests/test_report.py` and the message fixture's 93 cases in `tests/test_message.py`.

@@ -2,7 +2,7 @@
   "profile": "checks",
   "profile_page": "profiles/checks.md",
   "notes": [
-    "rules: 0 to 6 are Fernhollow's house rules as a Charter would carry them in x_checks_rules (draft 1, 2026-10-22); 7 and 8 are the room-mark rules a team's world may carry (the team packs write them), a house rule of such a world and never a rule of every world: a Report with no mark is lore (profiles/report.md).",
+    "rules: 0 to 6 are Fernhollow's house rules as a Charter would carry them in x_checks_rules (draft 1, 2026-10-22); 7 and 8 are the room-mark rules a team's world may carry (the team packs write them), a house rule of such a world and never a rule of every world: a Report with no mark is lore (profiles/report.md). 9 is a one_of whose entry is an id in upper case over a link field (serial 122): the list's own reading, trimmed and without regard to case, so a link that holds the id in lowercase is one of the list's.",
     "cases: element gives a body as a reader might hold it; expect gives, per rule index, 'ok', 'short' or 'out' (not scoped); a rule index absent from expect is not applied to that case.",
     "not_checked: rules a reader must report by name, never apply and never pass silently; reason is prose, a reader's words may differ. A row whose reason is null is the control among them: a rule a reader can apply (an extension key is always a field), so a reader applies it and does not report it.",
     "stubs: an element marked known_of: true (folder spec 4.4) is judged by no rule and counted in no rule's scoped; its absent fields are unknown, not short, and a filled field does not bring it in (serial 64).",
@@ -18,7 +18,8 @@
     {"rule": "a line names every side", "where": {"type": "relation", "supertype": "Funding"}, "require": {"field": "institutions", "links_min": 1}},
     {"rule": "a person or an organisation says where it stands", "where": {"type": ["character", "institution"]}, "require": {"field": "description", "present": true}},
     {"rule": "every work item carries the room's mark", "where": {"type": "relation", "supertype": "Work item"}, "require": {"field": "x_room_of", "present": true}},
-    {"rule": "every report carries the room's mark", "where": {"type": "narrative", "supertype": "Report"}, "require": {"field": "x_room_of", "present": true}}
+    {"rule": "every report carries the room's mark", "where": {"type": "narrative", "supertype": "Report"}, "require": {"field": "x_room_of", "present": true}},
+    {"rule": "every Character stands at the ferry landing", "where": {"type": "character"}, "require": {"field": "location", "one_of": ["019A8100-0000-7000-8000-0000000000AB"]}}
   ],
   "cases": [
     {"name": "a Character with a reputation", "element": {"type": "character", "supertype": "Person", "reputation": "keeps the world"}, "expect": {"0": "ok", "1": "out", "2": "out", "3": "out", "4": "out", "5": "out"}},
@@ -47,7 +48,9 @@
     {"name": "a report with the room's mark", "element": {"type": "narrative", "supertype": "Report", "x_room_of": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f"}, "expect": {"7": "out", "8": "ok"}},
     {"name": "a report with no mark", "element": {"type": "narrative", "supertype": "Report"}, "expect": {"7": "out", "8": "short"}},
     {"name": "a Report relation is outside both room-mark rules", "element": {"type": "relation", "supertype": "Report"}, "expect": {"7": "out", "8": "out"}},
-    {"name": "a unit separator alone is a set mark", "element": {"type": "relation", "supertype": "Work item", "x_room_of": "\u001f"}, "expect": {"7": "ok"}}
+    {"name": "a unit separator alone is a set mark", "element": {"type": "relation", "supertype": "Work item", "x_room_of": "\u001f"}, "expect": {"7": "ok"}},
+    {"name": "a one_of entry in upper case meets a link that holds the id in lowercase", "element": {"type": "character", "name": "Wren", "location": "019a8100-0000-7000-8000-0000000000ab"}, "expect": {"9": "ok"}},
+    {"name": "a Character with no location is short of a one_of", "element": {"type": "character", "name": "Sedge"}, "expect": {"9": "short"}}
   ],
   "not_checked": [
     {"rule": {"rule": "a fifth predicate", "where": {"type": "character"}, "require": {"field": "reputation", "longer_than": 3}}, "reason": "a predicate outside the four"},

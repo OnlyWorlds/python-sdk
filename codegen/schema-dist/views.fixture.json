@@ -74,7 +74,7 @@
         "type": "law",
         "supertype": "Charter",
         "x_charter_of": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
-        "description": "How we work in this world.\nOne: every AI session ends with a report."
+        "description": "How we work in this world.\nOne: a stretch of work worth telling ends with a report."
       },
       "expect": {
         "row": "charter",
