@@ -258,7 +258,9 @@ def sender_status(message: Mapping[str, Any], members: Sequence[Mapping[str, Any
 # A time a reader can order by: an RFC 3339 date-time, ``YYYY-MM-DDTHH:MM:SS``, an optional fraction of a
 # second after ``.``, then ``Z`` or ``+HH:MM`` / ``-HH:MM`` (``T`` and ``Z`` in either case), or the same with
 # no zone, read as UTC. The date must exist (Gregorian, leap years), hours 00-23, minutes and seconds 00-59.
-# ASCII digits only, the whole string, nothing trimmed. The npm SDK reads the same rule (message.ts timeKey);
+# ASCII digits only, the whole string, nothing trimmed. A year is any four of the digits 0 to 9, 0000 among them,
+# on the Gregorian calendar run on in both directions (0000 is a leap year; an offset may carry an instant past
+# either end). The npm SDK reads the same rule (message.ts timeKey);
 # anything else is unreadable and sorts last.
 _DATE_TIME = re.compile(
     r"([0-9]{4})-([0-9]{2})-([0-9]{2})[Tt]([0-9]{2}):([0-9]{2}):([0-9]{2})(?:\.([0-9]+))?"

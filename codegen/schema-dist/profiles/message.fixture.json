@@ -7,7 +7,7 @@
     "addressed: isAddressedTo(message, character); an empty character id (\"\") is never addressed, not even by an empty characters. An empty characters addresses every member only when the message's x_served_trimmed (served by keel, a list of field names) does not name characters; with it, the message is addressed to no Character the reader is given. unseen: isAddressedTo as above beside hasUnseenRecipients(message) as unseen_recipients, true when x_served_trimmed names characters (someone the reader cannot see is a recipient; never who or how many). everyone: isToEveryone(message, keyless) as to_everyone and hasUnseenRecipients(message, keyless) as unseen_recipients, keyless true for a body served without a credential (the keyless public reader, which keel never serves the mark): isToEveryone is true only for a message with an empty characters, no mark naming characters, and a credential; hasUnseenRecipients is null (unknown) for a keyless body. A case without keyless (unseen) has a credential. A keyless body's null narrator keeps senderStatus unverifiable, never unseen: with no mark, the reader cannot tell nobody from someone hidden (keyless-null-narrator-is-unverifiable). A Note (note_pair) is not a message and is addressed to nobody. sent_by: isSentBy(message, character), whether narrator is the character; a message with no narrator is sent by nobody.",
     "sender: senderStatus(message, members) is status; a case with members null is a world whose members list the reader cannot read. status unseen is a null narrator beside an x_served_trimmed naming narrator (a sender the reader cannot see, shown as from someone you cannot see), distinct from unverifiable for a null narrator without the mark; claimed is the narrator (null: none, shown as from nobody, or unseen); written_by, on a mismatch, is the author's Character.",
     "mark: readMarkOf(relations, character, members): of the Read relations given, the id of the reader's mark: actor the reader, written by the reader's own hand (the sender rule on actor: verified) or carrying no created_by at all (a folder, an export: no hand to check), and, where it carries changed_by, last changed by its creator (changed_by equal to created_by; a changed_by with no created_by beside it is ignored); the newest updated_at when there are several, whatever their order in the list; null when the reader has none, and always null for an empty character id. keyless true is a body served without a credential (the keyless public reader, served no created_by or changed_by): no mark counts there, so readMarkOf(relations, character, members, keyless) is null; a case without keyless has a credential, or is a folder.",
-    "order: created_at, read as an instant (an offset and a fraction of a second count), and two equal created_at keep the order of the list given (the server's list order); a created_at that cannot be read as a date and time (absent, null, 09:61, a word) comes after every readable one, in the order of the list given.",
+    "order: created_at, read as an instant (an offset and a fraction of a second count; a time with no offset is UTC) in the one form the page gives, matched whole, every part in its range, a year any four of the digits 0 to 9 from 0000 on the Gregorian calendar run on in both directions (the leap rule on the year's number as written, so 0000 is a leap year), and a fraction counted to its sixth digit, and two at the same instant keep the order of the list given (the server's list order); a created_at that cannot be read as a date and time (absent, null, 09:61, a word) comes after every readable one, in the order of the list given.",
     "unread: unreadFor(messages, reader, read_mark, members) for reader: messages only (a Note never), addressed to the reader, not sent by the reader, not on the mark; as ids in created_at order; read_mark null is a reader with no mark. Sent by the reader: a message with no created_by key (a folder, an export) is the reader's own when its narrator is the reader; one with created_by is the reader's own only when senderStatus against members is verified (a mismatch, an author off the list, no members list: unread for the Character it claims). A case without members reads the world's members; members null is a reader with no members list.",
     "thread: every message whose chain of parent_narrative reaches root, the root included, as ids in created_at order; a parent_narrative that is not a string (a number, null, an object) ends the chain there.",
     "edited: editedBy(message, members) as {edited, by}: edited is true when the message carries changed_by and it is not equal to its created_by (an absent created_by is never equal; null is the owner on both); by is the Character of the changed_by membership on members, null when it plays none, is off the list, or there is no list, and null whenever edited is false. The sender's answer never changes for an edit.",
@@ -2847,6 +2847,406 @@
       "reader": "019a3b10-0000-7000-8000-0000000000a2",
       "keyless": true,
       "mark": null
+    },
+    {
+      "kind": "unread",
+      "name": "created-at-with-no-offset-is-read-as-utc",
+      "note": "A created_at with no offset is read as UTC wherever the reader runs: 10:00:00+02:00 is 08:00Z, 09:00:00 is 09:00Z and 10:30:00+01:00 is 09:30Z. Compared as text the order is 09:00:00, then 10:00:00+02:00, then 10:30:00+01:00; a reader that reads the time with no offset as its own local time gives that order east of Greenwich and another west of it. The case cannot catch a reader whose own clock is UTC.",
+      "messages": [
+        {
+          "id": "019a3b10-0000-7000-8000-000000000cac",
+          "type": "narrative",
+          "supertype": "Message",
+          "name": "Message ac",
+          "story": "",
+          "narrator": "019a3b10-0000-7000-8000-0000000000a3",
+          "created_by": "019a3b10-0000-7000-8000-0000000000b3",
+          "characters": [
+            "019a3b10-0000-7000-8000-0000000000a1"
+          ],
+          "parent_narrative": null,
+          "created_at": "2026-11-12T10:30:00+01:00"
+        },
+        {
+          "id": "019a3b10-0000-7000-8000-000000000cad",
+          "type": "narrative",
+          "supertype": "Message",
+          "name": "Message ad",
+          "story": "",
+          "narrator": "019a3b10-0000-7000-8000-0000000000a3",
+          "created_by": "019a3b10-0000-7000-8000-0000000000b3",
+          "characters": [
+            "019a3b10-0000-7000-8000-0000000000a1"
+          ],
+          "parent_narrative": null,
+          "created_at": "2026-11-12T09:00:00"
+        },
+        {
+          "id": "019a3b10-0000-7000-8000-000000000cae",
+          "type": "narrative",
+          "supertype": "Message",
+          "name": "Message ae",
+          "story": "",
+          "narrator": "019a3b10-0000-7000-8000-0000000000a3",
+          "created_by": "019a3b10-0000-7000-8000-0000000000b3",
+          "characters": [
+            "019a3b10-0000-7000-8000-0000000000a1"
+          ],
+          "parent_narrative": null,
+          "created_at": "2026-11-12T10:00:00+02:00"
+        }
+      ],
+      "reader": "019a3b10-0000-7000-8000-0000000000a1",
+      "read_mark": null,
+      "unread": [
+        "019a3b10-0000-7000-8000-000000000cae",
+        "019a3b10-0000-7000-8000-000000000cad",
+        "019a3b10-0000-7000-8000-000000000cac"
+      ]
+    },
+    {
+      "kind": "unread",
+      "name": "created-at-in-any-other-form-cannot-be-read",
+      "note": "Only the page's one form is read, matched whole. R1 (a lower-case t and z) and R2 (ten digits of a fraction) are in it: R2 is 08:00:00.123456Z and R1 09:00Z. X1 a date alone, X2 a space where the T is, X3 a time without its seconds, X4 an offset without its colon and X5 a time followed by a line break and X6 a year in Arabic-Indic digits (the page's digits are 0 to 9) are not, and come after, in the order given. A language's own date parser reads X1 to X4; a pattern tested with a dollar sign and a plain match reads X5 and puts it first.",
+      "messages": [
+        {
+          "id": "019a3b10-0000-7000-8000-000000000cb0",
+          "type": "narrative",
+          "supertype": "Message",
+          "name": "Message b0",
+          "story": "",
+          "narrator": "019a3b10-0000-7000-8000-0000000000a3",
+          "created_by": "019a3b10-0000-7000-8000-0000000000b3",
+          "characters": [
+            "019a3b10-0000-7000-8000-0000000000a1"
+          ],
+          "parent_narrative": null,
+          "created_at": "2026-11-12"
+        },
+        {
+          "id": "019a3b10-0000-7000-8000-000000000cb1",
+          "type": "narrative",
+          "supertype": "Message",
+          "name": "Message b1",
+          "story": "",
+          "narrator": "019a3b10-0000-7000-8000-0000000000a3",
+          "created_by": "019a3b10-0000-7000-8000-0000000000b3",
+          "characters": [
+            "019a3b10-0000-7000-8000-0000000000a1"
+          ],
+          "parent_narrative": null,
+          "created_at": "2026-11-12t09:00:00z"
+        },
+        {
+          "id": "019a3b10-0000-7000-8000-000000000cb2",
+          "type": "narrative",
+          "supertype": "Message",
+          "name": "Message b2",
+          "story": "",
+          "narrator": "019a3b10-0000-7000-8000-0000000000a3",
+          "created_by": "019a3b10-0000-7000-8000-0000000000b3",
+          "characters": [
+            "019a3b10-0000-7000-8000-0000000000a1"
+          ],
+          "parent_narrative": null,
+          "created_at": "2026-11-12 10:00:00Z"
+        },
+        {
+          "id": "019a3b10-0000-7000-8000-000000000cb3",
+          "type": "narrative",
+          "supertype": "Message",
+          "name": "Message b3",
+          "story": "",
+          "narrator": "019a3b10-0000-7000-8000-0000000000a3",
+          "created_by": "019a3b10-0000-7000-8000-0000000000b3",
+          "characters": [
+            "019a3b10-0000-7000-8000-0000000000a1"
+          ],
+          "parent_narrative": null,
+          "created_at": "2026-11-12T08:00:00.1234567891Z"
+        },
+        {
+          "id": "019a3b10-0000-7000-8000-000000000cb4",
+          "type": "narrative",
+          "supertype": "Message",
+          "name": "Message b4",
+          "story": "",
+          "narrator": "019a3b10-0000-7000-8000-0000000000a3",
+          "created_by": "019a3b10-0000-7000-8000-0000000000b3",
+          "characters": [
+            "019a3b10-0000-7000-8000-0000000000a1"
+          ],
+          "parent_narrative": null,
+          "created_at": "2026-11-12T10:00Z"
+        },
+        {
+          "id": "019a3b10-0000-7000-8000-000000000cb5",
+          "type": "narrative",
+          "supertype": "Message",
+          "name": "Message b5",
+          "story": "",
+          "narrator": "019a3b10-0000-7000-8000-0000000000a3",
+          "created_by": "019a3b10-0000-7000-8000-0000000000b3",
+          "characters": [
+            "019a3b10-0000-7000-8000-0000000000a1"
+          ],
+          "parent_narrative": null,
+          "created_at": "2026-11-12T10:00:00+0200"
+        },
+        {
+          "id": "019a3b10-0000-7000-8000-000000000cb6",
+          "type": "narrative",
+          "supertype": "Message",
+          "name": "Message b6",
+          "story": "",
+          "narrator": "019a3b10-0000-7000-8000-0000000000a3",
+          "created_by": "019a3b10-0000-7000-8000-0000000000b3",
+          "characters": [
+            "019a3b10-0000-7000-8000-0000000000a1"
+          ],
+          "parent_narrative": null,
+          "created_at": "2026-11-12T07:00:00Z\n"
+        },
+        {
+          "id": "019a3b10-0000-7000-8000-000000000cc2",
+          "type": "narrative",
+          "supertype": "Message",
+          "name": "Message c2",
+          "story": "",
+          "narrator": "019a3b10-0000-7000-8000-0000000000a3",
+          "created_by": "019a3b10-0000-7000-8000-0000000000b3",
+          "characters": [
+            "019a3b10-0000-7000-8000-0000000000a1"
+          ],
+          "parent_narrative": null,
+          "created_at": "\u0662\u0660\u0662\u0666-11-12T10:00:00Z"
+        }
+      ],
+      "reader": "019a3b10-0000-7000-8000-0000000000a1",
+      "read_mark": null,
+      "unread": [
+        "019a3b10-0000-7000-8000-000000000cb3",
+        "019a3b10-0000-7000-8000-000000000cb1",
+        "019a3b10-0000-7000-8000-000000000cb0",
+        "019a3b10-0000-7000-8000-000000000cb2",
+        "019a3b10-0000-7000-8000-000000000cb4",
+        "019a3b10-0000-7000-8000-000000000cb5",
+        "019a3b10-0000-7000-8000-000000000cb6",
+        "019a3b10-0000-7000-8000-000000000cc2"
+      ]
+    },
+    {
+      "kind": "unread",
+      "name": "created-at-with-a-part-out-of-its-range-cannot-be-read",
+      "note": "Each of Y1 (30 February), Y2 (hour 24) and Y3 (second 60) is in the page's form with a part out of its range: none can be read, and they come after R, in the order given.",
+      "messages": [
+        {
+          "id": "019a3b10-0000-7000-8000-000000000cb7",
+          "type": "narrative",
+          "supertype": "Message",
+          "name": "Message b7",
+          "story": "",
+          "narrator": "019a3b10-0000-7000-8000-0000000000a3",
+          "created_by": "019a3b10-0000-7000-8000-0000000000b3",
+          "characters": [
+            "019a3b10-0000-7000-8000-0000000000a1"
+          ],
+          "parent_narrative": null,
+          "created_at": "2026-02-30T10:00:00Z"
+        },
+        {
+          "id": "019a3b10-0000-7000-8000-000000000cb8",
+          "type": "narrative",
+          "supertype": "Message",
+          "name": "Message b8",
+          "story": "",
+          "narrator": "019a3b10-0000-7000-8000-0000000000a3",
+          "created_by": "019a3b10-0000-7000-8000-0000000000b3",
+          "characters": [
+            "019a3b10-0000-7000-8000-0000000000a1"
+          ],
+          "parent_narrative": null,
+          "created_at": "2026-11-12T24:00:00Z"
+        },
+        {
+          "id": "019a3b10-0000-7000-8000-000000000cb9",
+          "type": "narrative",
+          "supertype": "Message",
+          "name": "Message b9",
+          "story": "",
+          "narrator": "019a3b10-0000-7000-8000-0000000000a3",
+          "created_by": "019a3b10-0000-7000-8000-0000000000b3",
+          "characters": [
+            "019a3b10-0000-7000-8000-0000000000a1"
+          ],
+          "parent_narrative": null,
+          "created_at": "2026-11-12T23:59:60Z"
+        },
+        {
+          "id": "019a3b10-0000-7000-8000-000000000cba",
+          "type": "narrative",
+          "supertype": "Message",
+          "name": "Message ba",
+          "story": "",
+          "narrator": "019a3b10-0000-7000-8000-0000000000a3",
+          "created_by": "019a3b10-0000-7000-8000-0000000000b3",
+          "characters": [
+            "019a3b10-0000-7000-8000-0000000000a1"
+          ],
+          "parent_narrative": null,
+          "created_at": "2026-11-12T10:00:00Z"
+        }
+      ],
+      "reader": "019a3b10-0000-7000-8000-0000000000a1",
+      "read_mark": null,
+      "unread": [
+        "019a3b10-0000-7000-8000-000000000cba",
+        "019a3b10-0000-7000-8000-000000000cb7",
+        "019a3b10-0000-7000-8000-000000000cb8",
+        "019a3b10-0000-7000-8000-000000000cb9"
+      ]
+    },
+    {
+      "kind": "unread",
+      "name": "created-at-fraction-counts-to-its-sixth-digit",
+      "note": "A fraction counts to its sixth digit and later digits are dropped: P (.0000019) and Q (.0000011) are both 10:00:00.000001Z, one instant, and keep the order given; S (.000002) comes after. A reader that compares seven digits gives Q, P, S; one that rounds to the sixth gives Q, then S and P as one instant in the order given.",
+      "messages": [
+        {
+          "id": "019a3b10-0000-7000-8000-000000000cbb",
+          "type": "narrative",
+          "supertype": "Message",
+          "name": "Message bb",
+          "story": "",
+          "narrator": "019a3b10-0000-7000-8000-0000000000a3",
+          "created_by": "019a3b10-0000-7000-8000-0000000000b3",
+          "characters": [
+            "019a3b10-0000-7000-8000-0000000000a1"
+          ],
+          "parent_narrative": null,
+          "created_at": "2026-11-12T10:00:00.000002Z"
+        },
+        {
+          "id": "019a3b10-0000-7000-8000-000000000cbc",
+          "type": "narrative",
+          "supertype": "Message",
+          "name": "Message bc",
+          "story": "",
+          "narrator": "019a3b10-0000-7000-8000-0000000000a3",
+          "created_by": "019a3b10-0000-7000-8000-0000000000b3",
+          "characters": [
+            "019a3b10-0000-7000-8000-0000000000a1"
+          ],
+          "parent_narrative": null,
+          "created_at": "2026-11-12T10:00:00.0000019Z"
+        },
+        {
+          "id": "019a3b10-0000-7000-8000-000000000cbd",
+          "type": "narrative",
+          "supertype": "Message",
+          "name": "Message bd",
+          "story": "",
+          "narrator": "019a3b10-0000-7000-8000-0000000000a3",
+          "created_by": "019a3b10-0000-7000-8000-0000000000b3",
+          "characters": [
+            "019a3b10-0000-7000-8000-0000000000a1"
+          ],
+          "parent_narrative": null,
+          "created_at": "2026-11-12T10:00:00.0000011Z"
+        }
+      ],
+      "reader": "019a3b10-0000-7000-8000-0000000000a1",
+      "read_mark": null,
+      "unread": [
+        "019a3b10-0000-7000-8000-000000000cbc",
+        "019a3b10-0000-7000-8000-000000000cbd",
+        "019a3b10-0000-7000-8000-000000000cbb"
+      ]
+    },
+    {
+      "kind": "unread",
+      "name": "created-at-at-either-end-of-the-years-is-read",
+      "note": "A year is any four of the digits 0 to 9, 0000 among them, on the Gregorian calendar run on in both directions, and every text in the form and in range is an instant: E3 (0000-01-01T00:00:00+01:00) is 23:00Z on the day before E2 (0000-01-01T00:00:00Z), and E1 (9999-12-31T23:00:00-02:00) is 01:00Z on the first day of year 10000. E4 (0000-02-29T00:00:00Z) is a day that month has: the leap rule is taken on the year's number as written, and 0000 is divisible by 400. So E3, E2, E4, R, E1. A reader whose date type cannot hold year 0 or a time past 9999 puts E1, E2 or E3 among the unreadable.",
+      "messages": [
+        {
+          "id": "019a3b10-0000-7000-8000-000000000cbe",
+          "type": "narrative",
+          "supertype": "Message",
+          "name": "Message be",
+          "story": "",
+          "narrator": "019a3b10-0000-7000-8000-0000000000a3",
+          "created_by": "019a3b10-0000-7000-8000-0000000000b3",
+          "characters": [
+            "019a3b10-0000-7000-8000-0000000000a1"
+          ],
+          "parent_narrative": null,
+          "created_at": "9999-12-31T23:00:00-02:00"
+        },
+        {
+          "id": "019a3b10-0000-7000-8000-000000000cbf",
+          "type": "narrative",
+          "supertype": "Message",
+          "name": "Message bf",
+          "story": "",
+          "narrator": "019a3b10-0000-7000-8000-0000000000a3",
+          "created_by": "019a3b10-0000-7000-8000-0000000000b3",
+          "characters": [
+            "019a3b10-0000-7000-8000-0000000000a1"
+          ],
+          "parent_narrative": null,
+          "created_at": "0000-01-01T00:00:00Z"
+        },
+        {
+          "id": "019a3b10-0000-7000-8000-000000000cc0",
+          "type": "narrative",
+          "supertype": "Message",
+          "name": "Message c0",
+          "story": "",
+          "narrator": "019a3b10-0000-7000-8000-0000000000a3",
+          "created_by": "019a3b10-0000-7000-8000-0000000000b3",
+          "characters": [
+            "019a3b10-0000-7000-8000-0000000000a1"
+          ],
+          "parent_narrative": null,
+          "created_at": "2026-11-12T10:00:00Z"
+        },
+        {
+          "id": "019a3b10-0000-7000-8000-000000000cc1",
+          "type": "narrative",
+          "supertype": "Message",
+          "name": "Message c1",
+          "story": "",
+          "narrator": "019a3b10-0000-7000-8000-0000000000a3",
+          "created_by": "019a3b10-0000-7000-8000-0000000000b3",
+          "characters": [
+            "019a3b10-0000-7000-8000-0000000000a1"
+          ],
+          "parent_narrative": null,
+          "created_at": "0000-01-01T00:00:00+01:00"
+        },
+        {
+          "id": "019a3b10-0000-7000-8000-000000000cc3",
+          "type": "narrative",
+          "supertype": "Message",
+          "name": "Message c3",
+          "story": "",
+          "narrator": "019a3b10-0000-7000-8000-0000000000a3",
+          "created_by": "019a3b10-0000-7000-8000-0000000000b3",
+          "characters": [
+            "019a3b10-0000-7000-8000-0000000000a1"
+          ],
+          "parent_narrative": null,
+          "created_at": "0000-02-29T00:00:00Z"
+        }
+      ],
+      "reader": "019a3b10-0000-7000-8000-0000000000a1",
+      "read_mark": null,
+      "unread": [
+        "019a3b10-0000-7000-8000-000000000cc1",
+        "019a3b10-0000-7000-8000-000000000cbf",
+        "019a3b10-0000-7000-8000-000000000cc3",
+        "019a3b10-0000-7000-8000-000000000cc0",
+        "019a3b10-0000-7000-8000-000000000cbe"
+      ]
     }
   ]
 }

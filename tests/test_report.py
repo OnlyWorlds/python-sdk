@@ -15,7 +15,7 @@ from onlyworlds._schema import ROOM_MARK
 
 REPO = Path(__file__).resolve().parent.parent
 FIXTURE = REPO / "codegen" / "schema-dist" / "profiles" / "report.fixture.json"
-THREAD_CASES = 20
+THREAD_CASES = 27
 WORLD = "019a7120-0000-7000-8000-000000000000"
 
 

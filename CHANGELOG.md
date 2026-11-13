@@ -4,6 +4,10 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+## 0.120.1 (2026-11-13)
+
+- Schema repinned to schema-dist v0.34.0-dist.121 (canonical 00.34.00 unchanged, no schema file moved). The report profile states what rule 9 left unsaid: a parent that is no string, padded, or one id given twice; a thread whose report has a date alone; a ring of reports, which hides no report. The message profile states the whole time grammar, a `created_at` with no offset read as UTC and the years 0000 to 9999 included. `report_threads_of` and every message reader already answered each new case as ruled, so no reader changed: the report fixture's 27 thread cases replay in `tests/test_report.py` and the message fixture's 93 cases in `tests/test_message.py`.
+
 ## 0.120.0 (2026-11-12)
 
 - Schema repinned to schema-dist v0.34.0-dist.120 (canonical 00.34.00 unchanged, no schema file moved, `views.json` still version 3). The report profile gains rule 9, threads: a report that continues earlier work names the first report of that work in `parent_narrative`, a closed talk's report keeps its board entry there, and a reader groups reports by that field without walking further up. The page's first fixture, `report.fixture.json`, holds 20 thread cases; `views.fixture.json` moves two line numbers with its page.
