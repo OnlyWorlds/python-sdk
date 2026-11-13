@@ -4,6 +4,10 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+## 0.123.0 (2026-11-13)
+
+- Schema repinned to schema-dist v0.34.1-dist.124, canonical 00.34.01: `SCHEMA_VERSION` is now `"00.34.01"`. One description moved and no field: Map's `hierarchy` orders the maps that stand side by side (floors, decks, layers), the maps with the same `parent_map`, without one the maps of the same `location`, without either the maps of the world itself; lower is deeper or earlier, and nesting is said by `parent_map` and `location`, not by the number. No reader in the package changes.
+
 ## 0.122.0 (2026-11-13)
 
 - Schema repinned to schema-dist v0.34.0-dist.123 (canonical 00.34.00 unchanged, no schema file moved): times that are read and not ordered, and an address found in prose. Eighty-four new fixture cases across the address, lens, message, record, strand and checks profiles, each passing here; three record cases are renamed for what they test.

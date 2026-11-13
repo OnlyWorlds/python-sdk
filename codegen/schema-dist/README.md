@@ -80,7 +80,7 @@ One line per problem (`elements/creature/x.json: `characters` is not a field of 
 
 ## Versions
 
-`VERSION` holds `key: value` lines; it is not a bare version string. The canonical version is written zero-padded there and without the padding in tags: canonical `00.34.00` is tagged `v0.34.0-dist.<serial>`. The serial counts publishes of the same canonical version, such as a presentation fix or a new ruling.
+`VERSION` holds `key: value` lines; it is not a bare version string. The canonical version is written zero-padded there and without the padding in tags: canonical `00.34.01` is tagged `v0.34.1-dist.<serial>`. The serial counts publishes of the same canonical version, such as a presentation fix or a new ruling.
 
 ## Pinning
 

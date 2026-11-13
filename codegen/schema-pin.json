@@ -2,15 +2,20 @@
   "_what": "The recorded pin for the vendored OnlyWorlds schema distribution (codegen/schema-dist/, copied byte-exact). Do not edit by hand; re-vendor from the pinned tag and review the diff. Kept equal to the npm SDK's pin (github.com/OnlyWorlds/sdk, codegen/schema-pin.json) on purpose: two clients, one schema.",
   "_why_manifest_sha256": "Verifying the tree against its own MANIFEST.json only proves internal consistency. If the tag moved, the manifest moved with it. The hash recorded here is the one first accepted, which is what makes a moved tag visible.",
   "repo": "https://github.com/OnlyWorlds/schema-dist",
-  "tag": "v0.34.0-dist.123",
-  "commit": "6092c3966a90369df4131d6f69dd74c3f8b15606",
-  "manifest_sha256": "47f8a02d9647daf75fd66cfe17a0be73a0d1502c1907640155118a01ddf8063f",
-  "canonical_version": "00.34.00",
-  "dist_serial": 123,
+  "tag": "v0.34.1-dist.124",
+  "commit": "094107b304877216e8307afb364bd452d8c0920c",
+  "manifest_sha256": "9db0444a22a4a56ec08a8e78e429983b8e66cb2085de0f7e45410cd66ae16568",
+  "canonical_version": "00.34.01",
+  "dist_serial": 124,
   "published": "2026-11-13",
   "pinned_at": "2026-11-13",
   "pinned_by": "The maintainer: tree from `git archive` of the tag in a schema-dist checkout (210 files: the 209 the MANIFEST lists, and MANIFEST.json itself); files re-hashed against MANIFEST.json by generate_schema.py; MANIFEST self-hash matched against the raw file GitHub serves at the tag, whose ref resolves to the commit above.",
   "previous_pins": [
+    {
+      "tag": "v0.34.0-dist.123",
+      "manifest_sha256": "47f8a02d9647daf75fd66cfe17a0be73a0d1502c1907640155118a01ddf8063f",
+      "note": "superseded by v0.34.1-dist.124 (canonical 00.34.01: Map.hierarchy's description says which maps it orders, the maps with the same parent_map, else of the same location, else of the world itself, lower deeper or earlier; no field, no reader moves)"
+    },
     {
       "tag": "v0.34.0-dist.122",
       "manifest_sha256": "067eeba68bb30d36e8d20e58f5a0dd575e84ee8488018e81507b78cf32b24b45",
