@@ -36,6 +36,12 @@ CASES: list[dict[str, Any]] = DOC["cases"]
 # here; once the pin moves, the fixture's own answers stand and this table no longer applies.
 PIN_SERIAL: int = json.loads((REPO / "codegen" / "schema-pin.json").read_text(encoding="utf-8"))["dist_serial"]
 AHEAD_OF_THE_DIST = PIN_SERIAL == 122 and "OW_RECORD_FIXTURE" not in os.environ
+TURNED_BY_SERIAL_123 = (
+    "no-mark-played-offset",
+    "mark-leap-day-of-a-leap-year",
+    "fluffington-two-games",
+    "order-by-the-instant-not-the-string",
+)
 OFFSET_EVENT = "019a8000-0000-7000-8000-000000000215"
 NO_SECONDS_EVENT = "019a8000-0000-7000-8000-000000000242"
 
@@ -84,7 +90,18 @@ def test_the_fixture_holds_serial_122s_41_cases() -> None:
     assert len(CASES) == 41, f"the fixture holds {len(CASES)} cases, serial 122 has 41"
 
 
-@pytest.mark.parametrize("case", CASES, ids=[c["name"] for c in CASES])
+def _case_id(case: dict[str, Any]) -> str:
+    """A case's name; one serial 123 turns says so, while its answer is held here."""
+    turned = AHEAD_OF_THE_DIST and case["name"] in TURNED_BY_SERIAL_123
+    return f"{case['name']}[turned-by-serial-123]" if turned else str(case["name"])
+
+
+def test_the_four_turned_cases_are_in_the_vendored_fixture() -> None:
+    if AHEAD_OF_THE_DIST:
+        assert sorted(c["name"] for c in CASES if c["name"] in TURNED_BY_SERIAL_123) == sorted(TURNED_BY_SERIAL_123)
+
+
+@pytest.mark.parametrize("case", CASES, ids=[_case_id(c) for c in CASES])
 def test_fixture_case(case: dict[str, Any]) -> None:
     elements = copy.deepcopy(DOC["worlds"][case["world"]]["elements"])
     if case["kind"] == "mark":
@@ -186,7 +203,7 @@ def test_played_at_orders_as_its_instant() -> None:
 
 
 # Serial 123: a record's played_at is read by the message page's grammar (the message readers' own, message._instant).
-# Against the record grammar before it, three strings move, each answer below.
+# Against the record grammar before it, five strings move, each answer below.
 
 
 def test_a_played_at_with_a_lower_case_t_and_z_is_now_a_mark() -> None:
@@ -220,9 +237,9 @@ def test_a_played_at_without_seconds_is_now_no_mark() -> None:
     assert records_of("c", [ev]) == []
 
 
-def test_the_message_grammar_reads_more_than_the_three_strings_the_serial_names() -> None:
-    """Two more strings move with the message grammar, though serial 123 names neither: a time with no zone is
-    read as UTC, and the year 0000 is a year (the record page said 0001 or later). Both were no mark before."""
+def test_a_played_at_with_no_zone_or_in_the_year_0000_is_now_a_mark() -> None:
+    """Before serial 123: no mark, and no record, for either. Now a time with no zone is read as UTC, and the
+    year 0000 is a year (the record page said 0001 or later)."""
     no_zone = _ev("a", "2026-11-01T00:30:00")
     assert record_mark_of(no_zone) is not None
     got = records_of("c", [no_zone, _ev("b", "2026-11-01T00:30:00Z")])
