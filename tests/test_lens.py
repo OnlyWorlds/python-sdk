@@ -458,6 +458,34 @@ def test_changed_within_reads_a_folder_element_by_the_newer_sync_stamp() -> None
     assert kept(updated_at="2026-10-26T00:00:00Z", local_updated_at="soon")
 
 
+def test_rule_5_orders_by_the_clock_changed_within_reads() -> None:
+    """One clock per lens (serial 123): rule 5's order past the anchors reads the time ``changed_within``
+    reads, so a folder element edited locally yesterday is newer than one the server stamped last week, and
+    the budget keeps it, though its ``updated_at`` is the older. An element with no readable time still sorts
+    last. The npm SDK asserts the same."""
+    edited = {
+        "id": "e1",
+        "type": "object",
+        "name": "Edited here",
+        "updated_at": "2026-10-15T00:00:00Z",
+        "server_updated_at": "2026-10-15T00:00:00Z",
+        "local_updated_at": "2026-10-26T00:00:00Z",
+    }
+    stamped = {
+        "id": "e2",
+        "type": "object",
+        "name": "Stamped there",
+        "updated_at": "2026-10-20T00:00:00Z",
+        "server_updated_at": "2026-10-20T00:00:00Z",
+    }
+    undated = {"id": "e0", "type": "object", "name": "No time", "local_updated_at": "soon"}
+    world = {"elements": [stamped, undated, edited]}
+    one = resolve_lens(world, _lens_on({}, {"types": ["object"], "budget": 1}), OWNER)
+    assert (one["kept"], one["cut"]) == (["e1"], {"budget": 2})
+    every = resolve_lens(world, _lens_on({}, {"types": ["object"]}), OWNER)
+    assert every["kept"] == ["e1", "e2", "e0"]
+
+
 def test_a_lens_a_guest_knows_only_as_a_stub_reads_as_nothing() -> None:
     world: dict[str, Any] = {
         "elements": [

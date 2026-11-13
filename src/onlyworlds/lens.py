@@ -724,12 +724,16 @@ class _Reading:
         return aid is not None and not (recipe.types is not None and aid in recipe.types)
 
     def sort(self, ids: Iterable[str]) -> list[str]:
-        """Rule 5's order past the anchors: the schema's type order, newest ``updated_at`` first (an unreadable
-        time last), then by id (by code point)."""
+        """Rule 5's order past the anchors: the schema's type order, newest first by the clock ``changed_within``
+        reads (``_changed_at``: on the wire ``updated_at``, in a folder the newer of ``server_updated_at`` and
+        ``local_updated_at``; one clock per lens, serial 123; no readable time last), then by id (by code point,
+        as written)."""
 
         def key(eid: str) -> tuple[int, int, int, int, str]:
-            unreadable, seconds, micros = _instant(self.by_id[eid].get("updated_at"))
-            return (_TYPE_RANK[self.type_of[eid]], unreadable, -seconds, -micros, eid)
+            at = _changed_at(self.by_id[eid])
+            if at is None:
+                return (_TYPE_RANK[self.type_of[eid]], 1, 0, 0, eid)
+            return (_TYPE_RANK[self.type_of[eid]], 0, -at[0], -at[1], eid)
 
         return sorted(ids, key=key)
 
