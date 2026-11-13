@@ -3247,6 +3247,217 @@
         "019a3b10-0000-7000-8000-000000000cc0",
         "019a3b10-0000-7000-8000-000000000cbe"
       ]
+    },
+    {
+      "kind": "mark",
+      "name": "mark-an-updated-at-that-cannot-be-read-never-wins",
+      "relations": [
+        {
+          "id": "019a3b10-0000-7000-8000-0000000000dc",
+          "type": "relation",
+          "supertype": "Read",
+          "name": "Read: Ada",
+          "actor": "019a3b10-0000-7000-8000-0000000000a1",
+          "narratives": [
+            "019a3b10-0000-7000-8000-000000000c11"
+          ],
+          "updated_at": "2026-10-27",
+          "created_by": null
+        },
+        {
+          "id": "019a3b10-0000-7000-8000-0000000000db",
+          "type": "relation",
+          "supertype": "Read",
+          "name": "Read: Ada",
+          "actor": "019a3b10-0000-7000-8000-0000000000a1",
+          "narratives": [
+            "019a3b10-0000-7000-8000-000000000c11"
+          ],
+          "updated_at": "2026-10-26T08:00:00Z",
+          "created_by": null
+        }
+      ],
+      "reader": "019a3b10-0000-7000-8000-0000000000a1",
+      "mark": "019a3b10-0000-7000-8000-0000000000db"
+    },
+    {
+      "kind": "mark",
+      "name": "mark-an-updated-at-that-cannot-be-read-never-wins-listed-last",
+      "relations": [
+        {
+          "id": "019a3b10-0000-7000-8000-0000000000e0",
+          "type": "relation",
+          "supertype": "Read",
+          "name": "Read: Ada",
+          "actor": "019a3b10-0000-7000-8000-0000000000a1",
+          "narratives": [
+            "019a3b10-0000-7000-8000-000000000c11"
+          ],
+          "updated_at": "2026-10-26T08:00:00Z",
+          "created_by": null
+        },
+        {
+          "id": "019a3b10-0000-7000-8000-0000000000e2",
+          "type": "relation",
+          "supertype": "Read",
+          "name": "Read: Ada",
+          "actor": "019a3b10-0000-7000-8000-0000000000a1",
+          "narratives": [
+            "019a3b10-0000-7000-8000-000000000c11"
+          ],
+          "updated_at": "2026-10-27",
+          "created_by": null
+        }
+      ],
+      "reader": "019a3b10-0000-7000-8000-0000000000a1",
+      "mark": "019a3b10-0000-7000-8000-0000000000e0"
+    },
+    {
+      "kind": "mark",
+      "name": "mark-two-at-one-instant-tie-by-the-higher-id",
+      "relations": [
+        {
+          "id": "019a3b10-0000-7000-8000-0000000000dd",
+          "type": "relation",
+          "supertype": "Read",
+          "name": "Read: Ada",
+          "actor": "019a3b10-0000-7000-8000-0000000000a1",
+          "narratives": [
+            "019a3b10-0000-7000-8000-000000000c11"
+          ],
+          "updated_at": "2026-10-26T11:00:00+01:00",
+          "created_by": null
+        },
+        {
+          "id": "019a3b10-0000-7000-8000-0000000000de",
+          "type": "relation",
+          "supertype": "Read",
+          "name": "Read: Ada",
+          "actor": "019a3b10-0000-7000-8000-0000000000a1",
+          "narratives": [
+            "019a3b10-0000-7000-8000-000000000c11"
+          ],
+          "updated_at": "2026-10-26T10:00:00Z",
+          "created_by": null
+        }
+      ],
+      "reader": "019a3b10-0000-7000-8000-0000000000a1",
+      "mark": "019a3b10-0000-7000-8000-0000000000de"
+    },
+    {
+      "kind": "mark",
+      "name": "mark-two-at-one-instant-tie-by-the-higher-id-listed-first",
+      "relations": [
+        {
+          "id": "019a3b10-0000-7000-8000-0000000000de",
+          "type": "relation",
+          "supertype": "Read",
+          "name": "Read: Ada",
+          "actor": "019a3b10-0000-7000-8000-0000000000a1",
+          "narratives": [
+            "019a3b10-0000-7000-8000-000000000c11"
+          ],
+          "updated_at": "2026-10-26T10:00:00Z",
+          "created_by": null
+        },
+        {
+          "id": "019a3b10-0000-7000-8000-0000000000dd",
+          "type": "relation",
+          "supertype": "Read",
+          "name": "Read: Ada",
+          "actor": "019a3b10-0000-7000-8000-0000000000a1",
+          "narratives": [
+            "019a3b10-0000-7000-8000-000000000c11"
+          ],
+          "updated_at": "2026-10-26T11:00:00+01:00",
+          "created_by": null
+        }
+      ],
+      "reader": "019a3b10-0000-7000-8000-0000000000a1",
+      "mark": "019a3b10-0000-7000-8000-0000000000de"
+    },
+    {
+      "kind": "mark",
+      "name": "mark-none-can-be-read-the-higher-id",
+      "relations": [
+        {
+          "id": "019a3b10-0000-7000-8000-0000000000d0",
+          "type": "relation",
+          "supertype": "Read",
+          "name": "Read: Ada",
+          "actor": "019a3b10-0000-7000-8000-0000000000a1",
+          "narratives": [
+            "019a3b10-0000-7000-8000-000000000c11"
+          ],
+          "created_by": null,
+          "updated_at": "yesterday"
+        },
+        {
+          "id": "019a3b10-0000-7000-8000-0000000000df",
+          "type": "relation",
+          "supertype": "Read",
+          "name": "Read: Ada",
+          "actor": "019a3b10-0000-7000-8000-0000000000a1",
+          "narratives": [
+            "019a3b10-0000-7000-8000-000000000c11"
+          ],
+          "created_by": null,
+          "updated_at": "2026-10-26"
+        }
+      ],
+      "reader": "019a3b10-0000-7000-8000-0000000000a1",
+      "mark": "019a3b10-0000-7000-8000-0000000000df"
+    },
+    {
+      "kind": "mark",
+      "name": "mark-none-can-be-read-the-higher-id-listed-first",
+      "relations": [
+        {
+          "id": "019a3b10-0000-7000-8000-0000000000df",
+          "type": "relation",
+          "supertype": "Read",
+          "name": "Read: Ada",
+          "actor": "019a3b10-0000-7000-8000-0000000000a1",
+          "narratives": [
+            "019a3b10-0000-7000-8000-000000000c11"
+          ],
+          "created_by": null,
+          "updated_at": "2026-10-26"
+        },
+        {
+          "id": "019a3b10-0000-7000-8000-0000000000d0",
+          "type": "relation",
+          "supertype": "Read",
+          "name": "Read: Ada",
+          "actor": "019a3b10-0000-7000-8000-0000000000a1",
+          "narratives": [
+            "019a3b10-0000-7000-8000-000000000c11"
+          ],
+          "created_by": null,
+          "updated_at": "yesterday"
+        }
+      ],
+      "reader": "019a3b10-0000-7000-8000-0000000000a1",
+      "mark": "019a3b10-0000-7000-8000-0000000000df"
+    },
+    {
+      "kind": "mark",
+      "name": "mark-a-lone-mark-is-the-mark-though-its-time-cannot-be-read",
+      "relations": [
+        {
+          "id": "019a3b10-0000-7000-8000-0000000000d0",
+          "type": "relation",
+          "supertype": "Read",
+          "name": "Read: Ada",
+          "actor": "019a3b10-0000-7000-8000-0000000000a1",
+          "narratives": [
+            "019a3b10-0000-7000-8000-000000000c11"
+          ],
+          "created_by": null
+        }
+      ],
+      "reader": "019a3b10-0000-7000-8000-0000000000a1",
+      "mark": "019a3b10-0000-7000-8000-0000000000d0"
     }
   ]
 }

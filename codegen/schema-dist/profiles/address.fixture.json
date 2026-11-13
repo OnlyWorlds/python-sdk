@@ -6,7 +6,8 @@
     "refusals: every reason a reader or a writer refuses by, in the order a parser checks them (no_world and bad_form are the writer's only).",
     "format cases: address gives form (human or text), world (absent for the in-world text form), type and id (both absent for a world's own address), and optionally lens and moment; expect is the exact string a writer writes, or refuse the reason.",
     "parse cases: text is the string as a reader receives it; expect is the reading (form, world, world_is_slug, type, id, lens, moment, canonical; type and id null for a world's own address), or refuse the reason. canonical is true when the string as received is exactly what a writer writes for that reading.",
-    "ids: any UUID version, in the hyphenated 8-4-4-4-12 form; read in either case of hex, always written lowercase."
+    "ids: any UUID version, in the hyphenated 8-4-4-4-12 form; read in either case of hex, always written lowercase.",
+    "prose cases: text is a line as a reader finds it and index where an address starts in it; expect gives the address (the slice of text from index that the address covers, where it ends in prose) and its reading (what the parse cases answer for that slice). The whole-string parser is unchanged: handed the line's tail whole it may refuse. Every prose case is ASCII up to the end of its address (one holds a combining mark where no address is found), so its index and its address are the same whether a language counts UTF-16 units or code points."
   ],
   "types": [
     "character",
@@ -1640,6 +1641,993 @@
         "lens": ""
       },
       "refuse": "bad_lens"
+    },
+    {
+      "name": "prose-an-address-then-a-full-stop",
+      "claim": "a full stop after the id is the line's, not the address's",
+      "kind": "prose",
+      "text": "Renamed the Consul's Steinway: ow://character/019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71.",
+      "index": 31,
+      "expect": {
+        "address": "ow://character/019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71",
+        "reading": {
+          "form": "text",
+          "world": null,
+          "world_is_slug": false,
+          "type": "character",
+          "id": "019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71",
+          "lens": null,
+          "moment": null,
+          "canonical": true
+        }
+      }
+    },
+    {
+      "name": "prose-a-moment-then-a-full-stop",
+      "claim": "a moment ends by its own grammar, a step; the full stop after it is the line's",
+      "kind": "prose",
+      "text": "Renamed the Consul's Steinway: ow://character/019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71@12.",
+      "index": 31,
+      "expect": {
+        "address": "ow://character/019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71@12",
+        "reading": {
+          "form": "text",
+          "world": null,
+          "world_is_slug": false,
+          "type": "character",
+          "id": "019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71",
+          "lens": null,
+          "moment": 12,
+          "canonical": true
+        }
+      }
+    },
+    {
+      "name": "prose-a-fragment-is-not-part-of-the-address",
+      "claim": "the address ends before its #: a fragment is not part of an address found in prose",
+      "kind": "prose",
+      "text": "Renamed the Consul's Steinway: ow://character/019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71#notes.",
+      "index": 31,
+      "expect": {
+        "address": "ow://character/019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71",
+        "reading": {
+          "form": "text",
+          "world": null,
+          "world_is_slug": false,
+          "type": "character",
+          "id": "019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71",
+          "lens": null,
+          "moment": null,
+          "canonical": true
+        }
+      }
+    },
+    {
+      "name": "prose-the-lens-is-taken-another-key-is-not",
+      "claim": "?lens= and a lens continue the address; it ends before the & of any other key",
+      "kind": "prose",
+      "text": "Renamed the Consul's Steinway: ow://character/019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71?lens=019a2b7e-4c1d-7f20-9b3e-1a2c3d4e5f60&x=y.",
+      "index": 31,
+      "expect": {
+        "address": "ow://character/019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71?lens=019a2b7e-4c1d-7f20-9b3e-1a2c3d4e5f60",
+        "reading": {
+          "form": "text",
+          "world": null,
+          "world_is_slug": false,
+          "type": "character",
+          "id": "019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71",
+          "lens": "019a2b7e-4c1d-7f20-9b3e-1a2c3d4e5f60",
+          "moment": null,
+          "canonical": true
+        }
+      }
+    },
+    {
+      "name": "bare-address",
+      "claim": "bare address: the packages' shared address-in-prose case, as both packages keep it",
+      "kind": "prose",
+      "text": "ow://object/01a1d4ef-0000-7000-8000-000000000084",
+      "index": 0,
+      "expect": {
+        "address": "ow://object/01a1d4ef-0000-7000-8000-000000000084",
+        "reading": {
+          "form": "text",
+          "world": null,
+          "world_is_slug": false,
+          "type": "object",
+          "id": "01a1d4ef-0000-7000-8000-000000000084",
+          "lens": null,
+          "moment": null,
+          "canonical": true
+        }
+      }
+    },
+    {
+      "name": "full-stop-after-id",
+      "claim": "full stop after id: the packages' shared address-in-prose case, as both packages keep it",
+      "kind": "prose",
+      "text": "ow://object/01a1d4ef-0000-7000-8000-000000000084.",
+      "index": 0,
+      "expect": {
+        "address": "ow://object/01a1d4ef-0000-7000-8000-000000000084",
+        "reading": {
+          "form": "text",
+          "world": null,
+          "world_is_slug": false,
+          "type": "object",
+          "id": "01a1d4ef-0000-7000-8000-000000000084",
+          "lens": null,
+          "moment": null,
+          "canonical": true
+        }
+      }
+    },
+    {
+      "name": "comma-and-prose-after-id",
+      "claim": "comma and prose after id: the packages' shared address-in-prose case, as both packages keep it",
+      "kind": "prose",
+      "text": "ow://object/01a1d4ef-0000-7000-8000-000000000084, then more",
+      "index": 0,
+      "expect": {
+        "address": "ow://object/01a1d4ef-0000-7000-8000-000000000084",
+        "reading": {
+          "form": "text",
+          "world": null,
+          "world_is_slug": false,
+          "type": "object",
+          "id": "01a1d4ef-0000-7000-8000-000000000084",
+          "lens": null,
+          "moment": null,
+          "canonical": true
+        }
+      }
+    },
+    {
+      "name": "moment-then-full-stop",
+      "claim": "moment then full stop: the packages' shared address-in-prose case, as both packages keep it",
+      "kind": "prose",
+      "text": "ow://object/01a1d4ef-0000-7000-8000-000000000084@12.",
+      "index": 0,
+      "expect": {
+        "address": "ow://object/01a1d4ef-0000-7000-8000-000000000084@12",
+        "reading": {
+          "form": "text",
+          "world": null,
+          "world_is_slug": false,
+          "type": "object",
+          "id": "01a1d4ef-0000-7000-8000-000000000084",
+          "lens": null,
+          "moment": 12,
+          "canonical": true
+        }
+      }
+    },
+    {
+      "name": "negative-moment",
+      "claim": "negative moment: the packages' shared address-in-prose case, as both packages keep it",
+      "kind": "prose",
+      "text": "ow://object/01a1d4ef-0000-7000-8000-000000000084@-3 and on",
+      "index": 0,
+      "expect": {
+        "address": "ow://object/01a1d4ef-0000-7000-8000-000000000084@-3",
+        "reading": {
+          "form": "text",
+          "world": null,
+          "world_is_slug": false,
+          "type": "object",
+          "id": "01a1d4ef-0000-7000-8000-000000000084",
+          "lens": null,
+          "moment": -3,
+          "canonical": true
+        }
+      }
+    },
+    {
+      "name": "lens-then-full-stop",
+      "claim": "lens then full stop: the packages' shared address-in-prose case, as both packages keep it",
+      "kind": "prose",
+      "text": "ow://object/01a1d4ef-0000-7000-8000-000000000084?lens=0193a1c2-7d3e-7f00-8a11-3c5e7b9d2f41.",
+      "index": 0,
+      "expect": {
+        "address": "ow://object/01a1d4ef-0000-7000-8000-000000000084?lens=0193a1c2-7d3e-7f00-8a11-3c5e7b9d2f41",
+        "reading": {
+          "form": "text",
+          "world": null,
+          "world_is_slug": false,
+          "type": "object",
+          "id": "01a1d4ef-0000-7000-8000-000000000084",
+          "lens": "0193a1c2-7d3e-7f00-8a11-3c5e7b9d2f41",
+          "moment": null,
+          "canonical": true
+        }
+      }
+    },
+    {
+      "name": "moment-and-lens",
+      "claim": "moment and lens: the packages' shared address-in-prose case, as both packages keep it",
+      "kind": "prose",
+      "text": "ow://object/01a1d4ef-0000-7000-8000-000000000084@4?lens=0193a1c2-7d3e-7f00-8a11-3c5e7b9d2f41; done",
+      "index": 0,
+      "expect": {
+        "address": "ow://object/01a1d4ef-0000-7000-8000-000000000084@4?lens=0193a1c2-7d3e-7f00-8a11-3c5e7b9d2f41",
+        "reading": {
+          "form": "text",
+          "world": null,
+          "world_is_slug": false,
+          "type": "object",
+          "id": "01a1d4ef-0000-7000-8000-000000000084",
+          "lens": "0193a1c2-7d3e-7f00-8a11-3c5e7b9d2f41",
+          "moment": 4,
+          "canonical": true
+        }
+      }
+    },
+    {
+      "name": "fragment-not-taken",
+      "claim": "fragment not taken: the packages' shared address-in-prose case, as both packages keep it",
+      "kind": "prose",
+      "text": "ow://object/01a1d4ef-0000-7000-8000-000000000084#notes.",
+      "index": 0,
+      "expect": {
+        "address": "ow://object/01a1d4ef-0000-7000-8000-000000000084",
+        "reading": {
+          "form": "text",
+          "world": null,
+          "world_is_slug": false,
+          "type": "object",
+          "id": "01a1d4ef-0000-7000-8000-000000000084",
+          "lens": null,
+          "moment": null,
+          "canonical": true
+        }
+      }
+    },
+    {
+      "name": "other-key-after-lens-not-taken",
+      "claim": "other key after lens not taken: the packages' shared address-in-prose case, as both packages keep it",
+      "kind": "prose",
+      "text": "ow://object/01a1d4ef-0000-7000-8000-000000000084?lens=0193a1c2-7d3e-7f00-8a11-3c5e7b9d2f41&x=y.",
+      "index": 0,
+      "expect": {
+        "address": "ow://object/01a1d4ef-0000-7000-8000-000000000084?lens=0193a1c2-7d3e-7f00-8a11-3c5e7b9d2f41",
+        "reading": {
+          "form": "text",
+          "world": null,
+          "world_is_slug": false,
+          "type": "object",
+          "id": "01a1d4ef-0000-7000-8000-000000000084",
+          "lens": "0193a1c2-7d3e-7f00-8a11-3c5e7b9d2f41",
+          "moment": null,
+          "canonical": true
+        }
+      }
+    },
+    {
+      "name": "other-key-first-not-taken",
+      "claim": "other key first not taken: the packages' shared address-in-prose case, as both packages keep it",
+      "kind": "prose",
+      "text": "ow://object/01a1d4ef-0000-7000-8000-000000000084?x=y&lens=0193a1c2-7d3e-7f00-8a11-3c5e7b9d2f41",
+      "index": 0,
+      "expect": {
+        "address": "ow://object/01a1d4ef-0000-7000-8000-000000000084",
+        "reading": {
+          "form": "text",
+          "world": null,
+          "world_is_slug": false,
+          "type": "object",
+          "id": "01a1d4ef-0000-7000-8000-000000000084",
+          "lens": null,
+          "moment": null,
+          "canonical": true
+        }
+      }
+    },
+    {
+      "name": "world-type-id",
+      "claim": "world type id: the packages' shared address-in-prose case, as both packages keep it",
+      "kind": "prose",
+      "text": "ow://0193a1c2-7d3e-7f00-8a11-3c5e7b9d2f40/character/01a1d4ef-0000-7000-8000-000000000084.",
+      "index": 0,
+      "expect": {
+        "address": "ow://0193a1c2-7d3e-7f00-8a11-3c5e7b9d2f40/character/01a1d4ef-0000-7000-8000-000000000084",
+        "reading": {
+          "form": "text",
+          "world": "0193a1c2-7d3e-7f00-8a11-3c5e7b9d2f40",
+          "world_is_slug": false,
+          "type": "character",
+          "id": "01a1d4ef-0000-7000-8000-000000000084",
+          "lens": null,
+          "moment": null,
+          "canonical": true
+        }
+      }
+    },
+    {
+      "name": "world-alone",
+      "claim": "world alone: the packages' shared address-in-prose case, as both packages keep it",
+      "kind": "prose",
+      "text": "ow://0193a1c2-7d3e-7f00-8a11-3c5e7b9d2f40.",
+      "index": 0,
+      "expect": {
+        "address": "ow://0193a1c2-7d3e-7f00-8a11-3c5e7b9d2f40",
+        "reading": {
+          "form": "text",
+          "world": "0193a1c2-7d3e-7f00-8a11-3c5e7b9d2f40",
+          "world_is_slug": false,
+          "type": null,
+          "id": null,
+          "lens": null,
+          "moment": null,
+          "canonical": true
+        }
+      }
+    },
+    {
+      "name": "site-form-element",
+      "claim": "site form element: the packages' shared address-in-prose case, as both packages keep it",
+      "kind": "prose",
+      "text": "https://www.onlyworlds.com/w/0193a1c2-7d3e-7f00-8a11-3c5e7b9d2f40/event/01a1d4ef-0000-7000-8000-000000000084.",
+      "index": 0,
+      "expect": {
+        "address": "https://www.onlyworlds.com/w/0193a1c2-7d3e-7f00-8a11-3c5e7b9d2f40/event/01a1d4ef-0000-7000-8000-000000000084",
+        "reading": {
+          "form": "human",
+          "world": "0193a1c2-7d3e-7f00-8a11-3c5e7b9d2f40",
+          "world_is_slug": false,
+          "type": "event",
+          "id": "01a1d4ef-0000-7000-8000-000000000084",
+          "lens": null,
+          "moment": null,
+          "canonical": true
+        }
+      }
+    },
+    {
+      "name": "site-form-slug",
+      "claim": "site form slug: the packages' shared address-in-prose case, as both packages keep it",
+      "kind": "prose",
+      "text": "https://www.onlyworlds.com/w/moppetopia.",
+      "index": 0,
+      "expect": {
+        "address": "https://www.onlyworlds.com/w/moppetopia",
+        "reading": {
+          "form": "human",
+          "world": "moppetopia",
+          "world_is_slug": true,
+          "type": null,
+          "id": null,
+          "lens": null,
+          "moment": null,
+          "canonical": false
+        }
+      }
+    },
+    {
+      "name": "at-an-index-mid-line",
+      "claim": "at an index mid line: the packages' shared address-in-prose case, as both packages keep it",
+      "kind": "prose",
+      "text": "Built the gate: ow://object/01a1d4ef-0000-7000-8000-000000000084.",
+      "index": 16,
+      "expect": {
+        "address": "ow://object/01a1d4ef-0000-7000-8000-000000000084",
+        "reading": {
+          "form": "text",
+          "world": null,
+          "world_is_slug": false,
+          "type": "object",
+          "id": "01a1d4ef-0000-7000-8000-000000000084",
+          "lens": null,
+          "moment": null,
+          "canonical": true
+        }
+      }
+    },
+    {
+      "name": "index-not-at-an-address",
+      "claim": "index not at an address: the packages' shared address-in-prose case, as both packages keep it",
+      "kind": "prose",
+      "text": "Built the gate: ow://object/01a1d4ef-0000-7000-8000-000000000084.",
+      "index": 0,
+      "expect": {
+        "address": null,
+        "reading": null
+      }
+    },
+    {
+      "name": "trailing-slash-not-taken",
+      "claim": "trailing slash not taken: the packages' shared address-in-prose case, as both packages keep it",
+      "kind": "prose",
+      "text": "ow://object/01a1d4ef-0000-7000-8000-000000000084/",
+      "index": 0,
+      "expect": {
+        "address": "ow://object/01a1d4ef-0000-7000-8000-000000000084",
+        "reading": {
+          "form": "text",
+          "world": null,
+          "world_is_slug": false,
+          "type": "object",
+          "id": "01a1d4ef-0000-7000-8000-000000000084",
+          "lens": null,
+          "moment": null,
+          "canonical": true
+        }
+      }
+    },
+    {
+      "name": "id-in-upper-case-read",
+      "claim": "id in upper case read: the packages' shared address-in-prose case, as both packages keep it",
+      "kind": "prose",
+      "text": "ow://object/01A1D4EF-0000-7000-8000-000000000084.",
+      "index": 0,
+      "expect": {
+        "address": "ow://object/01A1D4EF-0000-7000-8000-000000000084",
+        "reading": {
+          "form": "text",
+          "world": null,
+          "world_is_slug": false,
+          "type": "object",
+          "id": "01a1d4ef-0000-7000-8000-000000000084",
+          "lens": null,
+          "moment": null,
+          "canonical": false
+        }
+      }
+    },
+    {
+      "name": "short-id-is-no-address",
+      "claim": "short id is no address: the packages' shared address-in-prose case, as both packages keep it",
+      "kind": "prose",
+      "text": "ow://object/01a1d4ef-0000.",
+      "index": 0,
+      "expect": {
+        "address": null,
+        "reading": null
+      }
+    },
+    {
+      "name": "uppercase-prefix-is-no-address",
+      "claim": "uppercase prefix is no address: the packages' shared address-in-prose case, as both packages keep it",
+      "kind": "prose",
+      "text": "OW://object/01a1d4ef-0000-7000-8000-000000000084",
+      "index": 0,
+      "expect": {
+        "address": null,
+        "reading": null
+      }
+    },
+    {
+      "name": "unknown-type-is-no-address",
+      "claim": "unknown type is no address: the packages' shared address-in-prose case, as both packages keep it",
+      "kind": "prose",
+      "text": "ow://thing/01a1d4ef-0000-7000-8000-000000000084",
+      "index": 0,
+      "expect": {
+        "address": null,
+        "reading": null
+      }
+    },
+    {
+      "name": "moment-without-digits-not-taken",
+      "claim": "moment without digits not taken: the packages' shared address-in-prose case, as both packages keep it",
+      "kind": "prose",
+      "text": "ow://object/01a1d4ef-0000-7000-8000-000000000084@.",
+      "index": 0,
+      "expect": {
+        "address": "ow://object/01a1d4ef-0000-7000-8000-000000000084",
+        "reading": {
+          "form": "text",
+          "world": null,
+          "world_is_slug": false,
+          "type": "object",
+          "id": "01a1d4ef-0000-7000-8000-000000000084",
+          "lens": null,
+          "moment": null,
+          "canonical": true
+        }
+      }
+    },
+    {
+      "name": "lens-not-an-id-not-taken",
+      "claim": "lens not an id not taken: the packages' shared address-in-prose case, as both packages keep it",
+      "kind": "prose",
+      "text": "ow://object/01a1d4ef-0000-7000-8000-000000000084?lens=abc.",
+      "index": 0,
+      "expect": {
+        "address": "ow://object/01a1d4ef-0000-7000-8000-000000000084",
+        "reading": {
+          "form": "text",
+          "world": null,
+          "world_is_slug": false,
+          "type": "object",
+          "id": "01a1d4ef-0000-7000-8000-000000000084",
+          "lens": null,
+          "moment": null,
+          "canonical": true
+        }
+      }
+    },
+    {
+      "name": "lens-ends-after-its-id",
+      "claim": "lens ends after its id: the packages' shared address-in-prose case, as both packages keep it",
+      "kind": "prose",
+      "text": "ow://object/01a1d4ef-0000-7000-8000-000000000084?lens=0193a1c2-7d3e-7f00-8a11-3c5e7b9d2f410",
+      "index": 0,
+      "expect": {
+        "address": "ow://object/01a1d4ef-0000-7000-8000-000000000084?lens=0193a1c2-7d3e-7f00-8a11-3c5e7b9d2f41",
+        "reading": {
+          "form": "text",
+          "world": null,
+          "world_is_slug": false,
+          "type": "object",
+          "id": "01a1d4ef-0000-7000-8000-000000000084",
+          "lens": "0193a1c2-7d3e-7f00-8a11-3c5e7b9d2f41",
+          "moment": null,
+          "canonical": true
+        }
+      }
+    },
+    {
+      "name": "text-run-on-after-the-id",
+      "claim": "text run on after the id: the packages' shared address-in-prose case, as both packages keep it",
+      "kind": "prose",
+      "text": "ow://object/01a1d4ef-0000-7000-8000-000000000084abc",
+      "index": 0,
+      "expect": {
+        "address": "ow://object/01a1d4ef-0000-7000-8000-000000000084",
+        "reading": {
+          "form": "text",
+          "world": null,
+          "world_is_slug": false,
+          "type": "object",
+          "id": "01a1d4ef-0000-7000-8000-000000000084",
+          "lens": null,
+          "moment": null,
+          "canonical": true
+        }
+      }
+    },
+    {
+      "name": "moment-zero-then-full-stop",
+      "claim": "moment zero then full stop: the packages' shared address-in-prose case, as both packages keep it",
+      "kind": "prose",
+      "text": "ow://object/01a1d4ef-0000-7000-8000-000000000084@0.",
+      "index": 0,
+      "expect": {
+        "address": "ow://object/01a1d4ef-0000-7000-8000-000000000084@0",
+        "reading": {
+          "form": "text",
+          "world": null,
+          "world_is_slug": false,
+          "type": "object",
+          "id": "01a1d4ef-0000-7000-8000-000000000084",
+          "lens": null,
+          "moment": 0,
+          "canonical": true
+        }
+      }
+    },
+    {
+      "name": "moment-with-a-leading-zero-not-taken",
+      "claim": "moment with a leading zero not taken: the packages' shared address-in-prose case, as both packages keep it",
+      "kind": "prose",
+      "text": "ow://object/01a1d4ef-0000-7000-8000-000000000084@012",
+      "index": 0,
+      "expect": {
+        "address": "ow://object/01a1d4ef-0000-7000-8000-000000000084",
+        "reading": {
+          "form": "text",
+          "world": null,
+          "world_is_slug": false,
+          "type": "object",
+          "id": "01a1d4ef-0000-7000-8000-000000000084",
+          "lens": null,
+          "moment": null,
+          "canonical": true
+        }
+      }
+    },
+    {
+      "name": "moment-past-the-range-not-taken",
+      "claim": "moment past the range not taken: the packages' shared address-in-prose case, as both packages keep it",
+      "kind": "prose",
+      "text": "ow://object/01a1d4ef-0000-7000-8000-000000000084@2147483648",
+      "index": 0,
+      "expect": {
+        "address": "ow://object/01a1d4ef-0000-7000-8000-000000000084",
+        "reading": {
+          "form": "text",
+          "world": null,
+          "world_is_slug": false,
+          "type": "object",
+          "id": "01a1d4ef-0000-7000-8000-000000000084",
+          "lens": null,
+          "moment": null,
+          "canonical": true
+        }
+      }
+    },
+    {
+      "name": "moment-at-the-range-taken",
+      "claim": "moment at the range taken: the packages' shared address-in-prose case, as both packages keep it",
+      "kind": "prose",
+      "text": "ow://object/01a1d4ef-0000-7000-8000-000000000084@2147483647.",
+      "index": 0,
+      "expect": {
+        "address": "ow://object/01a1d4ef-0000-7000-8000-000000000084@2147483647",
+        "reading": {
+          "form": "text",
+          "world": null,
+          "world_is_slug": false,
+          "type": "object",
+          "id": "01a1d4ef-0000-7000-8000-000000000084",
+          "lens": null,
+          "moment": 2147483647,
+          "canonical": true
+        }
+      }
+    },
+    {
+      "name": "second-moment-not-taken",
+      "claim": "second moment not taken: the packages' shared address-in-prose case, as both packages keep it",
+      "kind": "prose",
+      "text": "ow://object/01a1d4ef-0000-7000-8000-000000000084@3@4",
+      "index": 0,
+      "expect": {
+        "address": "ow://object/01a1d4ef-0000-7000-8000-000000000084@3",
+        "reading": {
+          "form": "text",
+          "world": null,
+          "world_is_slug": false,
+          "type": "object",
+          "id": "01a1d4ef-0000-7000-8000-000000000084",
+          "lens": null,
+          "moment": 3,
+          "canonical": true
+        }
+      }
+    },
+    {
+      "name": "moment-after-lens-not-taken",
+      "claim": "moment after lens not taken: the packages' shared address-in-prose case, as both packages keep it",
+      "kind": "prose",
+      "text": "ow://object/01a1d4ef-0000-7000-8000-000000000084?lens=0193a1c2-7d3e-7f00-8a11-3c5e7b9d2f41@3",
+      "index": 0,
+      "expect": {
+        "address": "ow://object/01a1d4ef-0000-7000-8000-000000000084?lens=0193a1c2-7d3e-7f00-8a11-3c5e7b9d2f41",
+        "reading": {
+          "form": "text",
+          "world": null,
+          "world_is_slug": false,
+          "type": "object",
+          "id": "01a1d4ef-0000-7000-8000-000000000084",
+          "lens": "0193a1c2-7d3e-7f00-8a11-3c5e7b9d2f41",
+          "moment": null,
+          "canonical": true
+        }
+      }
+    },
+    {
+      "name": "lens-key-in-upper-case-not-taken",
+      "claim": "lens key in upper case not taken: the packages' shared address-in-prose case, as both packages keep it",
+      "kind": "prose",
+      "text": "ow://object/01a1d4ef-0000-7000-8000-000000000084?LENS=0193a1c2-7d3e-7f00-8a11-3c5e7b9d2f41",
+      "index": 0,
+      "expect": {
+        "address": "ow://object/01a1d4ef-0000-7000-8000-000000000084",
+        "reading": {
+          "form": "text",
+          "world": null,
+          "world_is_slug": false,
+          "type": "object",
+          "id": "01a1d4ef-0000-7000-8000-000000000084",
+          "lens": null,
+          "moment": null,
+          "canonical": true
+        }
+      }
+    },
+    {
+      "name": "world-then-unknown-type",
+      "claim": "world then unknown type: the packages' shared address-in-prose case, as both packages keep it",
+      "kind": "prose",
+      "text": "ow://0193a1c2-7d3e-7f00-8a11-3c5e7b9d2f40/thing/01a1d4ef-0000-7000-8000-000000000084",
+      "index": 0,
+      "expect": {
+        "address": "ow://0193a1c2-7d3e-7f00-8a11-3c5e7b9d2f40",
+        "reading": {
+          "form": "text",
+          "world": "0193a1c2-7d3e-7f00-8a11-3c5e7b9d2f40",
+          "world_is_slug": false,
+          "type": null,
+          "id": null,
+          "lens": null,
+          "moment": null,
+          "canonical": true
+        }
+      }
+    },
+    {
+      "name": "world-then-type-then-short-id",
+      "claim": "world then type then short id: the packages' shared address-in-prose case, as both packages keep it",
+      "kind": "prose",
+      "text": "ow://0193a1c2-7d3e-7f00-8a11-3c5e7b9d2f40/character/01a1d4ef",
+      "index": 0,
+      "expect": {
+        "address": "ow://0193a1c2-7d3e-7f00-8a11-3c5e7b9d2f40",
+        "reading": {
+          "form": "text",
+          "world": "0193a1c2-7d3e-7f00-8a11-3c5e7b9d2f40",
+          "world_is_slug": false,
+          "type": null,
+          "id": null,
+          "lens": null,
+          "moment": null,
+          "canonical": true
+        }
+      }
+    },
+    {
+      "name": "bare-question-mark-not-taken",
+      "claim": "bare question mark not taken: the packages' shared address-in-prose case, as both packages keep it",
+      "kind": "prose",
+      "text": "ow://object/01a1d4ef-0000-7000-8000-000000000084?",
+      "index": 0,
+      "expect": {
+        "address": "ow://object/01a1d4ef-0000-7000-8000-000000000084",
+        "reading": {
+          "form": "text",
+          "world": null,
+          "world_is_slug": false,
+          "type": "object",
+          "id": "01a1d4ef-0000-7000-8000-000000000084",
+          "lens": null,
+          "moment": null,
+          "canonical": true
+        }
+      }
+    },
+    {
+      "name": "line-break-after-id",
+      "claim": "line break after id: the packages' shared address-in-prose case, as both packages keep it",
+      "kind": "prose",
+      "text": "ow://object/01a1d4ef-0000-7000-8000-000000000084\n",
+      "index": 0,
+      "expect": {
+        "address": "ow://object/01a1d4ef-0000-7000-8000-000000000084",
+        "reading": {
+          "form": "text",
+          "world": null,
+          "world_is_slug": false,
+          "type": "object",
+          "id": "01a1d4ef-0000-7000-8000-000000000084",
+          "lens": null,
+          "moment": null,
+          "canonical": true
+        }
+      }
+    },
+    {
+      "name": "space-before-at-index-0",
+      "claim": "space before at index 0: the packages' shared address-in-prose case, as both packages keep it",
+      "kind": "prose",
+      "text": " ow://object/01a1d4ef-0000-7000-8000-000000000084",
+      "index": 0,
+      "expect": {
+        "address": null,
+        "reading": null
+      }
+    },
+    {
+      "name": "prefix-alone",
+      "claim": "prefix alone: the packages' shared address-in-prose case, as both packages keep it",
+      "kind": "prose",
+      "text": "ow://",
+      "index": 0,
+      "expect": {
+        "address": null,
+        "reading": null
+      }
+    },
+    {
+      "name": "site-slug-too-short",
+      "claim": "site slug too short: the packages' shared address-in-prose case, as both packages keep it",
+      "kind": "prose",
+      "text": "https://www.onlyworlds.com/w/ab.",
+      "index": 0,
+      "expect": {
+        "address": null,
+        "reading": null
+      }
+    },
+    {
+      "name": "slug-starting-outside-its-alphabet-is-no-address",
+      "claim": "a slug in prose ends at the first character outside its alphabet; an upper-case first letter leaves an empty run, which is no slug, so no address",
+      "kind": "prose",
+      "text": "https://www.onlyworlds.com/w/Moppetopia.",
+      "index": 0,
+      "expect": {
+        "address": null,
+        "reading": null
+      }
+    },
+    {
+      "name": "slug-run-ending-in-a-hyphen-is-no-address",
+      "claim": "a slug is the whole run or nothing: my-world- (its alphabet holds the hyphen) is no slug, so no address, never cut back to my-world",
+      "kind": "prose",
+      "text": "https://www.onlyworlds.com/w/my-world-.",
+      "index": 0,
+      "expect": {
+        "address": null,
+        "reading": null
+      }
+    },
+    {
+      "name": "slug-run-past-forty-characters-is-no-address",
+      "claim": "a slug is the whole run or nothing: 41 letters are no slug, so no address, never cut back to the first 40",
+      "kind": "prose",
+      "text": "https://www.onlyworlds.com/w/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.",
+      "index": 0,
+      "expect": {
+        "address": null,
+        "reading": null
+      }
+    },
+    {
+      "name": "slug-that-is-a-type-word-is-no-address",
+      "claim": "a run that is a type word is no slug (the site reserves every type word), so event before a full stop is no address",
+      "kind": "prose",
+      "text": "https://www.onlyworlds.com/w/event.",
+      "index": 0,
+      "expect": {
+        "address": null,
+        "reading": null
+      }
+    },
+    {
+      "name": "slug-ends-at-its-alphabet-the-full-stop-is-prose",
+      "claim": "a slug in prose ends at the first character outside its alphabet: hyperion is the world's slug, and the full stop after it is prose",
+      "kind": "prose",
+      "text": "https://www.onlyworlds.com/w/hyperion.",
+      "index": 0,
+      "expect": {
+        "address": "https://www.onlyworlds.com/w/hyperion",
+        "reading": {
+          "form": "human",
+          "world": "hyperion",
+          "world_is_slug": true,
+          "type": null,
+          "id": null,
+          "lens": null,
+          "moment": null,
+          "canonical": false
+        }
+      }
+    },
+    {
+      "name": "slug-run-followed-by-an-upper-case-letter-is-no-address",
+      "claim": "a run followed by a letter is cut inside a word and is no address: mop is followed by P, so mopPetopia is no address, never the slug mop",
+      "kind": "prose",
+      "text": "https://www.onlyworlds.com/w/mopPetopia.",
+      "index": 0,
+      "expect": {
+        "address": null,
+        "reading": null
+      }
+    },
+    {
+      "name": "slug-run-followed-by-an-underscore-is-no-address",
+      "claim": "a run followed by an underscore is cut inside a word and is no address: hyper is followed by _, so hyper_ion is no address, never the slug hyper",
+      "kind": "prose",
+      "text": "https://www.onlyworlds.com/w/hyper_ion.",
+      "index": 0,
+      "expect": {
+        "address": null,
+        "reading": null
+      }
+    },
+    {
+      "name": "after-w-a-run-past-an-id-with-a-hyphen-is-a-slug",
+      "claim": "after /w/ the run is read whole: an id's 36 characters, a hyphen and an x are no id's form and a legal slug, so the address is that slug, where the site sends the click, never the id with the rest as prose",
+      "kind": "prose",
+      "text": "https://www.onlyworlds.com/w/019a7f00-0000-7000-8000-000000000003-x.",
+      "index": 0,
+      "expect": {
+        "address": "https://www.onlyworlds.com/w/019a7f00-0000-7000-8000-000000000003-x",
+        "reading": {
+          "form": "human",
+          "world": "019a7f00-0000-7000-8000-000000000003-x",
+          "world_is_slug": true,
+          "type": null,
+          "id": null,
+          "lens": null,
+          "moment": null,
+          "canonical": false
+        }
+      }
+    },
+    {
+      "name": "after-w-a-run-past-an-id-with-letters-is-a-slug",
+      "claim": "after /w/ the run is read whole: an id's 36 characters run on by abc are no id's form and a legal slug of 39 characters, so the address is that slug",
+      "kind": "prose",
+      "text": "https://www.onlyworlds.com/w/019a7f00-0000-7000-8000-000000000003abc.",
+      "index": 0,
+      "expect": {
+        "address": "https://www.onlyworlds.com/w/019a7f00-0000-7000-8000-000000000003abc",
+        "reading": {
+          "form": "human",
+          "world": "019a7f00-0000-7000-8000-000000000003abc",
+          "world_is_slug": true,
+          "type": null,
+          "id": null,
+          "lens": null,
+          "moment": null,
+          "canonical": false
+        }
+      }
+    },
+    {
+      "name": "after-w-an-id-in-upper-case-is-the-worlds-id",
+      "claim": "after /w/ a run that is exactly an id's form is the world's id, read in either case and taken lowercase; the run takes the upper-case hex letters, so it does not end at the first A",
+      "kind": "prose",
+      "text": "https://www.onlyworlds.com/w/019A7F00-0000-7000-8000-000000000003.",
+      "index": 0,
+      "expect": {
+        "address": "https://www.onlyworlds.com/w/019A7F00-0000-7000-8000-000000000003",
+        "reading": {
+          "form": "human",
+          "world": "019a7f00-0000-7000-8000-000000000003",
+          "world_is_slug": false,
+          "type": null,
+          "id": null,
+          "lens": null,
+          "moment": null,
+          "canonical": false
+        }
+      }
+    },
+    {
+      "name": "after-w-an-upper-case-id-run-on-by-a-hyphen-is-no-address",
+      "claim": "after /w/ the run is read whole: an upper-case id run on by a hyphen and an x is no id's form and no legal slug, so no address",
+      "kind": "prose",
+      "text": "https://www.onlyworlds.com/w/019A7F00-0000-7000-8000-000000000003-x.",
+      "index": 0,
+      "expect": {
+        "address": null,
+        "reading": null
+      }
+    },
+    {
+      "name": "after-w-an-id-followed-by-a-letter-is-no-address",
+      "claim": "after /w/ the run ends at G, outside its alphabet; a run followed by a letter is cut inside a word, so no address, though the run is an id's form",
+      "kind": "prose",
+      "text": "https://www.onlyworlds.com/w/019a7f00-0000-7000-8000-000000000003G.",
+      "index": 0,
+      "expect": {
+        "address": null,
+        "reading": null
+      }
+    },
+    {
+      "name": "after-w-an-id-followed-by-an-underscore-is-no-address",
+      "claim": "after /w/ a run followed by an underscore is cut inside a word, so no address, though the run is an id's form",
+      "kind": "prose",
+      "text": "https://www.onlyworlds.com/w/019a7f00-0000-7000-8000-000000000003_.",
+      "index": 0,
+      "expect": {
+        "address": null,
+        "reading": null
+      }
+    },
+    {
+      "name": "slug-run-followed-by-a-combining-mark-is-no-address",
+      "claim": "a run followed by a combining mark is cut inside a word: cafe and then U+0301, a decomposed cafe with its accent, is no address, never the slug cafe",
+      "kind": "prose",
+      "text": "https://www.onlyworlds.com/w/cafe\u0301.",
+      "index": 0,
+      "expect": {
+        "address": null,
+        "reading": null
+      }
     }
   ]
 }

@@ -1,7 +1,7 @@
 {
   "_what": "The recorded pin for the vendored OnlyWorlds tools list (codegen/tools/tools.json, byte for byte as GitHub serves it at the commit). Do not edit by hand: python codegen/generate_tools.py --repin <commit>, and review the diff. Kept equal to the npm SDK's pin (codegen/tools-pin.json) on purpose.",
   "repo": "https://github.com/OnlyWorlds/tools",
-  "commit": "53a05e4b0ee492d40b223aa5af3d40781dc382a9",
-  "sha256": "198f62a2ed74199dad7d2174f05294d4ccdd062ec0220cc526e02928a4d5ab41",
+  "commit": "aa009695f03d7c78972793b034c145990ce4c1b7",
+  "sha256": "2140d2b97a49d11b531f2d59b45e846bb8677d879a8ad3a6042bc42991514d05",
   "pinned_at": "2026-11-13"
 }

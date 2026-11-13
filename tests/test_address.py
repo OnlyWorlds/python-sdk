@@ -81,8 +81,8 @@ def test_every_case_of_the_address_fixture() -> None:
     )
     print(line, *wrong, sep="\n")
     assert wrong == [], line
-    assert len(cases) == 140, f"the fixture holds {len(cases)} cases, serial 122 has 140"
-    assert kinds == {"parse": 104, "format": 36}
+    assert len(cases) == 197, f"the fixture holds {len(cases)} cases, serial 123 has 197"
+    assert kinds == {"parse": 104, "format": 36, "prose": 57}
 
 
 def test_the_refusals_are_the_fixtures_and_every_one_is_exercised() -> None:

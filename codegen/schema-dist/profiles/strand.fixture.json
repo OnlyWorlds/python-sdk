@@ -1564,6 +1564,90 @@
           "character": null
         }
       }
+    },
+    "harbour-story-in-upper-case": {
+      "id": "019a7f00-0000-7000-8000-00000000f224",
+      "name": "Grey Harbour, the story named in upper case",
+      "x_strand": {
+        "narrative": "019A7F00-0000-7000-8000-000000000301",
+        "event": "019a7f00-0000-7000-8000-000000000311",
+        "location": "019a7f00-0000-7000-8000-000000000321"
+      },
+      "elements": [
+        {
+          "id": "019a7f00-0000-7000-8000-000000000301",
+          "type": "narrative",
+          "name": "The Night the Lighthouse Went Dark",
+          "protagonist": "019a7f00-0000-7000-8000-000000000331",
+          "events": [
+            "019a7f00-0000-7000-8000-000000000312",
+            "019a7f00-0000-7000-8000-000000000311"
+          ],
+          "locations": []
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000311",
+          "type": "event",
+          "name": "The lamp fails",
+          "locations": [
+            "019a7f00-0000-7000-8000-000000000321"
+          ],
+          "characters": []
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000312",
+          "type": "event",
+          "name": "The fleet sails",
+          "locations": [
+            "019a7f00-0000-7000-8000-000000000322"
+          ],
+          "characters": []
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000321",
+          "type": "location",
+          "name": "The Lighthouse"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000322",
+          "type": "location",
+          "name": "The Docks"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000331",
+          "type": "character",
+          "name": "Ilse the Keeper",
+          "location": "019a7f00-0000-7000-8000-000000000322"
+        }
+      ],
+      "hidden": [],
+      "readers": {
+        "owner": {
+          "rung": "owner",
+          "character": null
+        },
+        "contributor": {
+          "rung": "contributor",
+          "character": null
+        },
+        "guest": {
+          "rung": "guest",
+          "character": null,
+          "whole": [
+            "019a7f00-0000-7000-8000-000000000301",
+            "019a7f00-0000-7000-8000-000000000311",
+            "019a7f00-0000-7000-8000-000000000312",
+            "019a7f00-0000-7000-8000-000000000321",
+            "019a7f00-0000-7000-8000-000000000322",
+            "019a7f00-0000-7000-8000-000000000331"
+          ],
+          "known_of": []
+        },
+        "public": {
+          "rung": "public",
+          "character": null
+        }
+      }
     }
   },
   "cases": [
@@ -2148,6 +2232,21 @@
       "claim": "location is a number, neither a string id nor unset: the whole value is no mark (a reader that refuses only the empty string lets it through)",
       "kind": "strand",
       "world": "harbour-location-a-number",
+      "reader": "owner",
+      "want": {
+        "narrative": null,
+        "event": null,
+        "location": null,
+        "character": null,
+        "now": null,
+        "same": null
+      }
+    },
+    {
+      "name": "a-mark-naming-its-story-in-upper-case-is-no-strand",
+      "claim": "the mark's narrative is the story's id in upper case, which names no element as written (the address profile's \"The same id\"): every slot null, though a reader that folds the case fills all five",
+      "kind": "strand",
+      "world": "harbour-story-in-upper-case",
       "reader": "owner",
       "want": {
         "narrative": null,

@@ -2,15 +2,20 @@
   "_what": "The recorded pin for the vendored OnlyWorlds schema distribution (codegen/schema-dist/, copied byte-exact). Do not edit by hand; re-vendor from the pinned tag and review the diff. Kept equal to the npm SDK's pin (github.com/OnlyWorlds/sdk, codegen/schema-pin.json) on purpose: two clients, one schema.",
   "_why_manifest_sha256": "Verifying the tree against its own MANIFEST.json only proves internal consistency. If the tag moved, the manifest moved with it. The hash recorded here is the one first accepted, which is what makes a moved tag visible.",
   "repo": "https://github.com/OnlyWorlds/schema-dist",
-  "tag": "v0.34.0-dist.122",
-  "commit": "2888214672ba06d07096c3f76f4db48cbe986a76",
-  "manifest_sha256": "067eeba68bb30d36e8d20e58f5a0dd575e84ee8488018e81507b78cf32b24b45",
+  "tag": "v0.34.0-dist.123",
+  "commit": "6092c3966a90369df4131d6f69dd74c3f8b15606",
+  "manifest_sha256": "47f8a02d9647daf75fd66cfe17a0be73a0d1502c1907640155118a01ddf8063f",
   "canonical_version": "00.34.00",
-  "dist_serial": 122,
+  "dist_serial": 123,
   "published": "2026-11-13",
   "pinned_at": "2026-11-13",
   "pinned_by": "The maintainer: tree from `git archive` of the tag in a schema-dist checkout (210 files: the 209 the MANIFEST lists, and MANIFEST.json itself); files re-hashed against MANIFEST.json by generate_schema.py; MANIFEST self-hash matched against the raw file GitHub serves at the tag, whose ref resolves to the commit above.",
   "previous_pins": [
+    {
+      "tag": "v0.34.0-dist.122",
+      "manifest_sha256": "067eeba68bb30d36e8d20e58f5a0dd575e84ee8488018e81507b78cf32b24b45",
+      "note": "superseded by v0.34.0-dist.123 (canonical 00.34.00 unchanged, no schema file moved; times that are read and not ordered: the read mark is the newest readable updated_at, ties by the higher id; one clock per lens, the newest readable of three stamps; played_at read by the message page's grammar; an address found in prose, the run after /w/ read whole; seven pages and six fixtures, eighty-four cases; three record cases renamed)"
+    },
     {
       "tag": "v0.34.0-dist.121",
       "manifest_sha256": "35e1f6d73cb99ee3a4683f3e78e8996e1a8ccc7357d597de000fab4f5c8df460",

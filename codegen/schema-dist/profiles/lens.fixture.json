@@ -1742,6 +1742,230 @@
           "type": "language",
           "name": "Bank talk",
           "updated_at": "2026-11-12T10:00:00.5"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-0000000007b0",
+          "type": "character",
+          "name": "Teal",
+          "updated_at": "2026-11-01T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-0000000007b1",
+          "type": "character",
+          "name": "Rook",
+          "updated_at": "2026-11-01T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-0000000007b2",
+          "type": "narrative",
+          "name": "The ice holds",
+          "supertype": "Message",
+          "narrator": "019a7f00-0000-7000-8000-0000000007b1",
+          "characters": [
+            "019a7f00-0000-7000-8000-0000000007b0"
+          ],
+          "story": "Cross at dawn.",
+          "created_at": "2026-11-12T09:00:00Z",
+          "updated_at": "2026-11-12T09:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-0000000007b3",
+          "type": "narrative",
+          "name": "The ice is thin",
+          "supertype": "Message",
+          "narrator": "019a7f00-0000-7000-8000-0000000007b1",
+          "characters": [
+            "019a7f00-0000-7000-8000-0000000007b0"
+          ],
+          "story": "Wait for the thaw.",
+          "created_at": "2026-11-12 10:00:00Z",
+          "updated_at": "2026-11-12T10:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-0000000007c0",
+          "type": "family",
+          "name": "The Ice Folk",
+          "languages": [
+            "019a7f00-0000-7000-8000-0000000007c1",
+            "019a7f00-0000-7000-8000-0000000007c2"
+          ],
+          "server_updated_at": "2026-10-01T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-0000000007c1",
+          "type": "language",
+          "name": "Snowcant",
+          "server_updated_at": "2026-10-22T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-0000000007c2",
+          "type": "language",
+          "name": "Icetongue",
+          "server_updated_at": "2026-10-20T12:00:00Z",
+          "local_updated_at": "2026-10-25T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-0000000007d0",
+          "type": "family",
+          "name": "The Marsh Kin",
+          "languages": [
+            "019a7f00-0000-7000-8000-0000000007d1",
+            "019a7f00-0000-7000-8000-0000000007d2"
+          ],
+          "updated_at": "2026-11-01T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-0000000007d1",
+          "type": "language",
+          "name": "Mudspeech",
+          "server_updated_at": "2026-10-01 12:00:00Z",
+          "updated_at": "2026-11-05T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-0000000007d2",
+          "type": "language",
+          "name": "Reedcant",
+          "updated_at": "2026-11-01T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-0000000007e0",
+          "type": "family",
+          "name": "The Fog Kin",
+          "languages": [
+            "019a7f00-0000-7000-8000-0000000007e1",
+            "019a7f00-0000-7000-8000-0000000007e2"
+          ],
+          "updated_at": "2026-11-01T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-0000000007e1",
+          "type": "language",
+          "name": "Fogspeech",
+          "local_updated_at": "soon"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-0000000007e2",
+          "type": "language",
+          "name": "Bogcant",
+          "server_updated_at": "2026-09-01T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-0000000007f0",
+          "type": "family",
+          "name": "The Salt Kin",
+          "languages": [
+            "019a7f00-0000-7000-8000-0000000007f1",
+            "019a7f00-0000-7000-8000-0000000007f2"
+          ],
+          "updated_at": "2026-11-01T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-0000000007f1",
+          "type": "language",
+          "name": "Saltspeech",
+          "server_updated_at": "2026-10-25T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-0000000007f2",
+          "type": "language",
+          "name": "Tidecant",
+          "server_updated_at": "2026-10-27T12:00:00Z",
+          "local_updated_at": "2026-10-22T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000800",
+          "type": "family",
+          "name": "The Peat Kin",
+          "languages": [
+            "019a7f00-0000-7000-8000-000000000801",
+            "019a7f00-0000-7000-8000-000000000802"
+          ],
+          "updated_at": "2026-11-01T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000801",
+          "type": "language",
+          "name": "Peatspeech",
+          "server_updated_at": "2026-10-01T12:00:00Z",
+          "local_updated_at": "2026-10-02T12:00:00Z",
+          "updated_at": "2026-11-05T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000802",
+          "type": "language",
+          "name": "Turfcant",
+          "updated_at": "2026-11-01T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000810",
+          "type": "family",
+          "name": "The Moss Kin",
+          "languages": [
+            "019a7f00-0000-7000-8000-000000000811",
+            "019a7f00-0000-7000-8000-000000000812"
+          ],
+          "updated_at": "2026-11-01T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000811",
+          "type": "language",
+          "name": "Mossspeech",
+          "updated_at": "2026-10-01T12:00:00Z",
+          "local_updated_at": "2026-11-18T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000812",
+          "type": "language",
+          "name": "Lichencant",
+          "server_updated_at": "2026-10-01T12:00:00Z",
+          "updated_at": "2026-11-18T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000820",
+          "type": "family",
+          "name": "The Rush Kin",
+          "abilities": [
+            "019a7f00-0000-7000-8000-000000000821"
+          ],
+          "languages": [
+            "019a7f00-0000-7000-8000-000000000822"
+          ],
+          "updated_at": "2026-11-01T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000821",
+          "type": "ability",
+          "name": "Rushweaving",
+          "local_updated_at": "soon"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000822",
+          "type": "language",
+          "name": "Rushcant",
+          "updated_at": "2026-11-01T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000900",
+          "type": "family",
+          "name": "The Tarn Kin",
+          "languages": [
+            "019a7f00-0000-7000-8000-000000000901",
+            "019a7f00-0000-7000-8000-000000000902"
+          ],
+          "updated_at": "2026-11-01T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000901",
+          "type": "language",
+          "name": "Tarnspeech",
+          "updated_at": "2026-11-05T12:00:00+09:00",
+          "local_updated_at": "2026-11-05T04:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000902",
+          "type": "language",
+          "name": "Sedgecant",
+          "updated_at": "2026-11-05T03:30:00Z"
         }
       ],
       "hidden": [],
@@ -1759,12 +1983,17 @@
           "character": null,
           "whole": [
             "019a7f00-0000-7000-8000-000000000167",
-            "019a7f00-0000-7000-8000-000000000171"
+            "019a7f00-0000-7000-8000-000000000171",
+            "019a7f00-0000-7000-8000-0000000007b0"
           ],
           "known_of": [
             "019a7f00-0000-7000-8000-000000000166",
             "019a7f00-0000-7000-8000-00000000017b"
           ]
+        },
+        "teal": {
+          "rung": "contributor",
+          "character": "019a7f00-0000-7000-8000-0000000007b0"
         }
       }
     },
@@ -11331,6 +11560,406 @@
           "c": 0
         }
       }
+    },
+    {
+      "name": "changed-within-keeps-an-element-whose-updated-at-cannot-be-read",
+      "kind": "resolve",
+      "world": "fen",
+      "reader": "owner",
+      "lens": {
+        "id": "019a7f00-0000-7000-8000-0000000007ab",
+        "type": "construct",
+        "name": "A lens",
+        "supertype": "Lens",
+        "subtype": "",
+        "families": [
+          "019a7f00-0000-7000-8000-0000000007a0"
+        ],
+        "x_lens": {
+          "changed_within": 7
+        }
+      },
+      "clock": "2026-11-20T12:00:00Z",
+      "kept": [
+        "019a7f00-0000-7000-8000-0000000007a0",
+        "019a7f00-0000-7000-8000-0000000007a1"
+      ],
+      "cut": {
+        "stale": 2
+      },
+      "note": "Three Languages one hop from the Reed Kin, eight days before the clock. Ferry cant and Bank talk changed more than seven days before it and are cut stale. Reedspeech's updated_at has a space where the T is, which the message profile's one form does not read: it is kept, never cut stale, though a lenient parser reads it as eight days old and cuts it too. The Reed Kin is the anchor, never cut by changed_within."
+    },
+    {
+      "name": "mail-a-message-whose-created-at-cannot-be-read-is-cut-by-the-window",
+      "kind": "resolve",
+      "world": "fen",
+      "reader": "teal",
+      "lens": {
+        "id": "019a7f00-0000-7000-8000-0000000007b4",
+        "type": "construct",
+        "name": "A lens",
+        "supertype": "Lens",
+        "subtype": "",
+        "x_lens": {
+          "types": [
+            "narrative/message"
+          ],
+          "mail": "unread_full_read_titles"
+        }
+      },
+      "clock": "2026-11-13T12:00:00Z",
+      "kept": [],
+      "cut": {},
+      "mail": {
+        "unread": [
+          "019a7f00-0000-7000-8000-0000000007b2"
+        ],
+        "read": [],
+        "cut": {
+          "window": 1
+        },
+        "totals": {
+          "unread": 2,
+          "read": 0
+        }
+      },
+      "note": "Two unread messages to Teal. The ice is thin has a space where the T is in its created_at, which the message profile's one form does not read: it is cut by the window and counted window, never kept as the newest, though a lenient parser reads it as a day old. The totals count both, before the window."
+    },
+    {
+      "name": "a-note-keyed-by-an-anchors-id-in-upper-case-is-no-note",
+      "kind": "resolve",
+      "world": "vale",
+      "reader": "contributor",
+      "lens": {
+        "id": "019a7f00-0000-7000-8000-00000000006a",
+        "type": "construct",
+        "name": "A lens",
+        "supertype": "Lens",
+        "subtype": "",
+        "institutions": [
+          "019a7f00-0000-7000-8000-000000000003"
+        ],
+        "x_lens": {
+          "depth": 0,
+          "notes": {
+            "019A7F00-0000-7000-8000-000000000003": "Who keeps the lamps."
+          }
+        }
+      },
+      "kept": [
+        "019a7f00-0000-7000-8000-000000000003"
+      ],
+      "cut": {},
+      "rows": [
+        {
+          "id": "019a7f00-0000-7000-8000-000000000003",
+          "type": "institution",
+          "name": "Lamplighters' Guild",
+          "description": "Keepers of the harbour lamps.\nFounded after the first great fire.",
+          "founding_date": 1150,
+          "updated_at": "2026-09-21T12:00:00Z"
+        }
+      ],
+      "notes_ignored": 0,
+      "note": "The note's key is the anchor's id in upper case, which is not the id of any element the reader can see, as written: it is no note of the lens, so the anchor's row carries none and the note is not counted."
+    },
+    {
+      "name": "then by id: ascending by code point, each id as written",
+      "kind": "graph",
+      "world": {
+        "elements": [
+          {
+            "id": "L1",
+            "type": "construct",
+            "supertype": "Lens",
+            "name": "Ada and one friend",
+            "characters": [
+              "c1"
+            ],
+            "x_lens": {
+              "budget": 2
+            }
+          },
+          {
+            "id": "c1",
+            "type": "character",
+            "name": "Ada",
+            "friends": [
+              "ab",
+              "AC"
+            ],
+            "updated_at": "2026-11-01T12:00:00Z"
+          },
+          {
+            "id": "ab",
+            "type": "character",
+            "name": "Bo",
+            "updated_at": "2026-11-02T12:00:00Z"
+          },
+          {
+            "id": "AC",
+            "type": "character",
+            "name": "Cy",
+            "updated_at": "2026-11-02T12:00:00Z"
+          }
+        ]
+      },
+      "reader": {
+        "rung": "owner"
+      },
+      "options": {
+        "lens": "L1"
+      },
+      "want": {
+        "nodes": [
+          {
+            "id": "AC",
+            "type": "character",
+            "name": "Cy",
+            "family": "blue",
+            "icon": "person"
+          },
+          {
+            "id": "c1",
+            "type": "character",
+            "name": "Ada",
+            "family": "blue",
+            "icon": "person"
+          }
+        ],
+        "edges": [
+          {
+            "source": "c1",
+            "field": "friends",
+            "target": "AC",
+            "index": 1
+          }
+        ],
+        "edges_cut": {
+          "budget": 1
+        },
+        "cut": {
+          "budget": 1
+        },
+        "unreadable": null
+      },
+      "note": "Bo and Cy changed at one instant, one hop from Ada; the budget keeps one of them. Then by id, ascending by code point, each id as written: AC comes before ab (A is U+0041, a U+0061), so Cy is kept. A reader that folds the case orders ab before ac and keeps Bo."
+    },
+    {
+      "name": "a-folder-elements-clock-is-the-newer-of-its-two-and-orders-the-budget",
+      "kind": "resolve",
+      "world": "fen",
+      "reader": "owner",
+      "lens": {
+        "id": "019a7f00-0000-7000-8000-0000000007c4",
+        "type": "construct",
+        "name": "A lens",
+        "supertype": "Lens",
+        "subtype": "",
+        "families": [
+          "019a7f00-0000-7000-8000-0000000007c0"
+        ],
+        "x_lens": {
+          "budget": 2
+        }
+      },
+      "kept": [
+        "019a7f00-0000-7000-8000-0000000007c0",
+        "019a7f00-0000-7000-8000-0000000007c2"
+      ],
+      "cut": {
+        "budget": 1
+      },
+      "note": "Two Languages of the Ice Folk, held as a folder holds them, the budget keeping one. Rule 5 orders by the element's clock, the newest of its readable updated_at, server_updated_at and local_updated_at, the clock changed_within reads too; Icetongue and Snowcant hold folder stamps alone. Icetongue was edited locally on 10-25, after the server last stamped Snowcant on 10-22, so Icetongue is newer and kept. A reader of updated_at alone finds neither, falls to the ids and keeps Snowcant; a reader of server_updated_at alone keeps Snowcant too. keel stores no folder clock (its door refuses both keys), so keel's own replay skips this case."
+    },
+    {
+      "name": "a-folder-clock-that-cannot-be-read-is-ignored-beside-a-readable-updated-at",
+      "kind": "resolve",
+      "world": "fen",
+      "reader": "owner",
+      "lens": {
+        "id": "019a7f00-0000-7000-8000-0000000007d4",
+        "type": "construct",
+        "name": "A lens",
+        "supertype": "Lens",
+        "subtype": "",
+        "families": [
+          "019a7f00-0000-7000-8000-0000000007d0"
+        ],
+        "x_lens": {
+          "budget": 2
+        }
+      },
+      "kept": [
+        "019a7f00-0000-7000-8000-0000000007d0",
+        "019a7f00-0000-7000-8000-0000000007d1"
+      ],
+      "cut": {
+        "budget": 1
+      },
+      "note": "Mudspeech holds a server_updated_at with a space where the T is, which cannot be read and is ignored, beside an updated_at of 11-05: its clock is 11-05, newer than Reedcant's 11-01, so Mudspeech is kept. A reader that, finding a folder key, reads the folder keys alone gives Mudspeech no clock and keeps Reedcant."
+    },
+    {
+      "name": "an-element-with-no-readable-clock-comes-last",
+      "kind": "resolve",
+      "world": "fen",
+      "reader": "owner",
+      "lens": {
+        "id": "019a7f00-0000-7000-8000-0000000007e4",
+        "type": "construct",
+        "name": "A lens",
+        "supertype": "Lens",
+        "subtype": "",
+        "families": [
+          "019a7f00-0000-7000-8000-0000000007e0"
+        ],
+        "x_lens": {
+          "budget": 2
+        }
+      },
+      "kept": [
+        "019a7f00-0000-7000-8000-0000000007e0",
+        "019a7f00-0000-7000-8000-0000000007e2"
+      ],
+      "cut": {
+        "budget": 1
+      },
+      "note": "Fogspeech's only clock is a local_updated_at of the word soon, which cannot be read: it has no readable clock and comes last, after Bogcant's old server stamp, though its id is the lower. A reader that reads the word as now keeps Fogspeech."
+    },
+    {
+      "name": "a-clock-is-the-newest-of-the-three-not-the-local-one-first",
+      "kind": "resolve",
+      "world": "fen",
+      "reader": "owner",
+      "lens": {
+        "id": "019a7f00-0000-7000-8000-0000000007f4",
+        "type": "construct",
+        "name": "A lens",
+        "supertype": "Lens",
+        "subtype": "",
+        "families": [
+          "019a7f00-0000-7000-8000-0000000007f0"
+        ],
+        "x_lens": {
+          "budget": 2
+        }
+      },
+      "kept": [
+        "019a7f00-0000-7000-8000-0000000007f0",
+        "019a7f00-0000-7000-8000-0000000007f2"
+      ],
+      "cut": {
+        "budget": 1
+      },
+      "note": "Tidecant's server stamp (10-27) is newer than its local one (10-22): its clock is the newest, 10-27, after Saltspeech's 10-25, so Tidecant is kept. A reader that takes the local stamp whenever there is one gives Tidecant 10-22 and keeps Saltspeech, as the ids would."
+    },
+    {
+      "name": "a-clock-is-the-newest-of-the-three-an-updated-at-newer-than-both-folder-stamps",
+      "kind": "resolve",
+      "world": "fen",
+      "reader": "owner",
+      "lens": {
+        "id": "019a7f00-0000-7000-8000-000000000809",
+        "type": "construct",
+        "name": "A lens",
+        "supertype": "Lens",
+        "subtype": "",
+        "families": [
+          "019a7f00-0000-7000-8000-000000000800"
+        ],
+        "x_lens": {
+          "budget": 2
+        }
+      },
+      "kept": [
+        "019a7f00-0000-7000-8000-000000000800",
+        "019a7f00-0000-7000-8000-000000000801"
+      ],
+      "cut": {
+        "budget": 1
+      },
+      "note": "Two Languages of the Peat Kin, the budget keeping one. Peatspeech holds both folder stamps (10-01 and 10-02) and an updated_at of 11-05, newer than both: its clock is the newest of the three, 11-05, after Turfcant's 11-01, so Peatspeech is kept. A reader that takes the newer folder stamp whenever an element has one, and updated_at only when it has none, gives Peatspeech 10-02 and keeps Turfcant."
+    },
+    {
+      "name": "changed-within-cuts-by-the-clock-a-local-edit-and-a-wire-stamp-each-newer",
+      "kind": "resolve",
+      "world": "fen",
+      "reader": "owner",
+      "lens": {
+        "id": "019a7f00-0000-7000-8000-000000000819",
+        "type": "construct",
+        "name": "A lens",
+        "supertype": "Lens",
+        "subtype": "",
+        "families": [
+          "019a7f00-0000-7000-8000-000000000810"
+        ],
+        "x_lens": {
+          "changed_within": 7
+        }
+      },
+      "clock": "2026-11-20T12:00:00Z",
+      "kept": [
+        "019a7f00-0000-7000-8000-000000000810",
+        "019a7f00-0000-7000-8000-000000000811",
+        "019a7f00-0000-7000-8000-000000000812"
+      ],
+      "cut": {},
+      "note": "Two Languages one hop from the Moss Kin, changed_within 7 before a clock of 11-20. Mossspeech's updated_at is 10-01 and its local_updated_at 11-18; Lichencant's server_updated_at is 10-01 and its updated_at 11-18. Each clock is the newest of its values, 11-18, two days before the clock, so neither is cut stale and all three are kept. A reader of updated_at alone cuts Mossspeech stale; a reader that takes the folder stamps whenever an element has one cuts Lichencant stale. The Moss Kin is the anchor, never cut by changed_within."
+    },
+    {
+      "name": "an-element-with-no-readable-clock-comes-last-of-its-type-not-of-the-budget",
+      "kind": "resolve",
+      "world": "fen",
+      "reader": "owner",
+      "lens": {
+        "id": "019a7f00-0000-7000-8000-000000000829",
+        "type": "construct",
+        "name": "A lens",
+        "supertype": "Lens",
+        "subtype": "",
+        "families": [
+          "019a7f00-0000-7000-8000-000000000820"
+        ],
+        "x_lens": {
+          "budget": 2
+        }
+      },
+      "kept": [
+        "019a7f00-0000-7000-8000-000000000820",
+        "019a7f00-0000-7000-8000-000000000821"
+      ],
+      "cut": {
+        "budget": 1
+      },
+      "note": "The Rush Kin reaches an Ability and a Language, the budget keeping one. Rushweaving's only clock is a local_updated_at of the word soon, which cannot be read: it comes last of its type, the Ability, and the Ability comes before the Language in the schema's order, so Rushweaving is kept and Rushcant cut. A reader that puts every element with no readable clock after every type keeps Rushcant."
+    },
+    {
+      "name": "a-clock-is-the-newest-instant-of-the-three-not-the-greatest-text",
+      "kind": "resolve",
+      "world": "fen",
+      "reader": "owner",
+      "lens": {
+        "id": "019a7f00-0000-7000-8000-000000000909",
+        "type": "construct",
+        "name": "A lens",
+        "supertype": "Lens",
+        "subtype": "",
+        "families": [
+          "019a7f00-0000-7000-8000-000000000900"
+        ],
+        "x_lens": {
+          "budget": 2
+        }
+      },
+      "kept": [
+        "019a7f00-0000-7000-8000-000000000900",
+        "019a7f00-0000-7000-8000-000000000901"
+      ],
+      "cut": {
+        "budget": 1
+      },
+      "note": "Two Languages of the Tarn Kin, the budget keeping one. Tarnspeech's updated_at is 03:00Z written with +09:00 and its local edit is 04:00Z: its clock is the newest instant, 04:00Z, after Sedgecant's 03:30Z, so Tarnspeech is kept. A reader that takes the greatest string takes the +09:00 value, reads 03:00Z and keeps Sedgecant."
     }
   ],
   "graph_links": [

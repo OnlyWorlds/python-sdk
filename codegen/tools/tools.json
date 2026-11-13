@@ -428,6 +428,79 @@
           "on": "2026-11-13"
         }
       }
+    },
+    {
+      "id": "mapper",
+      "name": "OnlyWorlds mapper",
+      "sentence": "See a world's maps in the browser: its pictured maps with their Pins and Zones, and its layouts, where linked elements are joined by lines; a link opens one element on every map it is on. It only reads.",
+      "url": "https://maps.onlyworlds.com",
+      "source": "https://github.com/OnlyWorlds/mapper",
+      "source_note": null,
+      "maker": "OnlyWorlds (Temper, an AI agent working for Titus)",
+      "doors": [
+        "api"
+      ],
+      "open": {
+        "world": "https://maps.onlyworlds.com/?world={world}",
+        "element": "https://maps.onlyworlds.com/?world={world}&type={type}&element={id}",
+        "needs": "account",
+        "element_skips": [
+          "map_space"
+        ],
+        "element_types": null,
+        "opens_public": true
+      },
+      "client": "mapper",
+      "prefix": null,
+      "free_core": "See any public world's maps, and one element's maps by its address, with no account; a private world with a read key made with a free onlyworlds.com account, held in the page only.",
+      "paid": null,
+      "rung": "listed",
+      "listed_on": "2026-11-13",
+      "listed_by": "Kael, the OnlyWorlds maintainer, on a read of the seven lines at mapper 23ef7cb, on its maker's word (2026-11-13)",
+      "delisted_on": null,
+      "delisted_why": null,
+      "submission": "https://github.com/OnlyWorlds/tools/blob/master/reads/2026-11-13-mapper.md",
+      "checks": {
+        "what_it_says": {
+          "result": "pass",
+          "how": "read",
+          "on": "2026-11-13"
+        },
+        "keys_stay": {
+          "result": "pass",
+          "how": "read in source",
+          "on": "2026-11-13",
+          "note": "No key is needed for a public world. A pasted world key is held in the page's memory only, never stored, and sent only to www.onlyworlds.com; a reload asks for it again."
+        },
+        "names_itself": {
+          "result": "pass",
+          "how": "read in source",
+          "on": "2026-11-13",
+          "note": "It writes nothing to any world, so its client name is never sent, and it has no field prefix or producer line."
+        },
+        "speaks_the_wire": {
+          "result": "pass",
+          "how": "read in source",
+          "on": "2026-11-13",
+          "note": "It only reads: the world, /me and element lists and gets, each a route and parameters the API document describes; it writes no folder or world file."
+        },
+        "what_leaves": {
+          "result": "pass",
+          "how": "read in source",
+          "on": "2026-11-13",
+          "note": "A world is read from www.onlyworlds.com only and nothing is written; a Map's picture loads, with no key, from the address the world gives it; the host's network error logging may report a request that failed to its provider, never one that succeeded."
+        },
+        "host": {
+          "result": "pass",
+          "how": "read",
+          "on": "2026-11-13"
+        },
+        "free_core": {
+          "result": "pass",
+          "how": "read",
+          "on": "2026-11-13"
+        }
+      }
     }
   ]
 }

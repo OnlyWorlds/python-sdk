@@ -44,7 +44,7 @@ KINDS = {
     "sent_by": 3,
     "sender": 14,
     "unread": 22,
-    "mark": 11,
+    "mark": 18,
     "thread": 4,
     "unseen": 3,
     "everyone": 3,
@@ -123,7 +123,7 @@ def test_every_fixture_case_is_answered_as_the_fixture_says() -> None:
     cases = doc["cases"]
     wrong = [line for case in cases for line in replay(case, doc)]
     assert wrong == []
-    assert len(cases) == 93, f"the fixture holds {len(cases)} cases, serial 121 has 93"
+    assert len(cases) == 100, f"the fixture holds {len(cases)} cases, serial 123 has 100"
     assert Counter(c["kind"] for c in cases) == KINDS
 
 
