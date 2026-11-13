@@ -1,33 +1,244 @@
 {
-  "about": "Serial 123 point 7 (amendment 1): an address found in prose ends where its own grammar cannot continue. After the id (or a world alone), `@` and a moment and `?lens=` and a lens continue it; any other query key or a fragment is not part of an address found in prose, and the address ends before its `?`, `&` or `#`. readOwLinkAt(text, index) / read_ow_link_at(text, index) reads the address starting exactly at index: `end` is the index just past it, `address` is text[index:end], and `reading` is what the whole-string parser answers for that slice. null when the text at index is not an address. `index` defaults to 0. Kept byte for byte in both packages.",
+  "about": "Serial 123 point 7 (amendment 1): an address found in prose ends where its own grammar cannot continue. After the id (or a world alone), `@` and a moment and `?lens=` and a lens continue it; any other query key or a fragment is not part of an address found in prose, and the address ends before its `?`, `&` or `#`. readOwLinkAt(text, index) / read_ow_link_at(text, index) reads the address starting exactly at index and answers its reading and `end`, the index just past it; each case's `address` is the slice text[index:end] it must cover, and `reading` is what the whole-string parser answers for that slice. null when the text at index is not an address. `index` defaults to 0. Kept byte for byte in both packages. A lens ends where its id ends (36 characters); a moment is its whole run of an optional minus and digits and is taken only when that run reads as one step.",
   "ids": {
     "W": "0193a1c2-7d3e-7f00-8a11-3c5e7b9d2f40",
     "E": "01a1d4ef-0000-7000-8000-000000000084",
     "L": "0193a1c2-7d3e-7f00-8a11-3c5e7b9d2f41"
   },
   "cases": [
-    { "name": "bare-address", "text": "ow://object/{E}", "index": 0, "address": "ow://object/{E}" },
-    { "name": "full-stop-after-id", "text": "ow://object/{E}.", "index": 0, "address": "ow://object/{E}" },
-    { "name": "comma-and-prose-after-id", "text": "ow://object/{E}, then more", "index": 0, "address": "ow://object/{E}" },
-    { "name": "moment-then-full-stop", "text": "ow://object/{E}@12.", "index": 0, "address": "ow://object/{E}@12" },
-    { "name": "negative-moment", "text": "ow://object/{E}@-3 and on", "index": 0, "address": "ow://object/{E}@-3" },
-    { "name": "lens-then-full-stop", "text": "ow://object/{E}?lens={L}.", "index": 0, "address": "ow://object/{E}?lens={L}" },
-    { "name": "moment-and-lens", "text": "ow://object/{E}@4?lens={L}; done", "index": 0, "address": "ow://object/{E}@4?lens={L}" },
-    { "name": "fragment-not-taken", "text": "ow://object/{E}#notes.", "index": 0, "address": "ow://object/{E}" },
-    { "name": "other-key-after-lens-not-taken", "text": "ow://object/{E}?lens={L}&x=y.", "index": 0, "address": "ow://object/{E}?lens={L}" },
-    { "name": "other-key-first-not-taken", "text": "ow://object/{E}?x=y&lens={L}", "index": 0, "address": "ow://object/{E}" },
-    { "name": "world-type-id", "text": "ow://{W}/character/{E}.", "index": 0, "address": "ow://{W}/character/{E}" },
-    { "name": "world-alone", "text": "ow://{W}.", "index": 0, "address": "ow://{W}" },
-    { "name": "site-form-element", "text": "https://www.onlyworlds.com/w/{W}/event/{E}.", "index": 0, "address": "https://www.onlyworlds.com/w/{W}/event/{E}" },
-    { "name": "site-form-slug", "text": "https://www.onlyworlds.com/w/moppetopia.", "index": 0, "address": "https://www.onlyworlds.com/w/moppetopia" },
-    { "name": "at-an-index-mid-line", "text": "Built the gate: ow://object/{E}.", "index": 16, "address": "ow://object/{E}" },
-    { "name": "index-not-at-an-address", "text": "Built the gate: ow://object/{E}.", "index": 0, "address": null },
-    { "name": "trailing-slash-not-taken", "text": "ow://object/{E}/", "index": 0, "address": "ow://object/{E}" },
-    { "name": "id-in-upper-case-read", "text": "ow://object/01A1D4EF-0000-7000-8000-000000000084.", "index": 0, "address": "ow://object/01A1D4EF-0000-7000-8000-000000000084" },
-    { "name": "short-id-is-no-address", "text": "ow://object/01a1d4ef-0000.", "index": 0, "address": null },
-    { "name": "uppercase-prefix-is-no-address", "text": "OW://object/{E}", "index": 0, "address": null },
-    { "name": "unknown-type-is-no-address", "text": "ow://thing/{E}", "index": 0, "address": null },
-    { "name": "moment-without-digits-not-taken", "text": "ow://object/{E}@.", "index": 0, "address": "ow://object/{E}" },
-    { "name": "lens-not-an-id-not-taken", "text": "ow://object/{E}?lens=abc.", "index": 0, "address": "ow://object/{E}" }
+    {
+      "name": "bare-address",
+      "text": "ow://object/{E}",
+      "index": 0,
+      "address": "ow://object/{E}"
+    },
+    {
+      "name": "full-stop-after-id",
+      "text": "ow://object/{E}.",
+      "index": 0,
+      "address": "ow://object/{E}"
+    },
+    {
+      "name": "comma-and-prose-after-id",
+      "text": "ow://object/{E}, then more",
+      "index": 0,
+      "address": "ow://object/{E}"
+    },
+    {
+      "name": "moment-then-full-stop",
+      "text": "ow://object/{E}@12.",
+      "index": 0,
+      "address": "ow://object/{E}@12"
+    },
+    {
+      "name": "negative-moment",
+      "text": "ow://object/{E}@-3 and on",
+      "index": 0,
+      "address": "ow://object/{E}@-3"
+    },
+    {
+      "name": "lens-then-full-stop",
+      "text": "ow://object/{E}?lens={L}.",
+      "index": 0,
+      "address": "ow://object/{E}?lens={L}"
+    },
+    {
+      "name": "moment-and-lens",
+      "text": "ow://object/{E}@4?lens={L}; done",
+      "index": 0,
+      "address": "ow://object/{E}@4?lens={L}"
+    },
+    {
+      "name": "fragment-not-taken",
+      "text": "ow://object/{E}#notes.",
+      "index": 0,
+      "address": "ow://object/{E}"
+    },
+    {
+      "name": "other-key-after-lens-not-taken",
+      "text": "ow://object/{E}?lens={L}&x=y.",
+      "index": 0,
+      "address": "ow://object/{E}?lens={L}"
+    },
+    {
+      "name": "other-key-first-not-taken",
+      "text": "ow://object/{E}?x=y&lens={L}",
+      "index": 0,
+      "address": "ow://object/{E}"
+    },
+    {
+      "name": "world-type-id",
+      "text": "ow://{W}/character/{E}.",
+      "index": 0,
+      "address": "ow://{W}/character/{E}"
+    },
+    {
+      "name": "world-alone",
+      "text": "ow://{W}.",
+      "index": 0,
+      "address": "ow://{W}"
+    },
+    {
+      "name": "site-form-element",
+      "text": "https://www.onlyworlds.com/w/{W}/event/{E}.",
+      "index": 0,
+      "address": "https://www.onlyworlds.com/w/{W}/event/{E}"
+    },
+    {
+      "name": "site-form-slug",
+      "text": "https://www.onlyworlds.com/w/moppetopia.",
+      "index": 0,
+      "address": "https://www.onlyworlds.com/w/moppetopia"
+    },
+    {
+      "name": "at-an-index-mid-line",
+      "text": "Built the gate: ow://object/{E}.",
+      "index": 16,
+      "address": "ow://object/{E}"
+    },
+    {
+      "name": "index-not-at-an-address",
+      "text": "Built the gate: ow://object/{E}.",
+      "index": 0,
+      "address": null
+    },
+    {
+      "name": "trailing-slash-not-taken",
+      "text": "ow://object/{E}/",
+      "index": 0,
+      "address": "ow://object/{E}"
+    },
+    {
+      "name": "id-in-upper-case-read",
+      "text": "ow://object/01A1D4EF-0000-7000-8000-000000000084.",
+      "index": 0,
+      "address": "ow://object/01A1D4EF-0000-7000-8000-000000000084"
+    },
+    {
+      "name": "short-id-is-no-address",
+      "text": "ow://object/01a1d4ef-0000.",
+      "index": 0,
+      "address": null
+    },
+    {
+      "name": "uppercase-prefix-is-no-address",
+      "text": "OW://object/{E}",
+      "index": 0,
+      "address": null
+    },
+    {
+      "name": "unknown-type-is-no-address",
+      "text": "ow://thing/{E}",
+      "index": 0,
+      "address": null
+    },
+    {
+      "name": "moment-without-digits-not-taken",
+      "text": "ow://object/{E}@.",
+      "index": 0,
+      "address": "ow://object/{E}"
+    },
+    {
+      "name": "lens-not-an-id-not-taken",
+      "text": "ow://object/{E}?lens=abc.",
+      "index": 0,
+      "address": "ow://object/{E}"
+    },
+    {
+      "name": "lens-ends-after-its-id",
+      "text": "ow://object/{E}?lens={L}0",
+      "index": 0,
+      "address": "ow://object/{E}?lens={L}"
+    },
+    {
+      "name": "text-run-on-after-the-id",
+      "text": "ow://object/{E}abc",
+      "index": 0,
+      "address": "ow://object/{E}"
+    },
+    {
+      "name": "moment-zero-then-full-stop",
+      "text": "ow://object/{E}@0.",
+      "index": 0,
+      "address": "ow://object/{E}@0"
+    },
+    {
+      "name": "moment-with-a-leading-zero-not-taken",
+      "text": "ow://object/{E}@012",
+      "index": 0,
+      "address": "ow://object/{E}"
+    },
+    {
+      "name": "moment-past-the-range-not-taken",
+      "text": "ow://object/{E}@2147483648",
+      "index": 0,
+      "address": "ow://object/{E}"
+    },
+    {
+      "name": "moment-at-the-range-taken",
+      "text": "ow://object/{E}@2147483647.",
+      "index": 0,
+      "address": "ow://object/{E}@2147483647"
+    },
+    {
+      "name": "second-moment-not-taken",
+      "text": "ow://object/{E}@3@4",
+      "index": 0,
+      "address": "ow://object/{E}@3"
+    },
+    {
+      "name": "moment-after-lens-not-taken",
+      "text": "ow://object/{E}?lens={L}@3",
+      "index": 0,
+      "address": "ow://object/{E}?lens={L}"
+    },
+    {
+      "name": "lens-key-in-upper-case-not-taken",
+      "text": "ow://object/{E}?LENS={L}",
+      "index": 0,
+      "address": "ow://object/{E}"
+    },
+    {
+      "name": "world-then-unknown-type",
+      "text": "ow://{W}/thing/{E}",
+      "index": 0,
+      "address": "ow://{W}"
+    },
+    {
+      "name": "world-then-type-then-short-id",
+      "text": "ow://{W}/character/01a1d4ef",
+      "index": 0,
+      "address": "ow://{W}"
+    },
+    {
+      "name": "bare-question-mark-not-taken",
+      "text": "ow://object/{E}?",
+      "index": 0,
+      "address": "ow://object/{E}"
+    },
+    {
+      "name": "line-break-after-id",
+      "text": "ow://object/{E}\n",
+      "index": 0,
+      "address": "ow://object/{E}"
+    },
+    {
+      "name": "space-before-at-index-0",
+      "text": " ow://object/{E}",
+      "index": 0,
+      "address": null
+    },
+    {
+      "name": "prefix-alone",
+      "text": "ow://",
+      "index": 0,
+      "address": null
+    },
+    {
+      "name": "site-slug-too-short",
+      "text": "https://www.onlyworlds.com/w/ab.",
+      "index": 0,
+      "address": null
+    }
   ]
 }

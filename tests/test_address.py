@@ -148,7 +148,7 @@ def test_the_error_carries_the_reason_and_a_message() -> None:
 # Serial 123: an address found in prose. The cases are one file both packages keep byte for byte (the npm SDK's
 # copy beside its tests; this test holds its sha256); {W}, {E} and {L} stand for its ids.
 PROSE_FILE = REPO / "tests" / "fixtures" / "address-in-prose.json"
-PROSE_SHA256 = "ef71c4a19580c71a66020c2df5d48a894db872b6f65c8f780f9df3dabd0c253a"
+PROSE_SHA256 = "864f5e47f9faedb9dc1f378c04da74d41be8a17dd194c759e7940468ff458bfc"
 
 
 def _prose() -> dict[str, Any]:
@@ -187,7 +187,7 @@ def test_every_address_in_prose_case() -> None:
             wrong.append(f"{c['name']}: the reading is not the whole-string parser's")
     print(f"address in prose: {len(doc['cases'])} cases, {len(wrong)} wrong", *wrong, sep="\n")
     assert wrong == []
-    assert len(doc["cases"]) == 23
+    assert len(doc["cases"]) == 39
 
 
 W = "0193a1c2-7d3e-7f00-8a11-3c5e7b9d2f40"
@@ -241,10 +241,11 @@ def test_read_ow_link_at_answers_the_reading_and_its_end() -> None:
     assert found == AddressAt(parse_ow_link(f"ow://object/{E.upper()}"), 16 + 12 + 36)
     assert found is not None and found.reading.id == E and found.reading.canonical is False
     assert text[found.end :] == "."
-    # An index outside the text holds no address; one at its end neither.
+    # An index at the text's end or past it holds no address; a negative one is out of range, a ValueError.
     assert read_ow_link_at(text, len(text)) is None
     assert read_ow_link_at(text, len(text) + 1) is None
-    assert read_ow_link_at(text, -1) is None
+    with pytest.raises(ValueError):
+        read_ow_link_at(text, -1)
     with pytest.raises(TypeError):
         read_ow_link_at(None, 0)  # type: ignore[arg-type]
     with pytest.raises(TypeError):
