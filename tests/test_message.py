@@ -253,7 +253,8 @@ def test_sender_read_carries_the_claim() -> None:
 def test_the_newest_read_mark_wins_wherever_it_stands_in_the_list() -> None:
     """The fixture's ``mark-newest-updated-at-wins`` lists the newer mark first, so a reader that kept the
     first mark that counts would pass it. Here the newest stands last; a readable time beats an unreadable
-    one, and equal times keep the first in the list. The npm SDK asserts the same."""
+    one in either list order, and two times equal as instants, however each is written, tie by the higher
+    id (code point, as written), never by list order (serial 123). The npm SDK asserts the same."""
 
     def mark(mid: str, updated_at: str | None) -> dict[str, Any]:
         body: dict[str, Any] = {"id": mid, "type": "relation", "supertype": "Read", "actor": ADA, "narratives": []}
@@ -266,7 +267,18 @@ def test_the_newest_read_mark_wins_wherever_it_stands_in_the_list() -> None:
     assert read_mark_of([older, newer], ADA, None) is newer
     assert read_mark_of([undated, older, newer], ADA, None) is newer
     assert read_mark_of([older, undated], ADA, None) is older
-    assert read_mark_of([newer, twin], ADA, None) is newer
+    assert read_mark_of([newer, undated], ADA, None) is newer
+    # Equal instants: the higher id ("twin" > "new"), in either list order.
+    assert read_mark_of([newer, twin], ADA, None) is twin
+    assert read_mark_of([twin, newer], ADA, None) is twin
+    # One instant written two ways, Z and +01:00: still a tie, still the higher id.
+    zulu, offset = mark("b-zulu", "2026-10-26T10:00:00Z"), mark("a-offset", "2026-10-26T11:00:00+01:00")
+    assert read_mark_of([zulu, offset], ADA, None) is zulu
+    assert read_mark_of([offset, zulu], ADA, None) is zulu
+    # By code point, as written: an upper-case id is lower than a lower-case one.
+    upper, lower = mark("B", "2026-10-26T11:00:00Z"), mark("a", "2026-10-26T11:00:00Z")
+    assert read_mark_of([lower, upper], ADA, None) is lower
+    assert read_mark_of([upper, lower], ADA, None) is lower
     # The fixture's own case, its relations reversed: the owner's hand, checked on the members list.
     doc = load_fixture()
     case = next(c for c in doc["cases"] if c["name"] == "mark-newest-updated-at-wins")

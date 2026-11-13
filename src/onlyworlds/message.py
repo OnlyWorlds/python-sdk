@@ -329,8 +329,11 @@ def read_mark_of[E: Mapping[str, Any]](
     hand, and does not count. A relation with no
     ``changed_by`` key is held to the author check alone, and one that carries neither key (a folder, an
     export) has no hand to check and counts. Of several that count, the one with the newest ``updated_at``
-    wherever it stands in the list (equal times: the first in the list); a newer mark in another's hand is
-    ignored and the reader's own older mark stands. A ``character_id`` that is empty or not a string names
+    read as an instant (``_instant``), wherever it stands in the list; two equal as instants, however each
+    is written (``10:00:00Z`` and ``11:00:00+01:00``), tie by the higher ``id``, by code point as written,
+    never by list order (serial 123). One whose ``updated_at`` cannot be read never wins over one that can;
+    of only such marks, the first in the list. A newer mark in another's hand is ignored and the reader's
+    own older mark stands. A ``character_id`` that is empty or not a string names
     no reader: ``None``. A body read keyless (``keyless=True``, as ``is_to_everyone`` takes it: the public
     reader, served no ``created_by`` or ``changed_by`` on any body) carries no hands because they were taken
     off, not because it is a folder's, so no mark counts there: ``None``."""
@@ -340,6 +343,7 @@ def read_mark_of[E: Mapping[str, Any]](
         return None
     best: E | None = None
     best_rank: tuple[int, int, int] | None = None
+    best_id = ""
     for relation in relations:
         if not _matches(relation.get("type"), relation.get("supertype"), READ_MARK_PAIR):
             continue
@@ -352,10 +356,18 @@ def read_mark_of[E: Mapping[str, Any]](
         ):
             continue
         unreadable, seconds, micros = _instant(relation.get("updated_at"))
-        # A readable time beats an unreadable one, the newest beats the older; a tie keeps the first.
+        # A readable time beats an unreadable one, the newest beats the older; two equal readable instants
+        # tie by the higher id (str order is code point order; an id that is not a string is the lowest).
+        # Two unreadable ones keep the first.
         rank = (1 - unreadable, seconds, micros)
-        if best_rank is None or rank > best_rank:
-            best, best_rank = relation, rank
+        raw_id = relation.get("id")
+        rel_id = raw_id if isinstance(raw_id, str) else ""
+        if (
+            best_rank is None
+            or rank > best_rank
+            or (rank == best_rank and not unreadable and rel_id > best_id)
+        ):
+            best, best_rank, best_id = relation, rank, rel_id
     return best
 
 
