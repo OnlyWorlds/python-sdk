@@ -67,7 +67,7 @@ def _moved_by_serial_123(case: dict[str, Any]) -> Any:
         return None
     if name == "fluffington-two-games":  # the offset run (07:00Z) now a record, second newest
         assert [r["event"]["id"] for r in want].count(OFFSET_EVENT) == 0
-        offset_run = {
+        offset_run: dict[str, Any] = {
             "event": {"id": OFFSET_EVENT, "name": "Played with an offset"},
             "tool": "subs",
             "played_at": "2026-11-01T08:00:00+01:00",

@@ -1202,6 +1202,23 @@ def test_11_a_rule_it_cannot_apply_is_not_checked(require: dict[str, Any], why: 
     assert row.scoped == 0 and row.short == []
 
 
+def test_11_one_of_over_a_list_is_short() -> None:
+    """Serial 123: ``one_of`` applies to a field holding one value; on a list it is ``short``, a list holding only
+    listed ids included. The same id in a single link meets it."""
+    listed = "019a8100-0000-7000-8000-0000000000ab"
+    on_list = {"rule": "r", "where": {"type": "character"}, "require": {"field": "species", "one_of": [listed]}}
+    els = [
+        {"type": "character", "id": "1", "name": "Only listed", "species": [listed]},
+        {"type": "character", "id": "2", "name": "Empty", "species": []},
+    ]
+    (row,) = apply_checks([on_list], els)
+    assert row.not_checked is None and row.scoped == 2
+    assert [s["id"] for s in row.short] == ["1", "2"]
+    on_link = {"rule": "r", "where": {"type": "character"}, "require": {"field": "location", "one_of": [listed]}}
+    (row,) = apply_checks([on_link], [{"type": "character", "id": "1", "name": "Wren", "location": listed}])
+    assert row.scoped == 1 and row.short == []
+
+
 @pytest.mark.parametrize(
     "where",
     [{"type": []}, {"type": 3}, {"type": "character", "subtype": [1]}, {"type": "character", "name": "Ann"}, []],

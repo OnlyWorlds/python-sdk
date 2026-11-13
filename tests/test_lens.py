@@ -486,6 +486,55 @@ def test_rule_5_orders_by_the_clock_changed_within_reads() -> None:
     assert every["kept"] == ["e1", "e2", "e0"]
 
 
+def test_changed_within_keeps_an_element_whose_time_is_a_date_alone() -> None:
+    """Serial 123, point 1: an ``updated_at`` that cannot be read as a time, a date alone included, is kept,
+    never cut ``stale``. The npm SDK answers the same."""
+    world = {
+        "elements": [
+            {"id": "a", "type": "institution", "name": "Anchor", "objects": ["d", "old"]},
+            {"id": "d", "type": "object", "name": "Date alone", "updated_at": "2026-09-27"},
+            {"id": "old", "type": "object", "name": "Old", "updated_at": "2026-09-27T00:00:00Z"},
+        ]
+    }
+    lens = _lens_on({"institutions": ["a"]}, {"changed_within": 7})
+    r = resolve_lens(world, lens, OWNER, clock="2026-10-27T12:00:00Z")
+    assert (r["kept"], r["cut"]) == (["a", "d"], {"stale": 1})
+
+
+def test_the_mail_window_cuts_a_message_whose_created_at_cannot_be_read() -> None:
+    """Serial 123, point 2: a message whose ``created_at`` cannot be read is cut by the window, counted
+    ``window``, never kept as the newest. The npm SDK answers the same."""
+    message = {"type": "narrative", "supertype": "Message", "narrator": None, "characters": ["a"]}
+    world = {
+        "elements": [
+            {"id": "a", "type": "character", "name": "A"},
+            {**message, "id": "n1", "name": "today", "created_at": "2026-10-27T11:00:00Z"},
+            {**message, "id": "n2", "name": "garbage", "created_at": "garbage"},
+            {**message, "id": "n3", "name": "date alone", "created_at": "2026-10-27"},
+            {**message, "id": "n4", "name": "none"},
+        ]
+    }
+    lens = _lens_on({}, {"types": ["character"], "mail": "unread_full_read_titles"})
+    r = resolve_lens(world, lens, {"rung": "owner", "character": "a"}, clock="2026-10-27T12:00:00Z")
+    mail = r["mail"]
+    assert mail is not None
+    assert (mail["unread"], mail["cut"]) == (["n1"], {"window": 3})
+
+
+def test_rule_5_orders_ties_by_id_as_written() -> None:
+    """Serial 123, point 4: then by id, ascending by code point, each id as written, no folding: an upper-case
+    id sorts before every lower-case one. The npm SDK answers the same."""
+    at = "2026-10-01T12:00:00Z"
+    world = {
+        "elements": [
+            {"id": i, "type": "character", "name": i, "updated_at": at}
+            for i in ("019a7f00-0000-7000-8000-0000000000ab", "019a7f00-0000-7000-8000-0000000000AC")
+        ]
+    }
+    r = resolve_lens(world, _lens_on({}, {"types": ["character"], "budget": 1}), OWNER)
+    assert (r["kept"], r["cut"]) == (["019a7f00-0000-7000-8000-0000000000AC"], {"budget": 1})
+
+
 def test_a_lens_a_guest_knows_only_as_a_stub_reads_as_nothing() -> None:
     world: dict[str, Any] = {
         "elements": [
