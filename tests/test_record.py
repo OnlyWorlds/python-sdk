@@ -84,10 +84,31 @@ def _moved_by_serial_123(case: dict[str, Any]) -> Any:
     return want
 
 
-def test_the_fixture_holds_serial_122s_41_cases() -> None:
+# Serial 123 renames three of serial 122's cases for what they test, and rewrites their elements to match (an offset
+# without its colon, a time without seconds): each new case wants no mark, as its old one did, so none of them is
+# held to a turned answer above.
+RENAMED_BY_SERIAL_123 = {
+    "no-mark-played-offset": "no-mark-played-offset-without-its-colon",
+    "no-mark-year-0": "no-mark-year-0-without-seconds",
+    "no-mark-played-lower-case": "no-mark-played-lower-case-without-seconds",
+}
+
+
+def test_the_fixture_holds_serial_122s_41_cases_or_serial_123s_renamed() -> None:
     assert DOC["mark"]["field"] == RECORD_FIELD == "x_record"
     assert DOC["mark"]["members"] == ["tool", "played_at", "version", "seed", "outcome", "seats"]
-    assert len(CASES) == 41, f"the fixture holds {len(CASES)} cases, serial 122 has 41"
+    names = {c["name"] for c in CASES}
+    if names.isdisjoint(RENAMED_BY_SERIAL_123.values()):
+        assert set(RENAMED_BY_SERIAL_123) <= names
+        assert len(CASES) == 41, f"the fixture holds {len(CASES)} cases, serial 122 has 41"
+    else:
+        assert not AHEAD_OF_THE_DIST, "serial 123's names in a fixture held to serial 122's turned answers"
+        assert set(RENAMED_BY_SERIAL_123.values()) <= names
+        assert names.isdisjoint(RENAMED_BY_SERIAL_123)
+        assert len(CASES) >= 46, f"the fixture holds {len(CASES)} cases, serial 123's draft has 46"
+        for old, new in RENAMED_BY_SERIAL_123.items():
+            case = next(c for c in CASES if c["name"] == new)
+            assert case["kind"] == "mark" and case["want"] is None, f"{new} (was {old}) wants no mark"
 
 
 def _case_id(case: dict[str, Any]) -> str:
