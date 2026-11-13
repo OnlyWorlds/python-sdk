@@ -4,6 +4,10 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+## 0.123.1 (2026-11-14)
+
+- `plan_push` reads an absent multi-link as the empty list. A folder that leaves an empty multi-link out, planned against a fresh export that writes it as `[]`, planned a patch sending `[]` for every such field: a write that changed nothing on the server and came back on every push, since a fresh export is the baseline each time. Absent, `[]` and `null` are now one empty list for a schema multi-link, as the folder format says a reader folds them (and as `""`, `null` and absent already were one unset string). An extension field keeps its values apart: there `[]` and `null` still differ. A multi-link that held ids and is left out of the folder is still sent as `[]`.
+
 ## 0.123.0 (2026-11-13)
 
 - Schema repinned to schema-dist v0.34.1-dist.124, canonical 00.34.01: `SCHEMA_VERSION` is now `"00.34.01"`. One description moved and no field: Map's `hierarchy` orders the maps that stand side by side (floors, decks, layers), the maps with the same `parent_map`, without one the maps of the same `location`, without either the maps of the world itself; lower is deeper or earlier, and nesting is said by `parent_map` and `location`, not by the number. No reader in the package changes.

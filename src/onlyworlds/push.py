@@ -166,10 +166,16 @@ def _same(a: Any, b: Any) -> bool:
 
 
 def _equal_on_wire(etype: str, key: str, a: Any, b: Any) -> bool:
-    """``_same``, plus the ruling ``string-empty-is-unset``: for a schema TEXT field,
-    ``""``, ``null`` and absent are one state on the wire. Extension fields get no
-    such leniency: there ``""`` and ``null`` are different values."""
-    if FIELD_KINDS.get(etype, {}).get(key) == "text" and a in (None, "") and b in (None, ""):
+    """``_same``, plus the empty shapes a reader folds (folder spec §3, the unset shapes):
+    for a schema TEXT field ``""``, ``null`` and absent are one state on the wire (the
+    ruling ``string-empty-is-unset``); for a schema MULTI LINK ``[]``, ``null`` and absent
+    are one empty list (the server stores ``null`` as ``[]``). A single link or integer
+    reads absent as ``null`` already. Extension fields get no such leniency: there ``""``,
+    ``[]`` and ``null`` are different values."""
+    kind = FIELD_KINDS.get(etype, {}).get(key)
+    if kind == "text" and a in (None, "") and b in (None, ""):
+        return True
+    if kind == "multi_link" and (a is None or a == []) and (b is None or b == []):
         return True
     return _same(a, b)
 

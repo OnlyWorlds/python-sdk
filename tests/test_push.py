@@ -96,6 +96,22 @@ def test_plan_cleared_shapes_and_string_empty_is_unset(tmp_path: Path) -> None:
     }
 
 
+def test_plan_an_absent_multi_link_is_the_empty_list(tmp_path: Path) -> None:
+    # A folder that leaves an empty multi-link out, planned against an export that writes it as [],
+    # sends nothing: absent, [] and null are one empty list (folder spec, the unset shapes).
+    b1 = wire_char(C1, "G", species=[])
+    e1 = {k: v for k, v in b1.items() if k != "species"}
+    b2 = wire_char(C2, "H", species=[], x_list=[])
+    e2 = {k: v for k, v in b2.items() if k not in ("species", "x_list")}
+    e2["species"] = None
+    base, edit = folders(tmp_path, {"character": [b1, b2]}, {"character": [e1, e2]})
+    plan = plan_push(base, edit)
+    assert [(p.id, p.fields) for p in plan.patches] == [(C2, {"x_list": None})]  # an extension's [] is a value
+    # and the other way round: an empty list in the folder against a baseline without the key
+    base, edit = folders(tmp_path / "back", {"character": [e1]}, {"character": [b1]})
+    assert plan_push(base, edit).patches == []
+
+
 def test_atlas_link_spelling_reads_as_bare(tmp_path: Path) -> None:
     wire_pin = {"id": P1, "type": "pin", "name": "Pin", "map": "m1", "x": 1}
     atlas_pin = {"id": P1, "type": "pin", "name": "Pin", "map_id": "m1", "x": 2, "server_updated_at": "t"}
