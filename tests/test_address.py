@@ -48,6 +48,15 @@ def answer(case: dict[str, Any]) -> dict[str, Any]:
 
         def run() -> dict[str, Any]:
             return {"expect": element_address(case["address"])}
+    elif case["kind"] == "prose":  # serial 123: an address found in prose, read by read_ow_link_at
+
+        def run() -> dict[str, Any]:
+            index = case.get("index", 0)
+            found = read_ow_link_at(case["text"], index)
+            if found is None:
+                return {"expect": {"address": None, "reading": None}}
+            address = case["text"][index : found.end]
+            return {"expect": {"address": address, "reading": dataclasses.asdict(found.reading)}}
     else:
         raise AssertionError(f"a case of unknown kind {case['kind']}")
     try:
