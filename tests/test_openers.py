@@ -14,8 +14,8 @@ import pytest
 from onlyworlds import TOOLS, AddressError, openers_for, parse_ow_link
 
 FIXTURE = Path(__file__).resolve().parent / "fixtures" / "openers.fixture.json"
-FIXTURE_SHA256 = "9df2b52916223969f8b48284c770f933673cef308b2f5158cb2007715e80c17b"
-CASES = 110
+FIXTURE_SHA256 = "ac14435bc287e92bd18e651871f39a0c66870bb041be0eb394d3eb868eb76978"
+CASES = 111
 WORLD = "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f"
 ELEMENT = "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a"
 

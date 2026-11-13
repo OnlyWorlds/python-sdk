@@ -117,7 +117,9 @@ def _first_line(text: Any) -> str:
 def _skill(r: _Reading, text: Any) -> list[str]:
     """Keel's ``charter_skill``: every id the text names, lowercase, each once in the order written, kept when it is
     an Object of this world the reader sees, the first ``SKILL_MAX`` of those kept."""
-    objects = {eid.lower() for eid in r.view if r.type_of[eid] == "object"}
+    # An id found in a text is taken in lowercase; the Object it names is matched as its id is written (the address
+    # profile's same-id rule), so an Object held in upper case is named by no text.
+    objects = {eid for eid in r.view if r.type_of[eid] == "object"}
     found: list[str] = []
     for m in _ID.finditer(text if isinstance(text, str) else ""):
         value = m.group(0).lower()

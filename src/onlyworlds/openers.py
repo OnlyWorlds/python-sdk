@@ -217,7 +217,10 @@ def openers_for(
         if kind != "element":
             _fail("element is for an element's menu; a world's menu takes none")
         eid = element.get("id")
-        if not isinstance(eid, str) or eid.lower() != values["id"]:
+        # The address is a door, so its id is read in either case and taken in lowercase; the element's own id
+        # is read as written (the address profile's same-id rule): an element held as 019A... is not the
+        # element 019a... names.
+        if not isinstance(eid, str) or eid != values["id"]:
             _fail("element is the element the address names: its id differs")
         marks = marks_of(element)
 

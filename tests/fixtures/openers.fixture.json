@@ -3624,8 +3624,8 @@
    ]
   },
   {
-   "name": "skips-id-case",
-   "why": "the element's id compared without regard to case, as the address's is",
+   "name": "skips-id-case-held-upper",
+   "why": "the element's own id is read as written and the address's in lowercase (the same-id rule): an element held in upper case is not the element the address names",
    "tools": "skips",
    "kind": "element",
    "address": {
@@ -3641,6 +3641,35 @@
    "options": {
     "element": {
      "id": "0199C3A1-7B2E-7C3D-8E4F-5A6B7C8D9E1A",
+     "type": "location",
+     "name": "The element",
+     "hidden": true
+    }
+   },
+   "refuse": {
+    "error": "type",
+    "names": "its id differs",
+    "kind": "bad_value"
+   }
+  },
+  {
+   "name": "skips-id-case-address-upper",
+   "why": "an address is read in either case and names the lowercase id, so an element held in lowercase is the element an upper-case address names",
+   "tools": "skips",
+   "kind": "element",
+   "address": {
+    "form": "human",
+    "world": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f",
+    "type": "location",
+    "id": "0199C3A1-7B2E-7C3D-8E4F-5A6B7C8D9E1A"
+   },
+   "surface": {
+    "audience": "member",
+    "signed_in": true
+   },
+   "options": {
+    "element": {
+     "id": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a",
      "type": "location",
      "name": "The element",
      "hidden": true

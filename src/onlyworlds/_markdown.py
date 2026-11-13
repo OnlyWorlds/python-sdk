@@ -44,7 +44,8 @@ def prose_target(target: str, world_id: object = None) -> str | None:
         return None
     if r.id is None:
         return None
-    if r.world is not None and (not isinstance(world_id, str) or r.world != world_id.lower()):
+    # The link's world is read in either case and taken in lowercase; the World's own id is read as written.
+    if r.world is not None and (not isinstance(world_id, str) or r.world != world_id):
         return None
     return r.id
 
