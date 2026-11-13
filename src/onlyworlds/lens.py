@@ -261,13 +261,15 @@ def date_of(element: Any) -> int | None:
 
 
 def _changed_at(el: Mapping[str, Any]) -> tuple[int, int] | None:
-    """When an element last changed, as ``changed_within`` reads it: the newer of a folder element's
-    ``server_updated_at`` and ``local_updated_at`` where either reads as a time, else its ``updated_at``; ``None``
-    when none reads as one."""
-    stamps = [k for k in (_instant(el.get("server_updated_at")), _instant(el.get("local_updated_at"))) if not k[0]]
+    """An element's clock (lens rule 5, serial 123), read by rule 5's order and by ``changed_within`` alike: the
+    newest of its ``updated_at``, ``server_updated_at`` and ``local_updated_at`` that read as a time, decided element
+    by element, so a wire ``updated_at`` newer than both folder stamps wins; a value that cannot be read is ignored;
+    ``None`` when none reads as one."""
+    stamps = [
+        k for k in (_instant(el.get(f)) for f in ("updated_at", "server_updated_at", "local_updated_at")) if not k[0]
+    ]
     if not stamps:
-        unreadable, seconds, micros = _instant(el.get("updated_at"))
-        return None if unreadable else (seconds, micros)
+        return None
     newest = max(stamps)
     return (newest[1], newest[2])
 
@@ -697,9 +699,8 @@ class _Reading:
         return None
 
     def stale_cut(self, eid: str, recipe: _Recipe, wall: tuple[int, int]) -> CutReason | None:
-        """``changed_within``: changed longer ago than that many days before the reading's wall clock. The time read
-        is the element's ``updated_at``, or for a folder element (one carrying ``server_updated_at`` or
-        ``local_updated_at``) the newer of those two; an element with no readable time is never cut."""
+        """``changed_within``: an element whose clock (``_changed_at``, rule 5's) is older than that many days before
+        the reading's wall clock; an element with no readable clock is never cut."""
         if recipe.changed_within is None:
             return None
         at = _changed_at(self.by_id[eid])
@@ -724,10 +725,10 @@ class _Reading:
         return aid is not None and not (recipe.types is not None and aid in recipe.types)
 
     def sort(self, ids: Iterable[str]) -> list[str]:
-        """Rule 5's order past the anchors: the schema's type order, newest first by the clock ``changed_within``
-        reads (``_changed_at``: on the wire ``updated_at``, in a folder the newer of ``server_updated_at`` and
-        ``local_updated_at``; one clock per lens, serial 123; no readable time last), then by id (by code point,
-        as written)."""
+        """Rule 5's order past the anchors: the schema's type order, newest first by the element's clock
+        (``_changed_at``: the newest readable of ``updated_at``, ``server_updated_at`` and ``local_updated_at``, the
+        one ``changed_within`` reads; serial 123), an element with no readable clock last of its type, then by id
+        (by code point, as written)."""
 
         def key(eid: str) -> tuple[int, int, int, int, str]:
             at = _changed_at(self.by_id[eid])

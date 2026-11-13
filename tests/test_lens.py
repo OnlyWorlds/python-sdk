@@ -453,9 +453,12 @@ def test_changed_within_reads_a_folder_element_by_the_newer_sync_stamp() -> None
     assert kept(server_updated_at="2026-09-01T00:00:00Z", local_updated_at="2026-10-26T00:00:00Z")
     assert kept(server_updated_at="2026-10-26T00:00:00Z", local_updated_at="2026-09-01T00:00:00Z")
     assert not kept(server_updated_at="2026-09-01T00:00:00Z", local_updated_at="2026-09-02T00:00:00Z")
-    # A folder stamp, where one reads, wins over updated_at; an unreadable one is no stamp.
-    assert not kept(updated_at="2026-10-26T00:00:00Z", local_updated_at="2026-09-02T00:00:00Z")
+    # The clock is the newest of all three (serial 123): an updated_at newer than the folder stamps wins, an older
+    # one loses, and an unreadable stamp is ignored.
+    assert kept(updated_at="2026-10-26T00:00:00Z", local_updated_at="2026-09-02T00:00:00Z")
+    assert not kept(updated_at="2026-09-01T00:00:00Z", local_updated_at="2026-09-02T00:00:00Z")
     assert kept(updated_at="2026-10-26T00:00:00Z", local_updated_at="soon")
+    assert not kept(updated_at="2026-09-01T00:00:00Z", server_updated_at="soon")
 
 
 def test_rule_5_orders_by_the_clock_changed_within_reads() -> None:
@@ -484,6 +487,223 @@ def test_rule_5_orders_by_the_clock_changed_within_reads() -> None:
     assert (one["kept"], one["cut"]) == (["e1"], {"budget": 2})
     every = resolve_lens(world, _lens_on({}, {"types": ["object"]}), OWNER)
     assert every["kept"] == ["e1", "e2", "e0"]
+
+
+def _kin(tail: str) -> str:
+    return f"019a7f00-0000-7000-8000-{tail:0>12}"
+
+
+# Serial 123's clock (lens rule 5, amendments 6 and 8): an element's clock is the newest of its readable
+# ``updated_at``, ``server_updated_at`` and ``local_updated_at``, decided element by element; a value that cannot be
+# read is ignored; an element with no readable clock comes last of its type; ``changed_within`` reads the same clock
+# and keeps an element with none. Each case: a Family anchoring its members, the lens's ``x_lens``, the reading's
+# wall clock, and the kept ids and cut counts. The first five are the serial's own fixture cases (Ashfen), the last
+# three the probe worlds of its second outside read.
+_CLOCK_CASES: list[tuple[str, list[dict[str, Any]], dict[str, Any], str | None, list[str], dict[str, int]]] = [
+    (
+        "changed-within-keeps-an-element-whose-updated-at-cannot-be-read",
+        [
+            {
+                "id": "7a0",
+                "type": "family",
+                "name": "The Reed Kin",
+                "languages": ["7a1", "7a2", "7a3"],
+                "updated_at": "2026-11-01T12:00:00Z",
+            },
+            {"id": "7a1", "type": "language", "name": "Reedspeech", "updated_at": "2026-11-12 10:00:01Z"},
+            {"id": "7a2", "type": "language", "name": "Ferry cant", "updated_at": "2026-11-12T10:00:00Z"},
+            {"id": "7a3", "type": "language", "name": "Bank talk", "updated_at": "2026-11-12T10:00:00.5"},
+        ],
+        {"changed_within": 7},
+        "2026-11-20T12:00:00Z",
+        ["7a0", "7a1"],
+        {"stale": 2},
+    ),
+    (
+        "a-folder-elements-clock-is-the-newer-of-its-two-and-orders-the-budget",
+        [
+            {
+                "id": "7c0",
+                "type": "family",
+                "name": "The Ice Folk",
+                "languages": ["7c1", "7c2"],
+                "server_updated_at": "2026-10-01T12:00:00Z",
+            },
+            {"id": "7c1", "type": "language", "name": "Snowcant", "server_updated_at": "2026-10-22T12:00:00Z"},
+            {
+                "id": "7c2",
+                "type": "language",
+                "name": "Icetongue",
+                "server_updated_at": "2026-10-20T12:00:00Z",
+                "local_updated_at": "2026-10-25T12:00:00Z",
+            },
+        ],
+        {"budget": 2},
+        None,
+        ["7c0", "7c2"],
+        {"budget": 1},
+    ),
+    (
+        "a-folder-clock-that-cannot-be-read-is-ignored-beside-a-readable-updated-at",
+        [
+            {
+                "id": "7d0",
+                "type": "family",
+                "name": "The Marsh Kin",
+                "languages": ["7d1", "7d2"],
+                "updated_at": "2026-11-01T12:00:00Z",
+            },
+            {
+                "id": "7d1",
+                "type": "language",
+                "name": "Mudspeech",
+                "server_updated_at": "2026-10-01 12:00:00Z",
+                "updated_at": "2026-11-05T12:00:00Z",
+            },
+            {"id": "7d2", "type": "language", "name": "Reedcant", "updated_at": "2026-11-01T12:00:00Z"},
+        ],
+        {"budget": 2},
+        None,
+        ["7d0", "7d1"],
+        {"budget": 1},
+    ),
+    (
+        "an-element-with-no-readable-clock-comes-last",
+        [
+            {
+                "id": "7e0",
+                "type": "family",
+                "name": "The Fog Kin",
+                "languages": ["7e1", "7e2"],
+                "updated_at": "2026-11-01T12:00:00Z",
+            },
+            {"id": "7e1", "type": "language", "name": "Fogspeech", "local_updated_at": "soon"},
+            {"id": "7e2", "type": "language", "name": "Bogcant", "server_updated_at": "2026-09-01T12:00:00Z"},
+        ],
+        {"budget": 2},
+        None,
+        ["7e0", "7e2"],
+        {"budget": 1},
+    ),
+    (
+        "a-clock-is-the-newest-of-the-three-not-the-local-one-first",
+        [
+            {
+                "id": "7f0",
+                "type": "family",
+                "name": "The Salt Kin",
+                "languages": ["7f1", "7f2"],
+                "updated_at": "2026-11-01T12:00:00Z",
+            },
+            {"id": "7f1", "type": "language", "name": "Saltspeech", "server_updated_at": "2026-10-25T12:00:00Z"},
+            {
+                "id": "7f2",
+                "type": "language",
+                "name": "Tidecant",
+                "server_updated_at": "2026-10-27T12:00:00Z",
+                "local_updated_at": "2026-10-22T12:00:00Z",
+            },
+        ],
+        {"budget": 2},
+        None,
+        ["7f0", "7f2"],
+        {"budget": 1},
+    ),
+    (
+        # A wire updated_at newer than both folder stamps wins: Peatspeech's clock is 11-05, not its local 10-02.
+        "a-clock-is-the-newest-of-the-three-an-updated-at-newer-than-both-folder-stamps",
+        [
+            {
+                "id": "c00",
+                "type": "family",
+                "name": "The Peat Kin",
+                "languages": ["c01", "c02"],
+                "updated_at": "2026-11-01T12:00:00Z",
+            },
+            {
+                "id": "c01",
+                "type": "language",
+                "name": "Peatspeech",
+                "server_updated_at": "2026-10-01T12:00:00Z",
+                "local_updated_at": "2026-10-02T12:00:00Z",
+                "updated_at": "2026-11-05T12:00:00Z",
+            },
+            {"id": "c02", "type": "language", "name": "Turfcant", "updated_at": "2026-11-01T12:00:00Z"},
+        ],
+        {"budget": 2},
+        None,
+        ["c00", "c01"],
+        {"budget": 1},
+    ),
+    (
+        # changed_within reads the clock from its first clause: a local edit (Mossspeech) and a wire stamp newer
+        # than the folder's (Lichencant) each keep their element.
+        "changed-within-cuts-by-the-clock-a-local-edit-and-a-wire-stamp-each-newer",
+        [
+            {
+                "id": "c10",
+                "type": "family",
+                "name": "The Moss Kin",
+                "languages": ["c11", "c12"],
+                "updated_at": "2026-11-01T12:00:00Z",
+            },
+            {
+                "id": "c11",
+                "type": "language",
+                "name": "Mossspeech",
+                "updated_at": "2026-10-01T12:00:00Z",
+                "local_updated_at": "2026-11-18T12:00:00Z",
+            },
+            {
+                "id": "c12",
+                "type": "language",
+                "name": "Lichencant",
+                "server_updated_at": "2026-10-01T12:00:00Z",
+                "updated_at": "2026-11-18T12:00:00Z",
+            },
+        ],
+        {"changed_within": 7},
+        "2026-11-20T12:00:00Z",
+        ["c10", "c11", "c12"],
+        {},
+    ),
+    (
+        # Last of its type, not of the budget: an ability comes before a language in the schema's order.
+        "an-element-with-no-readable-clock-comes-last-of-its-type-not-of-the-budget",
+        [
+            {
+                "id": "c20",
+                "type": "family",
+                "name": "The Rush Kin",
+                "abilities": ["c21"],
+                "languages": ["c22"],
+                "updated_at": "2026-11-01T12:00:00Z",
+            },
+            {"id": "c21", "type": "ability", "name": "Rushweaving", "local_updated_at": "soon"},
+            {"id": "c22", "type": "language", "name": "Rushcant", "updated_at": "2026-11-01T12:00:00Z"},
+        ],
+        {"budget": 2},
+        None,
+        ["c20", "c21"],
+        {"budget": 1},
+    ),
+]
+
+
+@pytest.mark.parametrize(
+    ("elements", "x_lens", "clock", "kept", "cut"), [c[1:] for c in _CLOCK_CASES], ids=[c[0] for c in _CLOCK_CASES]
+)
+def test_the_clock_is_the_newest_of_the_three_read_element_by_element(
+    elements: list[dict[str, Any]], x_lens: dict[str, Any], clock: str | None, kept: list[str], cut: dict[str, int]
+) -> None:
+    world = {"elements": [{**e, "id": _kin(e["id"])} | _linked(e) for e in elements]}
+    lens = _lens_on({"families": [_kin(elements[0]["id"])]}, x_lens)
+    r = resolve_lens(world, lens, OWNER, clock=clock)
+    assert (r["kept"], r["cut"]) == ([_kin(k) for k in kept], cut)
+
+
+def _linked(e: Mapping[str, Any]) -> dict[str, Any]:
+    return {k: [_kin(v) for v in e[k]] for k in ("languages", "abilities") if k in e}
 
 
 def test_changed_within_keeps_an_element_whose_time_is_a_date_alone() -> None:
