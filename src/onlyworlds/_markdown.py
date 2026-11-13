@@ -5,7 +5,7 @@ from __future__ import annotations
 
 import re
 
-from .address import AddressError, parse_ow_link
+from .address import AddressError, _is_uuid, parse_ow_link
 
 __all__ = ["OW_REF", "escape_text", "heading", "one_line", "prose_target"]
 
@@ -37,7 +37,9 @@ def prose_target(target: str, world_id: object = None) -> str | None:
     element, and the cross-world form with this world's own id names one of its own."""
     m = _IN_WORLD.fullmatch(target)
     if m:
-        return m.group(2)
+        # An address, so an id in the form is read in either case and taken in lowercase (the address profile's
+        # same-id rule); a value not in the form names only a value written exactly as it is.
+        return m.group(2).lower() if _is_uuid(m.group(2)) else m.group(2)
     try:
         r = parse_ow_link(target)
     except AddressError:

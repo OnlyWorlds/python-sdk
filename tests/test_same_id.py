@@ -84,3 +84,12 @@ def test_a_prose_link_in_either_case_names_an_element_of_a_world_held_in_lowerca
 
 def test_a_prose_link_names_nothing_in_a_world_held_in_upper_case() -> None:
     assert prose_target(f"ow://{WORLD}/location/{ID}", WORLD.upper()) is None
+
+
+@pytest.mark.parametrize("named", [ID, UPPER])
+def test_an_in_world_prose_link_in_either_case_names_the_lowercase_id(named: str) -> None:
+    assert prose_target(f"ow://location/{named}", WORLD) == ID
+
+
+def test_an_in_world_prose_link_not_in_the_form_is_read_as_written() -> None:
+    assert prose_target("ow://location/A1", WORLD) == "A1"
