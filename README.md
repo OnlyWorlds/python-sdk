@@ -402,11 +402,13 @@ uv run python codegen/generate_casefold.py --check
 uv run python codegen/generate_nfc.py --check
 ```
 
-Three groups of tests run only when asked:
+Three groups of tests skip unless their variable is set:
 
 - `OW_CONFORMANCE_FIXTURE=<path>`: the folder-format conformance fixture from the Atlas repo.
 - `OW_OPENAPI=https://www.onlyworlds.com/api/v2/openapi.json` (or a saved copy): checks the client's routes, parameters and fields against the API's own OpenAPI document.
-- `OW_LIVE=1`: read-only calls against the demo world.
+- `OW_LIVE=1`: read-only calls against the demo world, and a few writes to the practice world (its published key and PIN, reset every night), each deleted again.
+
+CI's `wire` job sets the last two on every push. Red there with the other jobs green means the server moved under the client, not that a change broke it.
 
 `OKF_REFERENCE_SRC=<path>` (the `src/` of an open-knowledge-format checkout) also runs OKF's own parser and viewer over an exported bundle.
 
