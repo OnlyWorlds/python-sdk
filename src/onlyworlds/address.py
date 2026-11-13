@@ -15,6 +15,7 @@ ASCII case (A to Z) only, and nothing is percent-decoded.
 from __future__ import annotations
 
 import re
+import unicodedata
 from collections.abc import Mapping
 from dataclasses import dataclass
 from typing import Any, Literal, NoReturn
@@ -316,12 +317,13 @@ _TYPED_ID = re.compile(r"([a-z]+)/([0-9A-Fa-f-]{36})")
 def _human_path_end(text: str, start: int) -> int | None:
     """The end of the path after the site's ``/w/`` at ``start``, or None. The run is read whole, once, with no
     order between the forms: exactly an id's form (either case) is the id; any other legal slug run is the slug;
-    else no address. A run followed by a letter or an underscore is cut inside a word and is no address. Then
-    ``/<type>/<id>`` continues it where one follows whole; any other path after the world is prose."""
+    else no address. A run followed by a letter, a combining mark or an underscore (Unicode L and M) is cut inside
+    a word and is no address. Then ``/<type>/<id>`` continues it where one follows whole; any other path after the
+    world is prose."""
     run = _WORLD_RUN.match(text, start)
     assert run is not None
     world, end = run.group(0), run.end()
-    if end < len(text) and (text[end].isalpha() or text[end] == "_"):
+    if end < len(text) and (text[end].isalpha() or unicodedata.category(text[end]).startswith("M") or text[end] == "_"):
         return None
     if not (_is_uuid(world) or (_is_slug(world) and world not in _TYPES)):
         return None
@@ -350,7 +352,7 @@ def read_ow_link_at(text: str, index: int = 0) -> AddressAt | None:
     the run after ``/w/`` is read whole, once: it ends at the first character outside the slug's alphabet
     (lowercase letters, digits, hyphens) or the id's (an id in either case); exactly an id's form is the id, any
     other legal slug run (no type word, no closing hyphen, at most forty characters) is the slug, else there is no
-    address; a run followed by a letter or an underscore is cut inside a word and is no address
+    address; a run followed by a letter, a combining mark or an underscore is cut inside a word and is no address
     (``.../w/mopPetopia.``). ``/<type>/<id>`` continues it where one follows whole.
 
     After the path the address continues only with ``@`` and a moment (its whole run of digits after an optional

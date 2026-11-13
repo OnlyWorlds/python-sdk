@@ -268,6 +268,8 @@ def test_an_address_in_prose_at_its_edges(text: str, address: str | None) -> Non
         # A run followed by a letter or an underscore is cut inside a word: no address.
         (f"{SITE}mopPetopia.", None),
         (f"{SITE}hyper_ion.", None),
+        # A combining mark counts with the letters: a decomposed cafe-acute is cut inside a word.
+        (f"{SITE}cafe" + chr(0x301) + ".", None),
         (f"{SITE}{W}G", None),
         (f"{SITE}{W}_", None),
         (f"{SITE}hyperion/", f"{SITE}hyperion"),
