@@ -328,12 +328,12 @@ def read_mark_of[E: Mapping[str, Any]](
     included; a ``changed_by`` with no ``created_by`` beside it names a writer with no creator, which is no
     hand, and does not count. A relation with no
     ``changed_by`` key is held to the author check alone, and one that carries neither key (a folder, an
-    export) has no hand to check and counts. Of several that count, the one with the newest ``updated_at``
-    read as an instant (``_instant``), wherever it stands in the list; two equal as instants, however each
-    is written (``10:00:00Z`` and ``11:00:00+01:00``), tie by the higher ``id``, by code point as written,
-    never by list order (serial 123). One whose ``updated_at`` cannot be read (absent, not a string, a date
-    alone, any value ``_instant`` refuses) is never the mark, even alone: when no mark that counts has a
-    readable time, ``None``. A newer mark in another's hand is ignored and the reader's
+    export) has no hand to check and counts. A lone mark that counts is the mark, whatever its
+    ``updated_at`` (a folder's may carry none). Of several, the one with the newest ``updated_at`` read as an
+    instant (``_instant``), wherever it stands in the list; one whose ``updated_at`` cannot be read never
+    beats one that can; two equal as instants, however each is written (``10:00:00Z`` and
+    ``11:00:00+01:00``), or when none can be read, the higher ``id``, by code point as written, never the list
+    order (serial 123). A newer mark in another's hand is ignored and the reader's
     own older mark stands. A ``character_id`` that is empty or not a string names
     no reader: ``None``. A body read keyless (``keyless=True``, as ``is_to_everyone`` takes it: the public
     reader, served no ``created_by`` or ``changed_by`` on any body) carries no hands because they were taken
@@ -343,7 +343,7 @@ def read_mark_of[E: Mapping[str, Any]](
     if not isinstance(character_id, str) or not character_id:
         return None
     best: E | None = None
-    best_rank: tuple[int, int] | None = None
+    best_rank: tuple[int, int, int] | None = None
     best_id = ""
     for relation in relations:
         if not _matches(relation.get("type"), relation.get("supertype"), READ_MARK_PAIR):
@@ -357,11 +357,10 @@ def read_mark_of[E: Mapping[str, Any]](
         ):
             continue
         unreadable, seconds, micros = _instant(relation.get("updated_at"))
-        if unreadable:
-            continue  # never the mark, even alone
-        # The newest wins; two equal instants tie by the higher id (str order is code point order; an id that
-        # is not a string is the lowest, and two such keep the first).
-        rank = (seconds, micros)
+        # A readable time beats an unreadable one, the newest beats the older; two equal instants, or two
+        # unreadable ones (_instant gives every unreadable value one key), tie by the higher id: str order is
+        # code point order, an id that is not a string is the lowest, and two such keep the first.
+        rank = (1 - unreadable, seconds, micros)
         raw_id = relation.get("id")
         rel_id = raw_id if isinstance(raw_id, str) else ""
         if best_rank is None or rank > best_rank or (rank == best_rank and rel_id > best_id):

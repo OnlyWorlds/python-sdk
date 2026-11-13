@@ -213,7 +213,6 @@ def test_the_read_mark_supertype_is_folded_and_a_mark_with_no_members_list_has_n
         "actor": ADA,
         "narratives": [],
         "created_by": None,
-        "updated_at": "2026-10-26T10:00:00Z",
     }
     assert read_mark_of([mark], ADA, load_fixture()["members"]) is mark
     assert read_mark_of([mark], ADA, None) is None  # created_by exists but cannot be checked
@@ -225,14 +224,7 @@ def test_no_mark_counts_on_a_keyless_body() -> None:
     ``created_by`` nor ``changed_by`` because they were taken off, and ``read_mark_of`` with ``keyless=True``
     answers none, whatever the mark carries. ``keyless`` is a keyword, True or False, as ``is_to_everyone``
     takes it."""
-    bare: dict[str, Any] = {
-        "id": "m1",
-        "type": "relation",
-        "supertype": "Read",
-        "actor": ADA,
-        "narratives": [],
-        "updated_at": "2026-10-26T10:00:00Z",
-    }
+    bare: dict[str, Any] = {"id": "m1", "type": "relation", "supertype": "Read", "actor": ADA, "narratives": []}
     members = load_fixture()["members"]
     assert read_mark_of([bare], ADA, None) is bare  # a folder's: no hand to check
     assert read_mark_of([bare], ADA, None, keyless=True) is None
@@ -262,7 +254,8 @@ def test_the_newest_read_mark_wins_wherever_it_stands_in_the_list() -> None:
     """The fixture's ``mark-newest-updated-at-wins`` lists the newer mark first, so a reader that kept the
     first mark that counts would pass it. Here the newest stands last; a readable time beats an unreadable
     one in either list order, and two times equal as instants, however each is written, tie by the higher
-    id (code point, as written), never by list order (serial 123). The npm SDK asserts the same."""
+    id (code point, as written), never by list order; so do marks none of whose times can be read, and a
+    lone mark is the mark (serial 123). The npm SDK asserts the same."""
 
     def mark(mid: str, updated_at: str | None) -> dict[str, Any]:
         body: dict[str, Any] = {"id": mid, "type": "relation", "supertype": "Read", "actor": ADA, "narratives": []}
@@ -276,13 +269,14 @@ def test_the_newest_read_mark_wins_wherever_it_stands_in_the_list() -> None:
     assert read_mark_of([undated, older, newer], ADA, None) is newer
     assert read_mark_of([older, undated], ADA, None) is older
     assert read_mark_of([newer, undated], ADA, None) is newer
-    # A mark whose updated_at cannot be read is never the mark (serial 123): two such marks are no mark, and a
-    # lone one is none either, a date alone included.
+    # A lone mark is the mark, its time unreadable or missing included.
     garbage, date_only = mark("garbage", "yesterday"), mark("date-only", "2026-10-26")
-    assert read_mark_of([undated, garbage], ADA, None) is None
-    assert read_mark_of([garbage, undated], ADA, None) is None
-    assert read_mark_of([undated], ADA, None) is None
-    assert read_mark_of([date_only], ADA, None) is None
+    assert read_mark_of([undated], ADA, None) is undated
+    assert read_mark_of([garbage], ADA, None) is garbage
+    # When none can be read, the higher id ("undated" > "garbage" > "date-only"), in any list order.
+    assert read_mark_of([undated, garbage], ADA, None) is undated
+    assert read_mark_of([garbage, undated], ADA, None) is undated
+    assert read_mark_of([date_only, garbage], ADA, None) is garbage
     # Equal instants: the higher id ("twin" > "new"), in either list order.
     assert read_mark_of([newer, twin], ADA, None) is twin
     assert read_mark_of([twin, newer], ADA, None) is twin
@@ -311,16 +305,8 @@ def test_no_character_is_no_sender_and_no_reader_as_in_the_npm_sdk() -> None:
     assert is_sent_by({"narrator": None}, nobody) is False
     assert is_sent_by({"narrator": ""}, "") is False
     assert is_sent_by({}, "") is False
-    at = "2026-10-26T10:00:00Z"
-    blank: dict[str, Any] = {
-        "id": "m1",
-        "type": "relation",
-        "supertype": "Read",
-        "actor": "",
-        "narratives": [],
-        "updated_at": at,
-    }
-    no_actor: dict[str, Any] = {"id": "m2", "type": "relation", "supertype": "Read", "narratives": [], "updated_at": at}
+    blank: dict[str, Any] = {"id": "m1", "type": "relation", "supertype": "Read", "actor": "", "narratives": []}
+    no_actor: dict[str, Any] = {"id": "m2", "type": "relation", "supertype": "Read", "narratives": []}
     assert read_mark_of([blank], "", None) is None
     assert read_mark_of([no_actor], nobody, None) is None
     assert read_mark_of([{**blank, "actor": ADA}], ADA, None) is not None
