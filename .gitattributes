@@ -20,3 +20,5 @@ tests/fixtures/author-fields.fixture.json -text
 codegen/tools/tools.json -text
 # The layout methods' shared cases, the same bytes as the npm SDK's copy (both tests hold its sha256).
 tests/fixtures/layout/** -text
+# The address-in-prose cases (serial 123), the same bytes as the npm SDK's copy (the test holds its sha256).
+tests/fixtures/address-in-prose.json -text

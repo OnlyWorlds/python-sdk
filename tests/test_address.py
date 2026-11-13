@@ -6,6 +6,7 @@ kind this file does not know fails. The npm SDK's ``elementAddress`` and ``parse
 from __future__ import annotations
 
 import dataclasses
+import hashlib
 import json
 from collections import Counter
 from collections.abc import Callable
@@ -14,7 +15,15 @@ from typing import Any, get_args
 
 import pytest
 
-from onlyworlds import ELEMENT_TYPES, AddressError, AddressReason, element_address, parse_ow_link
+from onlyworlds import (
+    ELEMENT_TYPES,
+    AddressAt,
+    AddressError,
+    AddressReason,
+    element_address,
+    parse_ow_link,
+    read_ow_link_at,
+)
 
 REPO = Path(__file__).resolve().parents[1]
 VENDORED = REPO / "codegen" / "schema-dist" / "profiles" / "address.fixture.json"
@@ -134,3 +143,111 @@ def test_the_error_carries_the_reason_and_a_message() -> None:
     assert isinstance(err.value, ValueError)
     assert err.value.reason == "unknown_type"
     assert "22" in str(err.value)
+
+
+# Serial 123: an address found in prose. The cases are one file both packages keep byte for byte (the npm SDK's
+# copy beside its tests; this test holds its sha256); {W}, {E} and {L} stand for its ids.
+PROSE_FILE = REPO / "tests" / "fixtures" / "address-in-prose.json"
+PROSE_SHA256 = "ef71c4a19580c71a66020c2df5d48a894db872b6f65c8f780f9df3dabd0c253a"
+
+
+def _prose() -> dict[str, Any]:
+    raw = PROSE_FILE.read_bytes()
+    assert hashlib.sha256(raw).hexdigest() == PROSE_SHA256
+    doc: dict[str, Any] = json.loads(raw.decode("utf-8"))
+    return doc
+
+
+def _fill(s: str, ids: dict[str, str]) -> str:
+    for key, value in ids.items():
+        s = s.replace("{" + key + "}", value)
+    return s
+
+
+def test_every_address_in_prose_case() -> None:
+    doc = _prose()
+    ids: dict[str, str] = doc["ids"]
+    wrong: list[str] = []
+    for c in doc["cases"]:
+        text, index = _fill(c["text"], ids), c["index"]
+        want = None if c["address"] is None else _fill(c["address"], ids)
+        found = read_ow_link_at(text, index)
+        if index == 0 and read_ow_link_at(text) != found:
+            wrong.append(f"{c['name']}: the default index is not 0")
+        if want is None:
+            if found is not None:
+                wrong.append(f"{c['name']}: found {text[index : found.end]!r}, the case says no address")
+            continue
+        if found is None:
+            wrong.append(f"{c['name']}: found nothing, the case says {want!r}")
+            continue
+        if text[index : found.end] != want:
+            wrong.append(f"{c['name']}: found {text[index : found.end]!r}, the case says {want!r}")
+        elif found.reading != parse_ow_link(want):
+            wrong.append(f"{c['name']}: the reading is not the whole-string parser's")
+    print(f"address in prose: {len(doc['cases'])} cases, {len(wrong)} wrong", *wrong, sep="\n")
+    assert wrong == []
+    assert len(doc["cases"]) == 23
+
+
+W = "0193a1c2-7d3e-7f00-8a11-3c5e7b9d2f40"
+E = "01a1d4ef-0000-7000-8000-000000000084"
+L = "0193a1c2-7d3e-7f00-8a11-3c5e7b9d2f41"
+SITE = "https://www.onlyworlds.com/w/"
+
+
+@pytest.mark.parametrize(
+    ("text", "address"),
+    [
+        # A moment's value is its whole run of digits after an optional minus, read by the step grammar or not taken.
+        (f"ow://object/{E}@012", f"ow://object/{E}"),
+        (f"ow://object/{E}@-0.", f"ow://object/{E}"),
+        (f"ow://object/{E}@2147483647.", f"ow://object/{E}@2147483647"),
+        (f"ow://object/{E}@-2147483648.", f"ow://object/{E}@-2147483648"),
+        (f"ow://object/{E}@2147483648.", f"ow://object/{E}"),
+        (f"ow://object/{E}@4@5", f"ow://object/{E}@4"),
+        # A lens is the id after ?lens=, in either case of hex; the key is lens exactly; the lens comes after a moment.
+        (f"ow://object/{E}?lens={L.upper()}.", f"ow://object/{E}?lens={L.upper()}"),
+        (f"ow://object/{E}?LENS={L}", f"ow://object/{E}"),
+        (f"ow://object/{E}?lens={L}@4", f"ow://object/{E}?lens={L}"),
+        (f"ow://object/{E}?lens=", f"ow://object/{E}"),
+        (f"ow://object/{E}?lens={L}0", f"ow://object/{E}?lens={L}"),
+        # The path is the longest that parses: an id has its length, so what follows it is prose.
+        (f"ow://object/{E}0", f"ow://object/{E}"),
+        (f"ow://{W}/thing/{E}", f"ow://{W}"),
+        (f"{SITE}{W}/event/{E}?lens={L}#x", f"{SITE}{W}/event/{E}?lens={L}"),
+        (f"{SITE}moppetopia-", f"{SITE}moppetopia"),
+        # No path at all, a slug in the text form, white space at the index, another prefix: no address.
+        ("ow://", None),
+        ("ow://moppetopia.", None),
+        (f" ow://object/{E}", None),
+        (f"http://www.onlyworlds.com/w/{W}", None),
+        (f"{SITE}ab", None),
+    ],
+)
+def test_an_address_in_prose_at_its_edges(text: str, address: str | None) -> None:
+    found = read_ow_link_at(text)
+    if address is None:
+        assert found is None
+        return
+    assert found is not None
+    assert text[: found.end] == address
+    assert found.reading == parse_ow_link(address)
+
+
+def test_read_ow_link_at_answers_the_reading_and_its_end() -> None:
+    text = f"Built the gate: ow://object/{E.upper()}."
+    found = read_ow_link_at(text, 16)
+    assert found == AddressAt(parse_ow_link(f"ow://object/{E.upper()}"), 16 + 12 + 36)
+    assert found is not None and found.reading.id == E and found.reading.canonical is False
+    assert text[found.end :] == "."
+    # An index outside the text holds no address; one at its end neither.
+    assert read_ow_link_at(text, len(text)) is None
+    assert read_ow_link_at(text, len(text) + 1) is None
+    assert read_ow_link_at(text, -1) is None
+    with pytest.raises(TypeError):
+        read_ow_link_at(None, 0)  # type: ignore[arg-type]
+    with pytest.raises(TypeError):
+        read_ow_link_at(text, True)
+    with pytest.raises(TypeError):
+        read_ow_link_at(text, 1.0)  # type: ignore[arg-type]

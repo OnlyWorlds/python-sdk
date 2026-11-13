@@ -360,7 +360,7 @@ reading = parse_ow_link(text)  # AddressReading: form, world, world_is_slug, typ
 # a refusal raises AddressError: err.reason is the profile's name ("bad_id", "uppercase", ...)
 ```
 
-A field that holds an address is text: never fetch or resolve it on the server. `parse_ow_link` reads one string whole; finding a link inside other text is yours. The profile: [`profiles/address.md`](https://github.com/OnlyWorlds/schema-dist/blob/main/profiles/address.md), with its 133-case fixture, which is this module's test.
+A field that holds an address is text: never fetch or resolve it on the server. `parse_ow_link` reads one string whole, so `ow://object/<id>.` is refused. In prose, `read_ow_link_at(text, index)` reads the address that starts at `index` and answers an `AddressAt` (`reading`, `end`: the index just past it) or `None`; the address continues past its id only with `@` and a moment and `?lens=` and a lens, so a full stop, another query key and a fragment are left as prose. Finding where an address starts is yours. The profile: [`profiles/address.md`](https://github.com/OnlyWorlds/schema-dist/blob/main/profiles/address.md), with its 133-case fixture, which is this module's test.
 
 ### Open with
 

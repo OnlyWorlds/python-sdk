@@ -23,12 +23,14 @@ from ._schema import ELEMENT_TYPES
 from .room import _WHITE_SPACE
 
 __all__ = [
+    "AddressAt",
     "AddressError",
     "AddressForm",
     "AddressReading",
     "AddressReason",
     "element_address",
     "parse_ow_link",
+    "read_ow_link_at",
 ]
 
 AddressForm = Literal["human", "text"]
@@ -290,3 +292,74 @@ def parse_ow_link(text: str) -> AddressReading:
     lens = _read_lens(query) if has_query else None
     canonical = not world_is_slug and text == _write(form, world, type_, id_, moment, lens)
     return AddressReading(form, world, world_is_slug, type_, id_, lens, moment, canonical)
+
+
+@dataclass(frozen=True)
+class AddressAt:
+    """What ``read_ow_link_at`` finds: ``reading`` is what ``parse_ow_link`` reads from ``text[index:end]``, and
+    ``end`` is the index just past the address in the text it was found in."""
+
+    reading: AddressReading
+    end: int
+
+
+# A path is written with these characters only (an id, a slug, a type word, the slashes between).
+_PATH_RUN = re.compile(r"[0-9A-Za-z/-]+")
+_PATH_MAX = 36 + 1 + max(len(t) for t in _TYPES) + 1 + 36
+_MOMENT_RUN = re.compile(r"-?[0-9]+")
+_LENS_KEY = "?lens="
+
+
+def _parses(address: str) -> bool:
+    try:
+        parse_ow_link(address)
+    except AddressError:
+        return False
+    return True
+
+
+def read_ow_link_at(text: str, index: int = 0) -> AddressAt | None:
+    """The address that starts exactly at ``index`` in a text, and where it ends, or None when the text there
+    is not an address (serial 123: an address found in prose).
+
+    The prefix is ``ow://`` or ``https://www.onlyworlds.com/w/`` exactly as the parser takes it, nothing
+    trimmed. The path is the longest that ``parse_ow_link`` reads: an id has its length and a slug ends by its
+    own grammar, so ``ow://object/<id>.`` ends before the full stop and ``ow://object/<id>/`` before the slash.
+    After it the address continues only with ``@`` and a moment (its whole run of digits after an optional
+    minus, read by the parser's step grammar) and then ``?lens=`` and a lens (the id after it). Any other query
+    key or a fragment is not part of it: the address ends before its ``?``, ``&`` or ``#``. A ``@`` or ``?lens=``
+    whose value does not read is not taken; the address ends before it. What follows is prose.
+
+    ``parse_ow_link`` itself does not change: handed ``ow://object/<id>.`` whole, it still refuses it. An
+    ``index`` outside the text, or at its end, holds no address. A ``text`` that is not a string or an
+    ``index`` that is not an ``int`` is a ``TypeError``. The npm SDK's ``readOwLinkAt`` answers the same."""
+    if not isinstance(text, str):
+        raise TypeError("read_ow_link_at: text must be a string")
+    if isinstance(index, bool) or not isinstance(index, int):
+        raise TypeError("read_ow_link_at: index must be an int")
+    if not 0 <= index < len(text):
+        return None
+    if text.startswith(_HUMAN_PREFIX, index):
+        prefix = _HUMAN_PREFIX
+    elif text.startswith(_TEXT_PREFIX, index):
+        prefix = _TEXT_PREFIX
+    else:
+        return None
+    start = index + len(prefix)
+    run = _PATH_RUN.match(text, start)
+    if run is None:
+        return None
+    end = next(
+        (e for e in range(min(run.end(), start + _PATH_MAX), start, -1) if _parses(prefix + text[start:e])), None
+    )
+    if end is None:
+        return None
+    if text.startswith("@", end):
+        moment = _MOMENT_RUN.match(text, end + 1)
+        if moment is not None and _parses(text[index : moment.end()]):
+            end = moment.end()
+    if text.startswith(_LENS_KEY, end):
+        lens_end = end + len(_LENS_KEY) + 36
+        if _is_uuid(text[end + len(_LENS_KEY) : lens_end]):
+            end = lens_end
+    return AddressAt(parse_ow_link(text[index:end]), end)

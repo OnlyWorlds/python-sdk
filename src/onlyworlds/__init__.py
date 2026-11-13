@@ -23,12 +23,14 @@ from ._schema import (
 from ._tools import TOOLS
 from ._version import __version__
 from .address import (
+    AddressAt,
     AddressError,
     AddressForm,
     AddressReading,
     AddressReason,
     element_address,
     parse_ow_link,
+    read_ow_link_at,
 )
 from .charter import (
     SKILL_MAX,
@@ -155,6 +157,7 @@ __all__ = [
     "TOOLS",
     "TRAIL_TIERS",
     "WORLD_FILE_MEDIA_TYPE",
+    "AddressAt",
     "AddressError",
     "AddressForm",
     "AddressReading",
@@ -266,6 +269,7 @@ __all__ = [
     "push",
     "read_folder",
     "read_mark_of",
+    "read_ow_link_at",
     "read_spine_element",
     "read_world_file",
     "reading_aid_of",
