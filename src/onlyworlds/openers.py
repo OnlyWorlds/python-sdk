@@ -155,8 +155,9 @@ def openers_for(
     world's menu or naming another element than the address, a tools row that is not one (a ``needs`` or an
     ``element_skips`` or ``element_types`` word outside the list's format, an empty ``element_types``, skips or
     types on a row with no element door, or an ``opens_public`` that is not True or False, or True beside a
-    ``needs`` other than ``account``, included). The npm
-    SDK's ``openersFor`` gives the same rows.
+    ``needs`` other than ``account``, included). An element whose own id is held in upper case, the address's
+    lowercase id otherwise its own, is no refusal: no address can name it, so the answer is no rows, and a
+    surface draws its mark with an empty menu. The npm SDK's ``openersFor`` gives the same rows.
     """
     if isinstance(tools, str | bytes) or not isinstance(tools, Sequence):
         _fail("tools is the tools list's rows, a sequence")
@@ -211,6 +212,7 @@ def openers_for(
         _fail("surface online is a boolean")
 
     marks: list[str] = []
+    unnamed = False
     if element is not None:
         if not isinstance(element, Mapping):
             _fail("element is the element as served, a mapping, or None")
@@ -220,8 +222,12 @@ def openers_for(
         # The address is a door, so its id is read in either case and taken in lowercase; the element's own id
         # is read as written (the address profile's same-id rule): an element held as 019A... is not the
         # element 019a... names.
-        if not isinstance(eid, str) or eid != values["id"]:
+        if not isinstance(eid, str) or eid.lower() != values["id"]:
             _fail("element is the element the address names: its id differs")
+        # An element held in upper case is one no address can name, so no door opens it: no rows (answered at the
+        # end, after every check has run), and a surface still draws its mark. Not a caller's mistake, so no
+        # refusal; only an id that differs by more than case is one.
+        unnamed = eid != values["id"]
         marks = marks_of(element)
 
     def fill(template: str) -> str:
@@ -315,4 +321,4 @@ def openers_for(
         elif kind == "element" and element_door is None:
             state = "Opens the world"
         rows.append({"id": rid, "name": name, "href": href, "state": state})
-    return rows
+    return [] if unnamed else rows

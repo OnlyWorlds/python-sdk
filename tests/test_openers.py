@@ -14,7 +14,7 @@ import pytest
 from onlyworlds import TOOLS, AddressError, openers_for, parse_ow_link
 
 FIXTURE = Path(__file__).resolve().parent / "fixtures" / "openers.fixture.json"
-FIXTURE_SHA256 = "ac14435bc287e92bd18e651871f39a0c66870bb041be0eb394d3eb868eb76978"
+FIXTURE_SHA256 = "8af6f6daded20444184303a66c73ce72b76a5aa111f639ffc4a9e9072fb07c74"
 CASES = 111
 WORLD = "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f"
 ELEMENT = "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a"
@@ -101,3 +101,26 @@ def test_online_false_keeps_every_href_and_true_is_the_default() -> None:
     for r in offline:
         web = r["href"].lower().startswith(("http:", "https:"))
         assert r["state"] == ("Needs a connection" if web else None), r
+
+
+def test_an_element_held_in_upper_case_has_no_rows_and_a_real_mismatch_is_still_refused() -> None:
+    eid = "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e1a"
+    surface = {"audience": "member", "signed_in": True}
+
+    def at(aid: str) -> dict[str, Any]:
+        return {"form": "text", "world": WORLD, "type": "location", "id": aid}
+
+    def el(i: str) -> dict[str, Any]:
+        return {"id": i, "type": "location", "name": "The element"}
+
+    # Held in upper case, no address can name it: no rows, whichever case the address is written in.
+    for aid in (eid, eid.upper()):
+        assert openers_for(TOOLS, "element", at(aid), surface, element=el(eid.upper())) == []
+    # An id that differs by more than case is the caller's mistake, and still refused.
+    with pytest.raises(TypeError, match="its id differs"):
+        openers_for(TOOLS, "element", at(eid), surface, element=el(eid.replace("1a", "1b")))
+    # The empty answer comes after every check: a bad tools row is refused for a held-upper element too.
+    with pytest.raises(TypeError, match="needs"):
+        openers_for(
+            [{"id": "x", "name": "X", "open": {"needs": "nope"}}], "element", at(eid), surface, element=el(eid.upper())
+        )

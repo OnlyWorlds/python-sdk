@@ -3625,7 +3625,7 @@
   },
   {
    "name": "skips-id-case-held-upper",
-   "why": "the element's own id is read as written and the address's in lowercase (the same-id rule): an element held in upper case is not the element the address names",
+   "why": "the element's own id is read as written and the address's in lowercase (the same-id rule): an element held in upper case is one no address can name, so no door opens it and the menu has no rows; it is not a caller's mistake, so it is no refusal (only an id that differs by more than case is)",
    "tools": "skips",
    "kind": "element",
    "address": {
@@ -3646,11 +3646,7 @@
      "hidden": true
     }
    },
-   "refuse": {
-    "error": "type",
-    "names": "its id differs",
-    "kind": "bad_value"
-   }
+   "expect": []
   },
   {
    "name": "skips-id-case-address-upper",

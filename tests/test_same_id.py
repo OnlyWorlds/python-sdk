@@ -73,8 +73,8 @@ def test_an_address_in_upper_case_names_the_element_held_in_lowercase() -> None:
 
 @pytest.mark.parametrize("aid", [ID, UPPER])
 def test_an_element_held_in_upper_case_is_not_the_element_an_address_names(aid: str) -> None:
-    with pytest.raises(TypeError, match="its id differs"):
-        openers_for(TOOLS, "element", _at(aid), SURFACE, element=_el(UPPER))
+    # No address can name it, so its menu has no rows (serial 123's release); it is no refusal.
+    assert openers_for(TOOLS, "element", _at(aid), SURFACE, element=_el(UPPER)) == []
 
 
 @pytest.mark.parametrize("world", [WORLD, WORLD.upper()])
