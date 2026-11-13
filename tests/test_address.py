@@ -216,7 +216,6 @@ SITE = "https://www.onlyworlds.com/w/"
         (f"ow://object/{E}0", f"ow://object/{E}"),
         (f"ow://{W}/thing/{E}", f"ow://{W}"),
         (f"{SITE}{W}/event/{E}?lens={L}#x", f"{SITE}{W}/event/{E}?lens={L}"),
-        (f"{SITE}moppetopia-", f"{SITE}moppetopia"),
         # No path at all, a slug in the text form, white space at the index, another prefix: no address.
         ("ow://", None),
         ("ow://moppetopia.", None),
@@ -232,6 +231,46 @@ def test_an_address_in_prose_at_its_edges(text: str, address: str | None) -> Non
         return
     assert found is not None
     assert text[: found.end] == address
+    assert found.reading == parse_ow_link(address)
+
+
+@pytest.mark.parametrize(
+    ("text", "address"),
+    [
+        # The run after /w/ is read whole, once, with no order between the forms (serial 123, amendments 6 and 8):
+        # it ends at the first character outside the slug's alphabet or the id's; exactly an id's form, in either
+        # case, is the id; any other legal slug run is the slug; else no address.
+        (f"{SITE}{W}-x.", f"{SITE}{W}-x"),
+        (f"{SITE}{W}abc.", f"{SITE}{W}abc"),
+        (f"{SITE}{W.upper()}.", f"{SITE}{W.upper()}"),
+        (f"{SITE}{W.upper()}-x.", None),
+        (f"{SITE}{W}.", f"{SITE}{W}"),
+        (f"{SITE}hyperion.", f"{SITE}hyperion"),
+        (f"{SITE}hyperion-world/event/{E}.", f"{SITE}hyperion-world/event/{E}"),
+        (f"{SITE}hyperion/charcter/{E}.", f"{SITE}hyperion"),
+        # A slug run that is a type word, ends in a hyphen or runs past forty characters is no address, nor one that
+        # starts outside the alphabet.
+        (f"{SITE}event.", None),
+        (f"{SITE}Moppetopia.", None),
+        (f"{SITE}my-world-.", None),
+        (f"{SITE}moppetopia-", None),
+        (f"{SITE}{'a' * 41}.", None),
+        (f"{SITE}{'a' * 40}.", f"{SITE}{'a' * 40}"),
+        # A run followed by a letter or an underscore is cut inside a word: no address.
+        (f"{SITE}mopPetopia.", None),
+        (f"{SITE}hyper_ion.", None),
+        (f"{SITE}{W}G", None),
+        (f"{SITE}{W}_", None),
+        (f"{SITE}hyperion/", f"{SITE}hyperion"),
+    ],
+)
+def test_the_run_after_w_is_read_whole_once(text: str, address: str | None) -> None:
+    found = read_ow_link_at(f"See {text}", 4)
+    if address is None:
+        assert found is None
+        return
+    assert found is not None
+    assert text[: found.end - 4] == address
     assert found.reading == parse_ow_link(address)
 
 

@@ -308,6 +308,28 @@ _PATH_RUN = re.compile(r"[0-9A-Za-z/-]+")
 _PATH_MAX = 36 + 1 + max(len(t) for t in _TYPES) + 1 + 36
 _MOMENT_RUN = re.compile(r"-?[0-9]+")
 _LENS_KEY = "?lens="
+# The run after the site's /w/: the slug's alphabet and the id's (an id in either case) together.
+_WORLD_RUN = re.compile(r"[a-z0-9A-F-]*")
+_TYPED_ID = re.compile(r"([a-z]+)/([0-9A-Fa-f-]{36})")
+
+
+def _human_path_end(text: str, start: int) -> int | None:
+    """The end of the path after the site's ``/w/`` at ``start``, or None. The run is read whole, once, with no
+    order between the forms: exactly an id's form (either case) is the id; any other legal slug run is the slug;
+    else no address. A run followed by a letter or an underscore is cut inside a word and is no address. Then
+    ``/<type>/<id>`` continues it where one follows whole; any other path after the world is prose."""
+    run = _WORLD_RUN.match(text, start)
+    assert run is not None
+    world, end = run.group(0), run.end()
+    if end < len(text) and (text[end].isalpha() or text[end] == "_"):
+        return None
+    if not (_is_uuid(world) or (_is_slug(world) and world not in _TYPES)):
+        return None
+    if text.startswith("/", end):
+        typed = _TYPED_ID.match(text, end + 1)
+        if typed is not None and typed.group(1) in _TYPES and _is_uuid(typed.group(2)):
+            return typed.end()
+    return end
 
 
 def _parses(address: str) -> bool:
@@ -323,9 +345,15 @@ def read_ow_link_at(text: str, index: int = 0) -> AddressAt | None:
     is not an address (serial 123: an address found in prose).
 
     The prefix is ``ow://`` or ``https://www.onlyworlds.com/w/`` exactly as the parser takes it, nothing
-    trimmed. The path is the longest that ``parse_ow_link`` reads: an id has its length and a slug ends by its
-    own grammar, so ``ow://object/<id>.`` ends before the full stop and ``ow://object/<id>/`` before the slash.
-    After it the address continues only with ``@`` and a moment (its whole run of digits after an optional
+    trimmed. In the text form the path is the longest that ``parse_ow_link`` reads: an id has its length, so
+    ``ow://object/<id>.`` ends before the full stop and ``ow://object/<id>/`` before the slash. In the site's form
+    the run after ``/w/`` is read whole, once: it ends at the first character outside the slug's alphabet
+    (lowercase letters, digits, hyphens) or the id's (an id in either case); exactly an id's form is the id, any
+    other legal slug run (no type word, no closing hyphen, at most forty characters) is the slug, else there is no
+    address; a run followed by a letter or an underscore is cut inside a word and is no address
+    (``.../w/mopPetopia.``). ``/<type>/<id>`` continues it where one follows whole.
+
+    After the path the address continues only with ``@`` and a moment (its whole run of digits after an optional
     minus, read by the parser's step grammar) and then ``?lens=`` and a lens (the id after it). Any other query
     key or a fragment is not part of it: the address ends before its ``?``, ``&`` or ``#``. A ``@`` or ``?lens=``
     whose value does not read is not taken; the address ends before it. What follows is prose.
@@ -349,12 +377,16 @@ def read_ow_link_at(text: str, index: int = 0) -> AddressAt | None:
     else:
         return None
     start = index + len(prefix)
-    run = _PATH_RUN.match(text, start)
-    if run is None:
-        return None
-    end = next(
-        (e for e in range(min(run.end(), start + _PATH_MAX), start, -1) if _parses(prefix + text[start:e])), None
-    )
+    end: int | None
+    if prefix == _HUMAN_PREFIX:
+        end = _human_path_end(text, start)
+    else:
+        run = _PATH_RUN.match(text, start)
+        if run is None:
+            return None
+        end = next(
+            (e for e in range(min(run.end(), start + _PATH_MAX), start, -1) if _parses(prefix + text[start:e])), None
+        )
     if end is None:
         return None
     if text.startswith("@", end):
