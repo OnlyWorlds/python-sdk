@@ -31,6 +31,52 @@ def load_fixture() -> dict[str, Any]:
 DOC = load_fixture()
 CASES: list[dict[str, Any]] = DOC["cases"]
 
+# Serial 123 reads played_at by the message page's grammar, ahead of its dist: four cases of serial 122's vendored
+# fixture move. While the pin is serial 122's and the fixture is the vendored one, each is held to its new answer
+# here; once the pin moves, the fixture's own answers stand and this table no longer applies.
+PIN_SERIAL: int = json.loads((REPO / "codegen" / "schema-pin.json").read_text(encoding="utf-8"))["dist_serial"]
+AHEAD_OF_THE_DIST = PIN_SERIAL == 122 and "OW_RECORD_FIXTURE" not in os.environ
+OFFSET_EVENT = "019a8000-0000-7000-8000-000000000215"
+NO_SECONDS_EVENT = "019a8000-0000-7000-8000-000000000242"
+
+
+def _moved_by_serial_123(case: dict[str, Any]) -> Any:
+    """The new answer of a case serial 123 moves, or the fixture's own ``want``."""
+    want = case["want"]
+    if not AHEAD_OF_THE_DIST:
+        return want
+    name = case["name"]
+    if name == "no-mark-played-offset":  # an offset now reads: a mark, the value as written
+        assert want is None
+        return {
+            "tool": "subs",
+            "played_at": "2026-11-01T08:00:00+01:00",
+            "version": None,
+            "seed": None,
+            "outcome": None,
+            "seats": {},
+        }
+    if name == "mark-leap-day-of-a-leap-year":  # 2028-02-29T00:00Z has no seconds: no mark now
+        assert want is not None and want["played_at"] == "2028-02-29T00:00Z"
+        return None
+    if name == "fluffington-two-games":  # the offset run (07:00Z) now a record, second newest
+        assert [r["event"]["id"] for r in want].count(OFFSET_EVENT) == 0
+        offset_run = {
+            "event": {"id": OFFSET_EVENT, "name": "Played with an offset"},
+            "tool": "subs",
+            "played_at": "2026-11-01T08:00:00+01:00",
+            "version": None,
+            "seed": None,
+            "outcome": None,
+            "seat": None,
+            "stories": [],
+        }
+        return [want[0], offset_run, *want[1:]]
+    if name == "order-by-the-instant-not-the-string":  # 00:30Z has no seconds: no record now
+        assert [r["event"]["id"] for r in want].count(NO_SECONDS_EVENT) == 1
+        return [r for r in want if r["event"]["id"] != NO_SECONDS_EVENT]
+    return want
+
 
 def test_the_fixture_holds_serial_122s_41_cases() -> None:
     assert DOC["mark"]["field"] == RECORD_FIELD == "x_record"
@@ -44,9 +90,9 @@ def test_fixture_case(case: dict[str, Any]) -> None:
     if case["kind"] == "mark":
         el = next((e for e in elements if e["id"] == case["element"]), None)
         assert el is not None, f"no element {case['element']}"
-        assert record_mark_of(el) == case["want"]
+        assert record_mark_of(el) == _moved_by_serial_123(case)
     elif case["kind"] == "records":
-        assert records_of(case["character"], elements) == case["want"]
+        assert records_of(case["character"], elements) == _moved_by_serial_123(case)
     else:
         pytest.fail(f"a case of unknown kind {case['kind']}")
 
@@ -129,9 +175,59 @@ def _ev(id_: str, at: str) -> dict[str, Any]:
 
 def test_played_at_orders_as_its_instant() -> None:
     got = records_of(
-        "c", [_ev("a", "2026-11-01T00:30Z"), _ev("b", "2026-11-01T00:30:00.500Z"), _ev("c", "2026-11-01T00:29:59Z")]
+        "c",
+        [
+            _ev("a", "2026-11-01T01:30:00+01:00"),
+            _ev("b", "2026-11-01T00:30:00.500Z"),
+            _ev("c", "2026-11-01T00:29:59Z"),
+        ],
     )
     assert [r["event"]["id"] for r in got] == ["b", "a", "c"]
+
+
+# Serial 123: a record's played_at is read by the message page's grammar (the message readers' own, message._instant).
+# Against the record grammar before it, three strings move, each answer below.
+
+
+def test_a_played_at_with_a_lower_case_t_and_z_is_now_a_mark() -> None:
+    """Before serial 123: no mark, and no record. Now a mark carrying the value as written, and a record."""
+    ev = _ev("e", "2026-11-01t00:30:00z")
+    assert record_mark_of(ev) == {
+        "tool": "subs",
+        "played_at": "2026-11-01t00:30:00z",
+        "version": None,
+        "seed": None,
+        "outcome": None,
+        "seats": {},
+    }
+    assert [r["played_at"] for r in records_of("c", [ev])] == ["2026-11-01t00:30:00z"]
+
+
+def test_a_played_at_with_an_offset_is_now_a_mark_ordered_as_its_instant() -> None:
+    """Before serial 123: no mark, and no record. Now a mark, ordered by the instant it names: 00:30+01:00 is
+    23:30Z the day before, so it comes after 23:45Z, newest first, and ties 23:30Z by the Event's id."""
+    ev = _ev("b", "2026-11-01T00:30:00+01:00")
+    mark = record_mark_of(ev)
+    assert mark is not None and mark["played_at"] == "2026-11-01T00:30:00+01:00"
+    got = records_of("c", [ev, _ev("c", "2026-10-31T23:30:00Z"), _ev("a", "2026-10-31T23:45:00Z")])
+    assert [r["event"]["id"] for r in got] == ["a", "b", "c"]
+
+
+def test_a_played_at_without_seconds_is_now_no_mark() -> None:
+    """Before serial 123: a mark, and a record. Now no mark, and no record."""
+    ev = _ev("e", "2026-11-01T00:30Z")
+    assert record_mark_of(ev) is None
+    assert records_of("c", [ev]) == []
+
+
+def test_the_message_grammar_reads_more_than_the_three_strings_the_serial_names() -> None:
+    """Two more strings move with the message grammar, though serial 123 names neither: a time with no zone is
+    read as UTC, and the year 0000 is a year (the record page said 0001 or later). Both were no mark before."""
+    no_zone = _ev("a", "2026-11-01T00:30:00")
+    assert record_mark_of(no_zone) is not None
+    got = records_of("c", [no_zone, _ev("b", "2026-11-01T00:30:00Z")])
+    assert [r["event"]["id"] for r in got] == ["a", "b"]  # one instant: a tie, by id
+    assert record_mark_of(_ev("z", "0000-01-01T00:00:00Z")) is not None
 
 
 def test_played_at_orders_to_the_millisecond_as_javascript_does() -> None:
@@ -143,15 +239,20 @@ def test_played_at_orders_to_the_millisecond_as_javascript_does() -> None:
 @pytest.mark.parametrize(
     "at",
     [
-        "2026-13-01T00:00Z",
-        "2026-02-30T00:00Z",
-        "2026-02-29T00:00Z",
-        "2026-11-01T24:00Z",
-        "2026-11-01T00:60Z",
+        "2026-13-01T00:00:00Z",
+        "2026-02-30T00:00:00Z",
+        "2026-02-29T00:00:00Z",
+        "2026-11-01T24:00:00Z",
+        "2026-11-01T00:60:00Z",
         "2026-11-01T00:00:60Z",
-        "0000-01-01T00:00Z",
-        "2026-00-01T00:00Z",
-        "2026-11-00T00:00Z",
+        "2026-00-01T00:00:00Z",
+        "2026-11-00T00:00:00Z",
+        "2026-11-01T00:00:00+24:00",
+        "2026-11-01T00:00:00+01:60",
+        "2026-11-01T00:00:00+0100",
+        "2026-11-01 00:00:00Z",
+        "2026-11-01",
+        "2026-11-01T00:00:00Z\n",
     ],
 )
 def test_a_played_at_that_is_no_real_instant_is_no_mark(at: str) -> None:
@@ -160,7 +261,7 @@ def test_a_played_at_that_is_no_real_instant_is_no_mark(at: str) -> None:
     assert records_of("c", [ev]) == []
 
 
-@pytest.mark.parametrize("at", ["2028-02-29T00:00Z", "2000-02-29T23:59:59.999Z", "0001-01-01T00:00Z"])
+@pytest.mark.parametrize("at", ["2028-02-29T00:00:00Z", "2000-02-29T23:59:59.999Z", "0001-01-01T00:00:00Z"])
 def test_a_real_instant_is_a_mark(at: str) -> None:
     ev = {"id": "e", "type": "event", "characters": ["c"], "x_record": {"tool": "subs", "played_at": at}}
     assert record_mark_of(ev) is not None

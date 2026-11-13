@@ -16,17 +16,15 @@ from __future__ import annotations
 
 import re
 from collections.abc import Mapping, Sequence
-from datetime import UTC, datetime
 from typing import Any, Literal, TypedDict
 
+from .message import _instant
 from .review import proposed_mark_of
 
 #: The Event's field that carries the record's mark.
 RECORD_FIELD = "x_record"
 
 _TOOL = re.compile(r"[a-z0-9-]{1,32}")
-# ASCII digits only: Python's \d takes any Unicode digit (a full-width year) and int() reads it; npm and keel do not.
-_PLAYED_AT = re.compile(r"([0-9]{4})-([0-9]{2})-([0-9]{2})T([0-9]{2}):([0-9]{2})(?::([0-9]{2})(?:\.([0-9]+))?)?Z")
 _OUTCOME = re.compile(r"[a-z]{1,24}")
 
 
@@ -120,18 +118,16 @@ def record_mark_of(element: Any) -> RecordMark | None:
 
 
 def _instant_ms(played_at: str) -> int | None:
-    """The instant in whole milliseconds, or None when the value is not a real calendar instant in the profile's form
-    (month 1 to 12, the day within its month, hour 0 to 23, minute and second 0 to 59). A fraction is truncated past
-    three digits, as JavaScript's Date.parse reads it, so the two packages order the same records the same way."""
-    m = _PLAYED_AT.fullmatch(played_at)
-    if m is None:
+    """The instant in whole milliseconds, or None when the value cannot be read as a time.
+
+    Read by the message page's grammar (serial 123), the one the message readers use (``message._instant``):
+    ``YYYY-MM-DDTHH:MM:SS``, an optional fraction, then ``Z``, ``+HH:MM`` / ``-HH:MM`` or nothing (read as UTC);
+    ``T`` and ``Z`` in either case; ASCII digits; a real calendar instant; seconds required. The order is to the
+    millisecond, a fraction truncated past three digits, as the record page reads it."""
+    unreadable, seconds, micros = _instant(played_at)
+    if unreadable:
         return None
-    y, mo, d, h, mi = (int(m.group(i)) for i in range(1, 6))
-    try:
-        at = datetime(y, mo, d, h, mi, int(m.group(6) or 0), tzinfo=UTC)
-    except ValueError:
-        return None
-    return int(at.timestamp()) * 1000 + int((m.group(7) or "")[:3].ljust(3, "0"))
+    return seconds * 1000 + micros // 1000
 
 
 def records_of(character_id: str, elements: Sequence[Any]) -> list[Record]:
