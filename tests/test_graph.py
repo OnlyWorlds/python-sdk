@@ -112,18 +112,10 @@ def links_add_up(g: WorldGraph, c: Mapping[str, Any]) -> None:
     )
 
 
-# STAGED serial 128: the published fixture still wants the old answer; the serial flips it
-_STAGED_128 = frozenset(
-    {"x_lens_leads_to and x_spine_depends_on are links; another x_ field is not; a missing id is not counted"}
-)
-
-
 def test_the_fixtures_graph_cases() -> None:
     cases = load_cases()
     wrong: list[str] = []
     for c in cases:
-        if c["name"] in _STAGED_128:
-            continue
         opts = c.get("options", {})
         refused = c["want"].get("refused")
         if refused is not None:
