@@ -6,7 +6,8 @@
   "A case's want holds the keys it tests; a case marked whole holds the entire answer, keys in order.",
   "Every want was worked by hand from the page's rules.",
   "A graph is what worldGraph serves the visitor, so a link to an element they may not see is no edge here (the graph never holds an edge to a non-node): the place-not-seen case is a Character with no location edge.",
-  "Why hops defaults to 1 (measured 2026-11-01 on four public graphs, five heads): with no reach limit the top head takes most of a world (7,347 of Sikelia's 8,899 nodes, 84 of Blood Meridian's 101, 89 of Moppetopia's 163); at one hop the clusters are Moppetopia 28, 11, 7, 5, 3 and Sikelia 57, 29, 27, 25, 17."
+  "Why hops defaults to 1 (measured 2026-11-01 on four public graphs, five heads): with no reach limit the top head takes most of a world (7,347 of Sikelia's 8,899 nodes, 84 of Blood Meridian's 101, 89 of Moppetopia's 163); at one hop the clusters are Moppetopia 28, 11, 7, 5, 3 and Sikelia 57, 29, 27, 25, 17.",
+  "The case 'a list naming one target twice is one edge in the graph it is served' holds no repeat: its graph is what worldGraph answers for an Event whose characters is [mara, mara], one edge at index 0, since the fold is worldGraph's (the lens fixture's 'a list naming one target twice is one edge in its first place; a repeat to a hidden target is cut once' is the case a reader that draws two edges fails). It pins that the landing reads that one edge as degree 1 at each end, so both ends are near orphans."
  ],
  "cases": [
   {
@@ -1732,7 +1733,7 @@
    }
   },
   {
-   "name": "a list naming one target twice is two edges: degree 2 at both ends, no near orphan",
+   "name": "a list naming one target twice is one edge in the graph it is served: degree 1 at both ends, both near orphans",
    "graph": {
     "nodes": [
      {
@@ -1750,12 +1751,6 @@
       "field": "characters",
       "target": "mara",
       "index": 0
-     },
-     {
-      "source": "ev",
-      "field": "characters",
-      "target": "mara",
-      "index": 1
      }
     ]
    },
@@ -1767,18 +1762,26 @@
        {
         "id": "mara",
         "hops": 0,
-        "degree": 2
+        "degree": 1
        },
        {
         "id": "ev",
         "hops": 1,
-        "degree": 2
+        "degree": 1
        }
       ]
      }
     ],
     "unclustered": [],
     "gaps": [
+     {
+      "kind": "near_orphan",
+      "id": "ev"
+     },
+     {
+      "kind": "near_orphan",
+      "id": "mara"
+     },
      {
       "kind": "no_place",
       "id": "mara"

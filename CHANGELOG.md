@@ -4,10 +4,15 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
-- (STAGED: publishes with serial 128) `world_graph` reads each element once in a multi-link: a list that names one element twice (a schema link or a declared extension link alike) gives one edge, at the first entry's place in the list as served (in `[c1, c1, c2]` the edge to c1 has index 0 and c2 keeps index 2), and a repeat to an element that is not a node counts once in `edges_cut`. Ids compare as written: `[a, A]` is no repeat.
-- (STAGED: publishes with serial 128) `degree_of` and `out_degree_of` follow the graph: a list naming one element twice counts 1 at each end. `landing_of` folds nothing itself; on such a graph both ends read degree 1 and are near orphans.
-- (STAGED: publishes with serial 128) `recipients_of` answers each Character once, in its first place: `[a, a, b]` reads `[a, b]`.
-- (STAGED: publishes with serial 128) `recipients_of`, `is_addressed_to`, `is_to_everyone` and `has_unseen_recipients` answer for a message only: any other Narrative, a Story or a Note, has no recipients and is addressed to nobody, whatever its `characters` holds (a Story's `characters` are the people it is about).
+## 0.126.0 (2026-11-14)
+
+schema-dist v0.34.1-dist.128 (canonical 00.34.01 unchanged, no schema file moved). Writers stamp folder format 0.3.24, which the dist's lint knows (no writer's bytes change). The fixtures' new cases pass: the address fixture's 218 (two `prose-all`), the lens fixture's 235, the message fixture's 102 (two `recipients`), the spine fixture's repeat.
+
+- `read_spine_element` reads `x_spine_depends_on` each id once, in its first place.
+- `world_graph` reads each element once in a multi-link: a list that names one element twice (a schema link or a declared extension link alike) gives one edge, at the first entry's place in the list as served (in `[c1, c1, c2]` the edge to c1 has index 0 and c2 keeps index 2), and a repeat to an element that is not a node counts once in `edges_cut`. Ids compare as written: `[a, A]` is no repeat.
+- `degree_of` and `out_degree_of` follow the graph: a list naming one element twice counts 1 at each end. `landing_of` folds nothing itself; on such a graph both ends read degree 1 and are near orphans.
+- `recipients_of` answers each Character once, in its first place: `[a, a, b]` reads `[a, b]`.
+- `recipients_of`, `is_addressed_to`, `is_to_everyone` and `has_unseen_recipients` answer for a message only: any other Narrative, a Story or a Note, has no recipients and is addressed to nobody, whatever its `characters` holds (a Story's `characters` are the people it is about).
 
 ## 0.125.0 (2026-11-14)
 

@@ -7,7 +7,8 @@
     "format cases: address gives form (human or text), world (absent for the in-world text form), type and id (both absent for a world's own address), and optionally lens and moment; expect is the exact string a writer writes, or refuse the reason.",
     "parse cases: text is the string as a reader receives it; expect is the reading (form, world, world_is_slug, type, id, lens, moment, canonical; type and id null for a world's own address), or refuse the reason. canonical is true when the string as received is exactly what a writer writes for that reading.",
     "ids: any UUID version, in the hyphenated 8-4-4-4-12 form; read in either case of hex, always written lowercase.",
-    "prose cases: text is a line as a reader finds it and index where an address starts in it; expect gives the address (the slice of text from index that the address covers, where it ends in prose) and its reading (what the parse cases answer for that slice). The whole-string parser is unchanged: handed the line's tail whole it may refuse. Every prose case is ASCII up to the end of its address but six: four hold a letter or a combining mark before the index (one of them followed by a space and then the address), and two hold one right after a slug's run, where no address is found. Where a letter above U+FFFF stands before the index (prose-start-glued-astral-letter, prose-start-astral-letter-then-space), `index` counts code points and `index_utf16` UTF-16 units, and a reader that indexes by UTF-16 units reads `index_utf16`; everywhere else the two counts agree. A reader that indexes by another unit (UTF-8 bytes) converts the code point `index` to its own."
+    "prose cases: text is a line as a reader finds it and index where an address starts in it; expect gives the address (the slice of text from index that the address covers, where it ends in prose) and its reading (what the parse cases answer for that slice). The whole-string parser is unchanged: handed the line's tail whole it may refuse. Every prose case is ASCII up to the end of its address but six: four hold a letter or a combining mark before the index (one of them followed by a space and then the address), and two hold one right after a slug's run, where no address is found. Where a letter above U+FFFF stands before the index (prose-start-glued-astral-letter, prose-start-astral-letter-then-space), `index` counts code points and `index_utf16` UTF-16 units, and a reader that indexes by UTF-16 units reads `index_utf16`; everywhere else the two counts agree. A reader that indexes by another unit (UTF-8 bytes) converts the code point `index` to its own.",
+    "prose-all cases: text is a text read whole for every address it holds; found is the addresses found in it, in order, each the string as it stands in the text (the slice a finder answers), never indexes, so it reads the same in every language. Addresses do not overlap: read left to right, at each prefix the finder is asked; an address found takes its whole run and the reading goes on past its end, and a prefix inside that run is no start. A prose-all case carries found and neither expect nor refuse (every other kind carries one of the two)."
   ],
   "types": [
     "character",
@@ -2938,6 +2939,25 @@
         "address": null,
         "reading": null
       }
+    },
+    {
+      "name": "prose-all-a-prefix-inside-an-address-is-no-start",
+      "claim": "addresses found in a text do not overlap: the site address's slug run is abc3ow and ends at the colon, so the address is the world's own and what follows is prose; the ow:// inside that run (after the digit 3, which glues nothing) is no start, so the text holds one address",
+      "kind": "prose-all",
+      "text": "Built the gate: https://www.onlyworlds.com/w/abc3ow://object/01a1d4ef-0000-7000-8000-000000000084.",
+      "found": [
+        "https://www.onlyworlds.com/w/abc3ow"
+      ]
+    },
+    {
+      "name": "prose-all-back-to-back-after-digit",
+      "claim": "two addresses written back to back, the first id ending in a digit: read left to right, the first takes its run up to its id's end, and the second starts where it ends, so the text holds two addresses in order",
+      "kind": "prose-all",
+      "text": "ow://object/01a1d4ef-0000-7000-8000-000000000084ow://object/01a1d4ef-0000-7000-8000-000000000085.",
+      "found": [
+        "ow://object/01a1d4ef-0000-7000-8000-000000000084",
+        "ow://object/01a1d4ef-0000-7000-8000-000000000085"
+      ]
     }
   ]
 }

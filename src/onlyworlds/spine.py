@@ -221,12 +221,12 @@ def read_spine_element(type: str, element: Mapping[str, Any] | FolderElement) ->
     (a blank entry and a non-string are dropped; no entry left, or not a list, is not stated);
     ``x_spine_truth`` a string that is not blank (a non-string dropped); ``x_spine_access``, ``x_spine_status`` and
     ``x_spine_layer`` one of their lists; ``x_spine_audience`` a list whose known words are kept and the
-    rest dropped, the primary the first known; ``x_spine_depends_on`` a list whose strings are kept, an
-    empty list stated as empty (whether an id resolves is the world's audit); ``x_spine_probe`` a string
-    in the probe form, or ``"unsupported"`` (a non-string dropped); ``x_spine_verified`` an object whose
-    ``at`` is a real calendar day; ``x_spine_retires`` a string that is not blank, as given and untrimmed,
-    on any element (a non-string dropped; whether it names a row, and whether it sits on a Retirement
-    Event, is the audit's). A key that is absent or ``None`` is not stated and drops nothing.
+    rest dropped, the primary the first known; ``x_spine_depends_on`` a list whose strings are kept, each once in
+    its first place, an empty list stated as empty (whether an id resolves is the world's audit); ``x_spine_probe``
+    a string in the probe form, or ``"unsupported"`` (a non-string dropped); ``x_spine_verified`` an object whose
+    ``at`` is a real calendar day; ``x_spine_retires`` a string that is not blank, as given and untrimmed, on any
+    element (a non-string dropped; whether it names a row, and whether it sits on a Retirement Event, is the
+    audit's). A key that is absent or ``None`` is not stated and drops nothing.
     """
     body: Mapping[str, Any] = element.body if isinstance(element, FolderElement) else element
     dropped: list[dict[str, Any]] = []
@@ -273,7 +273,7 @@ def read_spine_element(type: str, element: Mapping[str, Any] | FolderElement) ->
     depends_on: tuple[str, ...] | None = None
     raw = body.get("x_spine_depends_on")
     if isinstance(raw, list):
-        depends_on = tuple(d for d in raw if isinstance(d, str))
+        depends_on = tuple(dict.fromkeys(d for d in raw if isinstance(d, str)))  # each id once, in its first place
         dropped += [_named("x_spine_depends_on", d) for d in raw if not isinstance(d, str)]
     elif raw is not None:
         dropped.append(_named("x_spine_depends_on", raw))

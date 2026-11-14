@@ -23,7 +23,11 @@ profile's table names that an object mark lacks (its rule 5). An element's `id`,
 world's `id` and a link that is a UUID written other than lowercase in the hyphenated
 8-4-4-4-12 form (upper case, no hyphens, braces, `urn:uuid:`) get one warning line each,
 never a problem (the address profile's "The same id": inside a world it is another id);
-the lookups stay as written. The last line is the count it checked, so an empty
+the lookups stay as written. A multi-link, or an extension list a profile reads as links
+(`x_spine_depends_on`, `x_lens_leads_to`: the lens profile's closed table), that names one
+element more than once gets one warning line per element, with how many times, never a
+problem (each names each element once; a reader reads a repeat once, in its first place);
+entries are compared as written, so `[a, A]` is no repeat. The last line is the count it checked, so an empty
 report is a result and not a silence. Exit 0 clean, 1 with problems, 2 when
 the folder is not a world folder.
 
@@ -47,13 +51,16 @@ from pathlib import Path
 
 # The folder format's version this lint was written against: the folder spec's
 # own version line, the one source. It moves when the spec's version moves, and
-# publish_dist.py writes the dist README's version sentence from it. 0.3.22
-# (2026-11-12) says what a draft world is (a world no host holds yet, kept by the
-# tool as a world folder or a world file's content; element ids are kept through a
-# hand-over and the host gives the world its id) and that a writer adds no `world`
-# key to an element file and a reader gives one no meaning; this lint gains no check
-# (a `world` key in an element file was already reported as no field of its type).
-FORMAT_VERSION = "0.3.22"
+# publish_dist.py writes the dist README's version sentence from it. 0.3.24
+# (2026-11-14, serial 128) says a multi-link names each element once: a reader served a
+# list that names one element twice reads it once, in its first place, a writer served
+# one writes it back as served, and a writer that builds a list builds it with each
+# element once; this lint warns on a repeat, never a problem (_repeat_warnings). 0.3.23
+# (2026-11-14, serial 126) points the in-prose reference line at the address profile;
+# this lint reads no prose and gained no check. 0.3.22 (2026-11-12) says what a draft
+# world is and that a writer adds no `world` key to an element file (already reported
+# as no field of its type).
+FORMAT_VERSION = "0.3.24"
 
 # Keys an element body carries that the schema does not declare: the type
 # slug and the server-managed fields (elements/serialize.py READONLY_FIELDS
@@ -70,6 +77,10 @@ BODY_EXTRA_KEYS = {"type", "created_at", "updated_at", "change_seq", "created_by
 FOLDER_KEYS = {"local_updated_at", "server_updated_at", "image_media_id", "known_of",
                "hidden"}
 EXTENSION_PREFIXES = ("x_", "atlas_", "shadow_")
+# The extension lists a profile reads as links (the lens profile's closed table of declared
+# links, which the spine profile's x_spine_depends_on is in): the repeat warning reads them
+# as it reads a multi-link (serial 128); nothing else of them is checked here.
+LINK_EXTENSIONS = ("x_lens_leads_to", "x_spine_depends_on")
 # A known-of stub (folder spec 4.4) keeps these and leaves every unset field out
 # (rule 1); a field keel marks public (presentation.json's `public` lists) may also be there, set. The
 # lint cannot tell public from not without keel's wrapper, so it flags only
@@ -242,6 +253,8 @@ def lint_folder(src: Path, decoded: dict) -> Report:
             if key == "x_served_trimmed" and not isinstance(value, list):
                 report.add(f"{rel}: `x_served_trimmed` must be an array of field names, not {value!r}")
                 continue
+            if key in LINK_EXTENSIONS and isinstance(value, list):
+                _repeat_warnings(report, rel, key, value)
             if key in BODY_EXTRA_KEYS or key in FOLDER_KEYS \
                     or key.startswith(EXTENSION_PREFIXES):
                 continue
@@ -266,6 +279,7 @@ def lint_folder(src: Path, decoded: dict) -> Report:
                 else:
                     for v in value:
                         _check_link(report, rel, key, v, spec["target"], bodies)
+                    _repeat_warnings(report, rel, key, value)
             elif kind == "generic_type" and value not in (None, "") \
                     and value not in decoded["types"]:
                 report.add(f"{rel}: `{key}` {value!r} is not a type slug")
@@ -297,6 +311,24 @@ def _review_warnings(report, rel, body) -> None:
             if name not in value:
                 report.warnings.append(
                     f"{rel}: `{key}` has no `{name}` (review profile, rule 5)")
+
+
+REPEAT = "a multi-link names each element once, and a reader reads it once, in its first place"
+
+
+def _repeat_warnings(report, rel: str, key: str, values: list) -> None:
+    """One warning line for each element a multi-link names more than once, in the order of
+    its first place, never a problem: the lint never repairs, a reader reads the repeat once,
+    and keel stores each element once. Entries are compared as written (the address profile's
+    "The same id"): `[a, A]` is two values, and `A` gets its own spelling line. A value that is
+    not a string is reported by _check_link and not counted here."""
+    counts: dict[str, int] = {}
+    for v in values:
+        if isinstance(v, str):
+            counts[v] = counts.get(v, 0) + 1
+    for v, n in counts.items():
+        if n > 1:
+            report.warnings.append(f"{rel}: `{key}` names {v} {n} times: {REPEAT}")
 
 
 def _check_link(report, rel, key, value, target, bodies) -> None:

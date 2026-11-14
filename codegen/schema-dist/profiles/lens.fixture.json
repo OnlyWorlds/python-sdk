@@ -7920,18 +7920,99 @@
             "field": "x_spine_depends_on",
             "target": "t2",
             "index": 0
-          },
-          {
-            "source": "t1",
-            "field": "x_spine_depends_on",
-            "target": "t2",
-            "index": 1
           }
         ],
         "edges_cut": {},
         "cut": {},
         "unreadable": null
-      }
+      },
+      "note": "Serial 128. t1's x_spine_depends_on names t2 twice: a multi-link names each element once, so it is one edge, read in its first place (index 0). Before serial 128 this case wanted two edges, index 0 and 1."
+    },
+    {
+      "name": "a list naming one target twice is one edge in its first place; a repeat to a hidden target is cut once",
+      "kind": "graph",
+      "world": {
+        "elements": [
+          {
+            "id": "ev",
+            "type": "event",
+            "name": "The Muster",
+            "characters": [
+              "mara",
+              "mara",
+              "ghost",
+              "sol",
+              "ghost"
+            ]
+          },
+          {
+            "id": "ghost",
+            "type": "character",
+            "name": "Ghost",
+            "hidden": true
+          },
+          {
+            "id": "mara",
+            "type": "character",
+            "name": "Mara"
+          },
+          {
+            "id": "sol",
+            "type": "character",
+            "name": "Sol"
+          }
+        ]
+      },
+      "reader": {
+        "rung": "owner"
+      },
+      "want": {
+        "nodes": [
+          {
+            "id": "ev",
+            "type": "event",
+            "name": "The Muster",
+            "family": "amber",
+            "icon": "saved_search"
+          },
+          {
+            "id": "mara",
+            "type": "character",
+            "name": "Mara",
+            "family": "blue",
+            "icon": "person"
+          },
+          {
+            "id": "sol",
+            "type": "character",
+            "name": "Sol",
+            "family": "blue",
+            "icon": "person"
+          }
+        ],
+        "edges": [
+          {
+            "source": "ev",
+            "field": "characters",
+            "target": "mara",
+            "index": 0
+          },
+          {
+            "source": "ev",
+            "field": "characters",
+            "target": "sol",
+            "index": 3
+          }
+        ],
+        "edges_cut": {
+          "hidden": 1
+        },
+        "cut": {
+          "hidden": 1
+        },
+        "unreadable": null
+      },
+      "note": "Serial 128. A multi-link names each element once: the Muster's characters names Mara twice and the hidden Ghost twice. Mara is one edge, read in her first place (index 0); Ghost is one edge cut, counted once as hidden; Sol keeps her place in the list as stored (index 3), since an index points back into the list as it is served, never into a list with the repeats taken out."
     },
     {
       "name": "a link to the lens element itself is outside_lens: the lens read is never in its own result",
@@ -10779,6 +10860,33 @@
       ],
       "cut": {},
       "note": "An anchor is a field and an id. Bel is a Character named under characters, the first anchor field in the schema's order, and again under locations: one lens meets an id once, under the first field, so Bel is kept and nothing is cut."
+    },
+    {
+      "name": "an-anchor-a-list-names-twice-is-one-anchor-in-its-first-place",
+      "kind": "resolve",
+      "world": "vale",
+      "reader": "contributor",
+      "lens": {
+        "id": "019a7f00-0000-7000-8000-000000000452",
+        "type": "construct",
+        "name": "A lens",
+        "supertype": "Lens",
+        "subtype": "",
+        "characters": [
+          "019a7f00-0000-7000-8000-000000000004",
+          "019a7f00-0000-7000-8000-000000000001",
+          "019a7f00-0000-7000-8000-000000000004"
+        ],
+        "x_lens": {
+          "depth": 0
+        }
+      },
+      "kept": [
+        "019a7f00-0000-7000-8000-000000000004",
+        "019a7f00-0000-7000-8000-000000000001"
+      ],
+      "cut": {},
+      "note": "Serial 128. characters names Brin, then Ada, then Brin again: a multi-link names each element once, so Brin is one anchor, met in her first place, and the anchors in link order are Brin then Ada. A reader that kept the last place would keep Ada first; one that read the repeat twice would keep Brin twice."
     },
     {
       "name": "an-id-two-wrong-fields-anchor-in-an-umbrella-and-its-child-is-counted-once",

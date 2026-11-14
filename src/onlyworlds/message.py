@@ -143,7 +143,7 @@ def recipients_of(message: Mapping[str, Any]) -> list[str]:
     message is addressed to every member of the world: a body that omits the field, or holds ``None``,
     reads as empty. Entries that are not ids are left out; use ``is_addressed_to`` for "is it for X". A
     Note, or any Narrative that is not a message, has no recipients: ``[]``, whatever its ``characters``
-    holds (STAGED: serial 128). (STAGED: serial 128) A multi-link
+    holds (since serial 128). A multi-link
     names each element once: a list naming one Character twice answers it once, in its first place."""
     if not is_message(message):
         return []
@@ -157,7 +157,7 @@ def is_addressed_to(message: Mapping[str, Any], character_id: str) -> bool:
     """True when ``character_id`` is in the message's ``characters``, or ``characters`` is empty (absent,
     ``None`` or ``[]``) and the server did not trim it for this reader (``is_to_everyone``): an empty list
     whose ``x_served_trimmed`` names ``characters`` is to someone the reader cannot see. A Note, or
-    any Narrative that is not a message, is addressed to nobody (STAGED: serial 128). A list that names
+    any Narrative that is not a message, is addressed to nobody (since serial 128). A list that names
     no valid id (``[""]``) and a value that is not a list address nobody, never everyone. Nothing else
     addresses a message: not ``narrator``, not a name or an id in ``story``, not ``protagonist`` or any
     other link. An empty ``character_id``
@@ -190,7 +190,7 @@ def has_unseen_recipients(message: Mapping[str, Any], *, keyless: bool = False) 
     ``characters`` trimmed (its ``x_served_trimmed`` list names ``characters``), whatever is left in the
     list. It says that such a recipient exists, never who or how many. ``None`` for a body read keyless
     (``keyless=True``): it carries no mark, so the reader cannot say either way. False for a Note or any
-    Narrative that is not a message, which has no recipients, keyless or not (STAGED: serial 128)."""
+    Narrative that is not a message, which has no recipients, keyless or not (since serial 128)."""
     keyless = _keyless("has_unseen_recipients", keyless)
     if not isinstance(message, Mapping) or not is_message(message):
         return False

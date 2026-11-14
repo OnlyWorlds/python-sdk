@@ -1,7 +1,7 @@
 """The address profile (schema-dist ``profiles/address.md``, serial 77): ``element_address`` and
 ``parse_ow_link`` on every conformance case in ``codegen/schema-dist/profiles/address.fixture.json``, vendored
 with the distribution. The vendored copy is the only source: a missing fixture fails, never skips. A case of a
-kind this file does not know fails; a prose-all case (STAGED: serial 128) runs ``find_ow_links``. The npm SDK's
+kind this file does not know fails; a prose-all case (since serial 128) runs ``find_ow_links``. The npm SDK's
 ``elementAddress`` and ``parseOwLink`` run the same cases."""
 
 from __future__ import annotations
@@ -59,7 +59,7 @@ def answer(case: dict[str, Any]) -> dict[str, Any]:
                 return {"expect": {"address": None, "reading": None}}
             address = case["text"][index : found.end]
             return {"expect": {"address": address, "reading": dataclasses.asdict(found.reading)}}
-    elif case["kind"] == "prose-all":  # STAGED: serial 128: every address find_ow_links finds, each its slice, in order
+    elif case["kind"] == "prose-all":  # Since serial 128: every address find_ow_links finds, each its slice, in order
 
         def run() -> dict[str, Any]:
             return {"found": [case["text"][f.start : f.end] for f in find_ow_links(case["text"])]}
@@ -75,7 +75,7 @@ def test_every_case_of_the_address_fixture() -> None:
     cases = load_fixture()["cases"]
     wrong = []
     for c in cases:
-        # A prose-all case (STAGED: serial 128) wants found; every other case exactly one of expect or refuse, and a
+        # A prose-all case (since serial 128) wants found; every other case exactly one of expect or refuse, and a
         # case with neither (or both) wants something no answer gives, so it is wrong, never passed over.
         if c["kind"] == "prose-all":
             want = {"found": c.get("found")}
@@ -94,8 +94,8 @@ def test_every_case_of_the_address_fixture() -> None:
     )
     print(line, *wrong, sep="\n")
     assert wrong == [], line
-    assert len(cases) == 216, f"the fixture holds {len(cases)} cases, serial 127 has 216"
-    assert kinds == {"parse": 104, "format": 36, "prose": 76}
+    assert len(cases) == 218, f"the fixture holds {len(cases)} cases, serial 128 has 218"
+    assert kinds == {"parse": 104, "format": 36, "prose": 76, "prose-all": 2}
 
 
 def test_the_refusals_are_the_fixtures_and_every_one_is_exercised() -> None:

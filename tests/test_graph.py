@@ -91,7 +91,7 @@ def links_add_up(g: WorldGraph, c: Mapping[str, Any]) -> None:
             if kind == "single_link":
                 targets += [v] if isinstance(v, str) and v in by_id else []
             elif kind == "multi_link" and isinstance(v, list):
-                # (STAGED: serial 128) each element once in a list: a repeat is one link
+                # (since serial 128) each element once in a list: a repeat is one link
                 targets += list(dict.fromkeys(t for t in v if isinstance(t, str) and t in by_id))
         for field in ("x_lens_leads_to", "x_spine_depends_on"):
             v = el.get(field)
@@ -138,7 +138,7 @@ def test_the_fixtures_graph_cases() -> None:
     for line in wrong:
         print(line)
     assert wrong == []
-    assert len(cases) == 55, f"the fixture holds {len(cases)} graph cases, serial 123 has 55"
+    assert len(cases) == 56, f"the fixture holds {len(cases)} graph cases, serial 128 has 56"
 
 
 def test_a_node_s_family_is_its_type_s_colour_word() -> None:
@@ -391,7 +391,7 @@ def test_degree_of_on_every_fixture_graph_case_equals_a_direct_count() -> None:
             assert d[n["id"]] == direct, (c["name"], n["id"])
 
 
-# Each element once in a multi-link (STAGED: serial 128): a list that names one element twice is read once, in its
+# Each element once in a multi-link (since serial 128): a list that names one element twice is read once, in its
 # first place. The npm SDK holds the same cases.
 _ONCE: dict[str, Any] = {
     "elements": [

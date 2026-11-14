@@ -85,7 +85,7 @@ def test_refused_before_reading() -> None:
 
 
 def test_a_list_naming_one_target_twice_reads_degree_1_and_two_near_orphans() -> None:
-    """(STAGED: serial 128) Each element once: the landing reader folds nothing itself; the graph ``world_graph``
+    """(since serial 128) Each element once: the landing reader folds nothing itself; the graph ``world_graph``
     answers holds one edge for the repeat, so both ends read degree 1 and are near orphans. A graph handed in with
     two edges still reads them as two."""
     world = {

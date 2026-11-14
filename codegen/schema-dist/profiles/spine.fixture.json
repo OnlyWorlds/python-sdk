@@ -5,7 +5,7 @@
     "type: the element's type slug; element: the keys a reader sees on the body (supertype and x_spine_*).",
     "read: what a conforming reader of one element says. kind: the list's spelling, 'off-list', or 'free' (Character, Institution, Collective).",
     "Each key is its value as read, or null when not stated. primary: the audience's first known word. probe: the verb ('http', 'gh repo', 'gh release', 'npm', 'pypi', 'dns', 'room', 'file', 'none') or 'unsupported'. retires: x_spine_retires as read, the retired row's id, on any element (a blank string is not stated; a non-blank string as given, untrimmed); the reader judges nothing about where it sits.",
-    "dropped: what the reader named and left out, each {key, value} with the value exactly as the element held it (compare as JSON values, never as text), in key order address, truth, access, status, layer, audience, depends_on, probe, verified, retires, and within a list in the list's order.",
+    "dropped: what the reader named and left out, each {key, value} with the value exactly as the element held it (compare as JSON values, never as text), in key order address, truth, access, status, layer, audience, depends_on, probe, verified, retires, and within a list in the list's order. A repeat a list names is read once, in its first place, and is not dropped: dropped lists what could not be read, and a repeat read once loses nothing.",
     "Not here: whether an id resolves, one owner per row, a Retirement Event: the world's audit, never a reader of one element."
   ],
   "cases": [
@@ -1070,6 +1070,34 @@
         "audience": null,
         "primary": null,
         "depends_on": [],
+        "probe": null,
+        "verified_at": null,
+        "retires": null,
+        "dropped": []
+      }
+    },
+    {
+      "name": "depends-on-a-repeat-is-read-once-and-not-dropped",
+      "type": "object",
+      "element": {
+        "supertype": "Tool",
+        "x_spine_depends_on": [
+          "id-1",
+          "id-1"
+        ]
+      },
+      "read": {
+        "kind": "Tool",
+        "address": null,
+        "truth": null,
+        "access": null,
+        "status": null,
+        "layer": null,
+        "audience": null,
+        "primary": null,
+        "depends_on": [
+          "id-1"
+        ],
         "probe": null,
         "verified_at": null,
         "retires": null,

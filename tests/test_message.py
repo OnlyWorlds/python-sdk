@@ -41,6 +41,7 @@ FIXTURE = REPO / "codegen" / "schema-dist" / "profiles" / "message.fixture.json"
 KINDS = {
     "pair": 10,
     "addressed": 11,
+    "recipients": 2,
     "sent_by": 3,
     "sender": 14,
     "unread": 22,
@@ -113,7 +114,7 @@ def replay(case: dict[str, Any], doc: dict[str, Any]) -> list[str]:
         expect("unread_for", ids(got_unread), case["unread"])
     elif kind == "thread":
         expect("thread_of", ids(thread_of(case["messages"], case["root"])), case["thread"])
-    elif kind == "recipients":  # STAGED: serial 128: each Character once, in the order of its first place
+    elif kind == "recipients":  # Since serial 128: each Character once, in the order of its first place
         expect("recipients_of", recipients_of(case["message"]), case["recipients"])
     else:
         wrong.append(f"{name}: a kind this test does not know: {kind!r}")
@@ -125,7 +126,7 @@ def test_every_fixture_case_is_answered_as_the_fixture_says() -> None:
     cases = doc["cases"]
     wrong = [line for case in cases for line in replay(case, doc)]
     assert wrong == []
-    assert len(cases) == 100, f"the fixture holds {len(cases)} cases, serial 123 has 100"
+    assert len(cases) == 102, f"the fixture holds {len(cases)} cases, serial 128 has 102"
     assert Counter(c["kind"] for c in cases) == KINDS
 
 
@@ -477,7 +478,7 @@ def test_keyless_is_a_boolean() -> None:
 
 
 def test_recipients_read_each_character_once_in_its_first_place() -> None:
-    """(STAGED: serial 128) A multi-link names each element once: a list naming one recipient twice answers it
+    """(since serial 128) A multi-link names each element once: a list naming one recipient twice answers it
     once, in its first place. The npm SDK holds the same case."""
     assert recipients_of({"type": "narrative", "supertype": "Message", "characters": [MARA, MARA, ADA]}) == [MARA, ADA]
     assert recipients_of({"type": "narrative", "supertype": "Message", "characters": [ADA, MARA, ADA]}) == [ADA, MARA]
@@ -485,7 +486,7 @@ def test_recipients_read_each_character_once_in_its_first_place() -> None:
 
 
 def test_a_narrative_that_is_not_a_message_has_no_recipients() -> None:
-    # STAGED serial 128: only a message is addressed; a Story's characters are the people it is about.
+    # Since serial 128: only a message is addressed; a Story's characters are the people it is about.
     story = {"type": "narrative", "supertype": "Story", "characters": ["a"]}
     assert not is_message(story)
     assert recipients_of(story) == []

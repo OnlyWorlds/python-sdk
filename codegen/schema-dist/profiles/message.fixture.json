@@ -5,6 +5,7 @@
     "pair: narrative + supertype Message, each trimmed and folded like the room profile's pairs; is_message is what isMessage must answer.",
     "characters and members: the world every case reads. characters is the world's Characters (id to name), the names a reader shows; members is the members list as GET members returns its rows (the owner's row has id null, matching a created_by of null).",
     "addressed: isAddressedTo(message, character); an empty character id (\"\") is never addressed, not even by an empty characters. An empty characters addresses every member only when the message's x_served_trimmed (served by keel, a list of field names) does not name characters; with it, the message is addressed to no Character the reader is given. unseen: isAddressedTo as above beside hasUnseenRecipients(message) as unseen_recipients, true when x_served_trimmed names characters (someone the reader cannot see is a recipient; never who or how many). everyone: isToEveryone(message, keyless) as to_everyone and hasUnseenRecipients(message, keyless) as unseen_recipients, keyless true for a body served without a credential (the keyless public reader, which keel never serves the mark): isToEveryone is true only for a message with an empty characters, no mark naming characters, and a credential; hasUnseenRecipients is null (unknown) for a keyless body. A case without keyless (unseen) has a credential. A keyless body's null narrator keeps senderStatus unverifiable, never unseen: with no mark, the reader cannot tell nobody from someone hidden (keyless-null-narrator-is-unverifiable). A Note (note_pair) is not a message and is addressed to nobody. sent_by: isSentBy(message, character), whether narrator is the character; a message with no narrator is sent by nobody.",
+    "recipients: recipientsOf(message) as recipients: the ids of characters, each Character once, in the order of its first place (a list served with one Character twice is read once, in its first place); a Note, or any Narrative that is not a message, has none.",
     "sender: senderStatus(message, members) is status; a case with members null is a world whose members list the reader cannot read. status unseen is a null narrator beside an x_served_trimmed naming narrator (a sender the reader cannot see, shown as from someone you cannot see), distinct from unverifiable for a null narrator without the mark; claimed is the narrator (null: none, shown as from nobody, or unseen); written_by, on a mismatch, is the author's Character.",
     "mark: readMarkOf(relations, character, members): of the Read relations given, the id of the reader's mark: actor the reader, written by the reader's own hand (the sender rule on actor: verified) or carrying no created_by at all (a folder, an export: no hand to check), and, where it carries changed_by, last changed by its creator (changed_by equal to created_by; a changed_by with no created_by beside it is ignored); the newest updated_at when there are several, whatever their order in the list; null when the reader has none, and always null for an empty character id. keyless true is a body served without a credential (the keyless public reader, served no created_by or changed_by): no mark counts there, so readMarkOf(relations, character, members, keyless) is null; a case without keyless has a credential, or is a folder.",
     "order: created_at, read as an instant (an offset and a fraction of a second count; a time with no offset is UTC) in the one form the page gives, matched whole, every part in its range, a year any four of the digits 0 to 9 from 0000 on the Gregorian calendar run on in both directions (the leap rule on the year's number as written, so 0000 is a leap year), and a fraction counted to its sixth digit, and two at the same instant keep the order of the list given (the server's list order); a created_at that cannot be read as a date and time (absent, null, 09:61, a word) comes after every readable one, in the order of the list given.",
@@ -196,6 +197,49 @@
       },
       "character": "019a3b10-0000-7000-8000-0000000000a4",
       "addressed": false
+    },
+    {
+      "kind": "recipients",
+      "name": "recipients-a-repeated-recipient-is-answered-once-in-its-first-place",
+      "message": {
+        "id": "019a3b10-0000-7000-8000-000000000d28",
+        "type": "narrative",
+        "supertype": "Message",
+        "name": "Message 128",
+        "story": "",
+        "narrator": "019a3b10-0000-7000-8000-0000000000a3",
+        "characters": [
+          "019a3b10-0000-7000-8000-0000000000a2",
+          "019a3b10-0000-7000-8000-0000000000a1",
+          "019a3b10-0000-7000-8000-0000000000a2"
+        ],
+        "parent_narrative": null,
+        "created_at": "2026-11-14T09:00:00Z"
+      },
+      "recipients": [
+        "019a3b10-0000-7000-8000-0000000000a2",
+        "019a3b10-0000-7000-8000-0000000000a1"
+      ],
+      "note": "characters names the second Character, then the first, then the second again: a message names each Character once, so the second is one recipient, answered in her first place, before the first. A reader that kept the last place would answer the first Character first; one that read the repeat twice would answer three recipients."
+    },
+    {
+      "kind": "recipients",
+      "name": "recipients-a-narrative-that-is-not-a-message-has-none",
+      "message": {
+        "id": "019a3b10-0000-7000-8000-000000000d29",
+        "type": "narrative",
+        "supertype": "Story",
+        "name": "Story 129",
+        "story": "",
+        "narrator": "019a3b10-0000-7000-8000-0000000000a3",
+        "characters": [
+          "019a3b10-0000-7000-8000-0000000000a1"
+        ],
+        "parent_narrative": null,
+        "created_at": "2026-11-14T09:01:00Z"
+      },
+      "recipients": [],
+      "note": "A Narrative with supertype Story is not a message, so it has no recipients: its characters are the people it is about. A reader answers recipients only for what the pair names a message."
     },
     {
       "kind": "addressed",

@@ -11,13 +11,15 @@
 
 **Degree** counts every edge, in or out, once at each node it touches. A mirror pair is two edges, and a link to itself counts once.
 
+**Each element once.** A multi-link, and any extension list a profile reads as links, names each element once (the lens profile's declared links `x_spine_depends_on` and `x_lens_leads_to` among them; a lens's anchors and a message's recipients are multi-links of the schema). A reader served a list that names one element twice reads it once, in its first place; a writer that is served one writes it back as it was served, and a writer that builds a list builds it with each element once. So a list that names one target twice is one edge in the graph `worldGraph` answers, counted once at each end. This reader folds nothing itself: it reads the graph it is given.
+
 **The rules.**
 1. **The mode.** `gaps` when the graph has fewer nodes than `size`, `graph` otherwise. The answer carries the `size` it was read at. Both parts are always read, and the mode says which one a door draws first.
 2. **Heads.** The Characters with at least one edge, most linked first, ties by id in code point order, the first `heads` of them. A known-of node is never a head. A world with no linked Character has no clusters.
 3. **Clusters.** A node within `hops` steps of a head joins the head it is fewest steps from. A step follows an edge either way, and a mirror pair is one step. When two heads are equally near, the node joins the higher-ranked one, so every node has one home. Each cluster is `{head, members}`, in the heads' order. A member is `{id, hops, degree}`: the head first at 0, then by hops, then by degree (highest first), then by id.
 4. **Unclustered.** Every node no head reaches, as `{id, degree}`, by degree (highest first), then by id: the world around the clusters, which a drawing mutes.
 5. **Gaps.** One entry per gap, `{kind, id}`, in the order of the kinds, then by id. A node can carry several. A known-of node is never a gap, since a stub carries no links. The kinds:
-   - `orphan` and `near_orphan`: a node of degree 0, and one of degree 1, by the degree this page defines (an edge counted once at every node it touches: a link to itself once, each place in a list once), never by a report's own count.
+   - `orphan` and `near_orphan`: a node of degree 0, and one of degree 1, by the degree this page defines (an edge counted once at every node it touches: a link to itself once, a list's element once however often the list names it), never by a report's own count.
    - `no_place`: a Character whose `location` names no Location node.
    - `nobody_here`: a Location that no Character's `location` names. Another type's `location` does not count.
 
@@ -31,10 +33,10 @@
 - the nearest head beating a higher-ranked one, and a tie on hops going to the higher-ranked;
 - the default reach and a wider one, and the cap on heads;
 - a Character with no link, and a known-of Character, as no head;
-- a mirror pair and a self link;
+- a mirror pair and a self link, and a list naming one target twice as the one edge the reader is served;
 - no Characters, and an empty graph;
 - each gap kind, an Object's `location`, and a place the visitor may not see;
 - the mode at, under and over the size, and null options;
 - the refusals.
 
-**Ruled**: 2026-11-01, on the first draft. 2026-11-02, serial 104: `orphan` and `near_orphan` by this page's degree (three engine ports read the toolkit's report count and the page's degree apart on a self link and a doubled target); a `heads` past the reader's integer range reads as the largest. 2026-11-02, the door sentence: any door may serve the answer, and a key beside the five is the door's own (a read of keel's two doors against this page).
+**Ruled**: 2026-11-01, on the first draft. 2026-11-02, serial 104: `orphan` and `near_orphan` by this page's degree (three engine ports read the toolkit's report count and the page's degree apart on a self link and a doubled target); a `heads` past the reader's integer range reads as the largest. 2026-11-02, the door sentence: any door may serve the answer, and a key beside the five is the door's own (a read of keel's two doors against this page). 2026-11-14, serial 128: a multi-link, and any extension list a profile reads as links, names each element once, so a list that names one target twice is one edge, counted once at each end, and a node that list alone links is a near orphan (the case that wanted two edges and degree 2 now wants one edge and degree 1).

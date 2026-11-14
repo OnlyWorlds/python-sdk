@@ -129,7 +129,7 @@ def world_graph(
 
     Each schema link field, and each extension field a profile declares a link (``x_lens_leads_to``,
     ``x_spine_depends_on``), gives one edge per target that is a node, with the target's place in the list as the
-    reader is served it; a link held on both ends is two edges. (STAGED: serial 128) A multi-link names each element
+    reader is served it; a link held on both ends is two edges. (since serial 128) A multi-link names each element
     once: a list that names one element twice gives one edge, at the first entry's place in the list as served, and
     a repeat to an element that is not a node is counted once; ids compare as written, so ``a`` and ``A`` are no
     repeat. A guest's known-of element has no edges out. A link
@@ -314,7 +314,7 @@ def world_graph(
 def degree_of(graph: Mapping[str, Any]) -> dict[str, int]:
     """Each node's degree in a graph ``world_graph`` answered: the number of its edges, in or out, each edge
     counted once for every node it touches (a mirror pair is two edges, so each end counts 2; a link to itself
-    counts once; (STAGED: serial 128) a list naming one element twice is one edge, so it counts 1). Every node is a
+    counts once; (since serial 128) a list naming one element twice is one edge, so it counts 1). Every node is a
     key, 0 included, in the graph's node order. Edges join nodes only, so the count
     is the reader's: what the reading left out (hidden, room, proposed, map space, past a lens) is never counted.
     This is "most linked" for a finder: rank by it, highest first. A graph that is not one is a TypeError. The
