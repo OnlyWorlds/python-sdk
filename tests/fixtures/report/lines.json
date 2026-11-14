@@ -12,7 +12,7 @@
    "words": "Renamed the Consul's Steinway"
   },
   {
-   "kind": "closing stop",
+   "kind": "closing stop; the profile's example (rule 8, ruling 3)",
    "line": "Renamed the Consul's Steinway: ow://object/068e2e56-d4b9-7c40-8000-173975bfd994.",
    "address": "ow://object/068e2e56-d4b9-7c40-8000-173975bfd994",
    "words": "Renamed the Consul's Steinway."
@@ -204,7 +204,7 @@
    "words": "Built ((ow://object/068e2e56-d4b9-7c40-8000-173975bfd994))"
   },
   {
-   "kind": "closer with no opener",
+   "kind": "closer with no opener; 3d an unmatched closer stays",
    "line": "Built: ow://object/068e2e56-d4b9-7c40-8000-173975bfd994).",
    "address": "ow://object/068e2e56-d4b9-7c40-8000-173975bfd994",
    "words": "Built)."
@@ -264,19 +264,19 @@
    "words": "Built éow://object/068e2e56-d4b9-7c40-8000-173975bfd994"
   },
   {
-   "kind": "address first",
+   "kind": "address first; 3b an address first",
    "line": "ow://object/068e2e56-d4b9-7c40-8000-173975bfd994 was built.",
    "address": "ow://object/068e2e56-d4b9-7c40-8000-173975bfd994",
    "words": "ow://object/068e2e56-d4b9-7c40-8000-173975bfd994 was built."
   },
   {
-   "kind": "address only",
+   "kind": "address only; 3b a bare address shows itself",
    "line": "ow://object/068e2e56-d4b9-7c40-8000-173975bfd994",
    "address": "ow://object/068e2e56-d4b9-7c40-8000-173975bfd994",
    "words": "ow://object/068e2e56-d4b9-7c40-8000-173975bfd994"
   },
   {
-   "kind": "colon then address",
+   "kind": "colon then address; 3b only a colon before",
    "line": ": ow://object/068e2e56-d4b9-7c40-8000-173975bfd994",
    "address": "ow://object/068e2e56-d4b9-7c40-8000-173975bfd994",
    "words": ": ow://object/068e2e56-d4b9-7c40-8000-173975bfd994"
@@ -486,12 +486,6 @@
    "words": "Built: ow://object/068e2e56-d4b9-7c40-8000-173975bfd994"
   },
   {
-   "kind": "the profile's example (rule 8, ruling 3)",
-   "line": "Renamed the Consul's Steinway: ow://object/068e2e56-d4b9-7c40-8000-173975bfd994.",
-   "address": "ow://object/068e2e56-d4b9-7c40-8000-173975bfd994",
-   "words": "Renamed the Consul's Steinway."
-  },
-  {
    "kind": "one space at the joint (ruling 3)",
    "line": "e ow://map/068e2e56-d4b9-7c40-8000-173975bfd994  3",
    "address": "ow://map/068e2e56-d4b9-7c40-8000-173975bfd994",
@@ -540,25 +534,7 @@
    "words": "Built (ow://object/068e2e56-d4b9-7c40-8000-173975bfd994 today"
   },
   {
-   "kind": "3b a bare address shows itself",
-   "line": "ow://object/068e2e56-d4b9-7c40-8000-173975bfd994",
-   "address": "ow://object/068e2e56-d4b9-7c40-8000-173975bfd994",
-   "words": "ow://object/068e2e56-d4b9-7c40-8000-173975bfd994"
-  },
-  {
-   "kind": "3b an address first",
-   "line": "ow://object/068e2e56-d4b9-7c40-8000-173975bfd994 was built.",
-   "address": "ow://object/068e2e56-d4b9-7c40-8000-173975bfd994",
-   "words": "ow://object/068e2e56-d4b9-7c40-8000-173975bfd994 was built."
-  },
-  {
-   "kind": "3b only a colon before",
-   "line": ": ow://object/068e2e56-d4b9-7c40-8000-173975bfd994",
-   "address": "ow://object/068e2e56-d4b9-7c40-8000-173975bfd994",
-   "words": ": ow://object/068e2e56-d4b9-7c40-8000-173975bfd994"
-  },
-  {
-   "kind": "3b only White_Space before a pair",
+   "kind": "3b only White_Space before a pair; the trim's own case: a line read as given, untrimmed (in a text, ruling 1 trims it first)",
    "line": "  (ow://object/068e2e56-d4b9-7c40-8000-173975bfd994)",
    "address": "ow://object/068e2e56-d4b9-7c40-8000-173975bfd994",
    "words": "  (ow://object/068e2e56-d4b9-7c40-8000-173975bfd994)"
@@ -568,12 +544,6 @@
    "line": "Renamed the Steinway : ow://object/068e2e56-d4b9-7c40-8000-173975bfd994.",
    "address": "ow://object/068e2e56-d4b9-7c40-8000-173975bfd994",
    "words": "Renamed the Steinway."
-  },
-  {
-   "kind": "3d an unmatched closer stays",
-   "line": "Built: ow://object/068e2e56-d4b9-7c40-8000-173975bfd994).",
-   "address": "ow://object/068e2e56-d4b9-7c40-8000-173975bfd994",
-   "words": "Built)."
   },
   {
    "kind": "3e an opening bracket is no closing mark",

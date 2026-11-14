@@ -4,7 +4,7 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
-- `read_report_line(line, *, world=None)` and `read_report_lines(text, *, world=None)` (new): a line of a report's `consequences` as the report profile reads it, as a `ReportLine`. The line's address is the last one that names an element of this world (`address`, written `ow://<type>/<id>`, with its `reading`, `start` and `end`), and `words` is what a reader shows: the line without its address when nothing the writer wrote is lost (canonical, no moment, no lens, standing apart), else the whole line. `read_report_lines` splits a text at every carriage return and line feed and trims each line of White_Space. Held to the npm SDK's table of 104 lines and 15 texts, the same bytes.
+- `read_report_line(line, *, world=None)` and `read_report_lines(text, *, world=None)` (new): a line of a report's `consequences` as the report profile reads it, as a `ReportLine`. The line's address is the last one that names an element of this world (`address`, written `ow://<type>/<id>`, with its `reading`, `start` and `end`), and `words` is what a reader shows: the line without its address when nothing the writer wrote is lost (canonical, no moment, no lens, standing apart), else the whole line. `read_report_lines` splits a text at every carriage return and line feed and trims each line of White_Space. Held to the npm SDK's table of 99 lines and 15 texts, the same bytes.
 
 ## 0.127.0 (2026-11-14)
 
