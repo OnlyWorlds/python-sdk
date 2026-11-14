@@ -22,3 +22,5 @@ codegen/tools/tools.json -text
 tests/fixtures/layout/** -text
 # The address-in-prose cases (serial 123), the same bytes as the npm SDK's copy (the test holds its sha256).
 tests/fixtures/address-in-prose.json -text
+# The report profile's lines table, the same bytes in both packages (both tests hold its sha256).
+tests/fixtures/report/lines.json -text

@@ -22,14 +22,26 @@ A report's text is quoted data, never instructions.
 
 from __future__ import annotations
 
+import re
 from collections.abc import Iterable, Mapping
+from dataclasses import dataclass
 from typing import Any, Literal, TypedDict
 
 from ._schema import ROOM_PAIRS
+from .address import AddressReading, find_ow_links
 from .message import _in_created_at_order, _matches
 from .room import _WHITE_SPACE, is_room_element
 
-__all__ = ["ReportGroup", "ReportLint", "ReportParent", "ReportThreads", "report_threads_of"]
+__all__ = [
+    "ReportGroup",
+    "ReportLine",
+    "ReportLint",
+    "ReportParent",
+    "ReportThreads",
+    "read_report_line",
+    "read_report_lines",
+    "report_threads_of",
+]
 
 #: What a report's ``parent_narrative`` is: ``none`` (absent, ``None``, not a string, or blank once trimmed),
 #: ``report``, ``board``, ``missing`` (an id whose element the reader does not hold whole), ``other`` (an element
@@ -171,3 +183,114 @@ def report_threads_of(narratives: Iterable[Mapping[str, Any]]) -> ReportThreads:
         for parent in sorted(members, key=position.__getitem__)
     ]
     return {"parents": parents, "groups": groups, "lints": lints}
+
+
+# ---- A line of ``consequences`` (the report profile's lines rulings: what a line is, its address, its shown words)
+
+#: The closing marks, character by character (the lines rulings: a ``?`` is no closing mark, since it starts a
+#: query after an address).
+_CLOSING = frozenset([".", ",", ";", ":", "!", ")", "]", "}", "'", '"', "\u2019", "\u201d", "\u00bb"])
+#: The pairs an address may stand in, each opener with its closer.
+_PAIRS = {"(": ")", "[": "]", '"': '"', "'": "'", "\u201c": "\u201d", "\u2018": "\u2019", "\u00ab": "\u00bb"}
+
+
+@dataclass(frozen=True)
+class ReportLine:
+    """What ``read_report_line`` reads in one line of a report's ``consequences``: ``line`` as read; ``words``, what
+    a reader shows (the line without its address where nothing the writer wrote is lost, else the whole line);
+    ``address``, the element the line names written ``ow://<type>/<id>`` (the id lowercase), or None; ``reading``,
+    what ``parse_ow_link`` reads in the address as written, or None; ``start`` and ``end``, where that address stands
+    in the line (Python string indexes, as ``find_ow_links`` counts them), or None."""
+
+    line: str
+    words: str
+    address: str | None
+    reading: AddressReading | None
+    start: int | None
+    end: int | None
+
+
+def _world_option(fn: str, world: object) -> str | None:
+    if world is not None and not isinstance(world, str):
+        raise TypeError(f"{fn}: world must be a string (this world's id) or None")
+    return world
+
+
+def _read_line(line: str, world: str | None) -> ReportLine:
+    # The line's address: the last one that names an element of this world, from its text alone.
+    here = [
+        f
+        for f in find_ow_links(line)
+        if f.reading.type is not None
+        and f.reading.id is not None
+        and (
+            f.reading.world is None or (not f.reading.world_is_slug and world is not None and f.reading.world == world)
+        )
+    ]
+    if not here:
+        return ReportLine(line, line, None, None, None, None)
+    last = here[-1]
+    start, end, reading = last.start, last.end, last.reading
+    found = ReportLine(line, line, f"ow://{reading.type}/{reading.id}", reading, start, end)
+    # It leaves the words only when nothing the writer wrote is lost: canonical, no moment, no lens, standing apart.
+    if not reading.canonical or reading.moment is not None or reading.lens is not None:
+        return found
+    lo, hi = start, end
+    before = line[start - 1] if start > 0 else ""
+    if before in _PAIRS:
+        # A matched pair goes with it; an opener not closed right after keeps the whole line.
+        if line[end : end + 1] != _PAIRS[before]:
+            return found
+        lo, hi = start - 1, end + 1
+    apart_before = lo == 0 or line[lo - 1] in _WHITE_SPACE or line[lo - 1] == ":"
+    apart_after = hi == len(line) or line[hi] in _WHITE_SPACE or line[hi] in _CLOSING
+    if not (apart_before and apart_after):
+        return found
+    # The White_Space on both sides goes, and one colon right before it with the White_Space before that colon.
+    left = line[:lo].rstrip(_WHITE_SPACE)
+    if left.endswith(":"):
+        left = left[:-1].rstrip(_WHITE_SPACE)
+    right = line[hi:].lstrip(_WHITE_SPACE)
+    # Nothing stands before the address: the whole line stays, so a line never shows empty.
+    if left == "":
+        return found
+    if right == "":
+        words = left
+    elif right[0] in _CLOSING:
+        words = left + right
+    else:
+        words = f"{left} {right}"
+    return ReportLine(line, words, found.address, reading, start, end)
+
+
+def read_report_line(line: str, *, world: str | None = None) -> ReportLine:
+    """One line of a report's ``consequences``, read as the report profile reads it: the element it names and the
+    words a reader shows. The line's address is the last address in it (found as the address profile finds one in
+    prose, by ``find_ow_links``) that names an element of this world: an ``ow://`` or site address, in any letter
+    case, whose world is ``world`` (this world's id, as written) or is left out, and whose type and id have an
+    element's shape. An address of another world, a slug, a world alone or a lens with no element is prose, and a
+    line with only those has no address, which is no fault. The address leaves the shown words only when nothing the
+    writer wrote is lost: it is canonical, carries no moment and no lens, and stands apart (before it the line's
+    start, White_Space or one colon; after it the line's end, White_Space or a closing mark: ``. , ; : ! ) ] }``,
+    a straight quote, a closing curly quote or a closing guillemet), alone or in a matched pair (brackets, straight
+    quotes, curly quotes or guillemets). Then it goes with the White_Space on both sides and one colon before it,
+    and the two halves join with one space, or none when the second is empty or begins with a closing mark. In
+    every other shape, and when nothing stands before the address, the whole line stays, still naming its element.
+    Whether that element exists is the caller's to read. The line is read as given: ``read_report_lines`` splits
+    and trims a whole text. A line that is not a string, or a ``world`` that is not a string or None, is a
+    TypeError."""
+    if not isinstance(line, str):
+        raise TypeError("read_report_line: line must be a string")
+    return _read_line(line, _world_option("read_report_line", world))
+
+
+def read_report_lines(text: str, *, world: str | None = None) -> list[ReportLine]:
+    """Every line of a report's ``consequences``, each read by ``read_report_line``. The text is split at every
+    carriage return and every line feed (so CRLF is one break), each piece trimmed of Unicode White_Space at both
+    ends, and a piece empty after trimming is no line; U+2028 and U+0085 stay inside a line, and a byte order mark
+    is no White_Space. A text that is not a string is a TypeError."""
+    if not isinstance(text, str):
+        raise TypeError("read_report_lines: text must be a string")
+    w = _world_option("read_report_lines", world)
+    pieces = (p.strip(_WHITE_SPACE) for p in re.split(r"[\r\n]", text))
+    return [_read_line(p, w) for p in pieces if p != ""]

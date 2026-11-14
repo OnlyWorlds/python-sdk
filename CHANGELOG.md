@@ -4,6 +4,8 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+- `read_report_line(line, *, world=None)` and `read_report_lines(text, *, world=None)` (new): a line of a report's `consequences` as the report profile reads it, as a `ReportLine`. The line's address is the last one that names an element of this world (`address`, written `ow://<type>/<id>`, with its `reading`, `start` and `end`), and `words` is what a reader shows: the line without its address when nothing the writer wrote is lost (canonical, no moment, no lens, standing apart), else the whole line. `read_report_lines` splits a text at every carriage return and line feed and trims each line of White_Space. Held to the npm SDK's table of 104 lines and 15 texts, the same bytes.
+
 ## 0.127.0 (2026-11-14)
 
 - `layout_by_kind(graph)` (new): a world nobody laid out, laid out from its graph as `world_graph` answers it. Each kind gets an anchor on a circle, links act as springs and neighbours push apart for 320 seeded steps (160 past 2,000 elements), then the points are fitted into a frame of -1 to 1. Answers `{"method": "by-kind", "version": 1, "points": [{"id", "x", "y"}, ...]}` in the caller's node order. The graph is first put in one order (nodes by id; edges by source, field, index, then target, by code point), so a graph handed in another order gives the same points by id. The anchors are a baked table, never computed with the runtime's cosine and sine, so the points equal the npm SDK's `layoutByKind` to the last bit; the shared fixture `tests/fixtures/layout/by-kind.json` is replayed exactly.

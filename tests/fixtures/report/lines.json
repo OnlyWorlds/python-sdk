@@ -1,0 +1,865 @@
+{
+ "profile": "report",
+ "table": "lines",
+ "status": "draft",
+ "about": "A line of consequences: texts split at every CR and LF and trimmed of White_Space (ruling 1); each line's address, the last that names an element of this world, written ow://<type>/<id>, or null (ruling 2); the shown words (ruling 3). `kind` is a note, never compared.",
+ "world": "068e012b-52a9-79bf-8000-26bb67891425",
+ "cases": [
+  {
+   "kind": "plain",
+   "line": "Renamed the Consul's Steinway: ow://object/068e2e56-d4b9-7c40-8000-173975bfd994",
+   "address": "ow://object/068e2e56-d4b9-7c40-8000-173975bfd994",
+   "words": "Renamed the Consul's Steinway"
+  },
+  {
+   "kind": "closing stop",
+   "line": "Renamed the Consul's Steinway: ow://object/068e2e56-d4b9-7c40-8000-173975bfd994.",
+   "address": "ow://object/068e2e56-d4b9-7c40-8000-173975bfd994",
+   "words": "Renamed the Consul's Steinway."
+  },
+  {
+   "kind": "prose after",
+   "line": "Renamed: ow://object/068e2e56-d4b9-7c40-8000-173975bfd994, then hung it.",
+   "address": "ow://object/068e2e56-d4b9-7c40-8000-173975bfd994",
+   "words": "Renamed, then hung it."
+  },
+  {
+   "kind": "pick: later other world",
+   "line": "Built: ow://object/068e2e56-d4b9-7c40-8000-173975bfd994 and ow://019a0000-1111-7222-8333-444455556666/object/068e2e8c-e2f4-7e4c-8000-8abcf4e8e286",
+   "address": "ow://object/068e2e56-d4b9-7c40-8000-173975bfd994",
+   "words": "Built and ow://019a0000-1111-7222-8333-444455556666/object/068e2e8c-e2f4-7e4c-8000-8abcf4e8e286"
+  },
+  {
+   "kind": "pick: later slug",
+   "line": "Built: ow://object/068e2e56-d4b9-7c40-8000-173975bfd994 then https://www.onlyworlds.com/w/my-world/object/068e2e8c-e2f4-7e4c-8000-8abcf4e8e286",
+   "address": "ow://object/068e2e56-d4b9-7c40-8000-173975bfd994",
+   "words": "Built then https://www.onlyworlds.com/w/my-world/object/068e2e8c-e2f4-7e4c-8000-8abcf4e8e286"
+  },
+  {
+   "kind": "pick: later world alone",
+   "line": "Built: ow://object/068e2e56-d4b9-7c40-8000-173975bfd994 in ow://019a0000-1111-7222-8333-444455556666",
+   "address": "ow://object/068e2e56-d4b9-7c40-8000-173975bfd994",
+   "words": "Built in ow://019a0000-1111-7222-8333-444455556666"
+  },
+  {
+   "kind": "pick: later this world alone",
+   "line": "Built: ow://object/068e2e56-d4b9-7c40-8000-173975bfd994 in ow://068e012b-52a9-79bf-8000-26bb67891425",
+   "address": "ow://object/068e2e56-d4b9-7c40-8000-173975bfd994",
+   "words": "Built in ow://068e012b-52a9-79bf-8000-26bb67891425"
+  },
+  {
+   "kind": "pick: later site world alone",
+   "line": "Built: ow://object/068e2e56-d4b9-7c40-8000-173975bfd994 on https://www.onlyworlds.com/w/068e012b-52a9-79bf-8000-26bb67891425",
+   "address": "ow://object/068e2e56-d4b9-7c40-8000-173975bfd994",
+   "words": "Built on https://www.onlyworlds.com/w/068e012b-52a9-79bf-8000-26bb67891425"
+  },
+  {
+   "kind": "pick: later site slug alone",
+   "line": "Built: ow://object/068e2e56-d4b9-7c40-8000-173975bfd994 on https://www.onlyworlds.com/w/my-world",
+   "address": "ow://object/068e2e56-d4b9-7c40-8000-173975bfd994",
+   "words": "Built on https://www.onlyworlds.com/w/my-world"
+  },
+  {
+   "kind": "site form, this world",
+   "line": "Built: https://www.onlyworlds.com/w/068e012b-52a9-79bf-8000-26bb67891425/object/068e2e56-d4b9-7c40-8000-173975bfd994",
+   "address": "ow://object/068e2e56-d4b9-7c40-8000-173975bfd994",
+   "words": "Built"
+  },
+  {
+   "kind": "site form, other world",
+   "line": "Built: https://www.onlyworlds.com/w/019a0000-1111-7222-8333-444455556666/object/068e2e56-d4b9-7c40-8000-173975bfd994",
+   "address": null,
+   "words": "Built: https://www.onlyworlds.com/w/019a0000-1111-7222-8333-444455556666/object/068e2e56-d4b9-7c40-8000-173975bfd994"
+  },
+  {
+   "kind": "site form, slug",
+   "line": "Built: https://www.onlyworlds.com/w/my-world/object/068e2e56-d4b9-7c40-8000-173975bfd994",
+   "address": null,
+   "words": "Built: https://www.onlyworlds.com/w/my-world/object/068e2e56-d4b9-7c40-8000-173975bfd994"
+  },
+  {
+   "kind": "other world only",
+   "line": "Built: ow://019a0000-1111-7222-8333-444455556666/object/068e2e56-d4b9-7c40-8000-173975bfd994",
+   "address": null,
+   "words": "Built: ow://019a0000-1111-7222-8333-444455556666/object/068e2e56-d4b9-7c40-8000-173975bfd994"
+  },
+  {
+   "kind": "cross-world form, this world",
+   "line": "Built: ow://068e012b-52a9-79bf-8000-26bb67891425/object/068e2e56-d4b9-7c40-8000-173975bfd994",
+   "address": "ow://object/068e2e56-d4b9-7c40-8000-173975bfd994",
+   "words": "Built"
+  },
+  {
+   "kind": "case: upper id",
+   "line": "Built: ow://object/068E2E56-D4B9-7C40-8000-173975BFD994",
+   "address": "ow://object/068e2e56-d4b9-7c40-8000-173975bfd994",
+   "words": "Built: ow://object/068E2E56-D4B9-7C40-8000-173975BFD994"
+  },
+  {
+   "kind": "case: upper world id",
+   "line": "Built: ow://068E012B-52A9-79BF-8000-26BB67891425/object/068e2e56-d4b9-7c40-8000-173975bfd994",
+   "address": "ow://object/068e2e56-d4b9-7c40-8000-173975bfd994",
+   "words": "Built: ow://068E012B-52A9-79BF-8000-26BB67891425/object/068e2e56-d4b9-7c40-8000-173975bfd994"
+  },
+  {
+   "kind": "case: mixed id",
+   "line": "Built: ow://object/068E2e56-D4b9-7c40-8000-173975BFD994",
+   "address": "ow://object/068e2e56-d4b9-7c40-8000-173975bfd994",
+   "words": "Built: ow://object/068E2e56-D4b9-7c40-8000-173975BFD994"
+  },
+  {
+   "kind": "case: Object type word",
+   "line": "Built: ow://Object/068e2e56-d4b9-7c40-8000-173975bfd994",
+   "address": null,
+   "words": "Built: ow://Object/068e2e56-d4b9-7c40-8000-173975bfd994"
+  },
+  {
+   "kind": "case: OW prefix",
+   "line": "Built: OW://object/068e2e56-d4b9-7c40-8000-173975bfd994",
+   "address": null,
+   "words": "Built: OW://object/068e2e56-d4b9-7c40-8000-173975bfd994"
+  },
+  {
+   "kind": "case: WWW host",
+   "line": "Built: https://WWW.onlyworlds.com/w/068e012b-52a9-79bf-8000-26bb67891425/object/068e2e56-d4b9-7c40-8000-173975bfd994",
+   "address": null,
+   "words": "Built: https://WWW.onlyworlds.com/w/068e012b-52a9-79bf-8000-26bb67891425/object/068e2e56-d4b9-7c40-8000-173975bfd994"
+  },
+  {
+   "kind": "moment",
+   "line": "Built: ow://object/068e2e56-d4b9-7c40-8000-173975bfd994@12",
+   "address": "ow://object/068e2e56-d4b9-7c40-8000-173975bfd994",
+   "words": "Built: ow://object/068e2e56-d4b9-7c40-8000-173975bfd994@12"
+  },
+  {
+   "kind": "moment, stop",
+   "line": "Built: ow://object/068e2e56-d4b9-7c40-8000-173975bfd994@-3.",
+   "address": "ow://object/068e2e56-d4b9-7c40-8000-173975bfd994",
+   "words": "Built: ow://object/068e2e56-d4b9-7c40-8000-173975bfd994@-3."
+  },
+  {
+   "kind": "lens",
+   "line": "Built: ow://object/068e2e56-d4b9-7c40-8000-173975bfd994?lens=068e2e8c-e2f4-7e4c-8000-8abcf4e8e286",
+   "address": "ow://object/068e2e56-d4b9-7c40-8000-173975bfd994",
+   "words": "Built: ow://object/068e2e56-d4b9-7c40-8000-173975bfd994?lens=068e2e8c-e2f4-7e4c-8000-8abcf4e8e286"
+  },
+  {
+   "kind": "lens and other key",
+   "line": "Built: ow://object/068e2e56-d4b9-7c40-8000-173975bfd994?lens=068e2e8c-e2f4-7e4c-8000-8abcf4e8e286&x=1",
+   "address": "ow://object/068e2e56-d4b9-7c40-8000-173975bfd994",
+   "words": "Built: ow://object/068e2e56-d4b9-7c40-8000-173975bfd994?lens=068e2e8c-e2f4-7e4c-8000-8abcf4e8e286&x=1"
+  },
+  {
+   "kind": "other query",
+   "line": "Built: ow://object/068e2e56-d4b9-7c40-8000-173975bfd994?x=1",
+   "address": "ow://object/068e2e56-d4b9-7c40-8000-173975bfd994",
+   "words": "Built: ow://object/068e2e56-d4b9-7c40-8000-173975bfd994?x=1"
+  },
+  {
+   "kind": "fragment",
+   "line": "Built: ow://object/068e2e56-d4b9-7c40-8000-173975bfd994#top",
+   "address": "ow://object/068e2e56-d4b9-7c40-8000-173975bfd994",
+   "words": "Built: ow://object/068e2e56-d4b9-7c40-8000-173975bfd994#top"
+  },
+  {
+   "kind": "ampersand",
+   "line": "Built: ow://object/068e2e56-d4b9-7c40-8000-173975bfd994&more",
+   "address": "ow://object/068e2e56-d4b9-7c40-8000-173975bfd994",
+   "words": "Built: ow://object/068e2e56-d4b9-7c40-8000-173975bfd994&more"
+  },
+  {
+   "kind": "markdown link",
+   "line": "Set [Ada](ow://character/068e2e56-d4b9-7c40-8000-173975bfd994) as heir",
+   "address": "ow://character/068e2e56-d4b9-7c40-8000-173975bfd994",
+   "words": "Set [Ada](ow://character/068e2e56-d4b9-7c40-8000-173975bfd994) as heir"
+  },
+  {
+   "kind": "quote, stop",
+   "line": "Quoted \"ow://object/068e2e56-d4b9-7c40-8000-173975bfd994\".",
+   "address": "ow://object/068e2e56-d4b9-7c40-8000-173975bfd994",
+   "words": "Quoted."
+  },
+  {
+   "kind": "quote unclosed",
+   "line": "Quoted \"ow://object/068e2e56-d4b9-7c40-8000-173975bfd994",
+   "address": "ow://object/068e2e56-d4b9-7c40-8000-173975bfd994",
+   "words": "Quoted \"ow://object/068e2e56-d4b9-7c40-8000-173975bfd994"
+  },
+  {
+   "kind": "parens, prose",
+   "line": "Moved the gate (ow://object/068e2e56-d4b9-7c40-8000-173975bfd994) today",
+   "address": "ow://object/068e2e56-d4b9-7c40-8000-173975bfd994",
+   "words": "Moved the gate today"
+  },
+  {
+   "kind": "bracket unclosed",
+   "line": "Moved the gate [ow://object/068e2e56-d4b9-7c40-8000-173975bfd994 to the hall",
+   "address": "ow://object/068e2e56-d4b9-7c40-8000-173975bfd994",
+   "words": "Moved the gate [ow://object/068e2e56-d4b9-7c40-8000-173975bfd994 to the hall"
+  },
+  {
+   "kind": "double parens",
+   "line": "Built ((ow://object/068e2e56-d4b9-7c40-8000-173975bfd994))",
+   "address": "ow://object/068e2e56-d4b9-7c40-8000-173975bfd994",
+   "words": "Built ((ow://object/068e2e56-d4b9-7c40-8000-173975bfd994))"
+  },
+  {
+   "kind": "closer with no opener",
+   "line": "Built: ow://object/068e2e56-d4b9-7c40-8000-173975bfd994).",
+   "address": "ow://object/068e2e56-d4b9-7c40-8000-173975bfd994",
+   "words": "Built)."
+  },
+  {
+   "kind": "closer with no opener, bare",
+   "line": "Built: ow://object/068e2e56-d4b9-7c40-8000-173975bfd994)",
+   "address": "ow://object/068e2e56-d4b9-7c40-8000-173975bfd994",
+   "words": "Built)"
+  },
+  {
+   "kind": "parens around more than the address",
+   "line": "Built (see ow://object/068e2e56-d4b9-7c40-8000-173975bfd994) today",
+   "address": "ow://object/068e2e56-d4b9-7c40-8000-173975bfd994",
+   "words": "Built (see) today"
+  },
+  {
+   "kind": "parens, stop",
+   "line": "Built (ow://object/068e2e56-d4b9-7c40-8000-173975bfd994).",
+   "address": "ow://object/068e2e56-d4b9-7c40-8000-173975bfd994",
+   "words": "Built."
+  },
+  {
+   "kind": "pair inside a word",
+   "line": "x(ow://object/068e2e56-d4b9-7c40-8000-173975bfd994)s",
+   "address": "ow://object/068e2e56-d4b9-7c40-8000-173975bfd994",
+   "words": "x(ow://object/068e2e56-d4b9-7c40-8000-173975bfd994)s"
+  },
+  {
+   "kind": "glued: hyphen",
+   "line": "Built x-ow://object/068e2e56-d4b9-7c40-8000-173975bfd994",
+   "address": "ow://object/068e2e56-d4b9-7c40-8000-173975bfd994",
+   "words": "Built x-ow://object/068e2e56-d4b9-7c40-8000-173975bfd994"
+  },
+  {
+   "kind": "glued: digit",
+   "line": "Built 3ow://object/068e2e56-d4b9-7c40-8000-173975bfd994",
+   "address": "ow://object/068e2e56-d4b9-7c40-8000-173975bfd994",
+   "words": "Built 3ow://object/068e2e56-d4b9-7c40-8000-173975bfd994"
+  },
+  {
+   "kind": "glued: letter (no address)",
+   "line": "Built elbow://object/068e2e56-d4b9-7c40-8000-173975bfd994",
+   "address": null,
+   "words": "Built elbow://object/068e2e56-d4b9-7c40-8000-173975bfd994"
+  },
+  {
+   "kind": "glued: underscore (no address)",
+   "line": "Built _ow://object/068e2e56-d4b9-7c40-8000-173975bfd994",
+   "address": null,
+   "words": "Built _ow://object/068e2e56-d4b9-7c40-8000-173975bfd994"
+  },
+  {
+   "kind": "glued: combining mark (no address)",
+   "line": "Built éow://object/068e2e56-d4b9-7c40-8000-173975bfd994",
+   "address": null,
+   "words": "Built éow://object/068e2e56-d4b9-7c40-8000-173975bfd994"
+  },
+  {
+   "kind": "address first",
+   "line": "ow://object/068e2e56-d4b9-7c40-8000-173975bfd994 was built.",
+   "address": "ow://object/068e2e56-d4b9-7c40-8000-173975bfd994",
+   "words": "ow://object/068e2e56-d4b9-7c40-8000-173975bfd994 was built."
+  },
+  {
+   "kind": "address only",
+   "line": "ow://object/068e2e56-d4b9-7c40-8000-173975bfd994",
+   "address": "ow://object/068e2e56-d4b9-7c40-8000-173975bfd994",
+   "words": "ow://object/068e2e56-d4b9-7c40-8000-173975bfd994"
+  },
+  {
+   "kind": "colon then address",
+   "line": ": ow://object/068e2e56-d4b9-7c40-8000-173975bfd994",
+   "address": "ow://object/068e2e56-d4b9-7c40-8000-173975bfd994",
+   "words": ": ow://object/068e2e56-d4b9-7c40-8000-173975bfd994"
+  },
+  {
+   "kind": "space runs",
+   "line": "Built:  ow://object/068e2e56-d4b9-7c40-8000-173975bfd994   today",
+   "address": "ow://object/068e2e56-d4b9-7c40-8000-173975bfd994",
+   "words": "Built today"
+  },
+  {
+   "kind": "marks after",
+   "line": "Built: ow://object/068e2e56-d4b9-7c40-8000-173975bfd994 !!",
+   "address": "ow://object/068e2e56-d4b9-7c40-8000-173975bfd994",
+   "words": "Built!!"
+  },
+  {
+   "kind": "emoji after, spaced",
+   "line": "Built: ow://object/068e2e56-d4b9-7c40-8000-173975bfd994 🎉",
+   "address": "ow://object/068e2e56-d4b9-7c40-8000-173975bfd994",
+   "words": "Built 🎉"
+  },
+  {
+   "kind": "emoji after, glued",
+   "line": "Built: ow://object/068e2e56-d4b9-7c40-8000-173975bfd994🎉",
+   "address": "ow://object/068e2e56-d4b9-7c40-8000-173975bfd994",
+   "words": "Built: ow://object/068e2e56-d4b9-7c40-8000-173975bfd994🎉"
+  },
+  {
+   "kind": "ellipsis after",
+   "line": "Built: ow://object/068e2e56-d4b9-7c40-8000-173975bfd994…",
+   "address": "ow://object/068e2e56-d4b9-7c40-8000-173975bfd994",
+   "words": "Built: ow://object/068e2e56-d4b9-7c40-8000-173975bfd994…"
+  },
+  {
+   "kind": "dash after",
+   "line": "Built: ow://object/068e2e56-d4b9-7c40-8000-173975bfd994—then more",
+   "address": "ow://object/068e2e56-d4b9-7c40-8000-173975bfd994",
+   "words": "Built: ow://object/068e2e56-d4b9-7c40-8000-173975bfd994—then more"
+  },
+  {
+   "kind": "letter after id",
+   "line": "Built: ow://object/068e2e56-d4b9-7c40-8000-173975bfd994x",
+   "address": "ow://object/068e2e56-d4b9-7c40-8000-173975bfd994",
+   "words": "Built: ow://object/068e2e56-d4b9-7c40-8000-173975bfd994x"
+  },
+  {
+   "kind": "colon after",
+   "line": "Built: ow://object/068e2e56-d4b9-7c40-8000-173975bfd994:",
+   "address": "ow://object/068e2e56-d4b9-7c40-8000-173975bfd994",
+   "words": "Built:"
+  },
+  {
+   "kind": "brace after",
+   "line": "Built: ow://object/068e2e56-d4b9-7c40-8000-173975bfd994}",
+   "address": "ow://object/068e2e56-d4b9-7c40-8000-173975bfd994",
+   "words": "Built}"
+  },
+  {
+   "kind": "ws: NBSP before",
+   "line": "Built: ow://object/068e2e56-d4b9-7c40-8000-173975bfd994",
+   "address": "ow://object/068e2e56-d4b9-7c40-8000-173975bfd994",
+   "words": "Built"
+  },
+  {
+   "kind": "ws: FEFF before",
+   "line": "Built:﻿ow://object/068e2e56-d4b9-7c40-8000-173975bfd994",
+   "address": "ow://object/068e2e56-d4b9-7c40-8000-173975bfd994",
+   "words": "Built:﻿ow://object/068e2e56-d4b9-7c40-8000-173975bfd994"
+  },
+  {
+   "kind": "ws: U+0085 before",
+   "line": "Built:ow://object/068e2e56-d4b9-7c40-8000-173975bfd994",
+   "address": "ow://object/068e2e56-d4b9-7c40-8000-173975bfd994",
+   "words": "Built"
+  },
+  {
+   "kind": "ws: U+3000 around",
+   "line": "Built:　ow://object/068e2e56-d4b9-7c40-8000-173975bfd994　today",
+   "address": "ow://object/068e2e56-d4b9-7c40-8000-173975bfd994",
+   "words": "Built today"
+  },
+  {
+   "kind": "ws: FEFF after",
+   "line": "Built: ow://object/068e2e56-d4b9-7c40-8000-173975bfd994﻿ today",
+   "address": "ow://object/068e2e56-d4b9-7c40-8000-173975bfd994",
+   "words": "Built: ow://object/068e2e56-d4b9-7c40-8000-173975bfd994﻿ today"
+  },
+  {
+   "kind": "ws: U+0085 after",
+   "line": "Built: ow://object/068e2e56-d4b9-7c40-8000-173975bfd994today",
+   "address": "ow://object/068e2e56-d4b9-7c40-8000-173975bfd994",
+   "words": "Built today"
+  },
+  {
+   "kind": "no address: count line",
+   "line": "Set the subtype of 3 Objects to surveyed (a search for every Object finds them)",
+   "address": null,
+   "words": "Set the subtype of 3 Objects to surveyed (a search for every Object finds them)"
+  },
+  {
+   "kind": "no address: nothing changed",
+   "line": "nothing changed",
+   "address": null,
+   "words": "nothing changed"
+  },
+  {
+   "kind": "no address: bad type word",
+   "line": "Built: ow://dragon/068e2e56-d4b9-7c40-8000-173975bfd994",
+   "address": null,
+   "words": "Built: ow://dragon/068e2e56-d4b9-7c40-8000-173975bfd994"
+  },
+  {
+   "kind": "no address: no id",
+   "line": "Built: ow://object/o1",
+   "address": null,
+   "words": "Built: ow://object/o1"
+  },
+  {
+   "kind": "no address: http",
+   "line": "Built: http://www.onlyworlds.com/w/068e012b-52a9-79bf-8000-26bb67891425/object/068e2e56-d4b9-7c40-8000-173975bfd994",
+   "address": null,
+   "words": "Built: http://www.onlyworlds.com/w/068e012b-52a9-79bf-8000-26bb67891425/object/068e2e56-d4b9-7c40-8000-173975bfd994"
+  },
+  {
+   "kind": "no address: bare host",
+   "line": "Built: https://onlyworlds.com/w/068e012b-52a9-79bf-8000-26bb67891425/object/068e2e56-d4b9-7c40-8000-173975bfd994",
+   "address": null,
+   "words": "Built: https://onlyworlds.com/w/068e012b-52a9-79bf-8000-26bb67891425/object/068e2e56-d4b9-7c40-8000-173975bfd994"
+  },
+  {
+   "kind": "world only, site",
+   "line": "Built: https://www.onlyworlds.com/w/068e012b-52a9-79bf-8000-26bb67891425",
+   "address": null,
+   "words": "Built: https://www.onlyworlds.com/w/068e012b-52a9-79bf-8000-26bb67891425"
+  },
+  {
+   "kind": "slug only, site",
+   "line": "Built: https://www.onlyworlds.com/w/my-world",
+   "address": null,
+   "words": "Built: https://www.onlyworlds.com/w/my-world"
+  },
+  {
+   "kind": "world only, text",
+   "line": "Built in ow://019a0000-1111-7222-8333-444455556666",
+   "address": null,
+   "words": "Built in ow://019a0000-1111-7222-8333-444455556666"
+  },
+  {
+   "kind": "guillemets",
+   "line": "Built «ow://object/068e2e56-d4b9-7c40-8000-173975bfd994» today",
+   "address": "ow://object/068e2e56-d4b9-7c40-8000-173975bfd994",
+   "words": "Built today"
+  },
+  {
+   "kind": "single curly, prose",
+   "line": "Built ‘ow://object/068e2e56-d4b9-7c40-8000-173975bfd994’, then hung it.",
+   "address": "ow://object/068e2e56-d4b9-7c40-8000-173975bfd994",
+   "words": "Built, then hung it."
+  },
+  {
+   "kind": "double curly",
+   "line": "Built “ow://object/068e2e56-d4b9-7c40-8000-173975bfd994” today",
+   "address": "ow://object/068e2e56-d4b9-7c40-8000-173975bfd994",
+   "words": "Built today"
+  },
+  {
+   "kind": "straight single",
+   "line": "Built 'ow://object/068e2e56-d4b9-7c40-8000-173975bfd994'",
+   "address": "ow://object/068e2e56-d4b9-7c40-8000-173975bfd994",
+   "words": "Built"
+  },
+  {
+   "kind": "two here",
+   "line": "Built: ow://object/068e2e56-d4b9-7c40-8000-173975bfd994 and ow://object/068e2e8c-e2f4-7e4c-8000-8abcf4e8e286",
+   "address": "ow://object/068e2e8c-e2f4-7e4c-8000-8abcf4e8e286",
+   "words": "Built: ow://object/068e2e56-d4b9-7c40-8000-173975bfd994 and"
+  },
+  {
+   "kind": "here then other, stop",
+   "line": "Built: ow://object/068e2e56-d4b9-7c40-8000-173975bfd994, ow://019a0000-1111-7222-8333-444455556666/object/068e2e8c-e2f4-7e4c-8000-8abcf4e8e286.",
+   "address": "ow://object/068e2e56-d4b9-7c40-8000-173975bfd994",
+   "words": "Built, ow://019a0000-1111-7222-8333-444455556666/object/068e2e8c-e2f4-7e4c-8000-8abcf4e8e286."
+  },
+  {
+   "kind": "moment then other",
+   "line": "Built: ow://object/068e2e56-d4b9-7c40-8000-173975bfd994@12 then ow://019a0000-1111-7222-8333-444455556666/object/068e2e8c-e2f4-7e4c-8000-8abcf4e8e286",
+   "address": "ow://object/068e2e56-d4b9-7c40-8000-173975bfd994",
+   "words": "Built: ow://object/068e2e56-d4b9-7c40-8000-173975bfd994@12 then ow://019a0000-1111-7222-8333-444455556666/object/068e2e8c-e2f4-7e4c-8000-8abcf4e8e286"
+  },
+  {
+   "kind": "bracket then other paren",
+   "line": "Built: [ow://object/068e2e56-d4b9-7c40-8000-173975bfd994] (ow://019a0000-1111-7222-8333-444455556666/object/068e2e8c-e2f4-7e4c-8000-8abcf4e8e286)",
+   "address": "ow://object/068e2e56-d4b9-7c40-8000-173975bfd994",
+   "words": "Built (ow://019a0000-1111-7222-8333-444455556666/object/068e2e8c-e2f4-7e4c-8000-8abcf4e8e286)"
+  },
+  {
+   "kind": "quoted words before",
+   "line": "Moved \"the gate\" ow://object/068e2e56-d4b9-7c40-8000-173975bfd994",
+   "address": "ow://object/068e2e56-d4b9-7c40-8000-173975bfd994",
+   "words": "Moved \"the gate\""
+  },
+  {
+   "kind": "the same address twice",
+   "line": "Built: ow://object/068e2e56-d4b9-7c40-8000-173975bfd994 ow://object/068e2e56-d4b9-7c40-8000-173975bfd994",
+   "address": "ow://object/068e2e56-d4b9-7c40-8000-173975bfd994",
+   "words": "Built: ow://object/068e2e56-d4b9-7c40-8000-173975bfd994"
+  },
+  {
+   "kind": "the profile's example (rule 8, ruling 3)",
+   "line": "Renamed the Consul's Steinway: ow://object/068e2e56-d4b9-7c40-8000-173975bfd994.",
+   "address": "ow://object/068e2e56-d4b9-7c40-8000-173975bfd994",
+   "words": "Renamed the Consul's Steinway."
+  },
+  {
+   "kind": "one space at the joint (ruling 3)",
+   "line": "e ow://map/068e2e56-d4b9-7c40-8000-173975bfd994  3",
+   "address": "ow://map/068e2e56-d4b9-7c40-8000-173975bfd994",
+   "words": "e 3"
+  },
+  {
+   "kind": "3a a colon glued before",
+   "line": "Built:ow://object/068e2e56-d4b9-7c40-8000-173975bfd994",
+   "address": "ow://object/068e2e56-d4b9-7c40-8000-173975bfd994",
+   "words": "Built"
+  },
+  {
+   "kind": "3a a colon glued, then prose",
+   "line": "Built:ow://object/068e2e56-d4b9-7c40-8000-173975bfd994 today",
+   "address": "ow://object/068e2e56-d4b9-7c40-8000-173975bfd994",
+   "words": "Built today"
+  },
+  {
+   "kind": "3a two colons glued: one goes",
+   "line": "Built::ow://object/068e2e56-d4b9-7c40-8000-173975bfd994",
+   "address": "ow://object/068e2e56-d4b9-7c40-8000-173975bfd994",
+   "words": "Built:"
+  },
+  {
+   "kind": "3a a matched pair goes with it",
+   "line": "Built (ow://object/068e2e56-d4b9-7c40-8000-173975bfd994) today",
+   "address": "ow://object/068e2e56-d4b9-7c40-8000-173975bfd994",
+   "words": "Built today"
+  },
+  {
+   "kind": "3a a matched quote pair",
+   "line": "Quoted \"ow://object/068e2e56-d4b9-7c40-8000-173975bfd994\" today",
+   "address": "ow://object/068e2e56-d4b9-7c40-8000-173975bfd994",
+   "words": "Quoted today"
+  },
+  {
+   "kind": "3a a matched pair after a colon",
+   "line": "Built: (ow://object/068e2e56-d4b9-7c40-8000-173975bfd994).",
+   "address": "ow://object/068e2e56-d4b9-7c40-8000-173975bfd994",
+   "words": "Built."
+  },
+  {
+   "kind": "3a an opener not closed right after",
+   "line": "Built (ow://object/068e2e56-d4b9-7c40-8000-173975bfd994 today",
+   "address": "ow://object/068e2e56-d4b9-7c40-8000-173975bfd994",
+   "words": "Built (ow://object/068e2e56-d4b9-7c40-8000-173975bfd994 today"
+  },
+  {
+   "kind": "3b a bare address shows itself",
+   "line": "ow://object/068e2e56-d4b9-7c40-8000-173975bfd994",
+   "address": "ow://object/068e2e56-d4b9-7c40-8000-173975bfd994",
+   "words": "ow://object/068e2e56-d4b9-7c40-8000-173975bfd994"
+  },
+  {
+   "kind": "3b an address first",
+   "line": "ow://object/068e2e56-d4b9-7c40-8000-173975bfd994 was built.",
+   "address": "ow://object/068e2e56-d4b9-7c40-8000-173975bfd994",
+   "words": "ow://object/068e2e56-d4b9-7c40-8000-173975bfd994 was built."
+  },
+  {
+   "kind": "3b only a colon before",
+   "line": ": ow://object/068e2e56-d4b9-7c40-8000-173975bfd994",
+   "address": "ow://object/068e2e56-d4b9-7c40-8000-173975bfd994",
+   "words": ": ow://object/068e2e56-d4b9-7c40-8000-173975bfd994"
+  },
+  {
+   "kind": "3b only White_Space before a pair",
+   "line": "  (ow://object/068e2e56-d4b9-7c40-8000-173975bfd994)",
+   "address": "ow://object/068e2e56-d4b9-7c40-8000-173975bfd994",
+   "words": "  (ow://object/068e2e56-d4b9-7c40-8000-173975bfd994)"
+  },
+  {
+   "kind": "3c White_Space before the colon goes",
+   "line": "Renamed the Steinway : ow://object/068e2e56-d4b9-7c40-8000-173975bfd994.",
+   "address": "ow://object/068e2e56-d4b9-7c40-8000-173975bfd994",
+   "words": "Renamed the Steinway."
+  },
+  {
+   "kind": "3d an unmatched closer stays",
+   "line": "Built: ow://object/068e2e56-d4b9-7c40-8000-173975bfd994).",
+   "address": "ow://object/068e2e56-d4b9-7c40-8000-173975bfd994",
+   "words": "Built)."
+  },
+  {
+   "kind": "3e an opening bracket is no closing mark",
+   "line": "Renamed it: ow://object/068e2e56-d4b9-7c40-8000-173975bfd994 (done)",
+   "address": "ow://object/068e2e56-d4b9-7c40-8000-173975bfd994",
+   "words": "Renamed it (done)"
+  },
+  {
+   "kind": "a closing mark: a question mark after",
+   "line": "Moved: ow://object/068e2e56-d4b9-7c40-8000-173975bfd994?",
+   "address": "ow://object/068e2e56-d4b9-7c40-8000-173975bfd994",
+   "words": "Moved: ow://object/068e2e56-d4b9-7c40-8000-173975bfd994?"
+  },
+  {
+   "kind": "a closing mark: a guillemet after",
+   "line": "Moved «gate: ow://object/068e2e56-d4b9-7c40-8000-173975bfd994»",
+   "address": "ow://object/068e2e56-d4b9-7c40-8000-173975bfd994",
+   "words": "Moved «gate»"
+  },
+  {
+   "kind": "a closing mark: a brace after",
+   "line": "Moved: ow://object/068e2e56-d4b9-7c40-8000-173975bfd994}",
+   "address": "ow://object/068e2e56-d4b9-7c40-8000-173975bfd994",
+   "words": "Moved}"
+  },
+  {
+   "kind": "a closing mark: a curly double quote after",
+   "line": "Moved “gate: ow://object/068e2e56-d4b9-7c40-8000-173975bfd994”",
+   "address": "ow://object/068e2e56-d4b9-7c40-8000-173975bfd994",
+   "words": "Moved “gate”"
+  },
+  {
+   "kind": "a closing mark: a hyphen after is no closing mark",
+   "line": "Moved: ow://object/068e2e56-d4b9-7c40-8000-173975bfd994-x",
+   "address": "ow://object/068e2e56-d4b9-7c40-8000-173975bfd994",
+   "words": "Moved: ow://object/068e2e56-d4b9-7c40-8000-173975bfd994-x"
+  },
+  {
+   "kind": "2 a later site address of this world",
+   "line": "Built ow://object/068e2e56-d4b9-7c40-8000-173975bfd994 then https://www.onlyworlds.com/w/068e012b-52a9-79bf-8000-26bb67891425/object/068e2e8c-e2f4-7e4c-8000-8abcf4e8e286",
+   "address": "ow://object/068e2e8c-e2f4-7e4c-8000-8abcf4e8e286",
+   "words": "Built ow://object/068e2e56-d4b9-7c40-8000-173975bfd994 then"
+  },
+  {
+   "kind": "2 a well-formed address of any element is the line's",
+   "line": "Made ow://zone/068e2e8c-e2f4-7e4c-8000-8abcf4e8e286",
+   "address": "ow://zone/068e2e8c-e2f4-7e4c-8000-8abcf4e8e286",
+   "words": "Made"
+  },
+  {
+   "kind": "2 a lens address with no element",
+   "line": "Read through ow://068e012b-52a9-79bf-8000-26bb67891425?lens=068e2e8c-e2f4-7e4c-8000-8abcf4e8e286",
+   "address": null,
+   "words": "Read through ow://068e012b-52a9-79bf-8000-26bb67891425?lens=068e2e8c-e2f4-7e4c-8000-8abcf4e8e286"
+  }
+ ],
+ "texts": [
+  {
+   "kind": "LF",
+   "text": "a: ow://object/068e2e56-d4b9-7c40-8000-173975bfd994\nb",
+   "lines": [
+    {
+     "line": "a: ow://object/068e2e56-d4b9-7c40-8000-173975bfd994",
+     "address": "ow://object/068e2e56-d4b9-7c40-8000-173975bfd994",
+     "words": "a"
+    },
+    {
+     "line": "b",
+     "address": null,
+     "words": "b"
+    }
+   ]
+  },
+  {
+   "kind": "CRLF",
+   "text": "a: ow://object/068e2e56-d4b9-7c40-8000-173975bfd994\r\nb",
+   "lines": [
+    {
+     "line": "a: ow://object/068e2e56-d4b9-7c40-8000-173975bfd994",
+     "address": "ow://object/068e2e56-d4b9-7c40-8000-173975bfd994",
+     "words": "a"
+    },
+    {
+     "line": "b",
+     "address": null,
+     "words": "b"
+    }
+   ]
+  },
+  {
+   "kind": "lone CR",
+   "text": "a: ow://object/068e2e56-d4b9-7c40-8000-173975bfd994\rb",
+   "lines": [
+    {
+     "line": "a: ow://object/068e2e56-d4b9-7c40-8000-173975bfd994",
+     "address": "ow://object/068e2e56-d4b9-7c40-8000-173975bfd994",
+     "words": "a"
+    },
+    {
+     "line": "b",
+     "address": null,
+     "words": "b"
+    }
+   ]
+  },
+  {
+   "kind": "U+2028",
+   "text": "a: ow://object/068e2e56-d4b9-7c40-8000-173975bfd994 b",
+   "lines": [
+    {
+     "line": "a: ow://object/068e2e56-d4b9-7c40-8000-173975bfd994 b",
+     "address": "ow://object/068e2e56-d4b9-7c40-8000-173975bfd994",
+     "words": "a b"
+    }
+   ]
+  },
+  {
+   "kind": "U+2029",
+   "text": "a: ow://object/068e2e56-d4b9-7c40-8000-173975bfd994 b",
+   "lines": [
+    {
+     "line": "a: ow://object/068e2e56-d4b9-7c40-8000-173975bfd994 b",
+     "address": "ow://object/068e2e56-d4b9-7c40-8000-173975bfd994",
+     "words": "a b"
+    }
+   ]
+  },
+  {
+   "kind": "U+0085 as a break",
+   "text": "a: ow://object/068e2e56-d4b9-7c40-8000-173975bfd994b",
+   "lines": [
+    {
+     "line": "a: ow://object/068e2e56-d4b9-7c40-8000-173975bfd994b",
+     "address": "ow://object/068e2e56-d4b9-7c40-8000-173975bfd994",
+     "words": "a b"
+    }
+   ]
+  },
+  {
+   "kind": "empty lines",
+   "text": "\n\na\n\n\nb\n",
+   "lines": [
+    {
+     "line": "a",
+     "address": null,
+     "words": "a"
+    },
+    {
+     "line": "b",
+     "address": null,
+     "words": "b"
+    }
+   ]
+  },
+  {
+   "kind": "CR-only line",
+   "text": "a\n\r\nb",
+   "lines": [
+    {
+     "line": "a",
+     "address": null,
+     "words": "a"
+    },
+    {
+     "line": "b",
+     "address": null,
+     "words": "b"
+    }
+   ]
+  },
+  {
+   "kind": "FEFF at a line start",
+   "text": "﻿a: ow://object/068e2e56-d4b9-7c40-8000-173975bfd994\nb",
+   "lines": [
+    {
+     "line": "﻿a: ow://object/068e2e56-d4b9-7c40-8000-173975bfd994",
+     "address": "ow://object/068e2e56-d4b9-7c40-8000-173975bfd994",
+     "words": "﻿a"
+    },
+    {
+     "line": "b",
+     "address": null,
+     "words": "b"
+    }
+   ]
+  },
+  {
+   "kind": "FEFF-only line",
+   "text": "a\n﻿\nb",
+   "lines": [
+    {
+     "line": "a",
+     "address": null,
+     "words": "a"
+    },
+    {
+     "line": "﻿",
+     "address": null,
+     "words": "﻿"
+    },
+    {
+     "line": "b",
+     "address": null,
+     "words": "b"
+    }
+   ]
+  },
+  {
+   "kind": "U+0085 at a line end",
+   "text": "a: ow://object/068e2e56-d4b9-7c40-8000-173975bfd994\nb",
+   "lines": [
+    {
+     "line": "a: ow://object/068e2e56-d4b9-7c40-8000-173975bfd994",
+     "address": "ow://object/068e2e56-d4b9-7c40-8000-173975bfd994",
+     "words": "a"
+    },
+    {
+     "line": "b",
+     "address": null,
+     "words": "b"
+    }
+   ]
+  },
+  {
+   "kind": "U+0085-only line",
+   "text": "a\n\nb",
+   "lines": [
+    {
+     "line": "a",
+     "address": null,
+     "words": "a"
+    },
+    {
+     "line": "b",
+     "address": null,
+     "words": "b"
+    }
+   ]
+  },
+  {
+   "kind": "NBSP edges",
+   "text": " a \nb",
+   "lines": [
+    {
+     "line": "a",
+     "address": null,
+     "words": "a"
+    },
+    {
+     "line": "b",
+     "address": null,
+     "words": "b"
+    }
+   ]
+  },
+  {
+   "kind": "U+3000 edges",
+   "text": "　a　\nb",
+   "lines": [
+    {
+     "line": "a",
+     "address": null,
+     "words": "a"
+    },
+    {
+     "line": "b",
+     "address": null,
+     "words": "b"
+    }
+   ]
+  },
+  {
+   "kind": "tab and spaces only line",
+   "text": "a\n \t \nb",
+   "lines": [
+    {
+     "line": "a",
+     "address": null,
+     "words": "a"
+    },
+    {
+     "line": "b",
+     "address": null,
+     "words": "b"
+    }
+   ]
+  }
+ ]
+}

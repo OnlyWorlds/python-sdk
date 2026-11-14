@@ -118,7 +118,16 @@ from .names import type_word
 from .openers import Opener, Tool, ToolOpen, openers_for
 from .push import Patch, PushPlan, PushResult, plan_push, push, verify_level
 from .record import RECORD_FIELD, Record, RecordMark, RecordStory, record_mark_of, records_of
-from .report import ReportGroup, ReportLint, ReportParent, ReportThreads, report_threads_of
+from .report import (
+    ReportGroup,
+    ReportLine,
+    ReportLint,
+    ReportParent,
+    ReportThreads,
+    read_report_line,
+    read_report_lines,
+    report_threads_of,
+)
 from .review import PROPOSED_MARK, ProposedMark, hands_on_as_proposed, proposed_mark_of
 from .room import is_charter_element, is_room_element, reading_aid_of
 from .spine import SPINE_KINDS, SpineRead, read_spine_element
@@ -208,6 +217,7 @@ __all__ = [
     "RecordMark",
     "RecordStory",
     "ReportGroup",
+    "ReportLine",
     "ReportLint",
     "ReportParent",
     "ReportThreads",
@@ -281,6 +291,8 @@ __all__ = [
     "read_folder",
     "read_mark_of",
     "read_ow_link_at",
+    "read_report_line",
+    "read_report_lines",
     "read_spine_element",
     "read_world_file",
     "reading_aid_of",
