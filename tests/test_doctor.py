@@ -1132,7 +1132,7 @@ def test_11_present_reads_null_blank_and_empty_list_as_absent() -> None:
     values: list[Any] = [None, "", " \t\n", [], "x", 0, False, ["a"], {}]
     els = [{"type": "character", "id": str(i), "name": "", "x_bb_notes": v} for i, v in enumerate(values)]
     (row,) = apply_checks([rule], els)
-    assert [s["id"] for s in row.short] == ["0", "1", "2", "3"]
+    assert [s["id"] for s in row.short] == ["0", "1", "2", "3", "8"]  # STAGED for serial 126: {} short too
 
 
 def test_11_where_type_as_a_list_and_the_fold() -> None:

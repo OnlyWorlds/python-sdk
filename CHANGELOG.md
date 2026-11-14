@@ -4,6 +4,8 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+- (staged for schema-dist serial 126, not yet ruled) A mark read by presence (`x_room_of`, `x_charter_of`) reads an empty list or an empty object as absent, as the review mark already does: a compact read leaves both out, so a mark must not count in one served form and not the other. The checks profile's `present` reads an empty object as short, as it reads an empty list.
+
 ## 0.123.1 (2026-11-14)
 
 - `plan_push` reads an absent multi-link as the empty list. A folder that leaves an empty multi-link out, planned against a fresh export that writes it as `[]`, planned a patch sending `[]` for every such field: a write that changed nothing on the server and came back on every push, since a fresh export is the baseline each time. Absent, `[]` and `null` are now one empty list for a schema multi-link, as the folder format says a reader folds them (and as `""`, `null` and absent already were one unset string). An extension field keeps its values apart: there `[]` and `null` still differ. A multi-link that held ids and is left out of the folder is still sent as `[]`.

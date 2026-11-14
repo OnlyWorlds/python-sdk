@@ -60,8 +60,11 @@ def _fold(text: str) -> str:
 
 def _has_mark(value: Any) -> bool:
     """The room and charter profiles' presence rule for a mark (``x_room_of``, ``x_charter_of``): any value but
-    ``None``; a string only when something is left after trimming White_Space. Never compared to anything."""
-    return value is not None and not (isinstance(value, str) and value.strip(_WHITE_SPACE) == "")
+    ``None``; a string only when something is left after trimming White_Space; an empty list or an empty object is
+    absent too (STAGED for serial 126, not ruled). Never compared to anything."""
+    if value is None or (isinstance(value, (list, Mapping)) and not value):
+        return False
+    return not (isinstance(value, str) and value.strip(_WHITE_SPACE) == "")
 
 
 def is_room_element(element: Mapping[str, Any] | FolderElement) -> bool:
