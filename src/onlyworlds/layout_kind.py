@@ -88,9 +88,9 @@ def _group_rank(kind: str) -> int:
 def _read_graph(
     fn: str, graph: Any
 ) -> tuple[list[Mapping[str, Any]], list[Mapping[str, Any]], list[Mapping[str, Any]], dict[str, int]]:
-    """The caller's nodes, then the method's one order of the graph: the nodes by id, the edges by source, field (none
-    as ``""``), index (none as 0) and target, every word by code point (Python orders strings by code point), and each
-    node's place in that order. A TypeError naming what cannot be read."""
+    """The caller's nodes, then the method's one order of the graph: the nodes by id, the edges by source, field (left
+    out as ``""``), index (left out as 0) and target, every word by code point (Python orders strings by code point),
+    and each node's place in that order. A TypeError naming what cannot be read."""
 
     def fail(msg: str) -> TypeError:
         return TypeError(f"{fn}: {msg}")
@@ -118,16 +118,16 @@ def _read_graph(
     for k, e in enumerate(links):
         if not isinstance(e, Mapping) or not isinstance(e.get("source"), str) or not isinstance(e.get("target"), str):
             raise fail(f"edge {k} is not {{source, target}}")
-        field = e.get("field")
-        if field is not None and not isinstance(field, str):
+        # A key left out counts as "" or 0; a key given as None is refused, as the npm SDK refuses null.
+        if "field" in e and not isinstance(e["field"], str):
             raise fail(f"edge {k}: field is a string")
         at = e.get("index")
-        if at is not None and (not isinstance(at, (int, float)) or isinstance(at, bool) or not math.isfinite(at)):
+        if "index" in e and (not isinstance(at, (int, float)) or isinstance(at, bool) or not math.isfinite(at)):
             raise fail(f"edge {k}: index is a number")
     nodes = sorted(given, key=lambda x: str(x["id"]))
     edges = sorted(
         links,
-        key=lambda e: (e["source"], e.get("field") or "", e.get("index") or 0, e["target"]),
+        key=lambda e: (e["source"], e.get("field", ""), e.get("index", 0), e["target"]),
     )
     return given, nodes, edges, {x["id"]: i for i, x in enumerate(nodes)}
 
@@ -149,9 +149,9 @@ def layout_by_kind(graph: Mapping[str, Any]) -> KindLayout:
     order, so a saved layout can say what made it. An empty graph answers no points; a graph of one element answers
     0, 0.
 
-    The graph is first put in one order: the nodes by id, the edges by source, then field (none as ``""``), then index
-    (none as 0), then target, every word by code point. ``world_graph`` answers in that order already; a graph handed
-    in any other order gives the same points, each under its id.
+    The graph is first put in one order: the nodes by id, the edges by source, then field (left out as ``""``), then
+    index (left out as 0), then target, every word by code point. ``world_graph`` answers in that order already; a
+    graph handed in any other order gives the same points, each under its id.
 
     The same graph gives the same points to the last bit in every language and browser, the npm SDK's ``layoutByKind``
     included: the anchors are a baked table of numbers, never computed, and the rest is arithmetic every runtime rounds
@@ -159,7 +159,7 @@ def layout_by_kind(graph: Mapping[str, Any]) -> KindLayout:
 
     Raises ``TypeError``, naming what, on a graph it cannot read: no nodes or edges list, a node with no id, a type
     that is not one of the 22, a name that is not a string or None, an id twice, an edge without a string source and
-    target.
+    target, an edge's field that is not a string or index that is not a finite number (``None`` included).
     """
     given, nodes, edges, index = _read_graph("layout_by_kind", graph)
     n = len(nodes)

@@ -139,6 +139,8 @@ def test_an_edge_with_no_field_or_index_sorts_as_the_empty_field_at_0() -> None:
     backwards = copy.deepcopy(bare)
     backwards["edges"].reverse()
     assert layout_by_kind(bare) == layout_by_kind(named) == layout_by_kind(backwards)
+    around = layout_around(bare, case["graph"]["nodes"][0]["id"], steps=2)
+    assert around == layout_around(named, case["graph"]["nodes"][0]["id"], steps=2)
 
 
 def test_the_answer_does_not_touch_the_graph() -> None:
@@ -177,6 +179,8 @@ def test_the_answer_does_not_touch_the_graph() -> None:
         ({"nodes": [], "edges": [{"source": "a", "target": "b", "index": "0"}]}, "edge 0: index is a number"),
         ({"nodes": [], "edges": [{"source": "a", "target": "b", "index": True}]}, "edge 0: index is a number"),
         ({"nodes": [], "edges": [{"source": "a", "target": "b", "index": math.nan}]}, "edge 0: index is a number"),
+        ({"nodes": [], "edges": [{"source": "a", "target": "b", "field": None}]}, "edge 0: field is a string"),
+        ({"nodes": [], "edges": [{"source": "a", "target": "b", "index": None}]}, "edge 0: index is a number"),
     ],
 )
 def test_a_graph_it_cannot_read_is_refused_by_both(graph: Any, message: str) -> None:
