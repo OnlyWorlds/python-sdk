@@ -81,6 +81,7 @@ from .http import (
     sanitize_payload,
 )
 from .landing import Landing, LandingCluster, LandingGap, LandingMember, landing_of
+from .layout_kind import AroundLayout, AroundPoint, KindLayout, KindPoint, layout_around, layout_by_kind
 from .layout_trail import (
     TRAIL_TIERS,
     TrailHanger,
@@ -166,6 +167,8 @@ __all__ = [
     "AddressReading",
     "AddressReason",
     "ApiError",
+    "AroundLayout",
+    "AroundPoint",
     "BulkResult",
     "ChangeWalk",
     "CharterHub",
@@ -181,6 +184,8 @@ __all__ = [
     "GraphEdge",
     "GraphNode",
     "GuideRead",
+    "KindLayout",
+    "KindPoint",
     "Landing",
     "LandingCluster",
     "LandingGap",
@@ -260,6 +265,8 @@ __all__ = [
     "is_template",
     "is_to_everyone",
     "landing_of",
+    "layout_around",
+    "layout_by_kind",
     "layout_of",
     "lenses_in_use",
     "map_space",

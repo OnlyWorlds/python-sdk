@@ -4,6 +4,9 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+- `layout_by_kind(graph)` (new): a world nobody laid out, laid out from its graph as `world_graph` answers it. Each kind gets an anchor on a circle, links act as springs and neighbours push apart for 320 seeded steps (160 past 2,000 elements), then the points are fitted into a frame of -1 to 1. Answers `{"method": "by-kind", "version": 1, "points": [{"id", "x", "y"}, ...]}` in node order. The anchors are a baked table, never computed with the runtime's cosine and sine, so the points equal the npm SDK's `layoutByKind` to the last bit; the shared fixture `tests/fixtures/layout/by-kind.json` is replayed exactly.
+- `layout_around(graph, focus, *, steps=1)` (new): one element at 0, 0, its neighbours on rings round it in colour group, type and name order (names by code point), and with `steps=2` their neighbours fanned out beyond. Answers `{"method": "around", "version": 1, "points": [{"id", "depth", "x", "y"}, ...]}` in node order, only the elements within the steps; within 1e-12 of the npm SDK's `layoutAround`. A focus that is not a node or a `steps` other than 1 or 2 is a ValueError.
+
 ## 0.126.0 (2026-11-14)
 
 schema-dist v0.34.1-dist.128 (canonical 00.34.01 unchanged, no schema file moved). Writers stamp folder format 0.3.24, which the dist's lint knows (no writer's bytes change). The fixtures' new cases pass: the address fixture's 218 (two `prose-all`), the lens fixture's 235, the message fixture's 102 (two `recipients`), the spine fixture's repeat.
