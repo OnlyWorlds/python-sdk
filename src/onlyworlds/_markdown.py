@@ -27,7 +27,7 @@ def heading(name: str) -> str:
 # group 2. Which element it names, if any in this world, is ``prose_target``'s to read.
 OW_REF = re.compile(r"\[([^\]\n]*)\]\((ow://[^)\s]*)\)")
 # The folder format's in-world form: the type word as the address profile reads it (lowercase, one of the 22;
-# STAGED for serial 126, which ends the any-case reading), the id as written, so a folder whose ids are not
+# since serial 126, which ended the any-case reading), the id as written, so a folder whose ids are not
 # UUIDs still names its own elements. The address profile reads every other form.
 _IN_WORLD = re.compile(r"ow://([a-z_]+)/([\w-]+)")
 

@@ -61,7 +61,7 @@ def _fold(text: str) -> str:
 def _has_mark(value: Any) -> bool:
     """The room and charter profiles' presence rule for a mark (``x_room_of``, ``x_charter_of``): any value but
     ``None``; a string only when something is left after trimming White_Space; an empty list or an empty object is
-    absent too (STAGED for serial 126, not ruled). Never compared to anything."""
+    absent too (serial 126). Never compared to anything."""
     if value is None or (isinstance(value, (list, Mapping)) and not value):
         return False
     return not (isinstance(value, str) and value.strip(_WHITE_SPACE) == "")
@@ -72,7 +72,8 @@ def is_room_element(element: Mapping[str, Any] | FolderElement) -> bool:
     leading byte order mark is no match) and compared without regard to case (Unicode simple case
     folding, the ``.owworld`` reader's table), match one of ``ROOM_PAIRS``, AND it
     carries the mark ``x_room_of``, read by presence (serial 83): any value but ``None``, a string only when
-    something is left after trimming it, and the value is never compared (a number counts, ``"  "`` does not).
+    something is left after trimming it, an empty list or mapping never (serial 126), and the value is never
+    compared (a number counts, ``"  "`` does not).
 
     Both, always: a pair without the mark is lore (a novel's letters are Narratives with supertype
     Message), and a mark without a pair is not a room element (a malformed mark: report it, never hide
@@ -129,7 +130,8 @@ def is_charter_element(element: Mapping[str, Any] | FolderElement) -> bool:
     world's charter (``law``, supertype ``Charter``), its guide (``construct``, supertype ``Guide``) or one of its
     domains (``construct``, supertype ``Domain``), the type and supertype each trimmed and compared without regard
     to case, the whole word, AND the mark ``x_charter_of``, the id of the world the aid belongs to. The mark counts
-    when it is present and not ``None``; a string mark counts only when something is left after trimming. Both,
+    when it is present and not ``None``; a string mark counts only when something is left after trimming, and an
+    empty list or mapping never. Both,
     always: the pair without the mark is lore, and stays in every view (a kingdom's Charter in a novel's world is a
     Law like any other).
 

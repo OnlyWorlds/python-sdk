@@ -4,6 +4,10 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+## 0.124.1 (2026-11-14)
+
+- The docstrings of `is_room_element` and `is_charter_element` say what 0.124.0 reads: an empty list or an empty mapping is no mark. They still said any value but `None` counted. No code changes.
+
 ## 0.124.0 (2026-11-14)
 
 - Schema repinned to schema-dist v0.34.1-dist.126 (canonical 00.34.01 unchanged, no schema file moved): six profile pages and five fixtures.
