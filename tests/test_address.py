@@ -1,7 +1,8 @@
 """The address profile (schema-dist ``profiles/address.md``, serial 77): ``element_address`` and
 ``parse_ow_link`` on every conformance case in ``codegen/schema-dist/profiles/address.fixture.json``, vendored
 with the distribution. The vendored copy is the only source: a missing fixture fails, never skips. A case of a
-kind this file does not know fails. The npm SDK's ``elementAddress`` and ``parseOwLink`` run the same cases."""
+kind this file does not know fails; a prose-all case (STAGED: serial 128) runs ``find_ow_links``. The npm SDK's
+``elementAddress`` and ``parseOwLink`` run the same cases."""
 
 from __future__ import annotations
 
@@ -21,6 +22,7 @@ from onlyworlds import (
     AddressError,
     AddressReason,
     element_address,
+    find_ow_links,
     parse_ow_link,
     read_ow_link_at,
 )
@@ -57,6 +59,10 @@ def answer(case: dict[str, Any]) -> dict[str, Any]:
                 return {"expect": {"address": None, "reading": None}}
             address = case["text"][index : found.end]
             return {"expect": {"address": address, "reading": dataclasses.asdict(found.reading)}}
+    elif case["kind"] == "prose-all":  # STAGED: serial 128: every address find_ow_links finds, each its slice, in order
+
+        def run() -> dict[str, Any]:
+            return {"found": [case["text"][f.start : f.end] for f in find_ow_links(case["text"])]}
     else:
         raise AssertionError(f"a case of unknown kind {case['kind']}")
     try:
@@ -69,7 +75,14 @@ def test_every_case_of_the_address_fixture() -> None:
     cases = load_fixture()["cases"]
     wrong = []
     for c in cases:
-        want = {"refuse": c["refuse"]} if "refuse" in c else {"expect": c["expect"]}
+        # A prose-all case (STAGED: serial 128) wants found; every other case exactly one of expect or refuse, and a
+        # case with neither (or both) wants something no answer gives, so it is wrong, never passed over.
+        if c["kind"] == "prose-all":
+            want = {"found": c.get("found")}
+        elif ("refuse" in c) != ("expect" in c):
+            want = {"refuse": c["refuse"]} if "refuse" in c else {"expect": c["expect"]}
+        else:
+            want = {"expect or refuse, one of them": c["name"]}
         got = answer(c)
         if got != want:
             wrong.append(f"{c['kind']}/{c['name']}: gave {got}, the fixture says {want}")
