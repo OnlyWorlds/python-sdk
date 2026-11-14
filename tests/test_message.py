@@ -113,6 +113,8 @@ def replay(case: dict[str, Any], doc: dict[str, Any]) -> list[str]:
         expect("unread_for", ids(got_unread), case["unread"])
     elif kind == "thread":
         expect("thread_of", ids(thread_of(case["messages"], case["root"])), case["thread"])
+    elif kind == "recipients":  # STAGED: serial 128: each Character once, in the order of its first place
+        expect("recipients_of", recipients_of(case["message"]), case["recipients"])
     else:
         wrong.append(f"{name}: a kind this test does not know: {kind!r}")
     return wrong
