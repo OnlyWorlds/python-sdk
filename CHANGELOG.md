@@ -6,6 +6,7 @@ The package version runs on its own semver; the schema it is generated from is `
 
 - (staged for schema-dist serial 126, not yet ruled) A mark read by presence (`x_room_of`, `x_charter_of`) reads an empty list or an empty object as absent, as the review mark already does: a compact read leaves both out, so a mark must not count in one served form and not the other. The checks profile's `present` reads an empty object as short, as it reads an empty list.
 - (staged for schema-dist serial 126) The Markdown pack and the OKF export read an in-prose reference's type word as the address profile reads it, lowercase and one of the 22: `[x](ow://Character/<id>)` or `[x](ow://dragon/<id>)` names no element and stays as written, where it was read in any case and any word since 0.74.1. An id is still read as written, so a folder whose ids are not UUIDs keeps its references.
+- `read_ow_link_at`'s docstring no longer says the npm SDK's `readOwLinkAt` answers the same in every case: both read the same addresses, but npm's `index` and `end` count UTF-16 units and these count code points, so the numbers differ when a character above U+FFFF stands before the address. No code changes.
 
 ## 0.123.1 (2026-11-14)
 

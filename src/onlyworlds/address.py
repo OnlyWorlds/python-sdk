@@ -363,7 +363,8 @@ def read_ow_link_at(text: str, index: int = 0) -> AddressAt | None:
     ``parse_ow_link`` itself does not change: handed ``ow://object/<id>.`` whole, it still refuses it. An
     ``index`` at the text's end or past it holds no address. A ``text`` that is not a string or an ``index``
     that is not an ``int`` is a ``TypeError``; a negative ``index`` is a ``ValueError``. The npm SDK's
-    ``readOwLinkAt`` answers the same."""
+    ``readOwLinkAt`` reads the same addresses, but its ``index`` and ``end`` count UTF-16 units where these
+    count code points, so the two numbers differ in a text with a character above U+FFFF before the address."""
     if not isinstance(text, str):
         raise TypeError("read_ow_link_at: text must be a string")
     if isinstance(index, bool) or not isinstance(index, int):
