@@ -129,7 +129,10 @@ def world_graph(
 
     Each schema link field, and each extension field a profile declares a link (``x_lens_leads_to``,
     ``x_spine_depends_on``), gives one edge per target that is a node, with the target's place in the list as the
-    reader is served it; a link held on both ends is two edges. A guest's known-of element has no edges out. A link
+    reader is served it; a link held on both ends is two edges. (STAGED: serial 128) A multi-link names each element
+    once: a list that names one element twice gives one edge, at the first entry's place in the list as served, and
+    a repeat to an element that is not a node is counted once; ids compare as written, so ``a`` and ``A`` are no
+    repeat. A guest's known-of element has no edges out. A link
     to an element that is not a node is counted in ``edges_cut`` by that element's reason: the lens's cut reason,
     else, with a lens, ``outside_lens`` for one the reader sees that the lens neither kept nor cut (counted for every
     rung); one of the kinds out by default without a lens; and ``not_visible`` for one the reader does not see. A link
@@ -279,17 +282,25 @@ def world_graph(
             v = el.get(field)
             entries: list[Any] = (v if isinstance(v, list) else []) if many else [v]
             served = 0
+            read: set[str] = set()
             for i, t in enumerate(entries):
                 in_served = seen_owner or (isinstance(t, str) and r.served_as(t, targets.get(field)))
-                visit(source, field, t, i if seen_owner else served, targets.get(field))
+                if not (isinstance(t, str) and t in read):  # each element once, in its first place
+                    visit(source, field, t, i if seen_owner else served, targets.get(field))
+                if isinstance(t, str):
+                    read.add(t)
                 if in_served:
                     served += 1
         # A declared extension link is served as stored to every reader.
         for field in _DECLARED_LINKS:
             v = el.get(field)
             if isinstance(v, list):
+                read_x: set[str] = set()
                 for i, t in enumerate(v):
-                    visit(source, field, t, i, None)
+                    if not (isinstance(t, str) and t in read_x):
+                        visit(source, field, t, i, None)
+                    if isinstance(t, str):
+                        read_x.add(t)
     edges.sort(key=lambda e: (e["source"], e["field"], e["index"]))
     return {
         "nodes": nodes,
@@ -303,7 +314,8 @@ def world_graph(
 def degree_of(graph: Mapping[str, Any]) -> dict[str, int]:
     """Each node's degree in a graph ``world_graph`` answered: the number of its edges, in or out, each edge
     counted once for every node it touches (a mirror pair is two edges, so each end counts 2; a link to itself
-    counts once). Every node is a key, 0 included, in the graph's node order. Edges join nodes only, so the count
+    counts once; (STAGED: serial 128) a list naming one element twice is one edge, so it counts 1). Every node is a
+    key, 0 included, in the graph's node order. Edges join nodes only, so the count
     is the reader's: what the reading left out (hidden, room, proposed, map space, past a lens) is never counted.
     This is "most linked" for a finder: rank by it, highest first. A graph that is not one is a TypeError. The
     npm SDK's ``degreeOf`` gives the same answer on the same graph."""

@@ -1167,3 +1167,19 @@ def test_an_umbrellas_own_hop_keeps_a_child_lens_it_reaches() -> None:
     umbrella = {**LENS, "id": _id(3), "name": "Umbrella", "characters": [_id(1)], "constructs": [_id(2)]}
     world = {"elements": [{"id": _id(1), "type": "character", "name": "Ada"}, child, umbrella]}
     assert resolve_lens(world, _id(3), OWNER)["kept"] == [_id(1), _id(2)]
+
+
+def test_a_lens_naming_one_anchor_twice_reads_it_once() -> None:
+    """Each element once (serial 128): lens anchors already read a repeat once; this pins it. The npm SDK holds the
+    same case."""
+    lens = {**LENS, "characters": [_id(1), _id(1), _id(2)], "x_lens": {"depth": 0}}
+    world = {
+        "elements": [
+            {"id": _id(1), "type": "character", "name": "Ada"},
+            {"id": _id(2), "type": "character", "name": "Ben"},
+            lens,
+        ]
+    }
+    got = resolve_lens(world, lens, OWNER)
+    assert got["kept"] == [_id(1), _id(2)] and got["cut"] == {}
+    assert [r["id"] for r in got["rows"]] == [_id(1), _id(2)]

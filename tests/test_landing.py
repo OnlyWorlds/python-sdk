@@ -12,7 +12,7 @@ from typing import Any
 
 import pytest
 
-from onlyworlds import landing_of
+from onlyworlds import landing_of, world_graph
 
 REPO = Path(__file__).resolve().parent.parent
 FIXTURE = Path(
@@ -82,3 +82,32 @@ def test_refused_before_reading() -> None:
         landing_of({"nodes": []})
     with pytest.raises(ValueError):
         landing_of({"nodes": [], "edges": []}, heads=True)
+
+
+def test_a_list_naming_one_target_twice_reads_degree_1_and_two_near_orphans() -> None:
+    """(STAGED: serial 128) Each element once: the landing reader folds nothing itself; the graph ``world_graph``
+    answers holds one edge for the repeat, so both ends read degree 1 and are near orphans. A graph handed in with
+    two edges still reads them as two."""
+    world = {
+        "elements": [
+            {"id": "ev", "type": "event", "name": "Feast", "characters": ["mara", "mara"]},
+            {"id": "mara", "type": "character", "name": "Mara"},
+        ]
+    }
+    a = landing_of(world_graph(world, {"rung": "owner"}))
+    assert a["clusters"] == [
+        {"head": "mara", "members": [{"id": "mara", "hops": 0, "degree": 1}, {"id": "ev", "hops": 1, "degree": 1}]}
+    ]
+    assert a["gaps"] == [
+        {"kind": "near_orphan", "id": "ev"},
+        {"kind": "near_orphan", "id": "mara"},
+        {"kind": "no_place", "id": "mara"},
+    ]
+    two = {
+        "nodes": [{"id": "ev", "type": "event"}, {"id": "mara", "type": "character"}],
+        "edges": [
+            {"source": "ev", "field": "characters", "target": "mara", "index": 0},
+            {"source": "ev", "field": "characters", "target": "mara", "index": 1},
+        ],
+    }
+    assert [m["degree"] for m in landing_of(two)["clusters"][0]["members"]] == [2, 2]
