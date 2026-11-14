@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import re
 
+from ._schema import ELEMENT_TYPES
 from .address import AddressError, _is_uuid, parse_ow_link
 
 __all__ = ["OW_REF", "escape_text", "heading", "one_line", "prose_target"]
@@ -25,9 +26,10 @@ def heading(name: str) -> str:
 # An in-prose reference: a markdown link whose target is an ow:// address, label in group 1, target in
 # group 2. Which element it names, if any in this world, is ``prose_target``'s to read.
 OW_REF = re.compile(r"\[([^\]\n]*)\]\((ow://[^)\s]*)\)")
-# The folder format's in-world form (atlas `src/core/ow-links.ts`, OW_LINK_HREF_RE): the type word in any
-# case, the id as written. The address profile reads every other form.
-_IN_WORLD = re.compile(r"ow://([A-Za-z_]+)/([\w-]+)")
+# The folder format's in-world form: the type word as the address profile reads it (lowercase, one of the 22;
+# STAGED for serial 126, which ends the any-case reading), the id as written, so a folder whose ids are not
+# UUIDs still names its own elements. The address profile reads every other form.
+_IN_WORLD = re.compile(r"ow://([a-z_]+)/([\w-]+)")
 
 
 def prose_target(target: str, world_id: object = None) -> str | None:
@@ -36,7 +38,7 @@ def prose_target(target: str, world_id: object = None) -> str | None:
     target the address profile refuses. A moment (``@<step>``) or a lens (``?lens=<id>``) still names the
     element, and the cross-world form with this world's own id names one of its own."""
     m = _IN_WORLD.fullmatch(target)
-    if m:
+    if m and m.group(1) in ELEMENT_TYPES:
         # An address, so an id in the form is read in either case and taken in lowercase (the address profile's
         # same-id rule); a value not in the form names only a value written exactly as it is.
         return m.group(2).lower() if _is_uuid(m.group(2)) else m.group(2)

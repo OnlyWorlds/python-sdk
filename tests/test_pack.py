@@ -743,8 +743,22 @@ def prose_forms(eid: str) -> str:
     of this world: another world's, and this world's own address."""
     return (
         f"[f1](ow://character/{eid}@3) [f2](ow://character/{eid}?lens={LENS}) [f3](ow://{HEX_WORLD}/character/{eid})"
-        f" [f4](ow://Character/{eid}) [f5](ow://{OTHER_WORLD}/character/{eid}) [f6](ow://{HEX_WORLD})."
+        f" [f4](ow://character/{eid.upper()}) [f5](ow://{OTHER_WORLD}/character/{eid}) [f6](ow://{HEX_WORLD})."
     )
+
+
+def test_a_type_word_the_address_profile_refuses_is_no_reference() -> None:
+    # STAGED for serial 126: the type word is read as the address profile reads it, lowercase and one of the 22;
+    # an upper-case word or an unknown one names no element and stays as written, and is not counted unresolved.
+    prose = f"[u](ow://Character/{C1}) [d](ow://dragon/{C1}) [h](ow://character/c1)."
+    elements = [
+        ("character", {"id": C1, "name": "Ann"}),
+        ("character", {"id": "c1", "name": "Cy"}),
+        ("character", {"id": C2, "name": "Bo", "background": prose}),
+    ]
+    files, report = build_pack({**WORLD, "id": HEX_WORLD}, elements)
+    assert f"[u](ow://Character/{C1}) [d](ow://dragon/{C1}) h (Cy).\n" in files["01-character.md"]
+    assert report.unresolved == []
 
 
 def test_every_address_form_of_one_of_its_elements_becomes_words() -> None:

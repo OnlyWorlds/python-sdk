@@ -673,7 +673,7 @@ def prose_forms(wid: str) -> str:
     element of this world: another world's, and this world's own address."""
     return (
         f" [f1](ow://character/{CONSUL}@3) [f2](ow://character/{CONSUL}?lens={LENS}) [f3](ow://{wid}/character/{CONSUL})"
-        f" [f4](ow://Character/{CONSUL}) [f5](ow://{OTHER_WORLD}/character/{CONSUL}) [f6](ow://{wid})."
+        f" [f4](ow://character/{CONSUL.upper()}) [f5](ow://{OTHER_WORLD}/character/{CONSUL}) [f6](ow://{wid})."
     )
 
 
