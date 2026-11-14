@@ -160,18 +160,31 @@ def test_a_folder_element_is_a_message_by_its_directory_type() -> None:
 
 def test_recipients_keep_their_order_and_a_malformed_list_is_not_everyone() -> None:
     """The same answers as the npm SDK's test of the same name: a malformed list addresses nobody."""
-    assert recipients_of({"characters": [MARA, ADA]}) == [MARA, ADA]
-    assert recipients_of({}) == [] and recipients_of({"characters": ADA}) == []
+    assert recipients_of({"type": "narrative", "supertype": "Message", "characters": [MARA, ADA]}) == [MARA, ADA]
+    assert (
+        recipients_of({}) == []
+        and recipients_of({"type": "narrative", "supertype": "Message", "characters": ADA}) == []
+    )
     for characters in (ADA, [""], [5], {"0": ADA}):
-        assert is_addressed_to({"characters": characters}, ADA) is False, characters
+        assert is_addressed_to({"type": "narrative", "supertype": "Message", "characters": characters}, ADA) is False, (
+            characters
+        )
     no_recipients: tuple[list[str], None] = ([], None)
     for everyone in no_recipients:
-        assert is_addressed_to({"characters": everyone}, ADA) is True, everyone
-    assert is_addressed_to({}, ADA) is True
-    assert is_addressed_to({"characters": []}, "") is False
+        assert is_addressed_to({"type": "narrative", "supertype": "Message", "characters": everyone}, ADA) is True, (
+            everyone
+        )
+    assert is_addressed_to({"type": "narrative", "supertype": "Message"}, ADA) is True
+    assert is_addressed_to({"type": "narrative", "supertype": "Message", "characters": []}, "") is False
     for not_everyone in (ADA, [""], [5], [ADA]):
-        assert is_to_everyone({"characters": not_everyone}) is False, not_everyone
-    everyone_bodies: tuple[dict[str, Any], ...] = ({}, {"characters": None}, {"characters": []})
+        assert is_to_everyone({"type": "narrative", "supertype": "Message", "characters": not_everyone}) is False, (
+            not_everyone
+        )
+    everyone_bodies: tuple[dict[str, Any], ...] = (
+        {"type": "narrative", "supertype": "Message"},
+        {"type": "narrative", "supertype": "Message", "characters": None},
+        {"type": "narrative", "supertype": "Message", "characters": []},
+    )
     for m in everyone_bodies:
         assert is_to_everyone(m) is True, m
 
@@ -180,7 +193,12 @@ def test_a_list_the_server_trimmed_is_never_everyone_and_says_someone_unseen_is_
     """Every recipient hidden arrives as an empty list with the mark, never everyone."""
 
     def trimmed(characters: list[str], mark: list[str] | None = None) -> dict[str, Any]:
-        return {"characters": characters, "x_served_trimmed": ["characters"] if mark is None else mark}
+        return {
+            "type": "narrative",
+            "supertype": "Message",
+            "characters": characters,
+            "x_served_trimmed": ["characters"] if mark is None else mark,
+        }
 
     assert is_to_everyone(trimmed([])) is False
     assert has_unseen_recipients(trimmed([])) is True
@@ -191,13 +209,17 @@ def test_a_list_the_server_trimmed_is_never_everyone_and_says_someone_unseen_is_
     assert is_to_everyone(trimmed([], ["narrator"])) is True
     no_mark: tuple[dict[str, Any], ...] = (
         {},
-        {"characters": []},
-        {"x_served_trimmed": "characters"},
-        {"x_served_trimmed": None},
+        {"type": "narrative", "supertype": "Message", "characters": []},
+        {"type": "narrative", "supertype": "Message", "x_served_trimmed": "characters"},
+        {"type": "narrative", "supertype": "Message", "x_served_trimmed": None},
     )
     for m in no_mark:
         assert has_unseen_recipients(m) is False, m
-    keyless_bodies: tuple[dict[str, Any], ...] = ({}, {"characters": []}, {"characters": None})
+    keyless_bodies: tuple[dict[str, Any], ...] = (
+        {"type": "narrative", "supertype": "Message"},
+        {"type": "narrative", "supertype": "Message", "characters": []},
+        {"type": "narrative", "supertype": "Message", "characters": None},
+    )
     for m in keyless_bodies:
         assert is_to_everyone(m, keyless=True) is False, m
         assert has_unseen_recipients(m, keyless=True) is None, m
@@ -448,15 +470,34 @@ def test_keyless_is_a_boolean() -> None:
     not_bools: tuple[Any, ...] = ("yes", 1, None)
     for bad in not_bools:
         with pytest.raises(TypeError):
-            is_to_everyone({"characters": []}, keyless=bad)
+            is_to_everyone({"type": "narrative", "supertype": "Message", "characters": []}, keyless=bad)
         with pytest.raises(TypeError):
-            has_unseen_recipients({"characters": []}, keyless=bad)
+            has_unseen_recipients({"type": "narrative", "supertype": "Message", "characters": []}, keyless=bad)
     assert edited_by({"changed_by": "b2"}, None) == EditRead(True, None)
 
 
 def test_recipients_read_each_character_once_in_its_first_place() -> None:
     """(STAGED: serial 128) A multi-link names each element once: a list naming one recipient twice answers it
     once, in its first place. The npm SDK holds the same case."""
-    assert recipients_of({"characters": [MARA, MARA, ADA]}) == [MARA, ADA]
-    assert recipients_of({"characters": [ADA, MARA, ADA]}) == [ADA, MARA]
-    assert is_addressed_to({"characters": [ADA, ADA]}, ADA) is True
+    assert recipients_of({"type": "narrative", "supertype": "Message", "characters": [MARA, MARA, ADA]}) == [MARA, ADA]
+    assert recipients_of({"type": "narrative", "supertype": "Message", "characters": [ADA, MARA, ADA]}) == [ADA, MARA]
+    assert is_addressed_to({"type": "narrative", "supertype": "Message", "characters": [ADA, ADA]}, ADA) is True
+
+
+def test_a_narrative_that_is_not_a_message_has_no_recipients() -> None:
+    # STAGED serial 128: only a message is addressed; a Story's characters are the people it is about.
+    story = {"type": "narrative", "supertype": "Story", "characters": ["a"]}
+    assert not is_message(story)
+    assert recipients_of(story) == []
+    assert not is_addressed_to(story, "a")
+    assert not is_to_everyone({"type": "narrative", "supertype": "Story", "characters": []})
+    assert (
+        has_unseen_recipients(
+            {"type": "narrative", "supertype": "Story", "characters": [], "x_served_trimmed": ["characters"]}
+        )
+        is False
+    )
+    assert recipients_of({"type": "narrative", "characters": ["a"]}) == []
+    message = {"type": "narrative", "supertype": "Message", "characters": ["a"]}
+    assert recipients_of(message) == ["a"]
+    assert is_addressed_to(message, "a")

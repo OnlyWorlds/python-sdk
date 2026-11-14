@@ -142,9 +142,10 @@ def recipients_of(message: Mapping[str, Any]) -> list[str]:
     """The Character ids in the message's ``characters``, in the field's order. An empty list means the
     message is addressed to every member of the world: a body that omits the field, or holds ``None``,
     reads as empty. Entries that are not ids are left out; use ``is_addressed_to`` for "is it for X". A
-    Note has no recipients: ``[]``, whatever its ``characters`` holds. (STAGED: serial 128) A multi-link
+    Note, or any Narrative that is not a message, has no recipients: ``[]``, whatever its ``characters``
+    holds (STAGED: serial 128). (STAGED: serial 128) A multi-link
     names each element once: a list naming one Character twice answers it once, in its first place."""
-    if is_note(message):
+    if not is_message(message):
         return []
     value = message.get("characters")
     if not isinstance(value, list | tuple):
@@ -155,13 +156,14 @@ def recipients_of(message: Mapping[str, Any]) -> list[str]:
 def is_addressed_to(message: Mapping[str, Any], character_id: str) -> bool:
     """True when ``character_id`` is in the message's ``characters``, or ``characters`` is empty (absent,
     ``None`` or ``[]``) and the server did not trim it for this reader (``is_to_everyone``): an empty list
-    whose ``x_served_trimmed`` names ``characters`` is to someone the reader cannot see. A Note is
-    addressed to nobody. A list that names no valid id (``[""]``) and a value that
-    is not a list address nobody, never everyone. Nothing else addresses a message: not ``narrator``, not
-    a name or an id in ``story``, not ``protagonist`` or any other link. An empty ``character_id``
+    whose ``x_served_trimmed`` names ``characters`` is to someone the reader cannot see. A Note, or
+    any Narrative that is not a message, is addressed to nobody (STAGED: serial 128). A list that names
+    no valid id (``[""]``) and a value that is not a list address nobody, never everyone. Nothing else
+    addresses a message: not ``narrator``, not a name or an id in ``story``, not ``protagonist`` or any
+    other link. An empty ``character_id``
     (``""``) or one that is not a string is no Character: nothing is addressed to it, not even a message
     to everyone."""
-    if not isinstance(character_id, str) or not character_id or is_note(message):
+    if not isinstance(character_id, str) or not character_id or not is_message(message):
         return False
     if is_to_everyone(message):
         return True
@@ -177,7 +179,7 @@ def is_to_everyone(message: Mapping[str, Any], *, keyless: bool = False) -> bool
     ``has_unseen_recipients``. A body read keyless (``keyless=True``, the public reader with no
     credential) is never to everyone: it carries no mark, so an empty list may hold someone the reader
     cannot see. A Note is to nobody."""
-    if _keyless("is_to_everyone", keyless) or is_note(message) or has_unseen_recipients(message) is True:
+    if _keyless("is_to_everyone", keyless) or not is_message(message) or has_unseen_recipients(message) is True:
         return False
     value = message.get("characters")
     return value is None or (isinstance(value, list | tuple) and len(value) == 0)
@@ -187,10 +189,10 @@ def has_unseen_recipients(message: Mapping[str, Any], *, keyless: bool = False) 
     """True when the message is addressed to someone this reader cannot see: the server served it with
     ``characters`` trimmed (its ``x_served_trimmed`` list names ``characters``), whatever is left in the
     list. It says that such a recipient exists, never who or how many. ``None`` for a body read keyless
-    (``keyless=True``): it carries no mark, so the reader cannot say either way. False for a Note, which has
-    no recipients, keyless or not."""
+    (``keyless=True``): it carries no mark, so the reader cannot say either way. False for a Note or any
+    Narrative that is not a message, which has no recipients, keyless or not (STAGED: serial 128)."""
     keyless = _keyless("has_unseen_recipients", keyless)
-    if not isinstance(message, Mapping) or is_note(message):
+    if not isinstance(message, Mapping) or not is_message(message):
         return False
     if keyless:
         return None
