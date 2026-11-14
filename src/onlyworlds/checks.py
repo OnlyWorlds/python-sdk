@@ -224,7 +224,7 @@ def _holds(require: Mapping[str, Any], body: Mapping[str, Any]) -> bool:
             return False
         if isinstance(value, str):
             return value.strip(_WHITE_SPACE) != ""
-        return not (isinstance(value, (list, Mapping)) and not value)  # an empty object short too: STAGED, serial 126
+        return not (isinstance(value, (list, Mapping)) and not value)  # an empty list or object is short (serial 126)
     if "matches" in require:
         compiled = _pattern(require["matches"])[0]
         return isinstance(value, str) and compiled is not None and compiled.search(value) is not None
