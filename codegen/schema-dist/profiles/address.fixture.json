@@ -2628,6 +2628,86 @@
         "address": null,
         "reading": null
       }
+    },
+    {
+      "name": "world-then-uppercase-type-is-the-worlds-own",
+      "claim": "after a world's id, a type word in another case is no type word: the address is the world's own, and what follows it is prose",
+      "kind": "prose",
+      "text": "ow://0193a1c2-7d3e-7f00-8a11-3c5e7b9d2f40/Character/01a1d4ef-0000-7000-8000-000000000084.",
+      "index": 0,
+      "expect": {
+        "address": "ow://0193a1c2-7d3e-7f00-8a11-3c5e7b9d2f40",
+        "reading": {
+          "form": "text",
+          "world": "0193a1c2-7d3e-7f00-8a11-3c5e7b9d2f40",
+          "world_is_slug": false,
+          "type": null,
+          "id": null,
+          "lens": null,
+          "moment": null,
+          "canonical": true
+        }
+      }
+    },
+    {
+      "name": "slug-then-element-path",
+      "claim": "after a slug, a type word and an id are the element: the address runs to the id's end, and the full stop after it is prose",
+      "kind": "prose",
+      "text": "https://www.onlyworlds.com/w/hyperion/event/01a1d4ef-0000-7000-8000-000000000084.",
+      "index": 0,
+      "expect": {
+        "address": "https://www.onlyworlds.com/w/hyperion/event/01a1d4ef-0000-7000-8000-000000000084",
+        "reading": {
+          "form": "human",
+          "world": "hyperion",
+          "world_is_slug": true,
+          "type": "event",
+          "id": "01a1d4ef-0000-7000-8000-000000000084",
+          "lens": null,
+          "moment": null,
+          "canonical": false
+        }
+      }
+    },
+    {
+      "name": "slug-then-bad-path-is-the-worlds-own",
+      "claim": "after a slug, a path that is no type word and id is prose, and the address is the world's own: charcter is no type word",
+      "kind": "prose",
+      "text": "https://www.onlyworlds.com/w/hyperion/charcter/01a1d4ef-0000-7000-8000-000000000084.",
+      "index": 0,
+      "expect": {
+        "address": "https://www.onlyworlds.com/w/hyperion",
+        "reading": {
+          "form": "human",
+          "world": "hyperion",
+          "world_is_slug": true,
+          "type": null,
+          "id": null,
+          "lens": null,
+          "moment": null,
+          "canonical": false
+        }
+      }
+    },
+    {
+      "name": "slug-then-uppercase-type-is-the-worlds-own",
+      "claim": "after a slug, a type word in another case is no type word: the address is the world's own, and what follows it is prose",
+      "kind": "prose",
+      "text": "https://www.onlyworlds.com/w/hyperion/Event/01a1d4ef-0000-7000-8000-000000000084.",
+      "index": 0,
+      "expect": {
+        "address": "https://www.onlyworlds.com/w/hyperion",
+        "reading": {
+          "form": "human",
+          "world": "hyperion",
+          "world_is_slug": true,
+          "type": null,
+          "id": null,
+          "lens": null,
+          "moment": null,
+          "canonical": false
+        }
+      }
     }
   ]
 }

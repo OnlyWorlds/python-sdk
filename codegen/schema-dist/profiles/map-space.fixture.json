@@ -8225,6 +8225,198 @@
     ],
     "out": {}
    }
+  },
+  {
+   "name": "pin-empty-map-is-no-map",
+   "claim": "a Pin whose `map` is an empty string has no map: counted `no_map`, placed nowhere",
+   "elements": [
+    {
+     "type": "map",
+     "id": "019a9260-0000-7000-8000-00000000aa01",
+     "name": "deck",
+     "width": 100,
+     "height": 50
+    },
+    {
+     "type": "pin",
+     "id": "019a9260-0000-7000-8000-0000000d0001",
+     "name": "pin",
+     "map": "",
+     "x": 5,
+     "y": 5
+    }
+   ],
+   "want": {
+    "maps": [
+     {
+      "id": "019a9260-0000-7000-8000-00000000aa01",
+      "width": 100,
+      "height": 50,
+      "depth": null,
+      "z_max": null,
+      "scale": null,
+      "location": null,
+      "parent_map": null
+     }
+    ],
+    "zones": [],
+    "pins": [],
+    "out": {
+     "no_map": 1
+    }
+   }
+  },
+  {
+   "name": "marker-empty-zone-is-dangling",
+   "claim": "a Marker whose `zone` is an empty string names no zone: counted `dangling`, placed nowhere",
+   "elements": [
+    {
+     "type": "map",
+     "id": "019a9260-0000-7000-8000-00000000aa01",
+     "name": "deck",
+     "width": 100,
+     "height": 50
+    },
+    {
+     "type": "zone",
+     "id": "019a9260-0000-7000-8000-0000000b0001",
+     "name": "zone"
+    },
+    {
+     "type": "marker",
+     "id": "019a9260-0000-7000-8000-0000000c0001",
+     "name": "corner",
+     "map": "019a9260-0000-7000-8000-00000000aa01",
+     "zone": "019a9260-0000-7000-8000-0000000b0001",
+     "x": 1,
+     "y": 1,
+     "order": 0
+    },
+    {
+     "type": "marker",
+     "id": "019a9260-0000-7000-8000-0000000c0002",
+     "name": "corner",
+     "map": "019a9260-0000-7000-8000-00000000aa01",
+     "zone": "",
+     "x": 2,
+     "y": 2,
+     "order": 1
+    }
+   ],
+   "want": {
+    "maps": [
+     {
+      "id": "019a9260-0000-7000-8000-00000000aa01",
+      "width": 100,
+      "height": 50,
+      "depth": null,
+      "z_max": 0,
+      "scale": null,
+      "location": null,
+      "parent_map": null
+     }
+    ],
+    "zones": [
+     {
+      "zone": "019a9260-0000-7000-8000-0000000b0001",
+      "map": "019a9260-0000-7000-8000-00000000aa01",
+      "shape": "polygon",
+      "points": [
+       [
+        1,
+        1,
+        0
+       ]
+      ]
+     }
+    ],
+    "pins": [],
+    "out": {
+     "dangling": 1
+    }
+   }
+  },
+  {
+   "name": "map-empty-parent-and-location-are-null",
+   "claim": "a Map whose `parent_map` and `location` are empty strings has neither: both read as null",
+   "elements": [
+    {
+     "type": "map",
+     "id": "019a9260-0000-7000-8000-00000000aa01",
+     "name": "deck",
+     "width": 100,
+     "height": 50,
+     "parent_map": "",
+     "location": ""
+    }
+   ],
+   "want": {
+    "maps": [
+     {
+      "id": "019a9260-0000-7000-8000-00000000aa01",
+      "width": 100,
+      "height": 50,
+      "depth": null,
+      "z_max": null,
+      "scale": null,
+      "location": null,
+      "parent_map": null
+     }
+    ],
+    "zones": [],
+    "pins": [],
+    "out": {}
+   }
+  },
+  {
+   "name": "pin-empty-element-pair-is-a-point",
+   "claim": "a Pin whose `element_type` and `element_id` are both empty strings points at nothing: both null, a point",
+   "elements": [
+    {
+     "type": "map",
+     "id": "019a9260-0000-7000-8000-00000000aa01",
+     "name": "deck",
+     "width": 100,
+     "height": 50
+    },
+    {
+     "type": "pin",
+     "id": "019a9260-0000-7000-8000-0000000d0001",
+     "name": "pin",
+     "map": "019a9260-0000-7000-8000-00000000aa01",
+     "element_type": "",
+     "element_id": "",
+     "x": 5,
+     "y": 5
+    }
+   ],
+   "want": {
+    "maps": [
+     {
+      "id": "019a9260-0000-7000-8000-00000000aa01",
+      "width": 100,
+      "height": 50,
+      "depth": null,
+      "z_max": 0,
+      "scale": null,
+      "location": null,
+      "parent_map": null
+     }
+    ],
+    "zones": [],
+    "pins": [
+     {
+      "pin": "019a9260-0000-7000-8000-0000000d0001",
+      "map": "019a9260-0000-7000-8000-00000000aa01",
+      "element_type": null,
+      "element_id": null,
+      "x": 5,
+      "y": 5,
+      "z": 0
+     }
+    ],
+    "out": {}
+   }
   }
  ],
  "layout_cases": [
@@ -9251,6 +9443,111 @@
    ],
    "want": {
     "layout": null,
+    "ground": null,
+    "hand": []
+   }
+  },
+  {
+   "name": "layout-map-empty-id-is-no-map",
+   "claim": "a Map row whose `id` is an empty string is no Map, whatever its `x_layout`",
+   "map_index": [
+    0
+   ],
+   "elements": [
+    {
+     "type": "map",
+     "id": "",
+     "name": "board",
+     "x_layout": {
+      "method": "hand"
+     }
+    },
+    {
+     "type": "pin",
+     "id": "019a9260-0000-7000-8000-0000000d0001",
+     "name": "pin",
+     "map": "",
+     "x": 1,
+     "y": 1,
+     "x_hand": true
+    }
+   ],
+   "want": {
+    "layout": null,
+    "ground": null,
+    "hand": []
+   }
+  },
+  {
+   "name": "layout-pin-empty-id-is-no-pin",
+   "claim": "a marked Pin whose `id` is an empty string is no Pin: it is in no `hand`",
+   "map": "019a9260-0000-7000-8000-00000000aa01",
+   "elements": [
+    {
+     "type": "map",
+     "id": "019a9260-0000-7000-8000-00000000aa01",
+     "name": "board",
+     "x_layout": {
+      "method": "hand"
+     }
+    },
+    {
+     "type": "pin",
+     "id": "",
+     "name": "pin",
+     "map": "019a9260-0000-7000-8000-00000000aa01",
+     "x": 1,
+     "y": 1,
+     "x_hand": true
+    },
+    {
+     "type": "pin",
+     "id": "019a9260-0000-7000-8000-0000000d0002",
+     "name": "pin",
+     "map": "019a9260-0000-7000-8000-00000000aa01",
+     "x": 2,
+     "y": 2,
+     "x_hand": true
+    }
+   ],
+   "want": {
+    "layout": "hand",
+    "ground": null,
+    "hand": [
+     "019a9260-0000-7000-8000-0000000d0002"
+    ]
+   }
+  },
+  {
+   "name": "layout-ground-empty-map-is-no-ground",
+   "claim": "a ground whose `map` is an empty string names no Map: no ground",
+   "map": "019a9260-0000-7000-8000-00000000aa01",
+   "elements": [
+    {
+     "type": "map",
+     "id": "019a9260-0000-7000-8000-00000000aa01",
+     "name": "trail",
+     "x_layout": {
+      "method": "trail-by-place",
+      "settings": {
+       "ground": {
+        "map": "",
+        "width": 3000,
+        "height": 2000
+       }
+      }
+     }
+    },
+    {
+     "type": "map",
+     "id": "019a9260-0000-7000-8000-00000000aa02",
+     "name": "ground",
+     "width": 3462,
+     "height": 4676
+    }
+   ],
+   "want": {
+    "layout": "trail-by-place",
     "ground": null,
     "hand": []
    }

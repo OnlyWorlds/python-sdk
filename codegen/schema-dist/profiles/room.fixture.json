@@ -310,6 +310,24 @@
       "in_room": false
     },
     {
+      "name": "mark-empty-list",
+      "element": {
+        "type": "narrative",
+        "supertype": "Message",
+        "x_room_of": []
+      },
+      "in_room": false
+    },
+    {
+      "name": "mark-empty-object",
+      "element": {
+        "type": "narrative",
+        "supertype": "Message",
+        "x_room_of": {}
+      },
+      "in_room": false
+    },
+    {
       "name": "mark-null",
       "element": {
         "type": "narrative",
@@ -324,6 +342,15 @@
         "type": "narrative",
         "supertype": "Message",
         "x_room_of": 7
+      },
+      "in_room": true
+    },
+    {
+      "name": "mark-false",
+      "element": {
+        "type": "narrative",
+        "supertype": "Message",
+        "x_room_of": false
       },
       "in_room": true
     },
