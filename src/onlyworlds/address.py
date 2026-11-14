@@ -323,7 +323,7 @@ def _human_path_end(text: str, start: int) -> int | None:
     run = _WORLD_RUN.match(text, start)
     assert run is not None
     world, end = run.group(0), run.end()
-    if end < len(text) and (text[end].isalpha() or unicodedata.category(text[end]).startswith("M") or text[end] == "_"):
+    if end < len(text) and _in_a_word(text[end]):
         return None
     if not (_is_uuid(world) or (_is_slug(world) and world not in _TYPES)):
         return None
@@ -332,6 +332,12 @@ def _human_path_end(text: str, start: int) -> int | None:
         if typed is not None and typed.group(1) in _TYPES and _is_uuid(typed.group(2)):
             return typed.end()
     return end
+
+
+def _in_a_word(ch: str) -> bool:
+    """A letter of any script, a combining mark or an underscore (Unicode L and M): beside one, an address is inside
+    a word, after its run and before its prefix alike."""
+    return ch.isalpha() or unicodedata.category(ch).startswith("M") or ch == "_"
 
 
 def _parses(address: str) -> bool:
@@ -358,7 +364,10 @@ def read_ow_link_at(text: str, index: int = 0) -> AddressAt | None:
     After the path the address continues only with ``@`` and a moment (its whole run of digits after an optional
     minus, read by the parser's step grammar) and then ``?lens=`` and a lens (the id after it). Any other query
     key or a fragment is not part of it: the address ends before its ``?``, ``&`` or ``#``. A ``@`` or ``?lens=``
-    whose value does not read is not taken; the address ends before it. What follows is prose.
+    whose value does not read is not taken; the address ends before it. What follows is prose. An address begins at
+    the start of the text or after a character that does not glue it to a word: after a letter of any script, a
+    combining mark or an underscore the start is inside a word and this answers None (``elbow://object/<id>``); a
+    hyphen or a digit before it does not glue (``x-ow://``, ``3ow://``), the same set read from both ends.
 
     ``parse_ow_link`` itself does not change: handed ``ow://object/<id>.`` whole, it still refuses it. An
     ``index`` at the text's end or past it holds no address. A ``text`` that is not a string or an ``index``
@@ -372,6 +381,10 @@ def read_ow_link_at(text: str, index: int = 0) -> AddressAt | None:
     if index < 0:
         raise ValueError(f"read_ow_link_at: index must be 0 or more; got {index}")
     if index >= len(text):
+        return None
+    # A start glued to a word is prose, the mirror of the cut after a run (STAGED: ruled 2026-11-14, publishes with
+    # a later serial).
+    if index > 0 and _in_a_word(text[index - 1]):
         return None
     if text.startswith(_HUMAN_PREFIX, index):
         prefix = _HUMAN_PREFIX

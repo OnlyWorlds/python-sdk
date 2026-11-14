@@ -302,3 +302,32 @@ def test_read_ow_link_at_answers_the_reading_and_its_end() -> None:
         read_ow_link_at(text, True)
     with pytest.raises(TypeError):
         read_ow_link_at(text, 1.0)  # type: ignore[arg-type]
+
+
+# What stands before ow:// (STAGED: ruled 2026-11-14, publishes with a later serial): a letter of any
+# script, a combining mark or an underscore glues the start into a word, the same set as the cut after a
+# run; a hyphen or a digit does not.
+def test_an_address_glued_to_a_word_before_it_is_prose() -> None:
+    e = "01a1d4ef-0000-7000-8000-000000000084"
+    cases = [
+        ("hyphen", "x-", True),
+        ("digit", "3", True),
+        ("letter", "elb", False),
+        ("non-ascii-letter", "caf\u00e9", False),
+        ("combining-mark", "cafe\u0301", False),
+        ("underscore", "_", False),
+        ("astral-letter", "\U0001d49c", False),
+        ("space", "a ", True),
+        ("opening-bracket", "(", True),
+        ("full-stop", "end.", True),
+        ("quote", "\u0022", True),
+        ("start-of-text", "", True),
+    ]
+    for name, before, found in cases:
+        text = f"{before}ow://object/{e} then"
+        got = read_ow_link_at(text, len(before))
+        if found:
+            assert got is not None and got.reading.id == e, name
+        else:
+            assert got is None, name
+    assert read_ow_link_at("elbhttps://www.onlyworlds.com/w/hyperion.", 3) is None, "the site form glues too"

@@ -4,6 +4,8 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+- (staged: ruled 2026-11-14, publishes with a later serial) `read_ow_link_at` answers None when the address would begin inside a word: after a letter of any script, a combining mark or an underscore (`elbow://object/<id>` is prose), the same set that cuts a run after it; a hyphen or a digit before `ow://` does not glue.
+
 ## 0.124.1 (2026-11-14)
 
 - The docstrings of `is_room_element` and `is_charter_element` say what 0.124.0 reads: an empty list or an empty mapping is no mark. They still said any value but `None` counted. No code changes.
