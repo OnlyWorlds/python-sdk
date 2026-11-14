@@ -10,13 +10,15 @@ gives the same points to the last bit in every language and browser. The kinds' 
 table of numbers baked into the package, never computed with the runtime's own cosine and sine (which differ in the
 last place between runtimes, and the method magnifies one unit in the last place into a visibly different picture);
 everything else is addition, subtraction, multiplication, division, square root and floor, which every runtime rounds
-alike. ``tests/fixtures/layout/by-kind.json`` (the npm SDK's bytes, sha256 held by both tests) is replayed whole.
+alike. Both first put the graph in one order (nodes by id, edges by source, field, index and target), so the order
+a caller hands it in changes no point. ``tests/fixtures/layout/by-kind.json`` (the npm SDK's bytes, sha256 held by both
+tests) is replayed whole.
 """
 
 from __future__ import annotations
 
 import math
-from collections.abc import Callable, Mapping, Sequence
+from collections.abc import Callable, Mapping
 from typing import Any, Literal, TypedDict
 
 from ._anchors import ANCHORS, GROUP_ORDER
@@ -83,18 +85,22 @@ def _group_rank(kind: str) -> int:
     return GROUP_ORDER.index(ELEMENT_GROUPS[kind])
 
 
-def _read_graph(fn: str, graph: Any) -> tuple[Sequence[Mapping[str, Any]], Sequence[Mapping[str, Any]], dict[str, int]]:
-    """The nodes, the edges and each node's place, or a TypeError naming what cannot be read."""
+def _read_graph(
+    fn: str, graph: Any
+) -> tuple[list[Mapping[str, Any]], list[Mapping[str, Any]], list[Mapping[str, Any]], dict[str, int]]:
+    """The caller's nodes, then the method's one order of the graph: the nodes by id, the edges by source, field (none
+    as ``""``), index (none as 0) and target, every word by code point (Python orders strings by code point), and each
+    node's place in that order. A TypeError naming what cannot be read."""
 
     def fail(msg: str) -> TypeError:
         return TypeError(f"{fn}: {msg}")
 
-    nodes = graph.get("nodes") if isinstance(graph, Mapping) else None
-    edges = graph.get("edges") if isinstance(graph, Mapping) else None
-    if not isinstance(nodes, list) or not isinstance(edges, list):
+    given = graph.get("nodes") if isinstance(graph, Mapping) else None
+    links = graph.get("edges") if isinstance(graph, Mapping) else None
+    if not isinstance(given, list) or not isinstance(links, list):
         raise fail("the graph is {nodes, edges}, as world_graph answers it")
-    index: dict[str, int] = {}
-    for i, node in enumerate(nodes):
+    seen: set[str] = set()
+    for i, node in enumerate(given):
         if not isinstance(node, Mapping):
             raise fail(f"node {i} is not an object")
         id_ = node.get("id")
@@ -106,13 +112,24 @@ def _read_graph(fn: str, graph: Any) -> tuple[Sequence[Mapping[str, Any]], Seque
         name = node.get("name")
         if name is not None and not isinstance(name, str):
             raise fail(f"node {id_}: name is a string or None")
-        if id_ in index:
+        if id_ in seen:
             raise fail(f"the id {id_} is a node twice")
-        index[id_] = i
-    for k, e in enumerate(edges):
+        seen.add(id_)
+    for k, e in enumerate(links):
         if not isinstance(e, Mapping) or not isinstance(e.get("source"), str) or not isinstance(e.get("target"), str):
             raise fail(f"edge {k} is not {{source, target}}")
-    return nodes, edges, index
+        field = e.get("field")
+        if field is not None and not isinstance(field, str):
+            raise fail(f"edge {k}: field is a string")
+        at = e.get("index")
+        if at is not None and (not isinstance(at, (int, float)) or isinstance(at, bool) or not math.isfinite(at)):
+            raise fail(f"edge {k}: index is a number")
+    nodes = sorted(given, key=lambda x: str(x["id"]))
+    edges = sorted(
+        links,
+        key=lambda e: (e["source"], e.get("field") or "", e.get("index") or 0, e["target"]),
+    )
+    return given, nodes, edges, {x["id"]: i for i, x in enumerate(nodes)}
 
 
 def layout_by_kind(graph: Mapping[str, Any]) -> KindLayout:
@@ -132,6 +149,10 @@ def layout_by_kind(graph: Mapping[str, Any]) -> KindLayout:
     order, so a saved layout can say what made it. An empty graph answers no points; a graph of one element answers
     0, 0.
 
+    The graph is first put in one order: the nodes by id, the edges by source, then field (none as ``""``), then index
+    (none as 0), then target, every word by code point. ``world_graph`` answers in that order already; a graph handed
+    in any other order gives the same points, each under its id.
+
     The same graph gives the same points to the last bit in every language and browser, the npm SDK's ``layoutByKind``
     included: the anchors are a baked table of numbers, never computed, and the rest is arithmetic every runtime rounds
     alike. Self-links pull nothing; a link to an id that is not a node is passed over.
@@ -140,10 +161,10 @@ def layout_by_kind(graph: Mapping[str, Any]) -> KindLayout:
     that is not one of the 22, a name that is not a string or None, an id twice, an edge without a string source and
     target.
     """
-    nodes, edges, index = _read_graph("layout_by_kind", graph)
+    given, nodes, edges, index = _read_graph("layout_by_kind", graph)
     n = len(nodes)
     if n <= 1:
-        return {"method": "by-kind", "version": 1, "points": [{"id": x["id"], "x": 0.0, "y": 0.0} for x in nodes]}
+        return {"method": "by-kind", "version": 1, "points": [{"id": x["id"], "x": 0.0, "y": 0.0} for x in given]}
 
     links: list[tuple[int, int]] = []
     for e in edges:
@@ -244,7 +265,9 @@ def layout_by_kind(graph: Mapping[str, Any]) -> KindLayout:
     return {
         "method": "by-kind",
         "version": 1,
-        "points": [{"id": x["id"], "x": (px[i] - mx) * s, "y": (py[i] - my) * s} for i, x in enumerate(nodes)],
+        "points": [
+            {"id": x["id"], "x": (px[index[x["id"]]] - mx) * s, "y": (py[index[x["id"]]] - my) * s} for x in given
+        ],
     }
 
 
@@ -260,7 +283,8 @@ def layout_around(graph: Mapping[str, Any], focus: str, *, steps: int = 1) -> Ar
     node's id. Answers ``{"method": "around", "version": 1, "points": [...]}``: the focus and every element within the
     steps, in the graph's node order, each ``{"id", "depth", "x", "y"}`` with its depth (0, 1 or 2). Nothing iterates,
     so each point is one cosine and one sine of an angle the method computes exactly; the npm SDK's ``layoutAround``
-    agrees to within about 1e-12.
+    agrees to within about 1e-12. The graph is first put in ``layout_by_kind``'s one order, so the order a graph is
+    handed in does not move a point.
 
     Raises ``TypeError`` on a ``steps`` that is not a whole number or a graph it cannot read (as ``layout_by_kind``),
     and ``ValueError`` on a ``steps`` that is not 1 or 2 or a focus that is not one of the graph's nodes.
@@ -269,7 +293,7 @@ def layout_around(graph: Mapping[str, Any], focus: str, *, steps: int = 1) -> Ar
         raise TypeError(f"layout_around: steps is 1 or 2, not {steps!r}")
     if steps not in (1, 2):
         raise ValueError(f"layout_around: steps is 1 or 2, not {steps!r}")
-    nodes, edges, index = _read_graph("layout_around", graph)
+    given, nodes, edges, index = _read_graph("layout_around", graph)
     centre = index.get(focus) if isinstance(focus, str) else None
     if centre is None:
         raise ValueError(f"layout_around: the focus {focus!r} is not a node of the graph")
@@ -333,6 +357,8 @@ def layout_around(graph: Mapping[str, Any], focus: str, *, steps: int = 1) -> Ar
         "method": "around",
         "version": 1,
         "points": [
-            {"id": x["id"], "depth": depth[j], "x": at[j][0], "y": at[j][1]} for j, x in enumerate(nodes) if j in at
+            {"id": x["id"], "depth": depth[j], "x": at[j][0], "y": at[j][1]}
+            for x in given
+            if (j := index[x["id"]]) in at
         ],
     }

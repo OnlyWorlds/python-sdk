@@ -11,6 +11,7 @@ import hashlib
 import importlib
 import json
 import math
+import random
 import sys
 from pathlib import Path
 from typing import Any
@@ -23,7 +24,7 @@ from onlyworlds._schema import ELEMENT_GROUPS
 
 REPO = Path(__file__).resolve().parent.parent
 FIXTURE = REPO / "tests" / "fixtures" / "layout" / "by-kind.json"
-FIXTURE_SHA = "218b6cf8852291d7"
+FIXTURE_SHA = "6e7c422eb4c72b17"
 BYTES = FIXTURE.read_bytes()
 FX: dict[str, Any] = json.loads(BYTES.decode("utf-8"))
 AROUND_TOLERANCE = 1e-12
@@ -96,6 +97,50 @@ def test_a_link_to_an_id_that_is_not_a_node_is_passed_over() -> None:
     assert [[p["x"], p["y"]] for p in layout_by_kind(graph)["points"]] == case["want"]
 
 
+def _shuffled(graph: dict[str, Any], seed: int) -> dict[str, Any]:
+    out = copy.deepcopy(graph)
+    rand = random.Random(seed)
+    rand.shuffle(out["nodes"])
+    rand.shuffle(out["edges"])
+    return out
+
+
+@pytest.mark.parametrize("name", ["hyperion", "moppetopia", "a-crowded-cell"])
+def test_a_graph_handed_in_another_order_gives_the_same_points_by_id(name: str) -> None:
+    case = next(c for c in FX["cases"] if c["name"] == name)
+    want = {p["id"]: (p["x"], p["y"]) for p in layout_by_kind(copy.deepcopy(case["graph"]))["points"]}
+    for seed in (1, 2, 3):
+        graph = _shuffled(case["graph"], seed)
+        got = layout_by_kind(graph)["points"]
+        assert [p["id"] for p in got] == [x["id"] for x in graph["nodes"]]  # the caller's order
+        assert {p["id"]: (p["x"], p["y"]) for p in got} == want
+
+
+def test_around_a_graph_handed_in_another_order_gives_the_same_points_by_id() -> None:
+    case = next(c for c in FX["around"] if c["name"] == "two-steps")
+    want = {p["id"]: p for p in layout_around(copy.deepcopy(case["graph"]), case["focus"], steps=2)["points"]}
+    for seed in (1, 2, 3):
+        graph = _shuffled(case["graph"], seed)
+        got = layout_around(graph, case["focus"], steps=2)["points"]
+        order = [x["id"] for x in graph["nodes"] if x["id"] in want]
+        assert [p["id"] for p in got] == order  # the caller's order, only the nodes within the steps
+        assert {p["id"]: p for p in got} == want
+
+
+def test_an_edge_with_no_field_or_index_sorts_as_the_empty_field_at_0() -> None:
+    case = next(c for c in FX["cases"] if c["name"] == "hyperion")
+    bare = copy.deepcopy(case["graph"])
+    for e in bare["edges"]:
+        e.pop("field")
+        e.pop("index")
+    named = copy.deepcopy(bare)
+    for e in named["edges"]:
+        e["field"], e["index"] = "", 0
+    backwards = copy.deepcopy(bare)
+    backwards["edges"].reverse()
+    assert layout_by_kind(bare) == layout_by_kind(named) == layout_by_kind(backwards)
+
+
 def test_the_answer_does_not_touch_the_graph() -> None:
     case = next(c for c in FX["cases"] if c["name"] == "hyperion")
     graph = copy.deepcopy(case["graph"])
@@ -128,6 +173,10 @@ def test_the_answer_does_not_touch_the_graph() -> None:
         ),
         ({"nodes": [], "edges": [{"source": "a"}]}, "edge 0 is not {source, target}"),
         ({"nodes": [], "edges": [None]}, "edge 0 is not {source, target}"),
+        ({"nodes": [], "edges": [{"source": "a", "target": "b", "field": 1}]}, "edge 0: field is a string"),
+        ({"nodes": [], "edges": [{"source": "a", "target": "b", "index": "0"}]}, "edge 0: index is a number"),
+        ({"nodes": [], "edges": [{"source": "a", "target": "b", "index": True}]}, "edge 0: index is a number"),
+        ({"nodes": [], "edges": [{"source": "a", "target": "b", "index": math.nan}]}, "edge 0: index is a number"),
     ],
 )
 def test_a_graph_it_cannot_read_is_refused_by_both(graph: Any, message: str) -> None:
