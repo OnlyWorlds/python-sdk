@@ -27,9 +27,11 @@ __all__ = [
     "AddressAt",
     "AddressError",
     "AddressForm",
+    "AddressFound",
     "AddressReading",
     "AddressReason",
     "element_address",
+    "find_ow_links",
     "parse_ow_link",
     "read_ow_link_at",
 ]
@@ -304,6 +306,16 @@ class AddressAt:
     end: int
 
 
+@dataclass(frozen=True)
+class AddressFound:
+    """What ``find_ow_links`` finds for each address: ``start`` and ``end`` in the text, and ``reading``, what
+    ``parse_ow_link`` reads from ``text[start:end]``."""
+
+    start: int
+    end: int
+    reading: AddressReading
+
+
 # A path is written with these characters only (an id, a slug, a type word, the slashes between).
 _PATH_RUN = re.compile(r"[0-9A-Za-z/-]+")
 _PATH_MAX = 36 + 1 + max(len(t) for t in _TYPES) + 1 + 36
@@ -400,8 +412,15 @@ def read_ow_link_at(text: str, index: int = 0) -> AddressAt | None:
         run = _PATH_RUN.match(text, start)
         if run is None:
             return None
+        # Every path the parser takes here ends in a world's or an element's id, so an end whose last 36
+        # characters are not an id is passed over without a parse.
         end = next(
-            (e for e in range(min(run.end(), start + _PATH_MAX), start, -1) if _parses(prefix + text[start:e])), None
+            (
+                e
+                for e in range(min(run.end(), start + _PATH_MAX), start, -1)
+                if e - 36 >= start and _is_uuid(text[e - 36 : e]) and _parses(prefix + text[start:e])
+            ),
+            None,
         )
     if end is None:
         return None
@@ -414,3 +433,34 @@ def read_ow_link_at(text: str, index: int = 0) -> AddressAt | None:
         if _is_uuid(text[end + len(_LENS_KEY) : lens_end]):
             end = lens_end
     return AddressAt(parse_ow_link(text[index:end]), end)
+
+
+def find_ow_links(text: str) -> list[AddressFound]:
+    """Every address in a text, in order, each an ``AddressFound`` (``start``, ``end``, ``reading``), read by
+    ``read_ow_link_at`` at each place either prefix (``ow://``, ``https://www.onlyworlds.com/w/``) starts, so a start
+    glued to a word is prose and what follows an address is prose as ``read_ow_link_at`` says. The search goes on
+    from the end of each address found, so no two overlap, and from just past a start that reads nothing. Linear in
+    the text: each prefix's next place is searched once, and a start reads a stretch no longer than the run of path
+    characters after it. ``start`` and ``end`` count code points, as ``read_ow_link_at``'s do (the npm SDK's
+    ``findOwLinks`` counts UTF-16 units). A ``text`` that is not a string is a ``TypeError``."""
+    if not isinstance(text, str):
+        raise TypeError("find_ow_links: text must be a string")
+    found: list[AddressFound] = []
+    next_text = text.find(_TEXT_PREFIX)
+    next_human = text.find(_HUMAN_PREFIX)
+    at = 0
+    while True:
+        if next_text != -1 and next_text < at:
+            next_text = text.find(_TEXT_PREFIX, at)
+        if next_human != -1 and next_human < at:
+            next_human = text.find(_HUMAN_PREFIX, at)
+        starts = [s for s in (next_text, next_human) if s != -1]
+        if not starts:
+            return found
+        start = min(starts)
+        got = read_ow_link_at(text, start)
+        if got is None:
+            at = start + 1
+        else:
+            found.append(AddressFound(start, got.end, got.reading))
+            at = got.end
