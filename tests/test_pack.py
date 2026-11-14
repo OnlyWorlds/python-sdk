@@ -748,7 +748,7 @@ def prose_forms(eid: str) -> str:
 
 
 def test_a_type_word_the_address_profile_refuses_is_no_reference() -> None:
-    # STAGED for serial 126: the type word is read as the address profile reads it, lowercase and one of the 22;
+    # Since serial 126: the type word is read as the address profile reads it, lowercase and one of the 22;
     # an upper-case word or an unknown one names no element and stays as written, and is not counted unresolved.
     prose = f"[u](ow://Character/{C1}) [d](ow://dragon/{C1}) [h](ow://character/c1)."
     elements = [

@@ -81,8 +81,8 @@ def test_every_case_of_the_address_fixture() -> None:
     )
     print(line, *wrong, sep="\n")
     assert wrong == [], line
-    assert len(cases) == 201, f"the fixture holds {len(cases)} cases, serial 126 has 201"
-    assert kinds == {"parse": 104, "format": 36, "prose": 61}
+    assert len(cases) == 216, f"the fixture holds {len(cases)} cases, serial 127 has 216"
+    assert kinds == {"parse": 104, "format": 36, "prose": 76}
 
 
 def test_the_refusals_are_the_fixtures_and_every_one_is_exercised() -> None:
@@ -304,7 +304,7 @@ def test_read_ow_link_at_answers_the_reading_and_its_end() -> None:
         read_ow_link_at(text, 1.0)  # type: ignore[arg-type]
 
 
-# What stands before ow:// (STAGED: ruled 2026-11-14, publishes with a later serial): a letter of any
+# What stands before ow:// (since serial 127): a letter of any
 # script, a combining mark or an underscore glues the start into a word, the same set as the cut after a
 # run; a hyphen or a digit does not.
 def test_an_address_glued_to_a_word_before_it_is_prose() -> None:

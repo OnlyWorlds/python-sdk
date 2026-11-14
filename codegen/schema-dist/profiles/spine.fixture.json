@@ -412,6 +412,29 @@
       }
     },
     {
+      "name": "truth-tab-alone",
+      "type": "object",
+      "element": {
+        "supertype": "Tool",
+        "x_spine_truth": "\t"
+      },
+      "read": {
+        "kind": "Tool",
+        "address": null,
+        "truth": null,
+        "access": null,
+        "status": null,
+        "layer": null,
+        "audience": null,
+        "primary": null,
+        "depends_on": null,
+        "probe": null,
+        "verified_at": null,
+        "retires": null,
+        "dropped": []
+      }
+    },
+    {
       "name": "status-trimmed-folded",
       "type": "object",
       "element": {

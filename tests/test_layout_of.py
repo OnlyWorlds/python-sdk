@@ -18,7 +18,7 @@ from onlyworlds import layout_of, map_space
 
 REPO = Path(__file__).resolve().parent.parent
 FIXTURE = REPO / "codegen" / "schema-dist" / "profiles" / "map-space.fixture.json"
-LAYOUT_CASES_IN_FIXTURE = 26
+LAYOUT_CASES_IN_FIXTURE = 29
 
 
 def load_fixture() -> dict[str, Any]:

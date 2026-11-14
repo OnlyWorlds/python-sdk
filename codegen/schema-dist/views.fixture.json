@@ -4,7 +4,7 @@
     "Each case: an element as a tool is served it, and what a reader of views.json answers: the row's id (null: no row, the type draws as today), the one sentence (null when no row or no field holds anything), and the banners at the head in order. A case with an `order` also names the fields drawn, in the order drawn (layouts.document); a reader compares `order` only where a case gives one.",
     "Matching a pair with its mark is the profile's own reader and its own fixture (room.fixture.json, the charter cases); these cases only test which row wins and what a row gives.",
     "cites: every field a row names (sentence, lead, fold, layout.by), quoted from the page that defines the kind at its line; a reader of this file checks each quote at its line, and that each named field is one the row's type has in the standard.",
-    "tables: a table that is not views.json, read by the cases that name it and never by any other. `two-rows-one-kind` is at fault on purpose: two rows hold narrative/Message, which a build of the file refuses. It exists only to pin what a page does with such a table: the first row wins, and the page is drawn. `lead-and-fold` is well formed: its one row names `story` in both lead and fold, which no row of views.json does, to pin that such a field is drawn in the lead, once."
+    "tables: a table that is not views.json, read by the cases that name it and never by any other. `two-rows-one-kind` is at fault on purpose: two rows hold narrative/Message, which a build of the file refuses. It exists only to pin what a page does with such a table: the first row wins, and the page is drawn. `lead-and-fold` is well formed: its one row names `story` in both lead and fold, which no row of views.json does, to pin that such a field is drawn in the lead, once. `own-banner-by-presence` is well formed: its one row, a type alone, carries the room mark `x_room_of` as its own banner, so the cases that name it read the banner by presence apart from the room line's match (on views.json the same mark both matches the room line and is its banner, so a value that is no mark matches no room row at all)."
   ],
   "cases": [
     {
@@ -815,6 +815,180 @@
           "charisma"
         ]
       }
+    },
+    {
+      "name": "own-banner-null-shows-nothing",
+      "claim": "a row's own banner is read by presence exactly as the room profile reads a mark: null is no mark, so the banner does not show; the table's one row matches by type alone, so the banner's reading is tested apart from any profile's match",
+      "table": "own-banner-by-presence",
+      "element": {
+        "type": "character",
+        "name": "Wren",
+        "description": "Keeps the ferry.",
+        "x_room_of": null
+      },
+      "expect": {
+        "row": "own-banner",
+        "sentence": "Keeps the ferry.",
+        "banners": []
+      }
+    },
+    {
+      "name": "own-banner-empty-string-shows-nothing",
+      "claim": "a row's own banner is read by presence exactly as the room profile reads a mark: a string with nothing in it is no mark, so the banner does not show; the table's one row matches by type alone, so the banner's reading is tested apart from any profile's match",
+      "table": "own-banner-by-presence",
+      "element": {
+        "type": "character",
+        "name": "Wren",
+        "description": "Keeps the ferry.",
+        "x_room_of": ""
+      },
+      "expect": {
+        "row": "own-banner",
+        "sentence": "Keeps the ferry.",
+        "banners": []
+      }
+    },
+    {
+      "name": "own-banner-spaces-shows-nothing",
+      "claim": "a row's own banner is read by presence exactly as the room profile reads a mark: a string with nothing left after trimming is no mark, so the banner does not show; the table's one row matches by type alone, so the banner's reading is tested apart from any profile's match",
+      "table": "own-banner-by-presence",
+      "element": {
+        "type": "character",
+        "name": "Wren",
+        "description": "Keeps the ferry.",
+        "x_room_of": "  "
+      },
+      "expect": {
+        "row": "own-banner",
+        "sentence": "Keeps the ferry.",
+        "banners": []
+      }
+    },
+    {
+      "name": "own-banner-empty-list-shows-nothing",
+      "claim": "a row's own banner is read by presence exactly as the room profile reads a mark: an empty list is no mark (serial 126), so the banner does not show; the table's one row matches by type alone, so the banner's reading is tested apart from any profile's match",
+      "table": "own-banner-by-presence",
+      "element": {
+        "type": "character",
+        "name": "Wren",
+        "description": "Keeps the ferry.",
+        "x_room_of": []
+      },
+      "expect": {
+        "row": "own-banner",
+        "sentence": "Keeps the ferry.",
+        "banners": []
+      }
+    },
+    {
+      "name": "own-banner-empty-object-shows-nothing",
+      "claim": "a row's own banner is read by presence exactly as the room profile reads a mark: an empty object is no mark (serial 126), so the banner does not show; the table's one row matches by type alone, so the banner's reading is tested apart from any profile's match",
+      "table": "own-banner-by-presence",
+      "element": {
+        "type": "character",
+        "name": "Wren",
+        "description": "Keeps the ferry.",
+        "x_room_of": {}
+      },
+      "expect": {
+        "row": "own-banner",
+        "sentence": "Keeps the ferry.",
+        "banners": []
+      }
+    },
+    {
+      "name": "own-banner-word-shows",
+      "claim": "a row's own banner is read by presence exactly as the room profile reads a mark: a string with something left after trimming is a mark, so the banner shows; the table's one row matches by type alone, so the banner's reading is tested apart from any profile's match",
+      "table": "own-banner-by-presence",
+      "element": {
+        "type": "character",
+        "name": "Wren",
+        "description": "Keeps the ferry.",
+        "x_room_of": "word"
+      },
+      "expect": {
+        "row": "own-banner",
+        "sentence": "Keeps the ferry.",
+        "banners": [
+          "x_room_of"
+        ]
+      }
+    },
+    {
+      "name": "own-banner-list-with-an-item-shows",
+      "claim": "a row's own banner is read by presence exactly as the room profile reads a mark: a list with something in it is a mark, so the banner shows; the table's one row matches by type alone, so the banner's reading is tested apart from any profile's match",
+      "table": "own-banner-by-presence",
+      "element": {
+        "type": "character",
+        "name": "Wren",
+        "description": "Keeps the ferry.",
+        "x_room_of": [
+          1
+        ]
+      },
+      "expect": {
+        "row": "own-banner",
+        "sentence": "Keeps the ferry.",
+        "banners": [
+          "x_room_of"
+        ]
+      }
+    },
+    {
+      "name": "own-banner-object-with-a-key-shows",
+      "claim": "a row's own banner is read by presence exactly as the room profile reads a mark: an object with something in it is a mark, so the banner shows; the table's one row matches by type alone, so the banner's reading is tested apart from any profile's match",
+      "table": "own-banner-by-presence",
+      "element": {
+        "type": "character",
+        "name": "Wren",
+        "description": "Keeps the ferry.",
+        "x_room_of": {
+          "a": 1
+        }
+      },
+      "expect": {
+        "row": "own-banner",
+        "sentence": "Keeps the ferry.",
+        "banners": [
+          "x_room_of"
+        ]
+      }
+    },
+    {
+      "name": "own-banner-zero-shows",
+      "claim": "a row's own banner is read by presence exactly as the room profile reads a mark: a number is a mark, 0 among them: any other value but null counts, so the banner shows; the table's one row matches by type alone, so the banner's reading is tested apart from any profile's match",
+      "table": "own-banner-by-presence",
+      "element": {
+        "type": "character",
+        "name": "Wren",
+        "description": "Keeps the ferry.",
+        "x_room_of": 0
+      },
+      "expect": {
+        "row": "own-banner",
+        "sentence": "Keeps the ferry.",
+        "banners": [
+          "x_room_of"
+        ]
+      }
+    },
+    {
+      "name": "own-banner-false-shows",
+      "claim": "a row's own banner is read by presence exactly as the room profile reads a mark: false is a mark, as the room fixture's mark-false reads it, so the banner shows; the table's one row matches by type alone, so the banner's reading is tested apart from any profile's match",
+      "table": "own-banner-by-presence",
+      "element": {
+        "type": "character",
+        "name": "Wren",
+        "description": "Keeps the ferry.",
+        "x_room_of": false
+      },
+      "expect": {
+        "row": "own-banner",
+        "sentence": "Keeps the ferry.",
+        "banners": [
+          "x_room_of"
+        ]
+      }
     }
   ],
   "cites": [
@@ -990,6 +1164,48 @@
               "field": "story",
               "label": "The full report"
             }
+          ],
+          "layout": {
+            "name": "document"
+          }
+        }
+      ]
+    },
+    "own-banner-by-presence": {
+      "banners": [
+        {
+          "mark": "known_of",
+          "defined_by": "onlyworlds.com, not the standard: a known-of stub, known_of: true (the API document, https://www.onlyworlds.com/api/v2/openapi.json)"
+        },
+        {
+          "mark": "hidden",
+          "defined_by": "onlyworlds.com, not the standard: hidden: true, served only to readers who still see the element (the API document, https://www.onlyworlds.com/api/v2/openapi.json)"
+        },
+        {
+          "mark": "x_review_proposed",
+          "defined_by": "profiles/review.md"
+        },
+        {
+          "mark": "x_review_checked",
+          "defined_by": "profiles/review.md"
+        },
+        {
+          "mark": "x_served_trimmed",
+          "defined_by": "onlyworlds.com, not the standard: ids the server left out of a list, the field named (the API document, https://www.onlyworlds.com/api/v2/openapi.json; profiles/message.md reads it)"
+        }
+      ],
+      "rows": [
+        {
+          "id": "own-banner",
+          "kind": {
+            "type": "character"
+          },
+          "from": "profiles/room.md",
+          "sentence": [
+            "description"
+          ],
+          "banner": [
+            "x_room_of"
           ],
           "layout": {
             "name": "document"

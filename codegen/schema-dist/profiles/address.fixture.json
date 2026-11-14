@@ -7,7 +7,7 @@
     "format cases: address gives form (human or text), world (absent for the in-world text form), type and id (both absent for a world's own address), and optionally lens and moment; expect is the exact string a writer writes, or refuse the reason.",
     "parse cases: text is the string as a reader receives it; expect is the reading (form, world, world_is_slug, type, id, lens, moment, canonical; type and id null for a world's own address), or refuse the reason. canonical is true when the string as received is exactly what a writer writes for that reading.",
     "ids: any UUID version, in the hyphenated 8-4-4-4-12 form; read in either case of hex, always written lowercase.",
-    "prose cases: text is a line as a reader finds it and index where an address starts in it; expect gives the address (the slice of text from index that the address covers, where it ends in prose) and its reading (what the parse cases answer for that slice). The whole-string parser is unchanged: handed the line's tail whole it may refuse. Every prose case is ASCII up to the end of its address (one holds a combining mark where no address is found), so its index and its address are the same whether a language counts UTF-16 units or code points."
+    "prose cases: text is a line as a reader finds it and index where an address starts in it; expect gives the address (the slice of text from index that the address covers, where it ends in prose) and its reading (what the parse cases answer for that slice). The whole-string parser is unchanged: handed the line's tail whole it may refuse. Every prose case is ASCII up to the end of its address but six: four hold a letter or a combining mark before the index (one of them followed by a space and then the address), and two hold one right after a slug's run, where no address is found. Where a letter above U+FFFF stands before the index (prose-start-glued-astral-letter, prose-start-astral-letter-then-space), `index` counts code points and `index_utf16` UTF-16 units, and a reader that indexes by UTF-16 units reads `index_utf16`; everywhere else the two counts agree. A reader that indexes by another unit (UTF-8 bytes) converts the code point `index` to its own."
   ],
   "types": [
     "character",
@@ -2630,6 +2630,17 @@
       }
     },
     {
+      "name": "slug-run-followed-by-an-astral-letter-is-no-address",
+      "claim": "a slug run followed by a letter above U+FFFF is cut inside a word and is no address: the reader looks at the whole code point after the run, never one UTF-16 unit (half a surrogate pair is not a letter)",
+      "kind": "prose",
+      "text": "https://www.onlyworlds.com/w/hyperion\ud835\udc9c is home",
+      "index": 0,
+      "expect": {
+        "address": null,
+        "reading": null
+      }
+    },
+    {
       "name": "world-then-uppercase-type-is-the-worlds-own",
       "claim": "after a world's id, a type word in another case is no type word: the address is the world's own, and what follows it is prose",
       "kind": "prose",
@@ -2707,6 +2718,225 @@
           "moment": null,
           "canonical": false
         }
+      }
+    },
+    {
+      "name": "prose-start-glued-letter",
+      "claim": "a letter straight before the prefix glues it into a word: the text is prose, no address starts there",
+      "kind": "prose",
+      "text": "Built the gate: elbow://object/01a1d4ef-0000-7000-8000-000000000084.",
+      "index": 19,
+      "expect": {
+        "address": null,
+        "reading": null
+      }
+    },
+    {
+      "name": "prose-start-glued-underscore",
+      "claim": "an underscore straight before the prefix glues it into a word: no address",
+      "kind": "prose",
+      "text": "tag_ow://object/01a1d4ef-0000-7000-8000-000000000084 here",
+      "index": 4,
+      "expect": {
+        "address": null,
+        "reading": null
+      }
+    },
+    {
+      "name": "prose-start-glued-non-ascii-letter",
+      "claim": "a letter of any script glues: a precomposed e with acute (U+00E9) before the prefix, no address",
+      "kind": "prose",
+      "text": "caf\u00e9ow://object/01a1d4ef-0000-7000-8000-000000000084",
+      "index": 4,
+      "expect": {
+        "address": null,
+        "reading": null
+      }
+    },
+    {
+      "name": "prose-start-glued-combining-mark",
+      "claim": "a combining mark glues: a combining acute (U+0301) straight before the prefix, no address",
+      "kind": "prose",
+      "text": "cafe\u0301ow://object/01a1d4ef-0000-7000-8000-000000000084",
+      "index": 5,
+      "expect": {
+        "address": null,
+        "reading": null
+      }
+    },
+    {
+      "name": "prose-start-glued-astral-letter",
+      "claim": "a letter above U+FFFF glues as any letter does: the reader looks one code point back, never one UTF-16 unit (U+1D49C is two units; half of it is not a letter); `index` counts code points, `index_utf16` UTF-16 units",
+      "kind": "prose",
+      "text": "\ud835\udc9cow://object/01a1d4ef-0000-7000-8000-000000000084",
+      "index": 1,
+      "index_utf16": 2,
+      "expect": {
+        "address": null,
+        "reading": null
+      }
+    },
+    {
+      "name": "prose-start-astral-letter-then-space",
+      "claim": "a letter above U+FFFF then a space before the prefix: the space glues nothing, so the address starts there; `index` counts code points and `index_utf16` UTF-16 units, and a reader at the wrong unit lands on the space and finds no address",
+      "kind": "prose",
+      "text": "\ud835\udc9c ow://object/01a1d4ef-0000-7000-8000-000000000084",
+      "index": 2,
+      "index_utf16": 3,
+      "expect": {
+        "address": "ow://object/01a1d4ef-0000-7000-8000-000000000084",
+        "reading": {
+          "form": "text",
+          "world": null,
+          "world_is_slug": false,
+          "type": "object",
+          "id": "01a1d4ef-0000-7000-8000-000000000084",
+          "lens": null,
+          "moment": null,
+          "canonical": true
+        }
+      }
+    },
+    {
+      "name": "prose-start-after-hyphen",
+      "claim": "a hyphen before the prefix does not glue: the address starts there",
+      "kind": "prose",
+      "text": "x-ow://object/01a1d4ef-0000-7000-8000-000000000084",
+      "index": 2,
+      "expect": {
+        "address": "ow://object/01a1d4ef-0000-7000-8000-000000000084",
+        "reading": {
+          "form": "text",
+          "world": null,
+          "world_is_slug": false,
+          "type": "object",
+          "id": "01a1d4ef-0000-7000-8000-000000000084",
+          "lens": null,
+          "moment": null,
+          "canonical": true
+        }
+      }
+    },
+    {
+      "name": "prose-start-after-digit",
+      "claim": "a digit before the prefix does not glue: the address starts there",
+      "kind": "prose",
+      "text": "3ow://object/01a1d4ef-0000-7000-8000-000000000084",
+      "index": 1,
+      "expect": {
+        "address": "ow://object/01a1d4ef-0000-7000-8000-000000000084",
+        "reading": {
+          "form": "text",
+          "world": null,
+          "world_is_slug": false,
+          "type": "object",
+          "id": "01a1d4ef-0000-7000-8000-000000000084",
+          "lens": null,
+          "moment": null,
+          "canonical": true
+        }
+      }
+    },
+    {
+      "name": "prose-start-after-opening-bracket",
+      "claim": "an opening bracket before the prefix does not glue, and the closing one after the id is prose",
+      "kind": "prose",
+      "text": "Built the gate (ow://object/01a1d4ef-0000-7000-8000-000000000084).",
+      "index": 16,
+      "expect": {
+        "address": "ow://object/01a1d4ef-0000-7000-8000-000000000084",
+        "reading": {
+          "form": "text",
+          "world": null,
+          "world_is_slug": false,
+          "type": "object",
+          "id": "01a1d4ef-0000-7000-8000-000000000084",
+          "lens": null,
+          "moment": null,
+          "canonical": true
+        }
+      }
+    },
+    {
+      "name": "prose-start-after-quote",
+      "claim": "a quotation mark before the prefix does not glue, and the closing one after the id is prose",
+      "kind": "prose",
+      "text": "Built the gate \"ow://object/01a1d4ef-0000-7000-8000-000000000084\".",
+      "index": 16,
+      "expect": {
+        "address": "ow://object/01a1d4ef-0000-7000-8000-000000000084",
+        "reading": {
+          "form": "text",
+          "world": null,
+          "world_is_slug": false,
+          "type": "object",
+          "id": "01a1d4ef-0000-7000-8000-000000000084",
+          "lens": null,
+          "moment": null,
+          "canonical": true
+        }
+      }
+    },
+    {
+      "name": "prose-start-of-text",
+      "claim": "the start of the text glues nothing: a line that begins with the prefix holds the address",
+      "kind": "prose",
+      "text": "ow://object/01a1d4ef-0000-7000-8000-000000000084 was built.",
+      "index": 0,
+      "expect": {
+        "address": "ow://object/01a1d4ef-0000-7000-8000-000000000084",
+        "reading": {
+          "form": "text",
+          "world": null,
+          "world_is_slug": false,
+          "type": "object",
+          "id": "01a1d4ef-0000-7000-8000-000000000084",
+          "lens": null,
+          "moment": null,
+          "canonical": true
+        }
+      }
+    },
+    {
+      "name": "prose-start-glued-letter-site-form",
+      "claim": "the start rule is the prefix's, both forms: a letter straight before the site's form glues it, no address",
+      "kind": "prose",
+      "text": "seehttps://www.onlyworlds.com/w/hyperion/object/01a1d4ef-0000-7000-8000-000000000084",
+      "index": 3,
+      "expect": {
+        "address": null,
+        "reading": null
+      }
+    },
+    {
+      "name": "prose-back-to-back-after-digit",
+      "claim": "two addresses written back to back: the first id ends in a digit, so the second start is not glued and holds the second address",
+      "kind": "prose",
+      "text": "ow://object/01a1d4ef-0000-7000-8000-000000000084ow://object/01a1d4ef-0000-7000-8000-000000000085.",
+      "index": 48,
+      "expect": {
+        "address": "ow://object/01a1d4ef-0000-7000-8000-000000000085",
+        "reading": {
+          "form": "text",
+          "world": null,
+          "world_is_slug": false,
+          "type": "object",
+          "id": "01a1d4ef-0000-7000-8000-000000000085",
+          "lens": null,
+          "moment": null,
+          "canonical": true
+        }
+      }
+    },
+    {
+      "name": "prose-back-to-back-after-hex-letter",
+      "claim": "two addresses written back to back: the first id ends in a hex letter, a letter, so the second start is glued and holds no address (the first is read at 0 as its own)",
+      "kind": "prose",
+      "text": "ow://object/01a1d4ef-0000-7000-8000-00000000008aow://object/01a1d4ef-0000-7000-8000-000000000085.",
+      "index": 48,
+      "expect": {
+        "address": null,
+        "reading": null
       }
     }
   ]

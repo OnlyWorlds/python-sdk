@@ -57,7 +57,7 @@ def test_the_mark_is_read_by_presence_never_by_its_value() -> None:
     present: tuple[Any, ...] = (7, 0, False, ["x"], {"world": WORLD}, "x", chr(0x1F), chr(0xFEFF), f"  {WORLD}  ")
     for mark in present:
         assert is_room_element({**message, "x_room_of": mark}) is True, repr(mark)
-    # STAGED for serial 126: an empty list or an empty object is absent too (a compact reader leaves both out).
+    # Since serial 126: an empty list or an empty object is absent too (a compact reader leaves both out).
     absent: tuple[Any, ...] = (None, "", " ", chr(0xA0) + chr(0x3000), "\t\n", [], {})
     for mark in absent:
         assert is_room_element({**message, "x_room_of": mark}) is False, repr(mark)

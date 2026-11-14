@@ -1,5 +1,5 @@
 """find_ow_links: every address in a text, in order, each an AddressFound, read by read_ow_link_at at each place a
-prefix starts. The start rule's cases as units (STAGED: ruled 2026-11-14, publishes with a later serial), order and
+prefix starts. The start rule's cases as units (since serial 127), order and
 no overlap, agreement with read_ow_link_at, and six hostile 1 MB texts timed."""
 
 import time

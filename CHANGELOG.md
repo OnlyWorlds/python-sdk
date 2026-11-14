@@ -4,8 +4,12 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
-- (staged: ruled 2026-11-14, publishes with a later serial) `read_ow_link_at` answers None when the address would begin inside a word: after a letter of any script, a combining mark or an underscore (`elbow://object/<id>` is prose), the same set that cuts a run after it; a hyphen or a digit before `ow://` does not glue.
-- (staged with the start rule) `find_ow_links(text)` (new): every address in a text, in order, each an `AddressFound` (`start`, `end`, `reading`), read by `read_ow_link_at` at each place either prefix starts; none overlap, and a start that reads nothing is passed. Linear in the text: each prefix's next place is searched once. Indexes count code points (the npm SDK's `findOwLinks` counts UTF-16 units). `read_ow_link_at` passes over a path end that is not an id without a parse; no answer changes.
+## 0.125.0 (2026-11-14)
+
+schema-dist v0.34.1-dist.127 (canonical 00.34.01 unchanged, no schema file moved). The fixtures' new cases pass: the address profile's glued starts (216 cases), three layout-mark cases and four presence cases through the doctor.
+
+- `read_ow_link_at` answers None when the address would begin inside a word: after a letter of any script, a combining mark or an underscore (`elbow://object/<id>` is prose), the same set that cuts a run after it; a hyphen or a digit before `ow://` does not glue.
+- `find_ow_links(text)` (new): every address in a text, in order, each an `AddressFound` (`start`, `end`, `reading`), read by `read_ow_link_at` at each place either prefix starts; none overlap, and a start that reads nothing is passed. Linear in the text: each prefix's next place is searched once. Indexes count code points (the npm SDK's `findOwLinks` counts UTF-16 units). `read_ow_link_at` passes over a path end that is not an id without a parse; no answer changes.
 
 ## 0.124.1 (2026-11-14)
 

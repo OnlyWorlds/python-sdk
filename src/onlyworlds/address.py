@@ -394,8 +394,7 @@ def read_ow_link_at(text: str, index: int = 0) -> AddressAt | None:
         raise ValueError(f"read_ow_link_at: index must be 0 or more; got {index}")
     if index >= len(text):
         return None
-    # A start glued to a word is prose, the mirror of the cut after a run (STAGED: ruled 2026-11-14, publishes with
-    # a later serial).
+    # A start glued to a word is prose, the mirror of the cut after a run (since serial 127).
     if index > 0 and _in_a_word(text[index - 1]):
         return None
     if text.startswith(_HUMAN_PREFIX, index):

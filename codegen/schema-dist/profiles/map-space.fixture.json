@@ -9551,6 +9551,128 @@
     "ground": null,
     "hand": []
    }
+  },
+  {
+   "name": "drawing-laid-out-by-a-method",
+   "claim": "rule 8: a Map whose Pins a method drew is a drawing of its elements, a layout map marked with that method; rule 11 leaves it out of a pick for the world's space; none of its Pins is placed by hand",
+   "map": "019a9270-0000-7000-8000-00000000aa01",
+   "elements": [
+    {
+     "type": "map",
+     "id": "019a9270-0000-7000-8000-00000000aa01",
+     "name": "the river towns, drawn",
+     "x_layout": {
+      "method": "trail-by-place"
+     }
+    },
+    {
+     "type": "pin",
+     "id": "019a9270-0000-7000-8000-0000000d0001",
+     "name": "pin",
+     "map": "019a9270-0000-7000-8000-00000000aa01",
+     "element_type": "location",
+     "element_id": "019a9270-0000-7000-8000-0000000c0001",
+     "x": 40,
+     "y": 120
+    },
+    {
+     "type": "pin",
+     "id": "019a9270-0000-7000-8000-0000000d0002",
+     "name": "pin",
+     "map": "019a9270-0000-7000-8000-00000000aa01",
+     "element_type": "location",
+     "element_id": "019a9270-0000-7000-8000-0000000c0002",
+     "x": 80,
+     "y": 60
+    }
+   ],
+   "want": {
+    "layout": "trail-by-place",
+    "ground": null,
+    "hand": []
+   }
+  },
+  {
+   "name": "true-positions-by-a-tool-unmarked",
+   "claim": "rule 12: a Map whose Pins a tool placed by its own recipe where each element is in the world, naming no ground, is a place and carries no mark: no layout, so rule 11 keeps it a candidate; the tool's recipe in its own namespace is no mark",
+   "map": "019a9270-0000-7000-8000-00000000aa01",
+   "elements": [
+    {
+     "type": "map",
+     "id": "019a9270-0000-7000-8000-00000000aa01",
+     "name": "the river valley",
+     "width": 4000,
+     "height": 3000,
+     "x_regionfill": {
+      "recipe": "from-coordinates"
+     }
+    },
+    {
+     "type": "pin",
+     "id": "019a9270-0000-7000-8000-0000000d0001",
+     "name": "pin",
+     "map": "019a9270-0000-7000-8000-00000000aa01",
+     "element_type": "location",
+     "element_id": "019a9270-0000-7000-8000-0000000c0001",
+     "x": 1210,
+     "y": 2240
+    },
+    {
+     "type": "pin",
+     "id": "019a9270-0000-7000-8000-0000000d0002",
+     "name": "pin",
+     "map": "019a9270-0000-7000-8000-00000000aa01",
+     "element_type": "location",
+     "element_id": "019a9270-0000-7000-8000-0000000c0002",
+     "x": 2875,
+     "y": 640
+    }
+   ],
+   "want": {
+    "layout": null,
+    "ground": null,
+    "hand": []
+   }
+  },
+  {
+   "name": "board-of-a-real-place-imported-unmarked",
+   "claim": "rule 12: a board its source holds over a map of a real place is imported with no mark, the test being what the Map is and never the source's word for it: supertype `Board` is no mark (rule 8), so no layout, and its Pins are in no `hand`",
+   "map": "019a9270-0000-7000-8000-00000000aa01",
+   "elements": [
+    {
+     "type": "map",
+     "id": "019a9270-0000-7000-8000-00000000aa01",
+     "name": "the harbour",
+     "supertype": "Board",
+     "width": 2048,
+     "height": 1536
+    },
+    {
+     "type": "pin",
+     "id": "019a9270-0000-7000-8000-0000000d0001",
+     "name": "pin",
+     "map": "019a9270-0000-7000-8000-00000000aa01",
+     "element_type": "location",
+     "element_id": "019a9270-0000-7000-8000-0000000c0001",
+     "x": 300,
+     "y": 400
+    },
+    {
+     "type": "pin",
+     "id": "019a9270-0000-7000-8000-0000000d0002",
+     "name": "pin",
+     "map": "019a9270-0000-7000-8000-00000000aa01",
+     "element_type": "location",
+     "element_id": "019a9270-0000-7000-8000-0000000c0002",
+     "x": 900,
+     "y": 1100
+    }
+   ],
+   "want": {
+    "layout": null,
+    "ground": null,
+    "hand": []
+   }
   }
  ]
 }
