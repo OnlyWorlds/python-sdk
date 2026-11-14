@@ -142,13 +142,14 @@ def recipients_of(message: Mapping[str, Any]) -> list[str]:
     """The Character ids in the message's ``characters``, in the field's order. An empty list means the
     message is addressed to every member of the world: a body that omits the field, or holds ``None``,
     reads as empty. Entries that are not ids are left out; use ``is_addressed_to`` for "is it for X". A
-    Note has no recipients: ``[]``, whatever its ``characters`` holds."""
+    Note has no recipients: ``[]``, whatever its ``characters`` holds. (STAGED: serial 128) A multi-link
+    names each element once: a list naming one Character twice answers it once, in its first place."""
     if is_note(message):
         return []
     value = message.get("characters")
     if not isinstance(value, list | tuple):
         return []
-    return [c for c in value if isinstance(c, str) and c]
+    return list(dict.fromkeys(c for c in value if isinstance(c, str) and c))
 
 
 def is_addressed_to(message: Mapping[str, Any], character_id: str) -> bool:

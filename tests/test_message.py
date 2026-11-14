@@ -450,3 +450,11 @@ def test_keyless_is_a_boolean() -> None:
         with pytest.raises(TypeError):
             has_unseen_recipients({"characters": []}, keyless=bad)
     assert edited_by({"changed_by": "b2"}, None) == EditRead(True, None)
+
+
+def test_recipients_read_each_character_once_in_its_first_place() -> None:
+    """(STAGED: serial 128) A multi-link names each element once: a list naming one recipient twice answers it
+    once, in its first place. The npm SDK holds the same case."""
+    assert recipients_of({"characters": [MARA, MARA, ADA]}) == [MARA, ADA]
+    assert recipients_of({"characters": [ADA, MARA, ADA]}) == [ADA, MARA]
+    assert is_addressed_to({"characters": [ADA, ADA]}, ADA) is True
