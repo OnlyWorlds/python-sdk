@@ -396,11 +396,15 @@ Not yet: typed element models, the account routes, a snapshot writer.
 ```bash
 uv sync
 uv run pytest -q
-uv run ruff check . && uv run mypy --strict src
+uv run ruff check . && uv run ruff format --check . && uv run mypy --strict src tests
 uv run python codegen/generate_schema.py --check
+uv run python codegen/generate_tools.py --check
+uv run python codegen/generate_anchors.py --check
 uv run python codegen/generate_casefold.py --check
 uv run python codegen/generate_nfc.py --check
 ```
+
+To move the schema pin to a new [schema-dist](https://github.com/OnlyWorlds/schema-dist) tag: `uv run python codegen/repin.py <tag> "<what the new pin moved>"` vendors the tag's tree from a local checkout of schema-dist (the directory beside this one, `$OW_SCHEMA_DIST`, or `--schema-dist <path>`) and rewrites `codegen/schema-pin.json`. It writes nothing unless the tree agrees with its own MANIFEST and with the MANIFEST GitHub serves at the tag. Then run `codegen/generate_schema.py` and the checks above.
 
 Three groups of tests skip unless their variable is set:
 
