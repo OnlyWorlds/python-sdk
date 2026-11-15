@@ -18,7 +18,7 @@ tests) is replayed whole.
 from __future__ import annotations
 
 import math
-from collections.abc import Callable, Mapping
+from collections.abc import Callable, Iterable, Mapping
 from typing import Any, Literal, TypedDict
 
 from ._anchors import ANCHORS, GROUP_ORDER
@@ -271,32 +271,20 @@ def layout_by_kind(graph: Mapping[str, Any]) -> KindLayout:
     }
 
 
-def layout_around(graph: Mapping[str, Any], focus: str, *, steps: int = 1) -> AroundLayout:
-    """Lay out one element and what is linked to it.
-
-    The focus stands at 0, 0. Its neighbours (one link away, in either direction) stand on a ring round it, in colour
-    group order, then by type word, then by name (code point order, the same in every language and locale; no name
-    sorts as the empty name), up to 60 on the first ring and further rings beyond it. With ``steps=2``, each
-    neighbour's own neighbours stand on an outer ring, fanned out near the neighbour that reached them.
-
-    ``graph`` is ``world_graph``'s answer, or any mapping of the same shape, as for ``layout_by_kind``; ``focus`` is a
-    node's id. Answers ``{"method": "around", "version": 1, "points": [...]}``: the focus and every element within the
-    steps, in the graph's node order, each ``{"id", "depth", "x", "y"}`` with its depth (0, 1 or 2). Nothing iterates,
-    so each point is one cosine and one sine of an angle the method computes exactly; the npm SDK's ``layoutAround``
-    agrees to within about 1e-12. The graph is first put in ``layout_by_kind``'s one order, so the order a graph is
-    handed in does not move a point.
-
-    Raises ``TypeError`` on a ``steps`` that is not a whole number or a graph it cannot read (as ``layout_by_kind``),
-    and ``ValueError`` on a ``steps`` that is not 1 or 2 or a focus that is not one of the graph's nodes.
-    """
+def _reach_around(
+    fn: str, graph: Any, focus: Any, steps: Any
+) -> tuple[list[Mapping[str, Any]], list[Mapping[str, Any]], dict[str, int], int, dict[int, int], dict[int, int]]:
+    """What ``around`` reaches: the checks ``layout_around`` makes, in its order, then each node within the steps with
+    its depth and the node it was reached from, in the order found. ``fn`` is the caller's name, for its refusals.
+    Answers the caller's nodes, the nodes in the one order, each id's place there, the focus's place, and the two."""
     if not isinstance(steps, int) or isinstance(steps, bool):
-        raise TypeError(f"layout_around: steps is 1 or 2, not {steps!r}")
+        raise TypeError(f"{fn}: steps is 1 or 2, not {steps!r}")
     if steps not in (1, 2):
-        raise ValueError(f"layout_around: steps is 1 or 2, not {steps!r}")
-    given, nodes, edges, index = _read_graph("layout_around", graph)
+        raise ValueError(f"{fn}: steps is 1 or 2, not {steps!r}")
+    given, nodes, edges, index = _read_graph(fn, graph)
     centre = index.get(focus) if isinstance(focus, str) else None
     if centre is None:
-        raise ValueError(f"layout_around: the focus {focus!r} is not a node of the graph")
+        raise ValueError(f"{fn}: the focus {focus!r} is not a node of the graph")
 
     adj: list[list[int]] = [[] for _ in nodes]
     for e in edges:
@@ -318,6 +306,65 @@ def layout_around(graph: Mapping[str, Any], focus: str, *, steps: int = 1) -> Ar
                     via[to] = a
                     nxt.append(to)
         frontier = nxt
+    return given, nodes, index, centre, depth, via
+
+
+def _placed_ids(fn: str, placed: Any) -> set[str]:
+    """``placed`` as a set of ids: a list, a tuple or a set; a member that is not a non-empty string is passed over."""
+    if isinstance(placed, (str, bytes, Mapping)) or not isinstance(placed, Iterable):
+        raise TypeError(f"{fn}: placed is a list or a set of element ids")
+    return {v for v in placed if isinstance(v, str) and v != ""}
+
+
+def unplaced_by_kind(graph: Mapping[str, Any], placed: Iterable[Any]) -> list[str]:
+    """What a saved ``by-kind`` layout map does not place (the default layouts' page, ``unplaced``).
+
+    Answers the ids of the graph's nodes that are not in ``placed``, by id in code point order. ``placed`` is the ids
+    of the elements the Map's Pins stand for, a list or a set: from ``map_space``, the ``element_id`` of each pin
+    whose ``map`` is this Map. A member that is not a non-empty string (a Pin that stands for no element) is passed
+    over, and an id that is no node of the graph is no part of the answer. The answer's length is the count a tool
+    shows; it does not say why an element has no Pin, and a saved layout map changes only when a person asks (the
+    map-space profile's rule 8). The npm SDK's ``unplacedByKind`` answers the same list.
+
+    Raises ``TypeError`` on a graph it cannot read (as ``layout_by_kind``) or a ``placed`` that is not a list or a set.
+    """
+    ids = _placed_ids("unplaced_by_kind", placed)
+    _given, nodes, _edges, _index = _read_graph("unplaced_by_kind", graph)
+    return [x["id"] for x in nodes if x["id"] not in ids]
+
+
+def unplaced_around(graph: Mapping[str, Any], focus: str, placed: Iterable[Any], *, steps: int = 1) -> list[str]:
+    """What a saved ``around`` layout map does not place.
+
+    Answers the ids of the focus and every node within the steps that are not in ``placed``, by id in code point
+    order. ``placed`` is read as ``unplaced_by_kind`` reads it; an id in it that ``around`` would not place (no node,
+    or a node further out than the steps) is no part of the answer. The npm SDK's ``unplacedAround`` answers the same
+    list. Raises as ``layout_around`` does, and ``TypeError`` on a ``placed`` that is not a list or a set.
+    """
+    _given, nodes, _index, _centre, depth, _via = _reach_around("unplaced_around", graph, focus, steps)
+    ids = _placed_ids("unplaced_around", placed)
+    return [x["id"] for j, x in enumerate(nodes) if j in depth and x["id"] not in ids]
+
+
+def layout_around(graph: Mapping[str, Any], focus: str, *, steps: int = 1) -> AroundLayout:
+    """Lay out one element and what is linked to it.
+
+    The focus stands at 0, 0. Its neighbours (one link away, in either direction) stand on a ring round it, in colour
+    group order, then by type word, then by name (code point order, the same in every language and locale; no name
+    sorts as the empty name), up to 60 on the first ring and further rings beyond it. With ``steps=2``, each
+    neighbour's own neighbours stand on an outer ring, fanned out near the neighbour that reached them.
+
+    ``graph`` is ``world_graph``'s answer, or any mapping of the same shape, as for ``layout_by_kind``; ``focus`` is a
+    node's id. Answers ``{"method": "around", "version": 1, "points": [...]}``: the focus and every element within the
+    steps, in the graph's node order, each ``{"id", "depth", "x", "y"}`` with its depth (0, 1 or 2). Nothing iterates,
+    so each point is one cosine and one sine of an angle the method computes exactly; the npm SDK's ``layoutAround``
+    agrees to within about 1e-12. The graph is first put in ``layout_by_kind``'s one order, so the order a graph is
+    handed in does not move a point.
+
+    Raises ``TypeError`` on a ``steps`` that is not a whole number or a graph it cannot read (as ``layout_by_kind``),
+    and ``ValueError`` on a ``steps`` that is not 1 or 2 or a focus that is not one of the graph's nodes.
+    """
+    given, nodes, index, centre, depth, via = _reach_around("layout_around", graph, focus, steps)
 
     def name(j: int) -> str:
         v = nodes[j].get("name")

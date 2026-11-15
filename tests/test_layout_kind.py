@@ -18,13 +18,13 @@ from typing import Any
 
 import pytest
 
-from onlyworlds import layout_around, layout_by_kind
+from onlyworlds import layout_around, layout_by_kind, unplaced_around, unplaced_by_kind
 from onlyworlds._anchors import ANCHORS, GROUP_ORDER
 from onlyworlds._schema import ELEMENT_GROUPS
 
 REPO = Path(__file__).resolve().parent.parent
 FIXTURE = REPO / "tests" / "fixtures" / "layout" / "by-kind.json"
-FIXTURE_SHA = "06a023eace0f906e"
+FIXTURE_SHA = "0e4fd88b382c298d"
 BYTES = FIXTURE.read_bytes()
 FX: dict[str, Any] = json.loads(BYTES.decode("utf-8"))
 AROUND_TOLERANCE = 1e-12
@@ -190,6 +190,63 @@ def test_a_graph_it_cannot_read_is_refused_by_both(graph: Any, message: str) -> 
     with pytest.raises(TypeError) as e:
         layout_around(graph, "a")
     assert str(e.value) == f"layout_around: {message}"
+
+
+def _unplaced(case: dict[str, Any], placed: Any) -> list[str]:
+    graph = copy.deepcopy(case["graph"])
+    if case["method"] == "by-kind":
+        return unplaced_by_kind(graph, placed)
+    return unplaced_around(graph, case["focus"], placed, steps=case["steps"])
+
+
+@pytest.mark.parametrize("case", FX["unplaced"], ids=[c["name"] for c in FX["unplaced"]])
+def test_unplaced_case_exactly(case: dict[str, Any]) -> None:
+    assert case["method"] in ("by-kind", "around")
+    assert _unplaced(case, list(case["placed"])) == case["want"]
+
+
+def test_unplaced_reads_a_list_and_a_set_alike_and_passes_over_what_is_no_id() -> None:
+    by_kind = next(c for c in FX["unplaced"] if c["name"] == "by-kind-a-pin-gone")
+    around = next(c for c in FX["unplaced"] if c["name"] == "around-a-pin-gone")
+    assert len(by_kind["want"]) == 2 and len(around["want"]) == 2
+    for case in (by_kind, around):
+        assert _unplaced(case, set(case["placed"])) == case["want"]
+        assert _unplaced(case, tuple(case["placed"])) == case["want"]
+        # a Pin that stands for no element gives no id: None, "" and a number place nothing
+        assert _unplaced(case, [None, "", 7, *case["placed"], *case["placed"]]) == case["want"]
+    # nothing placed: everything the method would place, by id in code point order, whatever order was handed
+    ids = [x["id"] for x in by_kind["graph"]["nodes"]]
+    assert unplaced_by_kind(copy.deepcopy(by_kind["graph"]), []) == sorted(ids)
+    assert ids != sorted(ids)
+    # around's steps default to 1, as layout_around's
+    for steps in (1, 2):
+        reached = sorted(
+            p["id"] for p in layout_around(copy.deepcopy(around["graph"]), around["focus"], steps=steps)["points"]
+        )
+        assert unplaced_around(copy.deepcopy(around["graph"]), around["focus"], [], steps=steps) == reached
+    assert unplaced_around(copy.deepcopy(around["graph"]), around["focus"], []) == unplaced_around(
+        copy.deepcopy(around["graph"]), around["focus"], [], steps=1
+    )
+
+
+@pytest.mark.parametrize("placed", [None, "a", b"a", 7, {"a": True}])
+def test_unplaced_refuses_a_placed_that_is_no_list(placed: Any) -> None:
+    graph = {"nodes": [{"id": "a", "type": "character"}], "edges": []}
+    with pytest.raises(TypeError, match=r"^unplaced_by_kind: placed is a list or a set of element ids$"):
+        unplaced_by_kind(graph, placed)
+    with pytest.raises(TypeError, match=r"^unplaced_around: placed is a list or a set of element ids$"):
+        unplaced_around(graph, "a", placed)
+
+
+def test_unplaced_refuses_what_the_layout_refuses_under_its_own_name() -> None:
+    graph = {"nodes": [{"id": "a", "type": "character"}], "edges": []}
+    with pytest.raises(TypeError, match=r"^unplaced_by_kind: the graph is \{nodes, edges\}"):
+        unplaced_by_kind({"nodes": []}, [])
+    with pytest.raises(ValueError, match=r"^unplaced_around: the focus 'b' is not a node of the graph$"):
+        unplaced_around(graph, "b", [])
+    with pytest.raises(ValueError, match=r"^unplaced_around: steps is 1 or 2, not 3$"):
+        unplaced_around(graph, "a", [], steps=3)
+    assert unplaced_by_kind({"nodes": [], "edges": []}, []) == []
 
 
 def test_a_focus_that_is_not_a_node_is_refused() -> None:

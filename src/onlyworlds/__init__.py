@@ -81,7 +81,16 @@ from .http import (
     sanitize_payload,
 )
 from .landing import Landing, LandingCluster, LandingGap, LandingMember, landing_of
-from .layout_kind import AroundLayout, AroundPoint, KindLayout, KindPoint, layout_around, layout_by_kind
+from .layout_kind import (
+    AroundLayout,
+    AroundPoint,
+    KindLayout,
+    KindPoint,
+    layout_around,
+    layout_by_kind,
+    unplaced_around,
+    unplaced_by_kind,
+)
 from .layout_trail import (
     TRAIL_TIERS,
     TrailHanger,
@@ -309,6 +318,8 @@ __all__ = [
     "thread_of",
     "trail_by_place",
     "type_word",
+    "unplaced_around",
+    "unplaced_by_kind",
     "unread_for",
     "uuid7",
     "verify_level",
