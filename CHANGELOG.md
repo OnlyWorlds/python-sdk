@@ -4,7 +4,10 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
-- `read_report_line(line, *, world=None)` and `read_report_lines(text, *, world=None)` (new): a line of a report's `consequences` as the report profile reads it, as a `ReportLine`. The line's address is the last one that names an element of this world (`address`, written `ow://<type>/<id>`, with its `reading`, `start` and `end`), and `words` is what a reader shows: the line without its address when nothing the writer wrote is lost (canonical, no moment, no lens, standing apart), else the whole line. `read_report_lines` splits a text at every carriage return and line feed and trims each line of White_Space. Held to the npm SDK's table of 101 lines and 16 texts, the same bytes.
+## 0.128.0 (2026-11-15)
+
+- `read_report_line(line, *, world=None)` and `read_report_lines(text, *, world=None)` (new): a line of a report's `consequences` as the report profile reads it, as a `ReportLine`. The line's address is the last one that names an element of this world (`address`, written `ow://<type>/<id>`, with its `reading`, `start` and `end`), and `words` is what a reader shows: the line without its address when nothing the writer wrote is lost (canonical, no moment, no lens, standing apart), else the whole line. `read_report_lines` splits a text at every carriage return and line feed and trims each line of White_Space. Held to the report profile's second fixture, `profiles/report-lines.fixture.json` (101 lines and 16 texts), byte for byte, as the npm SDK is.
+- **Schema repinned to schema-dist v0.34.1-dist.129** (from dist.128; canonical 00.34.01 unchanged, no schema file moved): the report profile's rule 10, a line of `consequences` read in three parts, and its second fixture.
 
 ## 0.127.0 (2026-11-14)
 

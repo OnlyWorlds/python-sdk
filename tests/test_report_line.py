@@ -1,6 +1,7 @@
-"""A line of a report's ``consequences``: the npm SDK's lines table (``tests/fixtures/report/lines.json``, the same
-bytes, sha256 held here and there) gives each line, the element its address names (or none) and the words a reader
-shows, and each text with the lines it splits into. Every row is compared whole, the address and the words exactly."""
+"""A line of a report's ``consequences``: the report profile's lines table (schema-dist's
+``profiles/report-lines.fixture.json``, the same bytes in the npm SDK, sha256 held here and there) gives each line,
+the element its address names (or none) and the words a reader shows, and each text with the lines it splits into.
+Every row is compared whole, the address and the words exactly."""
 
 from __future__ import annotations
 
@@ -14,7 +15,7 @@ import pytest
 from onlyworlds import parse_ow_link, read_report_line, read_report_lines
 
 REPO = Path(__file__).resolve().parent.parent
-TABLE = REPO / "tests" / "fixtures" / "report" / "lines.json"
+TABLE = REPO / "codegen" / "schema-dist" / "profiles" / "report-lines.fixture.json"
 TABLE_SHA = "2face7cd693235d8"
 BYTES = TABLE.read_bytes()
 FX: dict[str, Any] = json.loads(BYTES.decode("utf-8"))
