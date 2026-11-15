@@ -115,9 +115,12 @@ def is_message(element: Mapping[str, Any] | FolderElement) -> bool:
     them, are ``MESSAGE_PAIR`` (``narrative`` + ``Message``). The match is the whole word: ``Messages`` is
     no message, and a missing or ``None`` supertype is none. ``x_room_of`` is not read: a parlor's line and
     a world's own message are both messages. Takes a body or a ``FolderElement``, whose type may come
-    from its directory when the body has none."""
+    from its directory when the body has none. A value that is no object (``None``, a list, a string, a
+    number) is no element and so no message: False, never an error, here and in every reader below."""
     if isinstance(element, FolderElement):
         return _matches(element.type, element.body.get("supertype"), MESSAGE_PAIR)
+    if not isinstance(element, Mapping):
+        return False
     return _matches(element.get("type"), element.get("supertype"), MESSAGE_PAIR)
 
 
@@ -129,6 +132,8 @@ def is_note(element: Mapping[str, Any] | FolderElement) -> bool:
     ``FolderElement``."""
     if isinstance(element, FolderElement):
         return _matches(element.type, element.body.get("supertype"), NOTE_PAIR)
+    if not isinstance(element, Mapping):
+        return False
     return _matches(element.get("type"), element.get("supertype"), NOTE_PAIR)
 
 
@@ -205,7 +210,7 @@ def is_sent_by(message: Mapping[str, Any], character_id: str) -> bool:
     """True when the message's ``narrator`` is ``character_id``: the claim, whether or not
     ``sender_status`` proves it. A message with no ``narrator`` is sent by nobody. An id that is empty or
     not a string names no Character, so it sent nothing, even a message with no ``narrator``."""
-    if not isinstance(character_id, str) or not character_id:
+    if not isinstance(character_id, str) or not character_id or not isinstance(message, Mapping):
         return False
     return message.get("narrator") == character_id
 
@@ -243,7 +248,10 @@ def sender_status(message: Mapping[str, Any], members: Sequence[Mapping[str, Any
     naming no Character. ``unseen``: the sender is hidden from this reader (the server trimmed
     ``narrator``, its ``x_served_trimmed`` names it); show "from someone you cannot see", never "from
     nobody". A body read keyless carries no mark, so its missing ``narrator`` stays ``unverifiable``. An
-    edit never changes the answer: see ``edited_by``."""
+    edit never changes the answer: see ``edited_by``. A value that is no object claims no sender:
+    ``unverifiable``."""
+    if not isinstance(message, Mapping):
+        return SenderRead("unverifiable", None)
     narrator = message.get("narrator")
     claimed = narrator if isinstance(narrator, str) and narrator else None
     mark = message.get("x_served_trimmed")
@@ -350,6 +358,8 @@ def read_mark_of[E: Mapping[str, Any]](
     best_rank: tuple[int, int, int] | None = None
     best_id = ""
     for relation in relations:
+        if not isinstance(relation, Mapping):
+            continue
         if not _matches(relation.get("type"), relation.get("supertype"), READ_MARK_PAIR):
             continue
         if relation.get("actor") != character_id:
@@ -407,13 +417,13 @@ def unread_for[E: Mapping[str, Any]](
     message addressed to it unread. An id on the mark that names a message not addressed to it changes
     nothing."""
     read: set[str] = set()
-    if read_mark is not None:
+    if isinstance(read_mark, Mapping):
         ids = read_mark.get("narratives")
         if isinstance(ids, list | tuple):
             read = {i for i in ids if isinstance(i, str)}
     return [
         m
-        for m in _in_created_at_order(messages)
+        for m in _in_created_at_order(m for m in messages if isinstance(m, Mapping))
         if is_addressed_to(m, character_id) and not _is_own(m, character_id, members) and m.get("id") not in read
     ]
 
@@ -428,7 +438,7 @@ def thread_of[E: Mapping[str, Any]](messages: Iterable[E], root_id: str) -> list
     ``parent_narrative`` like any other. It reads messages; reports group by ``report_threads_of``."""
     if not isinstance(root_id, str) or not root_id:
         return []
-    listed = list(messages)
+    listed = [m for m in messages if isinstance(m, Mapping)]
     by_id: dict[str, E] = {}
     for m in listed:
         mid = m.get("id")
@@ -462,7 +472,7 @@ def edited_by(message: Mapping[str, Any], members: Sequence[Mapping[str, Any]] |
     ``None`` when it plays none, is off the list, or there is no list (show "edited by another hand"), and
     ``None`` whenever ``edited`` is False. A message with no ``changed_by`` (a folder, an export) says nothing
     of edits. Shown beside the sender's answer, never instead of it."""
-    if "changed_by" not in message:
+    if not isinstance(message, Mapping) or "changed_by" not in message:
         return EditRead(False)
     if "created_by" in message and message["changed_by"] == message["created_by"]:
         return EditRead(False)
@@ -490,6 +500,8 @@ def note_of(
     line: str | None = None
     line_key = _UNREADABLE
     for note in narratives:
+        if not isinstance(note, Mapping):
+            continue
         nid = note.get("id")
         if not is_note(note) or not isinstance(nid, str) or not nid or note.get("narrator") != character_id:
             continue

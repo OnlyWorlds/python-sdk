@@ -4,6 +4,7 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+- A value that is no object (`None`, a list, a string, a number, a boolean) is no element to any message or room reader, and none fails on it. `is_message`, `is_note`, `is_room_element`, `is_sent_by`, `is_addressed_to` and `is_to_everyone` answer `False`, `recipients_of` `[]`, `sender_status` `unverifiable`, `edited_by` not edited; `read_mark_of`, `unread_for`, `thread_of` and `note_of` pass over such an entry in the list they are given and read the rest, and `unread_for` reads such a `read_mark` as no mark. The folder's `is_known_of` and `is_hidden` answer `False` the same way. Each raised `AttributeError` before. The npm SDK's readers already answered this way; the two packages now agree on the same calls.
 - `onlyworlds.doctor` reads a supertype (the Charter's word in flags 8 and 11, `Tenure` and `Membership` in flag 2) with the package's one fold, as `is_charter_element` and every profile reader do: Unicode White_Space trimmed, simple case folding. It used `str.strip()` and `str.casefold()`. What changes: a supertype with U+001C to U+001F at an end is no longer read as the word (`str.strip()` removes those four; they are not White_Space). No letter changes: checked over every code point, no character whose full folding differs from its simple one folds into a piece of the three words.
 
 ## 0.128.1 (2026-11-15)

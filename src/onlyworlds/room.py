@@ -87,8 +87,10 @@ def is_room_element(element: Mapping[str, Any] | FolderElement) -> bool:
     kind: Any
     if isinstance(element, FolderElement):
         body, kind = element.body, element.type
-    else:
+    elif isinstance(element, Mapping):
         body, kind = element, element.get("type")
+    else:
+        return False  # no object, no element: False, never an error
     supertype, mark = body.get("supertype"), body.get(ROOM_MARK)
     if not isinstance(kind, str) or not isinstance(supertype, str):
         return False

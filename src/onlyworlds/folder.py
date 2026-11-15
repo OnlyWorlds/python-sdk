@@ -81,8 +81,9 @@ def is_known_of(body: Mapping[str, Any]) -> bool:
 
     Its absent fields are unknown, not empty: never read them as values or as a deletion,
     never merge them over a whole copy, never push it. Absent, ``false`` or anything else: whole.
+    A value that is no object is no element and so no stub: False, never an error.
     """
-    return body.get(KNOWN_OF) is True
+    return isinstance(body, Mapping) and body.get(KNOWN_OF) is True
 
 
 def is_hidden(body: Mapping[str, Any]) -> bool:
@@ -91,7 +92,9 @@ def is_hidden(body: Mapping[str, Any]) -> bool:
     handed to, never from its holder: a reader that hands a world on (the pack, the OKF bundle, a
     shared ``.owworld``) leaves it out unless asked; a copy keeps it byte for byte. Any value but
     absent, null and ``false`` counts as marked, so a doubt leaves the element out rather than
-    handing it on."""
+    handing it on. A value that is no object is no element and carries no mark: False, never an error."""
+    if not isinstance(body, Mapping):
+        return False
     value = body.get(HIDDEN)
     return value is not None and value is not False
 

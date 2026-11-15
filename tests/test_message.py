@@ -24,12 +24,17 @@ from onlyworlds import (
     edited_by,
     has_unseen_recipients,
     is_addressed_to,
+    is_charter_element,
+    is_hidden,
+    is_known_of,
     is_message,
     is_note,
+    is_room_element,
     is_sent_by,
     is_to_everyone,
     note_of,
     read_mark_of,
+    reading_aid_of,
     recipients_of,
     sender_status,
     thread_of,
@@ -502,3 +507,48 @@ def test_a_narrative_that_is_not_a_message_has_no_recipients() -> None:
     message = {"type": "narrative", "supertype": "Message", "characters": ["a"]}
     assert recipients_of(message) == ["a"]
     assert is_addressed_to(message, "a")
+
+
+NO_OBJECT: list[Any] = [None, [], [{"type": "narrative", "supertype": "Message"}], "Message", 5, True]
+
+
+@pytest.mark.parametrize("value", NO_OBJECT)
+def test_a_value_that_is_no_object_is_no_element_to_any_reader(value: Any) -> None:
+    # A served body that is no object (null, a list, a string, a number, a boolean) is no element: every reader
+    # gives its empty answer and none fails, as the npm SDK's do on the same eighteen calls.
+    assert is_message(value) is False
+    assert is_note(value) is False
+    assert is_room_element(value) is False
+    assert is_charter_element(value) is False
+    assert reading_aid_of(value) is None
+    assert recipients_of(value) == []
+    assert is_addressed_to(value, ADA) is False
+    assert is_to_everyone(value) is False
+    assert is_to_everyone(value, keyless=True) is False
+    assert has_unseen_recipients(value) is False
+    assert has_unseen_recipients(value, keyless=True) is False
+    assert is_sent_by(value, ADA) is False
+    assert sender_status(value, None) == SenderRead("unverifiable", None)
+    assert edited_by(value, None) == EditRead(False)
+    assert read_mark_of([value], ADA, None) is None
+    assert unread_for([value], ADA, None) == []
+    assert thread_of([value], ADA) == []
+    assert note_of([value], ADA, None) is None
+    # The folder's two marks read a body the same way; the SDK's isKnownOf answers false on each of these.
+    assert is_known_of(value) is False
+    assert is_hidden(value) is False
+
+
+def test_a_list_passes_over_what_is_no_object_and_reads_the_rest() -> None:
+    # The gate drops the entry, never the list: the elements beside a null or a string are read as before.
+    message = {"id": "m1", "type": "narrative", "supertype": "Message", "characters": [ADA], "narrator": MARA}
+    mark = {"id": "r1", "type": "relation", "supertype": "Read", "actor": ADA, "narratives": ["m1"]}
+    note = {"id": "n1", "type": "narrative", "supertype": "Note", "narrator": ADA}
+    junk: list[Any] = [None, "x", 5, []]
+    assert unread_for([*junk, message], ADA, None) == [message]
+    assert thread_of([*junk, message], "m1") == [message]
+    assert read_mark_of([*junk, mark], ADA, None) == mark
+    assert unread_for([message], ADA, mark) == []
+    for no_mark in junk:
+        assert unread_for([message], ADA, no_mark) == [message]
+    assert note_of([*junk, note], ADA, None) == "n1"
