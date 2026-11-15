@@ -693,6 +693,19 @@ def test_8_no_charter_is_a_finding_of_its_own() -> None:
     assert f["element"] is None and f["reason"].startswith("no charter")
 
 
+def test_8_reads_the_charter_word_as_the_profile_readers_do() -> None:
+    # One fold in the package: the supertype is trimmed of Unicode White_Space and folded simply (room._fold), as
+    # is_charter_element reads it. U+001F is not White_Space (str.strip() removes it), so a word ending in it is
+    # not the charter's word; a no-break space and an em space are, at either end.
+    def report(supertype: str) -> Report:
+        elements = on_the_wire(edit(clean(), "law", LAW1, supertype=supertype))
+        return api_report(FakeReader(elements, feed_of(elements)))
+
+    (f,) = found(report("Charter" + chr(0x1F)), "8")
+    assert f["element"] is None and f["reason"].startswith("no charter")
+    assert found(report(chr(0xA0) + "CHARTER" + chr(0x2003)), "8") == []
+
+
 def test_2_and_8_do_not_run_when_the_feed_cannot_be_read() -> None:
     r = api_report(FakeReader(on_the_wire(clean()), feed_fails=True))
     assert {x["flag"] for x in r.not_run} >= {"2", "8"}

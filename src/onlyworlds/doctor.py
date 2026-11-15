@@ -465,7 +465,9 @@ def _type_order(element_type: str) -> int:
 
 
 def _folded(value: Any) -> str:
-    return value.strip().casefold() if isinstance(value, str) else ""
+    """A supertype as the profile readers compare it (``room._fold``): Unicode White_Space trimmed, simple case
+    folding. Never ``str.strip()`` (it also removes U+001C to U+001F) or ``str.casefold()`` (full folding)."""
+    return _fold(value) if isinstance(value, str) else ""
 
 
 def fold_name(name: str) -> str:

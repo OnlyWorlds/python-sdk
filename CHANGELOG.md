@@ -4,6 +4,8 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+- `onlyworlds.doctor` reads a supertype (the Charter's word in flags 8 and 11, `Tenure` and `Membership` in flag 2) with the package's one fold, as `is_charter_element` and every profile reader do: Unicode White_Space trimmed, simple case folding. It used `str.strip()` and `str.casefold()`. What changes: a supertype with U+001C to U+001F at an end is no longer read as the word (`str.strip()` removes those four; they are not White_Space). No letter changes: checked over every code point, no character whose full folding differs from its simple one folds into a piece of the three words.
+
 ## 0.128.1 (2026-11-15)
 
 - **Schema repinned to schema-dist v0.34.1-dist.130** (from dist.129; canonical 00.34.01 unchanged, no schema file moved): the message profile says a body that is not a message answers false from the unseen-recipients reading whatever the key, and its fixture gains one case for it (`keyless-non-message-is-not-unseen`), which `has_unseen_recipients` already answered; the profile writes the keyless readers as the package takes them (`is_to_everyone(message, keyless=True)`). `has_unseen_recipients`' docstring says so.
