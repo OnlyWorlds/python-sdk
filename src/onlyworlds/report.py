@@ -266,10 +266,12 @@ def _read_line(line: str, world: str | None) -> ReportLine:
 def read_report_line(line: str, *, world: str | None = None) -> ReportLine:
     """One line of a report's ``consequences``, read as the report profile reads it: the element it names and the
     words a reader shows. The line's address is the last address in it (found as the address profile finds one in
-    prose, by ``find_ow_links``) that names an element of this world: an ``ow://`` or site address, in any letter
-    case, whose world is ``world`` (this world's id, as written) or is left out, and whose type and id have an
-    element's shape. An address of another world, a slug, a world alone or a lens with no element is prose, and a
-    line with only those has no address, which is no fault. The address leaves the shown words only when nothing the
+    prose, by ``find_ow_links``) that names an element of this world: an ``ow://`` or site address, its ids' hex in
+    either case (the prefix, the host and the type word only in lowercase), whose world is ``world`` or is left out,
+    and whose type and id have an element's shape. ``world`` is this world's id, lowercase as the world holds it: an
+    address's world is read lowercase and compared with it exactly. An address of another world, a slug, a world
+    alone or a lens with no element is prose, and a line with only those has no address, which is no fault. The
+    address leaves the shown words only when nothing the
     writer wrote is lost: it is canonical, carries no moment and no lens, and stands apart (before it the line's
     start, White_Space or one colon; after it the line's end, White_Space or a closing mark: ``. , ; : ! ) ] }``,
     a straight quote, a closing curly quote or a closing guillemet), alone or in a matched pair (brackets, straight

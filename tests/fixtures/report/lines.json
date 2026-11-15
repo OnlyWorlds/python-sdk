@@ -1,7 +1,7 @@
 {
  "profile": "report",
  "table": "lines",
- "status": "draft",
+ "status": "final",
  "about": "A line of consequences: texts split at every CR and LF and trimmed of White_Space (ruling 1); each line's address, the last that names an element of this world, written ow://<type>/<id>, or null (ruling 2); the shown words (ruling 3). `kind` is a note, never compared.",
  "world": "068e012b-52a9-79bf-8000-26bb67891425",
  "cases": [

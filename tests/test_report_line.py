@@ -15,7 +15,7 @@ from onlyworlds import parse_ow_link, read_report_line, read_report_lines
 
 REPO = Path(__file__).resolve().parent.parent
 TABLE = REPO / "tests" / "fixtures" / "report" / "lines.json"
-TABLE_SHA = "b5a7901f1317b2c1"
+TABLE_SHA = "81dcca339f4c37f6"
 BYTES = TABLE.read_bytes()
 FX: dict[str, Any] = json.loads(BYTES.decode("utf-8"))
 WORLD: str = FX["world"]
