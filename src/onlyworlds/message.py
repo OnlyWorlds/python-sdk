@@ -188,9 +188,10 @@ def is_to_everyone(message: Mapping[str, Any], *, keyless: bool = False) -> bool
 def has_unseen_recipients(message: Mapping[str, Any], *, keyless: bool = False) -> bool | None:
     """True when the message is addressed to someone this reader cannot see: the server served it with
     ``characters`` trimmed (its ``x_served_trimmed`` list names ``characters``), whatever is left in the
-    list. It says that such a recipient exists, never who or how many. ``None`` for a body read keyless
-    (``keyless=True``): it carries no mark, so the reader cannot say either way. False for a Note or any
-    Narrative that is not a message, which has no recipients, keyless or not (since serial 128)."""
+    list. It says that such a recipient exists, never who or how many. ``None`` for a message read
+    keyless (``keyless=True``): it carries no mark, so the reader cannot say either way. False for a Note
+    or any body that is not a message, whatever the key: it has no recipients, so nothing about them is
+    unknown (the message profile, serial 130)."""
     keyless = _keyless("has_unseen_recipients", keyless)
     if not isinstance(message, Mapping) or not is_message(message):
         return False

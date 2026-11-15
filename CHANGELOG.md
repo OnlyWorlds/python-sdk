@@ -4,6 +4,10 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+## 0.128.1 (2026-11-15)
+
+- **Schema repinned to schema-dist v0.34.1-dist.130** (from dist.129; canonical 00.34.01 unchanged, no schema file moved): the message profile says a body that is not a message answers false from the unseen-recipients reading whatever the key, and its fixture gains one case for it (`keyless-non-message-is-not-unseen`), which `has_unseen_recipients` already answered; the profile writes the keyless readers as the package takes them (`is_to_everyone(message, keyless=True)`). `has_unseen_recipients`' docstring says so.
+
 ## 0.128.0 (2026-11-15)
 
 - `read_report_line(line, *, world=None)` and `read_report_lines(text, *, world=None)` (new): a line of a report's `consequences` as the report profile reads it, as a `ReportLine`. The line's address is the last one that names an element of this world (`address`, written `ow://<type>/<id>`, with its `reading`, `start` and `end`), and `words` is what a reader shows: the line without its address when nothing the writer wrote is lost (canonical, no moment, no lens, standing apart), else the whole line. `read_report_lines` splits a text at every carriage return and line feed and trims each line of White_Space. Held to the report profile's second fixture, `profiles/report-lines.fixture.json` (101 lines and 16 texts), byte for byte, as the npm SDK is.
