@@ -5,7 +5,7 @@
     "pairs: the ten type-and-supertype pairs a reader matches, each trimmed and compared without regard to case. The order is the table's and carries no meaning: a reader matches a pair and may keep them as a set. A serial never reorders the pairs that exist; a new pair goes where the page's table puts it, and the release notes name its place; so a suite that pins the order turns red only when a pair is added.",
     "mark: x_room_of, the id of the world or the sitting the room belongs to; a room element carries it, a lore element never does.",
     "item: x_room_item, written only on a Take, the id of the work item the take is on; it makes nothing a room element, the pair and the mark do.",
-    "cases: element gives type, supertype and x_room_of as a body might carry them; in_room is what isRoomElement must answer: the pair AND the mark."
+    "cases: element gives type, supertype and x_room_of as a body might carry them, or is a value that is not an object (null, a list, a string), which is no room element; in_room is what isRoomElement must answer: the pair AND the mark. A case's note, where one is given, is prose for the reader of the fixture, never an input."
   ],
   "pairs": [
     {
@@ -178,6 +178,15 @@
       "in_room": true
     },
     {
+      "name": "trimmed-every-white-space-at-both-ends",
+      "element": {
+        "type": "relation",
+        "supertype": "\t\n\u000b\f\r \u0085\u00a0\u1680\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u2028\u2029\u202f\u205f\u3000Work item\t\n\u000b\f\r \u0085\u00a0\u1680\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u2028\u2029\u202f\u205f\u3000",
+        "x_room_of": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f"
+      },
+      "in_room": true
+    },
+    {
       "name": "byte-order-mark-not-trimmed",
       "element": {
         "type": "relation",
@@ -194,6 +203,64 @@
         "x_room_of": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f"
       },
       "in_room": false
+    },
+    {
+      "name": "long-s-folds",
+      "element": {
+        "type": "narrative",
+        "supertype": "ME\u017f\u017fAGE",
+        "x_room_of": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f"
+      },
+      "in_room": true
+    },
+    {
+      "name": "sharp-s-does-not-fold",
+      "element": {
+        "type": "narrative",
+        "supertype": "Me\u00dfage",
+        "x_room_of": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f"
+      },
+      "in_room": false
+    },
+    {
+      "name": "type-with-the-st-ligature-is-no-pair",
+      "element": {
+        "type": "con\ufb06ruct",
+        "supertype": "Spec",
+        "x_room_of": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f"
+      },
+      "in_room": false,
+      "note": "The type's st is U+FB06, a ligature with no simple folding (only full folding takes it to st), so the type is not construct and the element is no room element."
+    },
+    {
+      "name": "kelvin-sign-folds-to-k",
+      "element": {
+        "type": "relation",
+        "supertype": "Ta\u212ae",
+        "x_room_of": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f"
+      },
+      "in_room": true,
+      "note": "The Kelvin sign, U+212A, folds to k under simple case folding, so Ta\u212ae is the word take; a reader that upper-cases both sides leaves the Kelvin sign as it is and answers false."
+    },
+    {
+      "name": "dotless-i-does-not-fold",
+      "element": {
+        "type": "event",
+        "supertype": "S\u0131tting",
+        "x_room_of": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f"
+      },
+      "in_room": false,
+      "note": "The dotless i, U+0131, has no C or S row, so S\u0131tting is not the word sitting; a reader that upper-cases and then lower-cases each letter takes it to i and answers true."
+    },
+    {
+      "name": "dotted-capital-i-does-not-fold",
+      "element": {
+        "type": "event",
+        "supertype": "S\u0130tting",
+        "x_room_of": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f"
+      },
+      "in_room": false,
+      "note": "The capital I with a dot, U+0130, has no C or S row (only F and T), so S\u0130tting is not the word sitting; a reader that lower-cases each letter after upper-casing it takes it to i and answers true."
     },
     {
       "name": "charter-stays-lore",
@@ -380,6 +447,30 @@
         "x_room_of": "  0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f  "
       },
       "in_room": true
+    },
+    {
+      "name": "a-body-that-is-null-is-no-room-element",
+      "element": null,
+      "in_room": false,
+      "note": "A body that is null is no object, so it is no element and no room element; a reader answers false and does not fail."
+    },
+    {
+      "name": "a-list-is-no-room-element",
+      "element": [
+        {
+          "type": "narrative",
+          "supertype": "Message",
+          "x_room_of": "0199c3a1-7b2e-7c3d-8e4f-5a6b7c8d9e0f"
+        }
+      ],
+      "in_room": false,
+      "note": "A list is no object, even one that holds a marked room element, so it is no room element; a reader answers false, never the answer for the item in it, and does not fail."
+    },
+    {
+      "name": "a-string-is-no-room-element",
+      "element": "Message",
+      "in_room": false,
+      "note": "A string is no object, even the word Message, so it is no room element; a reader answers false and does not fail."
     }
   ],
   "mark": {

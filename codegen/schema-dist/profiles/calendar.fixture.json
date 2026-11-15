@@ -4092,6 +4092,320 @@
       ]
     },
     {
+      "name": "v2-except-offset-leap-mid-year",
+      "why": "every 4 except every 8, read on year index + 2, the leap day after month 1, so the days after it show the rule: Leap falls between Frost and Thaw in index 2 and 10 (Y = 4, 12) and not in index 6, 14 and -2 (Y = 8, 16, 0), where 1 Thaw follows 10 Frost; a reader whose days ignore except while its year count keeps it misreads Thaw in the excepted years",
+      "value": {
+        "version": 2,
+        "grain": "day",
+        "bundles": {
+          "months": {
+            "names": [
+              "Frost",
+              "Thaw"
+            ],
+            "lengths": [
+              10,
+              10
+            ]
+          }
+        },
+        "intercalary": [
+          {
+            "name": "Leap",
+            "after_month": 1,
+            "every_years": 4,
+            "except": [
+              8
+            ],
+            "offset": 2
+          }
+        ]
+      },
+      "valid": true,
+      "steps": [
+        {
+          "step": 49,
+          "words": "10 Frost, 2",
+          "breakdown": {
+            "absYear": 2,
+            "year": 2,
+            "era": null,
+            "month": 1,
+            "monthName": "Frost",
+            "day": 10,
+            "intercalary": null,
+            "weekday": null
+          }
+        },
+        {
+          "step": 50,
+          "words": "Leap, 2",
+          "breakdown": {
+            "absYear": 2,
+            "year": 2,
+            "era": null,
+            "month": null,
+            "monthName": null,
+            "day": null,
+            "intercalary": "Leap",
+            "weekday": null
+          }
+        },
+        {
+          "step": 59,
+          "words": "9 Thaw, 2",
+          "breakdown": {
+            "absYear": 2,
+            "year": 2,
+            "era": null,
+            "month": 2,
+            "monthName": "Thaw",
+            "day": 9,
+            "intercalary": null,
+            "weekday": null
+          }
+        },
+        {
+          "step": 60,
+          "words": "10 Thaw, 2",
+          "breakdown": {
+            "absYear": 2,
+            "year": 2,
+            "era": null,
+            "month": 2,
+            "monthName": "Thaw",
+            "day": 10,
+            "intercalary": null,
+            "weekday": null
+          }
+        },
+        {
+          "step": 130,
+          "words": "10 Frost, 6",
+          "breakdown": {
+            "absYear": 6,
+            "year": 6,
+            "era": null,
+            "month": 1,
+            "monthName": "Frost",
+            "day": 10,
+            "intercalary": null,
+            "weekday": null
+          }
+        },
+        {
+          "step": 131,
+          "words": "1 Thaw, 6",
+          "breakdown": {
+            "absYear": 6,
+            "year": 6,
+            "era": null,
+            "month": 2,
+            "monthName": "Thaw",
+            "day": 1,
+            "intercalary": null,
+            "weekday": null
+          }
+        },
+        {
+          "step": 140,
+          "words": "10 Thaw, 6",
+          "breakdown": {
+            "absYear": 6,
+            "year": 6,
+            "era": null,
+            "month": 2,
+            "monthName": "Thaw",
+            "day": 10,
+            "intercalary": null,
+            "weekday": null
+          }
+        },
+        {
+          "step": 141,
+          "words": "1 Frost, 7",
+          "breakdown": {
+            "absYear": 7,
+            "year": 7,
+            "era": null,
+            "month": 1,
+            "monthName": "Frost",
+            "day": 1,
+            "intercalary": null,
+            "weekday": null
+          }
+        },
+        {
+          "step": 210,
+          "words": "10 Frost, 10",
+          "breakdown": {
+            "absYear": 10,
+            "year": 10,
+            "era": null,
+            "month": 1,
+            "monthName": "Frost",
+            "day": 10,
+            "intercalary": null,
+            "weekday": null
+          }
+        },
+        {
+          "step": 211,
+          "words": "Leap, 10",
+          "breakdown": {
+            "absYear": 10,
+            "year": 10,
+            "era": null,
+            "month": null,
+            "monthName": null,
+            "day": null,
+            "intercalary": "Leap",
+            "weekday": null
+          }
+        },
+        {
+          "step": 220,
+          "words": "9 Thaw, 10",
+          "breakdown": {
+            "absYear": 10,
+            "year": 10,
+            "era": null,
+            "month": 2,
+            "monthName": "Thaw",
+            "day": 9,
+            "intercalary": null,
+            "weekday": null
+          }
+        },
+        {
+          "step": 221,
+          "words": "10 Thaw, 10",
+          "breakdown": {
+            "absYear": 10,
+            "year": 10,
+            "era": null,
+            "month": 2,
+            "monthName": "Thaw",
+            "day": 10,
+            "intercalary": null,
+            "weekday": null
+          }
+        },
+        {
+          "step": 291,
+          "words": "10 Frost, 14",
+          "breakdown": {
+            "absYear": 14,
+            "year": 14,
+            "era": null,
+            "month": 1,
+            "monthName": "Frost",
+            "day": 10,
+            "intercalary": null,
+            "weekday": null
+          }
+        },
+        {
+          "step": 292,
+          "words": "1 Thaw, 14",
+          "breakdown": {
+            "absYear": 14,
+            "year": 14,
+            "era": null,
+            "month": 2,
+            "monthName": "Thaw",
+            "day": 1,
+            "intercalary": null,
+            "weekday": null
+          }
+        },
+        {
+          "step": 301,
+          "words": "10 Thaw, 14",
+          "breakdown": {
+            "absYear": 14,
+            "year": 14,
+            "era": null,
+            "month": 2,
+            "monthName": "Thaw",
+            "day": 10,
+            "intercalary": null,
+            "weekday": null
+          }
+        },
+        {
+          "step": 302,
+          "words": "1 Frost, 15",
+          "breakdown": {
+            "absYear": 15,
+            "year": 15,
+            "era": null,
+            "month": 1,
+            "monthName": "Frost",
+            "day": 1,
+            "intercalary": null,
+            "weekday": null
+          }
+        },
+        {
+          "step": -31,
+          "words": "10 Frost, -2",
+          "breakdown": {
+            "absYear": -2,
+            "year": -2,
+            "era": null,
+            "month": 1,
+            "monthName": "Frost",
+            "day": 10,
+            "intercalary": null,
+            "weekday": null
+          }
+        },
+        {
+          "step": -30,
+          "words": "1 Thaw, -2",
+          "breakdown": {
+            "absYear": -2,
+            "year": -2,
+            "era": null,
+            "month": 2,
+            "monthName": "Thaw",
+            "day": 1,
+            "intercalary": null,
+            "weekday": null
+          }
+        },
+        {
+          "step": -21,
+          "words": "10 Thaw, -2",
+          "breakdown": {
+            "absYear": -2,
+            "year": -2,
+            "era": null,
+            "month": 2,
+            "monthName": "Thaw",
+            "day": 10,
+            "intercalary": null,
+            "weekday": null
+          }
+        },
+        {
+          "step": -20,
+          "words": "1 Frost, -1",
+          "breakdown": {
+            "absYear": -1,
+            "year": -1,
+            "era": null,
+            "month": 1,
+            "monthName": "Frost",
+            "day": 1,
+            "intercalary": null,
+            "weekday": null
+          }
+        }
+      ]
+    },
+    {
       "name": "v1-ignores-leap-keys",
       "why": "a version-1 value carrying except and offset reads them as unknown keys: the plain rule, every 4 from index 0",
       "value": {

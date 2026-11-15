@@ -13,7 +13,7 @@
     "thread: every message whose chain of parent_narrative reaches root, the root included, as ids in created_at order; a parent_narrative that is not a string (a number, null, an object) ends the chain there.",
     "edited: editedBy(message, members) as {edited, by}: edited is true when the message carries changed_by and it is not equal to its created_by (an absent created_by is never equal; null is the owner on both); by is the Character of the changed_by membership on members, null when it plays none, is off the list, or there is no list, and null whenever edited is false. The sender's answer never changes for an edit.",
     "note: noteOf(notes, character, members) is line: of the narratives given, the id of the Character's line: a Note (note_pair, trimmed and folded like pair) whose narrator is the character, neither hidden (hidden true) nor proposed (x_review_proposed an object), and in its author's hand (no created_by key: trusted, a folder; with created_by: senderStatus verified); the newest by the order above whose created_at can be read, or the last in the list when none can; null when there is none. A case without members reads the world's members.",
-    "Every case has a kind and a name; a reader dispatches on kind. A case's note is prose for the reader of the fixture, never an input."
+    "Every case has a kind and a name; a reader dispatches on kind. A case's note is prose for the reader of the fixture, never an input. A body, a read mark or an entry of a list that is not an object (null, a list, a string, a number, true or false) is no element: each kind's reader answers for it as for a body that is not a message and holds none of the fields, never fails, and passes over such an entry in a list."
   ],
   "pair": {
     "type": "narrative",
@@ -159,6 +159,52 @@
       "is_message": true
     },
     {
+      "kind": "pair",
+      "name": "pair-long-s-folds",
+      "element": {
+        "type": "narrative",
+        "supertype": "ME\u017f\u017fAGE"
+      },
+      "is_message": true,
+      "note": "Simple case folding takes the long s, U+017F, to s, so ME\u017f\u017fAGE is the word message; a reader that lower-cases leaves the long s and answers false."
+    },
+    {
+      "kind": "pair",
+      "name": "pair-sharp-s-does-not-fold",
+      "element": {
+        "type": "narrative",
+        "supertype": "Me\u00dfage"
+      },
+      "is_message": false,
+      "note": "The sharp s, U+00DF, has no simple folding, so Me\u00dfage is not the word message; a reader that folds fully takes it to ss and answers true."
+    },
+    {
+      "kind": "pair",
+      "name": "pair-body-null-is-no-message",
+      "element": null,
+      "is_message": false,
+      "note": "A body that is null is no object, so it is no element and no message; a reader answers false and does not fail."
+    },
+    {
+      "kind": "pair",
+      "name": "pair-body-a-list-is-no-message",
+      "element": [
+        {
+          "type": "narrative",
+          "supertype": "Message"
+        }
+      ],
+      "is_message": false,
+      "note": "A list is no object, even one that holds a message, so it is no element and no message; a reader answers false, never the answer for an item in it, and does not fail."
+    },
+    {
+      "kind": "pair",
+      "name": "pair-body-a-string-is-no-message",
+      "element": "Message",
+      "is_message": false,
+      "note": "A string is no object, even the word Message, so it is no element and no message; a reader answers false and does not fail."
+    },
+    {
       "kind": "addressed",
       "name": "addressed-direct",
       "message": {
@@ -177,6 +223,14 @@
       },
       "character": "019a3b10-0000-7000-8000-0000000000a1",
       "addressed": true
+    },
+    {
+      "kind": "addressed",
+      "name": "addressed-a-body-that-is-no-object-is-addressed-to-nobody",
+      "message": 7,
+      "character": "019a3b10-0000-7000-8000-0000000000a1",
+      "addressed": false,
+      "note": "A number is no object, so it is no message and is addressed to nobody; a reader answers false and does not fail."
     },
     {
       "kind": "addressed",
@@ -240,6 +294,13 @@
       },
       "recipients": [],
       "note": "A Narrative with supertype Story is not a message, so it has no recipients: its characters are the people it is about. A reader answers recipients only for what the pair names a message."
+    },
+    {
+      "kind": "recipients",
+      "name": "recipients-a-body-that-is-no-object-has-none",
+      "message": "Message",
+      "recipients": [],
+      "note": "A string is no object, even the word Message, so it has no recipients; a reader answers an empty list and does not fail."
     },
     {
       "kind": "addressed",
@@ -389,6 +450,29 @@
     },
     {
       "kind": "sent_by",
+      "name": "sent-by-a-body-that-is-no-object-is-sent-by-nobody",
+      "message": [
+        {
+          "id": "019a3b10-0000-7000-8000-0000000000c1",
+          "type": "narrative",
+          "supertype": "Message",
+          "name": "Message 1",
+          "story": "",
+          "narrator": "019a3b10-0000-7000-8000-0000000000a3",
+          "characters": [
+            "019a3b10-0000-7000-8000-0000000000a1",
+            "019a3b10-0000-7000-8000-0000000000a2"
+          ],
+          "parent_narrative": null,
+          "created_at": "2026-10-26T09:01:00Z"
+        }
+      ],
+      "character": "019a3b10-0000-7000-8000-0000000000a3",
+      "sent_by": false,
+      "note": "A list is no object, even one that holds a message sent by this Character, so it is sent by nobody; a reader answers false, never the answer for the item in it, and does not fail."
+    },
+    {
+      "kind": "sent_by",
       "name": "not-sent-by-recipient",
       "message": {
         "id": "019a3b10-0000-7000-8000-0000000000c1",
@@ -511,6 +595,26 @@
       },
       "status": "unverifiable",
       "claimed": null
+    },
+    {
+      "kind": "sender",
+      "name": "unverifiable-a-body-that-is-no-object",
+      "message": [
+        {
+          "id": "019a3b10-0000-7000-8000-000000000c20",
+          "type": "narrative",
+          "supertype": "Message",
+          "name": "Harbour",
+          "narrator": "019a3b10-0000-7000-8000-0000000000a2",
+          "characters": [
+            "019a3b10-0000-7000-8000-0000000000a4"
+          ],
+          "created_by": "019a3b10-0000-7000-8000-0000000000b2"
+        }
+      ],
+      "status": "unverifiable",
+      "claimed": null,
+      "note": "A list is no object, even one that holds a message whose sender is verified, so it names nobody: its sender is unverifiable, shown as from nobody, and no members list is read for it."
     },
     {
       "kind": "sender",
@@ -706,6 +810,131 @@
     },
     {
       "kind": "unread",
+      "name": "unread-passes-over-an-entry-that-is-no-object",
+      "messages": [
+        {
+          "id": "019a3b10-0000-7000-8000-000000000c11",
+          "type": "narrative",
+          "supertype": "Message",
+          "name": "Message 11",
+          "story": "",
+          "narrator": "019a3b10-0000-7000-8000-0000000000a3",
+          "created_by": "019a3b10-0000-7000-8000-0000000000b3",
+          "characters": [
+            "019a3b10-0000-7000-8000-0000000000a1"
+          ],
+          "parent_narrative": null,
+          "created_at": "2026-10-26T09:11:00Z"
+        },
+        null,
+        {
+          "id": "019a3b10-0000-7000-8000-000000000c12",
+          "type": "narrative",
+          "supertype": "Message",
+          "name": "Message 12",
+          "story": "",
+          "narrator": "019a3b10-0000-7000-8000-0000000000a3",
+          "created_by": "019a3b10-0000-7000-8000-0000000000b3",
+          "characters": [],
+          "parent_narrative": null,
+          "created_at": "2026-10-26T09:12:00Z"
+        },
+        "Message",
+        {
+          "id": "019a3b10-0000-7000-8000-000000000c13",
+          "type": "narrative",
+          "supertype": "Message",
+          "name": "Message 13",
+          "story": "",
+          "narrator": "019a3b10-0000-7000-8000-0000000000a3",
+          "created_by": "019a3b10-0000-7000-8000-0000000000b3",
+          "characters": [
+            "019a3b10-0000-7000-8000-0000000000a2"
+          ],
+          "parent_narrative": null,
+          "created_at": "2026-10-26T09:13:00Z"
+        },
+        7,
+        {
+          "id": "019a3b10-0000-7000-8000-000000000c14",
+          "type": "narrative",
+          "supertype": "Message",
+          "name": "Message 14",
+          "story": "",
+          "narrator": "019a3b10-0000-7000-8000-0000000000a2",
+          "created_by": "019a3b10-0000-7000-8000-0000000000b2",
+          "characters": [
+            "019a3b10-0000-7000-8000-0000000000a1",
+            "019a3b10-0000-7000-8000-0000000000a3"
+          ],
+          "parent_narrative": null,
+          "created_at": "2026-10-26T09:14:00Z"
+        },
+        [
+          {
+            "id": "019a3b10-0000-7000-8000-000000000c13",
+            "type": "narrative",
+            "supertype": "Message",
+            "name": "Message 13",
+            "story": "",
+            "narrator": "019a3b10-0000-7000-8000-0000000000a3",
+            "created_by": "019a3b10-0000-7000-8000-0000000000b3",
+            "characters": [
+              "019a3b10-0000-7000-8000-0000000000a2"
+            ],
+            "parent_narrative": null,
+            "created_at": "2026-10-26T09:13:00Z"
+          }
+        ],
+        {
+          "id": "019a3b10-0000-7000-8000-000000000c15",
+          "type": "narrative",
+          "supertype": "Message",
+          "name": "Message 15",
+          "story": "",
+          "narrator": "019a3b10-0000-7000-8000-0000000000a1",
+          "created_by": null,
+          "characters": [],
+          "parent_narrative": null,
+          "created_at": "2026-10-26T09:15:00Z"
+        },
+        {
+          "id": "019a3b10-0000-7000-8000-000000000c16",
+          "type": "narrative",
+          "supertype": "Message",
+          "name": "Message 16",
+          "story": "",
+          "narrator": "019a3b10-0000-7000-8000-0000000000a1",
+          "created_by": null,
+          "characters": [
+            "019a3b10-0000-7000-8000-0000000000a1",
+            "019a3b10-0000-7000-8000-0000000000a2"
+          ],
+          "parent_narrative": null,
+          "created_at": "2026-10-26T09:16:00Z"
+        }
+      ],
+      "reader": "019a3b10-0000-7000-8000-0000000000a1",
+      "read_mark": {
+        "id": "019a3b10-0000-7000-8000-0000000000d1",
+        "type": "relation",
+        "supertype": "Read",
+        "name": "Read: Ada",
+        "actor": "019a3b10-0000-7000-8000-0000000000a1",
+        "narratives": [
+          "019a3b10-0000-7000-8000-000000000c11"
+        ],
+        "updated_at": "2026-10-26T10:00:00Z",
+        "created_by": null
+      },
+      "unread": [
+        "019a3b10-0000-7000-8000-000000000c12",
+        "019a3b10-0000-7000-8000-000000000c14"
+      ],
+      "note": "unread-computed's messages with null, a string, a number and a list that holds a message among them: each entry that is no object is passed over and the rest is read, so the answer is unread-computed's."
+    },
+    {
+      "kind": "unread",
       "name": "unread-no-mark",
       "messages": [
         {
@@ -798,6 +1027,104 @@
         "019a3b10-0000-7000-8000-000000000c12",
         "019a3b10-0000-7000-8000-000000000c14"
       ]
+    },
+    {
+      "kind": "unread",
+      "name": "unread-a-read-mark-that-is-no-object-is-no-mark",
+      "messages": [
+        {
+          "id": "019a3b10-0000-7000-8000-000000000c11",
+          "type": "narrative",
+          "supertype": "Message",
+          "name": "Message 11",
+          "story": "",
+          "narrator": "019a3b10-0000-7000-8000-0000000000a3",
+          "created_by": "019a3b10-0000-7000-8000-0000000000b3",
+          "characters": [
+            "019a3b10-0000-7000-8000-0000000000a1"
+          ],
+          "parent_narrative": null,
+          "created_at": "2026-10-26T09:11:00Z"
+        },
+        {
+          "id": "019a3b10-0000-7000-8000-000000000c12",
+          "type": "narrative",
+          "supertype": "Message",
+          "name": "Message 12",
+          "story": "",
+          "narrator": "019a3b10-0000-7000-8000-0000000000a3",
+          "created_by": "019a3b10-0000-7000-8000-0000000000b3",
+          "characters": [],
+          "parent_narrative": null,
+          "created_at": "2026-10-26T09:12:00Z"
+        },
+        {
+          "id": "019a3b10-0000-7000-8000-000000000c13",
+          "type": "narrative",
+          "supertype": "Message",
+          "name": "Message 13",
+          "story": "",
+          "narrator": "019a3b10-0000-7000-8000-0000000000a3",
+          "created_by": "019a3b10-0000-7000-8000-0000000000b3",
+          "characters": [
+            "019a3b10-0000-7000-8000-0000000000a2"
+          ],
+          "parent_narrative": null,
+          "created_at": "2026-10-26T09:13:00Z"
+        },
+        {
+          "id": "019a3b10-0000-7000-8000-000000000c14",
+          "type": "narrative",
+          "supertype": "Message",
+          "name": "Message 14",
+          "story": "",
+          "narrator": "019a3b10-0000-7000-8000-0000000000a2",
+          "created_by": "019a3b10-0000-7000-8000-0000000000b2",
+          "characters": [
+            "019a3b10-0000-7000-8000-0000000000a1",
+            "019a3b10-0000-7000-8000-0000000000a3"
+          ],
+          "parent_narrative": null,
+          "created_at": "2026-10-26T09:14:00Z"
+        },
+        {
+          "id": "019a3b10-0000-7000-8000-000000000c15",
+          "type": "narrative",
+          "supertype": "Message",
+          "name": "Message 15",
+          "story": "",
+          "narrator": "019a3b10-0000-7000-8000-0000000000a1",
+          "created_by": null,
+          "characters": [],
+          "parent_narrative": null,
+          "created_at": "2026-10-26T09:15:00Z"
+        },
+        {
+          "id": "019a3b10-0000-7000-8000-000000000c16",
+          "type": "narrative",
+          "supertype": "Message",
+          "name": "Message 16",
+          "story": "",
+          "narrator": "019a3b10-0000-7000-8000-0000000000a1",
+          "created_by": null,
+          "characters": [
+            "019a3b10-0000-7000-8000-0000000000a1",
+            "019a3b10-0000-7000-8000-0000000000a2"
+          ],
+          "parent_narrative": null,
+          "created_at": "2026-10-26T09:16:00Z"
+        }
+      ],
+      "reader": "019a3b10-0000-7000-8000-0000000000a1",
+      "read_mark": [
+        "019a3b10-0000-7000-8000-000000000c11"
+      ],
+      "unread": [
+        "019a3b10-0000-7000-8000-000000000c11",
+        "019a3b10-0000-7000-8000-000000000c12",
+        "019a3b10-0000-7000-8000-000000000c14"
+      ],
+      "note": "A read mark that is a list, even a list of message ids, is no object, so it is no mark and every message addressed to the reader is unread, as in unread-no-mark."
     },
     {
       "kind": "unread",
@@ -1333,6 +1660,55 @@
     },
     {
       "kind": "mark",
+      "name": "mark-passes-over-an-entry-that-is-no-object",
+      "relations": [
+        null,
+        {
+          "id": "019a3b10-0000-7000-8000-0000000000d2",
+          "type": "relation",
+          "supertype": "Read",
+          "name": "Read: Ada",
+          "actor": "019a3b10-0000-7000-8000-0000000000a1",
+          "narratives": [
+            "019a3b10-0000-7000-8000-000000000c11"
+          ],
+          "updated_at": "2026-10-26T08:00:00Z",
+          "created_by": null
+        },
+        [
+          {
+            "id": "019a3b10-0000-7000-8000-0000000000df",
+            "type": "relation",
+            "supertype": "Read",
+            "name": "Read: Ada",
+            "actor": "019a3b10-0000-7000-8000-0000000000a1",
+            "narratives": [
+              "019a3b10-0000-7000-8000-000000000c11"
+            ],
+            "updated_at": "2026-10-27T08:00:00Z",
+            "created_by": null
+          }
+        ],
+        "Read",
+        {
+          "id": "019a3b10-0000-7000-8000-0000000000d4",
+          "type": "relation",
+          "supertype": "Read",
+          "name": "Read: Mara",
+          "actor": "019a3b10-0000-7000-8000-0000000000a2",
+          "narratives": [
+            "019a3b10-0000-7000-8000-000000000c13"
+          ],
+          "updated_at": "2026-10-26T12:00:00Z",
+          "created_by": "019a3b10-0000-7000-8000-0000000000b2"
+        }
+      ],
+      "reader": "019a3b10-0000-7000-8000-0000000000a1",
+      "mark": "019a3b10-0000-7000-8000-0000000000d2",
+      "note": "mark-one-per-reader's relations with null, a list that holds a newer mark of the reader's and a string among them: each entry that is no object is passed over, so the mark is mark-one-per-reader's, never the one inside the list."
+    },
+    {
+      "kind": "mark",
       "name": "mark-newest-updated-at-wins",
       "relations": [
         {
@@ -1765,6 +2141,88 @@
     },
     {
       "kind": "thread",
+      "name": "thread-passes-over-an-entry-that-is-no-object",
+      "messages": [
+        {
+          "id": "019a3b10-0000-7000-8000-000000000c34",
+          "type": "narrative",
+          "supertype": "Message",
+          "name": "Message 34",
+          "story": "",
+          "narrator": "019a3b10-0000-7000-8000-0000000000a3",
+          "characters": [
+            "019a3b10-0000-7000-8000-0000000000a1"
+          ],
+          "parent_narrative": null,
+          "created_at": "2026-10-26T09:34:00Z"
+        },
+        "019a3b10-0000-7000-8000-000000000c31",
+        {
+          "id": "019a3b10-0000-7000-8000-000000000c33",
+          "type": "narrative",
+          "supertype": "Message",
+          "name": "Message 33",
+          "story": "",
+          "narrator": "019a3b10-0000-7000-8000-0000000000a1",
+          "characters": [
+            "019a3b10-0000-7000-8000-0000000000a2"
+          ],
+          "parent_narrative": "019a3b10-0000-7000-8000-000000000c32",
+          "created_at": "2026-10-26T09:33:00Z"
+        },
+        null,
+        {
+          "id": "019a3b10-0000-7000-8000-000000000c32",
+          "type": "narrative",
+          "supertype": "Message",
+          "name": "Message 32",
+          "story": "",
+          "narrator": "019a3b10-0000-7000-8000-0000000000a2",
+          "characters": [
+            "019a3b10-0000-7000-8000-0000000000a1"
+          ],
+          "parent_narrative": "019a3b10-0000-7000-8000-000000000c31",
+          "created_at": "2026-10-26T09:32:00Z"
+        },
+        [
+          {
+            "id": "019a3b10-0000-7000-8000-000000000c33",
+            "type": "narrative",
+            "supertype": "Message",
+            "name": "Message 33",
+            "story": "",
+            "narrator": "019a3b10-0000-7000-8000-0000000000a1",
+            "characters": [
+              "019a3b10-0000-7000-8000-0000000000a2"
+            ],
+            "parent_narrative": "019a3b10-0000-7000-8000-000000000c32",
+            "created_at": "2026-10-26T09:33:00Z"
+          }
+        ],
+        {
+          "id": "019a3b10-0000-7000-8000-000000000c31",
+          "type": "narrative",
+          "supertype": "Message",
+          "name": "Message 31",
+          "story": "",
+          "narrator": "019a3b10-0000-7000-8000-0000000000a1",
+          "characters": [
+            "019a3b10-0000-7000-8000-0000000000a2"
+          ],
+          "parent_narrative": null,
+          "created_at": "2026-10-26T09:31:00Z"
+        }
+      ],
+      "root": "019a3b10-0000-7000-8000-000000000c31",
+      "thread": [
+        "019a3b10-0000-7000-8000-000000000c31",
+        "019a3b10-0000-7000-8000-000000000c32",
+        "019a3b10-0000-7000-8000-000000000c33"
+      ],
+      "note": "thread-chain-of-three's messages with the root's id as a string, null and a list that holds a message among them: each entry that is no object is passed over and the rest is read, so the thread is thread-chain-of-three's."
+    },
+    {
+      "kind": "thread",
       "name": "thread-from-the-middle",
       "messages": [
         {
@@ -1973,6 +2431,15 @@
     },
     {
       "kind": "unseen",
+      "name": "unseen-a-body-that-is-no-object-has-no-unseen-recipients",
+      "message": null,
+      "character": "019a3b10-0000-7000-8000-0000000000a1",
+      "addressed": false,
+      "unseen_recipients": false,
+      "note": "A body that is null is no message, so it is addressed to nobody and has no recipients the reader cannot see; a reader answers false twice and does not fail."
+    },
+    {
+      "kind": "unseen",
       "name": "empty-recipients-with-only-the-narrator-trimmed-is-to-everyone",
       "message": {
         "id": "019a3b10-0000-7000-8000-000000000c73",
@@ -2097,6 +2564,15 @@
       "unseen_recipients": false
     },
     {
+      "kind": "everyone",
+      "name": "everyone-a-body-that-is-no-object-is-not-to-everyone",
+      "message": [],
+      "keyless": false,
+      "to_everyone": false,
+      "unseen_recipients": false,
+      "note": "An empty list is no object, and no message with an empty characters: it is not to everyone, and it has no unseen recipients; a reader answers false twice and does not fail."
+    },
+    {
       "kind": "sender",
       "name": "keyless-null-narrator-is-unverifiable",
       "note": "A keyless body is served no mark, so its reader cannot tell a message sent by nobody from one whose sender is hidden: the status stays unverifiable, never unseen.",
@@ -2195,6 +2671,14 @@
       },
       "edited": false,
       "edited_by": null
+    },
+    {
+      "kind": "edited",
+      "name": "edited-a-body-that-is-no-object-says-nothing",
+      "message": true,
+      "edited": false,
+      "edited_by": null,
+      "note": "true is no object, so it carries no hand and no edit; a reader answers not edited, by nobody, and does not fail."
     },
     {
       "kind": "sender",
@@ -2506,6 +2990,64 @@
       ],
       "character": "019a3b10-0000-7000-8000-0000000000a2",
       "line": "019a3b10-0000-7000-8000-000000000c86"
+    },
+    {
+      "kind": "note",
+      "name": "note-passes-over-an-entry-that-is-no-object",
+      "notes": [
+        {
+          "id": "019a3b10-0000-7000-8000-000000000c86",
+          "type": "narrative",
+          "supertype": "Note",
+          "name": "Note 86",
+          "story": "",
+          "narrator": "019a3b10-0000-7000-8000-0000000000a2",
+          "created_by": "019a3b10-0000-7000-8000-0000000000b2",
+          "characters": [],
+          "created_at": "2026-10-26T11:00:00Z"
+        },
+        "Note",
+        {
+          "id": "019a3b10-0000-7000-8000-000000000c87",
+          "type": "narrative",
+          "supertype": "Note",
+          "name": "Note 87",
+          "story": "",
+          "narrator": "019a3b10-0000-7000-8000-0000000000a2",
+          "created_by": "019a3b10-0000-7000-8000-0000000000b2",
+          "characters": [],
+          "created_at": "2026-10-26T09:30:00Z"
+        },
+        [
+          {
+            "id": "019a3b10-0000-7000-8000-000000000c8f",
+            "type": "narrative",
+            "supertype": "Note",
+            "name": "Note 86",
+            "story": "",
+            "narrator": "019a3b10-0000-7000-8000-0000000000a2",
+            "created_by": "019a3b10-0000-7000-8000-0000000000b2",
+            "characters": [],
+            "created_at": "2026-10-26T13:00:00Z"
+          }
+        ],
+        7,
+        {
+          "id": "019a3b10-0000-7000-8000-000000000c88",
+          "type": "narrative",
+          "supertype": "Note",
+          "name": "Note 88",
+          "story": "",
+          "narrator": "019a3b10-0000-7000-8000-0000000000a3",
+          "created_by": "019a3b10-0000-7000-8000-0000000000b3",
+          "characters": [],
+          "created_at": "2026-10-26T12:00:00Z"
+        },
+        null
+      ],
+      "character": "019a3b10-0000-7000-8000-0000000000a2",
+      "line": "019a3b10-0000-7000-8000-000000000c86",
+      "note": "note-newest-by-created-at-is-the-authors-line's Notes with a string, a list that holds a newer Note of the same Character, a number and null among them: each entry that is no object is passed over, so the line is that case's, never the Note inside the list."
     },
     {
       "kind": "note",

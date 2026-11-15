@@ -44,18 +44,18 @@ from onlyworlds import (
 REPO = Path(__file__).resolve().parent.parent
 FIXTURE = REPO / "codegen" / "schema-dist" / "profiles" / "message.fixture.json"
 KINDS = {
-    "pair": 10,
-    "addressed": 11,
-    "recipients": 2,
-    "sent_by": 3,
-    "sender": 14,
-    "unread": 22,
-    "mark": 18,
-    "thread": 4,
-    "unseen": 3,
-    "everyone": 4,
-    "edited": 4,
-    "note": 8,
+    "pair": 15,
+    "addressed": 12,
+    "recipients": 3,
+    "sent_by": 4,
+    "sender": 15,
+    "unread": 24,
+    "mark": 19,
+    "thread": 5,
+    "unseen": 4,
+    "everyone": 5,
+    "edited": 5,
+    "note": 9,
 }
 
 ADA = "019a3b10-0000-7000-8000-0000000000a1"
@@ -131,7 +131,7 @@ def test_every_fixture_case_is_answered_as_the_fixture_says() -> None:
     cases = doc["cases"]
     wrong = [line for case in cases for line in replay(case, doc)]
     assert wrong == []
-    assert len(cases) == 103, f"the fixture holds {len(cases)} cases, serial 130 has 103"
+    assert len(cases) == 120, f"the fixture holds {len(cases)} cases, serial 131 has 120"
     assert Counter(c["kind"] for c in cases) == KINDS
 
 

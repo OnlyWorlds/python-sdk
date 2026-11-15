@@ -1715,6 +1715,55 @@
           "updated_at": "2026-10-12T12:00:00Z"
         },
         {
+          "id": "019a7f00-0000-7000-8000-0000000001c0",
+          "type": "object",
+          "name": "Slip chain",
+          "description": "\u2029\nHeld at the slip.",
+          "updated_at": "2026-10-12T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-0000000001c1",
+          "type": "object",
+          "name": "Net float",
+          "description": "Cork\u2029Pine.",
+          "updated_at": "2026-10-12T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-0000000001c2",
+          "type": "object",
+          "name": "Bait tin",
+          "description": "\u2029",
+          "updated_at": "2026-10-12T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-0000000001c3",
+          "type": "object",
+          "name": "Hook box",
+          "description": "\u2028",
+          "updated_at": "2026-10-12T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-0000000001c4",
+          "type": "object",
+          "name": "Line reel",
+          "description": "\u0085",
+          "updated_at": "2026-10-12T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-0000000001c5",
+          "type": "object",
+          "name": "Weight bag",
+          "description": "\u000b",
+          "updated_at": "2026-10-12T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-0000000001c6",
+          "type": "object",
+          "name": "Gaff",
+          "description": "\f",
+          "updated_at": "2026-10-12T12:00:00Z"
+        },
+        {
           "id": "019a7f00-0000-7000-8000-0000000007a0",
           "type": "family",
           "name": "The Reed Kin",
@@ -10140,6 +10189,232 @@
         }
       ],
       "note": "A first line that is U+2028, U+0085, a line tab or a form feed alone holds nothing once White_Space is trimmed (each is in the set, and none is a line break here), so it is skipped and the row's first line is the second."
+    },
+    {
+      "name": "show-first-line-skips-a-line-of-a-paragraph-separator-alone",
+      "kind": "resolve",
+      "world": "fen",
+      "reader": "owner",
+      "lens": {
+        "id": "019a7f00-0000-7000-8000-0000000001d0",
+        "type": "construct",
+        "name": "A lens",
+        "supertype": "Lens",
+        "subtype": "",
+        "objects": [
+          "019a7f00-0000-7000-8000-0000000001c0"
+        ],
+        "x_lens": {
+          "depth": 0,
+          "show": "first_line"
+        }
+      },
+      "kept": [
+        "019a7f00-0000-7000-8000-0000000001c0"
+      ],
+      "cut": {},
+      "rows": [
+        {
+          "id": "019a7f00-0000-7000-8000-0000000001c0",
+          "type": "object",
+          "name": "Slip chain",
+          "description": "Held at the slip."
+        }
+      ],
+      "note": "U+2029 (paragraph separator) is White_Space and no line break here: a first line of it alone holds nothing once trimmed, so it is skipped and the row's first line is the second."
+    },
+    {
+      "name": "show-first-line-does-not-split-at-a-paragraph-separator",
+      "kind": "resolve",
+      "world": "fen",
+      "reader": "owner",
+      "lens": {
+        "id": "019a7f00-0000-7000-8000-0000000001d1",
+        "type": "construct",
+        "name": "A lens",
+        "supertype": "Lens",
+        "subtype": "",
+        "objects": [
+          "019a7f00-0000-7000-8000-0000000001c1"
+        ],
+        "x_lens": {
+          "depth": 0,
+          "show": "first_line"
+        }
+      },
+      "kept": [
+        "019a7f00-0000-7000-8000-0000000001c1"
+      ],
+      "cut": {},
+      "rows": [
+        {
+          "id": "019a7f00-0000-7000-8000-0000000001c1",
+          "type": "object",
+          "name": "Net float",
+          "description": "Cork\u2029Pine."
+        }
+      ],
+      "note": "U+2029 is White_Space but no line break here: the description splits only at a carriage return or a line feed, so a U+2029 between two texts is carried whole in the one line, as stored."
+    },
+    {
+      "name": "show-first-line-gives-no-description-for-a-paragraph-separator-alone",
+      "kind": "resolve",
+      "world": "fen",
+      "reader": "owner",
+      "lens": {
+        "id": "019a7f00-0000-7000-8000-0000000001d2",
+        "type": "construct",
+        "name": "A lens",
+        "supertype": "Lens",
+        "subtype": "",
+        "objects": [
+          "019a7f00-0000-7000-8000-0000000001c2"
+        ],
+        "x_lens": {
+          "depth": 0,
+          "show": "first_line"
+        }
+      },
+      "kept": [
+        "019a7f00-0000-7000-8000-0000000001c2"
+      ],
+      "cut": {},
+      "rows": [
+        {
+          "id": "019a7f00-0000-7000-8000-0000000001c2",
+          "type": "object",
+          "name": "Bait tin"
+        }
+      ],
+      "note": "A description that is U+2029 and nothing else holds no line with something in it once White_Space is trimmed, so the row carries no description, never an invented empty one."
+    },
+    {
+      "name": "show-first-line-gives-no-description-for-a-line-separator-alone",
+      "kind": "resolve",
+      "world": "fen",
+      "reader": "owner",
+      "lens": {
+        "id": "019a7f00-0000-7000-8000-0000000001d3",
+        "type": "construct",
+        "name": "A lens",
+        "supertype": "Lens",
+        "subtype": "",
+        "objects": [
+          "019a7f00-0000-7000-8000-0000000001c3"
+        ],
+        "x_lens": {
+          "depth": 0,
+          "show": "first_line"
+        }
+      },
+      "kept": [
+        "019a7f00-0000-7000-8000-0000000001c3"
+      ],
+      "cut": {},
+      "rows": [
+        {
+          "id": "019a7f00-0000-7000-8000-0000000001c3",
+          "type": "object",
+          "name": "Hook box"
+        }
+      ],
+      "note": "A description that is U+2028 and nothing else holds no line with something in it once White_Space is trimmed, so the row carries no description."
+    },
+    {
+      "name": "show-first-line-gives-no-description-for-a-next-line-alone",
+      "kind": "resolve",
+      "world": "fen",
+      "reader": "owner",
+      "lens": {
+        "id": "019a7f00-0000-7000-8000-0000000001d4",
+        "type": "construct",
+        "name": "A lens",
+        "supertype": "Lens",
+        "subtype": "",
+        "objects": [
+          "019a7f00-0000-7000-8000-0000000001c4"
+        ],
+        "x_lens": {
+          "depth": 0,
+          "show": "first_line"
+        }
+      },
+      "kept": [
+        "019a7f00-0000-7000-8000-0000000001c4"
+      ],
+      "cut": {},
+      "rows": [
+        {
+          "id": "019a7f00-0000-7000-8000-0000000001c4",
+          "type": "object",
+          "name": "Line reel"
+        }
+      ],
+      "note": "A description that is U+0085 (next line) and nothing else holds no line with something in it once White_Space is trimmed, so the row carries no description."
+    },
+    {
+      "name": "show-first-line-gives-no-description-for-a-line-tab-alone",
+      "kind": "resolve",
+      "world": "fen",
+      "reader": "owner",
+      "lens": {
+        "id": "019a7f00-0000-7000-8000-0000000001d5",
+        "type": "construct",
+        "name": "A lens",
+        "supertype": "Lens",
+        "subtype": "",
+        "objects": [
+          "019a7f00-0000-7000-8000-0000000001c5"
+        ],
+        "x_lens": {
+          "depth": 0,
+          "show": "first_line"
+        }
+      },
+      "kept": [
+        "019a7f00-0000-7000-8000-0000000001c5"
+      ],
+      "cut": {},
+      "rows": [
+        {
+          "id": "019a7f00-0000-7000-8000-0000000001c5",
+          "type": "object",
+          "name": "Weight bag"
+        }
+      ],
+      "note": "A description that is U+000B (line tab) and nothing else holds no line with something in it once White_Space is trimmed, so the row carries no description."
+    },
+    {
+      "name": "show-first-line-gives-no-description-for-a-form-feed-alone",
+      "kind": "resolve",
+      "world": "fen",
+      "reader": "owner",
+      "lens": {
+        "id": "019a7f00-0000-7000-8000-0000000001d6",
+        "type": "construct",
+        "name": "A lens",
+        "supertype": "Lens",
+        "subtype": "",
+        "objects": [
+          "019a7f00-0000-7000-8000-0000000001c6"
+        ],
+        "x_lens": {
+          "depth": 0,
+          "show": "first_line"
+        }
+      },
+      "kept": [
+        "019a7f00-0000-7000-8000-0000000001c6"
+      ],
+      "cut": {},
+      "rows": [
+        {
+          "id": "019a7f00-0000-7000-8000-0000000001c6",
+          "type": "object",
+          "name": "Gaff"
+        }
+      ],
+      "note": "A description that is U+000C (form feed) and nothing else holds no line with something in it once White_Space is trimmed, so the row carries no description."
     },
     {
       "name": "show-name-carries-supertype-and-subtype-as-stored-untrimmed",
