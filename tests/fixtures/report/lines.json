@@ -2,7 +2,7 @@
  "profile": "report",
  "table": "lines",
  "status": "final",
- "about": "A line of consequences: texts split at every CR and LF and trimmed of White_Space (ruling 1); each line's address, the last that names an element of this world, written ow://<type>/<id>, or null (ruling 2); the shown words (ruling 3). `kind` is a note, never compared.",
+ "about": "A line of consequences: texts split at every CR and LF and trimmed of White_Space (part 1); each line's address, the last that names an element of this world, written ow://<type>/<id>, or null (part 2); the shown words (part 3). `kind` is a note, never compared.",
  "world": "068e012b-52a9-79bf-8000-26bb67891425",
  "cases": [
   {
@@ -12,7 +12,7 @@
    "words": "Renamed the Consul's Steinway"
   },
   {
-   "kind": "closing stop; the profile's example (rule 8, ruling 3)",
+   "kind": "closing stop; the profile's example (rule 8, part 3)",
    "line": "Renamed the Consul's Steinway: ow://object/068e2e56-d4b9-7c40-8000-173975bfd994.",
    "address": "ow://object/068e2e56-d4b9-7c40-8000-173975bfd994",
    "words": "Renamed the Consul's Steinway."
@@ -486,7 +486,7 @@
    "words": "Built: ow://object/068e2e56-d4b9-7c40-8000-173975bfd994"
   },
   {
-   "kind": "one space at the joint (ruling 3)",
+   "kind": "one space at the joint (part 3)",
    "line": "e ow://map/068e2e56-d4b9-7c40-8000-173975bfd994  3",
    "address": "ow://map/068e2e56-d4b9-7c40-8000-173975bfd994",
    "words": "e 3"
@@ -534,7 +534,19 @@
    "words": "Built (ow://object/068e2e56-d4b9-7c40-8000-173975bfd994 today"
   },
   {
-   "kind": "3b only White_Space before a pair; the trim's own case: a line read as given, untrimmed (in a text, ruling 1 trims it first)",
+   "kind": "3a a colon glued before a matched pair goes with the pair",
+   "line": "Built:(ow://object/068e2e56-d4b9-7c40-8000-173975bfd994)",
+   "address": "ow://object/068e2e56-d4b9-7c40-8000-173975bfd994",
+   "words": "Built"
+  },
+  {
+   "kind": "3a only the glued colon goes, a colon before it stays",
+   "line": "Built: :ow://object/068e2e56-d4b9-7c40-8000-173975bfd994",
+   "address": "ow://object/068e2e56-d4b9-7c40-8000-173975bfd994",
+   "words": "Built:"
+  },
+  {
+   "kind": "3b only White_Space before a pair; the trim's own case: a line read as given, untrimmed (in a text, part 1 trims it first)",
    "line": "  (ow://object/068e2e56-d4b9-7c40-8000-173975bfd994)",
    "address": "ow://object/068e2e56-d4b9-7c40-8000-173975bfd994",
    "words": "  (ow://object/068e2e56-d4b9-7c40-8000-173975bfd994)"
@@ -828,6 +840,22 @@
      "line": "b",
      "address": null,
      "words": "b"
+    }
+   ]
+  },
+  {
+   "kind": "U+000B and U+000C stay inside a line (part 1 breaks only at CR and LF)",
+   "text": "a: ow://object/068e2e56-d4b9-7c40-8000-173975bfd994\u000bb\fc\nd",
+   "lines": [
+    {
+     "line": "a: ow://object/068e2e56-d4b9-7c40-8000-173975bfd994\u000bb\fc",
+     "address": "ow://object/068e2e56-d4b9-7c40-8000-173975bfd994",
+     "words": "a b\fc"
+    },
+    {
+     "line": "d",
+     "address": null,
+     "words": "d"
     }
    ]
   }
