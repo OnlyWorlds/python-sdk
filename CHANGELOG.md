@@ -2,7 +2,10 @@
 
 The package version runs on its own semver; the schema it is generated from is `SCHEMA_DIST_TAG`.
 
-## Unreleased
+## 0.130.0 (2026-11-16)
+
+- **`layout_by_links_3d`: a 3D layout of a whole graph by its links (`by-links-3d`).** Given the graph as `world_graph` answers it and, optionally, the world's elements as served, it answers a point `[x, y, z]` for every node, in the order handed in (one flat `points` list), and how each was placed: a group's centre, with a centre, hanging off the body, on the shelf, or at its Pin. The body of the graph is cut into groups round its centres, the groups are packed apart in directions read from a table baked into the package, and 300 seeded force steps settle it; what hangs off the body is fanned out from it, and what is not joined to the main piece stands on a shelf under the picture. When a Map holds three or more of the graph's elements by a Pin, the Map that holds the most is a flat plate with each of its elements at its Pin, and a Map over a place on it a small plate above that place; a Pin's z is not read, and a layout map is never the plate. Maps and Pins are read through `map_space` and `layout_of`, nothing else. The same input gives the same points as the npm SDK's `layoutByLinks3d`: to the last bit for elements placed at a centre, with a centre or at a Pin, within a billionth of a rest (the unit `BY_LINKS_3D_REST`, 60) for the rest, which are placed with the runtime's cosine and sine. Two keyword options: `held`, points an earlier answer gave (element id to three finite numbers), so the picture keeps still as the world changes, and `held_unit`, the step those points were rounded to. A bad `held` or `held_unit` is refused before anything runs, each error with a `code` (`held-not-object`, `held-not-point`, `held-box`, `held-unit`). It is pure Python, so a world of several thousand elements takes minutes. The word `by-links-3d` is the tool's own until the method's page is published, and until then a release may move its points.
+- Tests: the method's shared fixture, the same bytes as the npm SDK's copy, replayed whole by its own compare rules; the baked directions table (`codegen/generate_directions.py`, its `--check` in CI) held to the table the fixture names by sha256.
 
 ## 0.129.1 (2026-11-16)
 

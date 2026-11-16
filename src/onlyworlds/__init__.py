@@ -91,6 +91,7 @@ from .layout_kind import (
     unplaced_around,
     unplaced_by_kind,
 )
+from .layout_links_3d import BY_LINKS_3D_REST, LayoutByLinks3d, layout_by_links_3d
 from .layout_trail import (
     TRAIL_TIERS,
     TrailHanger,
@@ -152,6 +153,7 @@ from .worldfile import (
 
 __all__ = [
     "API_BASE",
+    "BY_LINKS_3D_REST",
     "CHECKS_FIELD",
     "CREATE_FIELDS",
     "DATE_FIELD",
@@ -208,6 +210,7 @@ __all__ = [
     "LandingCluster",
     "LandingGap",
     "LandingMember",
+    "LayoutByLinks3d",
     "LensMail",
     "LensReading",
     "MapLayout",
@@ -286,6 +289,7 @@ __all__ = [
     "landing_of",
     "layout_around",
     "layout_by_kind",
+    "layout_by_links_3d",
     "layout_of",
     "lenses_in_use",
     "map_space",
