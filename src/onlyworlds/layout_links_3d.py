@@ -16,8 +16,16 @@ from typing import Any, Literal, TypedDict, cast
 from ._directions import DIRECTIONS
 from ._layout3d.method import HeldRangeError, HeldTypeError, layout3d
 from ._layout3d.space import space_rows
+from .layout_kind import _placed_ids
 
-__all__ = ["BY_LINKS_3D_REST", "HeldRangeError", "HeldTypeError", "LayoutByLinks3d", "layout_by_links_3d"]
+__all__ = [
+    "BY_LINKS_3D_REST",
+    "HeldRangeError",
+    "HeldTypeError",
+    "LayoutByLinks3d",
+    "layout_by_links_3d",
+    "unplaced_by_links_3d",
+]
 
 #: The rest length of the by-links-3d layout: a link's length at rest, and the unit of its answer's points.
 BY_LINKS_3D_REST = 60.0
@@ -116,3 +124,29 @@ def layout_by_links_3d(
         raise TypeError("layout_by_links_3d: the graph is {nodes, edges}, as world_graph answers it")
     rows = space_rows(list(elements) if elements is not None else None)
     return cast(LayoutByLinks3d, layout3d(nodes, edges, rows, DIRECTIONS, held=held, held_unit=held_unit))
+
+
+def unplaced_by_links_3d(graph: Mapping[str, Any], placed: Iterable[Any]) -> list[str]:
+    """What a saved ``by-links-3d`` layout map does not place.
+
+    Answers the ids of the graph's nodes that are not in ``placed``, by id in code point order. The method places
+    every node it is handed, of any type and with or without a link, so nothing else is left out. ``placed`` is the
+    ids of the elements the Map's Pins stand for, a list or a set: from ``map_space``, the ``element_id`` of each pin
+    whose ``map`` is this Map. A member that is not a non-empty string (a Pin that stands for no element) is passed
+    over, and an id that is no node of the graph is no part of the answer. The answer's length is the count a tool
+    shows; reading or drawing a layout map never changes it. The npm SDK's ``unplacedByLinks3d`` answers the same
+    list.
+
+    Raises ``TypeError`` on a graph that is not ``{nodes, edges}`` or a ``placed`` that is not a list or a set, and,
+    as ``layout_by_links_3d`` does, ``ValueError`` when two nodes share an id.
+    """
+    nodes = graph.get("nodes") if isinstance(graph, Mapping) else None
+    edges = graph.get("edges") if isinstance(graph, Mapping) else None
+    if not isinstance(nodes, list) or not isinstance(edges, list):
+        raise TypeError("unplaced_by_links_3d: the graph is {nodes, edges}, as world_graph answers it")
+    taken = _placed_ids("unplaced_by_links_3d", placed)
+    ids = sorted(x["id"] for x in nodes)
+    for i in range(1, len(ids)):
+        if ids[i] == ids[i - 1]:
+            raise ValueError(f"unplaced_by_links_3d: two nodes share the id {ids[i]}")
+    return [i for i in ids if i not in taken]

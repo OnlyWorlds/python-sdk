@@ -91,7 +91,7 @@ from .layout_kind import (
     unplaced_around,
     unplaced_by_kind,
 )
-from .layout_links_3d import BY_LINKS_3D_REST, LayoutByLinks3d, layout_by_links_3d
+from .layout_links_3d import BY_LINKS_3D_REST, LayoutByLinks3d, layout_by_links_3d, unplaced_by_links_3d
 from .layout_trail import (
     TRAIL_TIERS,
     TrailHanger,
@@ -324,6 +324,7 @@ __all__ = [
     "type_word",
     "unplaced_around",
     "unplaced_by_kind",
+    "unplaced_by_links_3d",
     "unread_for",
     "uuid7",
     "verify_level",
