@@ -51,6 +51,33 @@ def _envelope(body: bytes) -> dict[str, Any]:
     return data if isinstance(data, dict) else {}
 
 
+_HOST_BLOCKED_TITLE = re.compile(r"<title[^>]*>\s*Blocked\s*</title>", re.IGNORECASE)
+
+#: What a person reads when the host refuses a write (``ApiError.is_host_blocked``); the npm SDK's words.
+HOST_BLOCKED_MESSAGE = (
+    'The host in front of onlyworlds.com refused this request before the API saw it (a 403 page titled "Blocked"), '
+    "and nothing was written. It refuses text that holds a shell command such as python -m, python -c, perl -e, "
+    "or curl or wget with an address, right after a backtick, a semicolon or a pipe. Put such a command in a fenced "
+    "code block whose first line names a language, or write it without the backtick."
+)
+
+
+def _is_host_blocked_page(status: int, body: bytes) -> bool:
+    """A 403 whose body is not JSON and is an HTML page titled "Blocked": the host's refusal, not the API's."""
+    if status != 403 or not body:
+        return False
+    try:
+        text = body.decode("utf-8")
+    except UnicodeDecodeError:
+        return False
+    try:
+        data = json.loads(text)
+    except ValueError:
+        data = text
+    # a JSON answer is never the page, but a JSON string is read as its text, as the npm SDK reads it
+    return isinstance(data, str) and _HOST_BLOCKED_TITLE.search(data) is not None
+
+
 def error_code(body: bytes) -> str | None:
     """The machine ``code`` of an error body, whichever envelope shape carries it; None when there is none."""
     env = _envelope(body)
@@ -81,8 +108,21 @@ class ApiError(Exception):
         msg = env.get("message") or nested.get("message")
         self.api_message: str | None = msg if isinstance(msg, str) else None
         self.retry_after: float | None = parse_retry_after(response.header("Retry-After"))
+        if _is_host_blocked_page(response.status, response.body):
+            super().__init__(f"{method} {path} -> {response.status}: {HOST_BLOCKED_MESSAGE}")
+            return
         detail = response.body[:300].decode("utf-8", "replace")
         super().__init__(f"{method} {path} -> {response.status}: {detail}")
+
+    @property
+    def is_host_blocked(self) -> bool:
+        """The host in front of onlyworlds.com refused the request before the API saw it: a 403 whose body is an
+        HTML page titled "Blocked", not the API's JSON envelope. Nothing was written. The host refuses text that
+        holds a shell command such as ``python -m``, ``python -c``, ``perl -e``, or ``curl`` or ``wget`` with an
+        address right after a backtick, a semicolon or a pipe; such a command passes in a fenced code block whose
+        first line names a language, or without the backtick. ``code`` is None (it is no API code) and
+        ``response.body`` keeps the page."""
+        return _is_host_blocked_page(self.status, self.response.body)
 
     @property
     def is_auth_error(self) -> bool:

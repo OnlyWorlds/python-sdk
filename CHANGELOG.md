@@ -2,6 +2,10 @@
 
 The package version runs on its own semver; the schema it is generated from is `SCHEMA_DIST_TAG`.
 
+## 0.132.0 (2026-11-16)
+
+- **`ApiError.is_host_blocked`: a write the host refused before the API saw it.** The host in front of onlyworlds.com answers some writes with a 403 whose body is an HTML page titled "Blocked", not the API's JSON envelope: text that holds a shell command such as `python -m`, `python -c`, `perl -e`, or `curl` or `wget` with an address right after a backtick, a semicolon or a pipe. Such an error's message printed the first 300 bytes of the page until now. It now says the host refused the request and nothing was written, and how to write the command so it passes (a fenced code block whose first line names a language, or no backtick), in the npm SDK's words. `code` stays None, as it is no API code, and `response.body` keeps the page. Read on the page's title and on the body not being a JSON object or list, so the API's own 403s read as before.
+
 ## 0.131.0 (2026-11-16)
 
 - **`unplaced_by_links_3d`: what a saved `by-links-3d` layout map does not place.** Given the graph and the ids of the elements the Map's Pins stand for (a list, a tuple or a set), it answers the ids of the graph's nodes that the Map has no Pin for, by id in code point order. Every node counts, of any type and with or without a link, since the method places every node it is handed. `placed` is read as `unplaced_by_kind` reads it: a member that is not a non-empty string is passed over, and an id that is no node is no part of the answer; two nodes with one id raise `ValueError`, as `layout_by_links_3d` does. The npm SDK's `unplacedByLinks3d` answers the same list.
