@@ -2,15 +2,20 @@
   "_what": "The recorded pin for the vendored OnlyWorlds schema distribution (codegen/schema-dist/, copied byte-exact). Do not edit by hand; re-vendor from the pinned tag and review the diff. Kept equal to the npm SDK's pin (github.com/OnlyWorlds/sdk, codegen/schema-pin.json) on purpose: two clients, one schema.",
   "_why_manifest_sha256": "Verifying the tree against its own MANIFEST.json only proves internal consistency. If the tag moved, the manifest moved with it. The hash recorded here is the one first accepted, which is what makes a moved tag visible.",
   "repo": "https://github.com/OnlyWorlds/schema-dist",
-  "tag": "v0.34.1-dist.131",
-  "commit": "0dc4ab7afeae6eb1b037ae40721f2a8ad4242017",
-  "manifest_sha256": "e03d650359c877a9fe9127b186e44a7926e03046bc56c33bfabf8ed737fd767e",
+  "tag": "v0.34.1-dist.132",
+  "commit": "c2a46528bf6d5b6c5197b231dd8b2026d54dacf1",
+  "manifest_sha256": "263b287bcce91eda6c76c7b82746ddad378a44d79caa1ed8a14cf506d9898be2",
   "canonical_version": "00.34.01",
-  "dist_serial": 131,
-  "published": "2026-11-15",
-  "pinned_at": "2026-11-15",
-  "pinned_by": "The maintainer: tree from `git archive` of the tag in a schema-dist checkout (211 files: the 210 the MANIFEST lists, and MANIFEST.json itself); files re-hashed against MANIFEST.json by verify_dist.py; MANIFEST self-hash matched against the raw file GitHub serves at the tag, whose ref resolves to the commit above.",
+  "dist_serial": 132,
+  "published": "2026-11-16",
+  "pinned_at": "2026-11-16",
+  "pinned_by": "The maintainer: tree from `git archive` of the tag in a schema-dist checkout (213 files: the 212 the MANIFEST lists, and MANIFEST.json itself); files re-hashed against MANIFEST.json by verify_dist.py; MANIFEST self-hash matched against the raw file GitHub serves at the tag, whose ref resolves to the commit above.",
   "previous_pins": [
+    {
+      "tag": "v0.34.1-dist.131",
+      "manifest_sha256": "e03d650359c877a9fe9127b186e44a7926e03046bc56c33bfabf8ed737fd767e",
+      "note": "superseded by v0.34.1-dist.132 (the default layouts profile: by-kind, around and unplaced, with its fixture; map-space rule 8 names it)"
+    },
     {
       "tag": "v0.34.1-dist.130",
       "manifest_sha256": "06d2b87d8725cb1e85f731df6c3eafe3edad2e8f050bab89ba52f0fcf5880363",
