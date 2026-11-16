@@ -4,6 +4,11 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+## 0.129.0 (2026-11-16)
+
+- **Schema repinned to schema-dist v0.34.1-dist.132** (from dist.131; canonical 00.34.01 unchanged; no schema file moved). The distribution gains the layout profile: the page for the two default methods, `by-kind` and `around`, and for what a saved layout does not place, with its fixture. The map-space profile's rule 8 names it, and says that reading or drawing a layout map changes nothing of its layout.
+- **A method's word is its version.** The layout profile rules that a method which changes takes a new word, so a saved layout says what made it by `method` alone. The answers of `layout_by_kind` and `layout_around` keep `version: 1` as it is; the answer types now say to read `method`.
+- Tests: the layout tests and the anchors generator read the profile's own fixture from the pinned distribution (`profiles/layout.fixture.json`); the package's copy, the same bytes, is removed.
 - **`unplaced_by_kind` and `unplaced_around`: what a saved default layout does not place.** Given the graph and the ids of the elements a layout Map's Pins stand for (a list or a set), each answers the ids its method would place that the Map has no Pin for, by id in code point order: for `by-kind` every node of the graph, for `around` the focus and every node within its steps. An id among the placed ones that the method would not place is no part of the answer. A tool shows the answer's length as its count; neither function places anything. The npm SDK's `unplacedByKind` and `unplacedAround` answer the same lists.
 - Tests: the layout fixture gains eight cases for `layout_by_kind` and `layout_around` (an index of ten or more ordered by number, an edge with no field, one with no index, an edge to an id that is no node, the same link twice, names where code point order and UTF-16 order differ, a null name beside an absent one, two steps past sixty neighbours) and a suite for the two new readings. No answer of a released function changes.
 

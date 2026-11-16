@@ -11,7 +11,7 @@ table of numbers baked into the package, never computed with the runtime's own c
 last place between runtimes, and the method magnifies one unit in the last place into a visibly different picture);
 everything else is addition, subtraction, multiplication, division, square root and floor, which every runtime rounds
 alike. Both first put the graph in one order (nodes by id, edges by source, field, index and target), so the order
-a caller hands it in changes no point. ``tests/fixtures/layout/by-kind.json`` (the npm SDK's bytes, sha256 held by both
+a caller hands it in changes no point. The pinned distribution's ``profiles/layout.fixture.json`` (sha256 held by both
 tests) is replayed whole.
 """
 
@@ -43,7 +43,7 @@ class KindLayout(TypedDict):
     """What ``layout_by_kind`` answers: one point per node, in the graph's node order, and the method that made them."""
 
     method: Literal["by-kind"]
-    version: int
+    version: int  # always 1: a method's word is its version, so read ``method``, never this number
     points: list[KindPoint]
 
 
@@ -61,7 +61,7 @@ class AroundLayout(TypedDict):
     """What ``layout_around`` answers: the focus and every element within the steps, in the graph's node order."""
 
     method: Literal["around"]
-    version: int
+    version: int  # always 1: a method's word is its version, so read ``method``, never this number
     points: list[AroundPoint]
 
 

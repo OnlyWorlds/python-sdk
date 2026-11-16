@@ -1,5 +1,6 @@
-"""by-kind and around, two layout methods: the npm SDK's shared fixture (``tests/fixtures/layout/by-kind.json``, the
-same bytes, sha256 held here and there). Every ``cases`` entry compares exactly, float for float: the method is
+"""by-kind and around, two layout methods: the layout profile's own fixture, read from the pinned distribution
+(``codegen/schema-dist/profiles/layout.fixture.json``, sha256 held here and in the npm SDK's test). Every ``cases``
+entry compares exactly, float for float: the method is
 chaotic, so a twin that is off by one unit in the last place draws another picture. Every ``around`` entry compares
 within 1e-12: each of its points is one cosine and one sine, which runtimes round differently in the last place, and
 nothing iterates on them. Then the baked anchor table and the group order against the fixture, and the refusals."""
@@ -23,7 +24,7 @@ from onlyworlds._anchors import ANCHORS, GROUP_ORDER
 from onlyworlds._schema import ELEMENT_GROUPS
 
 REPO = Path(__file__).resolve().parent.parent
-FIXTURE = REPO / "tests" / "fixtures" / "layout" / "by-kind.json"
+FIXTURE = REPO / "codegen" / "schema-dist" / "profiles" / "layout.fixture.json"
 FIXTURE_SHA = "6860a7654f1a92e3"
 BYTES = FIXTURE.read_bytes()
 FX: dict[str, Any] = json.loads(BYTES.decode("utf-8"))
