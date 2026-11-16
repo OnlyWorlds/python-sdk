@@ -4,6 +4,10 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+## 0.129.1 (2026-11-16)
+
+- The docstring of `unplaced_by_kind` said a saved layout map changes only when a person asks. The map-space profile's rule 8 says something else: reading or drawing a layout map never changes it, and laying it out again is a write like any other. The docstring now says the first. No behaviour changes.
+
 ## 0.129.0 (2026-11-16)
 
 - **Schema repinned to schema-dist v0.34.1-dist.132** (from dist.131; canonical 00.34.01 unchanged; no schema file moved). The distribution gains the layout profile: the page for the two default methods, `by-kind` and `around`, and for what a saved layout does not place, with its fixture. The map-space profile's rule 8 names it, and says that reading or drawing a layout map changes nothing of its layout.
