@@ -2,7 +2,7 @@
 
 The package version runs on its own semver; the schema it is generated from is `SCHEMA_DIST_TAG`.
 
-## Unreleased
+## 0.131.0 (2026-11-16)
 
 - **`unplaced_by_links_3d`: what a saved `by-links-3d` layout map does not place.** Given the graph and the ids of the elements the Map's Pins stand for (a list, a tuple or a set), it answers the ids of the graph's nodes that the Map has no Pin for, by id in code point order. Every node counts, of any type and with or without a link, since the method places every node it is handed. `placed` is read as `unplaced_by_kind` reads it: a member that is not a non-empty string is passed over, and an id that is no node is no part of the answer; two nodes with one id raise `ValueError`, as `layout_by_links_3d` does. The npm SDK's `unplacedByLinks3d` answers the same list.
 - Tests: the method's shared fixture gains eight cases (72) and an `unplaced` suite of eight, the same bytes as the npm SDK's copy. No answer of the method changes.
