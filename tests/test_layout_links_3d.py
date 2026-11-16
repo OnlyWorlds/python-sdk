@@ -30,7 +30,7 @@ from onlyworlds.layout_links_3d import HeldRangeError, HeldTypeError
 REPO = Path(__file__).resolve().parent.parent
 FIXTURE = REPO / "tests" / "fixtures" / "layout" / "by-links-3d.fixture.json"
 TABLE = REPO / "codegen" / "layout" / "directions.json"
-FIXTURE_SHA = "ae11c21d3c8faa285e59e288d40da8aafac19ac3cfe303bd8d90da3244c5babe"
+FIXTURE_SHA = "16284adffac8903777e754cc01d547de95a61447b6d945ca2f641ddf93c4d4eb"
 BYTES = FIXTURE.read_bytes()
 
 

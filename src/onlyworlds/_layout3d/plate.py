@@ -19,7 +19,8 @@ rows are the Map and Pin rows space_rows() makes; nodes the graph's node ids. Th
 
 A row's key that is absent is read as UNDEF, which is not None. Map and element ids are held as keys by jkey(), so
 True and 1 are two keys and 1 and 1.0 one (as the npm SDK's Map holds them). A width or height that is not a number,
-or a negative area, raises PlateError. A division by a zero root is infinite (js_div()).
+raises PlateError. A width or height that is not over 0 is no size: such a first map gives no plate, such a small
+map is not taken, so a negative area is never reached. A division by a zero root is infinite (js_div()).
 """
 
 from __future__ import annotations
@@ -83,6 +84,15 @@ def jkey(v: Any, what: str | None = None) -> tuple[Any, ...]:
 
 def key(v: Any, what: str) -> tuple[Any, ...]:
     return jkey(v, what)
+
+
+def sized(v: Any) -> bool:
+    """a size: truthy and, when a number, over 0 (a Map's width is any whole number; NaN is no size)"""
+    if not truthy(v):
+        return False
+    if is_num(v):
+        return bool(v > 0)
+    return True
 
 
 def truthy(v: Any) -> bool:
@@ -214,7 +224,7 @@ def plate(rows: Sequence[Any], nodes: Sequence[Any], scale: Any = UNDEF) -> dict
     mp = maps[mk]
     W, H = get(mp, "width"), get(mp, "height")
     count = len(at[mk][1])
-    if count < 3 or not truthy(W) or not truthy(H):
+    if count < 3 or not sized(W) or not sized(H):
         return None
 
     # 4. the scale and the first map's places
@@ -253,7 +263,7 @@ def plate(rows: Sequence[Any], nodes: Sequence[Any], scale: Any = UNDEF) -> dict
             for ek, (el, xy) in mine.items():
                 if ek not in out:
                     fresh.append((ek, el, xy))
-            if key(loc, "a map's location") in out and truthy(cw) and truthy(ch) and len(mine) >= 3 and len(fresh):
+            if key(loc, "a map's location") in out and sized(cw) and sized(ch) and len(mine) >= 3 and len(fresh):
                 sc = js_div(TILE * REST, root(cw, ch, len(mine), f"the map {c}"))
                 lx, ly, lz = out[jkey(loc)][1]
                 rise = REST * (4 if len(mine) >= 20 else 2)

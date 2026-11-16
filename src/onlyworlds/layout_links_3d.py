@@ -45,7 +45,9 @@ class LayoutByLinks3d(TypedDict):
     part: list[Literal["map", "one-link", "no-link"] | None]
     #: The centres' ids, in rank order.
     centres: list[str]
-    #: True where the point answered is the element's held point; False everywhere when nothing is held.
+    #: True where the point answered is the element's held point; False everywhere when nothing is held. A pinned
+    #: element stands at its Pin and is never held, so False does not mean new: what is new is every id that was not
+    #: handed in.
     held: list[bool]
 
 
@@ -65,9 +67,10 @@ def layout_by_links_3d(
     body by one element is fanned out from it, and what is not joined to the main piece stands on a shelf under the
     picture. When the world has a Map that holds three or more elements of the graph by a Pin, the Map that holds the
     most (a tie to the greater id) is a flat plate, each of its pinned elements at its Pin, the groups whose centre is
-    pinned standing over it; a Map over a place on that plate is a small plate a little above it. A Pin's z is not
-    read: the plate is flat. A layout map (a Map whose ``x_layout`` names a method, the map-space profile's mark) is
-    never the plate: a saved layout never stands in for the world's own space.
+    pinned standing over it; a Map over a place on that plate is a small plate a little above it. A Map whose width
+    or height is not over 0 is no plate, and when it is the Map that holds the most, the world is laid out by its
+    links alone. A Pin's z is not read: the plate is flat. A layout map (a Map whose ``x_layout`` names a method,
+    the map-space profile's mark) is never the plate: a saved layout never stands in for the world's own space.
 
     ``graph`` is ``world_graph``'s answer, or any mapping of the same shape: ``nodes`` (each with ``id`` and
     ``type``) and ``edges`` (each with ``source`` and ``target``, and ``field`` and ``index`` where it has them), the

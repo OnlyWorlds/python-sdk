@@ -13,6 +13,7 @@ Each step, in this order:
   3. the move: each element's push, plus its links' pull times its scale (1 over the larger of 1 and a quarter of its
      links' summed weight), plus (anchor - point) * pull, moves it by at most the cap, cap0 * R * (1 - step / steps)
      + R / 20; a fixed element stands at its anchor.
+The push between two fixed elements is never read and is not worked out, which moves no number.
 Every sum runs in the order written and every expression keeps its grouping. A distance under 1e-6 is read as 1e-6 and
 a move's length under 1e-9 as 1e-9; a NaN goes through as it is (no max() or min()).
 """
@@ -78,7 +79,13 @@ def relax(feed: dict[str, Any], cutoff: float = 3, cap0: float = 3) -> dict[str,
     R3 = R / 3
     OFFS = _offsets()
 
-    for step in range(STEPS):
+    # Two fixed elements push each other and neither moves, so that push is never read: it is not worked out (a
+    # cell pair with no free element is passed over whole, and so is a pair of two fixed elements). The pushes on a
+    # free element are still summed in the same order, so no number of the answer changes. With no free element at
+    # all one step does what every step would: each element at its anchor.
+    free = n - sum(fixed)
+    run = min(STEPS, 1) if free == 0 else STEPS
+    for step in range(run):
         x0 = y0 = z0 = math.inf
         x1 = y1 = z1 = -math.inf
         for i in range(n):
@@ -115,6 +122,10 @@ def relax(feed: dict[str, Any], cutoff: float = 3, cap0: float = 3) -> dict[str,
             c = cellOf[i]
             order[fill[c]] = i
             fill[c] += 1
+        freeIn = [0] * cells
+        for i in range(n):
+            if not fixed[i]:
+                freeIn[cellOf[i]] += 1
 
         for i in range(n):
             dx[i] = 0.0
@@ -140,6 +151,8 @@ def relax(feed: dict[str, Any], cutoff: float = 3, cap0: float = 3) -> dict[str,
                         t1 = startOf[q + 1]
                         if t0 == t1:
                             continue
+                        if freeIn[c] == 0 and freeIn[q] == 0:
+                            continue
                         for u in range(s0, s1):
                             i = order[u]
                             xi = px[i]
@@ -147,6 +160,8 @@ def relax(feed: dict[str, Any], cutoff: float = 3, cap0: float = 3) -> dict[str,
                             zi = pz[i]
                             for w in range(u + 1 if same else t0, t1):
                                 j = order[w]
+                                if fixed[i] and fixed[j]:
+                                    continue
                                 ux = xi - px[j]
                                 uy = yi - py[j]
                                 uz = zi - pz[j]
