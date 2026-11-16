@@ -24,7 +24,7 @@ from onlyworlds._schema import ELEMENT_GROUPS
 
 REPO = Path(__file__).resolve().parent.parent
 FIXTURE = REPO / "tests" / "fixtures" / "layout" / "by-kind.json"
-FIXTURE_SHA = "b9efd52a4e7901ec"
+FIXTURE_SHA = "bb54cb64cf388be2"
 BYTES = FIXTURE.read_bytes()
 FX: dict[str, Any] = json.loads(BYTES.decode("utf-8"))
 AROUND_TOLERANCE = 1e-12
