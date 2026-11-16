@@ -8,6 +8,7 @@ run and compared:
            those are placed with the runtime's cosine and sine
   held     every element answered as held: the very double the case's input.held gives for it
   refused  the call raises before anything runs, with the case's code
+Its ``unplaced`` cases are ``unplaced_by_links_3d`` of a graph and a Map's placed ids: the same ids in the same order.
 Then the baked directions table against the table the fixture names, the handed order, the inputs left unchanged,
 and the exports."""
 
@@ -23,14 +24,14 @@ from typing import Any
 import pytest
 
 import onlyworlds
-from onlyworlds import BY_LINKS_3D_REST, LayoutByLinks3d, layout_by_links_3d
+from onlyworlds import BY_LINKS_3D_REST, LayoutByLinks3d, layout_by_links_3d, unplaced_by_links_3d
 from onlyworlds._directions import DIRECTIONS
 from onlyworlds.layout_links_3d import HeldRangeError, HeldTypeError
 
 REPO = Path(__file__).resolve().parent.parent
 FIXTURE = REPO / "tests" / "fixtures" / "layout" / "by-links-3d.fixture.json"
 TABLE = REPO / "codegen" / "layout" / "directions.json"
-FIXTURE_SHA = "16284adffac8903777e754cc01d547de95a61447b6d945ca2f641ddf93c4d4eb"
+FIXTURE_SHA = "b29606c379633a5fa13f35f71d449b67cb417013c2bfc223024650c7945edb37"
 BYTES = FIXTURE.read_bytes()
 
 
@@ -79,7 +80,7 @@ def test_the_fixture_is_the_one_both_packages_hold() -> None:
     assert hashlib.sha256(BYTES).hexdigest() == FIXTURE_SHA
     assert FX["method"] == "by-links-3d"
     assert FX["rest"] == BY_LINKS_3D_REST
-    assert list(FX["compare"]) == ["exact", "within", "held", "refused"]
+    assert list(FX["compare"]) == ["exact", "within", "held", "refused", "unplaced"]
 
 
 def test_the_baked_directions_are_the_table_the_fixture_names() -> None:
@@ -184,8 +185,39 @@ def test_the_refusals_and_the_graph() -> None:
         layout_by_links_3d({"nodes": [{"id": "a", "type": "character"}] * 2, "edges": []})
 
 
+@pytest.mark.parametrize("case", FX["unplaced"], ids=[c["name"] for c in FX["unplaced"]])
+def test_unplaced_case_exactly(case: dict[str, Any]) -> None:
+    assert unplaced_by_links_3d(copy.deepcopy(case["graph"]), copy.deepcopy(case["placed"])) == case["want"]
+
+
+def test_unplaced_reads_a_list_and_a_set_alike_and_passes_over_what_is_no_id() -> None:
+    case = next(c for c in FX["unplaced"] if c["name"] == "by-links-3d-a-placed-id-that-is-no-node")
+    assert case["want"] == ["s2"]
+    graph, placed = case["graph"], case["placed"]
+    for given in (list(placed), tuple(placed), set(placed)):
+        assert unplaced_by_links_3d(copy.deepcopy(graph), given) == case["want"]
+    # a Pin that stands for no element gives no id: None, "" and a number place nothing
+    assert unplaced_by_links_3d(copy.deepcopy(graph), [None, "", 7, *placed, *placed]) == case["want"]
+    # nothing placed: every node, by id in code point order, whatever order was handed
+    ids = [x["id"] for x in graph["nodes"]]
+    assert unplaced_by_links_3d(copy.deepcopy(graph), []) == sorted(ids)
+    assert ids != sorted(ids)
+    one = {"nodes": [{"id": "a", "type": "character"}], "edges": []}
+    not_placed: tuple[Any, ...] = ("a", None, {"a": True})
+    for bad in not_placed:
+        with pytest.raises(TypeError, match=r"^unplaced_by_links_3d: placed is a list or a set of element ids$"):
+            unplaced_by_links_3d(copy.deepcopy(one), bad)
+    not_graphs: tuple[Any, ...] = ({"nodes": []}, {"edges": []}, {"nodes": {}, "edges": []}, None, [])
+    for not_a_graph in not_graphs:
+        with pytest.raises(TypeError, match=r"^unplaced_by_links_3d: the graph is \{nodes, edges\}"):
+            unplaced_by_links_3d(not_a_graph, [])
+    with pytest.raises(ValueError, match=r"^unplaced_by_links_3d: two nodes share the id a$"):
+        unplaced_by_links_3d({"nodes": [{"id": "a", "type": "character"}] * 2, "edges": []}, [])
+    assert unplaced_by_links_3d({"nodes": [], "edges": []}, []) == []
+
+
 def test_the_names_are_exported() -> None:
-    for name in ("layout_by_links_3d", "LayoutByLinks3d", "BY_LINKS_3D_REST"):
+    for name in ("layout_by_links_3d", "unplaced_by_links_3d", "LayoutByLinks3d", "BY_LINKS_3D_REST"):
         assert name in onlyworlds.__all__
         assert getattr(onlyworlds, name) is not None
     assert BY_LINKS_3D_REST == 60.0

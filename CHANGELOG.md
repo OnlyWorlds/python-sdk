@@ -2,6 +2,11 @@
 
 The package version runs on its own semver; the schema it is generated from is `SCHEMA_DIST_TAG`.
 
+## Unreleased
+
+- **`unplaced_by_links_3d`: what a saved `by-links-3d` layout map does not place.** Given the graph and the ids of the elements the Map's Pins stand for (a list, a tuple or a set), it answers the ids of the graph's nodes that the Map has no Pin for, by id in code point order. Every node counts, of any type and with or without a link, since the method places every node it is handed. `placed` is read as `unplaced_by_kind` reads it: a member that is not a non-empty string is passed over, and an id that is no node is no part of the answer; two nodes with one id raise `ValueError`, as `layout_by_links_3d` does. The npm SDK's `unplacedByLinks3d` answers the same list.
+- Tests: the method's shared fixture gains eight cases (72) and an `unplaced` suite of eight, the same bytes as the npm SDK's copy. No answer of the method changes.
+
 ## 0.130.1 (2026-11-16)
 
 - **`layout_by_links_3d` no longer raises on a Map whose width or height is under 0.** A Map's `width` and `height` are any whole number in the standard. One under 0 raised a `PlateError` from inside the method when that Map held the most pinned elements, and with both under 0 the Map became a plate with every place mirrored. A width or height that is not over 0 is now no size: such a Map is no plate, no other Map is tried in its stead, and the world is laid out by its links alone; a Map over a place with such a size is no small plate. The method's shared fixture gains four cases for it (64), the same bytes as the npm SDK's copy.
