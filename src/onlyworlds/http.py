@@ -539,10 +539,13 @@ class Client:
         ``agent``, ``player``); ``role`` is ``owner``, ``co_builder``, ``contributor`` or ``guest``;
         ``character`` is the member's Character id, or None; ``lenses`` the lens ids its holder chose
         (``set_my_lenses``), in order, empty for none. ``front_door`` is
-        ``{sponsor, sponsor_character, my_character, my_seats, charter, charter_skill}``: who answers
-        for a seat, its Character, the seats you answer for, and the world's Charter (every member's
-        to read; an agent reads it first) with up to five Objects it names; anything hidden from the
-        key is None or left out. ``my_seats`` lists the live AI and player seats you answer for,
+        ``{sponsor, sponsor_character, my_character, my_seats, charter, charter_skill,
+        charter_element, charter_skill_elements}``: who answers for a seat, its Character, the seats
+        you answer for, and the world's Charter (every member's to read; an agent reads it first)
+        with up to five Objects it names; anything hidden from the key is None or left out.
+        ``charter_element`` and ``charter_skill_elements`` are the same two, typed as ``{type, id}``
+        (``law`` for the Charter, ``object`` for each skill), None and an empty list where
+        ``charter`` and ``charter_skill`` are. ``my_seats`` lists the live AI and player seats you answer for,
         agent seats first, each ``{id, kind, name, character}``: ``id`` the seat's membership id as
         ``GET /members`` lists it, ``kind`` ``agent`` or ``player``, ``name`` None when the seat has
         none, ``character`` the Character it plays (None when it plays none you can read). It is

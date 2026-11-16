@@ -2,6 +2,10 @@
 
 The package version runs on its own semver; the schema it is generated from is `SCHEMA_DIST_TAG`.
 
+## 0.132.1 (2026-11-16)
+
+- **`me()`'s description names the front door's two typed keys**, which `GET /me` and an AI seat's join now serve: `charter_element` (`{type: "law", id}`, or None where `charter` is) and `charter_skill_elements` (`{type: "object", id}` each, in `charter_skill`'s order). `me()` already returned them in the dict as served; only its help text moves.
+
 ## 0.132.0 (2026-11-16)
 
 - **`ApiError.is_host_blocked`: a write the host refused before the API saw it.** The host in front of onlyworlds.com answers some writes with a 403 whose body is an HTML page titled "Blocked", not the API's JSON envelope: text that holds a shell command such as `python -m`, `python -c`, `perl -e`, or `curl` or `wget` with an address right after a backtick, a semicolon or a pipe. Such an error's message printed the first 300 bytes of the page until now. It now says the host refused the request and nothing was written, and how to write the command so it passes (a fenced code block whose first line names a language, or no backtick), in the npm SDK's words. `code` stays None, as it is no API code, and `response.body` keeps the page. Read on the page's title and on the body not being a JSON object or list, so the API's own 403s read as before.
