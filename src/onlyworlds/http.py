@@ -552,12 +552,13 @@ class Client:
         empty for an AI or a player seat's own key and for anyone who answers for none; a seat made
         from a link for an email address is never listed. ``reading_aids`` is the world's reading aids as
         this key reads them, ``{charter, guide, domains, strand}``: the first three the packet ``charter_of``
-        answers (the charter profile), ``charter`` ``{id, name, rules, skill}`` or None, ``skill`` exactly
-        ``front_door``'s ``charter_skill``; ``guide`` ``{id, name}`` or None; ``domains`` a list of ``{id,
-        name, sentence, hubs}``; then ``strand``, what ``strand_of`` answers for this key (the strand
-        profile, since schema-dist serial 100): ``narrative``, ``event``, ``location``, ``character`` and
-        ``now`` each ``{id, name}`` or None, and ``same``; every slot None when the world has no strand or
-        its story is out of this key's view.
+        answers (the charter profile), ``charter`` ``{id, type, name, rules, skill}`` (``type`` ``law``) or
+        None, ``skill`` exactly ``front_door``'s ``charter_skill``; ``guide`` ``{id, type, name}``
+        (``construct``) or None; ``domains`` a list of ``{id, type, name, sentence, hubs}`` (``construct``);
+        then ``strand``, what ``strand_of`` answers for this key (the strand profile, since schema-dist
+        serial 100): ``narrative``, ``event``, ``location``, ``character`` and ``now`` each ``{id, type,
+        name}`` (the slot's own type, ``now`` a location) or None, and ``same``; every slot None when the
+        world has no strand or its story is out of this key's view.
         """
         data = self.call("GET", "me/")
         if not isinstance(data, dict):

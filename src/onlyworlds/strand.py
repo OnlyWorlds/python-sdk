@@ -13,7 +13,7 @@ never a second copy. The fixture (``codegen/schema-dist/profiles/strand.fixture.
 from __future__ import annotations
 
 from collections.abc import Mapping
-from typing import Any, TypedDict, TypeGuard
+from typing import Any, Literal, TypedDict, TypeGuard
 
 from .lens import _check_reader, _Reading
 
@@ -25,6 +25,8 @@ class StrandSlot(TypedDict):
     """A filled slot."""
 
     id: str
+    #: The element's type: the slot's own (narrative, event, location, character; ``now`` a location).
+    type: Literal["narrative", "event", "location", "character"]
     name: str
 
 
@@ -115,9 +117,9 @@ def strand_of(world: Mapping[str, Any], reader: Mapping[str, Any]) -> Strand:
     def seen(eid: Any, kind: str) -> TypeGuard[str]:
         return isinstance(eid, str) and eid in r.view and r.type_of.get(eid) == kind
 
-    def slot(eid: str) -> StrandSlot:
+    def slot(eid: str, kind: Literal["narrative", "event", "location", "character"]) -> StrandSlot:
         name = r.body(eid).get("name")
-        return {"id": eid, "name": name if isinstance(name, str) else ""}
+        return {"id": eid, "type": kind, "name": name if isinstance(name, str) else ""}
 
     def listed(holder: str, field: str, eid: str) -> bool:
         v = r.body(holder).get(field)
@@ -126,17 +128,17 @@ def strand_of(world: Mapping[str, Any], reader: Mapping[str, Any]) -> Strand:
     story, event, place = mark
     if not seen(story, "narrative"):
         return out
-    out["narrative"] = slot(story)
+    out["narrative"] = slot(story, "narrative")
     if seen(event, "event") and listed(story, "events", event):
-        out["event"] = slot(event)
+        out["event"] = slot(event, "event")
         if seen(place, "location") and listed(event, "locations", place):
-            out["location"] = slot(place)
+            out["location"] = slot(place, "location")
     hero = r.body(story).get("protagonist")
     if seen(hero, "character"):
-        out["character"] = slot(hero)
+        out["character"] = slot(hero, "character")
         now = r.body(hero).get("location")
         if seen(now, "location"):
-            out["now"] = slot(now)
+            out["now"] = slot(now, "location")
     if out["now"] is not None and out["location"] is not None:
         out["same"] = out["now"]["id"] == out["location"]["id"]
     return out

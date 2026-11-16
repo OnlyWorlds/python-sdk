@@ -4,6 +4,12 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+## 0.133.0 (2026-11-17)
+
+- **The charter and strand packets say each element's type** (schema-dist serial 133). `charter_of` answers `"type": "law"` on the Charter and `"type": "construct"` on the Guide and on each Domain; `strand_of` answers `type` on every filled slot (`narrative`, `event`, `location`, `character`, and `location` for `now`): the kind the slot holds, singular and lowercase, never the spelling stored. A packet is handed to a reader that may hold nothing else of the world, and an id is fetched by its type. `SCHEMA_DIST_TAG` moves to `v0.34.1-dist.133`; the charter fixture holds 47 cases and the strand fixture 29.
+
+- **A Domain's hub is an element of the kind its field links to, in the reader's view.** An id of another kind in a hub field, or of an element the reader does not see, names no hub. Wherever the charter and strand readers compare an element's type to a kind, the type is trimmed and compared without regard to case, as the room profile defines it.
+
 - **The `version` key on `layout_by_kind`'s and `layout_around`'s answers is on its way out.** It was always 1, and the layout profile's mark carries no version key: read `method`. The key stays until the npm SDK drops its twin at 5.0. The README names the address fixture without a case count.
 
 - **The OKF exporter names what it leaves at the folder's root.** A folder's `records/` (world data that is not elements, folder format §4.5) stays out of the bundle, which is a translation and not an archive in the folder's format, and the export now says so in a note. So does `media/` or any other entry beside `world.json`, `elements/` and `spatial/`; a dot-prefixed one is a tool's private store (§4.3) and is passed over. Before, all of them were left out with no note, against the module's "nothing is dropped in silence". `RECORDS_DIR` joins the folder module's layout constants.

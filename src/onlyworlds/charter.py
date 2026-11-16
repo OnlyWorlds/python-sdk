@@ -20,7 +20,7 @@ from __future__ import annotations
 import copy
 import re
 from collections.abc import Mapping
-from typing import Any, TypedDict
+from typing import Any, Literal, TypedDict
 
 from ._schema import LINK_TARGETS
 from .checks import CHECKS_FIELD
@@ -53,6 +53,8 @@ class CharterRead(TypedDict):
     """The world's Charter in a packet."""
 
     id: str
+    #: The Charter is a Law.
+    type: Literal["law"]
     name: str
     #: ``x_checks_rules`` as stored (the checks profile), ``[]`` when absent or null.
     rules: Any
@@ -65,6 +67,8 @@ class GuideRead(TypedDict):
     """The world's Guide in a packet."""
 
     id: str
+    #: The Guide is a Construct.
+    type: Literal["construct"]
     name: str
 
 
@@ -79,6 +83,8 @@ class DomainRead(TypedDict):
     """One Domain in a packet."""
 
     id: str
+    #: A Domain is a Construct.
+    type: Literal["construct"]
     name: str
     #: The description up to its first line break (a carriage return included), trimmed; ``""`` when none.
     sentence: str
@@ -137,7 +143,15 @@ def _hubs(r: _Reading, eid: str, body: Mapping[str, Any]) -> list[CharterHub]:
     for field, target in _HUB_FIELDS:
         value = body.get(field)
         for i in value if isinstance(value, list) else [value]:
-            if isinstance(i, str) and i != "" and i not in r.proposed and (target, i) not in seen:
+            # a hub is an element of its field's kind in the reader's view: an id of another kind names none
+            if (
+                isinstance(i, str)
+                and i != ""
+                and i not in r.proposed
+                and i in r.view
+                and r.type_of.get(i) == target
+                and (target, i) not in seen
+            ):
                 seen.add((target, i))
                 out.append({"type": target, "id": i})
     return out
@@ -184,6 +198,7 @@ def charter_of(world: Mapping[str, Any], reader: Mapping[str, Any]) -> CharterPa
         rules = stored.get(CHECKS_FIELD)
         packet["charter"] = {
             "id": law,
+            "type": "law",
             "name": _name(stored.get("name")),
             "rules": [] if rules is None else copy.deepcopy(rules),
             "skill": _skill(r, stored.get("description")),
@@ -192,7 +207,7 @@ def charter_of(world: Mapping[str, Any], reader: Mapping[str, Any]) -> CharterPa
     order: list[str] = []
     domains = marked("construct/domain")
     if guide is not None:
-        packet["guide"] = {"id": guide, "name": _name(r.by_id[guide].get("name"))}
+        packet["guide"] = {"id": guide, "type": "construct", "name": _name(r.by_id[guide].get("name"))}
         listed = r.body(guide).get("constructs")
         for i in listed if isinstance(listed, list) else []:
             if i in domains and i not in order:
@@ -203,6 +218,7 @@ def charter_of(world: Mapping[str, Any], reader: Mapping[str, Any]) -> CharterPa
         packet["domains"].append(
             {
                 "id": d,
+                "type": "construct",
                 "name": _name(body.get("name")),
                 "sentence": _first_line(body.get("description")),
                 "hubs": [] if body.get("known_of") is True else _hubs(r, d, body),

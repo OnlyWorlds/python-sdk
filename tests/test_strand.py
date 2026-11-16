@@ -35,11 +35,11 @@ def world_of(c: Mapping[str, Any]) -> dict[str, Any]:
     return copy.deepcopy(DOC["worlds"][world] if isinstance(world, str) else world)
 
 
-def test_the_fixture_holds_serial_123s_cases() -> None:
+def test_the_fixture_holds_serial_133s_cases() -> None:
     assert DOC["profile_page"] == "profiles/strand.md"
     assert DOC["mark"]["field"] == STRAND_FIELD == "x_strand"
     assert DOC["mark"]["members"] == ["narrative", "event", "location"]
-    assert len(CASES) == 27, f"the fixture holds {len(CASES)} cases, serial 123 has 27"
+    assert len(CASES) == 29, f"the fixture holds {len(CASES)} cases, serial 133 has 29"
     assert {c["kind"] for c in CASES} == {"strand"}
 
 

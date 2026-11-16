@@ -2,16 +2,17 @@
   "profile": "strand",
   "profile_page": "profiles/strand.md",
   "notes": [
-    "strand: strandOf(world, reader) answers {narrative, event, location, character, now, same}; the world carries its elements as the owner is served them, the ids its hidden mark keeps (hidden), and its readers, exactly as the lens and charter fixtures do. Each filled slot is {id, name}; an empty slot is null.",
-    "readers: a reader's rung is owner (the whole world), contributor (the world less the hidden), guest (exactly the whole and known_of ids it lists; a known_of id is a stub: type and name, no links; hidden beats known_of) or public (the world less the hidden and the room elements, and nothing at all unless the world carries open: true), as the lens and charter fixtures define them. The strand reader resolves every slot through that one view and keeps no second copy of the rule.",
+    "strand: strandOf(world, reader) answers {narrative, event, location, character, now, same}; the world carries its elements as the owner is served them, the ids its hidden mark keeps (hidden), and its readers, exactly as the lens and charter fixtures do. Each filled slot is {id, type, name}, type the kind the slot holds (now holds a location); an empty slot is null.",
+    "readers: a reader's rung is owner (the whole world), contributor (the world less the hidden), guest (exactly the whole and known_of ids it lists; a known_of id is a stub: its id, type and name, its description and its dates, no link and no extension field; hidden beats known_of) or public (the world less the hidden and the room elements, and nothing at all unless the world carries open: true), as the lens and charter fixtures define them. The strand reader resolves every slot through that one view and keeps no second copy of the rule.",
     "the key: the fixture gives x_strand as stored; the server's rule 1 (no key served when the named Narrative is out of the reader's view) is keel's test, not the reader's. A reader handed a key it cannot resolve answers an empty strand.",
     "mark: the value is an object whose narrative member is a string id; event and location are each a string id, null or absent (null and absent read as unset); any other shape (a bare string, narrative missing or not a string, event or location an empty string, a number or an object) reads as no mark: every slot null, same null. A reader needs no id-format test: an id that names no element in the view is an empty slot; the doctor names the shape.",
-    "stub: a narrative the reader knows only as a stub fills the narrative slot ({id, name}) and nothing else, since a stub serves no events and no protagonist.",
+    "stub: a narrative the reader knows only as a stub fills the narrative slot ({id, type, name}) and nothing else, since a stub serves no events and no protagonist.",
     "order: the reading never depends on a multi-link's order; the event must be IN the narrative's events and the location IN the event's locations, position ignored.",
     "no fallback: character comes from protagonist only, never from the event's characters; location from the mark only, never from the character's location; now from the character's location only.",
     "same: true when now and location are both set and the same id; false when both set and different; null when either is null.",
-    "kind: a slot holds only its own kind; an id of another kind in the mark or in a parent's list leaves the slot empty. same compares ids, never names.",
-    "shapes: a multi-link that is not a list reads as empty (a bare string in events or locations puts nothing in the list); a filled slot's name is the element's name as served, an empty string when it has none, never null."
+    "kind: a slot holds only its own kind, an element's type compared to it trimmed and folded as the room profile defines it; an id of another kind in the mark or in a parent's list leaves the slot empty. same compares ids, never names.",
+    "shapes: a multi-link that is not a list reads as empty (a bare string in events or locations puts nothing in the list); a filled slot's name is the element's name as served, an empty string when it has none, never null.",
+    "compare: objects are compared as values; the order of keys carries no meaning, so a reader that writes {type, id} or {id, type, name} in another order answers the same."
   ],
   "mark": {
     "field": "x_strand",
@@ -1648,6 +1649,174 @@
           "character": null
         }
       }
+    },
+    "harbour-story-type-stored-otherwise": {
+      "id": "019a7f00-0000-7000-8000-00000000f225",
+      "name": "Grey Harbour, the story's type stored padded and capitalised",
+      "x_strand": {
+        "narrative": "019a7f00-0000-7000-8000-000000000301",
+        "event": "019a7f00-0000-7000-8000-000000000311",
+        "location": "019a7f00-0000-7000-8000-000000000321"
+      },
+      "elements": [
+        {
+          "id": "019a7f00-0000-7000-8000-000000000301",
+          "type": " Narrative ",
+          "name": "The Night the Lighthouse Went Dark",
+          "protagonist": "019a7f00-0000-7000-8000-000000000331",
+          "events": [
+            "019a7f00-0000-7000-8000-000000000312",
+            "019a7f00-0000-7000-8000-000000000311"
+          ],
+          "locations": []
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000311",
+          "type": "event",
+          "name": "The lamp fails",
+          "locations": [
+            "019a7f00-0000-7000-8000-000000000321"
+          ],
+          "characters": []
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000312",
+          "type": "event",
+          "name": "The fleet sails",
+          "locations": [
+            "019a7f00-0000-7000-8000-000000000322"
+          ],
+          "characters": []
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000321",
+          "type": "location",
+          "name": "The Lighthouse"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000322",
+          "type": "location",
+          "name": "The Docks"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000331",
+          "type": "character",
+          "name": "Ilse the Keeper",
+          "location": "019a7f00-0000-7000-8000-000000000322"
+        }
+      ],
+      "hidden": [],
+      "readers": {
+        "owner": {
+          "rung": "owner",
+          "character": null
+        },
+        "contributor": {
+          "rung": "contributor",
+          "character": null
+        },
+        "guest": {
+          "rung": "guest",
+          "character": null,
+          "whole": [
+            "019a7f00-0000-7000-8000-000000000301",
+            "019a7f00-0000-7000-8000-000000000311",
+            "019a7f00-0000-7000-8000-000000000312",
+            "019a7f00-0000-7000-8000-000000000321",
+            "019a7f00-0000-7000-8000-000000000322",
+            "019a7f00-0000-7000-8000-000000000331"
+          ],
+          "known_of": []
+        },
+        "public": {
+          "rung": "public",
+          "character": null
+        }
+      }
+    },
+    "harbour-story-type-ideographic-space": {
+      "id": "019a7f00-0000-7000-8000-00000000f226",
+      "name": "Grey Harbour, the story's type padded with an ideographic space",
+      "x_strand": {
+        "narrative": "019a7f00-0000-7000-8000-000000000301",
+        "event": "019a7f00-0000-7000-8000-000000000311",
+        "location": "019a7f00-0000-7000-8000-000000000321"
+      },
+      "elements": [
+        {
+          "id": "019a7f00-0000-7000-8000-000000000301",
+          "type": "　Narrative",
+          "name": "The Night the Lighthouse Went Dark",
+          "protagonist": "019a7f00-0000-7000-8000-000000000331",
+          "events": [
+            "019a7f00-0000-7000-8000-000000000312",
+            "019a7f00-0000-7000-8000-000000000311"
+          ],
+          "locations": []
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000311",
+          "type": "event",
+          "name": "The lamp fails",
+          "locations": [
+            "019a7f00-0000-7000-8000-000000000321"
+          ],
+          "characters": []
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000312",
+          "type": "event",
+          "name": "The fleet sails",
+          "locations": [
+            "019a7f00-0000-7000-8000-000000000322"
+          ],
+          "characters": []
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000321",
+          "type": "location",
+          "name": "The Lighthouse"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000322",
+          "type": "location",
+          "name": "The Docks"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000331",
+          "type": "character",
+          "name": "Ilse the Keeper",
+          "location": "019a7f00-0000-7000-8000-000000000322"
+        }
+      ],
+      "hidden": [],
+      "readers": {
+        "owner": {
+          "rung": "owner",
+          "character": null
+        },
+        "contributor": {
+          "rung": "contributor",
+          "character": null
+        },
+        "guest": {
+          "rung": "guest",
+          "character": null,
+          "whole": [
+            "019a7f00-0000-7000-8000-000000000301",
+            "019a7f00-0000-7000-8000-000000000311",
+            "019a7f00-0000-7000-8000-000000000312",
+            "019a7f00-0000-7000-8000-000000000321",
+            "019a7f00-0000-7000-8000-000000000322",
+            "019a7f00-0000-7000-8000-000000000331"
+          ],
+          "known_of": []
+        },
+        "public": {
+          "rung": "public",
+          "character": null
+        }
+      }
     }
   },
   "cases": [
@@ -1660,22 +1829,27 @@
       "want": {
         "narrative": {
           "id": "019a7f00-0000-7000-8000-000000000301",
+          "type": "narrative",
           "name": "The Night the Lighthouse Went Dark"
         },
         "event": {
           "id": "019a7f00-0000-7000-8000-000000000311",
+          "type": "event",
           "name": "The lamp fails"
         },
         "location": {
           "id": "019a7f00-0000-7000-8000-000000000321",
+          "type": "location",
           "name": "The Lighthouse"
         },
         "character": {
           "id": "019a7f00-0000-7000-8000-000000000331",
+          "type": "character",
           "name": "Ilse the Keeper"
         },
         "now": {
           "id": "019a7f00-0000-7000-8000-000000000322",
+          "type": "location",
           "name": "The Docks"
         },
         "same": false
@@ -1690,22 +1864,27 @@
       "want": {
         "narrative": {
           "id": "019a7f00-0000-7000-8000-000000000301",
+          "type": "narrative",
           "name": "The Night the Lighthouse Went Dark"
         },
         "event": {
           "id": "019a7f00-0000-7000-8000-000000000311",
+          "type": "event",
           "name": "The lamp fails"
         },
         "location": {
           "id": "019a7f00-0000-7000-8000-000000000321",
+          "type": "location",
           "name": "The Lighthouse"
         },
         "character": {
           "id": "019a7f00-0000-7000-8000-000000000331",
+          "type": "character",
           "name": "Ilse the Keeper"
         },
         "now": {
           "id": "019a7f00-0000-7000-8000-000000000321",
+          "type": "location",
           "name": "The Lighthouse"
         },
         "same": true
@@ -1720,14 +1899,17 @@
       "want": {
         "narrative": {
           "id": "019a7f00-0000-7000-8000-000000000301",
+          "type": "narrative",
           "name": "The Night the Lighthouse Went Dark"
         },
         "event": {
           "id": "019a7f00-0000-7000-8000-000000000311",
+          "type": "event",
           "name": "The lamp fails"
         },
         "location": {
           "id": "019a7f00-0000-7000-8000-000000000321",
+          "type": "location",
           "name": "The Lighthouse"
         },
         "character": null,
@@ -1744,16 +1926,19 @@
       "want": {
         "narrative": {
           "id": "019a7f00-0000-7000-8000-000000000301",
+          "type": "narrative",
           "name": "The Night the Lighthouse Went Dark"
         },
         "event": null,
         "location": null,
         "character": {
           "id": "019a7f00-0000-7000-8000-000000000331",
+          "type": "character",
           "name": "Ilse the Keeper"
         },
         "now": {
           "id": "019a7f00-0000-7000-8000-000000000322",
+          "type": "location",
           "name": "The Docks"
         },
         "same": null
@@ -1768,19 +1953,23 @@
       "want": {
         "narrative": {
           "id": "019a7f00-0000-7000-8000-000000000301",
+          "type": "narrative",
           "name": "The Night the Lighthouse Went Dark"
         },
         "event": {
           "id": "019a7f00-0000-7000-8000-000000000311",
+          "type": "event",
           "name": "The lamp fails"
         },
         "location": null,
         "character": {
           "id": "019a7f00-0000-7000-8000-000000000331",
+          "type": "character",
           "name": "Ilse the Keeper"
         },
         "now": {
           "id": "019a7f00-0000-7000-8000-000000000321",
+          "type": "location",
           "name": "The Lighthouse"
         },
         "same": null
@@ -1795,18 +1984,22 @@
       "want": {
         "narrative": {
           "id": "019a7f00-0000-7000-8000-000000000301",
+          "type": "narrative",
           "name": "The Night the Lighthouse Went Dark"
         },
         "event": {
           "id": "019a7f00-0000-7000-8000-000000000311",
+          "type": "event",
           "name": "The lamp fails"
         },
         "location": {
           "id": "019a7f00-0000-7000-8000-000000000321",
+          "type": "location",
           "name": "The Lighthouse"
         },
         "character": {
           "id": "019a7f00-0000-7000-8000-000000000331",
+          "type": "character",
           "name": "Ilse the Keeper"
         },
         "now": null,
@@ -1852,22 +2045,27 @@
       "want": {
         "narrative": {
           "id": "019a7f00-0000-7000-8000-000000000301",
+          "type": "narrative",
           "name": "The Night the Lighthouse Went Dark"
         },
         "event": {
           "id": "019a7f00-0000-7000-8000-000000000311",
+          "type": "event",
           "name": "The lamp fails"
         },
         "location": {
           "id": "019a7f00-0000-7000-8000-000000000321",
+          "type": "location",
           "name": "The Lighthouse"
         },
         "character": {
           "id": "019a7f00-0000-7000-8000-000000000331",
+          "type": "character",
           "name": "Ilse the Keeper"
         },
         "now": {
           "id": "019a7f00-0000-7000-8000-000000000321",
+          "type": "location",
           "name": "The Lighthouse"
         },
         "same": true
@@ -1882,6 +2080,7 @@
       "want": {
         "narrative": {
           "id": "019a7f00-0000-7000-8000-000000000301",
+          "type": "narrative",
           "name": "The Night the Lighthouse Went Dark"
         },
         "event": null,
@@ -1900,15 +2099,18 @@
       "want": {
         "narrative": {
           "id": "019a7f00-0000-7000-8000-000000000301",
+          "type": "narrative",
           "name": "The Night the Lighthouse Went Dark"
         },
         "event": {
           "id": "019a7f00-0000-7000-8000-000000000311",
+          "type": "event",
           "name": "The lamp fails"
         },
         "location": null,
         "character": {
           "id": "019a7f00-0000-7000-8000-000000000331",
+          "type": "character",
           "name": "Ilse the Keeper"
         },
         "now": null,
@@ -1969,19 +2171,23 @@
       "want": {
         "narrative": {
           "id": "019a7f00-0000-7000-8000-000000000301",
+          "type": "narrative",
           "name": "The Night the Lighthouse Went Dark"
         },
         "event": {
           "id": "019a7f00-0000-7000-8000-000000000311",
+          "type": "event",
           "name": "The lamp fails"
         },
         "location": null,
         "character": {
           "id": "019a7f00-0000-7000-8000-000000000331",
+          "type": "character",
           "name": "Ilse the Keeper"
         },
         "now": {
           "id": "019a7f00-0000-7000-8000-000000000321",
+          "type": "location",
           "name": "The Lighthouse"
         },
         "same": null
@@ -1996,16 +2202,19 @@
       "want": {
         "narrative": {
           "id": "019a7f00-0000-7000-8000-000000000301",
+          "type": "narrative",
           "name": "The Night the Lighthouse Went Dark"
         },
         "event": null,
         "location": null,
         "character": {
           "id": "019a7f00-0000-7000-8000-000000000331",
+          "type": "character",
           "name": "Ilse the Keeper"
         },
         "now": {
           "id": "019a7f00-0000-7000-8000-000000000321",
+          "type": "location",
           "name": "The Lighthouse"
         },
         "same": null
@@ -2020,22 +2229,27 @@
       "want": {
         "narrative": {
           "id": "019a7f00-0000-7000-8000-000000000301",
+          "type": "narrative",
           "name": "The Night the Lighthouse Went Dark"
         },
         "event": {
           "id": "019a7f00-0000-7000-8000-000000000311",
+          "type": "event",
           "name": "The lamp fails"
         },
         "location": {
           "id": "019a7f00-0000-7000-8000-000000000321",
+          "type": "location",
           "name": "The Lighthouse"
         },
         "character": {
           "id": "019a7f00-0000-7000-8000-000000000331",
+          "type": "character",
           "name": "Ilse the Keeper"
         },
         "now": {
           "id": "019a7f00-0000-7000-8000-000000000323",
+          "type": "location",
           "name": "The Lighthouse"
         },
         "same": false
@@ -2050,16 +2264,19 @@
       "want": {
         "narrative": {
           "id": "019a7f00-0000-7000-8000-000000000301",
+          "type": "narrative",
           "name": "The Night the Lighthouse Went Dark"
         },
         "event": null,
         "location": null,
         "character": {
           "id": "019a7f00-0000-7000-8000-000000000331",
+          "type": "character",
           "name": "Ilse the Keeper"
         },
         "now": {
           "id": "019a7f00-0000-7000-8000-000000000321",
+          "type": "location",
           "name": "The Lighthouse"
         },
         "same": null
@@ -2074,16 +2291,19 @@
       "want": {
         "narrative": {
           "id": "019a7f00-0000-7000-8000-000000000301",
+          "type": "narrative",
           "name": "The Night the Lighthouse Went Dark"
         },
         "event": null,
         "location": null,
         "character": {
           "id": "019a7f00-0000-7000-8000-000000000331",
+          "type": "character",
           "name": "Ilse the Keeper"
         },
         "now": {
           "id": "019a7f00-0000-7000-8000-000000000321",
+          "type": "location",
           "name": "The Lighthouse"
         },
         "same": null
@@ -2098,16 +2318,19 @@
       "want": {
         "narrative": {
           "id": "019a7f00-0000-7000-8000-000000000301",
+          "type": "narrative",
           "name": "The Night the Lighthouse Went Dark"
         },
         "event": null,
         "location": null,
         "character": {
           "id": "019a7f00-0000-7000-8000-000000000331",
+          "type": "character",
           "name": "Ilse the Keeper"
         },
         "now": {
           "id": "019a7f00-0000-7000-8000-000000000321",
+          "type": "location",
           "name": "The Lighthouse"
         },
         "same": null
@@ -2137,16 +2360,19 @@
       "want": {
         "narrative": {
           "id": "019a7f00-0000-7000-8000-000000000301",
+          "type": "narrative",
           "name": "The Night the Lighthouse Went Dark"
         },
         "event": null,
         "location": null,
         "character": {
           "id": "019a7f00-0000-7000-8000-000000000331",
+          "type": "character",
           "name": "Ilse the Keeper"
         },
         "now": {
           "id": "019a7f00-0000-7000-8000-000000000321",
+          "type": "location",
           "name": "The Lighthouse"
         },
         "same": null
@@ -2154,29 +2380,34 @@
     },
     {
       "name": "a-slot-without-a-name-reads-an-empty-string",
-      "claim": "the hero's place has no name: the slot is {id, name: ''}, never null and never a missing key",
+      "claim": "the hero's place has no name: the slot is {id, type, name: ''}, never null and never a missing key",
       "kind": "strand",
       "world": "harbour-a-place-with-no-name",
       "reader": "owner",
       "want": {
         "narrative": {
           "id": "019a7f00-0000-7000-8000-000000000301",
+          "type": "narrative",
           "name": "The Night the Lighthouse Went Dark"
         },
         "event": {
           "id": "019a7f00-0000-7000-8000-000000000311",
+          "type": "event",
           "name": "The lamp fails"
         },
         "location": {
           "id": "019a7f00-0000-7000-8000-000000000321",
+          "type": "location",
           "name": "The Lighthouse"
         },
         "character": {
           "id": "019a7f00-0000-7000-8000-000000000331",
+          "type": "character",
           "name": "Ilse the Keeper"
         },
         "now": {
           "id": "019a7f00-0000-7000-8000-000000000323",
+          "type": "location",
           "name": ""
         },
         "same": false
@@ -2206,22 +2437,27 @@
       "want": {
         "narrative": {
           "id": "019a7f00-0000-7000-8000-000000000301",
+          "type": "narrative",
           "name": "The Night the Lighthouse Went Dark"
         },
         "event": {
           "id": "019a7f00-0000-7000-8000-000000000311",
+          "type": "event",
           "name": "The lamp fails"
         },
         "location": {
           "id": "019a7f00-0000-7000-8000-000000000321",
+          "type": "location",
           "name": "The Lighthouse"
         },
         "character": {
           "id": "019a7f00-0000-7000-8000-000000000331",
+          "type": "character",
           "name": "Ilse the Keeper"
         },
         "now": {
           "id": "019a7f00-0000-7000-8000-000000000321",
+          "type": "location",
           "name": "The Lighthouse"
         },
         "same": true
@@ -2255,6 +2491,76 @@
         "character": null,
         "now": null,
         "same": null
+      }
+    },
+    {
+      "name": "a-story-whose-type-is-stored-otherwise-fills-its-slot-as-narrative",
+      "claim": "the story's type is stored as ' Narrative ': matched to the slot's kind trimmed and folded it is the story, so all five slots fill as for the harbour, and the slot's type is narrative, never the spelling stored",
+      "kind": "strand",
+      "world": "harbour-story-type-stored-otherwise",
+      "reader": "owner",
+      "want": {
+        "narrative": {
+          "id": "019a7f00-0000-7000-8000-000000000301",
+          "type": "narrative",
+          "name": "The Night the Lighthouse Went Dark"
+        },
+        "event": {
+          "id": "019a7f00-0000-7000-8000-000000000311",
+          "type": "event",
+          "name": "The lamp fails"
+        },
+        "location": {
+          "id": "019a7f00-0000-7000-8000-000000000321",
+          "type": "location",
+          "name": "The Lighthouse"
+        },
+        "character": {
+          "id": "019a7f00-0000-7000-8000-000000000331",
+          "type": "character",
+          "name": "Ilse the Keeper"
+        },
+        "now": {
+          "id": "019a7f00-0000-7000-8000-000000000322",
+          "type": "location",
+          "name": "The Docks"
+        },
+        "same": false
+      }
+    },
+    {
+      "name": "a-story-typed-with-an-ideographic-space-before-narrative-is-the-story",
+      "claim": "the story's type is stored as an ideographic space, U+3000, before Narrative: the room profile's trim (the White_Space set) takes it and its fold matches the word, so the strand fills as for the harbour, the slot typed narrative; the answer is the room profile's, so an ASCII-only trim is wrong here",
+      "kind": "strand",
+      "world": "harbour-story-type-ideographic-space",
+      "reader": "owner",
+      "want": {
+        "narrative": {
+          "id": "019a7f00-0000-7000-8000-000000000301",
+          "type": "narrative",
+          "name": "The Night the Lighthouse Went Dark"
+        },
+        "event": {
+          "id": "019a7f00-0000-7000-8000-000000000311",
+          "type": "event",
+          "name": "The lamp fails"
+        },
+        "location": {
+          "id": "019a7f00-0000-7000-8000-000000000321",
+          "type": "location",
+          "name": "The Lighthouse"
+        },
+        "character": {
+          "id": "019a7f00-0000-7000-8000-000000000331",
+          "type": "character",
+          "name": "Ilse the Keeper"
+        },
+        "now": {
+          "id": "019a7f00-0000-7000-8000-000000000322",
+          "type": "location",
+          "name": "The Docks"
+        },
+        "same": false
       }
     }
   ]
