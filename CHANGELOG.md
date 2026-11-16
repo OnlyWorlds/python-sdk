@@ -4,6 +4,8 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+- **The `version` key on `layout_by_kind`'s and `layout_around`'s answers is on its way out.** It was always 1, and the layout profile's mark carries no version key: read `method`. The key stays until the npm SDK drops its twin at 5.0. The README names the address fixture without a case count.
+
 - **The OKF exporter names what it leaves at the folder's root.** A folder's `records/` (world data that is not elements, folder format §4.5) stays out of the bundle, which is a translation and not an archive in the folder's format, and the export now says so in a note. So does `media/` or any other entry beside `world.json`, `elements/` and `spatial/`; a dot-prefixed one is a tool's private store (§4.3) and is passed over. Before, all of them were left out with no note, against the module's "nothing is dropped in silence". `RECORDS_DIR` joins the folder module's layout constants.
 
 ## 0.132.1 (2026-11-16)

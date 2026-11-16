@@ -43,7 +43,9 @@ class KindLayout(TypedDict):
     """What ``layout_by_kind`` answers: one point per node, in the graph's node order, and the method that made them."""
 
     method: Literal["by-kind"]
-    version: int  # always 1: a method's word is its version, so read ``method``, never this number
+    # Always 1: a method's word is its version, so read ``method``, never this number. The layout profile's
+    # mark carries no version key; this one leaves when the npm SDK's does, at its 5.0.
+    version: int
     points: list[KindPoint]
 
 
@@ -61,7 +63,9 @@ class AroundLayout(TypedDict):
     """What ``layout_around`` answers: the focus and every element within the steps, in the graph's node order."""
 
     method: Literal["around"]
-    version: int  # always 1: a method's word is its version, so read ``method``, never this number
+    # Always 1: a method's word is its version, so read ``method``, never this number. The layout profile's
+    # mark carries no version key; this one leaves when the npm SDK's does, at its 5.0.
+    version: int
     points: list[AroundPoint]
 
 
