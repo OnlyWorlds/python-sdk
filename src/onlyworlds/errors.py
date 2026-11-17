@@ -58,7 +58,7 @@ HOST_BLOCKED_MESSAGE = (
     'The host in front of onlyworlds.com refused this request before the API saw it (a 403 page titled "Blocked"), '
     "and nothing was written. It refuses text that holds a shell command such as python -m, python -c, perl -e, "
     "or curl or wget with an address, right after a backtick, a semicolon or a pipe. Put such a command in a fenced "
-    "code block whose first line names a language, or write it without the backtick."
+    "code block whose first line names a language, or write it with none of the three directly before it."
 )
 
 
@@ -120,8 +120,8 @@ class ApiError(Exception):
         HTML page titled "Blocked", not the API's JSON envelope. Nothing was written. The host refuses text that
         holds a shell command such as ``python -m``, ``python -c``, ``perl -e``, or ``curl`` or ``wget`` with an
         address right after a backtick, a semicolon or a pipe; such a command passes in a fenced code block whose
-        first line names a language, or without the backtick. ``code`` is None (it is no API code) and
-        ``response.body`` keeps the page."""
+        first line names a language, or with none of the three directly before it. ``code`` is None (it is no
+        API code) and ``response.body`` keeps the page."""
         return _is_host_blocked_page(self.status, self.response.body)
 
     @property

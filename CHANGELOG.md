@@ -4,6 +4,8 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+- **The message for a write the host refused says the whole way out.** The same command passes in a fenced code block whose first line names a language, or with no backtick, semicolon or pipe directly before it; the message named only the backtick. The npm SDK's words, as before.
+
 ## 0.133.0 (2026-11-17)
 
 - **The charter and strand packets say each element's type** (schema-dist serial 133). `charter_of` answers `"type": "law"` on the Charter and `"type": "construct"` on the Guide and on each Domain; `strand_of` answers `type` on every filled slot (`narrative`, `event`, `location`, `character`, and `location` for `now`): the kind the slot holds, singular and lowercase, never the spelling stored. A packet is handed to a reader that may hold nothing else of the world, and an id is fetched by its type. `SCHEMA_DIST_TAG` moves to `v0.34.1-dist.133`; the charter fixture holds 47 cases and the strand fixture 29.
