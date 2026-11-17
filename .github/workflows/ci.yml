@@ -31,7 +31,7 @@ jobs:
       - uses: astral-sh/setup-uv@v7
         with:
           python-version: ${{ matrix.python }}
-      - run: uv sync
+      - run: uv sync --locked
       - run: uv run python --version
       - run: uv run pytest -q
       - run: uv run ruff check .
@@ -52,7 +52,7 @@ jobs:
     steps:
       - uses: actions/checkout@v7
       - uses: astral-sh/setup-uv@v7
-      - run: uv sync
+      - run: uv sync --locked
       - name: OKF's reference code at the pinned commit
         run: |
           REPO=$(uv run python -c "from onlyworlds import okf; print(okf.OKF_REPO)")
@@ -80,5 +80,5 @@ jobs:
     steps:
       - uses: actions/checkout@v7
       - uses: astral-sh/setup-uv@v7
-      - run: uv sync
+      - run: uv sync --locked
       - run: uv run pytest -q tests/test_wire.py tests/test_live.py tests/test_live_practice.py

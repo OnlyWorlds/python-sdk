@@ -1,5 +1,7 @@
-# Keeps the actions the workflows use current: one grouped pull request a week, read and merged by a maintainer.
-# Only the workflow actions: the package's own dependencies are not updated from here.
+# Keeps the actions the workflows use and the packages the tests and checks install current: one grouped pull
+# request a week for each, read and merged by a maintainer. The uv group moves uv.lock, which CI and the release
+# install from exactly (uv sync --locked). It holds minor and patch updates only: a new major arrives as a pull
+# request of its own.
 version: 2
 updates:
   - package-ecosystem: github-actions
@@ -9,3 +11,11 @@ updates:
     groups:
       actions:
         patterns: ['*']
+  - package-ecosystem: uv
+    directory: /
+    schedule:
+      interval: weekly
+    groups:
+      uv:
+        patterns: ['*']
+        update-types: [minor, patch]

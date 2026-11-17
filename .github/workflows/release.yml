@@ -59,7 +59,7 @@ jobs:
             echo "the $v entry names someone inside the team or points at an internal room or tracker (above): say the rule and its date instead"; exit 1
           fi
 
-      - run: uv sync
+      - run: uv sync --locked
       - run: uv run pytest -q
       - run: uv run ruff check .
       - run: uv run mypy --strict src tests
