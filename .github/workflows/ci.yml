@@ -23,11 +23,16 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest]
+        # 3.12 is the oldest Python pyproject.toml admits; each newer minor is tested too.
+        python: ['3.12', '3.13', '3.14']
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v5
+        with:
+          python-version: ${{ matrix.python }}
       - run: uv sync
+      - run: uv run python --version
       - run: uv run pytest -q
       - run: uv run ruff check .
       - run: uv run ruff format --check .
