@@ -5,7 +5,7 @@
     "strand: strandOf(world, reader) answers {narrative, event, location, character, now, same}; the world carries its elements as the owner is served them, the ids its hidden mark keeps (hidden), and its readers, exactly as the lens and charter fixtures do. Each filled slot is {id, type, name}, type the kind the slot holds (now holds a location); an empty slot is null.",
     "readers: a reader's rung is owner (the whole world), contributor (the world less the hidden), guest (exactly the whole and known_of ids it lists; a known_of id is a stub: its id, type and name, its description and its dates, no link and no extension field; hidden beats known_of) or public (the world less the hidden and the room elements, and nothing at all unless the world carries open: true), as the lens and charter fixtures define them. The strand reader resolves every slot through that one view and keeps no second copy of the rule.",
     "the key: the fixture gives x_strand as stored; the server's rule 1 (no key served when the named Narrative is out of the reader's view) is keel's test, not the reader's. A reader handed a key it cannot resolve answers an empty strand.",
-    "mark: the value is an object whose narrative member is a string id; event and location are each a string id, null or absent (null and absent read as unset); any other shape (a bare string, narrative missing or not a string, event or location an empty string, a number or an object) reads as no mark: every slot null, same null. A reader needs no id-format test: an id that names no element in the view is an empty slot; the doctor names the shape.",
+    "mark: the value is an object whose narrative member is a string id; event and location are each a string id, null or absent (null and absent read as unset); any other shape (a bare string, any of the three members the empty string, narrative missing or not a string, event or location a number or an object) reads as no mark: every slot null, same null. No reader trims a member: one of white space alone (a space, a tab, an ideographic space) is a string that names no element, so its slot is null, and so is an id with white space on it; a non-empty narrative that names nothing (spaces alone among them) is a mark that leaves every slot null. A reader needs no id-format test: an id that names no element in the view is an empty slot; the doctor names the shape.",
     "stub: a narrative the reader knows only as a stub fills the narrative slot ({id, type, name}) and nothing else, since a stub serves no events and no protagonist.",
     "order: the reading never depends on a multi-link's order; the event must be IN the narrative's events and the location IN the event's locations, position ignored.",
     "no fallback: character comes from protagonist only, never from the event's characters; location from the mark only, never from the character's location; now from the character's location only.",
@@ -1817,6 +1817,854 @@
           "character": null
         }
       }
+    },
+    "harbour-story-empty-string": {
+      "id": "019a7f00-0000-7000-8000-00000000f227",
+      "name": "Grey Harbour, the story member an empty string",
+      "x_strand": {
+        "narrative": "",
+        "event": "019a7f00-0000-7000-8000-000000000311",
+        "location": "019a7f00-0000-7000-8000-000000000321"
+      },
+      "elements": [
+        {
+          "id": "019a7f00-0000-7000-8000-000000000301",
+          "type": "narrative",
+          "name": "The Night the Lighthouse Went Dark",
+          "protagonist": "019a7f00-0000-7000-8000-000000000331",
+          "events": [
+            "019a7f00-0000-7000-8000-000000000311"
+          ]
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000311",
+          "type": "event",
+          "name": "The lamp fails",
+          "locations": [
+            "019a7f00-0000-7000-8000-000000000321"
+          ]
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000321",
+          "type": "location",
+          "name": "The Lighthouse"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000331",
+          "type": "character",
+          "name": "Ilse the Keeper",
+          "location": "019a7f00-0000-7000-8000-000000000321"
+        }
+      ],
+      "hidden": [],
+      "readers": {
+        "owner": {
+          "rung": "owner",
+          "character": null
+        },
+        "contributor": {
+          "rung": "contributor",
+          "character": null
+        },
+        "guest": {
+          "rung": "guest",
+          "character": null,
+          "whole": [
+            "019a7f00-0000-7000-8000-000000000301",
+            "019a7f00-0000-7000-8000-000000000311",
+            "019a7f00-0000-7000-8000-000000000321",
+            "019a7f00-0000-7000-8000-000000000331"
+          ],
+          "known_of": []
+        },
+        "public": {
+          "rung": "public",
+          "character": null
+        }
+      }
+    },
+    "harbour-story-spaces": {
+      "id": "019a7f00-0000-7000-8000-00000000f228",
+      "name": "Grey Harbour, the story member three spaces",
+      "x_strand": {
+        "narrative": "   ",
+        "event": "019a7f00-0000-7000-8000-000000000311",
+        "location": "019a7f00-0000-7000-8000-000000000321"
+      },
+      "elements": [
+        {
+          "id": "019a7f00-0000-7000-8000-000000000301",
+          "type": "narrative",
+          "name": "The Night the Lighthouse Went Dark",
+          "protagonist": "019a7f00-0000-7000-8000-000000000331",
+          "events": [
+            "019a7f00-0000-7000-8000-000000000311"
+          ]
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000311",
+          "type": "event",
+          "name": "The lamp fails",
+          "locations": [
+            "019a7f00-0000-7000-8000-000000000321"
+          ]
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000321",
+          "type": "location",
+          "name": "The Lighthouse"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000331",
+          "type": "character",
+          "name": "Ilse the Keeper",
+          "location": "019a7f00-0000-7000-8000-000000000321"
+        }
+      ],
+      "hidden": [],
+      "readers": {
+        "owner": {
+          "rung": "owner",
+          "character": null
+        },
+        "contributor": {
+          "rung": "contributor",
+          "character": null
+        },
+        "guest": {
+          "rung": "guest",
+          "character": null,
+          "whole": [
+            "019a7f00-0000-7000-8000-000000000301",
+            "019a7f00-0000-7000-8000-000000000311",
+            "019a7f00-0000-7000-8000-000000000321",
+            "019a7f00-0000-7000-8000-000000000331"
+          ],
+          "known_of": []
+        },
+        "public": {
+          "rung": "public",
+          "character": null
+        }
+      }
+    },
+    "harbour-location-an-object": {
+      "id": "019a7f00-0000-7000-8000-00000000f229",
+      "name": "Grey Harbour, the location member an object",
+      "x_strand": {
+        "narrative": "019a7f00-0000-7000-8000-000000000301",
+        "event": "019a7f00-0000-7000-8000-000000000311",
+        "location": {
+          "id": "019a7f00-0000-7000-8000-000000000321"
+        }
+      },
+      "elements": [
+        {
+          "id": "019a7f00-0000-7000-8000-000000000301",
+          "type": "narrative",
+          "name": "The Night the Lighthouse Went Dark",
+          "protagonist": "019a7f00-0000-7000-8000-000000000331",
+          "events": [
+            "019a7f00-0000-7000-8000-000000000311"
+          ]
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000311",
+          "type": "event",
+          "name": "The lamp fails",
+          "locations": [
+            "019a7f00-0000-7000-8000-000000000321"
+          ]
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000321",
+          "type": "location",
+          "name": "The Lighthouse"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000331",
+          "type": "character",
+          "name": "Ilse the Keeper",
+          "location": "019a7f00-0000-7000-8000-000000000321"
+        }
+      ],
+      "hidden": [],
+      "readers": {
+        "owner": {
+          "rung": "owner",
+          "character": null
+        },
+        "contributor": {
+          "rung": "contributor",
+          "character": null
+        },
+        "guest": {
+          "rung": "guest",
+          "character": null,
+          "whole": [
+            "019a7f00-0000-7000-8000-000000000301",
+            "019a7f00-0000-7000-8000-000000000311",
+            "019a7f00-0000-7000-8000-000000000321",
+            "019a7f00-0000-7000-8000-000000000331"
+          ],
+          "known_of": []
+        },
+        "public": {
+          "rung": "public",
+          "character": null
+        }
+      }
+    },
+    "harbour-no-narrative": {
+      "id": "019a7f00-0000-7000-8000-00000000f230",
+      "name": "Grey Harbour, the mark with no story member",
+      "x_strand": {
+        "event": "019a7f00-0000-7000-8000-000000000311",
+        "location": "019a7f00-0000-7000-8000-000000000321"
+      },
+      "elements": [
+        {
+          "id": "019a7f00-0000-7000-8000-000000000301",
+          "type": "narrative",
+          "name": "The Night the Lighthouse Went Dark",
+          "protagonist": "019a7f00-0000-7000-8000-000000000331",
+          "events": [
+            "019a7f00-0000-7000-8000-000000000311"
+          ]
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000311",
+          "type": "event",
+          "name": "The lamp fails",
+          "locations": [
+            "019a7f00-0000-7000-8000-000000000321"
+          ]
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000321",
+          "type": "location",
+          "name": "The Lighthouse"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000331",
+          "type": "character",
+          "name": "Ilse the Keeper",
+          "location": "019a7f00-0000-7000-8000-000000000321"
+        }
+      ],
+      "hidden": [],
+      "readers": {
+        "owner": {
+          "rung": "owner",
+          "character": null
+        },
+        "contributor": {
+          "rung": "contributor",
+          "character": null
+        },
+        "guest": {
+          "rung": "guest",
+          "character": null,
+          "whole": [
+            "019a7f00-0000-7000-8000-000000000301",
+            "019a7f00-0000-7000-8000-000000000311",
+            "019a7f00-0000-7000-8000-000000000321",
+            "019a7f00-0000-7000-8000-000000000331"
+          ],
+          "known_of": []
+        },
+        "public": {
+          "rung": "public",
+          "character": null
+        }
+      }
+    },
+    "harbour-narrative-a-list": {
+      "id": "019a7f00-0000-7000-8000-00000000f231",
+      "name": "Grey Harbour, the story member a list",
+      "x_strand": {
+        "narrative": [
+          "019a7f00-0000-7000-8000-000000000301"
+        ],
+        "event": "019a7f00-0000-7000-8000-000000000311",
+        "location": "019a7f00-0000-7000-8000-000000000321"
+      },
+      "elements": [
+        {
+          "id": "019a7f00-0000-7000-8000-000000000301",
+          "type": "narrative",
+          "name": "The Night the Lighthouse Went Dark",
+          "protagonist": "019a7f00-0000-7000-8000-000000000331",
+          "events": [
+            "019a7f00-0000-7000-8000-000000000311"
+          ]
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000311",
+          "type": "event",
+          "name": "The lamp fails",
+          "locations": [
+            "019a7f00-0000-7000-8000-000000000321"
+          ]
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000321",
+          "type": "location",
+          "name": "The Lighthouse"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000331",
+          "type": "character",
+          "name": "Ilse the Keeper",
+          "location": "019a7f00-0000-7000-8000-000000000321"
+        }
+      ],
+      "hidden": [],
+      "readers": {
+        "owner": {
+          "rung": "owner",
+          "character": null
+        },
+        "contributor": {
+          "rung": "contributor",
+          "character": null
+        },
+        "guest": {
+          "rung": "guest",
+          "character": null,
+          "whole": [
+            "019a7f00-0000-7000-8000-000000000301",
+            "019a7f00-0000-7000-8000-000000000311",
+            "019a7f00-0000-7000-8000-000000000321",
+            "019a7f00-0000-7000-8000-000000000331"
+          ],
+          "known_of": []
+        },
+        "public": {
+          "rung": "public",
+          "character": null
+        }
+      }
+    },
+    "harbour-event-one-space": {
+      "id": "019a7f00-0000-7000-8000-00000000f232",
+      "name": "Grey Harbour, the event member one space",
+      "x_strand": {
+        "narrative": "019a7f00-0000-7000-8000-000000000301",
+        "event": " ",
+        "location": "019a7f00-0000-7000-8000-000000000321"
+      },
+      "elements": [
+        {
+          "id": "019a7f00-0000-7000-8000-000000000301",
+          "type": "narrative",
+          "name": "The Night the Lighthouse Went Dark",
+          "protagonist": "019a7f00-0000-7000-8000-000000000331",
+          "events": [
+            "019a7f00-0000-7000-8000-000000000311"
+          ]
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000311",
+          "type": "event",
+          "name": "The lamp fails",
+          "locations": [
+            "019a7f00-0000-7000-8000-000000000321"
+          ]
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000321",
+          "type": "location",
+          "name": "The Lighthouse"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000331",
+          "type": "character",
+          "name": "Ilse the Keeper",
+          "location": "019a7f00-0000-7000-8000-000000000321"
+        }
+      ],
+      "hidden": [],
+      "readers": {
+        "owner": {
+          "rung": "owner",
+          "character": null
+        },
+        "contributor": {
+          "rung": "contributor",
+          "character": null
+        },
+        "guest": {
+          "rung": "guest",
+          "character": null,
+          "whole": [
+            "019a7f00-0000-7000-8000-000000000301",
+            "019a7f00-0000-7000-8000-000000000311",
+            "019a7f00-0000-7000-8000-000000000321",
+            "019a7f00-0000-7000-8000-000000000331"
+          ],
+          "known_of": []
+        },
+        "public": {
+          "rung": "public",
+          "character": null
+        }
+      }
+    },
+    "harbour-event-a-tab": {
+      "id": "019a7f00-0000-7000-8000-00000000f233",
+      "name": "Grey Harbour, the event member a tab",
+      "x_strand": {
+        "narrative": "019a7f00-0000-7000-8000-000000000301",
+        "event": "\t",
+        "location": "019a7f00-0000-7000-8000-000000000321"
+      },
+      "elements": [
+        {
+          "id": "019a7f00-0000-7000-8000-000000000301",
+          "type": "narrative",
+          "name": "The Night the Lighthouse Went Dark",
+          "protagonist": "019a7f00-0000-7000-8000-000000000331",
+          "events": [
+            "019a7f00-0000-7000-8000-000000000311"
+          ]
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000311",
+          "type": "event",
+          "name": "The lamp fails",
+          "locations": [
+            "019a7f00-0000-7000-8000-000000000321"
+          ]
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000321",
+          "type": "location",
+          "name": "The Lighthouse"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000331",
+          "type": "character",
+          "name": "Ilse the Keeper",
+          "location": "019a7f00-0000-7000-8000-000000000321"
+        }
+      ],
+      "hidden": [],
+      "readers": {
+        "owner": {
+          "rung": "owner",
+          "character": null
+        },
+        "contributor": {
+          "rung": "contributor",
+          "character": null
+        },
+        "guest": {
+          "rung": "guest",
+          "character": null,
+          "whole": [
+            "019a7f00-0000-7000-8000-000000000301",
+            "019a7f00-0000-7000-8000-000000000311",
+            "019a7f00-0000-7000-8000-000000000321",
+            "019a7f00-0000-7000-8000-000000000331"
+          ],
+          "known_of": []
+        },
+        "public": {
+          "rung": "public",
+          "character": null
+        }
+      }
+    },
+    "harbour-event-ideographic-space": {
+      "id": "019a7f00-0000-7000-8000-00000000f234",
+      "name": "Grey Harbour, the event member an ideographic space",
+      "x_strand": {
+        "narrative": "019a7f00-0000-7000-8000-000000000301",
+        "event": "　",
+        "location": "019a7f00-0000-7000-8000-000000000321"
+      },
+      "elements": [
+        {
+          "id": "019a7f00-0000-7000-8000-000000000301",
+          "type": "narrative",
+          "name": "The Night the Lighthouse Went Dark",
+          "protagonist": "019a7f00-0000-7000-8000-000000000331",
+          "events": [
+            "019a7f00-0000-7000-8000-000000000311"
+          ]
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000311",
+          "type": "event",
+          "name": "The lamp fails",
+          "locations": [
+            "019a7f00-0000-7000-8000-000000000321"
+          ]
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000321",
+          "type": "location",
+          "name": "The Lighthouse"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000331",
+          "type": "character",
+          "name": "Ilse the Keeper",
+          "location": "019a7f00-0000-7000-8000-000000000321"
+        }
+      ],
+      "hidden": [],
+      "readers": {
+        "owner": {
+          "rung": "owner",
+          "character": null
+        },
+        "contributor": {
+          "rung": "contributor",
+          "character": null
+        },
+        "guest": {
+          "rung": "guest",
+          "character": null,
+          "whole": [
+            "019a7f00-0000-7000-8000-000000000301",
+            "019a7f00-0000-7000-8000-000000000311",
+            "019a7f00-0000-7000-8000-000000000321",
+            "019a7f00-0000-7000-8000-000000000331"
+          ],
+          "known_of": []
+        },
+        "public": {
+          "rung": "public",
+          "character": null
+        }
+      }
+    },
+    "harbour-location-spaces": {
+      "id": "019a7f00-0000-7000-8000-00000000f235",
+      "name": "Grey Harbour, the location member three spaces",
+      "x_strand": {
+        "narrative": "019a7f00-0000-7000-8000-000000000301",
+        "event": "019a7f00-0000-7000-8000-000000000311",
+        "location": "   "
+      },
+      "elements": [
+        {
+          "id": "019a7f00-0000-7000-8000-000000000301",
+          "type": "narrative",
+          "name": "The Night the Lighthouse Went Dark",
+          "protagonist": "019a7f00-0000-7000-8000-000000000331",
+          "events": [
+            "019a7f00-0000-7000-8000-000000000311"
+          ]
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000311",
+          "type": "event",
+          "name": "The lamp fails",
+          "locations": [
+            "019a7f00-0000-7000-8000-000000000321"
+          ]
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000321",
+          "type": "location",
+          "name": "The Lighthouse"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000331",
+          "type": "character",
+          "name": "Ilse the Keeper",
+          "location": "019a7f00-0000-7000-8000-000000000321"
+        }
+      ],
+      "hidden": [],
+      "readers": {
+        "owner": {
+          "rung": "owner",
+          "character": null
+        },
+        "contributor": {
+          "rung": "contributor",
+          "character": null
+        },
+        "guest": {
+          "rung": "guest",
+          "character": null,
+          "whole": [
+            "019a7f00-0000-7000-8000-000000000301",
+            "019a7f00-0000-7000-8000-000000000311",
+            "019a7f00-0000-7000-8000-000000000321",
+            "019a7f00-0000-7000-8000-000000000331"
+          ],
+          "known_of": []
+        },
+        "public": {
+          "rung": "public",
+          "character": null
+        }
+      }
+    },
+    "harbour-event-and-location-spaces": {
+      "id": "019a7f00-0000-7000-8000-00000000f236",
+      "name": "Grey Harbour, the event and location members spaces",
+      "x_strand": {
+        "narrative": "019a7f00-0000-7000-8000-000000000301",
+        "event": "  ",
+        "location": "  "
+      },
+      "elements": [
+        {
+          "id": "019a7f00-0000-7000-8000-000000000301",
+          "type": "narrative",
+          "name": "The Night the Lighthouse Went Dark",
+          "protagonist": "019a7f00-0000-7000-8000-000000000331",
+          "events": [
+            "019a7f00-0000-7000-8000-000000000311"
+          ]
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000311",
+          "type": "event",
+          "name": "The lamp fails",
+          "locations": [
+            "019a7f00-0000-7000-8000-000000000321"
+          ]
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000321",
+          "type": "location",
+          "name": "The Lighthouse"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000331",
+          "type": "character",
+          "name": "Ilse the Keeper",
+          "location": "019a7f00-0000-7000-8000-000000000321"
+        }
+      ],
+      "hidden": [],
+      "readers": {
+        "owner": {
+          "rung": "owner",
+          "character": null
+        },
+        "contributor": {
+          "rung": "contributor",
+          "character": null
+        },
+        "guest": {
+          "rung": "guest",
+          "character": null,
+          "whole": [
+            "019a7f00-0000-7000-8000-000000000301",
+            "019a7f00-0000-7000-8000-000000000311",
+            "019a7f00-0000-7000-8000-000000000321",
+            "019a7f00-0000-7000-8000-000000000331"
+          ],
+          "known_of": []
+        },
+        "public": {
+          "rung": "public",
+          "character": null
+        }
+      }
+    },
+    "harbour-story-id-a-space-in-front": {
+      "id": "019a7f00-0000-7000-8000-00000000f237",
+      "name": "Grey Harbour, the story member its id with a space in front",
+      "x_strand": {
+        "narrative": " 019a7f00-0000-7000-8000-000000000301",
+        "event": "019a7f00-0000-7000-8000-000000000311",
+        "location": "019a7f00-0000-7000-8000-000000000321"
+      },
+      "elements": [
+        {
+          "id": "019a7f00-0000-7000-8000-000000000301",
+          "type": "narrative",
+          "name": "The Night the Lighthouse Went Dark",
+          "protagonist": "019a7f00-0000-7000-8000-000000000331",
+          "events": [
+            "019a7f00-0000-7000-8000-000000000311"
+          ]
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000311",
+          "type": "event",
+          "name": "The lamp fails",
+          "locations": [
+            "019a7f00-0000-7000-8000-000000000321"
+          ]
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000321",
+          "type": "location",
+          "name": "The Lighthouse"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000331",
+          "type": "character",
+          "name": "Ilse the Keeper",
+          "location": "019a7f00-0000-7000-8000-000000000321"
+        }
+      ],
+      "hidden": [],
+      "readers": {
+        "owner": {
+          "rung": "owner",
+          "character": null
+        },
+        "contributor": {
+          "rung": "contributor",
+          "character": null
+        },
+        "guest": {
+          "rung": "guest",
+          "character": null,
+          "whole": [
+            "019a7f00-0000-7000-8000-000000000301",
+            "019a7f00-0000-7000-8000-000000000311",
+            "019a7f00-0000-7000-8000-000000000321",
+            "019a7f00-0000-7000-8000-000000000331"
+          ],
+          "known_of": []
+        },
+        "public": {
+          "rung": "public",
+          "character": null
+        }
+      }
+    },
+    "harbour-event-id-a-space-behind": {
+      "id": "019a7f00-0000-7000-8000-00000000f238",
+      "name": "Grey Harbour, the event member its id with a space behind",
+      "x_strand": {
+        "narrative": "019a7f00-0000-7000-8000-000000000301",
+        "event": "019a7f00-0000-7000-8000-000000000311 ",
+        "location": "019a7f00-0000-7000-8000-000000000321"
+      },
+      "elements": [
+        {
+          "id": "019a7f00-0000-7000-8000-000000000301",
+          "type": "narrative",
+          "name": "The Night the Lighthouse Went Dark",
+          "protagonist": "019a7f00-0000-7000-8000-000000000331",
+          "events": [
+            "019a7f00-0000-7000-8000-000000000311"
+          ]
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000311",
+          "type": "event",
+          "name": "The lamp fails",
+          "locations": [
+            "019a7f00-0000-7000-8000-000000000321"
+          ]
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000321",
+          "type": "location",
+          "name": "The Lighthouse"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000331",
+          "type": "character",
+          "name": "Ilse the Keeper",
+          "location": "019a7f00-0000-7000-8000-000000000321"
+        }
+      ],
+      "hidden": [],
+      "readers": {
+        "owner": {
+          "rung": "owner",
+          "character": null
+        },
+        "contributor": {
+          "rung": "contributor",
+          "character": null
+        },
+        "guest": {
+          "rung": "guest",
+          "character": null,
+          "whole": [
+            "019a7f00-0000-7000-8000-000000000301",
+            "019a7f00-0000-7000-8000-000000000311",
+            "019a7f00-0000-7000-8000-000000000321",
+            "019a7f00-0000-7000-8000-000000000331"
+          ],
+          "known_of": []
+        },
+        "public": {
+          "rung": "public",
+          "character": null
+        }
+      }
+    },
+    "harbour-place-id-a-space-behind": {
+      "id": "019a7f00-0000-7000-8000-00000000f239",
+      "name": "Grey Harbour, the location member its id with a space behind",
+      "x_strand": {
+        "narrative": "019a7f00-0000-7000-8000-000000000301",
+        "event": "019a7f00-0000-7000-8000-000000000311",
+        "location": "019a7f00-0000-7000-8000-000000000321 "
+      },
+      "elements": [
+        {
+          "id": "019a7f00-0000-7000-8000-000000000301",
+          "type": "narrative",
+          "name": "The Night the Lighthouse Went Dark",
+          "protagonist": "019a7f00-0000-7000-8000-000000000331",
+          "events": [
+            "019a7f00-0000-7000-8000-000000000311"
+          ]
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000311",
+          "type": "event",
+          "name": "The lamp fails",
+          "locations": [
+            "019a7f00-0000-7000-8000-000000000321"
+          ]
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000321",
+          "type": "location",
+          "name": "The Lighthouse"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000331",
+          "type": "character",
+          "name": "Ilse the Keeper",
+          "location": "019a7f00-0000-7000-8000-000000000321"
+        }
+      ],
+      "hidden": [],
+      "readers": {
+        "owner": {
+          "rung": "owner",
+          "character": null
+        },
+        "contributor": {
+          "rung": "contributor",
+          "character": null
+        },
+        "guest": {
+          "rung": "guest",
+          "character": null,
+          "whole": [
+            "019a7f00-0000-7000-8000-000000000301",
+            "019a7f00-0000-7000-8000-000000000311",
+            "019a7f00-0000-7000-8000-000000000321",
+            "019a7f00-0000-7000-8000-000000000331"
+          ],
+          "known_of": []
+        },
+        "public": {
+          "rung": "public",
+          "character": null
+        }
+      }
     }
   },
   "cases": [
@@ -2561,6 +3409,293 @@
           "name": "The Docks"
         },
         "same": false
+      }
+    },
+    {
+      "name": "an-empty-string-narrative-is-no-mark",
+      "claim": "narrative is the empty string: the empty string in any of the three members is no mark, so every slot is null (a reader that takes it as a mark naming nothing gives the same slots)",
+      "kind": "strand",
+      "world": "harbour-story-empty-string",
+      "reader": "owner",
+      "want": {
+        "narrative": null,
+        "event": null,
+        "location": null,
+        "character": null,
+        "now": null,
+        "same": null
+      }
+    },
+    {
+      "name": "a-story-member-of-spaces-names-no-story",
+      "claim": "narrative is three spaces: a string like any other, no reader trims it, so the value is a mark whose story names nothing, and every slot is null (a strand hangs off its story)",
+      "kind": "strand",
+      "world": "harbour-story-spaces",
+      "reader": "owner",
+      "want": {
+        "narrative": null,
+        "event": null,
+        "location": null,
+        "character": null,
+        "now": null,
+        "same": null
+      }
+    },
+    {
+      "name": "an-object-member-is-no-mark",
+      "claim": "location is an object holding the place's id, neither a string id nor unset: the whole value is no mark (a reader that reads the object's id fills all five)",
+      "kind": "strand",
+      "world": "harbour-location-an-object",
+      "reader": "owner",
+      "want": {
+        "narrative": null,
+        "event": null,
+        "location": null,
+        "character": null,
+        "now": null,
+        "same": null
+      }
+    },
+    {
+      "name": "a-mark-with-no-narrative-is-no-mark",
+      "claim": "the mark names an event and a place and no narrative: narrative is required, so the whole value is no mark",
+      "kind": "strand",
+      "world": "harbour-no-narrative",
+      "reader": "owner",
+      "want": {
+        "narrative": null,
+        "event": null,
+        "location": null,
+        "character": null,
+        "now": null,
+        "same": null
+      }
+    },
+    {
+      "name": "a-narrative-that-is-not-a-string-is-no-mark",
+      "claim": "narrative is a list holding the story's id, not a string: the whole value is no mark (a reader that takes the list's first id fills all five)",
+      "kind": "strand",
+      "world": "harbour-narrative-a-list",
+      "reader": "owner",
+      "want": {
+        "narrative": null,
+        "event": null,
+        "location": null,
+        "character": null,
+        "now": null,
+        "same": null
+      }
+    },
+    {
+      "name": "an-event-member-of-one-space-is-an-empty-slot",
+      "claim": "event is one space: a string like any other, no reader trims it, and it names no element, so the event slot is empty and with it the place then; the story, the hero and now fill (an empty string would be no mark)",
+      "kind": "strand",
+      "world": "harbour-event-one-space",
+      "reader": "owner",
+      "want": {
+        "narrative": {
+          "id": "019a7f00-0000-7000-8000-000000000301",
+          "type": "narrative",
+          "name": "The Night the Lighthouse Went Dark"
+        },
+        "event": null,
+        "location": null,
+        "character": {
+          "id": "019a7f00-0000-7000-8000-000000000331",
+          "type": "character",
+          "name": "Ilse the Keeper"
+        },
+        "now": {
+          "id": "019a7f00-0000-7000-8000-000000000321",
+          "type": "location",
+          "name": "The Lighthouse"
+        },
+        "same": null
+      }
+    },
+    {
+      "name": "an-event-member-of-a-tab-is-an-empty-slot",
+      "claim": "event is a tab alone: a string that names no element, never trimmed to an empty string, so the event and the place then are empty; the story, the hero and now fill",
+      "kind": "strand",
+      "world": "harbour-event-a-tab",
+      "reader": "owner",
+      "want": {
+        "narrative": {
+          "id": "019a7f00-0000-7000-8000-000000000301",
+          "type": "narrative",
+          "name": "The Night the Lighthouse Went Dark"
+        },
+        "event": null,
+        "location": null,
+        "character": {
+          "id": "019a7f00-0000-7000-8000-000000000331",
+          "type": "character",
+          "name": "Ilse the Keeper"
+        },
+        "now": {
+          "id": "019a7f00-0000-7000-8000-000000000321",
+          "type": "location",
+          "name": "The Lighthouse"
+        },
+        "same": null
+      }
+    },
+    {
+      "name": "an-event-member-of-an-ideographic-space-is-an-empty-slot",
+      "claim": "event is an ideographic space, U+3000, alone: a string that names no element, never trimmed by the White_Space set, so the event and the place then are empty; the story, the hero and now fill",
+      "kind": "strand",
+      "world": "harbour-event-ideographic-space",
+      "reader": "owner",
+      "want": {
+        "narrative": {
+          "id": "019a7f00-0000-7000-8000-000000000301",
+          "type": "narrative",
+          "name": "The Night the Lighthouse Went Dark"
+        },
+        "event": null,
+        "location": null,
+        "character": {
+          "id": "019a7f00-0000-7000-8000-000000000331",
+          "type": "character",
+          "name": "Ilse the Keeper"
+        },
+        "now": {
+          "id": "019a7f00-0000-7000-8000-000000000321",
+          "type": "location",
+          "name": "The Lighthouse"
+        },
+        "same": null
+      }
+    },
+    {
+      "name": "a-location-member-of-spaces-is-an-empty-slot",
+      "claim": "location is three spaces: a string that names no element, so the place then is empty and same is null; the story, the happening, the hero and now fill",
+      "kind": "strand",
+      "world": "harbour-location-spaces",
+      "reader": "owner",
+      "want": {
+        "narrative": {
+          "id": "019a7f00-0000-7000-8000-000000000301",
+          "type": "narrative",
+          "name": "The Night the Lighthouse Went Dark"
+        },
+        "event": {
+          "id": "019a7f00-0000-7000-8000-000000000311",
+          "type": "event",
+          "name": "The lamp fails"
+        },
+        "location": null,
+        "character": {
+          "id": "019a7f00-0000-7000-8000-000000000331",
+          "type": "character",
+          "name": "Ilse the Keeper"
+        },
+        "now": {
+          "id": "019a7f00-0000-7000-8000-000000000321",
+          "type": "location",
+          "name": "The Lighthouse"
+        },
+        "same": null
+      }
+    },
+    {
+      "name": "an-event-and-a-location-of-spaces-are-empty-slots",
+      "claim": "event and location are both two spaces: each a string that names no element, so both slots are empty and the strand reads as a story begun with its hero",
+      "kind": "strand",
+      "world": "harbour-event-and-location-spaces",
+      "reader": "owner",
+      "want": {
+        "narrative": {
+          "id": "019a7f00-0000-7000-8000-000000000301",
+          "type": "narrative",
+          "name": "The Night the Lighthouse Went Dark"
+        },
+        "event": null,
+        "location": null,
+        "character": {
+          "id": "019a7f00-0000-7000-8000-000000000331",
+          "type": "character",
+          "name": "Ilse the Keeper"
+        },
+        "now": {
+          "id": "019a7f00-0000-7000-8000-000000000321",
+          "type": "location",
+          "name": "The Lighthouse"
+        },
+        "same": null
+      }
+    },
+    {
+      "name": "a-story-id-with-a-space-in-front-names-no-story",
+      "claim": "narrative is the story's id with one space in front: no reader trims a member, so it is another value and names no element, and every slot is null (a reader that trims fills all five)",
+      "kind": "strand",
+      "world": "harbour-story-id-a-space-in-front",
+      "reader": "owner",
+      "want": {
+        "narrative": null,
+        "event": null,
+        "location": null,
+        "character": null,
+        "now": null,
+        "same": null
+      }
+    },
+    {
+      "name": "an-event-id-with-a-space-behind-names-no-event",
+      "claim": "event is the happening's id with one space behind: no reader trims a member, so it names no element; the event slot is empty and with it the place then, and the story, the hero and now fill (a reader that trims fills the event and the place too)",
+      "kind": "strand",
+      "world": "harbour-event-id-a-space-behind",
+      "reader": "owner",
+      "want": {
+        "narrative": {
+          "id": "019a7f00-0000-7000-8000-000000000301",
+          "type": "narrative",
+          "name": "The Night the Lighthouse Went Dark"
+        },
+        "event": null,
+        "location": null,
+        "character": {
+          "id": "019a7f00-0000-7000-8000-000000000331",
+          "type": "character",
+          "name": "Ilse the Keeper"
+        },
+        "now": {
+          "id": "019a7f00-0000-7000-8000-000000000321",
+          "type": "location",
+          "name": "The Lighthouse"
+        },
+        "same": null
+      }
+    },
+    {
+      "name": "a-place-id-with-a-space-behind-names-no-place",
+      "claim": "location is the place's id with one space behind, the event real: no reader trims a member, so it names no element; the place then is empty and same is null, and the story, the happening, the hero and now fill (a reader that trims the place fills it and reads same true)",
+      "kind": "strand",
+      "world": "harbour-place-id-a-space-behind",
+      "reader": "owner",
+      "want": {
+        "narrative": {
+          "id": "019a7f00-0000-7000-8000-000000000301",
+          "type": "narrative",
+          "name": "The Night the Lighthouse Went Dark"
+        },
+        "event": {
+          "id": "019a7f00-0000-7000-8000-000000000311",
+          "type": "event",
+          "name": "The lamp fails"
+        },
+        "location": null,
+        "character": {
+          "id": "019a7f00-0000-7000-8000-000000000331",
+          "type": "character",
+          "name": "Ilse the Keeper"
+        },
+        "now": {
+          "id": "019a7f00-0000-7000-8000-000000000321",
+          "type": "location",
+          "name": "The Lighthouse"
+        },
+        "same": null
       }
     }
   ]
