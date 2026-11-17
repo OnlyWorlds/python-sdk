@@ -4,6 +4,8 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+## 0.133.1 (2026-11-17)
+
 - **The LegendKeeper door says where the API's unsupported content can be read.** LegendKeeper's public API answers some blocks and properties as `unsupported`, with nothing in them. On a project seeded with LegendKeeper's tutorial these were every image inside a page (28), a list of sub-pages and the sidebar rows showing a resource's tags or aliases (17). The report's line now says that the export file holds them and that `--file` reads them.
 
 - **The LegendKeeper door names what it does not read from an export file.** The file road took a map's pins, regions and paths, a timeline's lanes and events and a board's records, and passed over any other key a document's content held without a word, where the report promises that nothing from the source is dropped without a line. Such a key is now named in the notes with the number of documents that hold it (`'labels' in 2 map documents`). No export read so far holds one: the case is planted in the tests. A sidebar property that points at a map is kept with the reason "a map property has no field", where the reason said maps are not imported, which stopped being true at 0.53.0.
