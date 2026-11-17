@@ -69,6 +69,30 @@ jobs:
           uv run pytest -q -rs tests/test_okf.py::test_reference_parser_and_viewer | tee "$RUNNER_TEMP/okf.txt"
           grep -q -E '^1 passed' "$RUNNER_TEMP/okf.txt"
 
+  folder-conformance:
+    # The folder format's conformance fixture lives in Atlas, the reference implementation.
+    # tests/test_reader.py skips its conformance group unless it is handed a copy, so the gates
+    # above never run it. Here the fixture is read from Atlas's default branch as it stands and a
+    # skip is a failure. When Atlas moves the fixture, this job goes red on the version the test
+    # names, until the reader has been read against what moved.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v7
+      - run: uv sync --locked
+      - name: Atlas's conformance fixture, as its default branch has it
+        run: |
+          git clone -q --depth 1 --filter=blob:none --sparse https://github.com/OnlyWorlds/atlas "$RUNNER_TEMP/atlas"
+          git -C "$RUNNER_TEMP/atlas" sparse-checkout set tests/fixtures/folder-conformance
+          git -C "$RUNNER_TEMP/atlas" log -1 --format='atlas %h %ad' --date=short
+          test -f "$RUNNER_TEMP/atlas/tests/fixtures/folder-conformance/expected.json"
+      - name: The reader's tests with the fixture, where a skip fails
+        env:
+          OW_CONFORMANCE_FIXTURE: ${{ runner.temp }}/atlas/tests/fixtures/folder-conformance
+        run: |
+          uv run pytest -q -rs tests/test_reader.py | tee "$RUNNER_TEMP/reader.txt"
+          grep -q -E '^[0-9]+ passed in ' "$RUNNER_TEMP/reader.txt"
+
   wire:
     # keel's own OpenAPI document and the public demo world, read only, and a few writes to the
     # practice world (its published key, reset every night), each deleted again. Red here with

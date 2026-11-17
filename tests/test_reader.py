@@ -36,7 +36,8 @@ def fingerprint(root: Path) -> dict[str, str]:
 def test_conformance_fixture(legacy: bool) -> None:
     assert FIXTURE is not None  # needs_fixture skips the test otherwise
     expected: dict[str, Any] = json.loads((FIXTURE / "expected.json").read_text(encoding="utf-8"))
-    assert expected["fixture_version"] == "1.2.1"  # 1.2.0 to 1.2.1 changed no element
+    # 1.2.0 to 1.2.1 changed no element; 1.2.2 renamed one, and its file with it (id and body kept)
+    assert expected["fixture_version"] == "1.2.2"
     world_dir = FIXTURE / "world"
     before = fingerprint(FIXTURE)
 
