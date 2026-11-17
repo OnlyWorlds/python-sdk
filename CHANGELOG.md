@@ -4,6 +4,8 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+- **`draught`'s docstring says whose reading a lens frame is.** Since 17 November 2026 onlyworlds.com adds the lenses a key starts with to a plain context read only when the Character read is the key's own; a read of any other Character holds no `lenses` unless `lens` names one. The docstring says so, and names the lenses a seat's Titles give it beside the ones it chose. No call changes.
+
 ## 0.134.0 (2026-11-17)
 
 - **`ApiError.fields_refusal`: everything a read's `fields` list got wrong, in one answer.** A read whose `fields` names fields the type does not have is one 422 with `param` `fields`, as before. Since 17 November 2026 onlyworlds.com names every unknown name in it, where it named only the first: the message lists them, and the error carries `unknown_fields` (each unknown name once, in the order sent), `types_with_field` (for each one another element type has, those types) and `allowed_fields` (the names this type takes). `fields_refusal` returns the three as a dict, as served, so a caller corrects the list in one try; it is `None` for any other error. A list with one unknown name keeps the message it always had, and no code in the package read that message. The npm SDK's `err.fieldsRefusal`, in 4.179.0.

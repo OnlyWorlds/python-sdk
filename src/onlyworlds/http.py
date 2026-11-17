@@ -1307,8 +1307,11 @@ class Client:
         ``lenses``, one frame ``{id, name?, rows?, cut?, mail?, skipped?, unreadable?}`` with that lens
         read for this key's own view. The lens carries its own reach and limit, so ``lens`` beside
         ``depth`` or ``budget`` is a 422 (``param`` lens); a lens this key cannot see is a 404. With no
-        ``lens`` and no policy key but ``compact``, keel adds one frame per lens chosen with
-        ``set_my_lenses``, in order."""
+        ``lens`` and no policy key but ``compact``, a read of this key's own Character (the one ``me()``
+        names) adds one frame per lens the key starts with, in order: the ones chosen with
+        ``set_my_lenses``, or for a seat that never chose, the ones its Titles give it. A read of any
+        other Character adds none of them. A frame is this key's own reading and its own Character's
+        mail, never the Character's."""
         if compact is not None and not isinstance(compact, bool):
             raise TypeError(f"draught: compact is True or False, not {compact!r}. Nothing was sent.")
         query = self._query(
