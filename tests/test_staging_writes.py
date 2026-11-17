@@ -137,7 +137,7 @@ def test_links_dedupe_tolerate_absent_ids_and_are_scrubbed_on_delete(
     assert owner.get("character", person["id"])["family"] == []
     with pytest.raises(ApiError) as gone:
         owner.get("family", fid)
-    assert gone.value.status == 404
+    assert (gone.value.status, gone.value.code) == (410, "gone")  # a deleted element reads gone, not absent
 
 
 def test_bulk_partial_atomic_cycles_and_replay(owner: Client, made: list[tuple[str, str]]) -> None:
