@@ -31,106 +31,21 @@ def load_fixture() -> dict[str, Any]:
 DOC = load_fixture()
 CASES: list[dict[str, Any]] = DOC["cases"]
 
-# Serial 123 reads played_at by the message page's grammar, ahead of its dist: four cases of serial 122's vendored
-# fixture move. While the pin is serial 122's and the fixture is the vendored one, each is held to its new answer
-# here; once the pin moves, the fixture's own answers stand and this table no longer applies.
-PIN_SERIAL: int = json.loads((REPO / "codegen" / "schema-pin.json").read_text(encoding="utf-8"))["dist_serial"]
-AHEAD_OF_THE_DIST = PIN_SERIAL == 122 and "OW_RECORD_FIXTURE" not in os.environ
-TURNED_BY_SERIAL_123 = (
-    "no-mark-played-offset",
-    "mark-leap-day-of-a-leap-year",
-    "fluffington-two-games",
-    "order-by-the-instant-not-the-string",
-)
-OFFSET_EVENT = "019a8000-0000-7000-8000-000000000215"
-NO_SECONDS_EVENT = "019a8000-0000-7000-8000-000000000242"
-
-
-def _moved_by_serial_123(case: dict[str, Any]) -> Any:
-    """The new answer of a case serial 123 moves, or the fixture's own ``want``."""
-    want = case["want"]
-    if not AHEAD_OF_THE_DIST:
-        return want
-    name = case["name"]
-    if name == "no-mark-played-offset":  # an offset now reads: a mark, the value as written
-        assert want is None
-        return {
-            "tool": "subs",
-            "played_at": "2026-11-01T08:00:00+01:00",
-            "version": None,
-            "seed": None,
-            "outcome": None,
-            "seats": {},
-        }
-    if name == "mark-leap-day-of-a-leap-year":  # 2028-02-29T00:00Z has no seconds: no mark now
-        assert want is not None and want["played_at"] == "2028-02-29T00:00Z"
-        return None
-    if name == "fluffington-two-games":  # the offset run (07:00Z) now a record, second newest
-        assert [r["event"]["id"] for r in want].count(OFFSET_EVENT) == 0
-        offset_run: dict[str, Any] = {
-            "event": {"id": OFFSET_EVENT, "name": "Played with an offset"},
-            "tool": "subs",
-            "played_at": "2026-11-01T08:00:00+01:00",
-            "version": None,
-            "seed": None,
-            "outcome": None,
-            "seat": None,
-            "stories": [],
-        }
-        return [want[0], offset_run, *want[1:]]
-    if name == "order-by-the-instant-not-the-string":  # 00:30Z has no seconds: no record now
-        assert [r["event"]["id"] for r in want].count(NO_SECONDS_EVENT) == 1
-        return [r for r in want if r["event"]["id"] != NO_SECONDS_EVENT]
-    return want
-
-
-# Serial 123 renames three of serial 122's cases for what they test, and rewrites their elements to match (an offset
-# without its colon, a time without seconds): each new case wants no mark, as its old one did, so none of them is
-# held to a turned answer above.
-RENAMED_BY_SERIAL_123 = {
-    "no-mark-played-offset": "no-mark-played-offset-without-its-colon",
-    "no-mark-year-0": "no-mark-year-0-without-seconds",
-    "no-mark-played-lower-case": "no-mark-played-lower-case-without-seconds",
-}
-
-
-def test_the_fixture_holds_serial_122s_41_cases_or_serial_123s_renamed() -> None:
+def test_the_fixture_holds_serial_123s_46_cases() -> None:
     assert DOC["mark"]["field"] == RECORD_FIELD == "x_record"
     assert DOC["mark"]["members"] == ["tool", "played_at", "version", "seed", "outcome", "seats"]
-    names = {c["name"] for c in CASES}
-    if names.isdisjoint(RENAMED_BY_SERIAL_123.values()):
-        assert set(RENAMED_BY_SERIAL_123) <= names
-        assert len(CASES) == 41, f"the fixture holds {len(CASES)} cases, serial 122 has 41"
-    else:
-        assert not AHEAD_OF_THE_DIST, "serial 123's names in a fixture held to serial 122's turned answers"
-        assert set(RENAMED_BY_SERIAL_123.values()) <= names
-        assert names.isdisjoint(RENAMED_BY_SERIAL_123)
-        assert len(CASES) >= 46, f"the fixture holds {len(CASES)} cases, serial 123's draft has 46"
-        for old, new in RENAMED_BY_SERIAL_123.items():
-            case = next(c for c in CASES if c["name"] == new)
-            assert case["kind"] == "mark" and case["want"] is None, f"{new} (was {old}) wants no mark"
+    assert len(CASES) == 46, f"the fixture holds {len(CASES)} cases, serial 123 has 46"
 
 
-def _case_id(case: dict[str, Any]) -> str:
-    """A case's name; one serial 123 turns says so, while its answer is held here."""
-    turned = AHEAD_OF_THE_DIST and case["name"] in TURNED_BY_SERIAL_123
-    return f"{case['name']}[turned-by-serial-123]" if turned else str(case["name"])
-
-
-def test_the_four_turned_cases_are_in_the_vendored_fixture() -> None:
-    if AHEAD_OF_THE_DIST:
-        assert sorted(c["name"] for c in CASES if c["name"] in TURNED_BY_SERIAL_123) == sorted(TURNED_BY_SERIAL_123)
-
-
-@pytest.mark.parametrize("case", CASES, ids=[_case_id(c) for c in CASES])
+@pytest.mark.parametrize("case", CASES, ids=[str(c["name"]) for c in CASES])
 def test_fixture_case(case: dict[str, Any]) -> None:
     elements = copy.deepcopy(DOC["worlds"][case["world"]]["elements"])
     if case["kind"] == "mark":
         el = next((e for e in elements if e["id"] == case["element"]), None)
         assert el is not None, f"no element {case['element']}"
-        assert record_mark_of(el) == _moved_by_serial_123(case)
+        assert record_mark_of(el) == case["want"]
     elif case["kind"] == "records":
-        assert records_of(case["character"], elements) == _moved_by_serial_123(case)
+        assert records_of(case["character"], elements) == case["want"]
     else:
         pytest.fail(f"a case of unknown kind {case['kind']}")
 
