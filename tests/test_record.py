@@ -31,6 +31,7 @@ def load_fixture() -> dict[str, Any]:
 DOC = load_fixture()
 CASES: list[dict[str, Any]] = DOC["cases"]
 
+
 def test_the_fixture_holds_serial_123s_46_cases() -> None:
     assert DOC["mark"]["field"] == RECORD_FIELD == "x_record"
     assert DOC["mark"]["members"] == ["tool", "played_at", "version", "seed", "outcome", "seats"]
