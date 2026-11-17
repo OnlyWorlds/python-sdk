@@ -11,7 +11,7 @@ jobs:
     # inside the team and point at no internal room or tracker, like the tree.
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
       - run: python3 scripts/public_words.py --commits "$RANGE"
@@ -27,8 +27,8 @@ jobs:
         python: ['3.12', '3.13', '3.14']
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: astral-sh/setup-uv@v5
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v7
         with:
           python-version: ${{ matrix.python }}
       - run: uv sync
@@ -53,7 +53,7 @@ jobs:
       OW_OPENAPI: https://www.onlyworlds.com/api/v2/openapi.json
       OW_LIVE: "1"
     steps:
-      - uses: actions/checkout@v4
-      - uses: astral-sh/setup-uv@v5
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v7
       - run: uv sync
       - run: uv run pytest -q tests/test_wire.py tests/test_live.py tests/test_live_practice.py
