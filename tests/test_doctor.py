@@ -287,8 +287,8 @@ def test_6b_an_element_with_no_text(tmp_path: Path) -> None:
     assert found(twin, "6b") == []
 
 
-def test_6b_seethes_35_false_alarms(tmp_path: Path) -> None:
-    # Her first hand run read `description` alone and called 35 of 115 elements stubs; each had text in its own fields
+def test_6b_the_35_false_alarms_of_a_description_only_read(tmp_path: Path) -> None:
+    # A first hand run read `description` alone and called 35 of 115 elements stubs; each had text in its own fields
     r = folder_report(
         tmp_path,
         edit(clean(), "title", T1, authority="", eligibility="Born in the harbor."),

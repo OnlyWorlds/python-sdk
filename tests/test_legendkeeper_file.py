@@ -154,7 +154,7 @@ def visible(out: Path) -> str:
 # ---------------------------------------------------------------------------
 
 
-def test_the_fixture_is_the_file_seethe_exported() -> None:
+def test_the_fixture_is_the_file_as_exported() -> None:
     assert hashlib.sha256(EXPORT.read_bytes()).hexdigest() == SHA256
     data = export()
     assert data["version"] == 1 and len(data["resources"]) == data["resourceCount"] == 41

@@ -211,7 +211,7 @@ def test_namespace_is_pinned() -> None:
     assert PRODUCER_INPUT == "kanka-export"
 
 
-def test_what_seethe_typed_is_what_comes_out(tmp_path: Path) -> None:
+def test_what_was_typed_is_what_comes_out(tmp_path: Path) -> None:
     """Six typed entities and Kanka's four starters, each its module's type; one Relation a pair;
     the two starters' hidden personality traits in two hidden Narratives."""
     out, report = run(tmp_path)

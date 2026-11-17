@@ -637,7 +637,7 @@ def validate_calendar_config(cfg: Mapping[str, Any]) -> list[str]:
 def read_calendar_config(value: object) -> CalendarConfig | None:
     """The reader: ``value`` itself when it is a usable calendar object, else None (show bare numbers).
     Refuses exactly what the profile's "Not a calendar" list refuses, and an intercalary day on a calendar
-    with no months (ruled for the profile's next serial, ahead of its fixture)."""
+    with no months (the profile, serial 90)."""
     if not isinstance(value, Mapping):
         return None
     cfg = value
@@ -707,7 +707,7 @@ def read_calendar_config(value: object) -> CalendarConfig | None:
     # A day placed after a month the year does not have has no position, and a reader never
     # invents one: the calendar is unreadable (the profile, serial 89: past the last, below the first;
     # the free week raised here). With no months there is no place between months, so any
-    # intercalary day is unreadable, after_month 0 included (ruled for the next serial, ahead of its fixture).
+    # intercalary day is unreadable, after_month 0 included (the profile, serial 90).
     if entries and not _truthy(months):
         return None
     month_count = len(_prop(months, "names")) if _truthy(months) else 0
