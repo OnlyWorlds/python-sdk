@@ -486,9 +486,40 @@ def test_every_key_of_the_error_envelope_reaches_apierror(doc: dict[str, Any]) -
     err = doc["components"]["schemas"]["Error"]["properties"]["error"]
     five = {"type", "code", "message", "param", "doc_url"}
     # With the hidden mark on, a 409 resync_required's envelope also carries `reason`; an AI use's
-    # 422 answer_not_parsed carries `refusals`. Each is allowed only when declared, and then read.
-    assert set(err["properties"]) - five <= {"reason", "refusals"}
+    # 422 answer_not_parsed carries `refusals`; a 422 on a read's `fields` list carries
+    # `unknown_fields`, `types_with_field` and `allowed_fields`. Each is allowed only when declared,
+    # and then read.
+    fields_keys = ("unknown_fields", "types_with_field", "allowed_fields")
+    assert set(err["properties"]) - five <= {"reason", "refusals", *fields_keys}
     assert five <= set(err["properties"])
+    declared = [k for k in fields_keys if k in err["properties"]]
+    if declared:
+        # each probe value is built from the kind the document declares; an unknown kind fails here
+        probe: dict[str, Any] = {}
+        for k in declared:
+            d = err["properties"][k]
+            if d.get("type") == "array":
+                assert d["items"] == {"type": "string"}, k
+                probe[k] = [f"probe-{k}-1", f"probe-{k}-2"]
+            else:
+                assert d.get("type") == "object", k
+                assert d["additionalProperties"] == {"type": "array", "items": {"type": "string"}}, k
+                probe[k] = {f"probe-{k}": ["probe-type-1", "probe-type-2"]}
+        probe.setdefault("unknown_fields", ["probe-name"])
+        refused_fields = {
+            "error": {
+                "type": "invalid_request",
+                "code": "invalid_request",
+                "message": "m",
+                "param": "fields",
+                "doc_url": "https://x/e",
+                **probe,
+            }
+        }
+        got_fields = ApiError("GET", "x", jresp(422, refused_fields)).fields_refusal
+        assert got_fields is not None
+        for k in declared:
+            assert got_fields[k] == probe[k], k
     if "refusals" in err["properties"]:
         refused = {
             "error": {

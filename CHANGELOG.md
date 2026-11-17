@@ -4,6 +4,10 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+## 0.134.0 (2026-11-17)
+
+- **`ApiError.fields_refusal`: everything a read's `fields` list got wrong, in one answer.** A read whose `fields` names fields the type does not have is one 422 with `param` `fields`, as before. Since 17 November 2026 onlyworlds.com names every unknown name in it, where it named only the first: the message lists them, and the error carries `unknown_fields` (each unknown name once, in the order sent), `types_with_field` (for each one another element type has, those types) and `allowed_fields` (the names this type takes). `fields_refusal` returns the three as a dict, as served, so a caller corrects the list in one try; it is `None` for any other error. A list with one unknown name keeps the message it always had, and no code in the package read that message. The npm SDK's `err.fieldsRefusal`, in 4.179.0.
+
 ## 0.133.1 (2026-11-17)
 
 - **The LegendKeeper door says where the API's unsupported content can be read.** LegendKeeper's public API answers some blocks and properties as `unsupported`, with nothing in them. On a project seeded with LegendKeeper's tutorial these were every image inside a page (28), a list of sub-pages and the sidebar rows showing a resource's tags or aliases (17). The report's line now says that the export file holds them and that `--file` reads them.

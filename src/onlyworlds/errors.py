@@ -251,6 +251,36 @@ class ApiError(Exception):
         return out
 
     @property
+    def fields_refusal(self) -> dict[str, Any] | None:
+        """What a read's ``fields`` list got wrong, from a 422 whose ``param`` is ``fields``: the
+        server refuses the whole list once, naming every field the type does not have, so the list
+        is corrected in one try. ``{"unknown_fields", "types_with_field", "allowed_fields"}`` as
+        served: every unknown name in the order sent; for each one another element type has, those
+        types; the names this type takes. None for any other error, or when the server sends no
+        ``unknown_fields``; an entry that is not a string is left out (as the npm SDK's
+        ``err.fieldsRefusal``)."""
+        if not (self.status == 422 and self.param == "fields"):
+            return None
+        raw_error = _envelope(self.response.body).get("error")
+        if not isinstance(raw_error, dict) or not isinstance(raw_error.get("unknown_fields"), list):
+            return None
+
+        def strings(value: Any) -> list[str]:
+            return [s for s in value if isinstance(s, str)] if isinstance(value, list) else []
+
+        held = raw_error.get("types_with_field")
+        types_with_field: dict[str, list[str]] = {}
+        if isinstance(held, dict):
+            for name, types in held.items():
+                if isinstance(name, str) and isinstance(types, list):
+                    types_with_field[name] = strings(types)
+        return {
+            "unknown_fields": strings(raw_error.get("unknown_fields")),
+            "types_with_field": types_with_field,
+            "allowed_fields": strings(raw_error.get("allowed_fields")),
+        }
+
+    @property
     def is_busy(self) -> bool:
         """keel's admission control turned the request away (503 ``server_busy``); see ``retry_after``."""
         return self.status == 503 and self.code == "server_busy"

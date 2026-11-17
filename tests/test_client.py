@@ -1177,6 +1177,64 @@ def test_refusals_leaves_out_a_row_not_in_its_shape() -> None:
     assert _refused([*bad, good]).refusals == [good]
 
 
+def _fields_refused(status: int = 422, **changes: Any) -> ApiError:
+    """The server's answer to fields=name,story,hidden,narrator,nonsuch on a Character list, its
+    allowed list cut to four names; a change of ``...`` removes that key."""
+    error: dict[str, Any] = {
+        "type": "invalid_request",
+        "code": "invalid_request",
+        "message": "Unknown fields in ?fields: story, hidden, narrator, nonsuch",
+        "param": "fields",
+        "doc_url": "https://onlyworlds.github.io/api/errors/#invalid_request",
+        "unknown_fields": ["story", "hidden", "narrator", "nonsuch"],
+        "types_with_field": {"story": ["narrative"], "narrator": ["narrative"]},
+        "allowed_fields": ["id", "name", "description", "supertype"],
+    }
+    for key, value in changes.items():
+        if value is ...:
+            del error[key]
+        else:
+            error[key] = value
+    return ApiError("GET", "x", jresp(status, {"error": error}))
+
+
+def test_fields_refusal_reads_the_three_keys_of_a_422_on_fields_as_served() -> None:
+    assert _fields_refused().fields_refusal == {
+        "unknown_fields": ["story", "hidden", "narrator", "nonsuch"],
+        "types_with_field": {"story": ["narrative"], "narrator": ["narrative"]},
+        "allowed_fields": ["id", "name", "description", "supertype"],
+    }
+
+
+def test_fields_refusal_is_none_on_any_other_error_each_condition_alone() -> None:
+    assert _fields_refused(unknown_fields=...).fields_refusal is None
+    assert _fields_refused(param="expand").fields_refusal is None
+    assert _fields_refused(status=400).fields_refusal is None
+    assert _fields_refused(unknown_fields="story").fields_refusal is None
+
+
+def test_fields_refusal_leaves_out_what_is_not_in_shape_and_answers_empty_for_a_missing_key() -> None:
+    odd = _fields_refused(
+        unknown_fields=["story", 7, None],
+        types_with_field={"story": ["narrative", 3], "narrator": "narrative"},
+        allowed_fields=["id", {}, "name"],
+    )
+    assert odd.fields_refusal == {
+        "unknown_fields": ["story"],
+        "types_with_field": {"story": ["narrative"]},
+        "allowed_fields": ["id", "name"],
+    }
+    thin = _fields_refused(types_with_field=..., allowed_fields=...)
+    assert thin.fields_refusal == {
+        "unknown_fields": ["story", "hidden", "narrator", "nonsuch"],
+        "types_with_field": {},
+        "allowed_fields": [],
+    }
+    as_list = _fields_refused(types_with_field=[["story", ["narrative"]]]).fields_refusal
+    assert as_list is not None
+    assert as_list["types_with_field"] == {}
+
+
 def test_search_sends_q_and_each_option_under_its_wire_name(make_client: MakeClient) -> None:
     """As the npm SDK's search (4.150.0): GET /search, q always, type, limit and as only when given."""
     answer = {"query": "APP-142", "results": [], "count": 0, "truncated": False}
