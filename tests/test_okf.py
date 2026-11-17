@@ -41,6 +41,7 @@ from onlyworlds.push import NOT_SENT  # noqa: E402
 ROOT = Path(__file__).resolve().parents[1]
 HYPERION = ROOT / "codegen" / "schema-dist" / "example" / "hyperion"
 BODY_LINK = re.compile(r"\]\(([^)\s]+\.md)\)")
+ELEMENT_ID = re.compile(r"[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}")
 
 if os.environ.get("OKF_REFERENCE_SRC"):
     sys.path.insert(0, os.environ["OKF_REFERENCE_SRC"])
@@ -289,7 +290,10 @@ def test_refuses_existing_out_dir(tmp_path: Path) -> None:
 def test_reference_parser_and_viewer(bundle: Bundle, tmp_path: Path) -> None:
     """OKF's own code at the pinned commit: every concept parses and has a
     type, indexes carry no frontmatter but the root's okf_version, and the
-    viewer draws one edge per distinct linked pair."""
+    viewer draws one edge per distinct linked pair: a link field's, or an
+    in-prose reference's (the export writes each as a link to the concept;
+    read here from the source's own text, any element id inside a markdown
+    link's target)."""
     for rel, data in bundle.files.items():
         doc = OKFDocument.parse(data.decode("utf-8"))
         if rel.endswith("index.md"):
@@ -304,9 +308,19 @@ def test_reference_parser_and_viewer(bundle: Bundle, tmp_path: Path) -> None:
         for t in link_ids(s, s["type"], name)
         if t != s["id"]
     }
+    prose = {
+        (s["id"], t)
+        for s in bundle.sources.values()
+        for value in s.values()
+        if isinstance(value, str)
+        for target in re.findall(r"\]\(([^)\s]+)\)", value)
+        for t in ELEMENT_ID.findall(target)
+        if t in bundle.sources and t != s["id"]
+    }
+    assert prose - pairs, "Hyperion carries in-prose references that no link field repeats"
     stats = generate_visualization(bundle.out, tmp_path / "viz.html")
     assert stats["concepts"] == len(bundle.sources) + 1
-    assert stats["edges"] == len(pairs)
+    assert stats["edges"] == len(pairs | prose)
 
 
 # --- the legacy layout
