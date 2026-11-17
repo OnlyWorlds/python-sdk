@@ -44,6 +44,31 @@ jobs:
       # Published text names no one inside the team and points at no internal room or tracker.
       - run: uv run python scripts/public_words.py
 
+  okf-reference:
+    # OKF's own parser and viewer, at the commit onlyworlds.okf pins, read this package's export.
+    # tests/test_okf.py skips that check when OKF's code is not importable, so the gates above
+    # never run it. Here the code is fetched at the pinned commit and a skip is a failure.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v7
+      - run: uv sync
+      - name: OKF's reference code at the pinned commit
+        run: |
+          REPO=$(uv run python -c "from onlyworlds import okf; print(okf.OKF_REPO)")
+          COMMIT=$(uv run python -c "from onlyworlds import okf; print(okf.OKF_COMMIT)")
+          echo "$REPO at $COMMIT"
+          git init -q "$RUNNER_TEMP/okf"
+          git -C "$RUNNER_TEMP/okf" fetch -q --depth 1 "$REPO" "$COMMIT"
+          git -C "$RUNNER_TEMP/okf" checkout -q FETCH_HEAD
+          test "$(git -C "$RUNNER_TEMP/okf" rev-parse HEAD)" = "$COMMIT"
+      - name: The reference check, where a skip fails
+        env:
+          OKF_REFERENCE_SRC: ${{ runner.temp }}/okf/src
+        run: |
+          uv run pytest -q -rs tests/test_okf.py::test_reference_parser_and_viewer | tee "$RUNNER_TEMP/okf.txt"
+          grep -q -E '^1 passed' "$RUNNER_TEMP/okf.txt"
+
   wire:
     # keel's own OpenAPI document and the public demo world, read only, and a few writes to the
     # practice world (its published key, reset every night), each deleted again. Red here with
