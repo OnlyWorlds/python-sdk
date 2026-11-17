@@ -3836,7 +3836,9 @@ class _Converter:
             n.append(
                 f"{self.unsupported} unsupported block{'' if self.unsupported == 1 else 's'} or propert"
                 f"{'y' if self.unsupported == 1 else 'ies'} (LegendKeeper's public model cannot express it): nothing"
-                " to read"
+                " to read through the API. Where this was measured they were a page's images, a list of sub-pages"
+                " and the sidebar rows showing tags or aliases: LegendKeeper's export file (--file) holds them,"
+                " and the door reads them from it"
             )
         for kind, count in sorted(self.unknown.items()):
             n.append(f"{count} block{'' if count == 1 else 's'} of kind {kind!r}, not known here: read by its text")
