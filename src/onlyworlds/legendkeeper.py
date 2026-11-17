@@ -551,6 +551,15 @@ _FEATURE_SAID = frozenset({"id", "name", "uri", "isHidden", "rank", "createdAt",
 
 #: The tldraw records a board carries, by ``typeName``: what rides on a board document as ``board``.
 _BOARD_RECORDS = (("shapes", "shape"), ("bindings", "binding"), ("assets", "asset"), ("pages", "page"))
+#: The content keys the export-file road reads, by document type: any other key is named in the notes.
+#: A page's content is the editor's document (``type`` and ``content``); a blank document holds none.
+_FILE_CONTENT_KEYS: dict[str, frozenset[str]] = {
+    "page": frozenset({"type", "content"}),
+    "map": frozenset({"pins", "regions", "paths"}),
+    "board": frozenset({"shapes", "bindings", "shapesV2"}),
+    "time": frozenset({"lanes", "events"}),
+    "blank": frozenset(),
+}
 
 #: An arrow's two terminals, start then end: the Relation's source and target.
 TERMINALS = ("start", "end")
@@ -901,6 +910,8 @@ class FileSource:
         self._icons = 0
         self._shows_row = 0
         self._marks: dict[str, int] = {}
+        #: (document type, content key) -> how many documents hold a key this road does not read
+        self._unread_content: dict[tuple[str, str], int] = {}
         rows = [r for r in data["resources"] if isinstance(r, dict) and isinstance(r.get("id"), str)]
         self._rows = {r["id"]: r for r in rows}
         tops = sorted(
@@ -953,6 +964,14 @@ class FileSource:
             out[rpath] = {**row, "documents": heads, "properties": props}
             for d in docs:
                 content = _obj(d.get("content"))
+                # a content key this road does not read is named in the notes, never dropped in silence
+                # (a document type not known here is named whole, under the documents not imported)
+                read_keys = _FILE_CONTENT_KEYS.get(str(d.get("type")))
+                if read_keys is not None:
+                    for key in content:
+                        if key not in read_keys:
+                            at = (str(d.get("type")), str(key))
+                            self._unread_content[at] = self._unread_content.get(at, 0) + 1
                 if d.get("type") == "page":
                     out[f"{rpath}/docs/{d['id']}/blocks"] = {
                         "id": d["id"],
@@ -1003,6 +1022,12 @@ class FileSource:
         if self._marks:
             listed = ", ".join(f"{m} {c}" for m, c in sorted(self._marks.items()))
             self.notes.append(f"text marks and inline nodes not known here, read as plain text: {listed}")
+        if self._unread_content:
+            listed = ", ".join(
+                f"{key!r} in {n} {kind} document{'' if n == 1 else 's'}"
+                for (kind, key), n in sorted(self._unread_content.items())
+            )
+            self.notes.append(f"content this door does not read from the export, not imported: {listed}")
         self.notes.append(
             "not kept from the export: createdBy (an account id), schemaVersion, showPropertyBar, isFullWidth,"
             " document locators, transforms and sources"
@@ -2245,7 +2270,7 @@ class _Converter:
         self._cards: list[_Card] = []
         #: records/ path -> a board's records, written whole beside the folder's elements
         self.board_records: dict[str, dict[str, Any]] = {}
-        #: map documents read through the API (no bounds or pins in its answers): not imported
+        #: map documents whose map and pins could not be read through the API: not imported, and said so
         self.api_maps = 0
         self.placed_pins = 0
         self.unplaced_pins = 0
@@ -2749,7 +2774,7 @@ class _Converter:
         elif kind == "map":
             target = self.items.get(str(prop.get("resourceId") or ""))
             where = {"resource": target.eid if target else prop.get("resourceId"), "document": prop.get("documentId")}
-            self._keep(item, title or "map", where, "maps are not imported")
+            self._keep(item, title or "map", where, "a map property has no field")
         elif kind == "unsupported":
             self.unsupported += 1
         else:

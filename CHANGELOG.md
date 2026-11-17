@@ -4,6 +4,8 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+- **The LegendKeeper door names what it does not read from an export file.** The file road took a map's pins, regions and paths, a timeline's lanes and events and a board's records, and passed over any other key a document's content held without a word, where the report promises that nothing from the source is dropped without a line. Such a key is now named in the notes with the number of documents that hold it (`'labels' in 2 map documents`). No export read so far holds one: the case is planted in the tests. A sidebar property that points at a map is kept with the reason "a map property has no field", where the reason said maps are not imported, which stopped being true at 0.53.0.
+
 - **The message for a write the host refused says the whole way out.** The same command passes in a fenced code block whose first line names a language, or with no backtick, semicolon or pipe directly before it; the message named only the backtick. The npm SDK's words, as before.
 
 ## 0.133.0 (2026-11-17)

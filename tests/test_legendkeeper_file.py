@@ -693,3 +693,32 @@ def test_a_visible_pin_on_a_hidden_page_is_named(tmp_path: Path) -> None:
     pin = of_type(out, "pin")["The quay"]
     assert "hidden" not in pin and pin["element_id"] == eid(QUAY)
     assert "'The quay': a visible pin on 'The quay map: Main' places the hidden 'The quay'" in report.notes
+
+
+def test_a_content_key_the_file_road_does_not_read_is_named(tmp_path: Path) -> None:
+    """Planted: no export read holds a content key beyond the ones this road reads, so a map's labels and folders
+    and a timeline's bookmarks are made up here. The real export prints no such note; the planted one names each
+    key with the number of documents that hold it, and the elements are the same either way."""
+    plain_out, plain = run(tmp_path / "a")
+    assert not [n for n in plain.notes if "does not read from the export" in n]
+    data = export()
+    planted = {"map": 0, "time": 0}
+    for r in data["resources"]:
+        for d in r.get("documents") or []:
+            if d.get("type") == "map" and isinstance(d.get("content"), dict):
+                d["content"]["labels"] = [{"id": "plantlabel1", "name": "A planted label"}]
+                d["content"]["folders"] = [{"id": "plantfolder1"}]
+                planted["map"] += 1
+            elif d.get("type") == "time" and isinstance(d.get("content"), dict):
+                d["content"]["bookmarks"] = [{"id": "plantmark1"}]
+                planted["time"] += 1
+    assert planted["map"] and planted["time"]
+    (tmp_path / "b").mkdir()
+    out, report = run(tmp_path / "b", write_lk(tmp_path / "b", data))
+    notes = [n for n in report.notes if "does not read from the export" in n]
+    assert len(notes) == 1
+    maps, times = planted["map"], planted["time"]
+    assert f"'folders' in {maps} map document" in notes[0]
+    assert f"'labels' in {maps} map document" in notes[0]
+    assert f"'bookmarks' in {times} time document" in notes[0]
+    assert tree(out) == tree(plain_out)
