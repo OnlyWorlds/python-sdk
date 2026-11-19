@@ -50,7 +50,7 @@ either changed: keel refuses a write that sets one half. The run stops at the fi
 answer that refuses the key itself (``stops_run``): a wrong PIN repeated across a push
 locks the key for every tool that uses it.
 
-A 202 is a patch held as a proposal (the world takes this agent seat's writes as
+A 202 is a patch held as a proposal (the world takes this AI seat's writes as
 proposals): the element did not change, so it is neither pushed nor failed. It is counted in
 ``PushResult.proposed``, logged with ``code: 202`` and its ``proposal`` id, never retried, and a
 rerun never sends that same patch again (``PushResult.already_proposed``): it would only file a

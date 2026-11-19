@@ -309,7 +309,7 @@ class BulkResult:
     the items that would have succeeded still say 201, with the ids and timestamps they would
     have had (keel spec, "counterfactual 201s"). Do not record those ids as created.
 
-    On a world that takes an agent seat's writes as proposals, a seat's item on an
+    On a world that takes an AI seat's writes as proposals, a seat's item on an
     existing element says 202 with ``proposal`` in its slot: the element did not change, so a
     202 slot is neither written nor failed (``proposed`` lists them). Under ``atomic`` a failed
     batch keeps no proposal either.
@@ -405,7 +405,7 @@ class Client:
         patch, delete, edit_links, bulk: the operations keel's document declares it on) carries
         ``X-OW-Agent``, and keel records those writes as agent-made (``changed_via: "declared"``; keel
         stores that the header was there, never its value). Off by default, and off in any tool
-        a person uses: it describes the caller. An agent seat's key counts as an agent without it.
+        a person uses: it describes the caller. An AI seat's key counts as an agent without it.
 
         ``client`` is the software's own name, sent as ``X-OW-Client`` on the same element writes
         and never on a read. keel stores it on the element as ``changed_client``, and on
@@ -546,7 +546,7 @@ class Client:
         ``charter_element`` and ``charter_skill_elements`` are the same two, typed as ``{type, id}``
         (``law`` for the Charter, ``object`` for each skill), None and an empty list where
         ``charter`` and ``charter_skill`` are. ``my_seats`` lists the live AI and player seats you answer for,
-        agent seats first, each ``{id, kind, name, character}``: ``id`` the seat's membership id as
+        AI seats first, each ``{id, kind, name, character}``: ``id`` the seat's membership id as
         ``GET /members`` lists it, ``kind`` ``agent`` or ``player``, ``name`` None when the seat has
         none, ``character`` the Character it plays (None when it plays none you can read). It is
         empty for an AI or a player seat's own key and for anyone who answers for none; a seat made
@@ -571,7 +571,7 @@ class Client:
         seat off its Titles' lenses. ``None`` goes back to never chosen: a seat playing a Character then
         starts with its Titles' lenses (``lenses_from`` says where a list comes from); on the owner's own
         keys ``None`` is the empty list. Any write
-        key of the world, with its PIN, sets its own holder's list: a person member's, an agent seat's,
+        key of the world, with its PIN, sets its own holder's list: a person member's, an AI seat's,
         or on the owner's keys the owner's own. Answers ``GET /me``'s body. The draught reads the list
         whenever it is given no ``lens`` and no policy. 404 for a lens this key cannot see; 422
         ``not_a_lens``, ``lens_is_template`` or ``lens_hidden`` (``param`` lenses); 403 for a read key. A
@@ -697,7 +697,7 @@ class Client:
         and the list came back whole). ``ordering`` is a 422 too: sort here.
 
         ``view_as`` (sent as ``as``) reads as another reader of this world would: a
-        membership id (a person, an agent seat or a player seat) as that member's own key, a
+        membership id (a person, an AI seat or a player seat) as that member's own key, a
         Character id as a guest of that Character with no membership, ``"public"`` as everything
         not hidden. The owner's keys only (a key with no member): a member key gets 403
         ``view_as_owner_only`` (``is_view_as_owner_only``). An element hidden from that reader
@@ -848,7 +848,7 @@ class Client:
         A known-of stub (``known_of: true``) is a ValueError before sending, here and
         on every element write: a PUT of one would blank every field it does not keep.
 
-        On a world that takes an agent seat's writes as proposals, a seat's PUT of an
+        On a world that takes an AI seat's writes as proposals, a seat's PUT of an
         existing element answers 202 and this raises ``ProposedError`` (the element unchanged; the
         row holds only what differs, and the fields this PUT left out that were not empty are named in
         its ``omitted``: an accept empties them). A seat's write that changes nothing makes no row and
@@ -875,7 +875,7 @@ class Client:
         if nobody changed the element since; otherwise nothing is written and ``PreconditionFailed``
         (412) is raised, whose ``current`` is the element as it is now. Omit it for an unconditional write.
 
-        A 202 (the world holds this agent seat's writes as proposals) raises
+        A 202 (the world holds this AI seat's writes as proposals) raises
         ``ProposedError``: the element did not change. keel checks ``if_match`` first, so a stale
         one is still a 412.
         """

@@ -294,7 +294,7 @@ class ApiError(Exception):
 
     @property
     def is_proposed(self) -> bool:
-        """The write was held as a proposal (202): the world takes this agent seat's writes
+        """The write was held as a proposal (202): the world takes this AI seat's writes
         as proposals, and the element did not change. The error is a ``ProposedError``, whose
         ``proposal`` is the row a keeper (the owner or a co-builder) accepts or declines."""
         return self.status == 202
@@ -320,7 +320,7 @@ class ApiError(Exception):
 
     @property
     def is_proposed_only(self) -> bool:
-        """The world takes this agent seat's writes as proposals, and the act has no proposal form (403
+        """The world takes this AI seat's writes as proposals, and the act has no proposal form (403
         ``proposed_only``): deleting an element the seat did not create, or accepting or
         declining a proposal. Propose instead, or ask a keeper. Also the review of a new element by
         the member its ``x_review_proposed`` mark names, on any world."""
@@ -378,7 +378,7 @@ class StaleProposal(ApiError):
 
 
 class ProposedError(ApiError):
-    """A write answered 202: the world takes this agent seat's writes as proposals (its
+    """A write answered 202: the world takes this AI seat's writes as proposals (its
     owner's setting, ``agent_writes_proposed`` on ``GET /world``), so the element did NOT change.
     ``proposal`` is the row the write became (None if a response ever lacks it): since 2026-10-23 its
     ``fields`` holds only what differs, and a PUT's ``omitted`` names the fields it would empty. A
@@ -393,7 +393,7 @@ class ProposedError(ApiError):
         pid = self.proposal.get("id") if self.proposal else None
         self.args = (
             f"{method} {path} -> 202: proposed, not applied (proposal {pid}): this world takes this "
-            "agent seat's writes as proposals, and a keeper accepts or declines them",
+            "AI seat's writes as proposals, and a keeper accepts or declines them",
         )
 
 

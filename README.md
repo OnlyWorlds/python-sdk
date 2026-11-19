@@ -34,7 +34,7 @@ Create a world at [onlyworlds.com](https://www.onlyworlds.com); its keys are on 
 
 - An `ow_r_` key reads, with no PIN: `Client("ow_r_…")`.
 - An `ow_w_` key reads and writes. Writes also send a PIN: `Client("ow_w_…", "…")`.
-- For code that writes, give it its own [agent seat](https://onlyworlds.github.io/docs/development/agents), a key for one tool or script. The seat's key and its `ow_s_` secret (passed as the PIN) work in one world, and you can remove them without touching your account PIN.
+- For code that writes, give it its own [AI seat](https://onlyworlds.github.io/docs/development/agents), a key for one tool or script. The seat's key and its `ow_s_` secret (passed as the PIN) work in one world, and you can remove them without touching your account PIN.
 
 Elements are plain dicts:
 

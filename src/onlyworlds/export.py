@@ -49,7 +49,7 @@ def exported_as(me: Mapping[str, Any] | None, character_name: Callable[[str], st
 
     - ``kind: owner`` (an owner-minted or classic key) -> owner, role owner, no character;
     - a member with role ``co_builder`` or ``contributor`` -> member, its role, no character;
-    - a guest of any kind (person, agent seat, player) -> character, role guest, and the
+    - a guest of any kind (person, AI seat, player) -> character, role guest, and the
       Character it reads as, ``{id, name}``, the name from ``character_name(id)``;
     - anything else -> None. No ``/me`` (``me`` None), a guest with no Character, a
       Character whose name cannot be read (``character_name`` gives None), or a kind or

@@ -485,7 +485,7 @@ PROPOSAL_ID = "019a0000-0000-7000-8000-0000000000aa"
 
 
 def held(*ids: str) -> Callable[..., Response]:
-    """A world that takes an agent seat's writes as proposals answers these ids 202."""
+    """A world that takes an AI seat's writes as proposals answers these ids 202."""
     stored = echo()
 
     def handler(method: str, url: str, headers: Mapping[str, str], body: bytes | None) -> Response:
