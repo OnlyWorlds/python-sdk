@@ -4,9 +4,9 @@
   "notes": [
     "pair: construct + supertype Lens, each trimmed and folded like the room profile's pairs; a template is a lens whose subtype, trimmed and folded, is Template.",
     "keys: the legal values of x_lens; a case's legal is what a reader's check answers, and bad names the first key refused (x_lens itself when the value is not an object).",
-    "worlds: each world's elements as its owner is served them, the ids its hidden mark keeps from every reader but the owner, and its readers. A reader's rung is owner (the whole world), contributor (the world less the hidden), guest (exactly the whole and known_of ids it lists; known_of is a stub, and a known_of id the hidden mark keeps is not in its view at all: hidden beats known_of, and only a guest's own creation, listed in whole, stays) or public (the world less the hidden and the room elements). An element whose x_review_proposed counts as present by the review profile's rule 1 (a mark or a doubt; null and an empty value, an empty or White_Space-only string, [] or {}, are none) is in no reader's view (the review profile's rule for a reader that hands a world on). A reader with as is the owner reading as that reader: the reader's view, and the owner's two counts (anchor_not_visible, not_visible).",
+    "worlds: each world's elements as its owner is served them, the ids its hidden mark keeps from every reader but a keeper (the owner or a co-builder) and the one who made each, and its readers. A reader's rung is owner (the whole world), co-builder (the whole world, as the owner reads it, hidden elements included, and none of the owner's two counts: a keeper, as the charter profile names the role), contributor (the world less the hidden, plus each hidden element its whole lists, which is one it made, as a guest's whole lists its own creation), guest (exactly the whole and known_of ids it lists; known_of is a stub, and a known_of id the hidden mark keeps is not in its view at all: hidden beats known_of, and only a guest's own creation, listed in whole, stays) or public (the world less the hidden and the room elements). An element whose x_review_proposed counts as present by the review profile's rule 1 (a mark or a doubt; null and an empty value, an empty or White_Space-only string, [] or {}, are none) is in no reader's view (the review profile's rule for a reader that hands a world on). A reader with as is the owner reading as that reader: the reader's view, and the owner's two counts (anchor_not_visible, not_visible).",
     "resolve: lens is the lens read, a body or the id of a lens in the world; as_of is the reading's date (absent: the world's now; with neither, no fence and the window cuts nothing); clock is the reading's wall clock, for the mail rule and changed_within. kept is the resolved set in order, cut the count by reason (a reason with no count is absent). rows, where given, are the kept rows as show makes them; mail, where given, is the mail rule's part; notes_ignored counts notes on ids that are not anchors.",
-    "invariant: subset (each reader's kept is a subset of the owner's, and no secret's id or name appears anywhere in a non-owner result), same_without (each reader's result is identical with the without ids removed from the world), unchanged (the world is identical before and after every reader's reading).",
+    "invariant: subset (each reader's kept is a subset of the owner's, and no secret's id or name appears anywhere in a non-keeper result), same_without (each reader's result is identical with the without ids removed from the world), unchanged (the world is identical before and after every reader's reading).",
     "uses: which lenses a seat reads, from its membership's choice and its Character's x_lens_uses. membership null means there is no membership (a folder world), and then the Character's x_lens_uses is read; a membership that exists and never chose is not this reading's case (keel gives that seat its Titles' lenses and never reads x_lens_uses).",
     "graph: a case carries its own small world (the elements as the owner is served them, hidden: true on an element the hidden mark keeps, a room element by its pair and x_room_of, a proposed one by x_review_proposed) and reader (rung; a guest's whole and known_of; the owner's as), because the order case needs ids above U+FFFF that no uuid can carry; options are the graph's flags and lens (an id, or a lens body); want is the nodes in order with their marks, the edges in order, edges_cut, the lens's cut and unreadable; edges_cut_reasons lists every reason an edge can be cut by, the graph's own first, then a lens's; graph_links is the closed table of extension fields that make an edge.",
     "degree: the two counts over a graph; a case's graph is nodes and edges as worldGraph gives them, and its want is degree and out_degree per node, every node a key in the graph's node order."
@@ -2054,7 +2054,8 @@
       "hidden": [
         "019a7f00-0000-7000-8000-000000000410",
         "019a7f00-0000-7000-8000-000000000411",
-        "019a7f00-0000-7000-8000-000000000413"
+        "019a7f00-0000-7000-8000-000000000413",
+        "019a7f00-0000-7000-8000-000000000414"
       ],
       "readers": {
         "owner": {
@@ -2088,6 +2089,17 @@
           ],
           "known_of": [
             "019a7f00-0000-7000-8000-000000000411"
+          ]
+        },
+        "co-builder": {
+          "rung": "co-builder",
+          "character": null
+        },
+        "scribe": {
+          "rung": "contributor",
+          "character": null,
+          "whole": [
+            "019a7f00-0000-7000-8000-000000000414"
           ]
         },
         "public": {
@@ -2290,6 +2302,12 @@
           "id": "019a7f00-0000-7000-8000-000000000413",
           "type": "character",
           "name": "The Guest's Own Spy",
+          "updated_at": "2026-10-06T12:00:00Z"
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000414",
+          "type": "character",
+          "name": "The Scribe's Own Informant",
           "updated_at": "2026-10-06T12:00:00Z"
         }
       ]
@@ -11373,7 +11391,142 @@
           "hidden": true
         }
       ],
-      "note": "Below the owner the hidden key travels only on a guest's body of its own hidden creation, which the guest sees whole: the spy is the guest's own and hidden from every other reader, so the guest's row carries hidden: true."
+      "note": "Below a keeper the hidden key travels only on a contributor's or a guest's body of its own hidden creation, which its maker sees whole: the spy is the guest's own and hidden from every other reader, so the guest's row carries hidden: true."
+    },
+    {
+      "name": "a-contributors-full-row-of-its-own-hidden-creation-carries-hidden-true",
+      "kind": "resolve",
+      "world": "ledger",
+      "reader": "scribe",
+      "lens": {
+        "id": "019a7f00-0000-7000-8000-000000000453",
+        "type": "construct",
+        "name": "A lens",
+        "supertype": "Lens",
+        "subtype": "",
+        "characters": [
+          "019a7f00-0000-7000-8000-000000000414",
+          "019a7f00-0000-7000-8000-000000000401"
+        ],
+        "x_lens": {
+          "depth": 0,
+          "show": "full"
+        }
+      },
+      "kept": [
+        "019a7f00-0000-7000-8000-000000000414",
+        "019a7f00-0000-7000-8000-000000000401"
+      ],
+      "cut": {},
+      "rows": [
+        {
+          "id": "019a7f00-0000-7000-8000-000000000414",
+          "type": "character",
+          "name": "The Scribe's Own Informant",
+          "updated_at": "2026-10-06T12:00:00Z",
+          "hidden": true
+        },
+        {
+          "id": "019a7f00-0000-7000-8000-000000000401",
+          "type": "character",
+          "name": "Hal Dale",
+          "updated_at": "2026-10-02T12:00:00Z"
+        }
+      ],
+      "note": "The hidden mark keeps an element from every reader but the owner and the one who made it: the informant is the scribe's own, a contributor's, so the scribe reads the world less the hidden plus the informant, and its row carries hidden: true."
+    },
+    {
+      "name": "a-contributors-hidden-creation-is-not-in-another-contributors-view",
+      "kind": "resolve",
+      "world": "ledger",
+      "reader": "contributor",
+      "lens": {
+        "id": "019a7f00-0000-7000-8000-000000000453",
+        "type": "construct",
+        "name": "A lens",
+        "supertype": "Lens",
+        "subtype": "",
+        "characters": [
+          "019a7f00-0000-7000-8000-000000000414",
+          "019a7f00-0000-7000-8000-000000000401"
+        ],
+        "x_lens": {
+          "depth": 0,
+          "show": "full"
+        }
+      },
+      "kept": [
+        "019a7f00-0000-7000-8000-000000000401"
+      ],
+      "cut": {},
+      "rows": [
+        {
+          "id": "019a7f00-0000-7000-8000-000000000401",
+          "type": "character",
+          "name": "Hal Dale",
+          "updated_at": "2026-10-02T12:00:00Z"
+        }
+      ],
+      "note": "The same lens read by a contributor that did not make the informant: the hidden mark keeps it from this reader, so the anchor is skipped and only Hal is kept, with no count, as a reader below the owner carries none."
+    },
+    {
+      "name": "a-co-builders-full-row-of-a-hidden-element-carries-hidden-true",
+      "kind": "resolve",
+      "world": "ledger",
+      "reader": "co-builder",
+      "lens": {
+        "id": "019a7f00-0000-7000-8000-000000000454",
+        "type": "construct",
+        "name": "A lens",
+        "supertype": "Lens",
+        "subtype": "",
+        "characters": [
+          "019a7f00-0000-7000-8000-000000000411"
+        ],
+        "x_lens": {
+          "depth": 0,
+          "show": "full"
+        }
+      },
+      "kept": [
+        "019a7f00-0000-7000-8000-000000000411"
+      ],
+      "cut": {},
+      "rows": [
+        {
+          "id": "019a7f00-0000-7000-8000-000000000411",
+          "type": "character",
+          "name": "The Heir",
+          "updated_at": "2026-10-06T12:00:00Z",
+          "hidden": true
+        }
+      ],
+      "note": "A co-builder is a keeper: the hidden mark keeps nothing from it, so it reads the Heir, which it did not make, whole, and its row carries hidden: true, as the owner's does."
+    },
+    {
+      "name": "a-co-builder-is-handed-none-of-the-owners-counts",
+      "kind": "resolve",
+      "world": "ledger",
+      "reader": "co-builder",
+      "lens": {
+        "id": "019a7f00-0000-7000-8000-000000000455",
+        "type": "construct",
+        "name": "A lens",
+        "supertype": "Lens",
+        "subtype": "",
+        "characters": [
+          "019a7f00-0000-7000-8000-000000000400"
+        ],
+        "x_lens": {
+          "depth": 1
+        }
+      },
+      "kept": [
+        "019a7f00-0000-7000-8000-000000000400",
+        "019a7f00-0000-7000-8000-000000000401"
+      ],
+      "cut": {},
+      "note": "Wren's friends are Hal and Ula, and Ula carries the review mark: a proposed element is in no reader's view, so the hop keeps Hal alone. The owner reading this lens counts Ula not_visible (the owner's count only: the owner reading as itself counts what is proposed); a co-builder is a keeper, but not the owner, and a reader that is not the owner never carries not_visible, not even as zero."
     },
     {
       "name": "a-hidden-element-a-guests-known-of-names-is-not-in-its-view",

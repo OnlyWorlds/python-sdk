@@ -11,7 +11,7 @@
     "lints: each {kind, report}: chain on a report whose parent is a report that itself has a report for its parent (one the reader holds, the pair and the mark, its own parent read by this rule); self on a report that names itself. A report that names itself is read as naming no parent, so a report that names it is no chain. These are the only lints: a parent that is missing or of no kind is no lint.",
     "The page rules the order inside a group and none between groups: groups and lints each compare as a set. Here groups are listed in the order their parent is first named in the list given, and lints in the order of their reports.",
     "A case's note is prose for the reader of the fixture, never an input.",
-    "talk_cases: each case is one Narrative as a reader is given it and its talks; a Narrative that is no report (the pair and the mark, both) is shown with no talk. talks: every talk on an element a reader shows the report with, each {type, id}, an id in objects as object and an id in constructs as construct, each entry read as the room profile reads a line's (one that is not a string, or is empty once trimmed of White_Space, names nothing; a field that is not a list names none; every other entry is an id read as written), read from the report alone, compared as a set. A reader shows a report with the talk on each Object or Construct it links, whether or not it names a sitting in events; talks never says which of them, if any, the report closed."
+    "talk_cases: each case is one Narrative as a reader is given it and its talks; a Narrative that is no report (the pair and the mark, both) is shown with no talk. talks: every talk on an element a reader shows the report with, each {type, id}, an id in objects as object and an id in constructs as construct, each entry read as the room profile reads a line's (one that is not a string, or is empty once trimmed of White_Space, names nothing; a field that is not a list names none; every other entry is an id read as written), read from the report alone, each once (a list names each element once, the landing profile's Each element once), compared as a set: an answer that holds one {type, id} twice is wrong. A reader shows a report with the talk on each Object or Construct it links, whether or not it names a sitting in events; talks never says which of them, if any, the report closed."
   ],
   "pair": {
     "type": "narrative",
@@ -1496,6 +1496,67 @@
         {
           "type": "object",
           "id": "019a7120-0000-7000-8000-000000000a03 "
+        }
+      ]
+    },
+    {
+      "name": "a-marked-board-entry-linking-an-object-is-no-report-and-shown-with-no-talk",
+      "note": "A board entry (the pair narrative + Board, with the mark) is no report: a report is the pair narrative + Report and the mark, both.",
+      "report": {
+        "id": "019a7120-0000-7000-8000-000000000a27",
+        "type": "narrative",
+        "supertype": "Board",
+        "x_room_of": "019a7120-0000-7000-8000-000000000000",
+        "subtype": "red",
+        "objects": [
+          "019a7120-0000-7000-8000-000000000a01"
+        ]
+      },
+      "talks": []
+    },
+    {
+      "name": "a-report-reads-an-entry-of-four-separators-as-an-id-as-written",
+      "note": "Its objects hold U+001C, U+001D, U+001E and U+001F together, beside an id. None of the four is White_Space by the room profile, so the entry is not empty once trimmed and is an id read as written, as the id beside it is: two talks.",
+      "report": {
+        "id": "019a7120-0000-7000-8000-000000000a28",
+        "type": "narrative",
+        "supertype": "Report",
+        "x_room_of": "019a7120-0000-7000-8000-000000000000",
+        "subtype": "completed",
+        "objects": [
+          "\u001c\u001d\u001e\u001f",
+          "019a7120-0000-7000-8000-000000000a01"
+        ]
+      },
+      "talks": [
+        {
+          "type": "object",
+          "id": "\u001c\u001d\u001e\u001f"
+        },
+        {
+          "type": "object",
+          "id": "019a7120-0000-7000-8000-000000000a01"
+        }
+      ]
+    },
+    {
+      "name": "a-report-naming-one-id-twice-is-shown-with-one-talk-on-it",
+      "note": "Its objects name one id twice: a list names each element once (the landing profile's Each element once), so the report is shown with one talk on it, and an answer that holds that talk twice is wrong.",
+      "report": {
+        "id": "019a7120-0000-7000-8000-000000000a29",
+        "type": "narrative",
+        "supertype": "Report",
+        "x_room_of": "019a7120-0000-7000-8000-000000000000",
+        "subtype": "completed",
+        "objects": [
+          "019a7120-0000-7000-8000-000000000a01",
+          "019a7120-0000-7000-8000-000000000a01"
+        ]
+      },
+      "talks": [
+        {
+          "type": "object",
+          "id": "019a7120-0000-7000-8000-000000000a01"
         }
       ]
     }

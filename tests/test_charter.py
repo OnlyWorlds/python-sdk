@@ -176,9 +176,9 @@ def part_set(rows: list[Any]) -> set[tuple[str, str, str]]:
     return {(row["type"], row["id"], row["state"]) for row in rows}
 
 
-def test_the_fixture_holds_serial_135s_design_cases() -> None:
-    assert len(DESIGN_CASES) == 13, f"the fixture holds {len(DESIGN_CASES)} design cases, serial 135 has 13"
-    assert len({c["name"] for c in DESIGN_CASES}) == 13
+def test_the_fixture_holds_serial_138s_design_cases() -> None:
+    assert len(DESIGN_CASES) == 16, f"the fixture holds {len(DESIGN_CASES)} design cases, serial 138 has 16"
+    assert len({c["name"] for c in DESIGN_CASES}) == 16
 
 
 @pytest.mark.parametrize("case", DESIGN_CASES, ids=lambda c: c["name"])

@@ -2,13 +2,13 @@
   "profile": "packet",
   "profile_page": "profiles/packet.md",
   "notes": [
-    "Each case is the work items as one reader is given them, in the order given, all Relations with supertype Work item in the world below, and a want worked by hand from the page's rules 1, 5, 7 and 8.",
+    "Each case is the work items as one reader is given them, in the order given, all Relations with supertype Work item in the world below (but two elements of one state case, which are no work items), and a want worked by hand from the page's rules 1, 5, 7 and 8.",
     "world: the world the work items sit in: its id, its Characters, and others, the ids of every other element of it the reader holds. A value written as no id in either list names no element the reader holds. x_packet_source names the same world, as a folder (server null), except where an item's elements are the source_world's.",
     "source_world: another world, the source of the packets that name its elements, whose elements the reader holds too, having resolved those packets there (rule 2); its Characters are no Characters of the world the items sit in.",
-    "state_cases want: states, for each item its state, the word `open`, `taken`, `done` or `standing` matched trimmed and without regard to case as the room profile defines it, or null for no state (rule 5); shown, every item (no item is hidden for its state); open_work, for each element any item names in x_packet_elements, the ids of the open work that names it (the items whose state is `open` or `taken`); elements, where present, an item's elements in x_packet_elements' order (rules 1 and 7).",
+    "state_cases want: states, for each item its state, the word `open`, `taken`, `done` or `standing` matched trimmed and without regard to case as the room profile defines it, or null for no state (rule 5); shown, every item (no item is hidden for its state); open_work, for each element any item names in x_packet_elements, the ids of the open work that names it (the items whose state is `open` or `taken`); elements, where present, an item's elements in x_packet_elements' order (rules 1 and 7). An element given that is no work item (a work item is a Relation with supertype Work item) is in no part of the want: it has no state, is not shown, and is open work on no element.",
     "asker_cases want: askers, for each item the Character id x_packet_from names or null (rule 8); lints, each {kind, item}, the one kind `asker`, for a key that is not one id (not a string, or a string empty once trimmed of White_Space as the room profile trims) or that is, written exactly so, an id in others or in the source_world (absent, null and a value that names no element the reader holds, in any spelling, are no lint); waiting_on, for each Character of the world, the ids of the open work whose asker is that Character.",
     "Order: the page orders no list of work items, so shown, each list in open_work, each list in waiting_on, and lints compare as sets, written here in the order the items are given. Only elements is a list in order, x_packet_elements' order (rule 1). states and askers compare as maps.",
-    "created_by holds a maker's id, which is no Character of the world. A case's note is prose for the reader of the fixture, never an input."
+    "created_by holds a maker's id, which is no Character of the world, but in one asker case, where it is written as a Character's id the reader holds, so that a reader that took the maker for the asker would name that Character. A case's note is prose for the reader of the fixture, never an input."
   ],
   "world": {
     "id": "019a8136-0000-7000-8000-000000000000",
@@ -680,6 +680,79 @@
         "open_work": {
           "019a8136-0000-7000-8000-000000000301": [],
           "019a8136-0000-7000-8000-000000000321": []
+        }
+      }
+    },
+    {
+      "name": "an-element-that-is-no-work-item-has-no-state",
+      "note": "Beside a work item, a Narrative with supertype Work item and a Relation with supertype Ally are given, each with the subtype open and a packet's keys: a work item is a Relation with supertype Work item, so neither is one. Neither has a state, is shown or is open work on the element it names.",
+      "items": [
+        {
+          "id": "019a8136-0000-7000-8000-000000000148",
+          "type": "relation",
+          "supertype": "Work item",
+          "subtype": "open",
+          "name": "Name the bay",
+          "x_packet_elements": [
+            {
+              "type": "location",
+              "id": "019a8136-0000-7000-8000-000000000301",
+              "reason": "No parent location."
+            }
+          ],
+          "x_packet_source": {
+            "server": null,
+            "world": "019a8136-0000-7000-8000-000000000000"
+          }
+        },
+        {
+          "id": "019a8136-0000-7000-8000-000000000149",
+          "type": "narrative",
+          "supertype": "Work item",
+          "subtype": "open",
+          "name": "Name the bay, as a note",
+          "x_packet_elements": [
+            {
+              "type": "location",
+              "id": "019a8136-0000-7000-8000-000000000301",
+              "reason": "No parent location."
+            }
+          ],
+          "x_packet_source": {
+            "server": null,
+            "world": "019a8136-0000-7000-8000-000000000000"
+          }
+        },
+        {
+          "id": "019a8136-0000-7000-8000-000000000150",
+          "type": "relation",
+          "supertype": "Ally",
+          "subtype": "open",
+          "name": "The bay's friends",
+          "x_packet_elements": [
+            {
+              "type": "location",
+              "id": "019a8136-0000-7000-8000-000000000301",
+              "reason": "No parent location."
+            }
+          ],
+          "x_packet_source": {
+            "server": null,
+            "world": "019a8136-0000-7000-8000-000000000000"
+          }
+        }
+      ],
+      "want": {
+        "states": {
+          "019a8136-0000-7000-8000-000000000148": "open"
+        },
+        "shown": [
+          "019a8136-0000-7000-8000-000000000148"
+        ],
+        "open_work": {
+          "019a8136-0000-7000-8000-000000000301": [
+            "019a8136-0000-7000-8000-000000000148"
+          ]
         }
       }
     }
@@ -1454,6 +1527,43 @@
           "019a8136-0000-7000-8000-000000000202": [
             "019a8136-0000-7000-8000-000000000132"
           ],
+          "019a8136-0000-7000-8000-000000000203": [],
+          "019A8136-0000-7000-8000-000000000204": []
+        }
+      }
+    },
+    {
+      "name": "the-maker-is-never-the-asker",
+      "note": "No key, and the maker in created_by is written as the id of a Character the reader holds: the asker is still not named, never the maker (rule 8), so that Character waits on nothing.",
+      "items": [
+        {
+          "id": "019a8136-0000-7000-8000-000000000151",
+          "type": "relation",
+          "supertype": "Work item",
+          "subtype": "open",
+          "created_by": "019a8136-0000-7000-8000-000000000202",
+          "name": "Name the cove",
+          "x_packet_elements": [
+            {
+              "type": "location",
+              "id": "019a8136-0000-7000-8000-000000000302",
+              "reason": "No name yet."
+            }
+          ],
+          "x_packet_source": {
+            "server": null,
+            "world": "019a8136-0000-7000-8000-000000000000"
+          }
+        }
+      ],
+      "want": {
+        "askers": {
+          "019a8136-0000-7000-8000-000000000151": null
+        },
+        "lints": [],
+        "waiting_on": {
+          "019a8136-0000-7000-8000-000000000201": [],
+          "019a8136-0000-7000-8000-000000000202": [],
           "019a8136-0000-7000-8000-000000000203": [],
           "019A8136-0000-7000-8000-000000000204": []
         }

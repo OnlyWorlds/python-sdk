@@ -4,7 +4,7 @@
   "notes": [
     "aids: an element is a reading aid when its type and supertype, each trimmed and folded as the room profile defines it, are one of pairs, and it carries mark.field, read by presence: any value but null, a string only when something is left after trimming White_Space, an empty list or an empty object never (serial 126). The pair without the mark is lore; the mark on no pair makes nothing. Wherever a type is compared to a kind (a pair, a hub's kind, a skill's being an Object), it is trimmed and folded as the room profile defines it.",
     "element: isCharterElement(element), in the room profile's matcher-case shape: element gives type, supertype and the mark as a body might carry them; is_charter_element is what the reader must answer, the pair AND the mark. A mark counts when its value is not null: a string only when something is left after the White_Space trim, an empty list or an empty object as absent, any other value (a number, a list or an object with something in it) as present; the value is never compared.",
-    "worlds: each world's elements as its owner is served them, the ids its hidden mark keeps from every reader but the owner, and its readers, in the lens fixture's shape. A reader's rung is owner (the whole world), contributor (the world less the hidden), guest (exactly the whole and known_of ids it lists; known_of is a stub, served as the lens profile serves one: its id, type, name, description, supertype, subtype and image_url, the server's times and its type's public fields, no link and no extension field) or public (the world less the hidden and the room elements, and nothing at all unless the world carries open: true, a world open to anyone). A case's world is a name in worlds or, as a graph case's is, a world of its own.",
+    "worlds: each world's elements as its owner is served them, the ids its hidden mark keeps from every reader but a keeper (the owner or a co-builder) and the one who made each, and its readers, in the lens fixture's shape. A reader's rung is owner (the whole world), contributor (the world less the hidden, plus each hidden element its whole lists, which is one it made, as a guest's whole lists its own creation), guest (exactly the whole and known_of ids it lists; known_of is a stub, served as the lens profile serves one: its id, type, name, description, supertype, subtype and image_url, the server's times and its type's public fields, no link and no extension field) or public (the world less the hidden and the room elements, and nothing at all unless the world carries open: true, a world open to anyone). A case's world is a name in worlds or, as a graph case's is, a world of its own.",
     "a stub's standing: a stub serves no extension field, so whether an element the reader holds only as a stub is a reading aid is read from the element as the owner is served it; what the reading shows of it is what the stub serves.",
     "charter: want is charterOf(world, reader). charter is {id, type, name, rules, skill} or null, type law: the newest marked Charter the reader sees, by created_at compared as instants (none sorts oldest), then the higher id by code point; rules the rules_field list as stored, [] when absent or null; skill the ids its description names (any id written as 8-4-4-4-12 hex, so every ow:// form, a site address and a bare id), in lowercase, each once in the order written, kept when it is an Object of this world the reader sees (served whole to every reader who reads the Charter; one the hidden mark keeps from the reader is not seen and not kept), the first skill_max of those kept. guide is {id, type, name} or null, type construct, chosen the same way among marked Guides. domains is every marked Domain the reader sees, each {id, type, name, sentence, hubs}, type construct: in the order of the Guide's constructs as the reader is served them first (an id named twice keeps its first place, an entry that is no marked Domain is skipped), then the rest by folded name and then id; with no Guide seen, by folded name and id alone.",
     "sentence: the description as served, trimmed of White_Space at both ends, cut at its first line break (a line feed or a carriage return) and trimmed again, so its first line that holds something; an empty string when there is none. hubs: the distinct {type, id} the Domain's served link fields name, each an element of its field's kind in the reader's view (any other id names no hub), in hub_fields' order (the Construct's link fields, the schema's order) and each list's own order, the Domain itself excluded; a stub serves no links, so a stub Domain's hubs are [].",
@@ -3558,6 +3558,152 @@
         {
           "type": "object",
           "id": "019a7f00-0000-7000-8000-0000000006b1",
+          "state": "locked"
+        }
+      ]
+    },
+    {
+      "name": "a-hidden-locked-object-is-no-design-part-for-a-contributor",
+      "note": "The marked Charter is the contributor's to read, and the locked Object carries the hidden mark: the contributor is not served the Object, so it reads no design state on it. Its owner, served it whole, would read it as a design part.",
+      "world": {
+        "id": "019a7f00-0000-7000-8000-00000000f15c",
+        "name": "Design 13",
+        "hidden": [
+          "019a7f00-0000-7000-8000-0000000006c1"
+        ],
+        "readers": {
+          "owner": {
+            "rung": "owner",
+            "character": null
+          },
+          "contributor": {
+            "rung": "contributor",
+            "character": null
+          }
+        },
+        "elements": [
+          {
+            "id": "019a7f00-0000-7000-8000-0000000006c0",
+            "type": "law",
+            "name": "Rules",
+            "supertype": "Charter",
+            "created_at": "2026-11-01T12:00:00Z",
+            "description": "The rules of the workshop.",
+            "x_charter_of": "019a7f00-0000-7000-8000-00000000f15c"
+          },
+          {
+            "id": "019a7f00-0000-7000-8000-0000000006c1",
+            "type": "object",
+            "name": "Control panel",
+            "subtype": "locked",
+            "created_at": "2026-11-02T12:00:00Z"
+          }
+        ]
+      },
+      "reader": "contributor",
+      "want": []
+    },
+    {
+      "name": "a-hidden-charter-gives-the-contributor-who-made-it-a-design-part",
+      "note": "The Charter carries the hidden mark and was made by the maker, a contributor, whose whole lists it: the hidden mark keeps an element from every reader but a keeper and the one who made it (the lens profile's rule 1), so charterOf finds the Charter for the maker, and the locked Object it reads whole is a design part.",
+      "world": {
+        "id": "019a7f00-0000-7000-8000-00000000f15d",
+        "name": "Design 14",
+        "hidden": [
+          "019a7f00-0000-7000-8000-0000000006d0"
+        ],
+        "readers": {
+          "owner": {
+            "rung": "owner",
+            "character": null
+          },
+          "contributor": {
+            "rung": "contributor",
+            "character": null
+          },
+          "maker": {
+            "rung": "contributor",
+            "character": null,
+            "whole": [
+              "019a7f00-0000-7000-8000-0000000006d0"
+            ]
+          }
+        },
+        "elements": [
+          {
+            "id": "019a7f00-0000-7000-8000-0000000006d0",
+            "type": "law",
+            "name": "Rules",
+            "supertype": "Charter",
+            "created_at": "2026-11-01T12:00:00Z",
+            "description": "The rules of the workshop.",
+            "x_charter_of": "019a7f00-0000-7000-8000-00000000f15d"
+          },
+          {
+            "id": "019a7f00-0000-7000-8000-0000000006d1",
+            "type": "object",
+            "name": "Control panel",
+            "subtype": "locked",
+            "created_at": "2026-11-02T12:00:00Z"
+          }
+        ]
+      },
+      "reader": "maker",
+      "want": [
+        {
+          "type": "object",
+          "id": "019a7f00-0000-7000-8000-0000000006d1",
+          "state": "locked"
+        }
+      ]
+    },
+    {
+      "name": "a-charter-a-guest-holds-only-as-a-stub-opens-the-gate",
+      "note": "The guest holds the marked Charter only as a known-of stub and the locked Object whole: the Charter is every member rung's to read whole, a known-of stub included (rule 5), so charterOf finds it for the guest and the Object is a design part.",
+      "world": {
+        "id": "019a7f00-0000-7000-8000-00000000f15e",
+        "name": "Design 15",
+        "hidden": [],
+        "readers": {
+          "owner": {
+            "rung": "owner",
+            "character": null
+          },
+          "guest": {
+            "rung": "guest",
+            "character": null,
+            "whole": [
+              "019a7f00-0000-7000-8000-0000000006e1"
+            ],
+            "known_of": [
+              "019a7f00-0000-7000-8000-0000000006e0"
+            ]
+          }
+        },
+        "elements": [
+          {
+            "id": "019a7f00-0000-7000-8000-0000000006e0",
+            "type": "law",
+            "name": "Rules",
+            "supertype": "Charter",
+            "created_at": "2026-11-01T12:00:00Z",
+            "description": "The rules of the workshop.",
+            "x_charter_of": "019a7f00-0000-7000-8000-00000000f15e"
+          },
+          {
+            "id": "019a7f00-0000-7000-8000-0000000006e1",
+            "type": "object",
+            "name": "Control panel",
+            "subtype": "locked",
+            "created_at": "2026-11-02T12:00:00Z"
+          }
+        ]
+      },
+      "reader": "guest",
+      "want": [
+        {
+          "type": "object",
+          "id": "019a7f00-0000-7000-8000-0000000006e1",
           "state": "locked"
         }
       ]

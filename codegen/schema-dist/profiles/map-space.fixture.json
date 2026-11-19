@@ -8417,6 +8417,1184 @@
     ],
     "out": {}
    }
+  },
+  {
+   "name": "written-size-is-as-written",
+   "claim": "a whole `width`, `height` or `depth` is answered as written, 0 and under 0 included (a `height` as a `width`), and never measured from the points",
+   "elements": [
+    {
+     "type": "character",
+     "id": "019a92a0-0000-7000-8000-c00000000001",
+     "name": "hero"
+    },
+    {
+     "type": "map",
+     "id": "019a92a0-0000-7000-8000-aa0000000001",
+     "name": "deck",
+     "width": -100,
+     "height": 100
+    },
+    {
+     "type": "pin",
+     "id": "019a92a0-0000-7000-8000-dd0000000001",
+     "name": "pin",
+     "map": "019a92a0-0000-7000-8000-aa0000000001",
+     "element_type": "character",
+     "element_id": "019a92a0-0000-7000-8000-c00000000001",
+     "x": 40,
+     "y": 60,
+     "z": 12
+    },
+    {
+     "type": "map",
+     "id": "019a92a0-0000-7000-8000-aa0000000002",
+     "name": "deck",
+     "width": 0,
+     "height": 100
+    },
+    {
+     "type": "pin",
+     "id": "019a92a0-0000-7000-8000-dd0000000002",
+     "name": "pin",
+     "map": "019a92a0-0000-7000-8000-aa0000000002",
+     "element_type": "character",
+     "element_id": "019a92a0-0000-7000-8000-c00000000001",
+     "x": 40,
+     "y": 60,
+     "z": 12
+    },
+    {
+     "type": "map",
+     "id": "019a92a0-0000-7000-8000-aa0000000003",
+     "name": "deck",
+     "width": 100,
+     "height": 100,
+     "depth": 0
+    },
+    {
+     "type": "pin",
+     "id": "019a92a0-0000-7000-8000-dd0000000003",
+     "name": "pin",
+     "map": "019a92a0-0000-7000-8000-aa0000000003",
+     "element_type": "character",
+     "element_id": "019a92a0-0000-7000-8000-c00000000001",
+     "x": 40,
+     "y": 60,
+     "z": 12
+    },
+    {
+     "type": "map",
+     "id": "019a92a0-0000-7000-8000-aa0000000004",
+     "name": "deck",
+     "width": 100,
+     "height": 100,
+     "depth": -5
+    },
+    {
+     "type": "pin",
+     "id": "019a92a0-0000-7000-8000-dd0000000004",
+     "name": "pin",
+     "map": "019a92a0-0000-7000-8000-aa0000000004",
+     "element_type": "character",
+     "element_id": "019a92a0-0000-7000-8000-c00000000001",
+     "x": 40,
+     "y": 60,
+     "z": 12
+    },
+    {
+     "type": "map",
+     "id": "019a92a0-0000-7000-8000-aa0000000005",
+     "name": "deck",
+     "width": 100,
+     "height": 0
+    },
+    {
+     "type": "pin",
+     "id": "019a92a0-0000-7000-8000-dd0000000005",
+     "name": "pin",
+     "map": "019a92a0-0000-7000-8000-aa0000000005",
+     "element_type": "character",
+     "element_id": "019a92a0-0000-7000-8000-c00000000001",
+     "x": 40,
+     "y": 60
+    },
+    {
+     "type": "map",
+     "id": "019a92a0-0000-7000-8000-aa0000000006",
+     "name": "deck",
+     "width": 100,
+     "height": -50
+    },
+    {
+     "type": "pin",
+     "id": "019a92a0-0000-7000-8000-dd0000000006",
+     "name": "pin",
+     "map": "019a92a0-0000-7000-8000-aa0000000006",
+     "element_type": "character",
+     "element_id": "019a92a0-0000-7000-8000-c00000000001",
+     "x": 40,
+     "y": 60
+    }
+   ],
+   "want": {
+    "maps": [
+     {
+      "id": "019a92a0-0000-7000-8000-aa0000000001",
+      "width": -100,
+      "height": 100,
+      "depth": null,
+      "z_max": 12,
+      "scale": null,
+      "location": null,
+      "parent_map": null
+     },
+     {
+      "id": "019a92a0-0000-7000-8000-aa0000000002",
+      "width": 0,
+      "height": 100,
+      "depth": null,
+      "z_max": 12,
+      "scale": null,
+      "location": null,
+      "parent_map": null
+     },
+     {
+      "id": "019a92a0-0000-7000-8000-aa0000000003",
+      "width": 100,
+      "height": 100,
+      "depth": 0,
+      "z_max": 12,
+      "scale": null,
+      "location": null,
+      "parent_map": null
+     },
+     {
+      "id": "019a92a0-0000-7000-8000-aa0000000004",
+      "width": 100,
+      "height": 100,
+      "depth": -5,
+      "z_max": 12,
+      "scale": null,
+      "location": null,
+      "parent_map": null
+     },
+     {
+      "id": "019a92a0-0000-7000-8000-aa0000000005",
+      "width": 100,
+      "height": 0,
+      "depth": null,
+      "z_max": 0,
+      "scale": null,
+      "location": null,
+      "parent_map": null
+     },
+     {
+      "id": "019a92a0-0000-7000-8000-aa0000000006",
+      "width": 100,
+      "height": -50,
+      "depth": null,
+      "z_max": 0,
+      "scale": null,
+      "location": null,
+      "parent_map": null
+     }
+    ],
+    "zones": [],
+    "pins": [
+     {
+      "pin": "019a92a0-0000-7000-8000-dd0000000001",
+      "map": "019a92a0-0000-7000-8000-aa0000000001",
+      "element_type": "character",
+      "element_id": "019a92a0-0000-7000-8000-c00000000001",
+      "x": 40,
+      "y": 60,
+      "z": 12
+     },
+     {
+      "pin": "019a92a0-0000-7000-8000-dd0000000002",
+      "map": "019a92a0-0000-7000-8000-aa0000000002",
+      "element_type": "character",
+      "element_id": "019a92a0-0000-7000-8000-c00000000001",
+      "x": 40,
+      "y": 60,
+      "z": 12
+     },
+     {
+      "pin": "019a92a0-0000-7000-8000-dd0000000003",
+      "map": "019a92a0-0000-7000-8000-aa0000000003",
+      "element_type": "character",
+      "element_id": "019a92a0-0000-7000-8000-c00000000001",
+      "x": 40,
+      "y": 60,
+      "z": 12
+     },
+     {
+      "pin": "019a92a0-0000-7000-8000-dd0000000004",
+      "map": "019a92a0-0000-7000-8000-aa0000000004",
+      "element_type": "character",
+      "element_id": "019a92a0-0000-7000-8000-c00000000001",
+      "x": 40,
+      "y": 60,
+      "z": 12
+     },
+     {
+      "pin": "019a92a0-0000-7000-8000-dd0000000005",
+      "map": "019a92a0-0000-7000-8000-aa0000000005",
+      "element_type": "character",
+      "element_id": "019a92a0-0000-7000-8000-c00000000001",
+      "x": 40,
+      "y": 60,
+      "z": 0
+     },
+     {
+      "pin": "019a92a0-0000-7000-8000-dd0000000006",
+      "map": "019a92a0-0000-7000-8000-aa0000000006",
+      "element_type": "character",
+      "element_id": "019a92a0-0000-7000-8000-c00000000001",
+      "x": 40,
+      "y": 60,
+      "z": 0
+     }
+    ],
+    "out": {}
+   }
+  },
+  {
+   "name": "size-not-whole-is-measured-depth-null",
+   "claim": "a `width` that is null, 1.5, \"100\" or true is measured from the Map's own points as a missing one is; a `depth` that is any of those reads null and is never measured",
+   "elements": [
+    {
+     "type": "character",
+     "id": "019a92a0-0000-7000-8000-c00000000001",
+     "name": "hero"
+    },
+    {
+     "type": "map",
+     "id": "019a92a0-0000-7000-8000-aa0000000001",
+     "name": "deck",
+     "width": null,
+     "height": 100,
+     "depth": 30
+    },
+    {
+     "type": "pin",
+     "id": "019a92a0-0000-7000-8000-dd0000000001",
+     "name": "pin",
+     "map": "019a92a0-0000-7000-8000-aa0000000001",
+     "element_type": "character",
+     "element_id": "019a92a0-0000-7000-8000-c00000000001",
+     "x": 40,
+     "y": 60,
+     "z": 12
+    },
+    {
+     "type": "map",
+     "id": "019a92a0-0000-7000-8000-aa0000000002",
+     "name": "deck",
+     "width": 1.5,
+     "height": 100,
+     "depth": 30
+    },
+    {
+     "type": "pin",
+     "id": "019a92a0-0000-7000-8000-dd0000000002",
+     "name": "pin",
+     "map": "019a92a0-0000-7000-8000-aa0000000002",
+     "element_type": "character",
+     "element_id": "019a92a0-0000-7000-8000-c00000000001",
+     "x": 40,
+     "y": 60,
+     "z": 12
+    },
+    {
+     "type": "map",
+     "id": "019a92a0-0000-7000-8000-aa0000000003",
+     "name": "deck",
+     "width": "100",
+     "height": 100,
+     "depth": 30
+    },
+    {
+     "type": "pin",
+     "id": "019a92a0-0000-7000-8000-dd0000000003",
+     "name": "pin",
+     "map": "019a92a0-0000-7000-8000-aa0000000003",
+     "element_type": "character",
+     "element_id": "019a92a0-0000-7000-8000-c00000000001",
+     "x": 40,
+     "y": 60,
+     "z": 12
+    },
+    {
+     "type": "map",
+     "id": "019a92a0-0000-7000-8000-aa0000000004",
+     "name": "deck",
+     "width": true,
+     "height": 100,
+     "depth": 30
+    },
+    {
+     "type": "pin",
+     "id": "019a92a0-0000-7000-8000-dd0000000004",
+     "name": "pin",
+     "map": "019a92a0-0000-7000-8000-aa0000000004",
+     "element_type": "character",
+     "element_id": "019a92a0-0000-7000-8000-c00000000001",
+     "x": 40,
+     "y": 60,
+     "z": 12
+    },
+    {
+     "type": "map",
+     "id": "019a92a0-0000-7000-8000-aa0000000005",
+     "name": "deck",
+     "width": 100,
+     "height": 100,
+     "depth": null
+    },
+    {
+     "type": "pin",
+     "id": "019a92a0-0000-7000-8000-dd0000000005",
+     "name": "pin",
+     "map": "019a92a0-0000-7000-8000-aa0000000005",
+     "element_type": "character",
+     "element_id": "019a92a0-0000-7000-8000-c00000000001",
+     "x": 40,
+     "y": 60,
+     "z": 12
+    },
+    {
+     "type": "map",
+     "id": "019a92a0-0000-7000-8000-aa0000000006",
+     "name": "deck",
+     "width": 100,
+     "height": 100,
+     "depth": 1.5
+    },
+    {
+     "type": "pin",
+     "id": "019a92a0-0000-7000-8000-dd0000000006",
+     "name": "pin",
+     "map": "019a92a0-0000-7000-8000-aa0000000006",
+     "element_type": "character",
+     "element_id": "019a92a0-0000-7000-8000-c00000000001",
+     "x": 40,
+     "y": 60,
+     "z": 12
+    },
+    {
+     "type": "map",
+     "id": "019a92a0-0000-7000-8000-aa0000000007",
+     "name": "deck",
+     "width": 100,
+     "height": 100,
+     "depth": "100"
+    },
+    {
+     "type": "pin",
+     "id": "019a92a0-0000-7000-8000-dd0000000007",
+     "name": "pin",
+     "map": "019a92a0-0000-7000-8000-aa0000000007",
+     "element_type": "character",
+     "element_id": "019a92a0-0000-7000-8000-c00000000001",
+     "x": 40,
+     "y": 60,
+     "z": 12
+    },
+    {
+     "type": "map",
+     "id": "019a92a0-0000-7000-8000-aa0000000008",
+     "name": "deck",
+     "width": 100,
+     "height": 100,
+     "depth": true
+    },
+    {
+     "type": "pin",
+     "id": "019a92a0-0000-7000-8000-dd0000000008",
+     "name": "pin",
+     "map": "019a92a0-0000-7000-8000-aa0000000008",
+     "element_type": "character",
+     "element_id": "019a92a0-0000-7000-8000-c00000000001",
+     "x": 40,
+     "y": 60,
+     "z": 12
+    }
+   ],
+   "want": {
+    "maps": [
+     {
+      "id": "019a92a0-0000-7000-8000-aa0000000001",
+      "width": 40,
+      "height": 100,
+      "depth": 30,
+      "z_max": 12,
+      "scale": null,
+      "location": null,
+      "parent_map": null,
+      "extent": "points"
+     },
+     {
+      "id": "019a92a0-0000-7000-8000-aa0000000002",
+      "width": 40,
+      "height": 100,
+      "depth": 30,
+      "z_max": 12,
+      "scale": null,
+      "location": null,
+      "parent_map": null,
+      "extent": "points"
+     },
+     {
+      "id": "019a92a0-0000-7000-8000-aa0000000003",
+      "width": 40,
+      "height": 100,
+      "depth": 30,
+      "z_max": 12,
+      "scale": null,
+      "location": null,
+      "parent_map": null,
+      "extent": "points"
+     },
+     {
+      "id": "019a92a0-0000-7000-8000-aa0000000004",
+      "width": 40,
+      "height": 100,
+      "depth": 30,
+      "z_max": 12,
+      "scale": null,
+      "location": null,
+      "parent_map": null,
+      "extent": "points"
+     },
+     {
+      "id": "019a92a0-0000-7000-8000-aa0000000005",
+      "width": 100,
+      "height": 100,
+      "depth": null,
+      "z_max": 12,
+      "scale": null,
+      "location": null,
+      "parent_map": null
+     },
+     {
+      "id": "019a92a0-0000-7000-8000-aa0000000006",
+      "width": 100,
+      "height": 100,
+      "depth": null,
+      "z_max": 12,
+      "scale": null,
+      "location": null,
+      "parent_map": null
+     },
+     {
+      "id": "019a92a0-0000-7000-8000-aa0000000007",
+      "width": 100,
+      "height": 100,
+      "depth": null,
+      "z_max": 12,
+      "scale": null,
+      "location": null,
+      "parent_map": null
+     },
+     {
+      "id": "019a92a0-0000-7000-8000-aa0000000008",
+      "width": 100,
+      "height": 100,
+      "depth": null,
+      "z_max": 12,
+      "scale": null,
+      "location": null,
+      "parent_map": null
+     }
+    ],
+    "zones": [],
+    "pins": [
+     {
+      "pin": "019a92a0-0000-7000-8000-dd0000000001",
+      "map": "019a92a0-0000-7000-8000-aa0000000001",
+      "element_type": "character",
+      "element_id": "019a92a0-0000-7000-8000-c00000000001",
+      "x": 40,
+      "y": 60,
+      "z": 12
+     },
+     {
+      "pin": "019a92a0-0000-7000-8000-dd0000000002",
+      "map": "019a92a0-0000-7000-8000-aa0000000002",
+      "element_type": "character",
+      "element_id": "019a92a0-0000-7000-8000-c00000000001",
+      "x": 40,
+      "y": 60,
+      "z": 12
+     },
+     {
+      "pin": "019a92a0-0000-7000-8000-dd0000000003",
+      "map": "019a92a0-0000-7000-8000-aa0000000003",
+      "element_type": "character",
+      "element_id": "019a92a0-0000-7000-8000-c00000000001",
+      "x": 40,
+      "y": 60,
+      "z": 12
+     },
+     {
+      "pin": "019a92a0-0000-7000-8000-dd0000000004",
+      "map": "019a92a0-0000-7000-8000-aa0000000004",
+      "element_type": "character",
+      "element_id": "019a92a0-0000-7000-8000-c00000000001",
+      "x": 40,
+      "y": 60,
+      "z": 12
+     },
+     {
+      "pin": "019a92a0-0000-7000-8000-dd0000000005",
+      "map": "019a92a0-0000-7000-8000-aa0000000005",
+      "element_type": "character",
+      "element_id": "019a92a0-0000-7000-8000-c00000000001",
+      "x": 40,
+      "y": 60,
+      "z": 12
+     },
+     {
+      "pin": "019a92a0-0000-7000-8000-dd0000000006",
+      "map": "019a92a0-0000-7000-8000-aa0000000006",
+      "element_type": "character",
+      "element_id": "019a92a0-0000-7000-8000-c00000000001",
+      "x": 40,
+      "y": 60,
+      "z": 12
+     },
+     {
+      "pin": "019a92a0-0000-7000-8000-dd0000000007",
+      "map": "019a92a0-0000-7000-8000-aa0000000007",
+      "element_type": "character",
+      "element_id": "019a92a0-0000-7000-8000-c00000000001",
+      "x": 40,
+      "y": 60,
+      "z": 12
+     },
+     {
+      "pin": "019a92a0-0000-7000-8000-dd0000000008",
+      "map": "019a92a0-0000-7000-8000-aa0000000008",
+      "element_type": "character",
+      "element_id": "019a92a0-0000-7000-8000-c00000000001",
+      "x": 40,
+      "y": 60,
+      "z": 12
+     }
+    ],
+    "out": {}
+   }
+  },
+  {
+   "name": "link-not-a-string-is-no-link",
+   "claim": "each of the seven links (a Map's `location` and `parent_map`, a Pin's `map`, `element_id` and `element_type`, a Marker's `map` and `zone`) is no link when its value is a list, a number, a boolean or an object, read as an absent one; a list holding a real id, the number 7 beside the id \"7\" and an object whose `id` is real included",
+   "elements": [
+    {
+     "type": "location",
+     "id": "019a92a0-0000-7000-8000-e00000000001",
+     "name": "place"
+    },
+    {
+     "type": "character",
+     "id": "7",
+     "name": "seven"
+    },
+    {
+     "type": "zone",
+     "id": "019a92a0-0000-7000-8000-b00000000001",
+     "name": "zone"
+    },
+    {
+     "type": "map",
+     "id": "019a92a0-0000-7000-8000-aa0000000001",
+     "name": "deck",
+     "width": 100,
+     "height": 100
+    },
+    {
+     "type": "character",
+     "id": "019a92a0-0000-7000-8000-c00000000001",
+     "name": "hero"
+    },
+    {
+     "type": "pin",
+     "id": "019a92a0-0000-7000-8000-dd0000000000",
+     "name": "pin",
+     "map": "019a92a0-0000-7000-8000-aa0000000001",
+     "element_type": "character",
+     "element_id": "019a92a0-0000-7000-8000-c00000000001",
+     "x": 10,
+     "y": 10
+    },
+    {
+     "type": "marker",
+     "id": "019a92a0-0000-7000-8000-cc0000000000",
+     "name": "corner",
+     "map": "019a92a0-0000-7000-8000-aa0000000001",
+     "zone": "019a92a0-0000-7000-8000-b00000000001",
+     "x": 5,
+     "y": 5
+    },
+    {
+     "type": "map",
+     "id": "019a92a0-0000-7000-8000-aa0000000002",
+     "name": "deck",
+     "width": 100,
+     "height": 100,
+     "location": [
+      "019a92a0-0000-7000-8000-e00000000001"
+     ]
+    },
+    {
+     "type": "map",
+     "id": "019a92a0-0000-7000-8000-aa0000000003",
+     "name": "deck",
+     "width": 100,
+     "height": 100,
+     "location": 7
+    },
+    {
+     "type": "map",
+     "id": "019a92a0-0000-7000-8000-aa0000000004",
+     "name": "deck",
+     "width": 100,
+     "height": 100,
+     "location": true
+    },
+    {
+     "type": "map",
+     "id": "019a92a0-0000-7000-8000-aa0000000005",
+     "name": "deck",
+     "width": 100,
+     "height": 100,
+     "location": {
+      "id": "019a92a0-0000-7000-8000-e00000000001"
+     }
+    },
+    {
+     "type": "map",
+     "id": "019a92a0-0000-7000-8000-aa0000000006",
+     "name": "deck",
+     "width": 100,
+     "height": 100,
+     "parent_map": [
+      "019a92a0-0000-7000-8000-aa0000000001"
+     ]
+    },
+    {
+     "type": "map",
+     "id": "019a92a0-0000-7000-8000-aa0000000007",
+     "name": "deck",
+     "width": 100,
+     "height": 100,
+     "parent_map": 7
+    },
+    {
+     "type": "map",
+     "id": "019a92a0-0000-7000-8000-aa0000000008",
+     "name": "deck",
+     "width": 100,
+     "height": 100,
+     "parent_map": true
+    },
+    {
+     "type": "map",
+     "id": "019a92a0-0000-7000-8000-aa0000000009",
+     "name": "deck",
+     "width": 100,
+     "height": 100,
+     "parent_map": {
+      "id": "019a92a0-0000-7000-8000-aa0000000001"
+     }
+    },
+    {
+     "type": "pin",
+     "id": "019a92a0-0000-7000-8000-dd0000000001",
+     "name": "pin",
+     "map": [
+      "019a92a0-0000-7000-8000-aa0000000001"
+     ],
+     "element_type": "character",
+     "element_id": "7",
+     "x": 21,
+     "y": 30
+    },
+    {
+     "type": "pin",
+     "id": "019a92a0-0000-7000-8000-dd0000000002",
+     "name": "pin",
+     "map": 7,
+     "element_type": "character",
+     "element_id": "7",
+     "x": 22,
+     "y": 30
+    },
+    {
+     "type": "pin",
+     "id": "019a92a0-0000-7000-8000-dd0000000003",
+     "name": "pin",
+     "map": true,
+     "element_type": "character",
+     "element_id": "7",
+     "x": 23,
+     "y": 30
+    },
+    {
+     "type": "pin",
+     "id": "019a92a0-0000-7000-8000-dd0000000004",
+     "name": "pin",
+     "map": {
+      "id": "019a92a0-0000-7000-8000-aa0000000001"
+     },
+     "element_type": "character",
+     "element_id": "7",
+     "x": 24,
+     "y": 30
+    },
+    {
+     "type": "pin",
+     "id": "019a92a0-0000-7000-8000-dd0000000005",
+     "name": "pin",
+     "map": "019a92a0-0000-7000-8000-aa0000000001",
+     "element_type": "character",
+     "element_id": [
+      "7"
+     ],
+     "x": 25,
+     "y": 30
+    },
+    {
+     "type": "pin",
+     "id": "019a92a0-0000-7000-8000-dd0000000006",
+     "name": "pin",
+     "map": "019a92a0-0000-7000-8000-aa0000000001",
+     "element_type": "character",
+     "element_id": 7,
+     "x": 26,
+     "y": 30
+    },
+    {
+     "type": "pin",
+     "id": "019a92a0-0000-7000-8000-dd0000000007",
+     "name": "pin",
+     "map": "019a92a0-0000-7000-8000-aa0000000001",
+     "element_type": "character",
+     "element_id": true,
+     "x": 27,
+     "y": 30
+    },
+    {
+     "type": "pin",
+     "id": "019a92a0-0000-7000-8000-dd0000000008",
+     "name": "pin",
+     "map": "019a92a0-0000-7000-8000-aa0000000001",
+     "element_type": "character",
+     "element_id": {
+      "id": "7"
+     },
+     "x": 28,
+     "y": 30
+    },
+    {
+     "type": "pin",
+     "id": "019a92a0-0000-7000-8000-dd0000000009",
+     "name": "pin",
+     "map": "019a92a0-0000-7000-8000-aa0000000001",
+     "element_type": [
+      "character"
+     ],
+     "element_id": "7",
+     "x": 29,
+     "y": 30
+    },
+    {
+     "type": "pin",
+     "id": "019a92a0-0000-7000-8000-dd000000000a",
+     "name": "pin",
+     "map": "019a92a0-0000-7000-8000-aa0000000001",
+     "element_type": 7,
+     "element_id": "7",
+     "x": 30,
+     "y": 30
+    },
+    {
+     "type": "pin",
+     "id": "019a92a0-0000-7000-8000-dd000000000b",
+     "name": "pin",
+     "map": "019a92a0-0000-7000-8000-aa0000000001",
+     "element_type": true,
+     "element_id": "7",
+     "x": 31,
+     "y": 30
+    },
+    {
+     "type": "pin",
+     "id": "019a92a0-0000-7000-8000-dd000000000c",
+     "name": "pin",
+     "map": "019a92a0-0000-7000-8000-aa0000000001",
+     "element_type": {
+      "id": "character"
+     },
+     "element_id": "7",
+     "x": 32,
+     "y": 30
+    },
+    {
+     "type": "marker",
+     "id": "019a92a0-0000-7000-8000-cc0000000001",
+     "name": "corner",
+     "map": [
+      "019a92a0-0000-7000-8000-aa0000000001"
+     ],
+     "zone": "019a92a0-0000-7000-8000-b00000000001",
+     "x": 51,
+     "y": 50
+    },
+    {
+     "type": "marker",
+     "id": "019a92a0-0000-7000-8000-cc0000000002",
+     "name": "corner",
+     "map": 7,
+     "zone": "019a92a0-0000-7000-8000-b00000000001",
+     "x": 52,
+     "y": 50
+    },
+    {
+     "type": "marker",
+     "id": "019a92a0-0000-7000-8000-cc0000000003",
+     "name": "corner",
+     "map": true,
+     "zone": "019a92a0-0000-7000-8000-b00000000001",
+     "x": 53,
+     "y": 50
+    },
+    {
+     "type": "marker",
+     "id": "019a92a0-0000-7000-8000-cc0000000004",
+     "name": "corner",
+     "map": {
+      "id": "019a92a0-0000-7000-8000-aa0000000001"
+     },
+     "zone": "019a92a0-0000-7000-8000-b00000000001",
+     "x": 54,
+     "y": 50
+    },
+    {
+     "type": "marker",
+     "id": "019a92a0-0000-7000-8000-cc0000000005",
+     "name": "corner",
+     "map": "019a92a0-0000-7000-8000-aa0000000001",
+     "zone": [
+      "019a92a0-0000-7000-8000-b00000000001"
+     ],
+     "x": 55,
+     "y": 50
+    },
+    {
+     "type": "marker",
+     "id": "019a92a0-0000-7000-8000-cc0000000006",
+     "name": "corner",
+     "map": "019a92a0-0000-7000-8000-aa0000000001",
+     "zone": 7,
+     "x": 56,
+     "y": 50
+    },
+    {
+     "type": "marker",
+     "id": "019a92a0-0000-7000-8000-cc0000000007",
+     "name": "corner",
+     "map": "019a92a0-0000-7000-8000-aa0000000001",
+     "zone": true,
+     "x": 57,
+     "y": 50
+    },
+    {
+     "type": "marker",
+     "id": "019a92a0-0000-7000-8000-cc0000000008",
+     "name": "corner",
+     "map": "019a92a0-0000-7000-8000-aa0000000001",
+     "zone": {
+      "id": "019a92a0-0000-7000-8000-b00000000001"
+     },
+     "x": 58,
+     "y": 50
+    }
+   ],
+   "want": {
+    "maps": [
+     {
+      "id": "019a92a0-0000-7000-8000-aa0000000001",
+      "width": 100,
+      "height": 100,
+      "depth": null,
+      "z_max": 0,
+      "scale": null,
+      "location": null,
+      "parent_map": null
+     },
+     {
+      "id": "019a92a0-0000-7000-8000-aa0000000002",
+      "width": 100,
+      "height": 100,
+      "depth": null,
+      "z_max": null,
+      "scale": null,
+      "location": null,
+      "parent_map": null
+     },
+     {
+      "id": "019a92a0-0000-7000-8000-aa0000000003",
+      "width": 100,
+      "height": 100,
+      "depth": null,
+      "z_max": null,
+      "scale": null,
+      "location": null,
+      "parent_map": null
+     },
+     {
+      "id": "019a92a0-0000-7000-8000-aa0000000004",
+      "width": 100,
+      "height": 100,
+      "depth": null,
+      "z_max": null,
+      "scale": null,
+      "location": null,
+      "parent_map": null
+     },
+     {
+      "id": "019a92a0-0000-7000-8000-aa0000000005",
+      "width": 100,
+      "height": 100,
+      "depth": null,
+      "z_max": null,
+      "scale": null,
+      "location": null,
+      "parent_map": null
+     },
+     {
+      "id": "019a92a0-0000-7000-8000-aa0000000006",
+      "width": 100,
+      "height": 100,
+      "depth": null,
+      "z_max": null,
+      "scale": null,
+      "location": null,
+      "parent_map": null
+     },
+     {
+      "id": "019a92a0-0000-7000-8000-aa0000000007",
+      "width": 100,
+      "height": 100,
+      "depth": null,
+      "z_max": null,
+      "scale": null,
+      "location": null,
+      "parent_map": null
+     },
+     {
+      "id": "019a92a0-0000-7000-8000-aa0000000008",
+      "width": 100,
+      "height": 100,
+      "depth": null,
+      "z_max": null,
+      "scale": null,
+      "location": null,
+      "parent_map": null
+     },
+     {
+      "id": "019a92a0-0000-7000-8000-aa0000000009",
+      "width": 100,
+      "height": 100,
+      "depth": null,
+      "z_max": null,
+      "scale": null,
+      "location": null,
+      "parent_map": null
+     }
+    ],
+    "zones": [
+     {
+      "zone": "019a92a0-0000-7000-8000-b00000000001",
+      "map": "019a92a0-0000-7000-8000-aa0000000001",
+      "shape": "polygon",
+      "points": [
+       [
+        5,
+        5,
+        0
+       ]
+      ]
+     }
+    ],
+    "pins": [
+     {
+      "pin": "019a92a0-0000-7000-8000-dd0000000000",
+      "map": "019a92a0-0000-7000-8000-aa0000000001",
+      "element_type": "character",
+      "element_id": "019a92a0-0000-7000-8000-c00000000001",
+      "x": 10,
+      "y": 10,
+      "z": 0
+     },
+     {
+      "pin": "019a92a0-0000-7000-8000-dd0000000005",
+      "map": "019a92a0-0000-7000-8000-aa0000000001",
+      "element_type": null,
+      "element_id": null,
+      "x": 25,
+      "y": 30,
+      "z": 0
+     },
+     {
+      "pin": "019a92a0-0000-7000-8000-dd0000000006",
+      "map": "019a92a0-0000-7000-8000-aa0000000001",
+      "element_type": null,
+      "element_id": null,
+      "x": 26,
+      "y": 30,
+      "z": 0
+     },
+     {
+      "pin": "019a92a0-0000-7000-8000-dd0000000007",
+      "map": "019a92a0-0000-7000-8000-aa0000000001",
+      "element_type": null,
+      "element_id": null,
+      "x": 27,
+      "y": 30,
+      "z": 0
+     },
+     {
+      "pin": "019a92a0-0000-7000-8000-dd0000000008",
+      "map": "019a92a0-0000-7000-8000-aa0000000001",
+      "element_type": null,
+      "element_id": null,
+      "x": 28,
+      "y": 30,
+      "z": 0
+     },
+     {
+      "pin": "019a92a0-0000-7000-8000-dd0000000009",
+      "map": "019a92a0-0000-7000-8000-aa0000000001",
+      "element_type": null,
+      "element_id": null,
+      "x": 29,
+      "y": 30,
+      "z": 0
+     },
+     {
+      "pin": "019a92a0-0000-7000-8000-dd000000000a",
+      "map": "019a92a0-0000-7000-8000-aa0000000001",
+      "element_type": null,
+      "element_id": null,
+      "x": 30,
+      "y": 30,
+      "z": 0
+     },
+     {
+      "pin": "019a92a0-0000-7000-8000-dd000000000b",
+      "map": "019a92a0-0000-7000-8000-aa0000000001",
+      "element_type": null,
+      "element_id": null,
+      "x": 31,
+      "y": 30,
+      "z": 0
+     },
+     {
+      "pin": "019a92a0-0000-7000-8000-dd000000000c",
+      "map": "019a92a0-0000-7000-8000-aa0000000001",
+      "element_type": null,
+      "element_id": null,
+      "x": 32,
+      "y": 30,
+      "z": 0
+     }
+    ],
+    "out": {
+     "dangling": 8,
+     "no_map": 4
+    }
+   }
+  },
+  {
+   "name": "measured-from-no-point-is-null",
+   "claim": "a `width` or `height` measured from a Map with no point of its own (no Marker or Pin, or only a Pin with no whole `x`) reads null, and the Map still says `extent: \"points\"`; a written `height` beside it stays as written",
+   "elements": [
+    {
+     "type": "character",
+     "id": "019a92a0-0000-7000-8000-c00000000001",
+     "name": "hero"
+    },
+    {
+     "type": "map",
+     "id": "019a92a0-0000-7000-8000-aa0000000001",
+     "name": "deck"
+    },
+    {
+     "type": "map",
+     "id": "019a92a0-0000-7000-8000-aa0000000002",
+     "name": "deck",
+     "height": 50
+    },
+    {
+     "type": "map",
+     "id": "019a92a0-0000-7000-8000-aa0000000003",
+     "name": "deck"
+    },
+    {
+     "type": "pin",
+     "id": "019a92a0-0000-7000-8000-dd0000000003",
+     "name": "pin",
+     "map": "019a92a0-0000-7000-8000-aa0000000003",
+     "element_type": "character",
+     "element_id": "019a92a0-0000-7000-8000-c00000000001",
+     "x": 1.5,
+     "y": 2
+    }
+   ],
+   "want": {
+    "maps": [
+     {
+      "id": "019a92a0-0000-7000-8000-aa0000000001",
+      "width": null,
+      "height": null,
+      "depth": null,
+      "z_max": null,
+      "scale": null,
+      "location": null,
+      "parent_map": null,
+      "extent": "points"
+     },
+     {
+      "id": "019a92a0-0000-7000-8000-aa0000000002",
+      "width": null,
+      "height": 50,
+      "depth": null,
+      "z_max": null,
+      "scale": null,
+      "location": null,
+      "parent_map": null,
+      "extent": "points"
+     },
+     {
+      "id": "019a92a0-0000-7000-8000-aa0000000003",
+      "width": null,
+      "height": null,
+      "depth": null,
+      "z_max": null,
+      "scale": null,
+      "location": null,
+      "parent_map": null,
+      "extent": "points"
+     }
+    ],
+    "zones": [],
+    "pins": [],
+    "out": {
+     "no_point": 1
+    }
+   }
   }
  ],
  "layout_cases": [
@@ -9670,6 +10848,106 @@
    ],
    "want": {
     "layout": null,
+    "ground": null,
+    "hand": []
+   }
+  },
+  {
+   "name": "ground-a-number-is-no-ground",
+   "claim": "rule 9 and reading H: a `ground.map` that is the number 7 is no link, so no ground, though a served Map's id is \"7\"",
+   "map": "019a92a0-0000-7000-8000-aa0000000011",
+   "elements": [
+    {
+     "type": "map",
+     "id": "019a92a0-0000-7000-8000-aa0000000011",
+     "name": "layout",
+     "x_layout": {
+      "method": "by-kind",
+      "settings": {
+       "ground": {
+        "map": 7
+       }
+      }
+     }
+    },
+    {
+     "type": "map",
+     "id": "7",
+     "name": "ground",
+     "width": 2000,
+     "height": 1000
+    }
+   ],
+   "want": {
+    "layout": "by-kind",
+    "ground": null,
+    "hand": []
+   }
+  },
+  {
+   "name": "ground-a-list-is-no-ground",
+   "claim": "rule 9 and reading H: a `ground.map` that is a list is no link, so no ground, though it holds a served Map's id",
+   "map": "019a92a0-0000-7000-8000-aa0000000011",
+   "elements": [
+    {
+     "type": "map",
+     "id": "019a92a0-0000-7000-8000-aa0000000011",
+     "name": "layout",
+     "x_layout": {
+      "method": "by-kind",
+      "settings": {
+       "ground": {
+        "map": [
+         "019a92a0-0000-7000-8000-aa0000000012"
+        ]
+       }
+      }
+     }
+    },
+    {
+     "type": "map",
+     "id": "019a92a0-0000-7000-8000-aa0000000012",
+     "name": "ground",
+     "width": 2000,
+     "height": 1000
+    }
+   ],
+   "want": {
+    "layout": "by-kind",
+    "ground": null,
+    "hand": []
+   }
+  },
+  {
+   "name": "ground-an-object-is-no-ground",
+   "claim": "rule 9 and reading H: a `ground.map` that is an object is no link, so no ground, though its `id` is a served Map's",
+   "map": "019a92a0-0000-7000-8000-aa0000000011",
+   "elements": [
+    {
+     "type": "map",
+     "id": "019a92a0-0000-7000-8000-aa0000000011",
+     "name": "layout",
+     "x_layout": {
+      "method": "by-kind",
+      "settings": {
+       "ground": {
+        "map": {
+         "id": "019a92a0-0000-7000-8000-aa0000000012"
+        }
+       }
+      }
+     }
+    },
+    {
+     "type": "map",
+     "id": "019a92a0-0000-7000-8000-aa0000000012",
+     "name": "ground",
+     "width": 2000,
+     "height": 1000
+    }
+   ],
+   "want": {
+    "layout": "by-kind",
     "ground": null,
     "hand": []
    }

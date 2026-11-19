@@ -225,7 +225,7 @@ def test_a_group_is_ordered_by_instant_never_by_id_or_text() -> None:
 
 # ---- The talks a report is shown with (report.md, serial 135): report_talks_of over the fixture's talk_cases
 
-TALK_CASES = 6
+TALK_CASES = 9
 
 
 def talk_cases() -> list[Any]:
