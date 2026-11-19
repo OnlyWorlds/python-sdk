@@ -34,6 +34,7 @@ from .address import (
     parse_ow_link,
     read_ow_link_at,
 )
+from .carry import CarryLint, CarryOf, CarryPoint, CarryStop, carry_of
 from .charter import (
     SKILL_MAX,
     CharterHub,
@@ -201,6 +202,10 @@ __all__ = [
     "AroundLayout",
     "AroundPoint",
     "BulkResult",
+    "CarryLint",
+    "CarryOf",
+    "CarryPoint",
+    "CarryStop",
     "ChangeWalk",
     "CharterHub",
     "CharterPacket",
@@ -274,6 +279,7 @@ __all__ = [
     "WriteReport",
     "__version__",
     "apply_checks",
+    "carry_of",
     "charter_of",
     "check_kinds",
     "date_of",
