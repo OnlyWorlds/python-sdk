@@ -74,7 +74,7 @@ class WorldGraph(TypedDict):
     #: to an element the reader sees that the lens neither kept nor cut; never in a lens's cut).
     edges_cut: dict[str, int]
     #: With a lens, the lens's own cut, unchanged. Without one, the elements out by default, counted by reason
-    #: (``room``, ``hidden`` and ``proposed`` for the owner only, ``map_space``, ``reading_aid``).
+    #: (``room``, ``hidden`` and ``proposed`` for a keeper only, ``map_space``, ``reading_aid``).
     cut: dict[str, int]
     #: With a lens whose ``x_lens`` the lens reader cannot read, the key it names (as ``resolve_lens``'s
     #: ``unreadable``), and the graph is empty. ``None`` otherwise, and always ``None`` without a lens.
@@ -89,14 +89,16 @@ _KINDS: tuple[str, ...] = ("room", "hidden", "proposed", "map_space", "reading_a
 """The kinds out of an unlensed graph by default, each brought back by its flag."""
 _MARKS: tuple[GraphMark, ...] = ("room", "hidden", "proposed", "reading_aid")
 _GRAPH_REASONS: tuple[str, ...] = (*_CUT_REASONS, *_KINDS, "outside_lens")
-_GRAPH_OWNER_ONLY = frozenset({*_OWNER_ONLY, "hidden", "proposed"})
+_GRAPH_KEEPER_ONLY = frozenset({"hidden", "proposed"})
 
 
-def _tally(counts: Mapping[str, int], owner: bool) -> dict[str, int]:
-    """Counts in the reasons' one order, a reason with no count left out, and the owner's reasons kept for the
-    owner."""
+def _tally(counts: Mapping[str, int], owner: bool, keeper: bool) -> dict[str, int]:
+    """Counts in the reasons' one order, a reason with no count left out, the owner's reasons kept for the owner and
+    the hidden and proposed counts for a keeper (serial 140)."""
     return {
-        why: counts[why] for why in _GRAPH_REASONS if counts.get(why, 0) > 0 and (owner or why not in _GRAPH_OWNER_ONLY)
+        why: counts[why]
+        for why in _GRAPH_REASONS
+        if counts.get(why, 0) > 0 and (owner or why not in _OWNER_ONLY) and (keeper or why not in _GRAPH_KEEPER_ONLY)
     }
 
 
@@ -140,10 +142,10 @@ def world_graph(
     counted. A Pin's generic pair (``element_type``, ``element_id``) is its placement, never an edge; its ``map``
     link is the edge. A node's ``name`` is the stored value, ``None`` when absent.
 
-    ``hidden`` or ``proposed`` from a reader that is not the owner, or any flag from a public reader, raises
-    ``ValueError`` naming the flag before anything is read; of several, the first in the order ``hidden``,
-    ``proposed``, ``rooms``, ``map_space``, ``reading_aids``. An owner reading ``as`` another reader is judged by that
-    reader's rung. The npm SDK's ``worldGraph`` gives the same answer on the same input."""
+    ``hidden`` or ``proposed`` from a reader below a keeper (the owner or a co-builder), or any flag from a public
+    reader, raises ``ValueError`` naming the flag before anything is read; of several, the first in the order
+    ``hidden``, ``proposed``, ``rooms``, ``map_space``, ``reading_aids``. An owner reading ``as`` another reader is
+    judged by that reader's rung. The npm SDK's ``worldGraph`` gives the same answer on the same input."""
     if not isinstance(world, Mapping) or not isinstance(world.get("elements"), list):
         raise TypeError("world_graph: world is a mapping with an elements list.")
     _check_reader(reader, "world_graph: reader")
@@ -160,8 +162,11 @@ def world_graph(
             raise TypeError(f"world_graph: {names[kind]} is a boolean; got {value!r}.")
     seen_rung = reader["as"]["rung"] if reader["rung"] == "owner" and reader.get("as") is not None else reader["rung"]
     for kind in ("hidden", "proposed"):
-        if flags[kind] and seen_rung != "owner":
-            raise ValueError(f"world_graph: {names[kind]} is the owner's alone; a {seen_rung} reader may not ask it.")
+        if flags[kind] and seen_rung not in ("owner", "co-builder"):
+            raise ValueError(
+                f"world_graph: {names[kind]} is a keeper's alone (the owner or a co-builder); "
+                f"a {seen_rung} reader may not ask it."
+            )
     if seen_rung == "public":
         for kind in ("room", "map_space", "reading_aid"):
             if flags[kind]:
@@ -174,7 +179,10 @@ def world_graph(
         raise TypeError("world_graph: lens is a lens body or its id.")
 
     r = _Reading(world, reader, _reading_date(world, as_of))
-    seen_owner = r.seen_rung == "owner"
+    # A keeper (the owner, or a co-builder; serial 140) is served the bodies as stored and its view holds the proposed.
+    seen_keeper = r.seen_rung in ("owner", "co-builder")
+    # The hidden and proposed counts are a keeper's, and the counts of a reader that keeps the owner's (the owner `as`).
+    keeper_counts = seen_keeper or r.owner
 
     def kinds(eid: str) -> list[str]:
         out: list[str] = []
@@ -191,8 +199,8 @@ def world_graph(
         return out
 
     def candidate(eid: str) -> bool:
-        # What the reader could see as a node: its view, and for the owner what is written as proposed too.
-        return eid in r.view or (seen_owner and eid in r.proposed)
+        # What the reader could see as a node: its view, and for a keeper what is written as proposed too.
+        return eid in r.view or (seen_keeper and eid in r.proposed)
 
     node_ids: set[str] = set()
     cut: dict[str, int]
@@ -226,7 +234,7 @@ def world_graph(
                 node_ids.add(eid)
             else:
                 counts[why] = counts.get(why, 0) + 1
-        cut = _tally(counts, r.owner)
+        cut = _tally(counts, r.owner, keeper_counts)
 
         def flag_reason(eid: str) -> str | None:
             return out_by(eid) if candidate(eid) else "not_visible"
@@ -284,9 +292,9 @@ def world_graph(
             served = 0
             read: set[str] = set()
             for i, t in enumerate(entries):
-                in_served = seen_owner or (isinstance(t, str) and r.served_as(t, targets.get(field)))
+                in_served = seen_keeper or (isinstance(t, str) and r.served_as(t, targets.get(field)))
                 if not (isinstance(t, str) and t in read):  # each element once, in its first place
-                    visit(source, field, t, i if seen_owner else served, targets.get(field))
+                    visit(source, field, t, i if seen_keeper else served, targets.get(field))
                 if isinstance(t, str):
                     read.add(t)
                 if in_served:
@@ -305,7 +313,7 @@ def world_graph(
     return {
         "nodes": nodes,
         "edges": edges,
-        "edges_cut": _tally(cut_edges, r.owner),
+        "edges_cut": _tally(cut_edges, r.owner, keeper_counts),
         "cut": cut,
         "unreadable": unreadable,
     }

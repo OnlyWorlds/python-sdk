@@ -4,6 +4,8 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+- **`world_graph` reads a co-builder as a keeper** (schema-dist serial 140). The flags `hidden` and `proposed` may be asked by a co-builder, and by the owner reading `as` one, where they were the owner's alone; a co-builder's graph without a lens is answered as the owner's is on the same input, the hidden and proposed elements it leaves out counted in `cut` and `edges_cut`. `not_visible` and `anchor_not_visible` stay the owner's, and a contributor, a guest and the public reader answer as before. A refused flag's `ValueError` now says it is a keeper's.
+
 ## 0.137.0 (2026-11-19)
 
 - **`carry_of(map, point, maps)`, the map-space profile's frame reading** (schema-dist serial 139, rules 13 and 14), the TypeScript SDK's `carryOf` with the same answer. A child Map says where it lies on the Map its `parent_map` names with `x_parent_frame`, a box `[x0, y0, x1, y1]` in the parent's pixels; `carry_of` carries a point on a Map up that chain, one level at a time by each level's own frame, in 64-bit floats, and answers `{parent_frame, lint, points, stop}`: the Map's own frame as written or None, what is wrong with it (`no_parent`, `not_four_numbers`, `not_a_box`), the point on each Map it reaches, and why the walk ended (`top`, `dangling`, `cycle`, `no_frame`, `no_carry`). Its types are `CarryOf`, `CarryPoint`, `CarryStop` and `CarryLint`. `map_space` and `layout_of` do not read the key.

@@ -59,8 +59,12 @@ def invariants(g: WorldGraph, c: Mapping[str, Any]) -> None:
         for k in ("room", "hidden", "proposed"):
             assert k not in g["cut"] and k not in g["edges_cut"], f"{name}: a public graph has no count of {k}"
     if reader["rung"] != "owner":
-        for k in ("hidden", "proposed", "not_visible", "anchor_not_visible"):
+        for k in ("not_visible", "anchor_not_visible"):
             assert k not in g["cut"] and k not in g["edges_cut"], f"{name}: no count of {k} for a reader not the owner"
+        # The hidden and proposed counts are a keeper's (the owner or a co-builder; serial 140).
+        if reader["rung"] != "co-builder":
+            for k in ("hidden", "proposed"):
+                assert k not in g["cut"] and k not in g["edges_cut"], f"{name}: no count of {k} below a keeper"
     opts = c.get("options", {})
     again = world_graph(c["world"], reader, **opts)
     assert json.dumps(again) == json.dumps(g), f"{name}: the same input gives the same bytes"
@@ -199,10 +203,13 @@ def test_the_fixtures_graph_tables_read_back_through_the_reader() -> None:
         flag: dict[str, Any] = {f: True}
         world_graph(empty, {"rung": "owner"}, **flag)
         if f in doc["owner_only_flags"]:
-            with pytest.raises(ValueError, match="owner's alone"):
+            with pytest.raises(ValueError, match="a keeper's alone"):
                 world_graph(empty, {"rung": "contributor"}, **flag)
         else:
             world_graph(empty, {"rung": "contributor"}, **flag)
+        # owner_only_flags keeps its name; since serial 140 a co-builder may ask them too.
+        world_graph(empty, {"rung": "co-builder"}, **flag)
+        world_graph(empty, {"rung": "owner", "as": {"rung": "co-builder"}}, **flag)
         with pytest.raises(ValueError):
             world_graph(empty, {"rung": "public"}, **flag)
     reasons = set(doc["edges_cut_reasons"])
@@ -292,9 +299,9 @@ class _Unread(list[Any]):
 
 def test_a_refused_flag_is_refused_before_anything_is_read() -> None:
     world = {"elements": _Unread([{"id": "c1", "type": "character"}])}
-    with pytest.raises(ValueError, match="hidden is the owner's alone"):
+    with pytest.raises(ValueError, match="hidden is a keeper's alone"):
         world_graph(world, {"rung": "contributor"}, hidden=True)
-    with pytest.raises(ValueError, match="proposed is the owner's alone"):
+    with pytest.raises(ValueError, match="proposed is a keeper's alone"):
         world_graph(world, {"rung": "guest", "whole": []}, proposed=True)
     with pytest.raises(ValueError, match="public reader takes no flag; it asked rooms"):
         world_graph(world, {"rung": "public"}, rooms=True)
