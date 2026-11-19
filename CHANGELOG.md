@@ -4,6 +4,11 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+## 0.137.0 (2026-11-19)
+
+- **`carry_of(map, point, maps)`, the map-space profile's frame reading** (schema-dist serial 139, rules 13 and 14), the TypeScript SDK's `carryOf` with the same answer. A child Map says where it lies on the Map its `parent_map` names with `x_parent_frame`, a box `[x0, y0, x1, y1]` in the parent's pixels; `carry_of` carries a point on a Map up that chain, one level at a time by each level's own frame, in 64-bit floats, and answers `{parent_frame, lint, points, stop}`: the Map's own frame as written or None, what is wrong with it (`no_parent`, `not_four_numbers`, `not_a_box`), the point on each Map it reaches, and why the walk ended (`top`, `dangling`, `cycle`, `no_frame`, `no_carry`). Its types are `CarryOf`, `CarryPoint`, `CarryStop` and `CarryLint`. `map_space` and `layout_of` do not read the key.
+- **The schema pin moves to `v0.34.1-dist.139`** (canonical 00.34.01 unchanged, no schema file moved, `_schema.py` changes only its provenance lines): the map-space page's rules 13 and 14 and the fixture's 66 `frame_cases`, which `carry_of` answers as published; the map-space reading's own cases are unchanged.
+
 ## 0.136.0 (2026-11-19)
 
 - **The schema pin moves to `v0.34.1-dist.138`** (serials 137 and 138; canonical 00.34.01 unchanged, no schema file moved, `_schema.py` changes only its provenance lines). Serial 137 publishes the `by-links-3d` method on the layout profile's page, with its fixture (116 cases) and directions table, adds four map-space cases (a Map's `width` or `height` that is a whole number, 0 and under 0 included, is answered as written; a slot measured on a Map with no placed point of its own is None), three layout-reading cases and two `unplaced` cases. Serial 138 adds cases to the lens (246), charter (16 design) and report (9 talk) fixtures. Every case passes as published.

@@ -2,15 +2,20 @@
   "_what": "The recorded pin for the vendored OnlyWorlds schema distribution (codegen/schema-dist/, copied byte-exact). Do not edit by hand; re-vendor from the pinned tag and review the diff. Kept equal to the npm SDK's pin (github.com/OnlyWorlds/sdk, codegen/schema-pin.json) on purpose: two clients, one schema.",
   "_why_manifest_sha256": "Verifying the tree against its own MANIFEST.json only proves internal consistency. If the tag moved, the manifest moved with it. The hash recorded here is the one first accepted, which is what makes a moved tag visible.",
   "repo": "https://github.com/OnlyWorlds/schema-dist",
-  "tag": "v0.34.1-dist.138",
-  "commit": "a4793840199570607bdd06fc54d472af6093dd20",
-  "manifest_sha256": "60c6f68fcd5ca63b02a0e99ea0c2b586159bb68ade38106aa890c823a6a6fca1",
+  "tag": "v0.34.1-dist.139",
+  "commit": "fc466572b978ea23d62e900161f5670ea363b58c",
+  "manifest_sha256": "65a3ded94dfce624e823c664c7bcfc317530a872213a217d8e3a63215fe9f4e5",
   "canonical_version": "00.34.01",
-  "dist_serial": 138,
+  "dist_serial": 139,
   "published": "2026-11-19",
   "pinned_at": "2026-11-19",
   "pinned_by": "The maintainer: tree from `git archive` of the tag in a schema-dist checkout (216 files: the 215 the MANIFEST lists, and MANIFEST.json itself); files re-hashed against MANIFEST.json by verify_dist.py; MANIFEST self-hash matched against the raw file GitHub serves at the tag, whose ref resolves to the commit above.",
   "previous_pins": [
+    {
+      "tag": "v0.34.1-dist.138",
+      "manifest_sha256": "60c6f68fcd5ca63b02a0e99ea0c2b586159bb68ade38106aa890c823a6a6fca1",
+      "note": "superseded by v0.34.1-dist.139 (serial 139, canonical 00.34.01 unchanged: the child Map frame, the map-space page's rules 13 and 14 and the fixture's 66 frame_cases)"
+    },
     {
       "tag": "v0.34.1-dist.136",
       "manifest_sha256": "9a1f31d1135a17ffa0facca587ba354a90821bdb28dc46a4a7335cbfe7acfa91",

@@ -10952,5 +10952,3295 @@
     "hand": []
    }
   }
+ ],
+ "frame_cases": [
+  {
+   "name": "frame-places-a-point",
+   "claim": "a point on the child is carried onto its parent by the frame, each axis by its own ratio, y from the bottom: (20, 10) on a 100 by 50 child framed by [100, 200, 300, 300] is (140, 220)",
+   "map": "019a9200-0000-7000-8000-00000000aa02",
+   "point": [
+    20,
+    10
+   ],
+   "elements": [
+    {
+     "type": "map",
+     "id": "019a9200-0000-7000-8000-00000000aa01",
+     "name": "land",
+     "width": 1000,
+     "height": 800
+    },
+    {
+     "type": "map",
+     "id": "019a9200-0000-7000-8000-00000000aa02",
+     "name": "town",
+     "width": 100,
+     "height": 50,
+     "parent_map": "019a9200-0000-7000-8000-00000000aa01",
+     "x_parent_frame": [
+      100,
+      200,
+      300,
+      300
+     ]
+    }
+   ],
+   "want": {
+    "parent_frame": [
+     100,
+     200,
+     300,
+     300
+    ],
+    "lint": null,
+    "points": [
+     {
+      "map": "019a9200-0000-7000-8000-00000000aa02",
+      "x": 20,
+      "y": 10
+     },
+     {
+      "map": "019a9200-0000-7000-8000-00000000aa01",
+      "x": 140.0,
+      "y": 220.0
+     }
+    ],
+    "stop": "top"
+   }
+  },
+  {
+   "name": "frame-a-stretch",
+   "claim": "a box of another shape than the child's is a stretch, not a fault: a 100 by 50 child on a box 20 wide and 100 tall carries y by 100 / 50 and x by 20 / 100, never by the width's ratio alone",
+   "map": "019a9200-0000-7000-8000-00000000aa02",
+   "point": [
+    50,
+    25
+   ],
+   "elements": [
+    {
+     "type": "map",
+     "id": "019a9200-0000-7000-8000-00000000aa01",
+     "name": "land",
+     "width": 1000,
+     "height": 800
+    },
+    {
+     "type": "map",
+     "id": "019a9200-0000-7000-8000-00000000aa02",
+     "name": "town",
+     "width": 100,
+     "height": 50,
+     "parent_map": "019a9200-0000-7000-8000-00000000aa01",
+     "x_parent_frame": [
+      10,
+      20,
+      30,
+      120
+     ]
+    }
+   ],
+   "want": {
+    "parent_frame": [
+     10,
+     20,
+     30,
+     120
+    ],
+    "lint": null,
+    "points": [
+     {
+      "map": "019a9200-0000-7000-8000-00000000aa02",
+      "x": 50,
+      "y": 25
+     },
+     {
+      "map": "019a9200-0000-7000-8000-00000000aa01",
+      "x": 20.0,
+      "y": 70.0
+     }
+    ],
+    "stop": "top"
+   }
+  },
+  {
+   "name": "frame-a-box-the-child-turned-is-a-stretch",
+   "claim": "no turn: a box of the child's shape turned on its side is a stretch, and x stays x",
+   "map": "019a9200-0000-7000-8000-00000000aa02",
+   "point": [
+    80,
+    10
+   ],
+   "elements": [
+    {
+     "type": "map",
+     "id": "019a9200-0000-7000-8000-00000000aa01",
+     "name": "land",
+     "width": 1000,
+     "height": 800
+    },
+    {
+     "type": "map",
+     "id": "019a9200-0000-7000-8000-00000000aa02",
+     "name": "town",
+     "width": 100,
+     "height": 50,
+     "parent_map": "019a9200-0000-7000-8000-00000000aa01",
+     "x_parent_frame": [
+      0,
+      0,
+      50,
+      100
+     ]
+    }
+   ],
+   "want": {
+    "parent_frame": [
+     0,
+     0,
+     50,
+     100
+    ],
+    "lint": null,
+    "points": [
+     {
+      "map": "019a9200-0000-7000-8000-00000000aa02",
+      "x": 80,
+      "y": 10
+     },
+     {
+      "map": "019a9200-0000-7000-8000-00000000aa01",
+      "x": 40.0,
+      "y": 20.0
+     }
+    ],
+    "stop": "top"
+   }
+  },
+  {
+   "name": "frame-a-point-outside-the-child",
+   "claim": "a point outside the child's rectangle is carried as written, never clipped",
+   "map": "019a9200-0000-7000-8000-00000000aa02",
+   "point": [
+    -10,
+    70
+   ],
+   "elements": [
+    {
+     "type": "map",
+     "id": "019a9200-0000-7000-8000-00000000aa01",
+     "name": "land",
+     "width": 1000,
+     "height": 800
+    },
+    {
+     "type": "map",
+     "id": "019a9200-0000-7000-8000-00000000aa02",
+     "name": "town",
+     "width": 100,
+     "height": 50,
+     "parent_map": "019a9200-0000-7000-8000-00000000aa01",
+     "x_parent_frame": [
+      100,
+      200,
+      300,
+      300
+     ]
+    }
+   ],
+   "want": {
+    "parent_frame": [
+     100,
+     200,
+     300,
+     300
+    ],
+    "lint": null,
+    "points": [
+     {
+      "map": "019a9200-0000-7000-8000-00000000aa02",
+      "x": -10,
+      "y": 70
+     },
+     {
+      "map": "019a9200-0000-7000-8000-00000000aa01",
+      "x": 80.0,
+      "y": 340.0
+     }
+    ],
+    "stop": "top"
+   }
+  },
+  {
+   "name": "frame-a-box-past-the-parent-edge",
+   "claim": "a box that runs past the parent's edges is a frame as written: the reader reports, it does not fix",
+   "map": "019a9200-0000-7000-8000-00000000aa02",
+   "point": [
+    100,
+    50
+   ],
+   "elements": [
+    {
+     "type": "map",
+     "id": "019a9200-0000-7000-8000-00000000aa01",
+     "name": "land",
+     "width": 1000,
+     "height": 800
+    },
+    {
+     "type": "map",
+     "id": "019a9200-0000-7000-8000-00000000aa02",
+     "name": "town",
+     "width": 100,
+     "height": 50,
+     "parent_map": "019a9200-0000-7000-8000-00000000aa01",
+     "x_parent_frame": [
+      -50,
+      700,
+      150,
+      900
+     ]
+    }
+   ],
+   "want": {
+    "parent_frame": [
+     -50,
+     700,
+     150,
+     900
+    ],
+    "lint": null,
+    "points": [
+     {
+      "map": "019a9200-0000-7000-8000-00000000aa02",
+      "x": 100,
+      "y": 50
+     },
+     {
+      "map": "019a9200-0000-7000-8000-00000000aa01",
+      "x": 150.0,
+      "y": 900.0
+     }
+    ],
+    "stop": "top"
+   }
+  },
+  {
+   "name": "frame-whole-numbers-written-with-a-fraction-part",
+   "claim": "the parent frame is answered as written; `100.0` and `100` are one number, and a whole `width` written `100.0` is a whole number above 0, so the point is carried",
+   "map": "019a9200-0000-7000-8000-00000000aa02",
+   "point": [
+    20,
+    10
+   ],
+   "elements": [
+    {
+     "type": "map",
+     "id": "019a9200-0000-7000-8000-00000000aa01",
+     "name": "land",
+     "width": 1000,
+     "height": 800
+    },
+    {
+     "type": "map",
+     "id": "019a9200-0000-7000-8000-00000000aa02",
+     "name": "town",
+     "width": 100.0,
+     "height": 50,
+     "parent_map": "019a9200-0000-7000-8000-00000000aa01",
+     "x_parent_frame": [
+      100.0,
+      200,
+      300.0,
+      300
+     ]
+    }
+   ],
+   "want": {
+    "parent_frame": [
+     100.0,
+     200,
+     300.0,
+     300
+    ],
+    "lint": null,
+    "points": [
+     {
+      "map": "019a9200-0000-7000-8000-00000000aa02",
+      "x": 20,
+      "y": 10
+     },
+     {
+      "map": "019a9200-0000-7000-8000-00000000aa01",
+      "x": 140.0,
+      "y": 220.0
+     }
+    ],
+    "stop": "top"
+   }
+  },
+  {
+   "name": "frame-on-a-map-with-no-parent",
+   "claim": "a frame on a Map with no `parent_map` is not read: `parent_frame` null, lint `no_parent`, the point stays",
+   "map": "019a9200-0000-7000-8000-00000000aa02",
+   "point": [
+    20,
+    10
+   ],
+   "elements": [
+    {
+     "type": "map",
+     "id": "019a9200-0000-7000-8000-00000000aa01",
+     "name": "land",
+     "width": 1000,
+     "height": 800
+    },
+    {
+     "type": "map",
+     "id": "019a9200-0000-7000-8000-00000000aa02",
+     "name": "town",
+     "width": 100,
+     "height": 50,
+     "x_parent_frame": [
+      100,
+      200,
+      300,
+      300
+     ]
+    }
+   ],
+   "want": {
+    "parent_frame": null,
+    "lint": "no_parent",
+    "points": [
+     {
+      "map": "019a9200-0000-7000-8000-00000000aa02",
+      "x": 20,
+      "y": 10
+     }
+    ],
+    "stop": "top"
+   }
+  },
+  {
+   "name": "frame-with-an-empty-parent-link",
+   "claim": "a `parent_map` that is an empty string is no link (reading H), so the frame is not read",
+   "map": "019a9200-0000-7000-8000-00000000aa02",
+   "point": [
+    20,
+    10
+   ],
+   "elements": [
+    {
+     "type": "map",
+     "id": "019a9200-0000-7000-8000-00000000aa01",
+     "name": "land",
+     "width": 1000,
+     "height": 800
+    },
+    {
+     "type": "map",
+     "id": "019a9200-0000-7000-8000-00000000aa02",
+     "name": "town",
+     "width": 100,
+     "height": 50,
+     "parent_map": "",
+     "x_parent_frame": [
+      100,
+      200,
+      300,
+      300
+     ]
+    }
+   ],
+   "want": {
+    "parent_frame": null,
+    "lint": "no_parent",
+    "points": [
+     {
+      "map": "019a9200-0000-7000-8000-00000000aa02",
+      "x": 20,
+      "y": 10
+     }
+    ],
+    "stop": "top"
+   }
+  },
+  {
+   "name": "frame-malformed-on-a-map-with-no-parent",
+   "claim": "with no `parent_map` the frame is not read at all: its lint is `no_parent`, whatever its shape",
+   "map": "019a9200-0000-7000-8000-00000000aa02",
+   "point": [
+    20,
+    10
+   ],
+   "elements": [
+    {
+     "type": "map",
+     "id": "019a9200-0000-7000-8000-00000000aa01",
+     "name": "land",
+     "width": 1000,
+     "height": 800
+    },
+    {
+     "type": "map",
+     "id": "019a9200-0000-7000-8000-00000000aa02",
+     "name": "town",
+     "width": 100,
+     "height": 50,
+     "x_parent_frame": [
+      30,
+      20,
+      10
+     ]
+    }
+   ],
+   "want": {
+    "parent_frame": null,
+    "lint": "no_parent",
+    "points": [
+     {
+      "map": "019a9200-0000-7000-8000-00000000aa02",
+      "x": 20,
+      "y": 10
+     }
+    ],
+    "stop": "top"
+   }
+  },
+  {
+   "name": "frame-absent",
+   "claim": "a child with a `parent_map` and no frame has `parent_frame` null and no lint, and its point is carried no further, though its Location has a Pin on the parent",
+   "map": "019a9200-0000-7000-8000-00000000aa02",
+   "point": [
+    20,
+    10
+   ],
+   "elements": [
+    {
+     "type": "map",
+     "id": "019a9200-0000-7000-8000-00000000aa01",
+     "name": "land",
+     "width": 1000,
+     "height": 800
+    },
+    {
+     "type": "map",
+     "id": "019a9200-0000-7000-8000-00000000aa02",
+     "name": "town",
+     "width": 100,
+     "height": 50,
+     "parent_map": "019a9200-0000-7000-8000-00000000aa01",
+     "location": "019a9200-0000-7000-8000-0000000e0001"
+    },
+    {
+     "type": "location",
+     "id": "019a9200-0000-7000-8000-0000000e0001",
+     "name": "place"
+    },
+    {
+     "type": "pin",
+     "id": "019a9200-0000-7000-8000-0000000d0001",
+     "name": "place",
+     "map": "019a9200-0000-7000-8000-00000000aa01",
+     "element_type": "location",
+     "element_id": "019a9200-0000-7000-8000-0000000e0001",
+     "x": 400,
+     "y": 300
+    }
+   ],
+   "want": {
+    "parent_frame": null,
+    "lint": null,
+    "points": [
+     {
+      "map": "019a9200-0000-7000-8000-00000000aa02",
+      "x": 20,
+      "y": 10
+     }
+    ],
+    "stop": "no_frame"
+   }
+  },
+  {
+   "name": "frame-null",
+   "claim": "an `x_parent_frame` of null is no frame, as an absent one, with no lint",
+   "map": "019a9200-0000-7000-8000-00000000aa02",
+   "point": [
+    20,
+    10
+   ],
+   "elements": [
+    {
+     "type": "map",
+     "id": "019a9200-0000-7000-8000-00000000aa01",
+     "name": "land",
+     "width": 1000,
+     "height": 800
+    },
+    {
+     "type": "map",
+     "id": "019a9200-0000-7000-8000-00000000aa02",
+     "name": "town",
+     "width": 100,
+     "height": 50,
+     "parent_map": "019a9200-0000-7000-8000-00000000aa01",
+     "x_parent_frame": null
+    }
+   ],
+   "want": {
+    "parent_frame": null,
+    "lint": null,
+    "points": [
+     {
+      "map": "019a9200-0000-7000-8000-00000000aa02",
+      "x": 20,
+      "y": 10
+     }
+    ],
+    "stop": "no_frame"
+   }
+  },
+  {
+   "name": "frame-three-numbers",
+   "claim": "an `x_parent_frame` that is three numbers is no frame, with the lint `not_four_numbers`",
+   "map": "019a9200-0000-7000-8000-00000000aa02",
+   "point": [
+    50,
+    25
+   ],
+   "elements": [
+    {
+     "type": "map",
+     "id": "019a9200-0000-7000-8000-00000000aa01",
+     "name": "land",
+     "width": 1000,
+     "height": 800
+    },
+    {
+     "type": "map",
+     "id": "019a9200-0000-7000-8000-00000000aa02",
+     "name": "town",
+     "width": 100,
+     "height": 50,
+     "parent_map": "019a9200-0000-7000-8000-00000000aa01",
+     "x_parent_frame": [
+      10,
+      20,
+      30
+     ]
+    }
+   ],
+   "want": {
+    "parent_frame": null,
+    "lint": "not_four_numbers",
+    "points": [
+     {
+      "map": "019a9200-0000-7000-8000-00000000aa02",
+      "x": 50,
+      "y": 25
+     }
+    ],
+    "stop": "no_frame"
+   }
+  },
+  {
+   "name": "frame-five-numbers",
+   "claim": "an `x_parent_frame` that is five numbers is no frame (its first four are never read), with the lint `not_four_numbers`",
+   "map": "019a9200-0000-7000-8000-00000000aa02",
+   "point": [
+    50,
+    25
+   ],
+   "elements": [
+    {
+     "type": "map",
+     "id": "019a9200-0000-7000-8000-00000000aa01",
+     "name": "land",
+     "width": 1000,
+     "height": 800
+    },
+    {
+     "type": "map",
+     "id": "019a9200-0000-7000-8000-00000000aa02",
+     "name": "town",
+     "width": 100,
+     "height": 50,
+     "parent_map": "019a9200-0000-7000-8000-00000000aa01",
+     "x_parent_frame": [
+      10,
+      20,
+      30,
+      40,
+      50
+     ]
+    }
+   ],
+   "want": {
+    "parent_frame": null,
+    "lint": "not_four_numbers",
+    "points": [
+     {
+      "map": "019a9200-0000-7000-8000-00000000aa02",
+      "x": 50,
+      "y": 25
+     }
+    ],
+    "stop": "no_frame"
+   }
+  },
+  {
+   "name": "frame-numbers-as-strings",
+   "claim": "an `x_parent_frame` that is numbers written as strings is no frame, with the lint `not_four_numbers`",
+   "map": "019a9200-0000-7000-8000-00000000aa02",
+   "point": [
+    50,
+    25
+   ],
+   "elements": [
+    {
+     "type": "map",
+     "id": "019a9200-0000-7000-8000-00000000aa01",
+     "name": "land",
+     "width": 1000,
+     "height": 800
+    },
+    {
+     "type": "map",
+     "id": "019a9200-0000-7000-8000-00000000aa02",
+     "name": "town",
+     "width": 100,
+     "height": 50,
+     "parent_map": "019a9200-0000-7000-8000-00000000aa01",
+     "x_parent_frame": [
+      "10",
+      "20",
+      "30",
+      "40"
+     ]
+    }
+   ],
+   "want": {
+    "parent_frame": null,
+    "lint": "not_four_numbers",
+    "points": [
+     {
+      "map": "019a9200-0000-7000-8000-00000000aa02",
+      "x": 50,
+      "y": 25
+     }
+    ],
+    "stop": "no_frame"
+   }
+  },
+  {
+   "name": "frame-a-string-among-numbers",
+   "claim": "an `x_parent_frame` that is one string among four is no frame, with the lint `not_four_numbers`",
+   "map": "019a9200-0000-7000-8000-00000000aa02",
+   "point": [
+    50,
+    25
+   ],
+   "elements": [
+    {
+     "type": "map",
+     "id": "019a9200-0000-7000-8000-00000000aa01",
+     "name": "land",
+     "width": 1000,
+     "height": 800
+    },
+    {
+     "type": "map",
+     "id": "019a9200-0000-7000-8000-00000000aa02",
+     "name": "town",
+     "width": 100,
+     "height": 50,
+     "parent_map": "019a9200-0000-7000-8000-00000000aa01",
+     "x_parent_frame": [
+      10,
+      "20",
+      30,
+      40
+     ]
+    }
+   ],
+   "want": {
+    "parent_frame": null,
+    "lint": "not_four_numbers",
+    "points": [
+     {
+      "map": "019a9200-0000-7000-8000-00000000aa02",
+      "x": 50,
+      "y": 25
+     }
+    ],
+    "stop": "no_frame"
+   }
+  },
+  {
+   "name": "frame-a-boolean-among-numbers",
+   "claim": "an `x_parent_frame` that is a boolean among four (true is no 1) is no frame, with the lint `not_four_numbers`",
+   "map": "019a9200-0000-7000-8000-00000000aa02",
+   "point": [
+    50,
+    25
+   ],
+   "elements": [
+    {
+     "type": "map",
+     "id": "019a9200-0000-7000-8000-00000000aa01",
+     "name": "land",
+     "width": 1000,
+     "height": 800
+    },
+    {
+     "type": "map",
+     "id": "019a9200-0000-7000-8000-00000000aa02",
+     "name": "town",
+     "width": 100,
+     "height": 50,
+     "parent_map": "019a9200-0000-7000-8000-00000000aa01",
+     "x_parent_frame": [
+      0,
+      0,
+      true,
+      40
+     ]
+    }
+   ],
+   "want": {
+    "parent_frame": null,
+    "lint": "not_four_numbers",
+    "points": [
+     {
+      "map": "019a9200-0000-7000-8000-00000000aa02",
+      "x": 50,
+      "y": 25
+     }
+    ],
+    "stop": "no_frame"
+   }
+  },
+  {
+   "name": "frame-null-among-numbers",
+   "claim": "an `x_parent_frame` that is a null among four is no frame, with the lint `not_four_numbers`",
+   "map": "019a9200-0000-7000-8000-00000000aa02",
+   "point": [
+    50,
+    25
+   ],
+   "elements": [
+    {
+     "type": "map",
+     "id": "019a9200-0000-7000-8000-00000000aa01",
+     "name": "land",
+     "width": 1000,
+     "height": 800
+    },
+    {
+     "type": "map",
+     "id": "019a9200-0000-7000-8000-00000000aa02",
+     "name": "town",
+     "width": 100,
+     "height": 50,
+     "parent_map": "019a9200-0000-7000-8000-00000000aa01",
+     "x_parent_frame": [
+      10,
+      null,
+      30,
+      40
+     ]
+    }
+   ],
+   "want": {
+    "parent_frame": null,
+    "lint": "not_four_numbers",
+    "points": [
+     {
+      "map": "019a9200-0000-7000-8000-00000000aa02",
+      "x": 50,
+      "y": 25
+     }
+    ],
+    "stop": "no_frame"
+   }
+  },
+  {
+   "name": "frame-a-list-among-numbers",
+   "claim": "an `x_parent_frame` that is a list among four is no frame, with the lint `not_four_numbers`",
+   "map": "019a9200-0000-7000-8000-00000000aa02",
+   "point": [
+    50,
+    25
+   ],
+   "elements": [
+    {
+     "type": "map",
+     "id": "019a9200-0000-7000-8000-00000000aa01",
+     "name": "land",
+     "width": 1000,
+     "height": 800
+    },
+    {
+     "type": "map",
+     "id": "019a9200-0000-7000-8000-00000000aa02",
+     "name": "town",
+     "width": 100,
+     "height": 50,
+     "parent_map": "019a9200-0000-7000-8000-00000000aa01",
+     "x_parent_frame": [
+      10,
+      [
+       20
+      ],
+      30,
+      40
+     ]
+    }
+   ],
+   "want": {
+    "parent_frame": null,
+    "lint": "not_four_numbers",
+    "points": [
+     {
+      "map": "019a9200-0000-7000-8000-00000000aa02",
+      "x": 50,
+      "y": 25
+     }
+    ],
+    "stop": "no_frame"
+   }
+  },
+  {
+   "name": "frame-a-string",
+   "claim": "an `x_parent_frame` that is a string is no frame, with the lint `not_four_numbers`",
+   "map": "019a9200-0000-7000-8000-00000000aa02",
+   "point": [
+    50,
+    25
+   ],
+   "elements": [
+    {
+     "type": "map",
+     "id": "019a9200-0000-7000-8000-00000000aa01",
+     "name": "land",
+     "width": 1000,
+     "height": 800
+    },
+    {
+     "type": "map",
+     "id": "019a9200-0000-7000-8000-00000000aa02",
+     "name": "town",
+     "width": 100,
+     "height": 50,
+     "parent_map": "019a9200-0000-7000-8000-00000000aa01",
+     "x_parent_frame": "10 20 30 40"
+    }
+   ],
+   "want": {
+    "parent_frame": null,
+    "lint": "not_four_numbers",
+    "points": [
+     {
+      "map": "019a9200-0000-7000-8000-00000000aa02",
+      "x": 50,
+      "y": 25
+     }
+    ],
+    "stop": "no_frame"
+   }
+  },
+  {
+   "name": "frame-an-object",
+   "claim": "an `x_parent_frame` that is an object of four corners is no frame, with the lint `not_four_numbers`",
+   "map": "019a9200-0000-7000-8000-00000000aa02",
+   "point": [
+    50,
+    25
+   ],
+   "elements": [
+    {
+     "type": "map",
+     "id": "019a9200-0000-7000-8000-00000000aa01",
+     "name": "land",
+     "width": 1000,
+     "height": 800
+    },
+    {
+     "type": "map",
+     "id": "019a9200-0000-7000-8000-00000000aa02",
+     "name": "town",
+     "width": 100,
+     "height": 50,
+     "parent_map": "019a9200-0000-7000-8000-00000000aa01",
+     "x_parent_frame": {
+      "x0": 10,
+      "y0": 20,
+      "x1": 30,
+      "y1": 40
+     }
+    }
+   ],
+   "want": {
+    "parent_frame": null,
+    "lint": "not_four_numbers",
+    "points": [
+     {
+      "map": "019a9200-0000-7000-8000-00000000aa02",
+      "x": 50,
+      "y": 25
+     }
+    ],
+    "stop": "no_frame"
+   }
+  },
+  {
+   "name": "frame-an-empty-list",
+   "claim": "an `x_parent_frame` that is an empty list is no frame, with the lint `not_four_numbers`",
+   "map": "019a9200-0000-7000-8000-00000000aa02",
+   "point": [
+    50,
+    25
+   ],
+   "elements": [
+    {
+     "type": "map",
+     "id": "019a9200-0000-7000-8000-00000000aa01",
+     "name": "land",
+     "width": 1000,
+     "height": 800
+    },
+    {
+     "type": "map",
+     "id": "019a9200-0000-7000-8000-00000000aa02",
+     "name": "town",
+     "width": 100,
+     "height": 50,
+     "parent_map": "019a9200-0000-7000-8000-00000000aa01",
+     "x_parent_frame": []
+    }
+   ],
+   "want": {
+    "parent_frame": null,
+    "lint": "not_four_numbers",
+    "points": [
+     {
+      "map": "019a9200-0000-7000-8000-00000000aa02",
+      "x": 50,
+      "y": 25
+     }
+    ],
+    "stop": "no_frame"
+   }
+  },
+  {
+   "name": "frame-mirrored-in-x",
+   "claim": "a frame with x0 above x1 (a mirrored box, never normalised) is no frame, with the lint `not_a_box`",
+   "map": "019a9200-0000-7000-8000-00000000aa02",
+   "point": [
+    50,
+    25
+   ],
+   "elements": [
+    {
+     "type": "map",
+     "id": "019a9200-0000-7000-8000-00000000aa01",
+     "name": "land",
+     "width": 1000,
+     "height": 800
+    },
+    {
+     "type": "map",
+     "id": "019a9200-0000-7000-8000-00000000aa02",
+     "name": "town",
+     "width": 100,
+     "height": 50,
+     "parent_map": "019a9200-0000-7000-8000-00000000aa01",
+     "x_parent_frame": [
+      30,
+      20,
+      10,
+      40
+     ]
+    }
+   ],
+   "want": {
+    "parent_frame": null,
+    "lint": "not_a_box",
+    "points": [
+     {
+      "map": "019a9200-0000-7000-8000-00000000aa02",
+      "x": 50,
+      "y": 25
+     }
+    ],
+    "stop": "no_frame"
+   }
+  },
+  {
+   "name": "frame-mirrored-in-y",
+   "claim": "a frame with y0 above y1 is no frame, with the lint `not_a_box`",
+   "map": "019a9200-0000-7000-8000-00000000aa02",
+   "point": [
+    50,
+    25
+   ],
+   "elements": [
+    {
+     "type": "map",
+     "id": "019a9200-0000-7000-8000-00000000aa01",
+     "name": "land",
+     "width": 1000,
+     "height": 800
+    },
+    {
+     "type": "map",
+     "id": "019a9200-0000-7000-8000-00000000aa02",
+     "name": "town",
+     "width": 100,
+     "height": 50,
+     "parent_map": "019a9200-0000-7000-8000-00000000aa01",
+     "x_parent_frame": [
+      10,
+      40,
+      30,
+      20
+     ]
+    }
+   ],
+   "want": {
+    "parent_frame": null,
+    "lint": "not_a_box",
+    "points": [
+     {
+      "map": "019a9200-0000-7000-8000-00000000aa02",
+      "x": 50,
+      "y": 25
+     }
+    ],
+    "stop": "no_frame"
+   }
+  },
+  {
+   "name": "frame-with-no-width",
+   "claim": "a frame with x0 equal to x1 (a box with no width) is no frame, with the lint `not_a_box`",
+   "map": "019a9200-0000-7000-8000-00000000aa02",
+   "point": [
+    50,
+    25
+   ],
+   "elements": [
+    {
+     "type": "map",
+     "id": "019a9200-0000-7000-8000-00000000aa01",
+     "name": "land",
+     "width": 1000,
+     "height": 800
+    },
+    {
+     "type": "map",
+     "id": "019a9200-0000-7000-8000-00000000aa02",
+     "name": "town",
+     "width": 100,
+     "height": 50,
+     "parent_map": "019a9200-0000-7000-8000-00000000aa01",
+     "x_parent_frame": [
+      10,
+      20,
+      10,
+      40
+     ]
+    }
+   ],
+   "want": {
+    "parent_frame": null,
+    "lint": "not_a_box",
+    "points": [
+     {
+      "map": "019a9200-0000-7000-8000-00000000aa02",
+      "x": 50,
+      "y": 25
+     }
+    ],
+    "stop": "no_frame"
+   }
+  },
+  {
+   "name": "frame-with-no-height",
+   "claim": "a frame with y0 equal to y1, `20` and `20.0` being one number is no frame, with the lint `not_a_box`",
+   "map": "019a9200-0000-7000-8000-00000000aa02",
+   "point": [
+    50,
+    25
+   ],
+   "elements": [
+    {
+     "type": "map",
+     "id": "019a9200-0000-7000-8000-00000000aa01",
+     "name": "land",
+     "width": 1000,
+     "height": 800
+    },
+    {
+     "type": "map",
+     "id": "019a9200-0000-7000-8000-00000000aa02",
+     "name": "town",
+     "width": 100,
+     "height": 50,
+     "parent_map": "019a9200-0000-7000-8000-00000000aa01",
+     "x_parent_frame": [
+      10,
+      20,
+      30,
+      20.0
+     ]
+    }
+   ],
+   "want": {
+    "parent_frame": null,
+    "lint": "not_a_box",
+    "points": [
+     {
+      "map": "019a9200-0000-7000-8000-00000000aa02",
+      "x": 50,
+      "y": 25
+     }
+    ],
+    "stop": "no_frame"
+   }
+  },
+  {
+   "name": "no-size-no-carry",
+   "claim": "a child with no `width` or `height` of its own has its frame and no carry: the extent its points measure (rule 2) is never the size a frame divides by",
+   "map": "019a9200-0000-7000-8000-00000000aa02",
+   "point": [
+    50,
+    25
+   ],
+   "elements": [
+    {
+     "type": "map",
+     "id": "019a9200-0000-7000-8000-00000000aa01",
+     "name": "land",
+     "width": 1000,
+     "height": 800
+    },
+    {
+     "type": "map",
+     "id": "019a9200-0000-7000-8000-00000000aa02",
+     "name": "town",
+     "parent_map": "019a9200-0000-7000-8000-00000000aa01",
+     "x_parent_frame": [
+      100,
+      200,
+      300,
+      300
+     ]
+    },
+    {
+     "type": "pin",
+     "id": "019a9200-0000-7000-8000-0000000d0011",
+     "name": "corner",
+     "map": "019a9200-0000-7000-8000-00000000aa02",
+     "x": 80,
+     "y": 40
+    },
+    {
+     "type": "marker",
+     "id": "019a9200-0000-7000-8000-0000000c0011",
+     "name": "corner",
+     "map": "019a9200-0000-7000-8000-00000000aa02",
+     "zone": "019a9200-0000-7000-8000-0000000b0011",
+     "x": 60,
+     "y": 45
+    },
+    {
+     "type": "zone",
+     "id": "019a9200-0000-7000-8000-0000000b0011",
+     "name": "yard"
+    }
+   ],
+   "want": {
+    "parent_frame": [
+     100,
+     200,
+     300,
+     300
+    ],
+    "lint": null,
+    "points": [
+     {
+      "map": "019a9200-0000-7000-8000-00000000aa02",
+      "x": 50,
+      "y": 25
+     }
+    ],
+    "stop": "no_carry"
+   }
+  },
+  {
+   "name": "no-height-no-carry",
+   "claim": "a child with a `width` and no `height` has its frame and no carry",
+   "map": "019a9200-0000-7000-8000-00000000aa02",
+   "point": [
+    50,
+    25
+   ],
+   "elements": [
+    {
+     "type": "map",
+     "id": "019a9200-0000-7000-8000-00000000aa01",
+     "name": "land",
+     "width": 1000,
+     "height": 800
+    },
+    {
+     "type": "map",
+     "id": "019a9200-0000-7000-8000-00000000aa02",
+     "name": "town",
+     "width": 100,
+     "parent_map": "019a9200-0000-7000-8000-00000000aa01",
+     "x_parent_frame": [
+      100,
+      200,
+      300,
+      300
+     ]
+    },
+    {
+     "type": "pin",
+     "id": "019a9200-0000-7000-8000-0000000d0011",
+     "name": "corner",
+     "map": "019a9200-0000-7000-8000-00000000aa02",
+     "x": 80,
+     "y": 40
+    },
+    {
+     "type": "marker",
+     "id": "019a9200-0000-7000-8000-0000000c0011",
+     "name": "corner",
+     "map": "019a9200-0000-7000-8000-00000000aa02",
+     "zone": "019a9200-0000-7000-8000-0000000b0011",
+     "x": 60,
+     "y": 45
+    },
+    {
+     "type": "zone",
+     "id": "019a9200-0000-7000-8000-0000000b0011",
+     "name": "yard"
+    }
+   ],
+   "want": {
+    "parent_frame": [
+     100,
+     200,
+     300,
+     300
+    ],
+    "lint": null,
+    "points": [
+     {
+      "map": "019a9200-0000-7000-8000-00000000aa02",
+      "x": 50,
+      "y": 25
+     }
+    ],
+    "stop": "no_carry"
+   }
+  },
+  {
+   "name": "width-zero-no-carry",
+   "claim": "a child with a `width` of 0 has its frame and no carry: rule 2 answers the size as written, and the frame divides only by a whole number above 0",
+   "map": "019a9200-0000-7000-8000-00000000aa02",
+   "point": [
+    50,
+    25
+   ],
+   "elements": [
+    {
+     "type": "map",
+     "id": "019a9200-0000-7000-8000-00000000aa01",
+     "name": "land",
+     "width": 1000,
+     "height": 800
+    },
+    {
+     "type": "map",
+     "id": "019a9200-0000-7000-8000-00000000aa02",
+     "name": "town",
+     "width": 0,
+     "height": 50,
+     "parent_map": "019a9200-0000-7000-8000-00000000aa01",
+     "x_parent_frame": [
+      100,
+      200,
+      300,
+      300
+     ]
+    }
+   ],
+   "want": {
+    "parent_frame": [
+     100,
+     200,
+     300,
+     300
+    ],
+    "lint": null,
+    "points": [
+     {
+      "map": "019a9200-0000-7000-8000-00000000aa02",
+      "x": 50,
+      "y": 25
+     }
+    ],
+    "stop": "no_carry"
+   }
+  },
+  {
+   "name": "width-under-zero-no-carry",
+   "claim": "a child with a `width` under 0 has its frame and no carry: rule 2 answers the size as written, and the frame divides only by a whole number above 0",
+   "map": "019a9200-0000-7000-8000-00000000aa02",
+   "point": [
+    50,
+    25
+   ],
+   "elements": [
+    {
+     "type": "map",
+     "id": "019a9200-0000-7000-8000-00000000aa01",
+     "name": "land",
+     "width": 1000,
+     "height": 800
+    },
+    {
+     "type": "map",
+     "id": "019a9200-0000-7000-8000-00000000aa02",
+     "name": "town",
+     "width": -100,
+     "height": 50,
+     "parent_map": "019a9200-0000-7000-8000-00000000aa01",
+     "x_parent_frame": [
+      100,
+      200,
+      300,
+      300
+     ]
+    }
+   ],
+   "want": {
+    "parent_frame": [
+     100,
+     200,
+     300,
+     300
+    ],
+    "lint": null,
+    "points": [
+     {
+      "map": "019a9200-0000-7000-8000-00000000aa02",
+      "x": 50,
+      "y": 25
+     }
+    ],
+    "stop": "no_carry"
+   }
+  },
+  {
+   "name": "height-under-zero-no-carry",
+   "claim": "a child with a `height` under 0 has its frame and no carry: rule 2 answers the size as written, and the frame divides only by a whole number above 0",
+   "map": "019a9200-0000-7000-8000-00000000aa02",
+   "point": [
+    50,
+    25
+   ],
+   "elements": [
+    {
+     "type": "map",
+     "id": "019a9200-0000-7000-8000-00000000aa01",
+     "name": "land",
+     "width": 1000,
+     "height": 800
+    },
+    {
+     "type": "map",
+     "id": "019a9200-0000-7000-8000-00000000aa02",
+     "name": "town",
+     "width": 100,
+     "height": -50,
+     "parent_map": "019a9200-0000-7000-8000-00000000aa01",
+     "x_parent_frame": [
+      100,
+      200,
+      300,
+      300
+     ]
+    }
+   ],
+   "want": {
+    "parent_frame": [
+     100,
+     200,
+     300,
+     300
+    ],
+    "lint": null,
+    "points": [
+     {
+      "map": "019a9200-0000-7000-8000-00000000aa02",
+      "x": 50,
+      "y": 25
+     }
+    ],
+    "stop": "no_carry"
+   }
+  },
+  {
+   "name": "width-with-a-fraction-no-carry",
+   "claim": "a child with a `width` of 99.6 (never rounded to 100) has its frame and no carry: rule 2 answers the size as written, and the frame divides only by a whole number above 0",
+   "map": "019a9200-0000-7000-8000-00000000aa02",
+   "point": [
+    50,
+    25
+   ],
+   "elements": [
+    {
+     "type": "map",
+     "id": "019a9200-0000-7000-8000-00000000aa01",
+     "name": "land",
+     "width": 1000,
+     "height": 800
+    },
+    {
+     "type": "map",
+     "id": "019a9200-0000-7000-8000-00000000aa02",
+     "name": "town",
+     "width": 99.6,
+     "height": 50,
+     "parent_map": "019a9200-0000-7000-8000-00000000aa01",
+     "x_parent_frame": [
+      100,
+      200,
+      300,
+      300
+     ]
+    }
+   ],
+   "want": {
+    "parent_frame": [
+     100,
+     200,
+     300,
+     300
+    ],
+    "lint": null,
+    "points": [
+     {
+      "map": "019a9200-0000-7000-8000-00000000aa02",
+      "x": 50,
+      "y": 25
+     }
+    ],
+    "stop": "no_carry"
+   }
+  },
+  {
+   "name": "width-a-string-no-carry",
+   "claim": "a child with a `width` written as the string \"100\" has its frame and no carry: rule 2 answers the size as written, and the frame divides only by a whole number above 0",
+   "map": "019a9200-0000-7000-8000-00000000aa02",
+   "point": [
+    50,
+    25
+   ],
+   "elements": [
+    {
+     "type": "map",
+     "id": "019a9200-0000-7000-8000-00000000aa01",
+     "name": "land",
+     "width": 1000,
+     "height": 800
+    },
+    {
+     "type": "map",
+     "id": "019a9200-0000-7000-8000-00000000aa02",
+     "name": "town",
+     "width": "100",
+     "height": 50,
+     "parent_map": "019a9200-0000-7000-8000-00000000aa01",
+     "x_parent_frame": [
+      100,
+      200,
+      300,
+      300
+     ]
+    }
+   ],
+   "want": {
+    "parent_frame": [
+     100,
+     200,
+     300,
+     300
+    ],
+    "lint": null,
+    "points": [
+     {
+      "map": "019a9200-0000-7000-8000-00000000aa02",
+      "x": 50,
+      "y": 25
+     }
+    ],
+    "stop": "no_carry"
+   }
+  },
+  {
+   "name": "width-a-boolean-no-carry",
+   "claim": "a child with a `width` of true has its frame and no carry: rule 2 answers the size as written, and the frame divides only by a whole number above 0",
+   "map": "019a9200-0000-7000-8000-00000000aa02",
+   "point": [
+    50,
+    25
+   ],
+   "elements": [
+    {
+     "type": "map",
+     "id": "019a9200-0000-7000-8000-00000000aa01",
+     "name": "land",
+     "width": 1000,
+     "height": 800
+    },
+    {
+     "type": "map",
+     "id": "019a9200-0000-7000-8000-00000000aa02",
+     "name": "town",
+     "width": true,
+     "height": 50,
+     "parent_map": "019a9200-0000-7000-8000-00000000aa01",
+     "x_parent_frame": [
+      100,
+      200,
+      300,
+      300
+     ]
+    }
+   ],
+   "want": {
+    "parent_frame": [
+     100,
+     200,
+     300,
+     300
+    ],
+    "lint": null,
+    "points": [
+     {
+      "map": "019a9200-0000-7000-8000-00000000aa02",
+      "x": 50,
+      "y": 25
+     }
+    ],
+    "stop": "no_carry"
+   }
+  },
+  {
+   "name": "decimals-in-the-written-order-x",
+   "claim": "the carried x is x0 + ((x * (x1 - x0)) / width) in 64-bit floats, in that order: the step per pixel first, the fraction first, a centre-based order and exact rationals each give another last bit",
+   "map": "019a9200-0000-7000-8000-00000000aa02",
+   "point": [
+    364.08,
+    450.558682673927
+   ],
+   "elements": [
+    {
+     "type": "map",
+     "id": "019a9200-0000-7000-8000-00000000aa01",
+     "name": "land",
+     "width": 4096,
+     "height": 4096
+    },
+    {
+     "type": "map",
+     "id": "019a9200-0000-7000-8000-00000000aa02",
+     "name": "town",
+     "width": 450,
+     "height": 600,
+     "parent_map": "019a9200-0000-7000-8000-00000000aa01",
+     "x_parent_frame": [
+      269.61,
+      1774.12,
+      454.23,
+      1812.92
+     ]
+    }
+   ],
+   "want": {
+    "parent_frame": [
+     269.61,
+     1774.12,
+     454.23,
+     1812.92
+    ],
+    "lint": null,
+    "points": [
+     {
+      "map": "019a9200-0000-7000-8000-00000000aa02",
+      "x": 364.08,
+      "y": 450.558682673927
+     },
+     {
+      "map": "019a9200-0000-7000-8000-00000000aa01",
+      "x": 418.97988799999996,
+      "y": 1803.2561281462472
+     }
+    ],
+    "stop": "top"
+   }
+  },
+  {
+   "name": "decimals-in-the-written-order-y",
+   "claim": "the carried y is y0 + ((y * (y1 - y0)) / height), in that order, in 64-bit floats",
+   "map": "019a9200-0000-7000-8000-00000000aa02",
+   "point": [
+    622.92,
+    1041.15
+   ],
+   "elements": [
+    {
+     "type": "map",
+     "id": "019a9200-0000-7000-8000-00000000aa01",
+     "name": "land",
+     "width": 4096,
+     "height": 4096
+    },
+    {
+     "type": "map",
+     "id": "019a9200-0000-7000-8000-00000000aa02",
+     "name": "town",
+     "width": 800,
+     "height": 1366,
+     "parent_map": "019a9200-0000-7000-8000-00000000aa01",
+     "x_parent_frame": [
+      299.633,
+      640.3,
+      456.374964,
+      693.817
+     ]
+    }
+   ],
+   "want": {
+    "parent_frame": [
+     299.633,
+     640.3,
+     456.374964,
+     693.817
+    ],
+    "lint": null,
+    "points": [
+     {
+      "map": "019a9200-0000-7000-8000-00000000aa02",
+      "x": 622.92,
+      "y": 1041.15
+     },
+     {
+      "map": "019a9200-0000-7000-8000-00000000aa01",
+      "x": 421.6801302686,
+      "y": 681.0900618960468
+     }
+    ],
+    "stop": "top"
+   }
+  },
+  {
+   "name": "nesting-three-levels",
+   "claim": "a point on a plan framed on a town map framed on the land is carried by the plan's frame, then the town's: each level carries the point the level below gave, in 64-bit floats, never a product of the levels' ratios",
+   "map": "019a9200-0000-7000-8000-00000000aa03",
+   "point": [
+    797.461665,
+    98.264319
+   ],
+   "elements": [
+    {
+     "type": "map",
+     "id": "019a9200-0000-7000-8000-00000000aa01",
+     "name": "land",
+     "width": 8000,
+     "height": 5700
+    },
+    {
+     "type": "map",
+     "id": "019a9200-0000-7000-8000-00000000aa02",
+     "name": "town",
+     "width": 1366,
+     "height": 1024,
+     "parent_map": "019a9200-0000-7000-8000-00000000aa01",
+     "x_parent_frame": [
+      719.6,
+      179.92,
+      907.61,
+      399.46
+     ]
+    },
+    {
+     "type": "map",
+     "id": "019a9200-0000-7000-8000-00000000aa03",
+     "name": "plan",
+     "width": 800,
+     "height": 450,
+     "parent_map": "019a9200-0000-7000-8000-00000000aa02",
+     "x_parent_frame": [
+      160.795,
+      546.164,
+      310.491,
+      819.23
+     ]
+    }
+   ],
+   "want": {
+    "parent_frame": [
+     160.795,
+     546.164,
+     310.491,
+     819.23
+    ],
+    "lint": null,
+    "points": [
+     {
+      "map": "019a9200-0000-7000-8000-00000000aa03",
+      "x": 797.461665,
+      "y": 98.264319
+     },
+     {
+      "map": "019a9200-0000-7000-8000-00000000aa02",
+      "x": 310.0160267548,
+      "y": 605.79209896012
+     },
+     {
+      "map": "019a9200-0000-7000-8000-00000000aa01",
+      "x": 762.2691897439018,
+      "y": 309.79851309150854
+     }
+    ],
+    "stop": "top"
+   }
+  },
+  {
+   "name": "nesting-four-levels",
+   "claim": "four levels compose as three do, one level at a time, up to the Map with no `parent_map`",
+   "map": "019a9200-0000-7000-8000-00000000aa04",
+   "point": [
+    38.437,
+    25.456
+   ],
+   "elements": [
+    {
+     "type": "map",
+     "id": "019a9200-0000-7000-8000-00000000aa01",
+     "name": "land",
+     "width": 8000,
+     "height": 5700
+    },
+    {
+     "type": "map",
+     "id": "019a9200-0000-7000-8000-00000000aa02",
+     "name": "town",
+     "width": 1366,
+     "height": 1024,
+     "parent_map": "019a9200-0000-7000-8000-00000000aa01",
+     "x_parent_frame": [
+      719.6,
+      179.92,
+      907.61,
+      399.46
+     ]
+    },
+    {
+     "type": "map",
+     "id": "019a9200-0000-7000-8000-00000000aa03",
+     "name": "plan",
+     "width": 800,
+     "height": 450,
+     "parent_map": "019a9200-0000-7000-8000-00000000aa02",
+     "x_parent_frame": [
+      160.795,
+      546.164,
+      310.491,
+      819.23
+     ]
+    },
+    {
+     "type": "map",
+     "id": "019a9200-0000-7000-8000-00000000aa04",
+     "name": "room",
+     "width": 40,
+     "height": 30,
+     "parent_map": "019a9200-0000-7000-8000-00000000aa03",
+     "x_parent_frame": [
+      580.24,
+      320.2,
+      599.25,
+      347.144
+     ]
+    }
+   ],
+   "want": {
+    "parent_frame": [
+     580.24,
+     320.2,
+     599.25,
+     347.144
+    ],
+    "lint": null,
+    "points": [
+     {
+      "map": "019a9200-0000-7000-8000-00000000aa04",
+      "x": 38.437,
+      "y": 25.456
+     },
+     {
+      "map": "019a9200-0000-7000-8000-00000000aa03",
+      "x": 598.50718425,
+      "y": 343.06288213333335
+     },
+     {
+      "map": "019a9200-0000-7000-8000-00000000aa02",
+      "x": 272.78766431686,
+      "y": 754.3391310502684
+     },
+     {
+      "map": "019a9200-0000-7000-8000-00000000aa01",
+      "x": 757.1452480001558,
+      "y": 341.64618440505456
+     }
+    ],
+    "stop": "top"
+   }
+  },
+  {
+   "name": "nesting-a-level-with-no-frame",
+   "claim": "where one level has no frame the point is carried no further: a plan framed on a town that has a `parent_map` and no frame stops on the town",
+   "map": "019a9200-0000-7000-8000-00000000aa03",
+   "point": [
+    10,
+    5
+   ],
+   "elements": [
+    {
+     "type": "map",
+     "id": "019a9200-0000-7000-8000-00000000aa01",
+     "name": "land",
+     "width": 1000,
+     "height": 800
+    },
+    {
+     "type": "map",
+     "id": "019a9200-0000-7000-8000-00000000aa02",
+     "name": "town",
+     "width": 100,
+     "height": 50,
+     "parent_map": "019a9200-0000-7000-8000-00000000aa01"
+    },
+    {
+     "type": "map",
+     "id": "019a9200-0000-7000-8000-00000000aa03",
+     "name": "plan",
+     "width": 40,
+     "height": 20,
+     "parent_map": "019a9200-0000-7000-8000-00000000aa02",
+     "x_parent_frame": [
+      10,
+      10,
+      50,
+      30
+     ]
+    }
+   ],
+   "want": {
+    "parent_frame": [
+     10,
+     10,
+     50,
+     30
+    ],
+    "lint": null,
+    "points": [
+     {
+      "map": "019a9200-0000-7000-8000-00000000aa03",
+      "x": 10,
+      "y": 5
+     },
+     {
+      "map": "019a9200-0000-7000-8000-00000000aa02",
+      "x": 20.0,
+      "y": 15.0
+     }
+    ],
+    "stop": "no_frame"
+   }
+  },
+  {
+   "name": "nesting-a-level-with-a-mirrored-frame",
+   "claim": "a level whose frame is no frame stops the walk as one with none: the read Map's lint is its own",
+   "map": "019a9200-0000-7000-8000-00000000aa03",
+   "point": [
+    10,
+    5
+   ],
+   "elements": [
+    {
+     "type": "map",
+     "id": "019a9200-0000-7000-8000-00000000aa01",
+     "name": "land",
+     "width": 1000,
+     "height": 800
+    },
+    {
+     "type": "map",
+     "id": "019a9200-0000-7000-8000-00000000aa02",
+     "name": "town",
+     "width": 100,
+     "height": 50,
+     "parent_map": "019a9200-0000-7000-8000-00000000aa01",
+     "x_parent_frame": [
+      300,
+      200,
+      100,
+      300
+     ]
+    },
+    {
+     "type": "map",
+     "id": "019a9200-0000-7000-8000-00000000aa03",
+     "name": "plan",
+     "width": 40,
+     "height": 20,
+     "parent_map": "019a9200-0000-7000-8000-00000000aa02",
+     "x_parent_frame": [
+      10,
+      10,
+      50,
+      30
+     ]
+    }
+   ],
+   "want": {
+    "parent_frame": [
+     10,
+     10,
+     50,
+     30
+    ],
+    "lint": null,
+    "points": [
+     {
+      "map": "019a9200-0000-7000-8000-00000000aa03",
+      "x": 10,
+      "y": 5
+     },
+     {
+      "map": "019a9200-0000-7000-8000-00000000aa02",
+      "x": 20.0,
+      "y": 15.0
+     }
+    ],
+    "stop": "no_frame"
+   }
+  },
+  {
+   "name": "nesting-a-level-with-no-carry",
+   "claim": "a level with a frame and no carry stops the walk on that level",
+   "map": "019a9200-0000-7000-8000-00000000aa03",
+   "point": [
+    10,
+    5
+   ],
+   "elements": [
+    {
+     "type": "map",
+     "id": "019a9200-0000-7000-8000-00000000aa01",
+     "name": "land",
+     "width": 1000,
+     "height": 800
+    },
+    {
+     "type": "map",
+     "id": "019a9200-0000-7000-8000-00000000aa02",
+     "name": "town",
+     "height": 50,
+     "parent_map": "019a9200-0000-7000-8000-00000000aa01",
+     "x_parent_frame": [
+      100,
+      200,
+      300,
+      300
+     ]
+    },
+    {
+     "type": "map",
+     "id": "019a9200-0000-7000-8000-00000000aa03",
+     "name": "plan",
+     "width": 40,
+     "height": 20,
+     "parent_map": "019a9200-0000-7000-8000-00000000aa02",
+     "x_parent_frame": [
+      10,
+      10,
+      50,
+      30
+     ]
+    }
+   ],
+   "want": {
+    "parent_frame": [
+     10,
+     10,
+     50,
+     30
+    ],
+    "lint": null,
+    "points": [
+     {
+      "map": "019a9200-0000-7000-8000-00000000aa03",
+      "x": 10,
+      "y": 5
+     },
+     {
+      "map": "019a9200-0000-7000-8000-00000000aa02",
+      "x": 20.0,
+      "y": 15.0
+     }
+    ],
+    "stop": "no_carry"
+   }
+  },
+  {
+   "name": "nesting-a-top-with-a-stray-frame",
+   "claim": "the walk ends on a Map with no `parent_map`, whatever it carries: a frame there is not read",
+   "map": "019a9200-0000-7000-8000-00000000aa02",
+   "point": [
+    20,
+    10
+   ],
+   "elements": [
+    {
+     "type": "map",
+     "id": "019a9200-0000-7000-8000-00000000aa01",
+     "name": "land",
+     "width": 1000,
+     "height": 800,
+     "x_parent_frame": [
+      0,
+      0,
+      10,
+      10
+     ]
+    },
+    {
+     "type": "map",
+     "id": "019a9200-0000-7000-8000-00000000aa02",
+     "name": "town",
+     "width": 100,
+     "height": 50,
+     "parent_map": "019a9200-0000-7000-8000-00000000aa01",
+     "x_parent_frame": [
+      100,
+      200,
+      300,
+      300
+     ]
+    }
+   ],
+   "want": {
+    "parent_frame": [
+     100,
+     200,
+     300,
+     300
+    ],
+    "lint": null,
+    "points": [
+     {
+      "map": "019a9200-0000-7000-8000-00000000aa02",
+      "x": 20,
+      "y": 10
+     },
+     {
+      "map": "019a9200-0000-7000-8000-00000000aa01",
+      "x": 140.0,
+      "y": 220.0
+     }
+    ],
+    "stop": "top"
+   }
+  },
+  {
+   "name": "parent-not-served",
+   "claim": "a `parent_map` that names a Map the reader is not served ends the walk, `dangling`; the child's own parent frame is still reported",
+   "map": "019a9200-0000-7000-8000-00000000aa02",
+   "point": [
+    20,
+    10
+   ],
+   "elements": [
+    {
+     "type": "map",
+     "id": "019a9200-0000-7000-8000-00000000aa02",
+     "name": "town",
+     "width": 100,
+     "height": 50,
+     "parent_map": "019a9200-0000-7000-8000-00000000aa09",
+     "x_parent_frame": [
+      100,
+      200,
+      300,
+      300
+     ]
+    }
+   ],
+   "want": {
+    "parent_frame": [
+     100,
+     200,
+     300,
+     300
+    ],
+    "lint": null,
+    "points": [
+     {
+      "map": "019a9200-0000-7000-8000-00000000aa02",
+      "x": 20,
+      "y": 10
+     }
+    ],
+    "stop": "dangling"
+   }
+  },
+  {
+   "name": "parent-not-served-and-frame-malformed",
+   "claim": "served-ness before shape: a child whose parent is not served and whose frame is no frame stops `dangling`, its lint still `not_four_numbers`",
+   "map": "019a9200-0000-7000-8000-00000000aa02",
+   "point": [
+    20,
+    10
+   ],
+   "elements": [
+    {
+     "type": "map",
+     "id": "019a9200-0000-7000-8000-00000000aa02",
+     "name": "town",
+     "width": 100,
+     "height": 50,
+     "parent_map": "019a9200-0000-7000-8000-00000000aa09",
+     "x_parent_frame": [
+      1,
+      2,
+      3
+     ]
+    }
+   ],
+   "want": {
+    "parent_frame": null,
+    "lint": "not_four_numbers",
+    "points": [
+     {
+      "map": "019a9200-0000-7000-8000-00000000aa02",
+      "x": 20,
+      "y": 10
+     }
+    ],
+    "stop": "dangling"
+   }
+  },
+  {
+   "name": "parent-whose-type-is-Map-is-not-served",
+   "claim": "a row whose `type` is `Map` is no Map (reading K): a parent served only so is not served",
+   "map": "019a9200-0000-7000-8000-00000000aa02",
+   "point": [
+    20,
+    10
+   ],
+   "elements": [
+    {
+     "type": "Map",
+     "id": "019a9200-0000-7000-8000-00000000aa01",
+     "name": "land",
+     "width": 1000,
+     "height": 800
+    },
+    {
+     "type": "map",
+     "id": "019a9200-0000-7000-8000-00000000aa02",
+     "name": "town",
+     "width": 100,
+     "height": 50,
+     "parent_map": "019a9200-0000-7000-8000-00000000aa01",
+     "x_parent_frame": [
+      100,
+      200,
+      300,
+      300
+     ]
+    }
+   ],
+   "want": {
+    "parent_frame": [
+     100,
+     200,
+     300,
+     300
+    ],
+    "lint": null,
+    "points": [
+     {
+      "map": "019a9200-0000-7000-8000-00000000aa02",
+      "x": 20,
+      "y": 10
+     }
+    ],
+    "stop": "dangling"
+   }
+  },
+  {
+   "name": "parent-names-itself",
+   "claim": "a Map whose `parent_map` names itself is a ring of one: the walk stops at once, `cycle`, and the parent frame is reported as written",
+   "map": "019a9200-0000-7000-8000-00000000aa02",
+   "point": [
+    20,
+    10
+   ],
+   "elements": [
+    {
+     "type": "map",
+     "id": "019a9200-0000-7000-8000-00000000aa02",
+     "name": "town",
+     "width": 100,
+     "height": 50,
+     "parent_map": "019a9200-0000-7000-8000-00000000aa02",
+     "x_parent_frame": [
+      100,
+      200,
+      300,
+      300
+     ]
+    }
+   ],
+   "want": {
+    "parent_frame": [
+     100,
+     200,
+     300,
+     300
+    ],
+    "lint": null,
+    "points": [
+     {
+      "map": "019a9200-0000-7000-8000-00000000aa02",
+      "x": 20,
+      "y": 10
+     }
+    ],
+    "stop": "cycle"
+   }
+  },
+  {
+   "name": "two-maps-in-a-ring",
+   "claim": "a ring of two: the point is carried onto the other Map once, and the walk stops before it reaches a Map it has passed",
+   "map": "019a9200-0000-7000-8000-00000000aa02",
+   "point": [
+    20,
+    10
+   ],
+   "elements": [
+    {
+     "type": "map",
+     "id": "019a9200-0000-7000-8000-00000000aa02",
+     "name": "town",
+     "width": 100,
+     "height": 50,
+     "parent_map": "019a9200-0000-7000-8000-00000000aa01",
+     "x_parent_frame": [
+      100,
+      200,
+      300,
+      300
+     ]
+    },
+    {
+     "type": "map",
+     "id": "019a9200-0000-7000-8000-00000000aa01",
+     "name": "land",
+     "width": 1000,
+     "height": 800,
+     "parent_map": "019a9200-0000-7000-8000-00000000aa02",
+     "x_parent_frame": [
+      0,
+      0,
+      50,
+      40
+     ]
+    }
+   ],
+   "want": {
+    "parent_frame": [
+     100,
+     200,
+     300,
+     300
+    ],
+    "lint": null,
+    "points": [
+     {
+      "map": "019a9200-0000-7000-8000-00000000aa02",
+      "x": 20,
+      "y": 10
+     },
+     {
+      "map": "019a9200-0000-7000-8000-00000000aa01",
+      "x": 140.0,
+      "y": 220.0
+     }
+    ],
+    "stop": "cycle"
+   }
+  },
+  {
+   "name": "a-ring-above-the-read-map",
+   "claim": "a ring above the read Map: the walk climbs into it and stops before a Map it has passed",
+   "map": "019a9200-0000-7000-8000-00000000aa02",
+   "point": [
+    20,
+    10
+   ],
+   "elements": [
+    {
+     "type": "map",
+     "id": "019a9200-0000-7000-8000-00000000aa02",
+     "name": "town",
+     "width": 100,
+     "height": 50,
+     "parent_map": "019a9200-0000-7000-8000-00000000aa01",
+     "x_parent_frame": [
+      100,
+      200,
+      300,
+      300
+     ]
+    },
+    {
+     "type": "map",
+     "id": "019a9200-0000-7000-8000-00000000aa01",
+     "name": "land",
+     "width": 1000,
+     "height": 800,
+     "parent_map": "019a9200-0000-7000-8000-00000000aa05",
+     "x_parent_frame": [
+      0,
+      0,
+      500,
+      400
+     ]
+    },
+    {
+     "type": "map",
+     "id": "019a9200-0000-7000-8000-00000000aa05",
+     "name": "other",
+     "width": 500,
+     "height": 400,
+     "parent_map": "019a9200-0000-7000-8000-00000000aa01",
+     "x_parent_frame": [
+      0,
+      0,
+      1000,
+      800
+     ]
+    }
+   ],
+   "want": {
+    "parent_frame": [
+     100,
+     200,
+     300,
+     300
+    ],
+    "lint": null,
+    "points": [
+     {
+      "map": "019a9200-0000-7000-8000-00000000aa02",
+      "x": 20,
+      "y": 10
+     },
+     {
+      "map": "019a9200-0000-7000-8000-00000000aa01",
+      "x": 140.0,
+      "y": 220.0
+     },
+     {
+      "map": "019a9200-0000-7000-8000-00000000aa05",
+      "x": 70.0,
+      "y": 110.0
+     }
+    ],
+    "stop": "cycle"
+   }
+  },
+  {
+   "name": "repeated-map-last-row-wins",
+   "claim": "two rows of one Map: the last served wins (reading I), for the Map read and for its parent",
+   "map": "019a9200-0000-7000-8000-00000000aa02",
+   "point": [
+    20,
+    10
+   ],
+   "elements": [
+    {
+     "type": "map",
+     "id": "019a9200-0000-7000-8000-00000000aa01",
+     "name": "land",
+     "width": 10,
+     "height": 10
+    },
+    {
+     "type": "map",
+     "id": "019a9200-0000-7000-8000-00000000aa01",
+     "name": "land",
+     "width": 1000,
+     "height": 800
+    },
+    {
+     "type": "map",
+     "id": "019a9200-0000-7000-8000-00000000aa02",
+     "name": "town",
+     "width": 100,
+     "height": 50,
+     "parent_map": "019a9200-0000-7000-8000-00000000aa01",
+     "x_parent_frame": [
+      0,
+      0,
+      1,
+      1
+     ]
+    },
+    {
+     "type": "map",
+     "id": "019a9200-0000-7000-8000-00000000aa02",
+     "name": "town",
+     "width": 100,
+     "height": 50,
+     "parent_map": "019a9200-0000-7000-8000-00000000aa01",
+     "x_parent_frame": [
+      100,
+      200,
+      300,
+      300
+     ]
+    }
+   ],
+   "want": {
+    "parent_frame": [
+     100,
+     200,
+     300,
+     300
+    ],
+    "lint": null,
+    "points": [
+     {
+      "map": "019a9200-0000-7000-8000-00000000aa02",
+      "x": 20,
+      "y": 10
+     },
+     {
+      "map": "019a9200-0000-7000-8000-00000000aa01",
+      "x": 140.0,
+      "y": 220.0
+     }
+    ],
+    "stop": "top"
+   }
+  },
+  {
+   "name": "map-row-without-a-string-id",
+   "claim": "a Map row with no non-empty string id is no Map (reading H): nothing it carries is read",
+   "map_index": [
+    1,
+    2
+   ],
+   "point": [
+    20,
+    10
+   ],
+   "elements": [
+    {
+     "type": "map",
+     "id": "019a9200-0000-7000-8000-00000000aa01",
+     "name": "land",
+     "width": 1000,
+     "height": 800
+    },
+    {
+     "type": "map",
+     "name": "town",
+     "width": 100,
+     "height": 50,
+     "parent_map": "019a9200-0000-7000-8000-00000000aa01",
+     "x_parent_frame": [
+      100,
+      200,
+      300,
+      300
+     ]
+    },
+    {
+     "type": "map",
+     "id": "",
+     "name": "town",
+     "width": 100,
+     "height": 50,
+     "parent_map": "019a9200-0000-7000-8000-00000000aa01",
+     "x_parent_frame": [
+      100,
+      200,
+      300,
+      300
+     ]
+    }
+   ],
+   "want": {
+    "parent_frame": null,
+    "lint": null,
+    "points": [],
+    "stop": null
+   }
+  },
+  {
+   "name": "scale-is-not-read",
+   "claim": "the frame places and a scale measures: two `x_metres_per_pixel` that disagree with the frame move no carried point, and the reading reports no scale",
+   "map": "019a9200-0000-7000-8000-00000000aa02",
+   "point": [
+    20,
+    10
+   ],
+   "elements": [
+    {
+     "type": "map",
+     "id": "019a9200-0000-7000-8000-00000000aa01",
+     "name": "land",
+     "width": 1000,
+     "height": 800,
+     "x_metres_per_pixel": 10.0
+    },
+    {
+     "type": "map",
+     "id": "019a9200-0000-7000-8000-00000000aa02",
+     "name": "town",
+     "width": 100,
+     "height": 50,
+     "parent_map": "019a9200-0000-7000-8000-00000000aa01",
+     "x_parent_frame": [
+      100,
+      200,
+      300,
+      300
+     ],
+     "x_metres_per_pixel": 0.5
+    }
+   ],
+   "want": {
+    "parent_frame": [
+     100,
+     200,
+     300,
+     300
+    ],
+    "lint": null,
+    "points": [
+     {
+      "map": "019a9200-0000-7000-8000-00000000aa02",
+      "x": 20,
+      "y": 10
+     },
+     {
+      "map": "019a9200-0000-7000-8000-00000000aa01",
+      "x": 140.0,
+      "y": 220.0
+     }
+    ],
+    "stop": "top"
+   }
+  },
+  {
+   "name": "a-layout-map-is-read-as-any-map",
+   "claim": "the reading reads a layout map's frame as any Map's; what a tool places from it is rule 11's",
+   "map": "019a9200-0000-7000-8000-00000000aa02",
+   "point": [
+    20,
+    10
+   ],
+   "elements": [
+    {
+     "type": "map",
+     "id": "019a9200-0000-7000-8000-00000000aa01",
+     "name": "land",
+     "width": 1000,
+     "height": 800
+    },
+    {
+     "type": "map",
+     "id": "019a9200-0000-7000-8000-00000000aa02",
+     "name": "town",
+     "width": 100,
+     "height": 50,
+     "parent_map": "019a9200-0000-7000-8000-00000000aa01",
+     "x_parent_frame": [
+      100,
+      200,
+      300,
+      300
+     ],
+     "x_layout": {
+      "method": "hand"
+     }
+    }
+   ],
+   "want": {
+    "parent_frame": [
+     100,
+     200,
+     300,
+     300
+    ],
+    "lint": null,
+    "points": [
+     {
+      "map": "019a9200-0000-7000-8000-00000000aa02",
+      "x": 20,
+      "y": 10
+     },
+     {
+      "map": "019a9200-0000-7000-8000-00000000aa01",
+      "x": 140.0,
+      "y": 220.0
+     }
+    ],
+    "stop": "top"
+   }
+  },
+  {
+   "name": "top-map-without-a-key",
+   "claim": "a Map with no `parent_map` and no `x_parent_frame`, the commonest input of all, has no lint",
+   "map": "019a9200-0000-7000-8000-00000000aa01",
+   "point": [
+    20,
+    10
+   ],
+   "elements": [
+    {
+     "type": "map",
+     "id": "019a9200-0000-7000-8000-00000000aa01",
+     "name": "land",
+     "width": 1000,
+     "height": 800
+    },
+    {
+     "type": "map",
+     "id": "019a9200-0000-7000-8000-00000000aa02",
+     "name": "town",
+     "width": 100,
+     "height": 50,
+     "parent_map": "019a9200-0000-7000-8000-00000000aa01",
+     "x_parent_frame": [
+      100,
+      200,
+      300,
+      300
+     ]
+    }
+   ],
+   "want": {
+    "parent_frame": null,
+    "lint": null,
+    "points": [
+     {
+      "map": "019a9200-0000-7000-8000-00000000aa01",
+      "x": 20,
+      "y": 10
+     }
+    ],
+    "stop": "top"
+   }
+  },
+  {
+   "name": "top-map-with-a-null-key",
+   "claim": "a Map with no `parent_map` whose `x_parent_frame` is null has no lint: a null key is no key",
+   "map": "019a9200-0000-7000-8000-00000000aa01",
+   "point": [
+    20,
+    10
+   ],
+   "elements": [
+    {
+     "type": "map",
+     "id": "019a9200-0000-7000-8000-00000000aa01",
+     "name": "land",
+     "width": 1000,
+     "height": 800,
+     "x_parent_frame": null
+    },
+    {
+     "type": "map",
+     "id": "019a9200-0000-7000-8000-00000000aa02",
+     "name": "town",
+     "width": 100,
+     "height": 50,
+     "parent_map": "019a9200-0000-7000-8000-00000000aa01",
+     "x_parent_frame": [
+      100,
+      200,
+      300,
+      300
+     ]
+    }
+   ],
+   "want": {
+    "parent_frame": null,
+    "lint": null,
+    "points": [
+     {
+      "map": "019a9200-0000-7000-8000-00000000aa01",
+      "x": 20,
+      "y": 10
+     }
+    ],
+    "stop": "top"
+   }
+  },
+  {
+   "name": "parent-names-itself-with-no-parent-frame",
+   "claim": "a ring comes before the shape: a Map that names itself and has no parent frame stops `cycle`, not `no_frame`",
+   "map": "019a9200-0000-7000-8000-00000000aa02",
+   "point": [
+    20,
+    10
+   ],
+   "elements": [
+    {
+     "type": "map",
+     "id": "019a9200-0000-7000-8000-00000000aa02",
+     "name": "town",
+     "width": 100,
+     "height": 50,
+     "parent_map": "019a9200-0000-7000-8000-00000000aa02"
+    }
+   ],
+   "want": {
+    "parent_frame": null,
+    "lint": null,
+    "points": [
+     {
+      "map": "019a9200-0000-7000-8000-00000000aa02",
+      "x": 20,
+      "y": 10
+     }
+    ],
+    "stop": "cycle"
+   }
+  },
+  {
+   "name": "parent-names-itself-with-no-width",
+   "claim": "a ring comes before the carry: a Map that names itself, with a parent frame and no `width`, stops `cycle`, not `no_carry`",
+   "map": "019a9200-0000-7000-8000-00000000aa02",
+   "point": [
+    20,
+    10
+   ],
+   "elements": [
+    {
+     "type": "map",
+     "id": "019a9200-0000-7000-8000-00000000aa02",
+     "name": "town",
+     "height": 50,
+     "parent_map": "019a9200-0000-7000-8000-00000000aa02",
+     "x_parent_frame": [
+      100,
+      200,
+      300,
+      300
+     ]
+    }
+   ],
+   "want": {
+    "parent_frame": [
+     100,
+     200,
+     300,
+     300
+    ],
+    "lint": null,
+    "points": [
+     {
+      "map": "019a9200-0000-7000-8000-00000000aa02",
+      "x": 20,
+      "y": 10
+     }
+    ],
+    "stop": "cycle"
+   }
+  },
+  {
+   "name": "no-parent-frame-and-no-width",
+   "claim": "no parent frame comes before no carry: a child with a served parent, no `x_parent_frame` and no `width` stops `no_frame`",
+   "map": "019a9200-0000-7000-8000-00000000aa02",
+   "point": [
+    20,
+    10
+   ],
+   "elements": [
+    {
+     "type": "map",
+     "id": "019a9200-0000-7000-8000-00000000aa01",
+     "name": "land",
+     "width": 1000,
+     "height": 800
+    },
+    {
+     "type": "map",
+     "id": "019a9200-0000-7000-8000-00000000aa02",
+     "name": "town",
+     "height": 50,
+     "parent_map": "019a9200-0000-7000-8000-00000000aa01"
+    }
+   ],
+   "want": {
+    "parent_frame": null,
+    "lint": null,
+    "points": [
+     {
+      "map": "019a9200-0000-7000-8000-00000000aa02",
+      "x": 20,
+      "y": 10
+     }
+    ],
+    "stop": "no_frame"
+   }
+  },
+  {
+   "name": "row-read-whose-type-is-Map",
+   "claim": "a row read whose `type` is `Map` is no Map (reading K): nothing it carries is read",
+   "map_index": [
+    1
+   ],
+   "point": [
+    20,
+    10
+   ],
+   "elements": [
+    {
+     "type": "map",
+     "id": "019a9200-0000-7000-8000-00000000aa01",
+     "name": "land",
+     "width": 1000,
+     "height": 800
+    },
+    {
+     "type": "Map",
+     "id": "019a9200-0000-7000-8000-00000000aa02",
+     "name": "town",
+     "width": 100,
+     "height": 50,
+     "parent_map": "019a9200-0000-7000-8000-00000000aa01",
+     "x_parent_frame": [
+      100,
+      200,
+      300,
+      300
+     ]
+    }
+   ],
+   "want": {
+    "parent_frame": null,
+    "lint": null,
+    "points": [],
+    "stop": null
+   }
+  },
+  {
+   "name": "parent-map-a-list",
+   "claim": "a `parent_map` that is a list holding a served Map's id is no link (reading H): the Map is a top, and its parent frame is not read, with the lint `no_parent`",
+   "map": "019a9200-0000-7000-8000-00000000aa02",
+   "point": [
+    20,
+    10
+   ],
+   "elements": [
+    {
+     "type": "map",
+     "id": "019a9200-0000-7000-8000-00000000aa01",
+     "name": "land",
+     "width": 1000,
+     "height": 800
+    },
+    {
+     "type": "map",
+     "id": "019a9200-0000-7000-8000-00000000aa02",
+     "name": "town",
+     "width": 100,
+     "height": 50,
+     "parent_map": [
+      "019a9200-0000-7000-8000-00000000aa01"
+     ],
+     "x_parent_frame": [
+      100,
+      200,
+      300,
+      300
+     ]
+    }
+   ],
+   "want": {
+    "parent_frame": null,
+    "lint": "no_parent",
+    "points": [
+     {
+      "map": "019a9200-0000-7000-8000-00000000aa02",
+      "x": 20,
+      "y": 10
+     }
+    ],
+    "stop": "top"
+   }
+  },
+  {
+   "name": "parent-map-a-number",
+   "claim": "a `parent_map` that is a number is no link (reading H): the Map is a top, and its parent frame is not read, with the lint `no_parent`",
+   "map": "019a9200-0000-7000-8000-00000000aa02",
+   "point": [
+    20,
+    10
+   ],
+   "elements": [
+    {
+     "type": "map",
+     "id": "019a9200-0000-7000-8000-00000000aa01",
+     "name": "land",
+     "width": 1000,
+     "height": 800
+    },
+    {
+     "type": "map",
+     "id": "019a9200-0000-7000-8000-00000000aa02",
+     "name": "town",
+     "width": 100,
+     "height": 50,
+     "parent_map": 7,
+     "x_parent_frame": [
+      100,
+      200,
+      300,
+      300
+     ]
+    }
+   ],
+   "want": {
+    "parent_frame": null,
+    "lint": "no_parent",
+    "points": [
+     {
+      "map": "019a9200-0000-7000-8000-00000000aa02",
+      "x": 20,
+      "y": 10
+     }
+    ],
+    "stop": "top"
+   }
+  },
+  {
+   "name": "parent-map-a-boolean",
+   "claim": "a `parent_map` that is true is no link (reading H): the Map is a top, and its parent frame is not read, with the lint `no_parent`",
+   "map": "019a9200-0000-7000-8000-00000000aa02",
+   "point": [
+    20,
+    10
+   ],
+   "elements": [
+    {
+     "type": "map",
+     "id": "019a9200-0000-7000-8000-00000000aa01",
+     "name": "land",
+     "width": 1000,
+     "height": 800
+    },
+    {
+     "type": "map",
+     "id": "019a9200-0000-7000-8000-00000000aa02",
+     "name": "town",
+     "width": 100,
+     "height": 50,
+     "parent_map": true,
+     "x_parent_frame": [
+      100,
+      200,
+      300,
+      300
+     ]
+    }
+   ],
+   "want": {
+    "parent_frame": null,
+    "lint": "no_parent",
+    "points": [
+     {
+      "map": "019a9200-0000-7000-8000-00000000aa02",
+      "x": 20,
+      "y": 10
+     }
+    ],
+    "stop": "top"
+   }
+  },
+  {
+   "name": "parent-map-an-object",
+   "claim": "a `parent_map` that is an object holding a served Map's id is no link (reading H): the Map is a top, and its parent frame is not read, with the lint `no_parent`",
+   "map": "019a9200-0000-7000-8000-00000000aa02",
+   "point": [
+    20,
+    10
+   ],
+   "elements": [
+    {
+     "type": "map",
+     "id": "019a9200-0000-7000-8000-00000000aa01",
+     "name": "land",
+     "width": 1000,
+     "height": 800
+    },
+    {
+     "type": "map",
+     "id": "019a9200-0000-7000-8000-00000000aa02",
+     "name": "town",
+     "width": 100,
+     "height": 50,
+     "parent_map": {
+      "id": "019a9200-0000-7000-8000-00000000aa01"
+     },
+     "x_parent_frame": [
+      100,
+      200,
+      300,
+      300
+     ]
+    }
+   ],
+   "want": {
+    "parent_frame": null,
+    "lint": "no_parent",
+    "points": [
+     {
+      "map": "019a9200-0000-7000-8000-00000000aa02",
+      "x": 20,
+      "y": 10
+     }
+    ],
+    "stop": "top"
+   }
+  },
+  {
+   "name": "frame-a-number",
+   "claim": "an `x_parent_frame` that is a number is no frame, with the lint `not_four_numbers`",
+   "map": "019a9200-0000-7000-8000-00000000aa02",
+   "point": [
+    50,
+    25
+   ],
+   "elements": [
+    {
+     "type": "map",
+     "id": "019a9200-0000-7000-8000-00000000aa01",
+     "name": "land",
+     "width": 1000,
+     "height": 800
+    },
+    {
+     "type": "map",
+     "id": "019a9200-0000-7000-8000-00000000aa02",
+     "name": "town",
+     "width": 100,
+     "height": 50,
+     "parent_map": "019a9200-0000-7000-8000-00000000aa01",
+     "x_parent_frame": 40
+    }
+   ],
+   "want": {
+    "parent_frame": null,
+    "lint": "not_four_numbers",
+    "points": [
+     {
+      "map": "019a9200-0000-7000-8000-00000000aa02",
+      "x": 50,
+      "y": 25
+     }
+    ],
+    "stop": "no_frame"
+   }
+  },
+  {
+   "name": "frame-a-boolean",
+   "claim": "an `x_parent_frame` that is true is no frame, with the lint `not_four_numbers`",
+   "map": "019a9200-0000-7000-8000-00000000aa02",
+   "point": [
+    50,
+    25
+   ],
+   "elements": [
+    {
+     "type": "map",
+     "id": "019a9200-0000-7000-8000-00000000aa01",
+     "name": "land",
+     "width": 1000,
+     "height": 800
+    },
+    {
+     "type": "map",
+     "id": "019a9200-0000-7000-8000-00000000aa02",
+     "name": "town",
+     "width": 100,
+     "height": 50,
+     "parent_map": "019a9200-0000-7000-8000-00000000aa01",
+     "x_parent_frame": true
+    }
+   ],
+   "want": {
+    "parent_frame": null,
+    "lint": "not_four_numbers",
+    "points": [
+     {
+      "map": "019a9200-0000-7000-8000-00000000aa02",
+      "x": 50,
+      "y": 25
+     }
+    ],
+    "stop": "no_frame"
+   }
+  },
+  {
+   "name": "frame-an-empty-string",
+   "claim": "an `x_parent_frame` that is an empty string is a value, not an absent key: no frame, with the lint `not_four_numbers`",
+   "map": "019a9200-0000-7000-8000-00000000aa02",
+   "point": [
+    50,
+    25
+   ],
+   "elements": [
+    {
+     "type": "map",
+     "id": "019a9200-0000-7000-8000-00000000aa01",
+     "name": "land",
+     "width": 1000,
+     "height": 800
+    },
+    {
+     "type": "map",
+     "id": "019a9200-0000-7000-8000-00000000aa02",
+     "name": "town",
+     "width": 100,
+     "height": 50,
+     "parent_map": "019a9200-0000-7000-8000-00000000aa01",
+     "x_parent_frame": ""
+    }
+   ],
+   "want": {
+    "parent_frame": null,
+    "lint": "not_four_numbers",
+    "points": [
+     {
+      "map": "019a9200-0000-7000-8000-00000000aa02",
+      "x": 50,
+      "y": 25
+     }
+    ],
+    "stop": "no_frame"
+   }
+  },
+  {
+   "name": "frame-false",
+   "claim": "an `x_parent_frame` that is false is a value, not an absent key: no frame, with the lint `not_four_numbers`",
+   "map": "019a9200-0000-7000-8000-00000000aa02",
+   "point": [
+    50,
+    25
+   ],
+   "elements": [
+    {
+     "type": "map",
+     "id": "019a9200-0000-7000-8000-00000000aa01",
+     "name": "land",
+     "width": 1000,
+     "height": 800
+    },
+    {
+     "type": "map",
+     "id": "019a9200-0000-7000-8000-00000000aa02",
+     "name": "town",
+     "width": 100,
+     "height": 50,
+     "parent_map": "019a9200-0000-7000-8000-00000000aa01",
+     "x_parent_frame": false
+    }
+   ],
+   "want": {
+    "parent_frame": null,
+    "lint": "not_four_numbers",
+    "points": [
+     {
+      "map": "019a9200-0000-7000-8000-00000000aa02",
+      "x": 50,
+      "y": 25
+     }
+    ],
+    "stop": "no_frame"
+   }
+  },
+  {
+   "name": "top-map-with-an-empty-string-key",
+   "claim": "on a Map with no `parent_map`, a key that is an empty string is present and not null: not read, with the lint `no_parent`",
+   "map": "019a9200-0000-7000-8000-00000000aa01",
+   "point": [
+    20,
+    10
+   ],
+   "elements": [
+    {
+     "type": "map",
+     "id": "019a9200-0000-7000-8000-00000000aa01",
+     "name": "land",
+     "width": 1000,
+     "height": 800,
+     "x_parent_frame": ""
+    },
+    {
+     "type": "map",
+     "id": "019a9200-0000-7000-8000-00000000aa02",
+     "name": "town",
+     "width": 100,
+     "height": 50,
+     "parent_map": "019a9200-0000-7000-8000-00000000aa01",
+     "x_parent_frame": [
+      100,
+      200,
+      300,
+      300
+     ]
+    }
+   ],
+   "want": {
+    "parent_frame": null,
+    "lint": "no_parent",
+    "points": [
+     {
+      "map": "019a9200-0000-7000-8000-00000000aa01",
+      "x": 20,
+      "y": 10
+     }
+    ],
+    "stop": "top"
+   }
+  }
  ]
 }
