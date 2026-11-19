@@ -5,6 +5,8 @@ The package version runs on its own semver; the schema it is generated from is `
 ## Unreleased
 
 - Tests: CI runs the whole suite against the built wheel, installed in place of the source tree (on Python 3.12), and checks that the wheel holds every tracked file of the package and nothing else. A wheel built without the vendored folder checker failed both, where the source run passes. The release runs the suite against the wheel it uploads, too, before publishing.
+- Tests: every Python example in the README is type-checked with `mypy --strict` against the installed package, each block on its own, so a renamed function, a keyword or an export the package no longer has fails before the README ships.
+- README: the folder example now checks that `folder.world` is present before reading its name (`None` when `world.json` is missing or unreadable), so it type-checks under `mypy --strict`.
 
 ## 0.134.1 (2026-11-17)
 

@@ -60,6 +60,7 @@ from onlyworlds import export_world, read_folder
 
 export_world("moppetopia", api_key="0000000001")
 folder = read_folder("moppetopia")
+assert folder.world is not None  # None when world.json is missing or unreadable; folder.skipped says why
 print(folder.world["name"], len(folder.elements), "elements")
 ```
 
