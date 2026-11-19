@@ -45,8 +45,7 @@ class LayoutByLinks3d(TypedDict):
     """What ``layout_by_links_3d`` answers: one row per placed node, in the order the nodes were handed in, and the
     nodes it does not place."""
 
-    #: The method's word. It is the tool's own until the method's page is published; until then a release may move
-    #: its points.
+    #: The method's word, ``by-links-3d``, as the layout profile's page names it.
     method: Literal["by-links-3d"]
     #: The placed nodes' ids, in the order handed in.
     ids: list[str]
@@ -140,8 +139,8 @@ def layout_by_links_3d(
     The method is pure Python, so a large world is slow: a world of several thousand elements takes minutes (about
     nine for 8,899 elements on the machine it was measured on).
 
-    The method's word, ``by-links-3d``, is the tool's own until the method's page is published, and until then a
-    release may move its points.
+    The method's word, ``by-links-3d``, is the layout profile's page's. ``BY_LINKS_3D_VERSION`` says when a release
+    moves its points.
     """
     nodes = graph.get("nodes") if isinstance(graph, Mapping) else None
     edges = graph.get("edges") if isinstance(graph, Mapping) else None
