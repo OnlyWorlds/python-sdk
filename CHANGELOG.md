@@ -4,6 +4,8 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+## 0.135.0 (2026-11-19)
+
 - **The schema pin moves to `v0.34.1-dist.136`** (serials 135 and 136; canonical 00.34.01 unchanged, no schema file moved, `_schema.py` changes only its provenance lines). Serial 135 adds a talk on an Object or a Construct to the room and report pages, the design state to the charter page (and that a Charter the hidden mark keeps from a reader is not that reader's), and three new fixture lists; serial 136 adds the packet page's `standing` state, `x_packet_from` and its first fixture, which no reader in this package reads yet.
 - **`talks_of(element)`**: the talks on an Object or a Construct that a line in the room (`narrative` + `Message`, with the mark) is in, each `{type, id}` from its `objects` and `constructs`, the id as written; `[]` for anything that is no line.
 - **`report_talks_of(narrative)`**: the talks a reader shows a report with, every Object and Construct its `objects` and `constructs` name, read as `talks_of` reads a line's; `[]` for a Narrative that is no report.
