@@ -1,0 +1,1463 @@
+{
+  "profile": "packet",
+  "profile_page": "profiles/packet.md",
+  "notes": [
+    "Each case is the work items as one reader is given them, in the order given, all Relations with supertype Work item in the world below, and a want worked by hand from the page's rules 1, 5, 7 and 8.",
+    "world: the world the work items sit in: its id, its Characters, and others, the ids of every other element of it the reader holds. A value written as no id in either list names no element the reader holds. x_packet_source names the same world, as a folder (server null), except where an item's elements are the source_world's.",
+    "source_world: another world, the source of the packets that name its elements, whose elements the reader holds too, having resolved those packets there (rule 2); its Characters are no Characters of the world the items sit in.",
+    "state_cases want: states, for each item its state, the word `open`, `taken`, `done` or `standing` matched trimmed and without regard to case as the room profile defines it, or null for no state (rule 5); shown, every item (no item is hidden for its state); open_work, for each element any item names in x_packet_elements, the ids of the open work that names it (the items whose state is `open` or `taken`); elements, where present, an item's elements in x_packet_elements' order (rules 1 and 7).",
+    "asker_cases want: askers, for each item the Character id x_packet_from names or null (rule 8); lints, each {kind, item}, the one kind `asker`, for a key that is not one id (not a string, or a string empty once trimmed of White_Space as the room profile trims) or that is, written exactly so, an id in others or in the source_world (absent, null and a value that names no element the reader holds, in any spelling, are no lint); waiting_on, for each Character of the world, the ids of the open work whose asker is that Character.",
+    "Order: the page orders no list of work items, so shown, each list in open_work, each list in waiting_on, and lints compare as sets, written here in the order the items are given. Only elements is a list in order, x_packet_elements' order (rule 1). states and askers compare as maps.",
+    "created_by holds a maker's id, which is no Character of the world. A case's note is prose for the reader of the fixture, never an input."
+  ],
+  "world": {
+    "id": "019a8136-0000-7000-8000-000000000000",
+    "characters": [
+      "019a8136-0000-7000-8000-000000000201",
+      "019a8136-0000-7000-8000-000000000202",
+      "019a8136-0000-7000-8000-000000000203",
+      "019A8136-0000-7000-8000-000000000204"
+    ],
+    "others": [
+      "019a8136-0000-7000-8000-000000000301",
+      "019a8136-0000-7000-8000-000000000302",
+      "019a8136-0000-7000-8000-000000000321",
+      "019a8136-0000-7000-8000-000000000322",
+      "019a8136-0000-7000-8000-000000000331",
+      "019a8136-0000-7000-8000-000000000341"
+    ]
+  },
+  "source_world": {
+    "id": "019a8136-0000-7000-8000-000000000500",
+    "characters": [
+      "019a8136-0000-7000-8000-000000000501"
+    ],
+    "others": [
+      "019a8136-0000-7000-8000-000000000511"
+    ]
+  },
+  "state_cases": [
+    {
+      "name": "standing-is-not-open-work",
+      "note": "A standing item is shown as itself and is open work on none of the elements it names.",
+      "items": [
+        {
+          "id": "019a8136-0000-7000-8000-000000000101",
+          "type": "relation",
+          "supertype": "Work item",
+          "subtype": "standing",
+          "name": "The order of work",
+          "x_packet_elements": [
+            {
+              "type": "location",
+              "id": "019a8136-0000-7000-8000-000000000301",
+              "reason": "No parent location."
+            },
+            {
+              "type": "object",
+              "id": "019a8136-0000-7000-8000-000000000321",
+              "reason": "No description."
+            }
+          ],
+          "x_packet_source": {
+            "server": null,
+            "world": "019a8136-0000-7000-8000-000000000000"
+          }
+        }
+      ],
+      "want": {
+        "states": {
+          "019a8136-0000-7000-8000-000000000101": "standing"
+        },
+        "shown": [
+          "019a8136-0000-7000-8000-000000000101"
+        ],
+        "open_work": {
+          "019a8136-0000-7000-8000-000000000301": [],
+          "019a8136-0000-7000-8000-000000000321": []
+        }
+      }
+    },
+    {
+      "name": "standing-with-a-capital-and-a-trailing-space",
+      "note": "The state is matched trimmed and without regard to case: `Standing ` is `standing`.",
+      "items": [
+        {
+          "id": "019a8136-0000-7000-8000-000000000102",
+          "type": "relation",
+          "supertype": "Work item",
+          "subtype": "Standing ",
+          "name": "The kept list",
+          "x_packet_elements": [
+            {
+              "type": "location",
+              "id": "019a8136-0000-7000-8000-000000000301",
+              "reason": "No parent location."
+            },
+            {
+              "type": "object",
+              "id": "019a8136-0000-7000-8000-000000000321",
+              "reason": "No description."
+            }
+          ],
+          "x_packet_source": {
+            "server": null,
+            "world": "019a8136-0000-7000-8000-000000000000"
+          }
+        }
+      ],
+      "want": {
+        "states": {
+          "019a8136-0000-7000-8000-000000000102": "standing"
+        },
+        "shown": [
+          "019a8136-0000-7000-8000-000000000102"
+        ],
+        "open_work": {
+          "019a8136-0000-7000-8000-000000000301": [],
+          "019a8136-0000-7000-8000-000000000321": []
+        }
+      }
+    },
+    {
+      "name": "open-taken-and-done-beside-a-standing-item",
+      "note": "The three states read as before; the open and the taken item are open work on the element they share, the done and the standing item are not.",
+      "items": [
+        {
+          "id": "019a8136-0000-7000-8000-000000000103",
+          "type": "relation",
+          "supertype": "Work item",
+          "subtype": "open",
+          "name": "Name the harbour",
+          "x_packet_elements": [
+            {
+              "type": "location",
+              "id": "019a8136-0000-7000-8000-000000000301",
+              "reason": "No parent location."
+            }
+          ],
+          "x_packet_source": {
+            "server": null,
+            "world": "019a8136-0000-7000-8000-000000000000"
+          }
+        },
+        {
+          "id": "019a8136-0000-7000-8000-000000000104",
+          "type": "relation",
+          "supertype": "Work item",
+          "subtype": "taken",
+          "name": "Map the harbour",
+          "x_packet_elements": [
+            {
+              "type": "location",
+              "id": "019a8136-0000-7000-8000-000000000301",
+              "reason": "No parent location."
+            }
+          ],
+          "x_packet_source": {
+            "server": null,
+            "world": "019a8136-0000-7000-8000-000000000000"
+          }
+        },
+        {
+          "id": "019a8136-0000-7000-8000-000000000105",
+          "type": "relation",
+          "supertype": "Work item",
+          "subtype": "done",
+          "name": "Date the harbour",
+          "x_packet_elements": [
+            {
+              "type": "location",
+              "id": "019a8136-0000-7000-8000-000000000301",
+              "reason": "No parent location."
+            }
+          ],
+          "x_packet_source": {
+            "server": null,
+            "world": "019a8136-0000-7000-8000-000000000000"
+          }
+        },
+        {
+          "id": "019a8136-0000-7000-8000-000000000106",
+          "type": "relation",
+          "supertype": "Work item",
+          "subtype": "standing",
+          "name": "Keep the harbour tidy",
+          "x_packet_elements": [
+            {
+              "type": "location",
+              "id": "019a8136-0000-7000-8000-000000000301",
+              "reason": "No parent location."
+            }
+          ],
+          "x_packet_source": {
+            "server": null,
+            "world": "019a8136-0000-7000-8000-000000000000"
+          }
+        }
+      ],
+      "want": {
+        "states": {
+          "019a8136-0000-7000-8000-000000000103": "open",
+          "019a8136-0000-7000-8000-000000000104": "taken",
+          "019a8136-0000-7000-8000-000000000105": "done",
+          "019a8136-0000-7000-8000-000000000106": "standing"
+        },
+        "shown": [
+          "019a8136-0000-7000-8000-000000000103",
+          "019a8136-0000-7000-8000-000000000104",
+          "019a8136-0000-7000-8000-000000000105",
+          "019a8136-0000-7000-8000-000000000106"
+        ],
+        "open_work": {
+          "019a8136-0000-7000-8000-000000000301": [
+            "019a8136-0000-7000-8000-000000000103",
+            "019a8136-0000-7000-8000-000000000104"
+          ]
+        }
+      }
+    },
+    {
+      "name": "a-standing-item-keeps-the-packets-order",
+      "note": "Five elements, given in no sorted order: the reader shows them in the order of x_packet_elements.",
+      "items": [
+        {
+          "id": "019a8136-0000-7000-8000-000000000107",
+          "type": "relation",
+          "supertype": "Work item",
+          "subtype": "standing",
+          "name": "The order of work",
+          "x_packet_elements": [
+            {
+              "type": "object",
+              "id": "019a8136-0000-7000-8000-000000000322",
+              "reason": "First in the order."
+            },
+            {
+              "type": "location",
+              "id": "019a8136-0000-7000-8000-000000000301",
+              "reason": "Second in the order."
+            },
+            {
+              "type": "narrative",
+              "id": "019a8136-0000-7000-8000-000000000341",
+              "reason": "Third in the order."
+            },
+            {
+              "type": "construct",
+              "id": "019a8136-0000-7000-8000-000000000331",
+              "reason": "Fourth in the order."
+            },
+            {
+              "type": "location",
+              "id": "019a8136-0000-7000-8000-000000000302",
+              "reason": "Fifth in the order."
+            }
+          ],
+          "x_packet_source": {
+            "server": null,
+            "world": "019a8136-0000-7000-8000-000000000000"
+          }
+        }
+      ],
+      "want": {
+        "states": {
+          "019a8136-0000-7000-8000-000000000107": "standing"
+        },
+        "shown": [
+          "019a8136-0000-7000-8000-000000000107"
+        ],
+        "open_work": {
+          "019a8136-0000-7000-8000-000000000322": [],
+          "019a8136-0000-7000-8000-000000000301": [],
+          "019a8136-0000-7000-8000-000000000341": [],
+          "019a8136-0000-7000-8000-000000000331": [],
+          "019a8136-0000-7000-8000-000000000302": []
+        },
+        "elements": {
+          "019a8136-0000-7000-8000-000000000107": [
+            "019a8136-0000-7000-8000-000000000322",
+            "019a8136-0000-7000-8000-000000000301",
+            "019a8136-0000-7000-8000-000000000341",
+            "019a8136-0000-7000-8000-000000000331",
+            "019a8136-0000-7000-8000-000000000302"
+          ]
+        }
+      }
+    },
+    {
+      "name": "elements-are-compared-on-the-items-the-want-names",
+      "note": "Two items; the want carries elements for the standing one only. A reader shows every item's elements, and only the standing item's are compared, in x_packet_elements' order.",
+      "items": [
+        {
+          "id": "019a8136-0000-7000-8000-000000000146",
+          "type": "relation",
+          "supertype": "Work item",
+          "subtype": "standing",
+          "name": "The order of work",
+          "x_packet_elements": [
+            {
+              "type": "object",
+              "id": "019a8136-0000-7000-8000-000000000322",
+              "reason": "First in the order."
+            },
+            {
+              "type": "location",
+              "id": "019a8136-0000-7000-8000-000000000302",
+              "reason": "Second in the order."
+            }
+          ],
+          "x_packet_source": {
+            "server": null,
+            "world": "019a8136-0000-7000-8000-000000000000"
+          }
+        },
+        {
+          "id": "019a8136-0000-7000-8000-000000000147",
+          "type": "relation",
+          "supertype": "Work item",
+          "subtype": "open",
+          "name": "Name the headland",
+          "x_packet_elements": [
+            {
+              "type": "location",
+              "id": "019a8136-0000-7000-8000-000000000301",
+              "reason": "No parent location."
+            }
+          ],
+          "x_packet_source": {
+            "server": null,
+            "world": "019a8136-0000-7000-8000-000000000000"
+          }
+        }
+      ],
+      "want": {
+        "states": {
+          "019a8136-0000-7000-8000-000000000146": "standing",
+          "019a8136-0000-7000-8000-000000000147": "open"
+        },
+        "shown": [
+          "019a8136-0000-7000-8000-000000000146",
+          "019a8136-0000-7000-8000-000000000147"
+        ],
+        "open_work": {
+          "019a8136-0000-7000-8000-000000000322": [],
+          "019a8136-0000-7000-8000-000000000302": [],
+          "019a8136-0000-7000-8000-000000000301": [
+            "019a8136-0000-7000-8000-000000000147"
+          ]
+        },
+        "elements": {
+          "019a8136-0000-7000-8000-000000000146": [
+            "019a8136-0000-7000-8000-000000000322",
+            "019a8136-0000-7000-8000-000000000302"
+          ]
+        }
+      }
+    },
+    {
+      "name": "a-subtype-none-of-the-four-is-no-state",
+      "note": "`blocked` is no state: the item is shown and is no open work; the open item beside it is.",
+      "items": [
+        {
+          "id": "019a8136-0000-7000-8000-000000000108",
+          "type": "relation",
+          "supertype": "Work item",
+          "subtype": "blocked",
+          "name": "Wait on the survey",
+          "x_packet_elements": [
+            {
+              "type": "location",
+              "id": "019a8136-0000-7000-8000-000000000301",
+              "reason": "No parent location."
+            }
+          ],
+          "x_packet_source": {
+            "server": null,
+            "world": "019a8136-0000-7000-8000-000000000000"
+          }
+        },
+        {
+          "id": "019a8136-0000-7000-8000-000000000109",
+          "type": "relation",
+          "supertype": "Work item",
+          "subtype": "open",
+          "name": "Name the bay",
+          "x_packet_elements": [
+            {
+              "type": "location",
+              "id": "019a8136-0000-7000-8000-000000000301",
+              "reason": "No parent location."
+            }
+          ],
+          "x_packet_source": {
+            "server": null,
+            "world": "019a8136-0000-7000-8000-000000000000"
+          }
+        }
+      ],
+      "want": {
+        "states": {
+          "019a8136-0000-7000-8000-000000000108": null,
+          "019a8136-0000-7000-8000-000000000109": "open"
+        },
+        "shown": [
+          "019a8136-0000-7000-8000-000000000108",
+          "019a8136-0000-7000-8000-000000000109"
+        ],
+        "open_work": {
+          "019a8136-0000-7000-8000-000000000301": [
+            "019a8136-0000-7000-8000-000000000109"
+          ]
+        }
+      }
+    },
+    {
+      "name": "an-empty-or-absent-subtype-is-no-state",
+      "note": "No subtype, a null one, an empty string and spaces alone are none of the four: each is shown and none is open work.",
+      "items": [
+        {
+          "id": "019a8136-0000-7000-8000-000000000110",
+          "type": "relation",
+          "supertype": "Work item",
+          "name": "No subtype",
+          "x_packet_elements": [
+            {
+              "type": "location",
+              "id": "019a8136-0000-7000-8000-000000000301",
+              "reason": "No parent location."
+            }
+          ],
+          "x_packet_source": {
+            "server": null,
+            "world": "019a8136-0000-7000-8000-000000000000"
+          }
+        },
+        {
+          "id": "019a8136-0000-7000-8000-000000000111",
+          "type": "relation",
+          "supertype": "Work item",
+          "subtype": null,
+          "name": "A null subtype",
+          "x_packet_elements": [
+            {
+              "type": "location",
+              "id": "019a8136-0000-7000-8000-000000000301",
+              "reason": "No parent location."
+            }
+          ],
+          "x_packet_source": {
+            "server": null,
+            "world": "019a8136-0000-7000-8000-000000000000"
+          }
+        },
+        {
+          "id": "019a8136-0000-7000-8000-000000000112",
+          "type": "relation",
+          "supertype": "Work item",
+          "subtype": "",
+          "name": "An empty subtype",
+          "x_packet_elements": [
+            {
+              "type": "location",
+              "id": "019a8136-0000-7000-8000-000000000301",
+              "reason": "No parent location."
+            }
+          ],
+          "x_packet_source": {
+            "server": null,
+            "world": "019a8136-0000-7000-8000-000000000000"
+          }
+        },
+        {
+          "id": "019a8136-0000-7000-8000-000000000113",
+          "type": "relation",
+          "supertype": "Work item",
+          "subtype": "   ",
+          "name": "Spaces alone",
+          "x_packet_elements": [
+            {
+              "type": "location",
+              "id": "019a8136-0000-7000-8000-000000000301",
+              "reason": "No parent location."
+            }
+          ],
+          "x_packet_source": {
+            "server": null,
+            "world": "019a8136-0000-7000-8000-000000000000"
+          }
+        },
+        {
+          "id": "019a8136-0000-7000-8000-000000000114",
+          "type": "relation",
+          "supertype": "Work item",
+          "subtype": "open",
+          "name": "Name the cape",
+          "x_packet_elements": [
+            {
+              "type": "location",
+              "id": "019a8136-0000-7000-8000-000000000301",
+              "reason": "No parent location."
+            }
+          ],
+          "x_packet_source": {
+            "server": null,
+            "world": "019a8136-0000-7000-8000-000000000000"
+          }
+        }
+      ],
+      "want": {
+        "states": {
+          "019a8136-0000-7000-8000-000000000110": null,
+          "019a8136-0000-7000-8000-000000000111": null,
+          "019a8136-0000-7000-8000-000000000112": null,
+          "019a8136-0000-7000-8000-000000000113": null,
+          "019a8136-0000-7000-8000-000000000114": "open"
+        },
+        "shown": [
+          "019a8136-0000-7000-8000-000000000110",
+          "019a8136-0000-7000-8000-000000000111",
+          "019a8136-0000-7000-8000-000000000112",
+          "019a8136-0000-7000-8000-000000000113",
+          "019a8136-0000-7000-8000-000000000114"
+        ],
+        "open_work": {
+          "019a8136-0000-7000-8000-000000000301": [
+            "019a8136-0000-7000-8000-000000000114"
+          ]
+        }
+      }
+    },
+    {
+      "name": "a-state-followed-by-a-unit-separator",
+      "note": "U+001F is no White_Space, so the room profile's trim leaves it: `open` followed by it is none of the four, no state. A language's trim that strips control characters reads `open`.",
+      "items": [
+        {
+          "id": "019a8136-0000-7000-8000-000000000115",
+          "type": "relation",
+          "supertype": "Work item",
+          "subtype": "open\u001f",
+          "name": "Name the reef",
+          "x_packet_elements": [
+            {
+              "type": "location",
+              "id": "019a8136-0000-7000-8000-000000000301",
+              "reason": "No parent location."
+            }
+          ],
+          "x_packet_source": {
+            "server": null,
+            "world": "019a8136-0000-7000-8000-000000000000"
+          }
+        },
+        {
+          "id": "019a8136-0000-7000-8000-000000000116",
+          "type": "relation",
+          "supertype": "Work item",
+          "subtype": "open",
+          "name": "Name the point",
+          "x_packet_elements": [
+            {
+              "type": "location",
+              "id": "019a8136-0000-7000-8000-000000000301",
+              "reason": "No parent location."
+            }
+          ],
+          "x_packet_source": {
+            "server": null,
+            "world": "019a8136-0000-7000-8000-000000000000"
+          }
+        }
+      ],
+      "want": {
+        "states": {
+          "019a8136-0000-7000-8000-000000000115": null,
+          "019a8136-0000-7000-8000-000000000116": "open"
+        },
+        "shown": [
+          "019a8136-0000-7000-8000-000000000115",
+          "019a8136-0000-7000-8000-000000000116"
+        ],
+        "open_work": {
+          "019a8136-0000-7000-8000-000000000301": [
+            "019a8136-0000-7000-8000-000000000116"
+          ]
+        }
+      }
+    },
+    {
+      "name": "a-byte-order-mark-is-not-trimmed",
+      "note": "U+FEFF is no White_Space, so the room profile's trim leaves it, as its own fixture's byte-order-mark case does: `open` after it is none of the four, no state. A trim that strips U+FEFF reads `open`.",
+      "items": [
+        {
+          "id": "019a8136-0000-7000-8000-000000000117",
+          "type": "relation",
+          "supertype": "Work item",
+          "subtype": "﻿open",
+          "name": "Name the sound",
+          "x_packet_elements": [
+            {
+              "type": "location",
+              "id": "019a8136-0000-7000-8000-000000000301",
+              "reason": "No parent location."
+            }
+          ],
+          "x_packet_source": {
+            "server": null,
+            "world": "019a8136-0000-7000-8000-000000000000"
+          }
+        },
+        {
+          "id": "019a8136-0000-7000-8000-000000000118",
+          "type": "relation",
+          "supertype": "Work item",
+          "subtype": "open",
+          "name": "Name the strait",
+          "x_packet_elements": [
+            {
+              "type": "location",
+              "id": "019a8136-0000-7000-8000-000000000301",
+              "reason": "No parent location."
+            }
+          ],
+          "x_packet_source": {
+            "server": null,
+            "world": "019a8136-0000-7000-8000-000000000000"
+          }
+        }
+      ],
+      "want": {
+        "states": {
+          "019a8136-0000-7000-8000-000000000117": null,
+          "019a8136-0000-7000-8000-000000000118": "open"
+        },
+        "shown": [
+          "019a8136-0000-7000-8000-000000000117",
+          "019a8136-0000-7000-8000-000000000118"
+        ],
+        "open_work": {
+          "019a8136-0000-7000-8000-000000000301": [
+            "019a8136-0000-7000-8000-000000000118"
+          ]
+        }
+      }
+    },
+    {
+      "name": "the-long-s-folds",
+      "note": "The long s (U+017F) folds to s by simple case folding, as the room profile's own fixture folds it: the word is `standing`. Lower-casing leaves the long s, and reads no state.",
+      "items": [
+        {
+          "id": "019a8136-0000-7000-8000-000000000119",
+          "type": "relation",
+          "supertype": "Work item",
+          "subtype": "ſTANDING",
+          "name": "The kept list",
+          "x_packet_elements": [
+            {
+              "type": "location",
+              "id": "019a8136-0000-7000-8000-000000000301",
+              "reason": "No parent location."
+            },
+            {
+              "type": "object",
+              "id": "019a8136-0000-7000-8000-000000000321",
+              "reason": "No description."
+            }
+          ],
+          "x_packet_source": {
+            "server": null,
+            "world": "019a8136-0000-7000-8000-000000000000"
+          }
+        }
+      ],
+      "want": {
+        "states": {
+          "019a8136-0000-7000-8000-000000000119": "standing"
+        },
+        "shown": [
+          "019a8136-0000-7000-8000-000000000119"
+        ],
+        "open_work": {
+          "019a8136-0000-7000-8000-000000000301": [],
+          "019a8136-0000-7000-8000-000000000321": []
+        }
+      }
+    }
+  ],
+  "asker_cases": [
+    {
+      "name": "the-asker-is-the-character-the-key-names",
+      "note": "The asker is the key's Character, not the maker and not actor.",
+      "items": [
+        {
+          "id": "019a8136-0000-7000-8000-000000000121",
+          "type": "relation",
+          "supertype": "Work item",
+          "subtype": "open",
+          "actor": "019a8136-0000-7000-8000-000000000203",
+          "created_by": "019a8136-0000-7000-8000-000000000901",
+          "x_packet_from": "019a8136-0000-7000-8000-000000000201",
+          "name": "Name the harbour",
+          "x_packet_elements": [
+            {
+              "type": "location",
+              "id": "019a8136-0000-7000-8000-000000000301",
+              "reason": "No parent location."
+            }
+          ],
+          "x_packet_source": {
+            "server": null,
+            "world": "019a8136-0000-7000-8000-000000000000"
+          }
+        }
+      ],
+      "want": {
+        "askers": {
+          "019a8136-0000-7000-8000-000000000121": "019a8136-0000-7000-8000-000000000201"
+        },
+        "lints": [],
+        "waiting_on": {
+          "019a8136-0000-7000-8000-000000000201": [
+            "019a8136-0000-7000-8000-000000000121"
+          ],
+          "019a8136-0000-7000-8000-000000000202": [],
+          "019a8136-0000-7000-8000-000000000203": [],
+          "019A8136-0000-7000-8000-000000000204": []
+        }
+      }
+    },
+    {
+      "name": "no-key-names-no-asker",
+      "note": "Without the key, or with it null, nobody is the asker and there is no lint: neither the maker in created_by, nor the tool in x_packet_producer, nor actor.",
+      "items": [
+        {
+          "id": "019a8136-0000-7000-8000-000000000122",
+          "type": "relation",
+          "supertype": "Work item",
+          "subtype": "open",
+          "actor": "019a8136-0000-7000-8000-000000000203",
+          "created_by": "019a8136-0000-7000-8000-000000000901",
+          "name": "Name the bay",
+          "x_packet_elements": [
+            {
+              "type": "location",
+              "id": "019a8136-0000-7000-8000-000000000301",
+              "reason": "No parent location."
+            }
+          ],
+          "x_packet_source": {
+            "server": null,
+            "world": "019a8136-0000-7000-8000-000000000000"
+          }
+        },
+        {
+          "id": "019a8136-0000-7000-8000-000000000123",
+          "type": "relation",
+          "supertype": "Work item",
+          "subtype": "open",
+          "created_by": "019a8136-0000-7000-8000-000000000901",
+          "x_packet_producer": {
+            "tool": "world-doctor",
+            "version": "0.11.0"
+          },
+          "name": "Doctor's findings",
+          "x_packet_elements": [
+            {
+              "type": "object",
+              "id": "019a8136-0000-7000-8000-000000000321",
+              "reason": "No description."
+            }
+          ],
+          "x_packet_source": {
+            "server": null,
+            "world": "019a8136-0000-7000-8000-000000000000"
+          }
+        },
+        {
+          "id": "019a8136-0000-7000-8000-000000000134",
+          "type": "relation",
+          "supertype": "Work item",
+          "subtype": "open",
+          "actor": "019a8136-0000-7000-8000-000000000203",
+          "created_by": "019a8136-0000-7000-8000-000000000901",
+          "x_packet_from": null,
+          "name": "Date the bay",
+          "x_packet_elements": [
+            {
+              "type": "location",
+              "id": "019a8136-0000-7000-8000-000000000301",
+              "reason": "No parent location."
+            }
+          ],
+          "x_packet_source": {
+            "server": null,
+            "world": "019a8136-0000-7000-8000-000000000000"
+          }
+        }
+      ],
+      "want": {
+        "askers": {
+          "019a8136-0000-7000-8000-000000000122": null,
+          "019a8136-0000-7000-8000-000000000123": null,
+          "019a8136-0000-7000-8000-000000000134": null
+        },
+        "lints": [],
+        "waiting_on": {
+          "019a8136-0000-7000-8000-000000000201": [],
+          "019a8136-0000-7000-8000-000000000202": [],
+          "019a8136-0000-7000-8000-000000000203": [],
+          "019A8136-0000-7000-8000-000000000204": []
+        }
+      }
+    },
+    {
+      "name": "a-key-that-is-no-character-names-no-asker",
+      "note": "The id of a Location the reader holds, an empty string and a list: no asker, each with a lint, never guessed at.",
+      "items": [
+        {
+          "id": "019a8136-0000-7000-8000-000000000124",
+          "type": "relation",
+          "supertype": "Work item",
+          "subtype": "open",
+          "created_by": "019a8136-0000-7000-8000-000000000901",
+          "x_packet_from": "019a8136-0000-7000-8000-000000000301",
+          "name": "Map the cape",
+          "x_packet_elements": [
+            {
+              "type": "location",
+              "id": "019a8136-0000-7000-8000-000000000301",
+              "reason": "No parent location."
+            }
+          ],
+          "x_packet_source": {
+            "server": null,
+            "world": "019a8136-0000-7000-8000-000000000000"
+          }
+        },
+        {
+          "id": "019a8136-0000-7000-8000-000000000125",
+          "type": "relation",
+          "supertype": "Work item",
+          "subtype": "open",
+          "created_by": "019a8136-0000-7000-8000-000000000901",
+          "x_packet_from": "",
+          "name": "Map the bay",
+          "x_packet_elements": [
+            {
+              "type": "location",
+              "id": "019a8136-0000-7000-8000-000000000301",
+              "reason": "No parent location."
+            }
+          ],
+          "x_packet_source": {
+            "server": null,
+            "world": "019a8136-0000-7000-8000-000000000000"
+          }
+        },
+        {
+          "id": "019a8136-0000-7000-8000-000000000126",
+          "type": "relation",
+          "supertype": "Work item",
+          "subtype": "open",
+          "created_by": "019a8136-0000-7000-8000-000000000901",
+          "x_packet_from": [
+            "019a8136-0000-7000-8000-000000000201"
+          ],
+          "name": "Map the harbour",
+          "x_packet_elements": [
+            {
+              "type": "location",
+              "id": "019a8136-0000-7000-8000-000000000301",
+              "reason": "No parent location."
+            }
+          ],
+          "x_packet_source": {
+            "server": null,
+            "world": "019a8136-0000-7000-8000-000000000000"
+          }
+        }
+      ],
+      "want": {
+        "askers": {
+          "019a8136-0000-7000-8000-000000000124": null,
+          "019a8136-0000-7000-8000-000000000125": null,
+          "019a8136-0000-7000-8000-000000000126": null
+        },
+        "lints": [
+          {
+            "kind": "asker",
+            "item": "019a8136-0000-7000-8000-000000000124"
+          },
+          {
+            "kind": "asker",
+            "item": "019a8136-0000-7000-8000-000000000125"
+          },
+          {
+            "kind": "asker",
+            "item": "019a8136-0000-7000-8000-000000000126"
+          }
+        ],
+        "waiting_on": {
+          "019a8136-0000-7000-8000-000000000201": [],
+          "019a8136-0000-7000-8000-000000000202": [],
+          "019a8136-0000-7000-8000-000000000203": [],
+          "019A8136-0000-7000-8000-000000000204": []
+        }
+      }
+    },
+    {
+      "name": "an-asker-the-reader-cannot-name",
+      "note": "An id the reader holds no element for (deleted, hidden from this reader, not served): no asker shown, no lint, never a guess.",
+      "items": [
+        {
+          "id": "019a8136-0000-7000-8000-000000000135",
+          "type": "relation",
+          "supertype": "Work item",
+          "subtype": "open",
+          "created_by": "019a8136-0000-7000-8000-000000000901",
+          "x_packet_from": "019a8136-0000-7000-8000-000000000299",
+          "name": "Name the shoal",
+          "x_packet_elements": [
+            {
+              "type": "location",
+              "id": "019a8136-0000-7000-8000-000000000301",
+              "reason": "No parent location."
+            }
+          ],
+          "x_packet_source": {
+            "server": null,
+            "world": "019a8136-0000-7000-8000-000000000000"
+          }
+        }
+      ],
+      "want": {
+        "askers": {
+          "019a8136-0000-7000-8000-000000000135": null
+        },
+        "lints": [],
+        "waiting_on": {
+          "019a8136-0000-7000-8000-000000000201": [],
+          "019a8136-0000-7000-8000-000000000202": [],
+          "019a8136-0000-7000-8000-000000000203": [],
+          "019A8136-0000-7000-8000-000000000204": []
+        }
+      }
+    },
+    {
+      "name": "an-asker-in-upper-case-names-nothing",
+      "note": "Read as written: the first Character's id in upper case is a spelling no element's own id is written in, so it names nothing the reader holds: no asker, no lint.",
+      "items": [
+        {
+          "id": "019a8136-0000-7000-8000-000000000136",
+          "type": "relation",
+          "supertype": "Work item",
+          "subtype": "open",
+          "x_packet_from": "019A8136-0000-7000-8000-000000000201",
+          "name": "Name the spit",
+          "x_packet_elements": [
+            {
+              "type": "location",
+              "id": "019a8136-0000-7000-8000-000000000301",
+              "reason": "No parent location."
+            }
+          ],
+          "x_packet_source": {
+            "server": null,
+            "world": "019a8136-0000-7000-8000-000000000000"
+          }
+        }
+      ],
+      "want": {
+        "askers": {
+          "019a8136-0000-7000-8000-000000000136": null
+        },
+        "lints": [],
+        "waiting_on": {
+          "019a8136-0000-7000-8000-000000000201": [],
+          "019a8136-0000-7000-8000-000000000202": [],
+          "019a8136-0000-7000-8000-000000000203": [],
+          "019A8136-0000-7000-8000-000000000204": []
+        }
+      }
+    },
+    {
+      "name": "a-character-whose-own-id-is-in-upper-case",
+      "note": "The fourth Character's own id is written in upper case. The first item writes it exactly so and names that Character as its asker; the second writes it in lowercase, a spelling no element's own id is written in, so it names nothing the reader holds: no asker, no lint.",
+      "items": [
+        {
+          "id": "019a8136-0000-7000-8000-000000000141",
+          "type": "relation",
+          "supertype": "Work item",
+          "subtype": "open",
+          "x_packet_from": "019A8136-0000-7000-8000-000000000204",
+          "name": "Name the creek",
+          "x_packet_elements": [
+            {
+              "type": "location",
+              "id": "019a8136-0000-7000-8000-000000000301",
+              "reason": "No parent location."
+            }
+          ],
+          "x_packet_source": {
+            "server": null,
+            "world": "019a8136-0000-7000-8000-000000000000"
+          }
+        },
+        {
+          "id": "019a8136-0000-7000-8000-000000000142",
+          "type": "relation",
+          "supertype": "Work item",
+          "subtype": "open",
+          "x_packet_from": "019a8136-0000-7000-8000-000000000204",
+          "name": "Date the creek",
+          "x_packet_elements": [
+            {
+              "type": "location",
+              "id": "019a8136-0000-7000-8000-000000000301",
+              "reason": "No parent location."
+            }
+          ],
+          "x_packet_source": {
+            "server": null,
+            "world": "019a8136-0000-7000-8000-000000000000"
+          }
+        }
+      ],
+      "want": {
+        "askers": {
+          "019a8136-0000-7000-8000-000000000141": "019A8136-0000-7000-8000-000000000204",
+          "019a8136-0000-7000-8000-000000000142": null
+        },
+        "lints": [],
+        "waiting_on": {
+          "019a8136-0000-7000-8000-000000000201": [],
+          "019a8136-0000-7000-8000-000000000202": [],
+          "019a8136-0000-7000-8000-000000000203": [],
+          "019A8136-0000-7000-8000-000000000204": [
+            "019a8136-0000-7000-8000-000000000141"
+          ]
+        }
+      }
+    },
+    {
+      "name": "an-asker-with-a-space-names-nothing",
+      "note": "Read as written: the first Character's id with a space after it is a spelling no element's own id is written in, so it names nothing the reader holds: no asker, no lint. The key is trimmed only to find whether it is empty.",
+      "items": [
+        {
+          "id": "019a8136-0000-7000-8000-000000000139",
+          "type": "relation",
+          "supertype": "Work item",
+          "subtype": "open",
+          "x_packet_from": "019a8136-0000-7000-8000-000000000201 ",
+          "name": "Name the inlet",
+          "x_packet_elements": [
+            {
+              "type": "location",
+              "id": "019a8136-0000-7000-8000-000000000301",
+              "reason": "No parent location."
+            }
+          ],
+          "x_packet_source": {
+            "server": null,
+            "world": "019a8136-0000-7000-8000-000000000000"
+          }
+        }
+      ],
+      "want": {
+        "askers": {
+          "019a8136-0000-7000-8000-000000000139": null
+        },
+        "lints": [],
+        "waiting_on": {
+          "019a8136-0000-7000-8000-000000000201": [],
+          "019a8136-0000-7000-8000-000000000202": [],
+          "019a8136-0000-7000-8000-000000000203": [],
+          "019A8136-0000-7000-8000-000000000204": []
+        }
+      }
+    },
+    {
+      "name": "an-asker-that-is-a-number-is-no-id",
+      "note": "A number is not one id: no asker, with a lint, never read as absent.",
+      "items": [
+        {
+          "id": "019a8136-0000-7000-8000-000000000140",
+          "type": "relation",
+          "supertype": "Work item",
+          "subtype": "open",
+          "x_packet_from": 7,
+          "name": "Name the lagoon",
+          "x_packet_elements": [
+            {
+              "type": "location",
+              "id": "019a8136-0000-7000-8000-000000000301",
+              "reason": "No parent location."
+            }
+          ],
+          "x_packet_source": {
+            "server": null,
+            "world": "019a8136-0000-7000-8000-000000000000"
+          }
+        }
+      ],
+      "want": {
+        "askers": {
+          "019a8136-0000-7000-8000-000000000140": null
+        },
+        "lints": [
+          {
+            "kind": "asker",
+            "item": "019a8136-0000-7000-8000-000000000140"
+          }
+        ],
+        "waiting_on": {
+          "019a8136-0000-7000-8000-000000000201": [],
+          "019a8136-0000-7000-8000-000000000202": [],
+          "019a8136-0000-7000-8000-000000000203": [],
+          "019A8136-0000-7000-8000-000000000204": []
+        }
+      }
+    },
+    {
+      "name": "an-asker-of-white-space-alone-is-no-id",
+      "note": "An ideographic space, a space and a tab are White_Space alone: empty once trimmed as the room profile trims, the key reads as an empty string does, not one id: no asker, with a lint.",
+      "items": [
+        {
+          "id": "019a8136-0000-7000-8000-000000000143",
+          "type": "relation",
+          "supertype": "Work item",
+          "subtype": "open",
+          "x_packet_from": "　 \t",
+          "name": "Name the cove",
+          "x_packet_elements": [
+            {
+              "type": "location",
+              "id": "019a8136-0000-7000-8000-000000000301",
+              "reason": "No parent location."
+            }
+          ],
+          "x_packet_source": {
+            "server": null,
+            "world": "019a8136-0000-7000-8000-000000000000"
+          }
+        }
+      ],
+      "want": {
+        "askers": {
+          "019a8136-0000-7000-8000-000000000143": null
+        },
+        "lints": [
+          {
+            "kind": "asker",
+            "item": "019a8136-0000-7000-8000-000000000143"
+          }
+        ],
+        "waiting_on": {
+          "019a8136-0000-7000-8000-000000000201": [],
+          "019a8136-0000-7000-8000-000000000202": [],
+          "019a8136-0000-7000-8000-000000000203": [],
+          "019A8136-0000-7000-8000-000000000204": []
+        }
+      }
+    },
+    {
+      "name": "an-asker-of-a-unit-separator-alone-names-nothing",
+      "note": "U+001F alone is no White_Space, so the room profile's trim leaves it and the key is not empty: a string that names nothing the reader holds, no asker, no lint. A language's trim that strips control characters reads it as empty.",
+      "items": [
+        {
+          "id": "019a8136-0000-7000-8000-000000000144",
+          "type": "relation",
+          "supertype": "Work item",
+          "subtype": "open",
+          "x_packet_from": "\u001f",
+          "name": "Name the firth",
+          "x_packet_elements": [
+            {
+              "type": "location",
+              "id": "019a8136-0000-7000-8000-000000000301",
+              "reason": "No parent location."
+            }
+          ],
+          "x_packet_source": {
+            "server": null,
+            "world": "019a8136-0000-7000-8000-000000000000"
+          }
+        }
+      ],
+      "want": {
+        "askers": {
+          "019a8136-0000-7000-8000-000000000144": null
+        },
+        "lints": [],
+        "waiting_on": {
+          "019a8136-0000-7000-8000-000000000201": [],
+          "019a8136-0000-7000-8000-000000000202": [],
+          "019a8136-0000-7000-8000-000000000203": [],
+          "019A8136-0000-7000-8000-000000000204": []
+        }
+      }
+    },
+    {
+      "name": "a-word-that-is-no-id-names-nothing",
+      "note": "A non-empty string not written in an id's form is still a string: it names nothing the reader holds, no asker, no lint.",
+      "items": [
+        {
+          "id": "019a8136-0000-7000-8000-000000000145",
+          "type": "relation",
+          "supertype": "Work item",
+          "subtype": "open",
+          "x_packet_from": "hello",
+          "name": "Name the estuary",
+          "x_packet_elements": [
+            {
+              "type": "location",
+              "id": "019a8136-0000-7000-8000-000000000301",
+              "reason": "No parent location."
+            }
+          ],
+          "x_packet_source": {
+            "server": null,
+            "world": "019a8136-0000-7000-8000-000000000000"
+          }
+        }
+      ],
+      "want": {
+        "askers": {
+          "019a8136-0000-7000-8000-000000000145": null
+        },
+        "lints": [],
+        "waiting_on": {
+          "019a8136-0000-7000-8000-000000000201": [],
+          "019a8136-0000-7000-8000-000000000202": [],
+          "019a8136-0000-7000-8000-000000000203": [],
+          "019A8136-0000-7000-8000-000000000204": []
+        }
+      }
+    },
+    {
+      "name": "the-asker-is-of-the-world-the-item-sits-in",
+      "note": "Both items sit in the world below and are about another world, the source. The asker is read among this world's Characters: the first Character asks the first item; the second names a Character of the source world only, which is no Character of this world, so no asker, with a lint.",
+      "items": [
+        {
+          "id": "019a8136-0000-7000-8000-000000000137",
+          "type": "relation",
+          "supertype": "Work item",
+          "subtype": "open",
+          "x_packet_from": "019a8136-0000-7000-8000-000000000201",
+          "name": "Name the source's harbour",
+          "x_packet_elements": [
+            {
+              "type": "location",
+              "id": "019a8136-0000-7000-8000-000000000511",
+              "reason": "No name."
+            }
+          ],
+          "x_packet_source": {
+            "server": null,
+            "world": "019a8136-0000-7000-8000-000000000500"
+          }
+        },
+        {
+          "id": "019a8136-0000-7000-8000-000000000138",
+          "type": "relation",
+          "supertype": "Work item",
+          "subtype": "open",
+          "x_packet_from": "019a8136-0000-7000-8000-000000000501",
+          "name": "Date the source's harbour",
+          "x_packet_elements": [
+            {
+              "type": "location",
+              "id": "019a8136-0000-7000-8000-000000000511",
+              "reason": "No date."
+            }
+          ],
+          "x_packet_source": {
+            "server": null,
+            "world": "019a8136-0000-7000-8000-000000000500"
+          }
+        }
+      ],
+      "want": {
+        "askers": {
+          "019a8136-0000-7000-8000-000000000137": "019a8136-0000-7000-8000-000000000201",
+          "019a8136-0000-7000-8000-000000000138": null
+        },
+        "lints": [
+          {
+            "kind": "asker",
+            "item": "019a8136-0000-7000-8000-000000000138"
+          }
+        ],
+        "waiting_on": {
+          "019a8136-0000-7000-8000-000000000201": [
+            "019a8136-0000-7000-8000-000000000137"
+          ],
+          "019a8136-0000-7000-8000-000000000202": [],
+          "019a8136-0000-7000-8000-000000000203": [],
+          "019A8136-0000-7000-8000-000000000204": []
+        }
+      }
+    },
+    {
+      "name": "what-am-i-waiting-on",
+      "note": "The open and taken items each Character asked for; a done, a standing and an item of no state are no waiting.",
+      "items": [
+        {
+          "id": "019a8136-0000-7000-8000-000000000127",
+          "type": "relation",
+          "supertype": "Work item",
+          "subtype": "open",
+          "x_packet_from": "019a8136-0000-7000-8000-000000000201",
+          "name": "Name the harbour",
+          "x_packet_elements": [
+            {
+              "type": "location",
+              "id": "019a8136-0000-7000-8000-000000000301",
+              "reason": "No parent location."
+            }
+          ],
+          "x_packet_source": {
+            "server": null,
+            "world": "019a8136-0000-7000-8000-000000000000"
+          }
+        },
+        {
+          "id": "019a8136-0000-7000-8000-000000000128",
+          "type": "relation",
+          "supertype": "Work item",
+          "subtype": "done",
+          "x_packet_from": "019a8136-0000-7000-8000-000000000201",
+          "name": "Date the harbour",
+          "x_packet_elements": [
+            {
+              "type": "location",
+              "id": "019a8136-0000-7000-8000-000000000301",
+              "reason": "No parent location."
+            }
+          ],
+          "x_packet_source": {
+            "server": null,
+            "world": "019a8136-0000-7000-8000-000000000000"
+          }
+        },
+        {
+          "id": "019a8136-0000-7000-8000-000000000129",
+          "type": "relation",
+          "supertype": "Work item",
+          "subtype": " Taken",
+          "x_packet_from": "019a8136-0000-7000-8000-000000000201",
+          "name": "Map the harbour",
+          "x_packet_elements": [
+            {
+              "type": "location",
+              "id": "019a8136-0000-7000-8000-000000000301",
+              "reason": "No parent location."
+            }
+          ],
+          "x_packet_source": {
+            "server": null,
+            "world": "019a8136-0000-7000-8000-000000000000"
+          }
+        },
+        {
+          "id": "019a8136-0000-7000-8000-000000000130",
+          "type": "relation",
+          "supertype": "Work item",
+          "subtype": "standing",
+          "x_packet_from": "019a8136-0000-7000-8000-000000000201",
+          "name": "Keep the harbour tidy",
+          "x_packet_elements": [
+            {
+              "type": "location",
+              "id": "019a8136-0000-7000-8000-000000000301",
+              "reason": "No parent location."
+            }
+          ],
+          "x_packet_source": {
+            "server": null,
+            "world": "019a8136-0000-7000-8000-000000000000"
+          }
+        },
+        {
+          "id": "019a8136-0000-7000-8000-000000000131",
+          "type": "relation",
+          "supertype": "Work item",
+          "subtype": "blocked",
+          "x_packet_from": "019a8136-0000-7000-8000-000000000201",
+          "name": "Wait on the survey",
+          "x_packet_elements": [
+            {
+              "type": "location",
+              "id": "019a8136-0000-7000-8000-000000000301",
+              "reason": "No parent location."
+            }
+          ],
+          "x_packet_source": {
+            "server": null,
+            "world": "019a8136-0000-7000-8000-000000000000"
+          }
+        },
+        {
+          "id": "019a8136-0000-7000-8000-000000000132",
+          "type": "relation",
+          "supertype": "Work item",
+          "subtype": "open",
+          "x_packet_from": "019a8136-0000-7000-8000-000000000202",
+          "name": "Name the bay",
+          "x_packet_elements": [
+            {
+              "type": "location",
+              "id": "019a8136-0000-7000-8000-000000000301",
+              "reason": "No parent location."
+            }
+          ],
+          "x_packet_source": {
+            "server": null,
+            "world": "019a8136-0000-7000-8000-000000000000"
+          }
+        },
+        {
+          "id": "019a8136-0000-7000-8000-000000000133",
+          "type": "relation",
+          "supertype": "Work item",
+          "subtype": "open",
+          "name": "Name the cape",
+          "x_packet_elements": [
+            {
+              "type": "location",
+              "id": "019a8136-0000-7000-8000-000000000301",
+              "reason": "No parent location."
+            }
+          ],
+          "x_packet_source": {
+            "server": null,
+            "world": "019a8136-0000-7000-8000-000000000000"
+          }
+        }
+      ],
+      "want": {
+        "askers": {
+          "019a8136-0000-7000-8000-000000000127": "019a8136-0000-7000-8000-000000000201",
+          "019a8136-0000-7000-8000-000000000128": "019a8136-0000-7000-8000-000000000201",
+          "019a8136-0000-7000-8000-000000000129": "019a8136-0000-7000-8000-000000000201",
+          "019a8136-0000-7000-8000-000000000130": "019a8136-0000-7000-8000-000000000201",
+          "019a8136-0000-7000-8000-000000000131": "019a8136-0000-7000-8000-000000000201",
+          "019a8136-0000-7000-8000-000000000132": "019a8136-0000-7000-8000-000000000202",
+          "019a8136-0000-7000-8000-000000000133": null
+        },
+        "lints": [],
+        "waiting_on": {
+          "019a8136-0000-7000-8000-000000000201": [
+            "019a8136-0000-7000-8000-000000000127",
+            "019a8136-0000-7000-8000-000000000129"
+          ],
+          "019a8136-0000-7000-8000-000000000202": [
+            "019a8136-0000-7000-8000-000000000132"
+          ],
+          "019a8136-0000-7000-8000-000000000203": [],
+          "019A8136-0000-7000-8000-000000000204": []
+        }
+      }
+    }
+  ]
+}

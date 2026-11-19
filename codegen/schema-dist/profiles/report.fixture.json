@@ -10,7 +10,8 @@
     "groups: each {parent, kind, reports}: the parent's id, report or board, and the ids of the reports that name it, ordered by created_at as the message profile orders messages (read in the one form the message profile gives, as an instant, a time with no offset as UTC; two at the same instant keep the order given; one that cannot be read after every one that can, in the order given). The parent itself is not in reports. A report in no group and heading none is not listed.",
     "lints: each {kind, report}: chain on a report whose parent is a report that itself has a report for its parent (one the reader holds, the pair and the mark, its own parent read by this rule); self on a report that names itself. A report that names itself is read as naming no parent, so a report that names it is no chain. These are the only lints: a parent that is missing or of no kind is no lint.",
     "The page rules the order inside a group and none between groups: groups and lints each compare as a set. Here groups are listed in the order their parent is first named in the list given, and lints in the order of their reports.",
-    "A case's note is prose for the reader of the fixture, never an input."
+    "A case's note is prose for the reader of the fixture, never an input.",
+    "talk_cases: each case is one Narrative as a reader is given it and its talks; a Narrative that is no report (the pair and the mark, both) is shown with no talk. talks: every talk on an element a reader shows the report with, each {type, id}, an id in objects as object and an id in constructs as construct, each entry read as the room profile reads a line's (one that is not a string, or is empty once trimmed of White_Space, names nothing; a field that is not a list names none; every other entry is an id read as written), read from the report alone, compared as a set. A reader shows a report with the talk on each Object or Construct it links, whether or not it names a sitting in events; talks never says which of them, if any, the report closed."
   ],
   "pair": {
     "type": "narrative",
@@ -1379,6 +1380,124 @@
         ],
         "lints": []
       }
+    }
+  ],
+  "talk_cases": [
+    {
+      "name": "a-report-linking-an-object-is-shown-with-the-talk-on-it",
+      "note": "No events: a talk on an element hangs on the element, in every sitting.",
+      "report": {
+        "id": "019a7120-0000-7000-8000-000000000a21",
+        "type": "narrative",
+        "supertype": "Report",
+        "x_room_of": "019a7120-0000-7000-8000-000000000000",
+        "subtype": "completed",
+        "objects": [
+          "019a7120-0000-7000-8000-000000000a01"
+        ]
+      },
+      "talks": [
+        {
+          "type": "object",
+          "id": "019a7120-0000-7000-8000-000000000a01"
+        }
+      ]
+    },
+    {
+      "name": "a-report-linking-a-construct-is-shown-with-the-talk-on-it",
+      "note": "No events: a talk on an element hangs on the element, in every sitting.",
+      "report": {
+        "id": "019a7120-0000-7000-8000-000000000a22",
+        "type": "narrative",
+        "supertype": "Report",
+        "x_room_of": "019a7120-0000-7000-8000-000000000000",
+        "subtype": "completed",
+        "constructs": [
+          "019a7120-0000-7000-8000-000000000a11"
+        ]
+      },
+      "talks": [
+        {
+          "type": "construct",
+          "id": "019a7120-0000-7000-8000-000000000a11"
+        }
+      ]
+    },
+    {
+      "name": "a-report-without-the-mark-linking-an-object-is-shown-with-no-talk",
+      "note": "A Narrative with supertype Report and no mark is lore, and nothing on the report page applies to it.",
+      "report": {
+        "id": "019a7120-0000-7000-8000-000000000a23",
+        "type": "narrative",
+        "supertype": "Report",
+        "subtype": "completed",
+        "objects": [
+          "019a7120-0000-7000-8000-000000000a01"
+        ]
+      },
+      "talks": []
+    },
+    {
+      "name": "a-report-whose-objects-hold-a-number-and-an-empty-string-is-shown-with-the-one-talk",
+      "note": "Its objects hold a number and the empty string beside one id: read as the room profile reads a line's entries, only the id names an element.",
+      "report": {
+        "id": "019a7120-0000-7000-8000-000000000a24",
+        "type": "narrative",
+        "supertype": "Report",
+        "x_room_of": "019a7120-0000-7000-8000-000000000000",
+        "subtype": "completed",
+        "objects": [
+          7,
+          "",
+          "019a7120-0000-7000-8000-000000000a01"
+        ]
+      },
+      "talks": [
+        {
+          "type": "object",
+          "id": "019a7120-0000-7000-8000-000000000a01"
+        }
+      ]
+    },
+    {
+      "name": "a-marked-message-linking-an-object-is-no-report-and-shown-with-no-talk",
+      "note": "A line in the room (the pair narrative + Message, with the mark) is no report: a report is the pair narrative + Report and the mark, both.",
+      "report": {
+        "id": "019a7120-0000-7000-8000-000000000a25",
+        "type": "narrative",
+        "supertype": "Message",
+        "x_room_of": "019a7120-0000-7000-8000-000000000000",
+        "objects": [
+          "019a7120-0000-7000-8000-000000000a01"
+        ]
+      },
+      "talks": []
+    },
+    {
+      "name": "a-report-reads-its-ids-as-written",
+      "note": "Its objects hold White_Space alone, which names nothing, an id in upper case and an id with a space after it: each of the two is read as written, never folded to lowercase or trimmed.",
+      "report": {
+        "id": "019a7120-0000-7000-8000-000000000a26",
+        "type": "narrative",
+        "supertype": "Report",
+        "x_room_of": "019a7120-0000-7000-8000-000000000000",
+        "subtype": "completed",
+        "objects": [
+          "  ",
+          "019A7120-0000-7000-8000-000000000A02",
+          "019a7120-0000-7000-8000-000000000a03 "
+        ]
+      },
+      "talks": [
+        {
+          "type": "object",
+          "id": "019A7120-0000-7000-8000-000000000A02"
+        },
+        {
+          "type": "object",
+          "id": "019a7120-0000-7000-8000-000000000a03 "
+        }
+      ]
     }
   ]
 }

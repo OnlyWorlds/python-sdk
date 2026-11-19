@@ -2,15 +2,20 @@
   "_what": "The recorded pin for the vendored OnlyWorlds schema distribution (codegen/schema-dist/, copied byte-exact). Do not edit by hand; re-vendor from the pinned tag and review the diff. Kept equal to the npm SDK's pin (github.com/OnlyWorlds/sdk, codegen/schema-pin.json) on purpose: two clients, one schema.",
   "_why_manifest_sha256": "Verifying the tree against its own MANIFEST.json only proves internal consistency. If the tag moved, the manifest moved with it. The hash recorded here is the one first accepted, which is what makes a moved tag visible.",
   "repo": "https://github.com/OnlyWorlds/schema-dist",
-  "tag": "v0.34.1-dist.134",
-  "commit": "700f04b6a99d5631e5e2b01072359d110282ad67",
-  "manifest_sha256": "199b4c9af2fcccaeeaa6ed2a27e41e76cb7dd2e491cdbd367741011982fdf174",
+  "tag": "v0.34.1-dist.136",
+  "commit": "56f5c029f6f485a9c448a5c112cfbdee669d03e6",
+  "manifest_sha256": "9a1f31d1135a17ffa0facca587ba354a90821bdb28dc46a4a7335cbfe7acfa91",
   "canonical_version": "00.34.01",
-  "dist_serial": 134,
-  "published": "2026-11-17",
-  "pinned_at": "2026-11-17",
-  "pinned_by": "The maintainer: tree from `git archive` of the tag in a schema-dist checkout (213 files: the 212 the MANIFEST lists, and MANIFEST.json itself); files re-hashed against MANIFEST.json by verify_dist.py; MANIFEST self-hash matched against the raw file GitHub serves at the tag, whose ref resolves to the commit above.",
+  "dist_serial": 136,
+  "published": "2026-11-19",
+  "pinned_at": "2026-11-19",
+  "pinned_by": "The maintainer: tree from `git archive` of the tag in a schema-dist checkout (214 files: the 213 the MANIFEST lists, and MANIFEST.json itself); files re-hashed against MANIFEST.json by verify_dist.py; MANIFEST self-hash matched against the raw file GitHub serves at the tag, whose ref resolves to the commit above.",
   "previous_pins": [
+    {
+      "tag": "v0.34.1-dist.134",
+      "manifest_sha256": "199b4c9af2fcccaeeaa6ed2a27e41e76cb7dd2e491cdbd367741011982fdf174",
+      "note": "superseded by v0.34.1-dist.136 (serials 135 and 136: room, report and charter talk and design lists, the packet fixture)"
+    },
     {
       "tag": "v0.34.1-dist.133",
       "manifest_sha256": "b0fe3a48684d2e90261f74b5c5b2382689e071a0af1709f359a174d45cc5324a",

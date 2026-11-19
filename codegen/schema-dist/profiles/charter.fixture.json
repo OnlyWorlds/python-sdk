@@ -4,11 +4,12 @@
   "notes": [
     "aids: an element is a reading aid when its type and supertype, each trimmed and folded as the room profile defines it, are one of pairs, and it carries mark.field, read by presence: any value but null, a string only when something is left after trimming White_Space, an empty list or an empty object never (serial 126). The pair without the mark is lore; the mark on no pair makes nothing. Wherever a type is compared to a kind (a pair, a hub's kind, a skill's being an Object), it is trimmed and folded as the room profile defines it.",
     "element: isCharterElement(element), in the room profile's matcher-case shape: element gives type, supertype and the mark as a body might carry them; is_charter_element is what the reader must answer, the pair AND the mark. A mark counts when its value is not null: a string only when something is left after the White_Space trim, an empty list or an empty object as absent, any other value (a number, a list or an object with something in it) as present; the value is never compared.",
-    "worlds: each world's elements as its owner is served them, the ids its hidden mark keeps from every reader but the owner, and its readers, in the lens fixture's shape. A reader's rung is owner (the whole world), contributor (the world less the hidden), guest (exactly the whole and known_of ids it lists; known_of is a stub: its id, type and name, its description and its dates, no link and no extension field) or public (the world less the hidden and the room elements, and nothing at all unless the world carries open: true, a world open to anyone). A case's world is a name in worlds or, as a graph case's is, a world of its own.",
+    "worlds: each world's elements as its owner is served them, the ids its hidden mark keeps from every reader but the owner, and its readers, in the lens fixture's shape. A reader's rung is owner (the whole world), contributor (the world less the hidden), guest (exactly the whole and known_of ids it lists; known_of is a stub, served as the lens profile serves one: its id, type, name, description, supertype, subtype and image_url, the server's times and its type's public fields, no link and no extension field) or public (the world less the hidden and the room elements, and nothing at all unless the world carries open: true, a world open to anyone). A case's world is a name in worlds or, as a graph case's is, a world of its own.",
     "a stub's standing: a stub serves no extension field, so whether an element the reader holds only as a stub is a reading aid is read from the element as the owner is served it; what the reading shows of it is what the stub serves.",
-    "charter: want is charterOf(world, reader). charter is {id, type, name, rules, skill} or null, type law: the newest marked Charter the reader sees, by created_at compared as instants (none sorts oldest), then the higher id by code point; rules the rules_field list as stored, [] when absent or null; skill the ids its description names (any id written as 8-4-4-4-12 hex, so every ow:// form, a site address and a bare id), in lowercase, each once in the order written, kept when it is an Object of this world the reader sees (served whole to every reader who reads the Charter; a hidden one is not seen and not kept), the first skill_max of those kept. guide is {id, type, name} or null, type construct, chosen the same way among marked Guides. domains is every marked Domain the reader sees, each {id, type, name, sentence, hubs}, type construct: in the order of the Guide's constructs as the reader is served them first (an id named twice keeps its first place, an entry that is no marked Domain is skipped), then the rest by folded name and then id; with no Guide seen, by folded name and id alone.",
+    "charter: want is charterOf(world, reader). charter is {id, type, name, rules, skill} or null, type law: the newest marked Charter the reader sees, by created_at compared as instants (none sorts oldest), then the higher id by code point; rules the rules_field list as stored, [] when absent or null; skill the ids its description names (any id written as 8-4-4-4-12 hex, so every ow:// form, a site address and a bare id), in lowercase, each once in the order written, kept when it is an Object of this world the reader sees (served whole to every reader who reads the Charter; one the hidden mark keeps from the reader is not seen and not kept), the first skill_max of those kept. guide is {id, type, name} or null, type construct, chosen the same way among marked Guides. domains is every marked Domain the reader sees, each {id, type, name, sentence, hubs}, type construct: in the order of the Guide's constructs as the reader is served them first (an id named twice keeps its first place, an entry that is no marked Domain is skipped), then the rest by folded name and then id; with no Guide seen, by folded name and id alone.",
     "sentence: the description as served, trimmed of White_Space at both ends, cut at its first line break (a line feed or a carriage return) and trimmed again, so its first line that holds something; an empty string when there is none. hubs: the distinct {type, id} the Domain's served link fields name, each an element of its field's kind in the reader's view (any other id names no hub), in hub_fields' order (the Construct's link fields, the schema's order) and each list's own order, the Domain itself excluded; a stub serves no links, so a stub Domain's hubs are [].",
-    "compare: objects are compared as values; the order of keys carries no meaning, so a reader that writes {type, id} or {id, type, name} in another order answers the same."
+    "compare: objects are compared as values; the order of keys carries no meaning, so a reader that writes {type, id} or {id, type, name} in another order answers the same.",
+    "design_cases: each case is a world of its own, a reader and want, every design part the reader sees: an Object or a Construct the reader is served whole (a known-of stub has none, though it is served its subtype) whose subtype, trimmed and folded as the room profile defines it, is in design or locked, in a world where charterOf finds a Charter for that reader; each {type, id, state}, type object or construct and state the page's word (in design or locked), whatever the spelling stored. want compares as a set."
   ],
   "pairs": [
     {
@@ -3036,6 +3037,530 @@
         ]
       },
       "note": "The answer is the room profile's (its trim, the White_Space set, and its fold, simple case folding by the C and S rows), never a language's own. Domains: an ideographic space each side of construct is trimmed (a Domain); con + U+FB06 + ruct is not construct, since the ligature has no simple folding (no Domain; a full fold would make one); CON + U+017F + TRUCT folds to construct, the long s to s (a Domain; lower-casing leaves it). Hubs: U+FEFF before Location is no White_Space, so the type is not location (no hub; a trim that takes a byte order mark would make one); location + U+001F likewise (no hub; a trim that takes the unit separator would make one); an em space, U+2003, before LOCATION is trimmed and the word folds (a hub). Birch Row is no Domain, so the order is Alder Quay, Cinder Point."
+    }
+  ],
+  "design_cases": [
+    {
+      "name": "a-locked-object-in-a-world-with-a-charter-is-a-design-part",
+      "note": "The world's Charter carries the mark: the Object's subtype locked is its design state.",
+      "world": {
+        "id": "019a7f00-0000-7000-8000-00000000f150",
+        "name": "Design 1",
+        "hidden": [],
+        "readers": {
+          "owner": {
+            "rung": "owner",
+            "character": null
+          }
+        },
+        "elements": [
+          {
+            "id": "019a7f00-0000-7000-8000-000000000600",
+            "type": "law",
+            "name": "Rules",
+            "supertype": "Charter",
+            "created_at": "2026-11-01T12:00:00Z",
+            "description": "The rules of the workshop.",
+            "x_charter_of": "019a7f00-0000-7000-8000-00000000f150"
+          },
+          {
+            "id": "019a7f00-0000-7000-8000-000000000601",
+            "type": "object",
+            "name": "Control panel",
+            "subtype": "locked",
+            "created_at": "2026-11-02T12:00:00Z"
+          }
+        ]
+      },
+      "reader": "owner",
+      "want": [
+        {
+          "type": "object",
+          "id": "019a7f00-0000-7000-8000-000000000601",
+          "state": "locked"
+        }
+      ]
+    },
+    {
+      "name": "a-construct-in-design-is-a-design-part",
+      "note": "A Construct carries the state as an Object does; no list of kinds decides it.",
+      "world": {
+        "id": "019a7f00-0000-7000-8000-00000000f151",
+        "name": "Design 2",
+        "hidden": [],
+        "readers": {
+          "owner": {
+            "rung": "owner",
+            "character": null
+          }
+        },
+        "elements": [
+          {
+            "id": "019a7f00-0000-7000-8000-000000000610",
+            "type": "law",
+            "name": "Rules",
+            "supertype": "Charter",
+            "created_at": "2026-11-01T12:00:00Z",
+            "description": "The rules of the workshop.",
+            "x_charter_of": "019a7f00-0000-7000-8000-00000000f151"
+          },
+          {
+            "id": "019a7f00-0000-7000-8000-000000000611",
+            "type": "construct",
+            "name": "Sign-in flow",
+            "subtype": "in design",
+            "created_at": "2026-11-02T12:00:00Z"
+          }
+        ]
+      },
+      "reader": "owner",
+      "want": [
+        {
+          "type": "construct",
+          "id": "019a7f00-0000-7000-8000-000000000611",
+          "state": "in design"
+        }
+      ]
+    },
+    {
+      "name": "a-subtype-with-a-capital-and-a-trailing-space-is-in-design",
+      "note": "The subtype is trimmed and folded as the room profile defines it; the state is the page's word, never the spelling stored.",
+      "world": {
+        "id": "019a7f00-0000-7000-8000-00000000f152",
+        "name": "Design 3",
+        "hidden": [],
+        "readers": {
+          "owner": {
+            "rung": "owner",
+            "character": null
+          }
+        },
+        "elements": [
+          {
+            "id": "019a7f00-0000-7000-8000-000000000620",
+            "type": "law",
+            "name": "Rules",
+            "supertype": "Charter",
+            "created_at": "2026-11-01T12:00:00Z",
+            "description": "The rules of the workshop.",
+            "x_charter_of": "019a7f00-0000-7000-8000-00000000f152"
+          },
+          {
+            "id": "019a7f00-0000-7000-8000-000000000621",
+            "type": "object",
+            "name": "Settings screen",
+            "subtype": "In Design ",
+            "created_at": "2026-11-02T12:00:00Z"
+          }
+        ]
+      },
+      "reader": "owner",
+      "want": [
+        {
+          "type": "object",
+          "id": "019a7f00-0000-7000-8000-000000000621",
+          "state": "in design"
+        }
+      ]
+    },
+    {
+      "name": "a-deprecated-construct-is-no-design-part",
+      "note": "A world's own further subtype is an ordinary subtype: no design state.",
+      "world": {
+        "id": "019a7f00-0000-7000-8000-00000000f153",
+        "name": "Design 4",
+        "hidden": [],
+        "readers": {
+          "owner": {
+            "rung": "owner",
+            "character": null
+          }
+        },
+        "elements": [
+          {
+            "id": "019a7f00-0000-7000-8000-000000000630",
+            "type": "law",
+            "name": "Rules",
+            "supertype": "Charter",
+            "created_at": "2026-11-01T12:00:00Z",
+            "description": "The rules of the workshop.",
+            "x_charter_of": "019a7f00-0000-7000-8000-00000000f153"
+          },
+          {
+            "id": "019a7f00-0000-7000-8000-000000000631",
+            "type": "construct",
+            "name": "Old export rule",
+            "subtype": "deprecated",
+            "created_at": "2026-11-02T12:00:00Z"
+          }
+        ]
+      },
+      "reader": "owner",
+      "want": []
+    },
+    {
+      "name": "a-law-with-a-subtype-is-no-design-part",
+      "note": "Only an Object or a Construct has a design state.",
+      "world": {
+        "id": "019a7f00-0000-7000-8000-00000000f154",
+        "name": "Design 5",
+        "hidden": [],
+        "readers": {
+          "owner": {
+            "rung": "owner",
+            "character": null
+          }
+        },
+        "elements": [
+          {
+            "id": "019a7f00-0000-7000-8000-000000000640",
+            "type": "law",
+            "name": "Rules",
+            "supertype": "Charter",
+            "created_at": "2026-11-01T12:00:00Z",
+            "description": "The rules of the workshop.",
+            "x_charter_of": "019a7f00-0000-7000-8000-00000000f154"
+          },
+          {
+            "id": "019a7f00-0000-7000-8000-000000000641",
+            "type": "law",
+            "name": "Naming rule",
+            "subtype": "accepted",
+            "created_at": "2026-11-02T12:00:00Z"
+          }
+        ]
+      },
+      "reader": "owner",
+      "want": []
+    },
+    {
+      "name": "a-locked-object-in-a-world-whose-charter-has-no-mark-is-no-design-part",
+      "note": "The world's only Law with supertype Charter has no mark, so charterOf finds no Charter and no element has a design state: locked is a word any world may use.",
+      "world": {
+        "id": "019a7f00-0000-7000-8000-00000000f155",
+        "name": "Design 6",
+        "hidden": [],
+        "readers": {
+          "owner": {
+            "rung": "owner",
+            "character": null
+          }
+        },
+        "elements": [
+          {
+            "id": "019a7f00-0000-7000-8000-000000000650",
+            "type": "law",
+            "name": "Rules",
+            "supertype": "Charter",
+            "created_at": "2026-11-01T12:00:00Z",
+            "description": "The rules of the workshop."
+          },
+          {
+            "id": "019a7f00-0000-7000-8000-000000000651",
+            "type": "object",
+            "name": "Control panel",
+            "subtype": "locked",
+            "created_at": "2026-11-02T12:00:00Z"
+          }
+        ]
+      },
+      "reader": "owner",
+      "want": []
+    },
+    {
+      "name": "a-workshops-spec-in-design-is-a-design-part",
+      "note": "The Construct is a room element (the room profile's pair construct + Spec, and the room's mark, which holds its sitting's id as a workshop's element does; the sitting's own mark holds the world's id): no kind is excluded, so its subtype in design is its design state in a world with a Charter.",
+      "world": {
+        "id": "019a7f00-0000-7000-8000-00000000f156",
+        "name": "Design 7",
+        "hidden": [],
+        "readers": {
+          "owner": {
+            "rung": "owner",
+            "character": null
+          }
+        },
+        "elements": [
+          {
+            "id": "019a7f00-0000-7000-8000-000000000660",
+            "type": "law",
+            "name": "Rules",
+            "supertype": "Charter",
+            "created_at": "2026-11-01T12:00:00Z",
+            "description": "The rules of the workshop.",
+            "x_charter_of": "019a7f00-0000-7000-8000-00000000f156"
+          },
+          {
+            "id": "019a7f00-0000-7000-8000-000000000662",
+            "type": "event",
+            "name": "Settings workshop",
+            "supertype": "Sitting",
+            "created_at": "2026-11-02T11:00:00Z",
+            "x_room_of": "019a7f00-0000-7000-8000-00000000f156"
+          },
+          {
+            "id": "019a7f00-0000-7000-8000-000000000661",
+            "type": "construct",
+            "name": "Settings screen",
+            "supertype": "Spec",
+            "subtype": "in design",
+            "created_at": "2026-11-02T12:00:00Z",
+            "x_room_of": "019a7f00-0000-7000-8000-000000000662"
+          }
+        ]
+      },
+      "reader": "owner",
+      "want": [
+        {
+          "type": "construct",
+          "id": "019a7f00-0000-7000-8000-000000000661",
+          "state": "in design"
+        }
+      ]
+    },
+    {
+      "name": "a-locked-law-is-no-design-part",
+      "note": "Only an Object or a Construct has a design state: a Law whose subtype is locked, in a world with a Charter, is no design part.",
+      "world": {
+        "id": "019a7f00-0000-7000-8000-00000000f157",
+        "name": "Design 8",
+        "hidden": [],
+        "readers": {
+          "owner": {
+            "rung": "owner",
+            "character": null
+          }
+        },
+        "elements": [
+          {
+            "id": "019a7f00-0000-7000-8000-000000000670",
+            "type": "law",
+            "name": "Rules",
+            "supertype": "Charter",
+            "created_at": "2026-11-01T12:00:00Z",
+            "description": "The rules of the workshop.",
+            "x_charter_of": "019a7f00-0000-7000-8000-00000000f157"
+          },
+          {
+            "id": "019a7f00-0000-7000-8000-000000000671",
+            "type": "law",
+            "name": "Naming rule",
+            "subtype": "locked",
+            "created_at": "2026-11-02T12:00:00Z"
+          }
+        ]
+      },
+      "reader": "owner",
+      "want": []
+    },
+    {
+      "name": "a-locked-object-with-a-unit-separator-after-it-has-no-design-state",
+      "note": "The subtype is locked followed by U+001F, the unit separator, which has no White_Space property: the room profile's trim leaves it, so the trimmed subtype is no design state (a language's own trim may take it).",
+      "world": {
+        "id": "019a7f00-0000-7000-8000-00000000f158",
+        "name": "Design 9",
+        "hidden": [],
+        "readers": {
+          "owner": {
+            "rung": "owner",
+            "character": null
+          }
+        },
+        "elements": [
+          {
+            "id": "019a7f00-0000-7000-8000-000000000680",
+            "type": "law",
+            "name": "Rules",
+            "supertype": "Charter",
+            "created_at": "2026-11-01T12:00:00Z",
+            "description": "The rules of the workshop.",
+            "x_charter_of": "019a7f00-0000-7000-8000-00000000f158"
+          },
+          {
+            "id": "019a7f00-0000-7000-8000-000000000681",
+            "type": "object",
+            "name": "Control panel",
+            "subtype": "locked\u001f",
+            "created_at": "2026-11-02T12:00:00Z"
+          }
+        ]
+      },
+      "reader": "owner",
+      "want": []
+    },
+    {
+      "name": "a-locked-object-a-guest-holds-only-as-a-stub-has-no-design-state",
+      "note": "The guest reads the marked Charter whole and holds the Object only as a known-of stub, which is served its subtype locked (the lens profile): the state is read only from an element served whole, so the stub has none.",
+      "world": {
+        "id": "019a7f00-0000-7000-8000-00000000f159",
+        "name": "Design 10",
+        "hidden": [],
+        "readers": {
+          "owner": {
+            "rung": "owner",
+            "character": null
+          },
+          "guest": {
+            "rung": "guest",
+            "character": null,
+            "whole": [
+              "019a7f00-0000-7000-8000-000000000690"
+            ],
+            "known_of": [
+              "019a7f00-0000-7000-8000-000000000691"
+            ]
+          }
+        },
+        "elements": [
+          {
+            "id": "019a7f00-0000-7000-8000-000000000690",
+            "type": "law",
+            "name": "Rules",
+            "supertype": "Charter",
+            "created_at": "2026-11-01T12:00:00Z",
+            "description": "The rules of the workshop.",
+            "x_charter_of": "019a7f00-0000-7000-8000-00000000f159"
+          },
+          {
+            "id": "019a7f00-0000-7000-8000-000000000691",
+            "type": "object",
+            "name": "Control panel",
+            "subtype": "locked",
+            "created_at": "2026-11-02T12:00:00Z"
+          }
+        ]
+      },
+      "reader": "guest",
+      "want": []
+    },
+    {
+      "name": "a-hidden-charter-gives-its-owner-a-design-part",
+      "note": "The world's marked Charter carries the hidden mark. Its owner sees it, so the locked Object is a design part for the owner. The next case is the same world read by a contributor.",
+      "world": {
+        "id": "019a7f00-0000-7000-8000-00000000f15a",
+        "name": "Design 11",
+        "hidden": [
+          "019a7f00-0000-7000-8000-0000000006a0"
+        ],
+        "readers": {
+          "owner": {
+            "rung": "owner",
+            "character": null
+          },
+          "contributor": {
+            "rung": "contributor",
+            "character": null
+          }
+        },
+        "elements": [
+          {
+            "id": "019a7f00-0000-7000-8000-0000000006a0",
+            "type": "law",
+            "name": "Rules",
+            "supertype": "Charter",
+            "created_at": "2026-11-01T12:00:00Z",
+            "description": "The rules of the workshop.",
+            "x_charter_of": "019a7f00-0000-7000-8000-00000000f15a"
+          },
+          {
+            "id": "019a7f00-0000-7000-8000-0000000006a1",
+            "type": "object",
+            "name": "Control panel",
+            "subtype": "locked",
+            "created_at": "2026-11-02T12:00:00Z"
+          }
+        ]
+      },
+      "reader": "owner",
+      "want": [
+        {
+          "type": "object",
+          "id": "019a7f00-0000-7000-8000-0000000006a1",
+          "state": "locked"
+        }
+      ]
+    },
+    {
+      "name": "a-hidden-charter-gives-a-contributor-no-design-part",
+      "note": "The same world as the case before, read by a contributor: the hidden mark keeps the Charter from it, and it wins over rule 5, so charterOf finds no Charter for this reader and the locked Object, which it reads whole, has no design state.",
+      "world": {
+        "id": "019a7f00-0000-7000-8000-00000000f15a",
+        "name": "Design 11",
+        "hidden": [
+          "019a7f00-0000-7000-8000-0000000006a0"
+        ],
+        "readers": {
+          "owner": {
+            "rung": "owner",
+            "character": null
+          },
+          "contributor": {
+            "rung": "contributor",
+            "character": null
+          }
+        },
+        "elements": [
+          {
+            "id": "019a7f00-0000-7000-8000-0000000006a0",
+            "type": "law",
+            "name": "Rules",
+            "supertype": "Charter",
+            "created_at": "2026-11-01T12:00:00Z",
+            "description": "The rules of the workshop.",
+            "x_charter_of": "019a7f00-0000-7000-8000-00000000f15a"
+          },
+          {
+            "id": "019a7f00-0000-7000-8000-0000000006a1",
+            "type": "object",
+            "name": "Control panel",
+            "subtype": "locked",
+            "created_at": "2026-11-02T12:00:00Z"
+          }
+        ]
+      },
+      "reader": "contributor",
+      "want": []
+    },
+    {
+      "name": "a-part-whose-type-is-stored-with-spaces-and-a-capital-is-written-object",
+      "note": "The Object's type is stored as \" Object \": trimmed and folded it is an Object, and its type in the answer is object, the kind's own word, as the packet writes a type.",
+      "world": {
+        "id": "019a7f00-0000-7000-8000-00000000f15b",
+        "name": "Design 12",
+        "hidden": [],
+        "readers": {
+          "owner": {
+            "rung": "owner",
+            "character": null
+          }
+        },
+        "elements": [
+          {
+            "id": "019a7f00-0000-7000-8000-0000000006b0",
+            "type": "law",
+            "name": "Rules",
+            "supertype": "Charter",
+            "created_at": "2026-11-01T12:00:00Z",
+            "description": "The rules of the workshop.",
+            "x_charter_of": "019a7f00-0000-7000-8000-00000000f15b"
+          },
+          {
+            "id": "019a7f00-0000-7000-8000-0000000006b1",
+            "type": " Object ",
+            "name": "Control panel",
+            "subtype": "locked",
+            "created_at": "2026-11-02T12:00:00Z"
+          }
+        ]
+      },
+      "reader": "owner",
+      "want": [
+        {
+          "type": "object",
+          "id": "019a7f00-0000-7000-8000-0000000006b1",
+          "state": "locked"
+        }
+      ]
     }
   ]
 }
