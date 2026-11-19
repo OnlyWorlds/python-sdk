@@ -4,6 +4,11 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+- **The schema pin moves to `v0.34.1-dist.136`** (serials 135 and 136; canonical 00.34.01 unchanged, no schema file moved, `_schema.py` changes only its provenance lines). Serial 135 adds a talk on an Object or a Construct to the room and report pages, the design state to the charter page (and that a Charter the hidden mark keeps from a reader is not that reader's), and three new fixture lists; serial 136 adds the packet page's `standing` state, `x_packet_from` and its first fixture, which no reader in this package reads yet.
+- **`talks_of(element)`**: the talks on an Object or a Construct that a line in the room (`narrative` + `Message`, with the mark) is in, each `{type, id}` from its `objects` and `constructs`, the id as written; `[]` for anything that is no line.
+- **`report_talks_of(narrative)`**: the talks a reader shows a report with, every Object and Construct its `objects` and `constructs` name, read as `talks_of` reads a line's; `[]` for a Narrative that is no report.
+- **`design_parts_of(world, reader)`**: the design parts a reader reads, each `{type, id, state}`, an Object or a Construct served whole whose `subtype`, trimmed and folded, is `in design` or `locked`, only when `charter_of` finds a Charter for that reader; `[]` otherwise.
+- Tests: the room fixture's 13 talk cases, the report fixture's 6 and the charter fixture's 13 design cases, each its own test, and the package's own cases beside them.
 - Tests: CI runs the whole suite against the built wheel, installed in place of the source tree (on Python 3.12), and checks that the wheel holds every tracked file of the package and nothing else. A wheel built without the vendored folder checker failed both, where the source run passes. The release runs the suite against the wheel it uploads, too, before publishing.
 - Tests: every Python example in the README is type-checked with `mypy --strict` against the installed package, each block on its own, so a renamed function, a keyword or an export the package no longer has fails before the README ships.
 - README: the folder example now checks that `folder.world` is present before reading its name (`None` when `world.json` is missing or unreadable), so it type-checks under `mypy --strict`.

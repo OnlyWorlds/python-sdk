@@ -1,4 +1,5 @@
-"""The report profile (schema-dist ``profiles/report.md``): rule 9, threads of reports (serial 120).
+"""The report profile (schema-dist ``profiles/report.md``): rule 9, threads of reports (serial 120), and the talks a
+report is shown with (``report_talks_of``, serial 135).
 
 A report is what a session, or a closed talk, leaves behind in a world: a Narrative whose type and supertype are
 the room profile's pair ``narrative`` + ``Report`` AND that carries the room's mark ``x_room_of``, read by presence
@@ -30,7 +31,7 @@ from typing import Any, Literal, TypedDict
 from ._schema import ROOM_PAIRS
 from .address import AddressReading, find_ow_links
 from .message import _in_created_at_order, _matches
-from .room import _WHITE_SPACE, is_room_element
+from .room import _WHITE_SPACE, Talk, _named_talks, is_room_element
 
 __all__ = [
     "ReportGroup",
@@ -40,6 +41,7 @@ __all__ = [
     "ReportThreads",
     "read_report_line",
     "read_report_lines",
+    "report_talks_of",
     "report_threads_of",
 ]
 
@@ -183,6 +185,23 @@ def report_threads_of(narratives: Iterable[Mapping[str, Any]]) -> ReportThreads:
         for parent in sorted(members, key=position.__getitem__)
     ]
     return {"parents": parents, "groups": groups, "lints": lints}
+
+
+def report_talks_of(narrative: Mapping[str, Any]) -> list[Talk]:
+    """The talks on an element a reader shows a report with (the report profile, serial 135): every Object its
+    ``objects`` name and every Construct its ``constructs`` name, read entry by entry as ``talks_of`` reads a line's.
+
+    A report is the pair ``narrative`` + ``Report`` and the room's mark, both, as ``report_threads_of`` reads one.
+    Each id in ``objects`` is ``{"type": "object", "id": id}``, each in ``constructs`` ``{"type": "construct", "id":
+    id}``; an entry that is not a string, or is empty once trimmed of White_Space, names nothing, a field that is not
+    a list names nothing, and every other entry is the id as written, untrimmed and with its case. Each ``{type, id}``
+    once, in its first place, the objects before the constructs. A report links every Object and Construct it touched
+    or changed, so none of these is named as the talk it closed: from the report alone no reader can tell. A Narrative
+    that is no report (one without the mark, a line in the room, a board entry, anything that is not a mapping)
+    answers ``[]``. The npm SDK's ``reportTalksOf`` is the same reader."""
+    if not isinstance(narrative, Mapping) or not _is_marked(narrative, _REPORT_PAIR):
+        return []
+    return _named_talks(narrative)
 
 
 # ---- A line of ``consequences`` (the report profile's lines rulings: what a line is, its address, its shown words)

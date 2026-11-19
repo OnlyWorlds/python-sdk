@@ -12,7 +12,8 @@ reader sees the world, and ``domains_of`` the list alone: keel serves the same p
 the lens reader's (``resolve_lens``): the elements as the owner is served them, the ids the hidden mark keeps, and a
 reader by its rung; the view and each served body are that reader's, never a second copy. The fixture
 (``codegen/schema-dist/profiles/charter.fixture.json``) is replayed whole by ``tests/test_charter.py``; the npm
-SDK's ``charterOf`` and ``domainsOf`` give the same answers on the same input.
+SDK's ``charterOf`` and ``domainsOf`` give the same answers on the same input. ``design_parts_of`` (serial 135)
+reads the design parts the same reader reads, gated on ``charter_of`` finding a Charter for that reader.
 """
 
 from __future__ import annotations
@@ -20,7 +21,7 @@ from __future__ import annotations
 import copy
 import re
 from collections.abc import Mapping
-from typing import Any, Literal, TypedDict
+from typing import Any, Literal, TypedDict, cast
 
 from ._schema import LINK_TARGETS
 from .checks import CHECKS_FIELD
@@ -33,9 +34,12 @@ __all__ = [
     "CharterHub",
     "CharterPacket",
     "CharterRead",
+    "DesignPart",
+    "DesignState",
     "DomainRead",
     "GuideRead",
     "charter_of",
+    "design_parts_of",
     "domains_of",
 ]
 
@@ -181,10 +185,18 @@ def charter_of(world: Mapping[str, Any], reader: Mapping[str, Any]) -> CharterPa
     then the rest by folded name and then id. A Domain the reader knows only as a stub has its served name and
     sentence and no hubs; a hidden one is not there. Whether an element is an aid is read from the element as the
     owner is served it, since a stub serves no mark. The npm SDK's ``charterOf`` gives the same answer."""
+    return _packet(world, _reading(world, reader, "charter_of"))
+
+
+def _reading(world: Mapping[str, Any], reader: Mapping[str, Any], fn: str) -> _Reading:
     if not isinstance(world, Mapping) or not isinstance(world.get("elements"), list):
-        raise TypeError("charter_of: world is a mapping with an elements list.")
-    _check_reader(reader, "charter_of: reader")
-    r = _Reading(world, reader, None)
+        raise TypeError(f"{fn}: world is a mapping with an elements list.")
+    _check_reader(reader, f"{fn}: reader")
+    return _Reading(world, reader, None)
+
+
+def _packet(world: Mapping[str, Any], r: _Reading) -> CharterPacket:
+    """``charter_of``'s answer from one reading of the world."""
     if r.seen_rung == "public" and world.get("open") is not True:
         return {"charter": None, "guide": None, "domains": []}
 
@@ -230,3 +242,53 @@ def charter_of(world: Mapping[str, Any], reader: Mapping[str, Any]) -> CharterPa
 def domains_of(world: Mapping[str, Any], reader: Mapping[str, Any]) -> list[DomainRead]:
     """The Domains alone, as ``charter_of`` lists them for ``reader``."""
     return charter_of(world, reader)["domains"]
+
+
+#: The two design states, as the charter profile writes them (serial 135).
+DesignState = Literal["in design", "locked"]
+
+_DESIGN_STATES: frozenset[str] = frozenset({"in design", "locked"})
+_DESIGN_TYPES: frozenset[str] = frozenset({"object", "construct"})
+
+
+class DesignPart(TypedDict):
+    """One design part: an Object or a Construct whose ``subtype`` is a design state. ``type`` is the kind's own word
+    (``object`` or ``construct``), whatever spelling the element's type is stored in."""
+
+    type: Literal["object", "construct"]
+    id: str
+    state: DesignState
+
+
+def design_parts_of(world: Mapping[str, Any], reader: Mapping[str, Any]) -> list[DesignPart]:
+    """The design parts ``reader`` reads in ``world`` (schema-dist ``profiles/charter.md``, the design state, serial
+    135): each ``{type, id, state}``, in the world's element order (the page orders no parts).
+
+    ``world`` and ``reader`` are ``charter_of``'s. The gate is the Charter: when ``charter_of`` finds a Charter for
+    this reader (a marked Charter Law, settled, that the reader sees; one the hidden mark keeps from the reader is not
+    its), every Object or Construct the reader is served whole whose ``subtype``, trimmed and folded as the room
+    profile defines it, is ``in design`` or ``locked`` is a design part, its state that word whatever the spelling
+    stored (``In Design `` is ``in design``). No Charter for this reader: ``[]``, whatever the subtypes, even where
+    another reader of the same world reads parts. A known-of stub has no design state though it is served its
+    subtype; a hidden or proposed element is read exactly as ``charter_of``'s view reads it. The state alone makes a
+    part, whatever the supertype: a room element's Spec counts. No other subtype and no other type has a design
+    state. Pure: nothing is stored or written. The npm SDK's ``designPartsOf`` gives the same answer."""
+    r = _reading(world, reader, "design_parts_of")
+    if _packet(world, r)["charter"] is None:
+        return []
+    parts: list[DesignPart] = []
+    for eid in r.order:
+        kind = r.type_of[eid]
+        if kind not in _DESIGN_TYPES or eid not in r.view or eid in r.stubs:
+            continue
+        subtype = r.body(eid).get("subtype")
+        state = _fold(subtype) if isinstance(subtype, str) else None
+        if state in _DESIGN_STATES:
+            parts.append(
+                {
+                    "type": cast(Literal["object", "construct"], kind),
+                    "id": eid,
+                    "state": cast(DesignState, state),
+                }
+            )
+    return parts

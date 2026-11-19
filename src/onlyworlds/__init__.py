@@ -39,9 +39,12 @@ from .charter import (
     CharterHub,
     CharterPacket,
     CharterRead,
+    DesignPart,
+    DesignState,
     DomainRead,
     GuideRead,
     charter_of,
+    design_parts_of,
     domains_of,
 )
 from .checks import CHECKS_FIELD, CheckRow, apply_checks
@@ -136,10 +139,11 @@ from .report import (
     ReportThreads,
     read_report_line,
     read_report_lines,
+    report_talks_of,
     report_threads_of,
 )
 from .review import PROPOSED_MARK, ProposedMark, hands_on_as_proposed, proposed_mark_of
-from .room import is_charter_element, is_room_element, reading_aid_of
+from .room import Talk, is_charter_element, is_room_element, reading_aid_of, talks_of
 from .spine import SPINE_KINDS, SpineRead, read_spine_element
 from .strand import STRAND_FIELD, Strand, StrandSlot, strand_of
 from .worldfile import (
@@ -196,6 +200,8 @@ __all__ = [
     "CharterRead",
     "CheckRow",
     "Client",
+    "DesignPart",
+    "DesignState",
     "DomainRead",
     "Door",
     "EditRead",
@@ -242,6 +248,7 @@ __all__ = [
     "StaleProposal",
     "Strand",
     "StrandSlot",
+    "Talk",
     "Tool",
     "ToolOpen",
     "TrailHanger",
@@ -264,6 +271,7 @@ __all__ = [
     "check_kinds",
     "date_of",
     "degree_of",
+    "design_parts_of",
     "domains_of",
     "door_where",
     "doors_of",
@@ -312,6 +320,7 @@ __all__ = [
     "recipients_of",
     "record_mark_of",
     "records_of",
+    "report_talks_of",
     "report_threads_of",
     "resolve_filenames",
     "resolve_lens",
@@ -319,6 +328,7 @@ __all__ = [
     "sender_status",
     "slugify",
     "strand_of",
+    "talks_of",
     "thread_of",
     "trail_by_place",
     "type_word",

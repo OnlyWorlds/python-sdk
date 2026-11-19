@@ -1,8 +1,8 @@
 """The charter profile (schema-dist ``profiles/charter.md``, serial 83): every conformance case in
 ``codegen/schema-dist/profiles/charter.fixture.json``, vendored with the distribution, each its own test, through
 ``charter_of`` and ``domains_of`` (the packet) and ``is_charter_element`` (the pair and the mark), and the
-fixture's tables read back against the package's. The npm SDK's ``charterOf``, ``domainsOf`` and
-``isCharterElement`` run the same cases."""
+fixture's tables read back against the package's, and every design case (serial 135) through ``design_parts_of``.
+The npm SDK's ``charterOf``, ``domainsOf``, ``isCharterElement`` and ``designPartsOf`` run the same cases."""
 
 from __future__ import annotations
 
@@ -21,6 +21,7 @@ from onlyworlds import (
     SKILL_MAX,
     FolderElement,
     charter_of,
+    design_parts_of,
     domains_of,
     is_charter_element,
     reading_aid_of,
@@ -164,3 +165,122 @@ def test_reading_aid_of_reads_the_pair_alone() -> None:
     bad: list[Any] = [None, "law/charter", 7, ["law", "Charter"], {"type": "law"}, {"type": "law", "supertype": None}]
     for b in [*bad, {"supertype": "Charter"}]:
         assert reading_aid_of(b) is None, b
+
+
+# ---- The design state (charter.md, serial 135): design_parts_of over the fixture's design_cases
+
+DESIGN_CASES: list[dict[str, Any]] = DOC["design_cases"]
+
+
+def part_set(rows: list[Any]) -> set[tuple[str, str, str]]:
+    return {(row["type"], row["id"], row["state"]) for row in rows}
+
+
+def test_the_fixture_holds_serial_135s_design_cases() -> None:
+    assert len(DESIGN_CASES) == 13, f"the fixture holds {len(DESIGN_CASES)} design cases, serial 135 has 13"
+    assert len({c["name"] for c in DESIGN_CASES}) == 13
+
+
+@pytest.mark.parametrize("case", DESIGN_CASES, ids=lambda c: c["name"])
+def test_design_parts_of(case: dict[str, Any]) -> None:
+    """Compared as a set, as the page says; each part once."""
+    world = world_of(case)
+    before = json.dumps(world, sort_keys=True)
+    reader = reader_of(world, case["reader"])
+    got = design_parts_of(world, reader)
+    assert part_set(got) == part_set(case["want"]), case.get("note")
+    assert len(got) == len(part_set(got)), f"a part twice: {got}"
+    assert json.dumps(world, sort_keys=True) == before, "design_parts_of moved the world"
+    # The owner reading as this reader reads this reader's parts.
+    assert part_set(design_parts_of(world, {"rung": "owner", "as": reader})) == part_set(case["want"])
+
+
+CHARTER = {
+    "id": "c0",
+    "type": "law",
+    "name": "Rules",
+    "supertype": "Charter",
+    "created_at": "2026-11-01T12:00:00Z",
+    "x_charter_of": "w",
+}
+
+
+def design_world(*parts: dict[str, Any], charter: dict[str, Any] | None = None, **more: Any) -> dict[str, Any]:
+    return {"id": "w", "hidden": [], "elements": [charter or CHARTER, *parts], **more}
+
+
+def test_design_parts_come_in_the_worlds_order() -> None:
+    # The package's own case: the page orders no parts; design_parts_of keeps the world's element order.
+    world = design_world(
+        {"id": "b", "type": "construct", "name": "B", "subtype": "locked"},
+        {"id": "a", "type": "object", "name": "A", "subtype": "in design"},
+    )
+    assert design_parts_of(world, {"rung": "owner"}) == [
+        {"type": "construct", "id": "b", "state": "locked"},
+        {"type": "object", "id": "a", "state": "in design"},
+    ]
+
+
+def test_the_subtype_is_trimmed_of_white_space_and_folded() -> None:
+    # The package's own case: White_Space at both ends goes, U+001C (str.strip's, no White_Space) stays, the fold is
+    # simple case folding, and a space inside is no match.
+    world = design_world(
+        {"id": "o1", "type": "object", "subtype": chr(0xA0) + "LOCKED" + chr(0x3000)},
+        {"id": "o2", "type": "object", "subtype": "\tIn DESIGN\n"},
+        {"id": "o3", "type": "object", "subtype": chr(0x1C) + "locked"},
+        {"id": "o4", "type": "object", "subtype": "in  design"},
+        {"id": "o5", "type": "object", "subtype": "indesign"},
+        {"id": "o6", "type": "object", "subtype": ["locked"]},
+        {"id": "o7", "type": "object", "subtype": None},
+        {"id": "o8", "type": "object", "supertype": "locked"},
+    )
+    assert design_parts_of(world, {"rung": "owner"}) == [
+        {"type": "object", "id": "o1", "state": "locked"},
+        {"type": "object", "id": "o2", "state": "in design"},
+    ]
+
+
+def test_a_proposed_charter_or_part_and_a_hidden_part_are_read_as_charter_of_reads_them() -> None:
+    # The package's own case: a proposed Charter opens no gate (charter.md: "or only a proposed one"); a proposed
+    # Object is in no reader's view; a hidden Object is a part for the owner and not there for a contributor.
+    part = {"id": "o1", "type": "object", "subtype": "locked"}
+    proposed_charter = {**CHARTER, "x_review_proposed": "is this ours?"}
+    assert design_parts_of(design_world(part, charter=proposed_charter), {"rung": "owner"}) == []
+    proposed_part = {"id": "o2", "type": "object", "subtype": "locked", "x_review_proposed": "real?"}
+    assert design_parts_of(design_world(part, proposed_part), {"rung": "owner"}) == [
+        {"type": "object", "id": "o1", "state": "locked"}
+    ]
+    hidden = design_world(part, {"id": "o3", "type": "construct", "subtype": "locked"}, hidden=["o3"])
+    assert [p["id"] for p in design_parts_of(hidden, {"rung": "owner"})] == ["o1", "o3"]
+    assert [p["id"] for p in design_parts_of(hidden, {"rung": "contributor"})] == ["o1"]
+
+
+def test_a_guest_reads_parts_only_on_what_it_holds_whole() -> None:
+    # The package's own case: the Charter as a stub still opens the gate (charter_of reads a stub's standing from the
+    # owner's element); an Object held whole is a part, one held as a stub is none, one not held is not there.
+    world = design_world(
+        {"id": "o1", "type": "object", "subtype": "locked"},
+        {"id": "o2", "type": "object", "subtype": "locked"},
+        {"id": "o3", "type": "object", "subtype": "locked"},
+    )
+    guest = {"rung": "guest", "whole": ["o1"], "known_of": ["c0", "o2"]}
+    assert charter_of(world, guest)["charter"] is not None
+    assert design_parts_of(world, guest) == [{"type": "object", "id": "o1", "state": "locked"}]
+    assert design_parts_of(world, {"rung": "guest", "whole": ["o1"], "known_of": []}) == []
+
+
+def test_a_public_reader_reads_parts_only_in_a_world_open_to_anyone() -> None:
+    # The package's own case.
+    part = {"id": "o1", "type": "object", "subtype": "locked"}
+    assert design_parts_of(design_world(part), {"rung": "public"}) == []
+    assert design_parts_of(design_world(part, open=True), {"rung": "public"}) == [
+        {"type": "object", "id": "o1", "state": "locked"}
+    ]
+
+
+def test_design_parts_of_refuses_what_is_not_a_reading() -> None:
+    with pytest.raises(TypeError):
+        design_parts_of({}, {"rung": "owner"})
+    with pytest.raises(TypeError):
+        design_parts_of({"elements": []}, {"rung": "admin"})
+    assert design_parts_of({"elements": []}, {"rung": "owner"}) == []

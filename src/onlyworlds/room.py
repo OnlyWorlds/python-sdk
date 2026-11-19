@@ -8,22 +8,31 @@ pairs; ``is_room_element`` reads the pair and the mark together. A lore view (a 
 a graph, a link picker, a story's context, a survey) leaves room elements out unless the person asks;
 the room's own views show them whole. A writer writes them like any element, the mark kept byte for
 byte: the rule is the reader's. A convention on the 22 types, never a change to the standard. The npm
-SDK's ``isRoomElement`` is the same matcher, with the same fold.
+SDK's ``isRoomElement`` is the same matcher, with the same fold. ``talks_of`` (serial 135) reads the talks on an
+Object or a Construct that a line in the room is in.
 """
 
 from __future__ import annotations
 
 from collections.abc import Mapping
-from typing import Any, Literal, cast
+from typing import Any, Literal, TypedDict, cast
 
 from ._schema import READING_AID_MARK, READING_AID_PAIRS, ROOM_MARK, ROOM_PAIRS
 from .folder import FolderElement
 from .worldfile import simple_case_fold
 
-__all__ = ["ROOM_PAIRS", "is_charter_element", "is_room_element", "reading_aid_of"]
+__all__ = ["ROOM_PAIRS", "Talk", "is_charter_element", "is_room_element", "reading_aid_of", "talks_of"]
 
 #: The three reading aids, as the charter profile names them (``profiles/charter.fixture.json``'s ``aid``).
 ReadingAid = Literal["charter", "guide", "domain"]
+
+
+class Talk(TypedDict):
+    """A talk on an element (the room profile, serial 135): ``object`` for an id a line or a report names in its
+    ``objects``, ``construct`` for one in its ``constructs``; the id as written."""
+
+    type: Literal["object", "construct"]
+    id: str
 
 
 _WHITE_SPACE: str = "".join(
@@ -98,6 +107,76 @@ def is_room_element(element: Mapping[str, Any] | FolderElement) -> bool:
         return False
     key = (_fold(kind), _fold(supertype))
     return any((_fold(t), _fold(s)) == key for t, s in ROOM_PAIRS)
+
+
+def _body_and_kind(element: Any) -> tuple[Mapping[str, Any], Any] | None:
+    if isinstance(element, FolderElement):
+        return element.body, element.type
+    if isinstance(element, Mapping):
+        return element, element.get("type")
+    return None
+
+
+def _is_pair(element: Any, pair: tuple[str, str]) -> bool:
+    """The element's type and supertype, each trimmed and folded as ``is_room_element`` reads them, are ``pair``."""
+    found = _body_and_kind(element)
+    if found is None:
+        return False
+    body, kind = found
+    supertype = body.get("supertype")
+    if not isinstance(kind, str) or not isinstance(supertype, str):
+        return False
+    return (_fold(kind), _fold(supertype)) == (_fold(pair[0]), _fold(pair[1]))
+
+
+_TALK_FIELDS: tuple[tuple[str, Literal["object", "construct"]], ...] = (
+    ("objects", "object"),
+    ("constructs", "construct"),
+)
+"""The only two fields that make a talk on an element, in the order their talks are answered."""
+
+
+def _named_talks(body: Mapping[str, Any]) -> list[Talk]:
+    """The talks a line or a report names (the room profile, serial 135): each id in ``objects`` an Object's, each
+    in ``constructs`` a Construct's. An entry that is not a string, or is empty once trimmed of White_Space, names
+    nothing, and a field that is not a list names nothing; every other entry is the id as written, untrimmed and
+    with its case. Each ``{type, id}`` once, in its first place, the objects before the constructs."""
+    out: list[Talk] = []
+    seen: set[tuple[str, str]] = set()
+    for field, kind in _TALK_FIELDS:
+        value = body.get(field)
+        if not isinstance(value, list):
+            continue
+        for entry in value:
+            if not isinstance(entry, str) or entry.strip(_WHITE_SPACE) == "":
+                continue
+            if (kind, entry) not in seen:
+                seen.add((kind, entry))
+                out.append({"type": kind, "id": entry})
+    return out
+
+
+_LINE_PAIR: tuple[str, str] = next(p for p in ROOM_PAIRS if (_fold(p[0]), _fold(p[1])) == ("narrative", "message"))
+"""A line in the room: the room profile's pair ``narrative`` + ``Message``, with the mark."""
+
+
+def talks_of(element: Mapping[str, Any] | FolderElement) -> list[Talk]:
+    """The talks on an element that ``element`` is in as a line (schema-dist ``profiles/room.md``, serial 135).
+
+    Only a line in the room is in a talk: the pair ``narrative`` + ``Message`` and the mark ``x_room_of``, read as
+    ``is_room_element`` reads them. Each id in its ``objects`` is ``{"type": "object", "id": id}``, each in its
+    ``constructs`` ``{"type": "construct", "id": id}``. An entry that is not a string, or is empty once trimmed of
+    White_Space, names nothing, and a field that is not a list names nothing; every other entry is the id as written,
+    a space left on it and its case included (the address profile's "The same id"), so ``ABC`` and ``abc`` are two
+    talks. Each ``{type, id}`` comes once, in its first place, the objects before the constructs. A line's
+    ``characters`` are its recipients and make no talk, and no other field does. Any other element (a Message
+    without the mark, a board entry, a report, lore, anything that is no element) answers ``[]``. Takes a body or a
+    ``FolderElement``. The npm SDK's ``talksOf`` is the same reader."""
+    if not is_room_element(element) or not _is_pair(element, _LINE_PAIR):
+        return []
+    found = _body_and_kind(element)
+    assert found is not None
+    return _named_talks(found[0])
 
 
 _READING_AID_KEYS: frozenset[str] = frozenset(f"{_fold(t)}/{_fold(s)}" for t, s in READING_AID_PAIRS)

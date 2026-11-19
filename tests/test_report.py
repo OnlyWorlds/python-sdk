@@ -1,6 +1,7 @@
 """The report profile's rule 9 (schema-dist ``profiles/report.md``, serial 120): every thread case in
 ``codegen/schema-dist/profiles/report.fixture.json``, vendored with the distribution, replayed through
-``report_threads_of``; then the edges the fixture leaves out."""
+``report_threads_of``, and every talk case (serial 135) through ``report_talks_of``; then the edges the
+fixture leaves out."""
 
 from __future__ import annotations
 
@@ -10,7 +11,7 @@ from typing import Any
 
 import pytest
 
-from onlyworlds import ROOM_PAIRS, ReportThreads, report_threads_of
+from onlyworlds import ROOM_PAIRS, ReportThreads, report_talks_of, report_threads_of
 from onlyworlds._schema import ROOM_MARK
 
 REPO = Path(__file__).resolve().parent.parent
@@ -220,3 +221,60 @@ def test_a_group_is_ordered_by_instant_never_by_id_or_text() -> None:
         ]
     )
     assert got["groups"] == [{"parent": "r1", "kind": "report", "reports": ["a", "c", "d", "b"]}]
+
+
+# ---- The talks a report is shown with (report.md, serial 135): report_talks_of over the fixture's talk_cases
+
+TALK_CASES = 6
+
+
+def talk_cases() -> list[Any]:
+    return list(load_fixture()["talk_cases"]) if FIXTURE.is_file() else []
+
+
+def test_the_fixture_holds_serial_135s_talk_cases() -> None:
+    cases = load_fixture()["talk_cases"]
+    assert len(cases) == TALK_CASES, f"{len(cases)} talk cases; this test was written for {TALK_CASES}"
+    assert len({c["name"] for c in cases}) == TALK_CASES
+
+
+@pytest.mark.parametrize("case", talk_cases(), ids=lambda c: str(c.get("name")))
+def test_talk_case(case: dict[str, Any]) -> None:
+    """Compared as a set, as the page says; each talk once."""
+    before = json.dumps(case["report"], sort_keys=True)
+    got = report_talks_of(case["report"])
+    assert {(t["type"], t["id"]) for t in got} == {(t["type"], t["id"]) for t in case["talks"]}, case.get("note")
+    assert len(got) == len({(t["type"], t["id"]) for t in got}), f"a talk twice: {got}"
+    assert json.dumps(case["report"], sort_keys=True) == before, "report_talks_of moved the report"
+
+
+def test_a_reports_talks_come_once_in_first_place_objects_before_constructs() -> None:
+    # The package's own case: the order report_talks_of promises, a duplicate id, a space left on an id, upper case.
+    r = report("r1", constructs=["k", "o"], objects=["o", " o", "O", "o", "\t"])
+    assert report_talks_of(r) == [
+        {"type": "object", "id": "o"},
+        {"type": "object", "id": " o"},
+        {"type": "object", "id": "O"},
+        {"type": "construct", "id": "k"},
+        {"type": "construct", "id": "o"},
+    ]
+
+
+@pytest.mark.parametrize("value", ["o", {"id": "o"}, 7, None, ("o",)])
+def test_a_reports_field_that_is_no_list_names_nothing(value: Any) -> None:
+    # The package's own case.
+    assert report_talks_of(report("r1", objects=value, constructs=value)) == []
+
+
+def test_only_a_report_is_shown_with_talks() -> None:
+    # The package's own case: the pair read trimmed and folded with the mark by presence, as report_threads_of reads
+    # a report; a board entry, a line, an unmarked Report and anything that is no mapping are no report.
+    assert report_talks_of(report("r1", type="NARRATIVE ", supertype=" report", objects=["o"])) == [
+        {"type": "object", "id": "o"}
+    ]
+    assert report_talks_of({**board("b1"), "objects": ["o"]}) == []
+    assert report_talks_of({**report("r1", objects=["o"]), ROOM_MARK: " "}) == []
+    assert report_talks_of({**report("r1", objects=["o"]), "supertype": "Message"}) == []
+    no_report: tuple[Any, ...] = (None, [], "a report", 7)
+    for nothing in no_report:
+        assert report_talks_of(nothing) == []
