@@ -4,6 +4,8 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+- Tests: CI runs the whole suite against the built wheel, installed in place of the source tree (on Python 3.12), and checks that the wheel holds every tracked file of the package and nothing else. A wheel built without the vendored folder checker failed both, where the source run passes.
+
 ## 0.134.1 (2026-11-17)
 
 - **The schema pin moves to `v0.34.1-dist.134`** (canonical 00.34.01 unchanged; no schema file moved, `_schema.py` changes only its provenance lines). The strand page now says that an empty string in any member of the mark is no mark, the story's included, and that no reader trims: a member of white space alone (a space, a tab, U+3000) or an id with a space on it names no element, so its slot is empty. `strand_of` already read every one of these that way; the fixture holds them as 42 cases (from 29). The checks page says what its specimen is, and its fixture's notes and its control row's field (`x_team_keeper`) change, its rules byte for byte as they were; the doctor's test replays them unchanged. The lens page says the reader is the one who asks, also beside another Character's context read.

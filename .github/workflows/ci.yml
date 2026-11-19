@@ -93,6 +93,38 @@ jobs:
           uv run pytest -q -rs tests/test_reader.py | tee "$RUNNER_TEMP/reader.txt"
           grep -q -E '^[0-9]+ passed in ' "$RUNNER_TEMP/reader.txt"
 
+  wheel:
+    # The gates job runs the suite on the source tree, installed editable; PyPI gets the wheel. A file the
+    # build leaves out (hatchling skips what .gitignore names, and anything outside the package path) passes
+    # there and fails for every user, on a version PyPI keeps forever. Here the suite runs against the wheel
+    # itself: the locked dev environment without the project, and the built wheel installed in its place.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v7
+        with:
+          python-version: '3.12'
+      - run: uv build --wheel
+      - name: The wheel holds every tracked file of the package, and nothing else
+        run: |
+          python3 - <<'PY'
+          import glob, subprocess, sys, zipfile
+          (wheel,) = glob.glob("dist/*.whl")
+          inside = {n for n in zipfile.ZipFile(wheel).namelist() if n.startswith("onlyworlds/")}
+          listed = subprocess.run(["git", "ls-files", "-z", "src/onlyworlds"], capture_output=True, text=True, check=True).stdout
+          tracked = {p[len("src/"):] for p in listed.split("\0") if p}
+          missing, extra = sorted(tracked - inside), sorted(inside - tracked)
+          if not tracked or missing or extra:
+              print(f"tracked {len(tracked)}, in the wheel {len(inside)}; left out: {missing}; not tracked: {extra}")
+              sys.exit(1)
+          print(f"the wheel holds the package's {len(tracked)} tracked files, and nothing else")
+          PY
+      - run: uv sync --locked --no-install-project
+      - run: uv pip install --no-deps dist/*.whl
+      - name: The suite imports the installed wheel, not the source tree
+        run: uv run --no-sync python -I -c "import onlyworlds; f = onlyworlds.__file__; assert '/site-packages/' in f, f; print(f)"
+      - run: uv run --no-sync pytest -q
+
   wire:
     # keel's own OpenAPI document and the public demo world, read only, and a few writes to the
     # practice world (its published key, reset every night), each deleted again. Red here with
