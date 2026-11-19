@@ -203,7 +203,7 @@ _LINK_FIELDS: dict[str, tuple[tuple[str, bool], ...]] = {
 }
 """Each type's link fields in the schema's order, and whether each is a list."""
 
-_RUNGS = ("owner", "contributor", "guest", "public")
+_RUNGS = ("owner", "co-builder", "contributor", "guest", "public")
 _LINE_BREAK = re.compile(r"[\r\n]")
 
 Body = dict[str, Any]
@@ -473,10 +473,13 @@ class _Reading:
             proposed = hands_on_as_proposed(el)
             if proposed:
                 self.proposed.add(eid)
-            if rung == "owner":
+            if rung in ("owner", "co-builder"):
                 sees = True
             elif rung == "contributor":
-                sees = eid not in hidden
+                # The hidden mark keeps an element from every reader but a keeper and the one who made it: a
+                # contributor's view is the world less the hidden, plus the hidden elements it made, listed in
+                # whole (serial 138).
+                sees = eid not in hidden or eid in whole_ids
             elif rung == "public":
                 sees = eid not in hidden and eid not in self.room and not proposed
             else:
@@ -544,8 +547,9 @@ class _Reading:
         """The body this reader is served: the owner's own body untouched; for any other reader, the body with
         every id outside the view left out (``_trim``), and for a known-of element the stub made from it
         (``_stub``). A hidden element's body carries ``hidden: true``, the world's ``hidden`` list read as the
-        element's own mark, for any reader it is served to (keel's serialize): the owner, and below it only a guest
-        of its own hidden creation, listed in its ``whole``, since no other rung's view holds a hidden element (a
+        element's own mark, for any reader it is served to (keel's serialize): a keeper (the owner or a co-builder),
+        and below it only a contributor or a guest of its own hidden creation, listed in its ``whole``, since no other
+        rung's view holds a hidden element (a
         hidden id in a guest's ``known_of`` alone is not in its view: hidden beats known_of). No other body carries
         a ``hidden`` key: a stored ``false`` or null is dropped."""
         cached = self._served.get(eid)
@@ -554,7 +558,8 @@ class _Reading:
         kind = self.type_of[eid]
         b = copy.deepcopy(self.by_id[eid])
         b.pop("x_served_trimmed", None)  # keel serves only the mark it adds, never a stored one
-        if self.seen_rung != "owner":
+        # A keeper (the owner, or a co-builder) is served the bodies as stored.
+        if self.seen_rung not in ("owner", "co-builder"):
             self._trim(b, kind)
         if eid in self.stubs:
             b = _stub(b, kind)
@@ -947,7 +952,8 @@ def _nothing(unreadable: str | None = None) -> LensReading:
 def _check_reader(reader: Any, where: str) -> None:
     if not isinstance(reader, Mapping) or reader.get("rung") not in _RUNGS:
         raise TypeError(
-            f"{where}: a reader is a mapping whose rung is owner, contributor, guest or public; got {reader!r}."
+            f"{where}: a reader is a mapping whose rung is owner, co-builder, contributor, guest or public; "
+            f"got {reader!r}."
         )
     if reader.get("as") is not None:
         _check_reader(reader["as"], f"{where}.as")
@@ -969,8 +975,9 @@ def resolve_lens(
     (``hidden``, beside each element's own ``hidden``), its ``members`` for the mail rule and its now (``now``,
     else the World's ``time_current`` as a folder spells it, else ``time_range_current`` as the API serves it).
     ``lens`` is a lens body or the id of a lens in the world the reader can
-    see. ``reader`` is a mapping: ``rung`` (``owner``, ``contributor``, ``guest`` with its ``whole`` and
-    ``known_of`` ids, or ``public``), ``character`` (for the mail rule), and on an owner ``as``, the reader it
+    see. ``reader`` is a mapping: ``rung`` (``owner``; ``co-builder``, the whole world as stored with none of the
+    owner's counts; ``contributor``, with its ``whole``, the hidden elements it made; ``guest`` with its ``whole``
+    and ``known_of`` ids; or ``public``), ``character`` (for the mail rule), and on an owner ``as``, the reader it
     reads as (that reader's view, the owner's two counts). ``as_of`` is the reading's date (absent: the world's
     now; none at all: no fence, and the window cuts nothing), ``clock`` the reading's wall-clock time for the mail
     rule's thirty days and ``changed_within`` (absent: the machine's time), never the world's now.
