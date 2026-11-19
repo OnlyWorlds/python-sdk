@@ -9,8 +9,8 @@ Both give the same answer as the npm SDK's ``layoutByKind`` and ``layoutAround``
 gives the same points to the last bit in every language and browser. The kinds' points on the circle are read from a
 table of numbers baked into the package, never computed with the runtime's own cosine and sine (which differ in the
 last place between runtimes, and the method magnifies one unit in the last place into a visibly different picture);
-everything else is addition, subtraction, multiplication, division, square root and floor, which every runtime rounds
-alike. Both first put the graph in one order (nodes by id, edges by source, field, index and target), so the order
+everything else is addition, subtraction, multiplication, division, square root, floor, the greater or the lesser of
+two numbers, and the ``mod`` of the generator's draws, which every runtime answers alike. Both first put the graph in one order (nodes by id, edges by source, field, index and target), so the order
 a caller hands it in changes no point. The pinned distribution's ``profiles/layout.fixture.json`` (sha256 held by both
 tests) is replayed whole.
 """
