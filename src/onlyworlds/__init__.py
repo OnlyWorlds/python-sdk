@@ -94,7 +94,13 @@ from .layout_kind import (
     unplaced_around,
     unplaced_by_kind,
 )
-from .layout_links_3d import BY_LINKS_3D_REST, LayoutByLinks3d, layout_by_links_3d, unplaced_by_links_3d
+from .layout_links_3d import (
+    BY_LINKS_3D_REST,
+    BY_LINKS_3D_VERSION,
+    LayoutByLinks3d,
+    layout_by_links_3d,
+    unplaced_by_links_3d,
+)
 from .layout_trail import (
     TRAIL_TIERS,
     TrailHanger,
@@ -158,6 +164,7 @@ from .worldfile import (
 __all__ = [
     "API_BASE",
     "BY_LINKS_3D_REST",
+    "BY_LINKS_3D_VERSION",
     "CHECKS_FIELD",
     "CREATE_FIELDS",
     "DATE_FIELD",

@@ -1,16 +1,19 @@
-"""by-links-3d, a 3D layout method read from a world's graph and its Maps and Pins. The method's shared fixture
-(``tests/fixtures/layout/by-links-3d.fixture.json``, sha256 held here and in the npm SDK's test) gives each case's
-input and the answer the reference implementation gives; the fixture's head (``call``, ``compare``) says how a case is
-run and compared:
-  exact    every element placed centre, with or map: each of x, y, z the same double (the eight bytes, so a zero's
-           sign counts); and every ids, how, group, part, held and centres entry
-  within   every element placed arm, link or shelf that is not held: each of x, y, z within 1e-9 of a rest, since
-           those are placed with the runtime's cosine and sine
+"""by-links-3d, a 3D layout method read from a world's graph and its Maps and Pins. The method's fixture, as the schema
+distribution publishes it (``codegen/schema-dist/profiles/layout-by-links-3d.fixture.json``, vendored with the pin; its
+sha256 held here and in the npm SDK's test) gives each case's input and the answer the reference implementation gives;
+the fixture's head (``call``, ``compare``) says how a case is run and compared:
+  pieces   the graph read into pieces; a ring piece is every other piece of two nodes or more with no node pinned
+           (want.how "map") and no node held (in input.held and not pinned)
+  exact    every ids, unplaced, how, group, part, held and centres entry; every element not of a ring piece placed
+           centre, with or map, or held: each of x, y, z the same double (a zero compared by its value)
+  within   every element placed arm or link that is not held, and every coordinate of every element of a ring piece:
+           each within 1e-9 of a rest, since those are placed with the runtime's cosine, sine and arcsine
   held     every element answered as held: the very double the case's input.held gives for it
-  refused  the call raises before anything runs, with the case's code
-Its ``unplaced`` cases are ``unplaced_by_links_3d`` of a graph and a Map's placed ids: the same ids in the same order.
-Then the baked directions table against the table the fixture names, the handed order, the inputs left unchanged,
-and the exports."""
+  refused  the call raises with the case's code
+The replay walks every case and reports the cases that disagree, by name, before it counts them. The fixture's
+``unplaced`` cases are ``unplaced_by_links_3d`` of a graph and a Map's placed ids: the same ids in the same order. Then
+the baked directions table against the table the fixture names, the handed order, the inputs left unchanged, and the
+exports."""
 
 from __future__ import annotations
 
@@ -24,14 +27,23 @@ from typing import Any
 import pytest
 
 import onlyworlds
-from onlyworlds import BY_LINKS_3D_REST, LayoutByLinks3d, layout_by_links_3d, unplaced_by_links_3d
+from onlyworlds import (
+    BY_LINKS_3D_REST,
+    BY_LINKS_3D_VERSION,
+    LayoutByLinks3d,
+    layout_by_links_3d,
+    unplaced_by_links_3d,
+)
 from onlyworlds._directions import DIRECTIONS
+from onlyworlds._layout3d.pieces import FIT, RING_GAP
 from onlyworlds.layout_links_3d import HeldRangeError, HeldTypeError
 
 REPO = Path(__file__).resolve().parent.parent
-FIXTURE = REPO / "tests" / "fixtures" / "layout" / "by-links-3d.fixture.json"
+PROFILES = REPO / "codegen" / "schema-dist" / "profiles"
+FIXTURE = PROFILES / "layout-by-links-3d.fixture.json"
+DIST_TABLE = PROFILES / "layout-by-links-3d.directions.json"
 TABLE = REPO / "codegen" / "layout" / "directions.json"
-FIXTURE_SHA = "b29606c379633a5fa13f35f71d449b67cb417013c2bfc223024650c7945edb37"
+FIXTURE_SHA = "acd6da7252493485cafc24356a84c53656d078872a28c695c0f7554009b6fb2a"
 BYTES = FIXTURE.read_bytes()
 
 
@@ -76,15 +88,95 @@ def named(name: str) -> dict[str, Any]:
     raise AssertionError(f"the fixture has no case {name}")
 
 
+def ring_ids(case: dict[str, Any]) -> set[str]:
+    """The ids of the case's ring pieces, as the fixture's compare.pieces reads them from the input and the want."""
+    nodes, edges, want = case["input"]["nodes"], case["input"]["edges"], case["want"]
+    ids = sorted(x["id"] for x in nodes)
+    at = {id_: i for i, id_ in enumerate(ids)}
+    parent = list(range(len(ids)))
+
+    def find(a: int) -> int:
+        while parent[a] != a:
+            a = parent[a]
+        return a
+
+    for e in edges:
+        a, b = at.get(e["source"]), at.get(e["target"])
+        if a is None or b is None or a == b:
+            continue
+        ra, rb = find(a), find(b)
+        if ra != rb:
+            parent[max(ra, rb)] = min(ra, rb)
+    pieces: dict[int, list[str]] = {}
+    for v in range(len(ids)):
+        pieces.setdefault(find(v), []).append(ids[v])
+    # the main piece: the most nodes, a tie to the smaller least id (dicts keep the order of the least id here)
+    main = max(pieces.values(), key=len) if pieces else []
+    how = dict(zip(want["ids"], want["how"], strict=True))
+    held = case["input"].get("held") or {}
+    out: set[str] = set()
+    for members in pieces.values():
+        if members is main or len(members) < 2:
+            continue
+        if any(how.get(i) == "map" for i in members):
+            continue
+        if any(i in held and how.get(i) != "map" for i in members):
+            continue
+        out.update(members)
+    return out
+
+
+def disagreement(case: dict[str, Any]) -> list[str]:
+    """What the package answers differently from the case's want, as the fixture's compare says; [] when it agrees."""
+    want = case["want"]
+    if "refused" in want:
+        try:
+            run(copy.deepcopy(case["input"]))
+        except Exception as err:
+            code = getattr(err, "code", None)
+            if not isinstance(err, ERROR_CLASS[want["refused"]]) or code != want["refused"]:
+                return [f"raised {type(err).__name__} {code!r}, want {want['refused']}"]
+            return []
+        return [f"answered, want refused {want['refused']}"]
+    got = run(copy.deepcopy(case["input"]))
+    off: list[str] = []
+    if got["method"] != "by-links-3d":
+        off.append(f"method {got['method']!r}")
+    for key in ("ids", "unplaced", "how", "group", "part", "held", "centres"):
+        if got[key] != want[key]:
+            off.append(f"{key}: {got[key]!r}, want {want[key]!r}")
+    if off or len(got["points"]) != len(want["points"]):
+        return off or [f"{len(got['points'])} numbers, want {len(want['points'])}"]
+    ring = ring_ids(case)
+    tolerance = 1e-9 * FX["rest"]
+    for i, id_ in enumerate(want["ids"]):
+        for a in range(3):
+            v, w = got["points"][3 * i + a], float(want["points"][3 * i + a])
+            if want["held"][i] is True:
+                h = float(case["input"]["held"][id_][a])
+                same = bits(v) == bits(h) and bits(w) == bits(h)
+            elif id_ in ring or want["how"][i] not in EXACT:
+                same = abs(v - w) <= tolerance
+            else:
+                same = v == w  # the same double; a zero compared by its value
+            if not same:
+                how = want["how"][i] + (", held" if want["held"][i] else "") + (", ring" if id_ in ring else "")
+                off.append(f"{id_}.{'xyz'[a]} ({how}): {v!r}, want {w!r}")
+    return off
+
+
 def test_the_fixture_is_the_one_both_packages_hold() -> None:
     assert hashlib.sha256(BYTES).hexdigest() == FIXTURE_SHA
     assert FX["method"] == "by-links-3d"
     assert FX["rest"] == BY_LINKS_3D_REST
-    assert list(FX["compare"]) == ["exact", "within", "held", "refused", "unplaced"]
+    assert FX["ring_gap"] == RING_GAP
+    assert FX["fit"] == FIT
+    assert list(FX["compare"]) == ["pieces", "exact", "within", "held", "refused", "fit", "unplaced"]
 
 
 def test_the_baked_directions_are_the_table_the_fixture_names() -> None:
     raw = TABLE.read_bytes()
+    assert raw == DIST_TABLE.read_bytes(), "codegen/layout/directions.json is the distribution's table, byte for byte"
     assert hashlib.sha256(raw).hexdigest() == FX["table_sha256"]
     table = json.loads(raw.decode("utf-8"), parse_int=_int)["directions"]
     assert list(DIRECTIONS) == list(table)
@@ -95,42 +187,25 @@ def test_the_baked_directions_are_the_table_the_fixture_names() -> None:
             assert [bits(v) for v in got] == [bits(v) for v in want], k
 
 
-@pytest.mark.parametrize("case", FX["cases"], ids=[c["name"] for c in FX["cases"]])
-def test_by_links_3d_case(case: dict[str, Any]) -> None:
-    assert case["steps"] == 300, "every case runs at the method's own 300 steps"
-    want = case["want"]
-    if "refused" in want:
-        with pytest.raises(ERROR_CLASS[want["refused"]]) as err:
-            run(copy.deepcopy(case["input"]))
-        assert getattr(err.value, "code", None) == want["refused"]
-        return
-    got = run(copy.deepcopy(case["input"]))
-    assert got["method"] == "by-links-3d"
-    assert got["ids"] == want["ids"]
-    for key in ("how", "group", "part", "held", "centres"):
-        assert got[key] == want[key], key
-    assert len(got["points"]) == len(want["points"])
-    tolerance = 1e-9 * FX["rest"]
-    off = []
-    for i, id_ in enumerate(want["ids"]):
-        for a in range(3):
-            v, w = got["points"][3 * i + a], float(want["points"][3 * i + a])
-            if want["held"][i] is True:
-                h = float(case["input"]["held"][id_][a])
-                same = bits(v) == bits(h) and bits(w) == bits(h)
-            elif want["how"][i] in EXACT:
-                same = bits(v) == bits(w)
-            else:
-                same = abs(v - w) <= tolerance
-            if not same:
-                off.append(
-                    f"{id_}.{'xyz'[a]} ({want['how'][i]}{', held' if want['held'][i] else ''}): {v!r}, want {w!r}"
-                )
-    assert off == [], f"{len(off)} numbers differ"
+def test_every_case_of_the_fixture() -> None:
+    red: dict[str, list[str]] = {}
+    ran = 0
+    for case in FX["cases"]:
+        assert case["steps"] == 300, "every case runs at the method's own 300 steps"
+        off = disagreement(case)
+        if off:
+            red[case["name"]] = off[:6] + ([f"... {len(off) - 6} more"] if len(off) > 6 else [])
+        ran += 1
+    assert list(red) == [], json.dumps(red, indent=1)
+    assert ran == len(FX["cases"]) == 116
 
 
 def test_the_answer_follows_the_handed_order() -> None:
-    for name in ("Moppetopia", "held: a saved answer, rounded, with heldUnit"):
+    for name in (
+        "Moppetopia",
+        "held: an earlier answer rounded to whole numbers, with heldUnit",
+        "pieces: a main and three equal pieces",
+    ):
         case_input = copy.deepcopy(named(name)["input"])
         base = run(copy.deepcopy(case_input))
         # a fixed shuffle: every third node first, then the rest reversed; the links and the rows reversed
@@ -142,7 +217,7 @@ def test_the_answer_follows_the_handed_order() -> None:
         if case_input["rows"]:
             case_input["rows"] = case_input["rows"][::-1]
         got = run(case_input)
-        assert got["ids"] == [x["id"] for x in case_input["nodes"]]
+        assert got["ids"] == [x["id"] for x in case_input["nodes"] if x["id"] in base["ids"]]
         at = {id_: j for j, id_ in enumerate(base["ids"])}
         for i, id_ in enumerate(got["ids"]):
             j = at[id_]
@@ -153,13 +228,15 @@ def test_the_answer_follows_the_handed_order() -> None:
             assert got["part"][i] == base["part"][j]
             assert got["held"][i] == base["held"][j]
         assert got["centres"] == base["centres"]
+        assert got["unplaced"] == base["unplaced"]
 
 
 def test_the_call_changes_none_of_its_inputs() -> None:
     for name in (
         "a small plate taken on the second pass",
         "held: a leaf beside a held leaf under a pinned parent",
-        "held: a saved answer, rounded, with heldUnit",
+        "held: an earlier answer rounded to whole numbers, with heldUnit",
+        "pieces: a chain pinned at both ends",
     ):
         case_input = named(name)["input"]
         graph = {"nodes": copy.deepcopy(case_input["nodes"]), "edges": copy.deepcopy(case_input["edges"])}
@@ -216,8 +293,20 @@ def test_unplaced_reads_a_list_and_a_set_alike_and_passes_over_what_is_no_id() -
     assert unplaced_by_links_3d({"nodes": [], "edges": []}, []) == []
 
 
+def test_the_answers_version() -> None:
+    # The npm SDK's BY_LINKS_3D_VERSION (src/layout-by-links-3d.ts), raised with this package's in the same change:
+    # 2 since the pieces (schema-dist serial 137). Raised whenever a case's answer moves.
+    assert BY_LINKS_3D_VERSION == 2
+
+
 def test_the_names_are_exported() -> None:
-    for name in ("layout_by_links_3d", "unplaced_by_links_3d", "LayoutByLinks3d", "BY_LINKS_3D_REST"):
+    for name in (
+        "layout_by_links_3d",
+        "unplaced_by_links_3d",
+        "LayoutByLinks3d",
+        "BY_LINKS_3D_REST",
+        "BY_LINKS_3D_VERSION",
+    ):
         assert name in onlyworlds.__all__
         assert getattr(onlyworlds, name) is not None
     assert BY_LINKS_3D_REST == 60.0
@@ -231,4 +320,5 @@ def test_the_names_are_exported() -> None:
         "part": [],
         "centres": [],
         "held": [],
+        "unplaced": [],
     }

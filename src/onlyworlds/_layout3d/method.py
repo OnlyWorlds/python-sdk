@@ -13,7 +13,8 @@ again here: every part is imported and called as its head says.
   held_unit  the step the held points were rounded to, or None: 0
 
 The answer: {"method", "ids", "points" (3n floats), "how", "group", "part", "centres", "held"}, rows in the order the
-nodes were handed in.
+nodes were handed in. One run of the method: a node off the main piece that is not pinned is placed by no rule here
+(its how, group and part None, its point (0, 0, 0)); ``pieces.layout_pieces`` makes the runs and the answer.
 
 The order, in this sequence:
   0. the refusals (read_held(), then read_unit()), before anything runs;
@@ -40,7 +41,7 @@ from collections.abc import Mapping, Sequence
 from typing import Any
 
 from .centres import centres
-from .hang import ARM, CENTRE, HOW, LINE, LINK, MAP, WITH, hang
+from .hang import CENTRE, HOW, LINE, MAP, NONE, WITH, hang
 from .plate import plate as plate_of
 from .points import Table, points
 from .relax import relax
@@ -94,9 +95,10 @@ def is_point(p: Any) -> bool:
     return True
 
 
-def read_held(held: Any) -> list[tuple[Any, list[float]]] | None:
-    """None when absent or empty, else its entries [(id, [x, y, z])], every number a float. The box is read over
-    every value handed in, an id that is no node's too."""
+def read_held(held: Any, box: bool = True) -> list[tuple[Any, list[float]]] | None:
+    """None when absent or empty, else its entries [(id, [x, y, z])], every number a float. With ``box`` the box is
+    read over every value handed in, an id that is no node's too; without it only the shape is read (the pieces read
+    the caller's whole ``held`` so, and each run tests the box of its own share)."""
     if held is None:
         return None
     if not isinstance(held, Mapping):
@@ -105,7 +107,7 @@ def read_held(held: Any) -> list[tuple[Any, list[float]]] | None:
     for id_, p in entries:
         if not is_point(p):
             raise HeldTypeError(REFUSED["notPoint"], f"layout_by_links_3d: held[{id_}] is not three finite numbers")
-    if entries:
+    if box and entries:
         lo = [math.inf, math.inf, math.inf]
         hi = [-math.inf, -math.inf, -math.inf]
         for _id, p in entries:
@@ -496,7 +498,6 @@ def layout3d(
         j += 1
 
     # 9. what is placed after the steps
-    kind = [x["type"] for x in sorted_nodes]
     degree = [0] * n
     for a, b in ip:
         degree[a] += 1
@@ -512,7 +513,6 @@ def layout3d(
         c["group"],
         p["cpt"],
         p["plate"],
-        kind,
         degree,
         relaxed,
         hopts,
@@ -529,6 +529,8 @@ def layout3d(
         out[3 * i], out[3 * i + 1], out[3 * i + 2] = h["pos"][3 * v], h["pos"][3 * v + 1], h["pos"][3 * v + 2]
         held_out[i] = keep is not None and keep[v] == 1
         w = h["how"][v]
+        if w == NONE:
+            continue  # off the main piece and not pinned: no rule of a run places it (the pieces do, or hand it back)
         how[i] = HOW[w]
         own = bool(s["body"][v]) and c["taken"][c["group"][v]] == v
         if w == CENTRE or w == WITH or (w == MAP and own):  # noqa: SIM109
@@ -536,10 +538,8 @@ def layout3d(
             part[i] = None
         elif w == MAP:
             group[i], part[i] = None, "map"
-        elif w == ARM or w == LINK:  # noqa: SIM109
-            group[i], part[i] = None, "one-link"
         else:
-            group[i], part[i] = None, "no-link"
+            group[i], part[i] = None, "one-link"
     return {
         "method": METHOD,
         "ids": handed,

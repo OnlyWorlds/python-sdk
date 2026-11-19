@@ -1,6 +1,6 @@
 """The by-links-3d layout, step 9: what is placed after the force steps.
 
-    hang(ids, body, hang_cut, hang_depth, off, taken, group, cpt, plate, kind, degree, relaxed[, held])
+    hang(ids, body, hang_cut, hang_depth, off, taken, group, cpt, plate, degree, relaxed[, held])
         -> {"pos": [x0, y0, z0, x1, ...] (3n floats), "how": [int] * n (an index into HOW), "skin": [float] * k,
             "middle": [x, y, z]}
 
@@ -16,15 +16,15 @@ In this order:
      d and rank j stands on a fan round the outward line, REST * d beyond the skin, at the golden angle times j and
      REST * 0.5 * the root of j from the line (over a pinned cut: straight above its place, the fan half as wide),
      ``link`` when its only link is to the cut, else ``arm``;
-  6. the shelf: each element off the main piece and not pinned, by kind then place, at the golden angle times j and
-     REST * 0.9 * the root of j + 1 from the middle of what is on the main piece, REST * 3 under its lowest point;
-  8. every held element that is not pinned stands at its held point (and the fan and shelf places near a held point,
-     within ``line``, are left to it, taking the next free place);
+  6. no rule here places an element off the main piece that is not pinned: its ``how`` stays ``NONE`` and its point
+     (0, 0, 0), and the method's pieces (``pieces.py``) place it by its own piece's run, or hand it back;
+  8. every held element that is not pinned stands at its held point (and the fan places near a held point, within
+     ``line``, are left to it, taking the next free place);
   7. last, a pinned element stands at its place, ``map``.
 
 math.cos and math.sin are the two functions that are not correctly rounded in every runtime: an element they place
-(an arm, a one-link element, a shelf element) can differ from another runtime's in the last places. Everything else
-here is + - * /, sqrt and floor, the same double in every runtime.
+(an arm, a one-link element) can differ from another runtime's in the last places. Everything else here is + - * /,
+sqrt and floor, the same double in every runtime.
 """
 
 from __future__ import annotations
@@ -35,8 +35,9 @@ from typing import Any
 
 REST = 60.0
 GOLD = math.pi * (3.0 - math.sqrt(5.0))
-HOW = ["centre", "with", "arm", "link", "shelf", "map"]
-CENTRE, WITH, ARM, LINK, SHELF, MAP = 0, 1, 2, 3, 4, 5
+HOW = ["centre", "with", "arm", "link", "map"]
+CENTRE, WITH, ARM, LINK, MAP = 0, 1, 2, 3, 4
+NONE = 255  # placed by no rule of a run: an element off the main piece that is not pinned
 LINE = REST / 8  # a held element nearer than this to a free place takes it (held points only)
 
 
@@ -70,7 +71,6 @@ def hang(
     group: Sequence[int],
     cpt: Sequence[float],
     plate: dict[str, Any] | None,
-    kind: Sequence[str],
     degree: Sequence[int],
     relaxed: Sequence[float],
     held: dict[str, Any] | None = None,
@@ -79,7 +79,7 @@ def hang(
     pinned = plate["pinned"] if plate else [0] * n
     at = plate["at"] if plate else None
     pos = [0.0] * (3 * n)
-    how = [255] * n
+    how = [NONE] * n
     sqrt, cos, sin = math.sqrt, math.cos, math.sin
 
     # the held elements that are not pinned, and the near test against every one of them
@@ -235,51 +235,6 @@ def hang(
             fx, fy, fz = fan_point(j, d)
             pos[3 * v], pos[3 * v + 1], pos[3 * v + 2] = fx, fy, fz
 
-    # 6. the shelf: what is off the main piece and not pinned, under the shape, by kind then index
-    any_off = 0
-    for v in range(n):
-        if off[v]:
-            any_off += 1
-    if any_off:
-        zmin, sx, sy, cnt = math.inf, 0.0, 0.0, 0
-        for v in range(n):
-            if off[v]:
-                continue
-            # a pinned element ends at its Pin (step 7), a held element at its held point (step 8)
-            src = at if pinned[v] else (hat if in_h[v] else pos)
-            assert src is not None
-            fx, fy, fz = src[3 * v], src[3 * v + 1], src[3 * v + 2]
-            if fz < zmin:
-                zmin = fz
-            sx += fx
-            sy += fy
-            cnt += 1
-        zmin = zmin - REST * 3
-        cx, cy = sx / cnt, sy / cnt
-        shelf = sorted((v for v in range(n) if off[v] and not pinned[v]), key=lambda v: (kind[v], v))
-
-        def shelf_point(j: int) -> tuple[float, float, float]:
-            r = REST * 0.9 * sqrt(j + 1)
-            return (cx + r * cos(GOLD * j), cy + r * sin(GOLD * j), zmin)
-
-        used = set()  # places taken by shelf elements not held
-        for q, v in enumerate(shelf):
-            how[v] = SHELF
-            j = q  # nothing held: its place in the order
-            if H:
-                if in_h[v]:
-                    continue  # keeps its held point (step 8)
-                j = 0
-                while True:
-                    if j not in used:
-                        fx, fy, fz = shelf_point(j)
-                        if not near(fx, fy, fz):
-                            break
-                    j += 1
-                used.add(j)
-            fx, fy, fz = shelf_point(j)
-            pos[3 * v], pos[3 * v + 1], pos[3 * v + 2] = fx, fy, fz
-
     # 8. every held element that is not pinned stands at its held point, whatever the rules above gave it
     if H:
         assert hat is not None
@@ -294,6 +249,6 @@ def hang(
         pos[3 * v], pos[3 * v + 1], pos[3 * v + 2] = at[3 * v], at[3 * v + 1], at[3 * v + 2]
         how[v] = MAP
     for v in range(n):
-        if how[v] == 255:
+        if how[v] == NONE and not off[v]:
             raise ValueError(f"hang: {ids[v]} was placed by no rule")
     return {"pos": pos, "how": how, "skin": skin, "middle": middle}
