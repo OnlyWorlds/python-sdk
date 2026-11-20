@@ -174,7 +174,7 @@ def doors_of(element: Mapping[str, Any], tools: Sequence[Tool] = TOOLS) -> list[
     return entries
 
 
-# The doors that mean agent-made: an AI seat, the MCP server, or a client that declared itself (the npm SDK's
+# The doors the platform marks as an AI's: an AI seat, the MCP server, or a client that declared itself (the npm SDK's
 # AGENT_DOORS and isAgentDoor).
 _AGENT_DOORS = frozenset({"seat", "mcp", "declared"})
 

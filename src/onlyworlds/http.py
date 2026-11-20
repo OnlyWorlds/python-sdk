@@ -403,7 +403,7 @@ class Client:
     ):
         """``agent=True`` declares the caller an AI agent: every element write (create, upsert,
         patch, delete, edit_links, bulk: the operations keel's document declares it on) carries
-        ``X-OW-Agent``, and keel records those writes as agent-made (``changed_via: "declared"``; keel
+        ``X-OW-Agent``, and keel records those writes as an AI's (``changed_via: "declared"``; keel
         stores that the header was there, never its value). Off by default, and off in any tool
         a person uses: it describes the caller. An AI seat's key counts as an agent without it.
 
