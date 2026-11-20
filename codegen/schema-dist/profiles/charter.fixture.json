@@ -6,7 +6,7 @@
     "element: isCharterElement(element), in the room profile's matcher-case shape: element gives type, supertype and the mark as a body might carry them; is_charter_element is what the reader must answer, the pair AND the mark. A mark counts when its value is not null: a string only when something is left after the White_Space trim, an empty list or an empty object as absent, any other value (a number, a list or an object with something in it) as present; the value is never compared.",
     "worlds: each world's elements as its owner is served them, the ids its hidden mark keeps from every reader but a keeper (the owner or a co-builder) and the one who made each, and its readers, in the lens fixture's shape. A reader's rung is owner (the whole world), contributor (the world less the hidden, plus each hidden element its whole lists, which is one it made, as a guest's whole lists its own creation), guest (exactly the whole and known_of ids it lists; known_of is a stub, served as the lens profile serves one: its id, type, name, description, supertype, subtype and image_url, the server's times and its type's public fields, no link and no extension field) or public (the world less the hidden and the room elements, and nothing at all unless the world carries open: true, a world open to anyone). A case's world is a name in worlds or, as a graph case's is, a world of its own.",
     "a stub's standing: a stub serves no extension field, so whether an element the reader holds only as a stub is a reading aid is read from the element as the owner is served it; what the reading shows of it is what the stub serves.",
-    "charter: want is charterOf(world, reader). charter is {id, type, name, rules, skill} or null, type law: the newest marked Charter the reader sees, by created_at compared as instants (none sorts oldest), then the higher id by code point; rules the rules_field list as stored, [] when absent or null; skill the ids its description names (any id written as 8-4-4-4-12 hex, so every ow:// form, a site address and a bare id), in lowercase, each once in the order written, kept when it is an Object of this world the reader sees (served whole to every reader who reads the Charter; one the hidden mark keeps from the reader is not seen and not kept), the first skill_max of those kept. guide is {id, type, name} or null, type construct, chosen the same way among marked Guides. domains is every marked Domain the reader sees, each {id, type, name, sentence, hubs}, type construct: in the order of the Guide's constructs as the reader is served them first (an id named twice keeps its first place, an entry that is no marked Domain is skipped), then the rest by folded name and then id; with no Guide seen, by folded name and id alone.",
+    "charter: want is charterOf(world, reader). charter is {id, type, name, rules, skill} or null, type law: the newest marked Charter the reader sees, by created_at compared as instants (none sorts oldest), then the higher id by code point; rules the rules_field list as stored, [] when absent or null; skill the ids its description names (any id written as 8-4-4-4-12 hex, so every ow:// form, a site address and a bare id), in lowercase, each once in the order written, kept when it is an Object of this world the reader sees (served whole to every reader who reads the Charter; one the hidden mark keeps from the reader is not seen and not kept), the first skill_max of those kept. guide is {id, type, name} or null, type construct, chosen the same way among marked Guides. domains is every marked Domain the reader sees, each {id, type, name, sentence, hubs}, type construct: in the order of the Guide's constructs as the reader is served them first (an id named twice keeps its first place, an entry that is no marked Domain is skipped), then the rest by folded name and then id; with no Guide seen, by folded name and id alone. A name is trimmed and folded as the room profile defines it. Folded names compare by code point, as written: never by UTF-16 unit, a collation or a locale, and nothing is normalized before or after the fold, so a decomposed and a precomposed spelling are two names.",
     "sentence: the description as served, trimmed of White_Space at both ends, cut at its first line break (a line feed or a carriage return) and trimmed again, so its first line that holds something; an empty string when there is none. hubs: the distinct {type, id} the Domain's served link fields name, each an element of its field's kind in the reader's view (any other id names no hub), in hub_fields' order (the Construct's link fields, the schema's order) and each list's own order, the Domain itself excluded; a stub serves no links, so a stub Domain's hubs are [].",
     "compare: objects are compared as values; the order of keys carries no meaning, so a reader that writes {type, id} or {id, type, name} in another order answers the same.",
     "design_cases: each case is a world of its own, a reader and want, every design part the reader sees: an Object or a Construct the reader is served whole (a known-of stub has none, though it is served its subtype) whose subtype, trimmed and folded as the room profile defines it, is in design or locked, in a world where charterOf finds a Charter for that reader; each {type, id, state}, type object or construct and state the page's word (in design or locked), whatever the spelling stored. want compares as a set."
@@ -3037,6 +3037,796 @@
         ]
       },
       "note": "The answer is the room profile's (its trim, the White_Space set, and its fold, simple case folding by the C and S rows), never a language's own. Domains: an ideographic space each side of construct is trimmed (a Domain); con + U+FB06 + ruct is not construct, since the ligature has no simple folding (no Domain; a full fold would make one); CON + U+017F + TRUCT folds to construct, the long s to s (a Domain; lower-casing leaves it). Hubs: U+FEFF before Location is no White_Space, so the type is not location (no hub; a trim that takes a byte order mark would make one); location + U+001F likewise (no hub; a trim that takes the unit separator would make one); an em space, U+2003, before LOCATION is trimmed and the word folds (a hub). Birch Row is no Domain, so the order is Alder Quay, Cinder Point."
+    },
+    {
+      "name": "folded-names-compare-by-code-point-so-an-astral-letter-comes-after-a-full-width-one",
+      "kind": "charter",
+      "world": {
+        "id": "019a7f00-0000-7000-8000-00000000f140",
+        "name": "Order 1",
+        "hidden": [],
+        "readers": {
+          "owner": {
+            "rung": "owner",
+            "character": null
+          }
+        },
+        "elements": [
+          {
+            "id": "019a7f00-0000-7000-8000-00000000aa01",
+            "type": "construct",
+            "name": "𐐀",
+            "supertype": "Domain",
+            "x_charter_of": "019a7f00-0000-7000-8000-00000000f140",
+            "created_at": "2026-11-01T12:00:00Z"
+          },
+          {
+            "id": "019a7f00-0000-7000-8000-00000000aa02",
+            "type": "construct",
+            "name": "ｚ",
+            "supertype": "Domain",
+            "x_charter_of": "019a7f00-0000-7000-8000-00000000f140",
+            "created_at": "2026-11-01T12:00:00Z"
+          },
+          {
+            "id": "019a7f00-0000-7000-8000-00000000ab01",
+            "type": "construct",
+            "name": "𐐨",
+            "supertype": "Domain",
+            "x_charter_of": "019a7f00-0000-7000-8000-00000000f140",
+            "created_at": "2026-11-01T12:00:00Z"
+          },
+          {
+            "id": "019a7f00-0000-7000-8000-00000000ab02",
+            "type": "construct",
+            "name": "𐐀",
+            "supertype": "Domain",
+            "x_charter_of": "019a7f00-0000-7000-8000-00000000f140",
+            "created_at": "2026-11-01T12:00:00Z"
+          },
+          {
+            "id": "019a7f00-0000-7000-8000-00000000ab03",
+            "type": "construct",
+            "name": "Ａ",
+            "supertype": "Domain",
+            "x_charter_of": "019a7f00-0000-7000-8000-00000000f140",
+            "created_at": "2026-11-01T12:00:00Z"
+          }
+        ]
+      },
+      "reader": "owner",
+      "want": {
+        "charter": null,
+        "guide": null,
+        "domains": [
+          {
+            "id": "019a7f00-0000-7000-8000-00000000ab03",
+            "type": "construct",
+            "name": "Ａ",
+            "sentence": "",
+            "hubs": []
+          },
+          {
+            "id": "019a7f00-0000-7000-8000-00000000aa02",
+            "type": "construct",
+            "name": "ｚ",
+            "sentence": "",
+            "hubs": []
+          },
+          {
+            "id": "019a7f00-0000-7000-8000-00000000aa01",
+            "type": "construct",
+            "name": "𐐀",
+            "sentence": "",
+            "hubs": []
+          },
+          {
+            "id": "019a7f00-0000-7000-8000-00000000ab01",
+            "type": "construct",
+            "name": "𐐨",
+            "sentence": "",
+            "hubs": []
+          },
+          {
+            "id": "019a7f00-0000-7000-8000-00000000ab02",
+            "type": "construct",
+            "name": "𐐀",
+            "sentence": "",
+            "hubs": []
+          }
+        ]
+      },
+      "note": "No Guide: the Domains by folded name, then id. U+10400, a capital beyond U+FFFF, folds to U+10428, so three names fold alike and go by id; the full-width A folds to U+FF41. Compared by code point, U+FF41 and U+FF5A come before U+10428; a reader that compares UTF-16 units puts the three first, since a surrogate is below U+FF41."
+    },
+    {
+      "name": "a-sharp-s-has-no-simple-folding-so-it-is-ordered-as-written",
+      "kind": "charter",
+      "world": {
+        "id": "019a7f00-0000-7000-8000-00000000f141",
+        "name": "Order 2",
+        "hidden": [],
+        "readers": {
+          "owner": {
+            "rung": "owner",
+            "character": null
+          }
+        },
+        "elements": [
+          {
+            "id": "019a7f00-0000-7000-8000-00000000a601",
+            "type": "construct",
+            "name": "Straße",
+            "supertype": "Domain",
+            "x_charter_of": "019a7f00-0000-7000-8000-00000000f141",
+            "created_at": "2026-11-01T12:00:00Z"
+          },
+          {
+            "id": "019a7f00-0000-7000-8000-00000000a602",
+            "type": "construct",
+            "name": "Strasse",
+            "supertype": "Domain",
+            "x_charter_of": "019a7f00-0000-7000-8000-00000000f141",
+            "created_at": "2026-11-01T12:00:00Z"
+          },
+          {
+            "id": "019a7f00-0000-7000-8000-00000000a603",
+            "type": "construct",
+            "name": "Strassf",
+            "supertype": "Domain",
+            "x_charter_of": "019a7f00-0000-7000-8000-00000000f141",
+            "created_at": "2026-11-01T12:00:00Z"
+          },
+          {
+            "id": "019a7f00-0000-7000-8000-00000000a604",
+            "type": "construct",
+            "name": "STRAẞE",
+            "supertype": "Domain",
+            "x_charter_of": "019a7f00-0000-7000-8000-00000000f141",
+            "created_at": "2026-11-01T12:00:00Z"
+          }
+        ]
+      },
+      "reader": "owner",
+      "want": {
+        "charter": null,
+        "guide": null,
+        "domains": [
+          {
+            "id": "019a7f00-0000-7000-8000-00000000a602",
+            "type": "construct",
+            "name": "Strasse",
+            "sentence": "",
+            "hubs": []
+          },
+          {
+            "id": "019a7f00-0000-7000-8000-00000000a603",
+            "type": "construct",
+            "name": "Strassf",
+            "sentence": "",
+            "hubs": []
+          },
+          {
+            "id": "019a7f00-0000-7000-8000-00000000a601",
+            "type": "construct",
+            "name": "Straße",
+            "sentence": "",
+            "hubs": []
+          },
+          {
+            "id": "019a7f00-0000-7000-8000-00000000a604",
+            "type": "construct",
+            "name": "STRAẞE",
+            "sentence": "",
+            "hubs": []
+          }
+        ]
+      },
+      "note": "No Guide: the Domains by folded name, then id. U+00DF, the sharp s, has no simple folding and stays itself, after every ASCII letter; U+1E9E, the capital sharp s, folds to it, so those two fold alike and go by id. Full folding, which takes the sharp s to ss, orders them otherwise."
+    },
+    {
+      "name": "a-decomposed-and-a-precomposed-name-are-two-names-ordered-as-written",
+      "kind": "charter",
+      "world": {
+        "id": "019a7f00-0000-7000-8000-00000000f142",
+        "name": "Order 3",
+        "hidden": [],
+        "readers": {
+          "owner": {
+            "rung": "owner",
+            "character": null
+          }
+        },
+        "elements": [
+          {
+            "id": "019a7f00-0000-7000-8000-00000000a301",
+            "type": "construct",
+            "name": "E\u0301cole",
+            "supertype": "Domain",
+            "x_charter_of": "019a7f00-0000-7000-8000-00000000f142",
+            "created_at": "2026-11-01T12:00:00Z"
+          },
+          {
+            "id": "019a7f00-0000-7000-8000-00000000a302",
+            "type": "construct",
+            "name": "École",
+            "supertype": "Domain",
+            "x_charter_of": "019a7f00-0000-7000-8000-00000000f142",
+            "created_at": "2026-11-01T12:00:00Z"
+          },
+          {
+            "id": "019a7f00-0000-7000-8000-00000000a303",
+            "type": "construct",
+            "name": "Ecluse",
+            "supertype": "Domain",
+            "x_charter_of": "019a7f00-0000-7000-8000-00000000f142",
+            "created_at": "2026-11-01T12:00:00Z"
+          },
+          {
+            "id": "019a7f00-0000-7000-8000-00000000a304",
+            "type": "construct",
+            "name": "Zed",
+            "supertype": "Domain",
+            "x_charter_of": "019a7f00-0000-7000-8000-00000000f142",
+            "created_at": "2026-11-01T12:00:00Z"
+          }
+        ]
+      },
+      "reader": "owner",
+      "want": {
+        "charter": null,
+        "guide": null,
+        "domains": [
+          {
+            "id": "019a7f00-0000-7000-8000-00000000a303",
+            "type": "construct",
+            "name": "Ecluse",
+            "sentence": "",
+            "hubs": []
+          },
+          {
+            "id": "019a7f00-0000-7000-8000-00000000a301",
+            "type": "construct",
+            "name": "E\u0301cole",
+            "sentence": "",
+            "hubs": []
+          },
+          {
+            "id": "019a7f00-0000-7000-8000-00000000a304",
+            "type": "construct",
+            "name": "Zed",
+            "sentence": "",
+            "hubs": []
+          },
+          {
+            "id": "019a7f00-0000-7000-8000-00000000a302",
+            "type": "construct",
+            "name": "École",
+            "sentence": "",
+            "hubs": []
+          }
+        ]
+      },
+      "note": "No Guide: the Domains by folded name, then id, as written. The first name is E followed by U+0301, a combining acute accent; the second is U+00C9, the precomposed capital E with acute. Nothing is normalized, so they are two names: the first folds to e followed by U+0301 and comes after Ecluse, the second folds to U+00E9 and comes after Zed."
+    },
+    {
+      "name": "names-equal-after-folding-are-ordered-by-id",
+      "kind": "charter",
+      "world": {
+        "id": "019a7f00-0000-7000-8000-00000000f143",
+        "name": "Order 4",
+        "hidden": [],
+        "readers": {
+          "owner": {
+            "rung": "owner",
+            "character": null
+          }
+        },
+        "elements": [
+          {
+            "id": "019a7f00-0000-7000-8000-00000000a901",
+            "type": "construct",
+            "name": "Paſs",
+            "supertype": "Domain",
+            "x_charter_of": "019a7f00-0000-7000-8000-00000000f143",
+            "created_at": "2026-11-01T12:00:00Z"
+          },
+          {
+            "id": "019a7f00-0000-7000-8000-00000000a902",
+            "type": "construct",
+            "name": "PASS",
+            "supertype": "Domain",
+            "x_charter_of": "019a7f00-0000-7000-8000-00000000f143",
+            "created_at": "2026-11-01T12:00:00Z"
+          },
+          {
+            "id": "019a7f00-0000-7000-8000-00000000a903",
+            "type": "construct",
+            "name": "pass",
+            "supertype": "Domain",
+            "x_charter_of": "019a7f00-0000-7000-8000-00000000f143",
+            "created_at": "2026-11-01T12:00:00Z"
+          },
+          {
+            "id": "019a7f00-0000-7000-8000-00000000a904",
+            "type": "construct",
+            "name": " Pass ",
+            "supertype": "Domain",
+            "x_charter_of": "019a7f00-0000-7000-8000-00000000f143",
+            "created_at": "2026-11-01T12:00:00Z"
+          }
+        ]
+      },
+      "reader": "owner",
+      "want": {
+        "charter": null,
+        "guide": null,
+        "domains": [
+          {
+            "id": "019a7f00-0000-7000-8000-00000000a901",
+            "type": "construct",
+            "name": "Paſs",
+            "sentence": "",
+            "hubs": []
+          },
+          {
+            "id": "019a7f00-0000-7000-8000-00000000a902",
+            "type": "construct",
+            "name": "PASS",
+            "sentence": "",
+            "hubs": []
+          },
+          {
+            "id": "019a7f00-0000-7000-8000-00000000a903",
+            "type": "construct",
+            "name": "pass",
+            "sentence": "",
+            "hubs": []
+          },
+          {
+            "id": "019a7f00-0000-7000-8000-00000000a904",
+            "type": "construct",
+            "name": " Pass ",
+            "sentence": "",
+            "hubs": []
+          }
+        ]
+      },
+      "note": "No Guide: the Domains by folded name, then id. A long s, capitals and spaces at both ends: all four names trim and fold to pass, so they go by id alone, whatever their spelling as stored."
+    },
+    {
+      "name": "a-byte-order-mark-before-a-name-or-a-unit-separator-after-it-stays-in-the-order",
+      "kind": "charter",
+      "world": {
+        "id": "019a7f00-0000-7000-8000-00000000f144",
+        "name": "Order 5",
+        "hidden": [],
+        "readers": {
+          "owner": {
+            "rung": "owner",
+            "character": null
+          }
+        },
+        "elements": [
+          {
+            "id": "019a7f00-0000-7000-8000-00000000b101",
+            "type": "construct",
+            "name": "\ufeffBay",
+            "supertype": "Domain",
+            "x_charter_of": "019a7f00-0000-7000-8000-00000000f144",
+            "created_at": "2026-11-01T12:00:00Z"
+          },
+          {
+            "id": "019a7f00-0000-7000-8000-00000000b102",
+            "type": "construct",
+            "name": "Bay\u001f",
+            "supertype": "Domain",
+            "x_charter_of": "019a7f00-0000-7000-8000-00000000f144",
+            "created_at": "2026-11-01T12:00:00Z"
+          },
+          {
+            "id": "019a7f00-0000-7000-8000-00000000b103",
+            "type": "construct",
+            "name": "Bay",
+            "supertype": "Domain",
+            "x_charter_of": "019a7f00-0000-7000-8000-00000000f144",
+            "created_at": "2026-11-01T12:00:00Z"
+          },
+          {
+            "id": "019a7f00-0000-7000-8000-00000000b104",
+            "type": "construct",
+            "name": "Cove",
+            "supertype": "Domain",
+            "x_charter_of": "019a7f00-0000-7000-8000-00000000f144",
+            "created_at": "2026-11-01T12:00:00Z"
+          }
+        ]
+      },
+      "reader": "owner",
+      "want": {
+        "charter": null,
+        "guide": null,
+        "domains": [
+          {
+            "id": "019a7f00-0000-7000-8000-00000000b103",
+            "type": "construct",
+            "name": "Bay",
+            "sentence": "",
+            "hubs": []
+          },
+          {
+            "id": "019a7f00-0000-7000-8000-00000000b102",
+            "type": "construct",
+            "name": "Bay\u001f",
+            "sentence": "",
+            "hubs": []
+          },
+          {
+            "id": "019a7f00-0000-7000-8000-00000000b104",
+            "type": "construct",
+            "name": "Cove",
+            "sentence": "",
+            "hubs": []
+          },
+          {
+            "id": "019a7f00-0000-7000-8000-00000000b101",
+            "type": "construct",
+            "name": "\ufeffBay",
+            "sentence": "",
+            "hubs": []
+          }
+        ]
+      },
+      "note": "No Guide: the Domains by folded name, then id, each name trimmed of White_Space and folded as the room profile defines it. U+FEFF, the byte order mark, and U+001F, the unit separator, have no White_Space property: the trim keeps them, so the first name comes after Cove, U+FEFF being above every letter here, and the second after Bay, U+001F being below every letter. A language's own trim may take either (JavaScript's trim takes the byte order mark, Python's strip the unit separator), and the name then ties with Bay and goes first by id."
+    },
+    {
+      "name": "names-trimmed-of-a-next-line-or-an-ideographic-space-are-ordered-by-id",
+      "kind": "charter",
+      "world": {
+        "id": "019a7f00-0000-7000-8000-00000000f145",
+        "name": "Order 6",
+        "hidden": [],
+        "readers": {
+          "owner": {
+            "rung": "owner",
+            "character": null
+          }
+        },
+        "elements": [
+          {
+            "id": "019a7f00-0000-7000-8000-00000000b201",
+            "type": "construct",
+            "name": "Bayou",
+            "supertype": "Domain",
+            "x_charter_of": "019a7f00-0000-7000-8000-00000000f145",
+            "created_at": "2026-11-01T12:00:00Z"
+          },
+          {
+            "id": "019a7f00-0000-7000-8000-00000000b202",
+            "type": "construct",
+            "name": "Bay\u0085",
+            "supertype": "Domain",
+            "x_charter_of": "019a7f00-0000-7000-8000-00000000f145",
+            "created_at": "2026-11-01T12:00:00Z"
+          },
+          {
+            "id": "019a7f00-0000-7000-8000-00000000b203",
+            "type": "construct",
+            "name": "　Bay",
+            "supertype": "Domain",
+            "x_charter_of": "019a7f00-0000-7000-8000-00000000f145",
+            "created_at": "2026-11-01T12:00:00Z"
+          },
+          {
+            "id": "019a7f00-0000-7000-8000-00000000b204",
+            "type": "construct",
+            "name": "Bay",
+            "supertype": "Domain",
+            "x_charter_of": "019a7f00-0000-7000-8000-00000000f145",
+            "created_at": "2026-11-01T12:00:00Z"
+          }
+        ]
+      },
+      "reader": "owner",
+      "want": {
+        "charter": null,
+        "guide": null,
+        "domains": [
+          {
+            "id": "019a7f00-0000-7000-8000-00000000b202",
+            "type": "construct",
+            "name": "Bay\u0085",
+            "sentence": "",
+            "hubs": []
+          },
+          {
+            "id": "019a7f00-0000-7000-8000-00000000b203",
+            "type": "construct",
+            "name": "　Bay",
+            "sentence": "",
+            "hubs": []
+          },
+          {
+            "id": "019a7f00-0000-7000-8000-00000000b204",
+            "type": "construct",
+            "name": "Bay",
+            "sentence": "",
+            "hubs": []
+          },
+          {
+            "id": "019a7f00-0000-7000-8000-00000000b201",
+            "type": "construct",
+            "name": "Bayou",
+            "sentence": "",
+            "hubs": []
+          }
+        ]
+      },
+      "note": "No Guide: the Domains by folded name, then id, each name trimmed of White_Space and folded as the room profile defines it. U+0085, the next line character, and U+3000, the ideographic space, have the White_Space property: the trim takes them, so three names are bay and go by id, before Bayou. A trim that leaves U+0085 (JavaScript's, or one of the code points up to U+0020) or U+3000 (one up to U+0020, or one of the White_Space code points below U+0100) orders those names apart, after Bayou."
+    },
+    {
+      "name": "names-equal-after-trimming-and-folding-are-ordered-by-id-whatever-their-created-at",
+      "kind": "charter",
+      "world": {
+        "id": "019a7f00-0000-7000-8000-00000000f146",
+        "name": "Order 7",
+        "hidden": [],
+        "readers": {
+          "owner": {
+            "rung": "owner",
+            "character": null
+          }
+        },
+        "elements": [
+          {
+            "id": "019a7f00-0000-7000-8000-00000000b301",
+            "type": "construct",
+            "name": "Heath",
+            "supertype": "Domain",
+            "x_charter_of": "019a7f00-0000-7000-8000-00000000f146",
+            "created_at": "2026-11-02T12:00:00Z"
+          },
+          {
+            "id": "019a7f00-0000-7000-8000-00000000b302",
+            "type": "construct",
+            "name": "HEATH",
+            "supertype": "Domain",
+            "x_charter_of": "019a7f00-0000-7000-8000-00000000f146",
+            "created_at": "2026-11-01T12:00:00Z"
+          },
+          {
+            "id": "019a7f00-0000-7000-8000-00000000b303",
+            "type": "construct",
+            "name": "heath",
+            "supertype": "Domain",
+            "x_charter_of": "019a7f00-0000-7000-8000-00000000f146",
+            "created_at": "2026-11-03T12:00:00Z"
+          }
+        ]
+      },
+      "reader": "owner",
+      "want": {
+        "charter": null,
+        "guide": null,
+        "domains": [
+          {
+            "id": "019a7f00-0000-7000-8000-00000000b301",
+            "type": "construct",
+            "name": "Heath",
+            "sentence": "",
+            "hubs": []
+          },
+          {
+            "id": "019a7f00-0000-7000-8000-00000000b302",
+            "type": "construct",
+            "name": "HEATH",
+            "sentence": "",
+            "hubs": []
+          },
+          {
+            "id": "019a7f00-0000-7000-8000-00000000b303",
+            "type": "construct",
+            "name": "heath",
+            "sentence": "",
+            "hubs": []
+          }
+        ]
+      },
+      "note": "No Guide: the Domains by folded name, then id, and nothing else. The three names fold to heath; their created_at are in neither the order of their ids nor its reverse, so a reader that breaks the tie by created_at, oldest or newest first, before the id orders them otherwise."
+    },
+    {
+      "name": "a-folded-name-that-another-begins-with-comes-before-it",
+      "kind": "charter",
+      "world": {
+        "id": "019a7f00-0000-7000-8000-00000000f147",
+        "name": "Order 8",
+        "hidden": [],
+        "readers": {
+          "owner": {
+            "rung": "owner",
+            "character": null
+          }
+        },
+        "elements": [
+          {
+            "id": "019a7f00-0000-7000-8000-00000000b401",
+            "type": "construct",
+            "name": "Ash Grove",
+            "supertype": "Domain",
+            "x_charter_of": "019a7f00-0000-7000-8000-00000000f147",
+            "created_at": "2026-11-01T12:00:00Z"
+          },
+          {
+            "id": "019a7f00-0000-7000-8000-00000000b402",
+            "type": "construct",
+            "name": "Ash",
+            "supertype": "Domain",
+            "x_charter_of": "019a7f00-0000-7000-8000-00000000f147",
+            "created_at": "2026-11-01T12:00:00Z"
+          },
+          {
+            "id": "019a7f00-0000-7000-8000-00000000b403",
+            "type": "construct",
+            "name": "Ashford",
+            "supertype": "Domain",
+            "x_charter_of": "019a7f00-0000-7000-8000-00000000f147",
+            "created_at": "2026-11-01T12:00:00Z"
+          }
+        ]
+      },
+      "reader": "owner",
+      "want": {
+        "charter": null,
+        "guide": null,
+        "domains": [
+          {
+            "id": "019a7f00-0000-7000-8000-00000000b402",
+            "type": "construct",
+            "name": "Ash",
+            "sentence": "",
+            "hubs": []
+          },
+          {
+            "id": "019a7f00-0000-7000-8000-00000000b401",
+            "type": "construct",
+            "name": "Ash Grove",
+            "sentence": "",
+            "hubs": []
+          },
+          {
+            "id": "019a7f00-0000-7000-8000-00000000b403",
+            "type": "construct",
+            "name": "Ashford",
+            "sentence": "",
+            "hubs": []
+          }
+        ]
+      },
+      "note": "No Guide: the Domains by folded name, then id, the name compared first and whole. ash is the start of ash grove, so it comes first, whatever the ids. A reader that sorts one key made of the folded name and the id joined puts Ash Grove first, since the space after ash is below every character an id is written with."
+    },
+    {
+      "name": "names-equal-after-folding-are-ordered-by-their-ids-as-written-never-folded",
+      "kind": "charter",
+      "world": {
+        "id": "019a7f00-0000-7000-8000-00000000f148",
+        "name": "Order 9",
+        "hidden": [],
+        "readers": {
+          "owner": {
+            "rung": "owner",
+            "character": null
+          }
+        },
+        "elements": [
+          {
+            "id": "019A7F00-0000-7000-8000-00000000B502",
+            "type": "construct",
+            "name": "Mere",
+            "supertype": "Domain",
+            "x_charter_of": "019a7f00-0000-7000-8000-00000000f148",
+            "created_at": "2026-11-01T12:00:00Z"
+          },
+          {
+            "id": "019a7f00-0000-7000-8000-00000000b501",
+            "type": "construct",
+            "name": "mere",
+            "supertype": "Domain",
+            "x_charter_of": "019a7f00-0000-7000-8000-00000000f148",
+            "created_at": "2026-11-01T12:00:00Z"
+          },
+          {
+            "id": "019a7f00-0000-7000-8000-00000000b503",
+            "type": "construct",
+            "name": "Moor",
+            "supertype": "Domain",
+            "x_charter_of": "019a7f00-0000-7000-8000-00000000f148",
+            "created_at": "2026-11-01T12:00:00Z"
+          }
+        ]
+      },
+      "reader": "owner",
+      "want": {
+        "charter": null,
+        "guide": null,
+        "domains": [
+          {
+            "id": "019A7F00-0000-7000-8000-00000000B502",
+            "type": "construct",
+            "name": "Mere",
+            "sentence": "",
+            "hubs": []
+          },
+          {
+            "id": "019a7f00-0000-7000-8000-00000000b501",
+            "type": "construct",
+            "name": "mere",
+            "sentence": "",
+            "hubs": []
+          },
+          {
+            "id": "019a7f00-0000-7000-8000-00000000b503",
+            "type": "construct",
+            "name": "Moor",
+            "sentence": "",
+            "hubs": []
+          }
+        ]
+      },
+      "note": "No Guide: the Domains by folded name, then id, the ids as written. Mere and mere fold alike; their ids are 019A7F00-...-B502 and 019a7f00-...-b501. Compared as written, by code point, an upper-case A comes before a lowercase a, so Mere leads; a reader that folds the case of the ids first reads b501 below b502 and puts mere first. Moor comes last by its name."
+    },
+    {
+      "name": "a-name-that-another-begins-with-before-a-control-character-comes-before-it",
+      "kind": "charter",
+      "world": {
+        "id": "019a7f00-0000-7000-8000-00000000f149",
+        "name": "Order 10",
+        "hidden": [],
+        "readers": {
+          "owner": {
+            "rung": "owner",
+            "character": null
+          }
+        },
+        "elements": [
+          {
+            "id": "019a7f00-0000-7000-8000-00000000b601",
+            "type": "construct",
+            "name": "Ash\u0001",
+            "supertype": "Domain",
+            "x_charter_of": "019a7f00-0000-7000-8000-00000000f149",
+            "created_at": "2026-11-01T12:00:00Z"
+          },
+          {
+            "id": "019a7f00-0000-7000-8000-00000000b602",
+            "type": "construct",
+            "name": "Ash",
+            "supertype": "Domain",
+            "x_charter_of": "019a7f00-0000-7000-8000-00000000f149",
+            "created_at": "2026-11-01T12:00:00Z"
+          }
+        ]
+      },
+      "reader": "owner",
+      "want": {
+        "charter": null,
+        "guide": null,
+        "domains": [
+          {
+            "id": "019a7f00-0000-7000-8000-00000000b602",
+            "type": "construct",
+            "name": "Ash",
+            "sentence": "",
+            "hubs": []
+          },
+          {
+            "id": "019a7f00-0000-7000-8000-00000000b601",
+            "type": "construct",
+            "name": "Ash\u0001",
+            "sentence": "",
+            "hubs": []
+          }
+        ]
+      },
+      "note": "No Guide: the Domains by folded name, then id, the name compared first and whole. The first name is Ash followed by U+0001, a control character with no White_Space property, so the trim keeps it; ash is the start of it, so Ash comes first, whatever the ids. A reader that sorts one key made of the folded name, a separator below U+001F and the id joined puts the longer name first whenever the separator is above U+0000."
     }
   ],
   "design_cases": [
@@ -3705,6 +4495,123 @@
           "type": "object",
           "id": "019a7f00-0000-7000-8000-0000000006e1",
           "state": "locked"
+        }
+      ]
+    },
+    {
+      "name": "an-object-locked-between-two-next-line-characters-is-locked",
+      "note": "The subtype is locked with U+0085, the next line character, before and after it. U+0085 has the White_Space property, so the room profile's trim takes it and the state is locked (a language's own trim may leave it).",
+      "world": {
+        "id": "019a7f00-0000-7000-8000-00000000f15f",
+        "name": "Design 16",
+        "hidden": [],
+        "readers": {
+          "owner": {
+            "rung": "owner",
+            "character": null
+          }
+        },
+        "elements": [
+          {
+            "id": "019a7f00-0000-7000-8000-0000000006f0",
+            "type": "law",
+            "name": "Rules",
+            "supertype": "Charter",
+            "created_at": "2026-11-01T12:00:00Z",
+            "description": "The rules of the workshop.",
+            "x_charter_of": "019a7f00-0000-7000-8000-00000000f15f"
+          },
+          {
+            "id": "019a7f00-0000-7000-8000-0000000006f1",
+            "type": "object",
+            "name": "Release switch",
+            "subtype": "\u0085locked\u0085",
+            "created_at": "2026-11-02T12:00:00Z"
+          }
+        ]
+      },
+      "reader": "owner",
+      "want": [
+        {
+          "type": "object",
+          "id": "019a7f00-0000-7000-8000-0000000006f1",
+          "state": "locked"
+        }
+      ]
+    },
+    {
+      "name": "a-locked-object-after-a-byte-order-mark-has-no-design-state",
+      "note": "The subtype is locked after U+FEFF, the byte order mark, which has no White_Space property: the room profile's trim keeps it, so the trimmed subtype is no design state (a language's own trim may take it).",
+      "world": {
+        "id": "019a7f00-0000-7000-8000-00000000f160",
+        "name": "Design 17",
+        "hidden": [],
+        "readers": {
+          "owner": {
+            "rung": "owner",
+            "character": null
+          }
+        },
+        "elements": [
+          {
+            "id": "019a7f00-0000-7000-8000-000000000700",
+            "type": "law",
+            "name": "Rules",
+            "supertype": "Charter",
+            "created_at": "2026-11-01T12:00:00Z",
+            "description": "The rules of the workshop.",
+            "x_charter_of": "019a7f00-0000-7000-8000-00000000f160"
+          },
+          {
+            "id": "019a7f00-0000-7000-8000-000000000701",
+            "type": "object",
+            "name": "Release switch",
+            "subtype": "\ufefflocked",
+            "created_at": "2026-11-02T12:00:00Z"
+          }
+        ]
+      },
+      "reader": "owner",
+      "want": []
+    },
+    {
+      "name": "a-construct-in-design-written-with-a-long-s-is-in-design",
+      "note": "The subtype is in design with its s written as U+017F, the long s. Simple case folding takes the long s to s, so the state is in design (a language's lower-casing leaves the long s as it is).",
+      "world": {
+        "id": "019a7f00-0000-7000-8000-00000000f161",
+        "name": "Design 18",
+        "hidden": [],
+        "readers": {
+          "owner": {
+            "rung": "owner",
+            "character": null
+          }
+        },
+        "elements": [
+          {
+            "id": "019a7f00-0000-7000-8000-000000000710",
+            "type": "law",
+            "name": "Rules",
+            "supertype": "Charter",
+            "created_at": "2026-11-01T12:00:00Z",
+            "description": "The rules of the workshop.",
+            "x_charter_of": "019a7f00-0000-7000-8000-00000000f161"
+          },
+          {
+            "id": "019a7f00-0000-7000-8000-000000000711",
+            "type": "construct",
+            "name": "Export rule",
+            "subtype": "in deſign",
+            "created_at": "2026-11-02T12:00:00Z"
+          }
+        ]
+      },
+      "reader": "owner",
+      "want": [
+        {
+          "type": "construct",
+          "id": "019a7f00-0000-7000-8000-000000000711",
+          "state": "in design"
         }
       ]
     }

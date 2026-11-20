@@ -56,9 +56,9 @@ def reader_of(world: Mapping[str, Any], name: str) -> dict[str, Any]:
     return r
 
 
-def test_the_fixture_holds_serial_133s_cases() -> None:
-    assert len(CASES) == 47, f"the fixture holds {len(CASES)} cases, serial 133 has 47"
-    assert Counter(c["kind"] for c in CASES) == {"charter": 41, "element": 6}
+def test_the_fixture_holds_serial_141s_cases() -> None:
+    assert len(CASES) == 57, f"the fixture holds {len(CASES)} cases, serial 141 has 57"
+    assert Counter(c["kind"] for c in CASES) == {"charter": 51, "element": 6}
     assert sorted(DOC["worlds"]) == ["bare", "copy", "harbour", "lore", "open", "proposed", "skills", "stub", "ties"]
 
 
@@ -176,9 +176,9 @@ def part_set(rows: list[Any]) -> set[tuple[str, str, str]]:
     return {(row["type"], row["id"], row["state"]) for row in rows}
 
 
-def test_the_fixture_holds_serial_138s_design_cases() -> None:
-    assert len(DESIGN_CASES) == 16, f"the fixture holds {len(DESIGN_CASES)} design cases, serial 138 has 16"
-    assert len({c["name"] for c in DESIGN_CASES}) == 16
+def test_the_fixture_holds_serial_141s_design_cases() -> None:
+    assert len(DESIGN_CASES) == 19, f"the fixture holds {len(DESIGN_CASES)} design cases, serial 141 has 19"
+    assert len({c["name"] for c in DESIGN_CASES}) == 19
 
 
 @pytest.mark.parametrize("case", DESIGN_CASES, ids=lambda c: c["name"])

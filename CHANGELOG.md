@@ -4,7 +4,11 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+## 0.138.0 (2026-11-20)
+
 - **`world_graph` reads a co-builder as a keeper** (schema-dist serial 140). The flags `hidden` and `proposed` may be asked by a co-builder, and by the owner reading `as` one, where they were the owner's alone; a co-builder's graph without a lens is answered as the owner's is on the same input, the hidden and proposed elements it leaves out counted in `cut` and `edges_cut`. `not_visible` and `anchor_not_visible` stay the owner's, and a contributor, a guest and the public reader answer as before. A refused flag's `ValueError` now says it is a keeper's.
+- **The schema pin moves to `v0.34.1-dist.141`** (canonical 00.34.01 unchanged, no schema file moved, `_schema.py` changes only its provenance lines). Serial 140 brings the keeper's graph above; serial 141 adds cases only: 10 charter cases, 3 design cases and 4 graph cases (a Domain name trimmed of White_Space and nothing else, names equal after folding ordered by their ids as written, a folded name compared whole before the id, a co-builder's lens never carrying `anchor_not_visible`), and the charter page's sentence that folded Domain names compare by code point. Every new case passes on the readers as they were.
+- Comments say an AI's door, as the API document does. The wire values are unchanged.
 
 ## 0.137.0 (2026-11-19)
 
