@@ -14613,5 +14613,1517 @@
     "stop": "top"
    }
   }
+ ],
+ "down_cases": [
+  {
+   "name": "down-the-frame-corner-to-the-origin",
+   "claim": "a point on the parent at the parent frame's corner (x0, y0) comes down to the child's origin: the point on `from` as given, then the point on `map`, and `stop` null; `parent_frame` is the child's own",
+   "map": "019a9300-0000-7000-8000-00000000aa02",
+   "from": "019a9300-0000-7000-8000-00000000aa01",
+   "point": [
+    7011.9,
+    1282.2
+   ],
+   "elements": [
+    {
+     "type": "map",
+     "id": "019a9300-0000-7000-8000-00000000aa01",
+     "name": "land",
+     "width": 8000,
+     "height": 6000
+    },
+    {
+     "type": "map",
+     "id": "019a9300-0000-7000-8000-00000000aa02",
+     "name": "town",
+     "width": 2400,
+     "height": 1800,
+     "parent_map": "019a9300-0000-7000-8000-00000000aa01",
+     "x_parent_frame": [
+      7011.9,
+      1282.2,
+      7164.3,
+      1396.6
+     ]
+    }
+   ],
+   "want": {
+    "parent_frame": [
+     7011.9,
+     1282.2,
+     7164.3,
+     1396.6
+    ],
+    "lint": null,
+    "points": [
+     {
+      "map": "019a9300-0000-7000-8000-00000000aa01",
+      "x": 7011.9,
+      "y": 1282.2
+     },
+     {
+      "map": "019a9300-0000-7000-8000-00000000aa02",
+      "x": 0.0,
+      "y": 0.0
+     }
+    ],
+    "stop": null
+   }
+  },
+  {
+   "name": "down-the-far-corner-to-the-size",
+   "claim": "the parent frame's corner (x1, y1) comes down to the child's (`width`, `height`)",
+   "map": "019a9300-0000-7000-8000-00000000aa02",
+   "from": "019a9300-0000-7000-8000-00000000aa01",
+   "point": [
+    7164.3,
+    1396.6
+   ],
+   "elements": [
+    {
+     "type": "map",
+     "id": "019a9300-0000-7000-8000-00000000aa01",
+     "name": "land",
+     "width": 8000,
+     "height": 6000
+    },
+    {
+     "type": "map",
+     "id": "019a9300-0000-7000-8000-00000000aa02",
+     "name": "town",
+     "width": 2400,
+     "height": 1800,
+     "parent_map": "019a9300-0000-7000-8000-00000000aa01",
+     "x_parent_frame": [
+      7011.9,
+      1282.2,
+      7164.3,
+      1396.6
+     ]
+    }
+   ],
+   "want": {
+    "parent_frame": [
+     7011.9,
+     1282.2,
+     7164.3,
+     1396.6
+    ],
+    "lint": null,
+    "points": [
+     {
+      "map": "019a9300-0000-7000-8000-00000000aa01",
+      "x": 7164.3,
+      "y": 1396.6
+     },
+     {
+      "map": "019a9300-0000-7000-8000-00000000aa02",
+      "x": 2400.0,
+      "y": 1800.0
+     }
+    ],
+    "stop": null
+   }
+  },
+  {
+   "name": "down-a-carried-point-does-not-come-back",
+   "claim": "no round trip is promised: (1234.5, 987.25) on the child is carried up by rule 14 to this point, and brought down it is not (1234.5, 987.25); in y the fraction taken first gives another last bit",
+   "map": "019a9300-0000-7000-8000-00000000aa02",
+   "from": "019a9300-0000-7000-8000-00000000aa01",
+   "point": [
+    7090.29075,
+    1344.9452222222221
+   ],
+   "elements": [
+    {
+     "type": "map",
+     "id": "019a9300-0000-7000-8000-00000000aa01",
+     "name": "land",
+     "width": 8000,
+     "height": 6000
+    },
+    {
+     "type": "map",
+     "id": "019a9300-0000-7000-8000-00000000aa02",
+     "name": "town",
+     "width": 2400,
+     "height": 1800,
+     "parent_map": "019a9300-0000-7000-8000-00000000aa01",
+     "x_parent_frame": [
+      7011.9,
+      1282.2,
+      7164.3,
+      1396.6
+     ]
+    }
+   ],
+   "want": {
+    "parent_frame": [
+     7011.9,
+     1282.2,
+     7164.3,
+     1396.6
+    ],
+    "lint": null,
+    "points": [
+     {
+      "map": "019a9300-0000-7000-8000-00000000aa01",
+      "x": 7090.29075,
+      "y": 1344.9452222222221
+     },
+     {
+      "map": "019a9300-0000-7000-8000-00000000aa02",
+      "x": 1234.5000000000032,
+      "y": 987.249999999999
+     }
+    ],
+    "stop": null
+   }
+  },
+  {
+   "name": "down-a-point-outside-the-parent-frame",
+   "claim": "a point on the parent left of the parent frame is brought down as written and never clipped: it lands left of the child's rectangle",
+   "map": "019a9300-0000-7000-8000-00000000aa02",
+   "from": "019a9300-0000-7000-8000-00000000aa01",
+   "point": [
+    6968.0215,
+    1353.0008888888888
+   ],
+   "elements": [
+    {
+     "type": "map",
+     "id": "019a9300-0000-7000-8000-00000000aa01",
+     "name": "land",
+     "width": 8000,
+     "height": 6000
+    },
+    {
+     "type": "map",
+     "id": "019a9300-0000-7000-8000-00000000aa02",
+     "name": "town",
+     "width": 2400,
+     "height": 1800,
+     "parent_map": "019a9300-0000-7000-8000-00000000aa01",
+     "x_parent_frame": [
+      7011.9,
+      1282.2,
+      7164.3,
+      1396.6
+     ]
+    }
+   ],
+   "want": {
+    "parent_frame": [
+     7011.9,
+     1282.2,
+     7164.3,
+     1396.6
+    ],
+    "lint": null,
+    "points": [
+     {
+      "map": "019a9300-0000-7000-8000-00000000aa01",
+      "x": 6968.0215,
+      "y": 1353.0008888888888
+     },
+     {
+      "map": "019a9300-0000-7000-8000-00000000aa02",
+      "x": -690.9999999999944,
+      "y": 1113.9999999999986
+     }
+    ],
+    "stop": null
+   }
+  },
+  {
+   "name": "down-decimals-in-the-written-order",
+   "claim": "each axis is ((X - x0) * width) / (x1 - x0) in 64-bit floats, in that order: the difference, then the product, then the quotient; in y the fraction taken first gives another last bit",
+   "map": "019a9300-0000-7000-8000-00000000aa02",
+   "from": "019a9300-0000-7000-8000-00000000aa01",
+   "point": [
+    7011.906349999999,
+    1282.244488888889
+   ],
+   "elements": [
+    {
+     "type": "map",
+     "id": "019a9300-0000-7000-8000-00000000aa01",
+     "name": "land",
+     "width": 8000,
+     "height": 6000
+    },
+    {
+     "type": "map",
+     "id": "019a9300-0000-7000-8000-00000000aa02",
+     "name": "town",
+     "width": 2400,
+     "height": 1800,
+     "parent_map": "019a9300-0000-7000-8000-00000000aa01",
+     "x_parent_frame": [
+      7011.9,
+      1282.2,
+      7164.3,
+      1396.6
+     ]
+    }
+   ],
+   "want": {
+    "parent_frame": [
+     7011.9,
+     1282.2,
+     7164.3,
+     1396.6
+    ],
+    "lint": null,
+    "points": [
+     {
+      "map": "019a9300-0000-7000-8000-00000000aa01",
+      "x": 7011.906349999999,
+      "y": 1282.244488888889
+     },
+     {
+      "map": "019a9300-0000-7000-8000-00000000aa02",
+      "x": 0.09999999999459137,
+      "y": 0.7000000000011768
+     }
+    ],
+    "stop": null
+   }
+  },
+  {
+   "name": "down-from-the-map-itself",
+   "claim": "when `from` is `map` there is a way down of no level: `points` holds the point as given, alone, and `stop` is null",
+   "map": "019a9300-0000-7000-8000-00000000aa02",
+   "from": "019a9300-0000-7000-8000-00000000aa02",
+   "point": [
+    1.5,
+    2.5
+   ],
+   "elements": [
+    {
+     "type": "map",
+     "id": "019a9300-0000-7000-8000-00000000aa01",
+     "name": "land",
+     "width": 8000,
+     "height": 6000
+    },
+    {
+     "type": "map",
+     "id": "019a9300-0000-7000-8000-00000000aa02",
+     "name": "town",
+     "width": 2400,
+     "height": 1800,
+     "parent_map": "019a9300-0000-7000-8000-00000000aa01",
+     "x_parent_frame": [
+      7011.9,
+      1282.2,
+      7164.3,
+      1396.6
+     ]
+    }
+   ],
+   "want": {
+    "parent_frame": [
+     7011.9,
+     1282.2,
+     7164.3,
+     1396.6
+    ],
+    "lint": null,
+    "points": [
+     {
+      "map": "019a9300-0000-7000-8000-00000000aa02",
+      "x": 1.5,
+      "y": 2.5
+     }
+    ],
+    "stop": null
+   }
+  },
+  {
+   "name": "down-two-levels",
+   "claim": "a point on the land comes down onto the town by the town's parent frame, and that point, as it came down, onto the plan by the plan's: one level at a time, never through one product of the levels' ratios, which gives other bits here",
+   "map": "019a9300-0000-7000-8000-00000000aa03",
+   "from": "019a9300-0000-7000-8000-00000000aa01",
+   "point": [
+    745.0,
+    300.0
+   ],
+   "elements": [
+    {
+     "type": "map",
+     "id": "019a9300-0000-7000-8000-00000000aa01",
+     "name": "land",
+     "width": 8000,
+     "height": 5700
+    },
+    {
+     "type": "map",
+     "id": "019a9300-0000-7000-8000-00000000aa02",
+     "name": "town",
+     "width": 1366,
+     "height": 1024,
+     "parent_map": "019a9300-0000-7000-8000-00000000aa01",
+     "x_parent_frame": [
+      719.6,
+      179.92,
+      907.61,
+      399.46
+     ]
+    },
+    {
+     "type": "map",
+     "id": "019a9300-0000-7000-8000-00000000aa03",
+     "name": "plan",
+     "width": 800,
+     "height": 450,
+     "parent_map": "019a9300-0000-7000-8000-00000000aa02",
+     "x_parent_frame": [
+      160.795,
+      546.164,
+      310.491,
+      819.23
+     ]
+    }
+   ],
+   "want": {
+    "parent_frame": [
+     160.795,
+     546.164,
+     310.491,
+     819.23
+    ],
+    "lint": null,
+    "points": [
+     {
+      "map": "019a9300-0000-7000-8000-00000000aa01",
+      "x": 745.0,
+      "y": 300.0
+     },
+     {
+      "map": "019a9300-0000-7000-8000-00000000aa02",
+      "x": 184.54550289878185,
+      "y": 560.0889131821082
+     },
+     {
+      "map": "019a9300-0000-7000-8000-00000000aa03",
+      "x": 126.92658667583295,
+      "y": 22.947605824045038
+     }
+    ],
+    "stop": null
+   }
+  },
+  {
+   "name": "down-one-level-of-two",
+   "claim": "`from` may be any Map the walk from `map` reaches: from the town, one level down onto the plan, and the land is not read",
+   "map": "019a9300-0000-7000-8000-00000000aa03",
+   "from": "019a9300-0000-7000-8000-00000000aa02",
+   "point": [
+    250.125,
+    600.5
+   ],
+   "elements": [
+    {
+     "type": "map",
+     "id": "019a9300-0000-7000-8000-00000000aa01",
+     "name": "land",
+     "width": 8000,
+     "height": 5700
+    },
+    {
+     "type": "map",
+     "id": "019a9300-0000-7000-8000-00000000aa02",
+     "name": "town",
+     "width": 1366,
+     "height": 1024,
+     "parent_map": "019a9300-0000-7000-8000-00000000aa01",
+     "x_parent_frame": [
+      719.6,
+      179.92,
+      907.61,
+      399.46
+     ]
+    },
+    {
+     "type": "map",
+     "id": "019a9300-0000-7000-8000-00000000aa03",
+     "name": "plan",
+     "width": 800,
+     "height": 450,
+     "parent_map": "019a9300-0000-7000-8000-00000000aa02",
+     "x_parent_frame": [
+      160.795,
+      546.164,
+      310.491,
+      819.23
+     ]
+    }
+   ],
+   "want": {
+    "parent_frame": [
+     160.795,
+     546.164,
+     310.491,
+     819.23
+    ],
+    "lint": null,
+    "points": [
+     {
+      "map": "019a9300-0000-7000-8000-00000000aa02",
+      "x": 250.125,
+      "y": 600.5
+     },
+     {
+      "map": "019a9300-0000-7000-8000-00000000aa03",
+      "x": 477.39418554938015,
+      "y": 89.54318736129727
+     }
+    ],
+    "stop": null
+   }
+  },
+  {
+   "name": "down-from-a-map-below",
+   "claim": "the walk from the land ends at once, `top`, without reaching the town below it: no way down, and `points` holds the point on `from` as given, alone",
+   "map": "019a9300-0000-7000-8000-00000000aa01",
+   "from": "019a9300-0000-7000-8000-00000000aa02",
+   "point": [
+    15,
+    15
+   ],
+   "elements": [
+    {
+     "type": "map",
+     "id": "019a9300-0000-7000-8000-00000000aa01",
+     "name": "land",
+     "width": 8000,
+     "height": 6000
+    },
+    {
+     "type": "map",
+     "id": "019a9300-0000-7000-8000-00000000aa02",
+     "name": "town",
+     "width": 2400,
+     "height": 1800,
+     "parent_map": "019a9300-0000-7000-8000-00000000aa01",
+     "x_parent_frame": [
+      7011.9,
+      1282.2,
+      7164.3,
+      1396.6
+     ]
+    }
+   ],
+   "want": {
+    "parent_frame": null,
+    "lint": null,
+    "points": [
+     {
+      "map": "019a9300-0000-7000-8000-00000000aa02",
+      "x": 15,
+      "y": 15
+     }
+    ],
+    "stop": "top"
+   }
+  },
+  {
+   "name": "down-from-a-map-beside",
+   "claim": "a harbour beside the town on the land is not on the walk from the town, which reaches the top: no way down, `top`, and the given point alone",
+   "map": "019a9300-0000-7000-8000-00000000aa02",
+   "from": "019a9300-0000-7000-8000-00000000aa04",
+   "point": [
+    15,
+    15
+   ],
+   "elements": [
+    {
+     "type": "map",
+     "id": "019a9300-0000-7000-8000-00000000aa01",
+     "name": "land",
+     "width": 8000,
+     "height": 6000
+    },
+    {
+     "type": "map",
+     "id": "019a9300-0000-7000-8000-00000000aa02",
+     "name": "town",
+     "width": 2400,
+     "height": 1800,
+     "parent_map": "019a9300-0000-7000-8000-00000000aa01",
+     "x_parent_frame": [
+      7011.9,
+      1282.2,
+      7164.3,
+      1396.6
+     ]
+    },
+    {
+     "type": "map",
+     "id": "019a9300-0000-7000-8000-00000000aa04",
+     "name": "harbour",
+     "width": 600,
+     "height": 400,
+     "parent_map": "019a9300-0000-7000-8000-00000000aa01",
+     "x_parent_frame": [
+      7200,
+      1300,
+      7260,
+      1340
+     ]
+    }
+   ],
+   "want": {
+    "parent_frame": [
+     7011.9,
+     1282.2,
+     7164.3,
+     1396.6
+    ],
+    "lint": null,
+    "points": [
+     {
+      "map": "019a9300-0000-7000-8000-00000000aa04",
+      "x": 15,
+      "y": 15
+     }
+    ],
+    "stop": "top"
+   }
+  },
+  {
+   "name": "down-from-a-parent-not-served",
+   "claim": "`from` is the Map the town's `parent_map` names, and it is not served: the walk ends `dangling`, and the given point stands alone",
+   "map": "019a9300-0000-7000-8000-00000000aa02",
+   "from": "019a9300-0000-7000-8000-00000000aa09",
+   "point": [
+    7100,
+    1300
+   ],
+   "elements": [
+    {
+     "type": "map",
+     "id": "019a9300-0000-7000-8000-00000000aa02",
+     "name": "town",
+     "width": 2400,
+     "height": 1800,
+     "parent_map": "019a9300-0000-7000-8000-00000000aa09",
+     "x_parent_frame": [
+      7011.9,
+      1282.2,
+      7164.3,
+      1396.6
+     ]
+    }
+   ],
+   "want": {
+    "parent_frame": [
+     7011.9,
+     1282.2,
+     7164.3,
+     1396.6
+    ],
+    "lint": null,
+    "points": [
+     {
+      "map": "019a9300-0000-7000-8000-00000000aa09",
+      "x": 7100,
+      "y": 1300
+     }
+    ],
+    "stop": "dangling"
+   }
+  },
+  {
+   "name": "down-through-a-ring",
+   "claim": "the town and the land name each other: the walk from the town carries onto the land once and ends `cycle`, never reaching the sea, so there is no way down from it",
+   "map": "019a9300-0000-7000-8000-00000000aa02",
+   "from": "019a9300-0000-7000-8000-00000000aa05",
+   "point": [
+    15,
+    15
+   ],
+   "elements": [
+    {
+     "type": "map",
+     "id": "019a9300-0000-7000-8000-00000000aa05",
+     "name": "sea",
+     "width": 9000,
+     "height": 9000
+    },
+    {
+     "type": "map",
+     "id": "019a9300-0000-7000-8000-00000000aa01",
+     "name": "land",
+     "width": 8000,
+     "height": 6000,
+     "parent_map": "019a9300-0000-7000-8000-00000000aa02",
+     "x_parent_frame": [
+      0,
+      0,
+      10,
+      10
+     ]
+    },
+    {
+     "type": "map",
+     "id": "019a9300-0000-7000-8000-00000000aa02",
+     "name": "town",
+     "width": 2400,
+     "height": 1800,
+     "parent_map": "019a9300-0000-7000-8000-00000000aa01",
+     "x_parent_frame": [
+      7011.9,
+      1282.2,
+      7164.3,
+      1396.6
+     ]
+    }
+   ],
+   "want": {
+    "parent_frame": [
+     7011.9,
+     1282.2,
+     7164.3,
+     1396.6
+    ],
+    "lint": null,
+    "points": [
+     {
+      "map": "019a9300-0000-7000-8000-00000000aa05",
+      "x": 15,
+      "y": 15
+     }
+    ],
+    "stop": "cycle"
+   }
+  },
+  {
+   "name": "down-past-a-level-with-no-frame",
+   "claim": "the plan has a `parent_map` and no parent frame: the walk from it ends `no_frame` on the plan, though the town is framed on the land; no point is brought part of the way, onto the town",
+   "map": "019a9300-0000-7000-8000-00000000aa03",
+   "from": "019a9300-0000-7000-8000-00000000aa01",
+   "point": [
+    745.0,
+    300.0
+   ],
+   "elements": [
+    {
+     "type": "map",
+     "id": "019a9300-0000-7000-8000-00000000aa01",
+     "name": "land",
+     "width": 8000,
+     "height": 5700
+    },
+    {
+     "type": "map",
+     "id": "019a9300-0000-7000-8000-00000000aa02",
+     "name": "town",
+     "width": 1366,
+     "height": 1024,
+     "parent_map": "019a9300-0000-7000-8000-00000000aa01",
+     "x_parent_frame": [
+      719.6,
+      179.92,
+      907.61,
+      399.46
+     ]
+    },
+    {
+     "type": "map",
+     "id": "019a9300-0000-7000-8000-00000000aa03",
+     "name": "plan",
+     "width": 800,
+     "height": 450,
+     "parent_map": "019a9300-0000-7000-8000-00000000aa02"
+    }
+   ],
+   "want": {
+    "parent_frame": null,
+    "lint": null,
+    "points": [
+     {
+      "map": "019a9300-0000-7000-8000-00000000aa01",
+      "x": 745.0,
+      "y": 300.0
+     }
+    ],
+    "stop": "no_frame"
+   }
+  },
+  {
+   "name": "down-past-a-level-with-no-carry",
+   "claim": "the plan has a parent frame and no `width`: the walk from it ends `no_carry`, and no point is brought part of the way; the plan's own parent frame is reported",
+   "map": "019a9300-0000-7000-8000-00000000aa03",
+   "from": "019a9300-0000-7000-8000-00000000aa01",
+   "point": [
+    745.0,
+    300.0
+   ],
+   "elements": [
+    {
+     "type": "map",
+     "id": "019a9300-0000-7000-8000-00000000aa01",
+     "name": "land",
+     "width": 8000,
+     "height": 5700
+    },
+    {
+     "type": "map",
+     "id": "019a9300-0000-7000-8000-00000000aa02",
+     "name": "town",
+     "width": 1366,
+     "height": 1024,
+     "parent_map": "019a9300-0000-7000-8000-00000000aa01",
+     "x_parent_frame": [
+      719.6,
+      179.92,
+      907.61,
+      399.46
+     ]
+    },
+    {
+     "type": "map",
+     "id": "019a9300-0000-7000-8000-00000000aa03",
+     "name": "plan",
+     "height": 450,
+     "parent_map": "019a9300-0000-7000-8000-00000000aa02",
+     "x_parent_frame": [
+      160.795,
+      546.164,
+      310.491,
+      819.23
+     ]
+    }
+   ],
+   "want": {
+    "parent_frame": [
+     160.795,
+     546.164,
+     310.491,
+     819.23
+    ],
+    "lint": null,
+    "points": [
+     {
+      "map": "019a9300-0000-7000-8000-00000000aa01",
+      "x": 745.0,
+      "y": 300.0
+     }
+    ],
+    "stop": "no_carry"
+   }
+  },
+  {
+   "name": "down-below-a-level-that-ends-the-walk",
+   "claim": "the walk from the town carries onto the land, so there is a way down from the land; the land's parent is not served, and the walk is not followed past `from`, so that fault is never met",
+   "map": "019a9300-0000-7000-8000-00000000aa02",
+   "from": "019a9300-0000-7000-8000-00000000aa01",
+   "point": [
+    7090.29075,
+    1344.9452222222221
+   ],
+   "elements": [
+    {
+     "type": "map",
+     "id": "019a9300-0000-7000-8000-00000000aa01",
+     "name": "land",
+     "width": 8000,
+     "height": 6000,
+     "parent_map": "019a9300-0000-7000-8000-00000000aa09",
+     "x_parent_frame": [
+      0,
+      0,
+      10,
+      10
+     ]
+    },
+    {
+     "type": "map",
+     "id": "019a9300-0000-7000-8000-00000000aa02",
+     "name": "town",
+     "width": 2400,
+     "height": 1800,
+     "parent_map": "019a9300-0000-7000-8000-00000000aa01",
+     "x_parent_frame": [
+      7011.9,
+      1282.2,
+      7164.3,
+      1396.6
+     ]
+    }
+   ],
+   "want": {
+    "parent_frame": [
+     7011.9,
+     1282.2,
+     7164.3,
+     1396.6
+    ],
+    "lint": null,
+    "points": [
+     {
+      "map": "019a9300-0000-7000-8000-00000000aa01",
+      "x": 7090.29075,
+      "y": 1344.9452222222221
+     },
+     {
+      "map": "019a9300-0000-7000-8000-00000000aa02",
+      "x": 1234.5000000000032,
+      "y": 987.249999999999
+     }
+    ],
+    "stop": null
+   }
+  },
+  {
+   "name": "down-below-a-ring",
+   "claim": "the walk from the plan carries onto the town, so there is a way down from the town, though the land above it names the town back: the walk is followed only until it reaches `from`",
+   "map": "019a9300-0000-7000-8000-00000000aa03",
+   "from": "019a9300-0000-7000-8000-00000000aa02",
+   "point": [
+    250.125,
+    600.5
+   ],
+   "elements": [
+    {
+     "type": "map",
+     "id": "019a9300-0000-7000-8000-00000000aa01",
+     "name": "land",
+     "width": 8000,
+     "height": 5700,
+     "parent_map": "019a9300-0000-7000-8000-00000000aa02",
+     "x_parent_frame": [
+      0,
+      0,
+      10,
+      10
+     ]
+    },
+    {
+     "type": "map",
+     "id": "019a9300-0000-7000-8000-00000000aa02",
+     "name": "town",
+     "width": 1366,
+     "height": 1024,
+     "parent_map": "019a9300-0000-7000-8000-00000000aa01",
+     "x_parent_frame": [
+      719.6,
+      179.92,
+      907.61,
+      399.46
+     ]
+    },
+    {
+     "type": "map",
+     "id": "019a9300-0000-7000-8000-00000000aa03",
+     "name": "plan",
+     "width": 800,
+     "height": 450,
+     "parent_map": "019a9300-0000-7000-8000-00000000aa02",
+     "x_parent_frame": [
+      160.795,
+      546.164,
+      310.491,
+      819.23
+     ]
+    }
+   ],
+   "want": {
+    "parent_frame": [
+     160.795,
+     546.164,
+     310.491,
+     819.23
+    ],
+    "lint": null,
+    "points": [
+     {
+      "map": "019a9300-0000-7000-8000-00000000aa02",
+      "x": 250.125,
+      "y": 600.5
+     },
+     {
+      "map": "019a9300-0000-7000-8000-00000000aa03",
+      "x": 477.39418554938015,
+      "y": 89.54318736129727
+     }
+    ],
+    "stop": null
+   }
+  },
+  {
+   "name": "down-from-the-map-itself-on-a-broken-walk",
+   "claim": "when `from` is `map` there is a way down of no level, whatever the walk from `map` would meet: the town's parent is not served, and the point as given stands alone with `stop` null",
+   "map": "019a9300-0000-7000-8000-00000000aa02",
+   "from": "019a9300-0000-7000-8000-00000000aa02",
+   "point": [
+    1.5,
+    2.5
+   ],
+   "elements": [
+    {
+     "type": "map",
+     "id": "019a9300-0000-7000-8000-00000000aa02",
+     "name": "town",
+     "width": 2400,
+     "height": 1800,
+     "parent_map": "019a9300-0000-7000-8000-00000000aa09",
+     "x_parent_frame": [
+      7011.9,
+      1282.2,
+      7164.3,
+      1396.6
+     ]
+    }
+   ],
+   "want": {
+    "parent_frame": [
+     7011.9,
+     1282.2,
+     7164.3,
+     1396.6
+    ],
+    "lint": null,
+    "points": [
+     {
+      "map": "019a9300-0000-7000-8000-00000000aa02",
+      "x": 1.5,
+      "y": 2.5
+     }
+    ],
+    "stop": null
+   }
+  },
+  {
+   "name": "down-from-a-row-whose-type-is-Map",
+   "claim": "`from` is read by its id alone: the town's parent is served only as a row whose `type` is `Map`, so the walk ends `dangling` (reading K), and no row under `from`'s id is read for it",
+   "map": "019a9300-0000-7000-8000-00000000aa02",
+   "from": "019a9300-0000-7000-8000-00000000aa01",
+   "point": [
+    7100,
+    1300
+   ],
+   "elements": [
+    {
+     "type": "Map",
+     "id": "019a9300-0000-7000-8000-00000000aa01",
+     "name": "land",
+     "width": 8000,
+     "height": 6000
+    },
+    {
+     "type": "map",
+     "id": "019a9300-0000-7000-8000-00000000aa02",
+     "name": "town",
+     "width": 2400,
+     "height": 1800,
+     "parent_map": "019a9300-0000-7000-8000-00000000aa01",
+     "x_parent_frame": [
+      7011.9,
+      1282.2,
+      7164.3,
+      1396.6
+     ]
+    }
+   ],
+   "want": {
+    "parent_frame": [
+     7011.9,
+     1282.2,
+     7164.3,
+     1396.6
+    ],
+    "lint": null,
+    "points": [
+     {
+      "map": "019a9300-0000-7000-8000-00000000aa01",
+      "x": 7100,
+      "y": 1300
+     }
+    ],
+    "stop": "dangling"
+   }
+  },
+  {
+   "name": "down-a-map-that-is-no-map-from-itself",
+   "claim": "a `map` that is no Map answers the empty reading before anything else, `from` naming the same id included",
+   "map_index": [
+    1
+   ],
+   "from": "019a9300-0000-7000-8000-00000000aa02",
+   "point": [
+    1.5,
+    2.5
+   ],
+   "elements": [
+    {
+     "type": "map",
+     "id": "019a9300-0000-7000-8000-00000000aa01",
+     "name": "land",
+     "width": 8000,
+     "height": 6000
+    },
+    {
+     "type": "Map",
+     "id": "019a9300-0000-7000-8000-00000000aa02",
+     "name": "town",
+     "width": 2400,
+     "height": 1800,
+     "parent_map": "019a9300-0000-7000-8000-00000000aa01",
+     "x_parent_frame": [
+      7011.9,
+      1282.2,
+      7164.3,
+      1396.6
+     ]
+    }
+   ],
+   "want": {
+    "parent_frame": null,
+    "lint": null,
+    "points": [],
+    "stop": null
+   }
+  },
+  {
+   "name": "down-from-an-empty-string",
+   "claim": "a `from` that is an empty string is no Map's id (reading H): the walk from the town never reaches it and ends `top`, so there is no way down, and the one point carries `from` as given",
+   "map": "019a9300-0000-7000-8000-00000000aa02",
+   "from": "",
+   "point": [
+    7100,
+    1300
+   ],
+   "elements": [
+    {
+     "type": "map",
+     "id": "019a9300-0000-7000-8000-00000000aa01",
+     "name": "land",
+     "width": 8000,
+     "height": 6000
+    },
+    {
+     "type": "map",
+     "id": "019a9300-0000-7000-8000-00000000aa02",
+     "name": "town",
+     "width": 2400,
+     "height": 1800,
+     "parent_map": "019a9300-0000-7000-8000-00000000aa01",
+     "x_parent_frame": [
+      7011.9,
+      1282.2,
+      7164.3,
+      1396.6
+     ]
+    }
+   ],
+   "want": {
+    "parent_frame": [
+     7011.9,
+     1282.2,
+     7164.3,
+     1396.6
+    ],
+    "lint": null,
+    "points": [
+     {
+      "map": "",
+      "x": 7100,
+      "y": 1300
+     }
+    ],
+    "stop": "top"
+   }
+  },
+  {
+   "name": "down-from-null",
+   "claim": "a `from` that is null is no Map's id (reading H): the walk from the town ends `dangling` on its parent not served, so there is no way down, and the one point carries `from` as given",
+   "map": "019a9300-0000-7000-8000-00000000aa02",
+   "from": null,
+   "point": [
+    7100,
+    1300
+   ],
+   "elements": [
+    {
+     "type": "map",
+     "id": "019a9300-0000-7000-8000-00000000aa02",
+     "name": "town",
+     "width": 2400,
+     "height": 1800,
+     "parent_map": "019a9300-0000-7000-8000-00000000aa09",
+     "x_parent_frame": [
+      7011.9,
+      1282.2,
+      7164.3,
+      1396.6
+     ]
+    }
+   ],
+   "want": {
+    "parent_frame": [
+     7011.9,
+     1282.2,
+     7164.3,
+     1396.6
+    ],
+    "lint": null,
+    "points": [
+     {
+      "map": null,
+      "x": 7100,
+      "y": 1300
+     }
+    ],
+    "stop": "dangling"
+   }
+  },
+  {
+   "name": "down-from-an-id-served-nowhere",
+   "claim": "a `from` that is an id no Map is served under, and not the parent the walk names, is not reached: the walk from the town ends `top`, its own word, and the given point stands alone",
+   "map": "019a9300-0000-7000-8000-00000000aa02",
+   "from": "019a9300-0000-7000-8000-00000000aa77",
+   "point": [
+    7100,
+    1300
+   ],
+   "elements": [
+    {
+     "type": "map",
+     "id": "019a9300-0000-7000-8000-00000000aa01",
+     "name": "land",
+     "width": 8000,
+     "height": 6000
+    },
+    {
+     "type": "map",
+     "id": "019a9300-0000-7000-8000-00000000aa02",
+     "name": "town",
+     "width": 2400,
+     "height": 1800,
+     "parent_map": "019a9300-0000-7000-8000-00000000aa01",
+     "x_parent_frame": [
+      7011.9,
+      1282.2,
+      7164.3,
+      1396.6
+     ]
+    }
+   ],
+   "want": {
+    "parent_frame": [
+     7011.9,
+     1282.2,
+     7164.3,
+     1396.6
+    ],
+    "lint": null,
+    "points": [
+     {
+      "map": "019a9300-0000-7000-8000-00000000aa77",
+      "x": 7100,
+      "y": 1300
+     }
+    ],
+    "stop": "top"
+   }
+  },
+  {
+   "name": "down-a-map-with-its-own-lint",
+   "claim": "`lint` is `map`'s own: the land carries a parent frame and no `parent_map`, so its lint is `no_parent`, and the walk from it ends `top` without reaching the town below it",
+   "map": "019a9300-0000-7000-8000-00000000aa01",
+   "from": "019a9300-0000-7000-8000-00000000aa02",
+   "point": [
+    15,
+    15
+   ],
+   "elements": [
+    {
+     "type": "map",
+     "id": "019a9300-0000-7000-8000-00000000aa01",
+     "name": "land",
+     "width": 8000,
+     "height": 6000,
+     "x_parent_frame": [
+      0,
+      0,
+      10,
+      10
+     ]
+    },
+    {
+     "type": "map",
+     "id": "019a9300-0000-7000-8000-00000000aa02",
+     "name": "town",
+     "width": 2400,
+     "height": 1800,
+     "parent_map": "019a9300-0000-7000-8000-00000000aa01",
+     "x_parent_frame": [
+      7011.9,
+      1282.2,
+      7164.3,
+      1396.6
+     ]
+    }
+   ],
+   "want": {
+    "parent_frame": null,
+    "lint": "no_parent",
+    "points": [
+     {
+      "map": "019a9300-0000-7000-8000-00000000aa02",
+      "x": 15,
+      "y": 15
+     }
+    ],
+    "stop": "top"
+   }
+  },
+  {
+   "name": "down-past-a-mirrored-parent-frame",
+   "claim": "the town's key is a box mirrored in x, no parent frame, with the lint `not_a_box`: the walk from the town ends `no_frame` before it reaches the land",
+   "map": "019a9300-0000-7000-8000-00000000aa02",
+   "from": "019a9300-0000-7000-8000-00000000aa01",
+   "point": [
+    7100,
+    1300
+   ],
+   "elements": [
+    {
+     "type": "map",
+     "id": "019a9300-0000-7000-8000-00000000aa01",
+     "name": "land",
+     "width": 8000,
+     "height": 6000
+    },
+    {
+     "type": "map",
+     "id": "019a9300-0000-7000-8000-00000000aa02",
+     "name": "town",
+     "width": 2400,
+     "height": 1800,
+     "parent_map": "019a9300-0000-7000-8000-00000000aa01",
+     "x_parent_frame": [
+      7164.3,
+      1282.2,
+      7011.9,
+      1396.6
+     ]
+    }
+   ],
+   "want": {
+    "parent_frame": null,
+    "lint": "not_a_box",
+    "points": [
+     {
+      "map": "019a9300-0000-7000-8000-00000000aa01",
+      "x": 7100,
+      "y": 1300
+     }
+    ],
+    "stop": "no_frame"
+   }
+  },
+  {
+   "name": "down-from-a-parent-not-served-past-a-mirrored-frame",
+   "claim": "served-ness before shape: the town's parent is not served and its key is a mirrored box, so the walk from it ends `dangling`, not `no_frame`, its lint still `not_a_box`",
+   "map": "019a9300-0000-7000-8000-00000000aa02",
+   "from": "019a9300-0000-7000-8000-00000000aa09",
+   "point": [
+    7100,
+    1300
+   ],
+   "elements": [
+    {
+     "type": "map",
+     "id": "019a9300-0000-7000-8000-00000000aa02",
+     "name": "town",
+     "width": 2400,
+     "height": 1800,
+     "parent_map": "019a9300-0000-7000-8000-00000000aa09",
+     "x_parent_frame": [
+      7164.3,
+      1282.2,
+      7011.9,
+      1396.6
+     ]
+    }
+   ],
+   "want": {
+    "parent_frame": null,
+    "lint": "not_a_box",
+    "points": [
+     {
+      "map": "019a9300-0000-7000-8000-00000000aa09",
+      "x": 7100,
+      "y": 1300
+     }
+    ],
+    "stop": "dangling"
+   }
+  },
+  {
+   "name": "down-a-map-served-twice",
+   "claim": "the town is served twice with two parent frames: the last row served wins (reading I), and the point comes down by the parent frame the walk checked at the town, never by the first row's",
+   "map": "019a9300-0000-7000-8000-00000000aa02",
+   "from": "019a9300-0000-7000-8000-00000000aa01",
+   "point": [
+    7100,
+    1300
+   ],
+   "elements": [
+    {
+     "type": "map",
+     "id": "019a9300-0000-7000-8000-00000000aa01",
+     "name": "land",
+     "width": 8000,
+     "height": 6000
+    },
+    {
+     "type": "map",
+     "id": "019a9300-0000-7000-8000-00000000aa02",
+     "name": "town",
+     "width": 2400,
+     "height": 1800,
+     "parent_map": "019a9300-0000-7000-8000-00000000aa01",
+     "x_parent_frame": [
+      7000,
+      1200,
+      7200,
+      1400
+     ]
+    },
+    {
+     "type": "map",
+     "id": "019a9300-0000-7000-8000-00000000aa02",
+     "name": "town",
+     "width": 2400,
+     "height": 1800,
+     "parent_map": "019a9300-0000-7000-8000-00000000aa01",
+     "x_parent_frame": [
+      7011.9,
+      1282.2,
+      7164.3,
+      1396.6
+     ]
+    }
+   ],
+   "want": {
+    "parent_frame": [
+     7011.9,
+     1282.2,
+     7164.3,
+     1396.6
+    ],
+    "lint": null,
+    "points": [
+     {
+      "map": "019a9300-0000-7000-8000-00000000aa01",
+      "x": 7100,
+      "y": 1300
+     },
+     {
+      "map": "019a9300-0000-7000-8000-00000000aa02",
+      "x": 1387.4015748031504,
+      "y": 280.0699300699297
+     }
+    ],
+    "stop": null
+   }
+  },
+  {
+   "name": "down-from-the-map-itself-with-its-own-lint",
+   "claim": "when `from` is `map` the lint is still `map`'s own: the land carries a key and no `parent_map`, so its lint is `no_parent`, with the point as given alone and `stop` null",
+   "map": "019a9300-0000-7000-8000-00000000aa01",
+   "from": "019a9300-0000-7000-8000-00000000aa01",
+   "point": [
+    15,
+    15
+   ],
+   "elements": [
+    {
+     "type": "map",
+     "id": "019a9300-0000-7000-8000-00000000aa01",
+     "name": "land",
+     "width": 8000,
+     "height": 6000,
+     "x_parent_frame": [
+      0,
+      0,
+      10,
+      10
+     ]
+    }
+   ],
+   "want": {
+    "parent_frame": null,
+    "lint": "no_parent",
+    "points": [
+     {
+      "map": "019a9300-0000-7000-8000-00000000aa01",
+      "x": 15,
+      "y": 15
+     }
+    ],
+    "stop": null
+   }
+  },
+  {
+   "name": "down-a-row-that-is-no-map",
+   "claim": "a row read whose `type` is `Map`, and one with no `id`, are no Map (readings K and H): each answers the empty reading, `points` empty and `stop` null",
+   "map_index": [
+    1,
+    2
+   ],
+   "from": "019a9300-0000-7000-8000-00000000aa01",
+   "point": [
+    7100,
+    1300
+   ],
+   "elements": [
+    {
+     "type": "map",
+     "id": "019a9300-0000-7000-8000-00000000aa01",
+     "name": "land",
+     "width": 8000,
+     "height": 6000
+    },
+    {
+     "type": "Map",
+     "id": "019a9300-0000-7000-8000-00000000aa02",
+     "name": "town",
+     "width": 2400,
+     "height": 1800,
+     "parent_map": "019a9300-0000-7000-8000-00000000aa01",
+     "x_parent_frame": [
+      7011.9,
+      1282.2,
+      7164.3,
+      1396.6
+     ]
+    },
+    {
+     "type": "map",
+     "name": "town",
+     "width": 2400,
+     "height": 1800,
+     "parent_map": "019a9300-0000-7000-8000-00000000aa01",
+     "x_parent_frame": [
+      7011.9,
+      1282.2,
+      7164.3,
+      1396.6
+     ]
+    }
+   ],
+   "want": {
+    "parent_frame": null,
+    "lint": null,
+    "points": [],
+    "stop": null
+   }
+  }
  ]
 }
