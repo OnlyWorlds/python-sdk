@@ -262,6 +262,23 @@ def test_bulk_body_flag_key_and_replay(make_client: MakeClient) -> None:
     assert c.bulk([]).was_replay is False
 
 
+def test_bulk_create_only_is_sent_only_when_true(make_client: MakeClient) -> None:
+    ok = {"errors": False, "items": [{"status": 201, "id": "a"}]}
+    t = FakeTransport(script=[jresp(200, ok), jresp(200, ok), jresp(200, ok)])
+    c = make_client(t)
+    items = [{"type": "character", "element": {"id": "mine", "name": "A"}}]
+    c.bulk(items, create_only=True)
+    assert list(t.calls[-1].body) == ["items", "atomic", "create_only"] and t.calls[-1].body["create_only"] is True
+    c.bulk(items)
+    c.bulk(items, create_only=False)
+    assert [list(call.body) for call in t.calls[-2:]] == [["items", "atomic"]] * 2
+    sent = len(t.calls)
+    for bad in ("true", 1, None):
+        with pytest.raises(TypeError, match="create_only is True or False"):
+            c.bulk(items, create_only=bad)  # type: ignore[arg-type]
+    assert len(t.calls) == sent  # a refused create_only sends nothing
+
+
 def test_bulk_resend_after_a_lost_answer_names_the_same_elements(make_client: MakeClient) -> None:
     """keel stores a bulk answer only after the batch commits: a 502 after the commit replays
     nothing, so an id-less item resent as id-less would be created twice. Ids given are kept."""

@@ -1134,6 +1134,7 @@ class Client:
         *,
         atomic: bool = False,
         idempotency_key: str | None = None,
+        create_only: bool = False,
     ) -> BulkResult:
         """``POST /bulk``: up to about 1,000 ``{"type", "element"}`` items.
 
@@ -1146,7 +1147,13 @@ class Client:
         ``hidden`` is sent as each element has it: an item that creates with
         ``hidden: true`` is created hidden; from a key that may not hide, that slot is a 403
         ``hidden_not_allowed`` and its element is not created, the other slots as ever.
+
+        ``create_only=True`` (sent as ``create_only``) creates every item with an ``id`` as ``create``
+        does, never replacing it: an id the world already holds answers that slot 409 ``id_conflict``
+        and the element stays as it was. Left False, the body is the one earlier releases sent.
         """
+        if not isinstance(create_only, bool):
+            raise TypeError("bulk: create_only is True or False. Nothing was sent.")
         elements = []
         for index, it in enumerate(items):
             _refuse_known_of(it["element"], f"bulk: items[{index}]")  # the whole call, never a skipped slot
@@ -1155,10 +1162,12 @@ class Client:
             if not element.get("id"):
                 element["id"] = _minted_id(idempotency_key, index)
             elements.append({"type": _segment(str(it["type"]), _TYPE, "element type"), "element": element})
-        body = {
+        body: dict[str, Any] = {
             "items": elements,
             "atomic": atomic,
         }
+        if create_only:
+            body["create_only"] = True
         key = idempotency_key or str(uuid.uuid4())
         got = self.send("POST", "bulk/", body, self._writing({"Idempotency-Key": key}))
         if got.response is None:

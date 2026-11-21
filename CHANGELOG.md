@@ -4,6 +4,10 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+## 0.139.0 (2026-11-21)
+
+- **`bulk(items, create_only=True)`**, sent as `create_only`: every item with an `id` is created as `create` creates it, never replaced. An id the world already holds answers that item's slot `409` `id_conflict`, and the element stays as it was; the rest of the batch goes on as before. Left `False`, the body is the one earlier releases sent; a value that is not a bool is refused before anything is sent.
+
 ## 0.138.2 (2026-11-21)
 
 - **`push` never sends `atlas_baseline_unknown`.** Atlas 1.124.30 marks a copy whose stamp came from OnlyWorlds with no record of what OnlyWorlds held, and keeps that mark on the device only. A folder Atlas wrote can carry it; `push` now leaves it out of every patch, as it does Atlas's other local-only fields.
