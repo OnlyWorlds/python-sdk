@@ -4,6 +4,10 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+## 0.138.1 (2026-11-21)
+
+- **The schema pin moves to `v0.34.1-dist.142`** (canonical 00.34.01 unchanged, no schema file moved, `_schema.py` changes only its provenance lines). The map-space page gains a note at the end of rule 14: where a Zone has an outline on a child Map and on its parent, no reading joins the two outlines or adds a point on the edge of the child's rectangle or of its parent frame, and what a tool draws there is the tool's; rule 4 now says one outline per Map the Zone has placed Markers on. Three new cases (46 in all) hold it: a Zone on a child Map and on its parent, a Zone placed on a parent and only unplaced on its child, and a Zone outlined on a child alone. `map_space` already answered all three; no answer on an earlier case moved.
+
 ## 0.138.0 (2026-11-20)
 
 - **`world_graph` reads a co-builder as a keeper** (schema-dist serial 140). The flags `hidden` and `proposed` may be asked by a co-builder, and by the owner reading `as` one, where they were the owner's alone; a co-builder's graph without a lens is answered as the owner's is on the same input, the hidden and proposed elements it leaves out counted in `cut` and `edges_cut`. `not_visible` and `anchor_not_visible` stay the owner's, and a contributor, a guest and the public reader answer as before. A refused flag's `ValueError` now says it is a keeper's.

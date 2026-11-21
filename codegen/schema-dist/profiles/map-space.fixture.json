@@ -9595,6 +9595,377 @@
      "no_point": 1
     }
    }
+  },
+  {
+   "name": "zone-on-a-child-and-its-parent",
+   "claim": "rule 4 and the note under rule 14: a Zone drawn as a line on a parent Map and on its child; the parent's line enters the child's parent frame, has a Marker inside it and leaves it. Each Map's outline holds that Map's own Markers as written: nothing is joined, no point is added on the parent frame's edge and none inside it is taken out",
+   "elements": [
+    {
+     "type": "map",
+     "id": "019a9420-0000-7000-8000-00000000aa01",
+     "name": "land",
+     "width": 1000,
+     "height": 800
+    },
+    {
+     "type": "map",
+     "id": "019a9420-0000-7000-8000-00000000aa02",
+     "name": "town",
+     "width": 100,
+     "height": 50,
+     "parent_map": "019a9420-0000-7000-8000-00000000aa01",
+     "x_parent_frame": [
+      100,
+      200,
+      300,
+      300
+     ]
+    },
+    {
+     "type": "zone",
+     "id": "019a9420-0000-7000-8000-0000000b0001",
+     "name": "river",
+     "shape": "line"
+    },
+    {
+     "type": "marker",
+     "id": "019a9420-0000-7000-8000-0000000c0001",
+     "name": "river: land 1",
+     "map": "019a9420-0000-7000-8000-00000000aa01",
+     "zone": "019a9420-0000-7000-8000-0000000b0001",
+     "x": 40,
+     "y": 210,
+     "order": 0
+    },
+    {
+     "type": "marker",
+     "id": "019a9420-0000-7000-8000-0000000c0002",
+     "name": "river: land 2",
+     "map": "019a9420-0000-7000-8000-00000000aa01",
+     "zone": "019a9420-0000-7000-8000-0000000b0001",
+     "x": 160,
+     "y": 230,
+     "order": 1
+    },
+    {
+     "type": "marker",
+     "id": "019a9420-0000-7000-8000-0000000c0005",
+     "name": "river: land 3",
+     "map": "019a9420-0000-7000-8000-00000000aa01",
+     "zone": "019a9420-0000-7000-8000-0000000b0001",
+     "x": 440,
+     "y": 250,
+     "order": 2
+    },
+    {
+     "type": "marker",
+     "id": "019a9420-0000-7000-8000-0000000c0003",
+     "name": "river: town 1",
+     "map": "019a9420-0000-7000-8000-00000000aa02",
+     "zone": "019a9420-0000-7000-8000-0000000b0001",
+     "x": 0,
+     "y": 10,
+     "order": 0
+    },
+    {
+     "type": "marker",
+     "id": "019a9420-0000-7000-8000-0000000c0004",
+     "name": "river: town 2",
+     "map": "019a9420-0000-7000-8000-00000000aa02",
+     "zone": "019a9420-0000-7000-8000-0000000b0001",
+     "x": 20,
+     "y": 10,
+     "order": 1
+    }
+   ],
+   "want": {
+    "maps": [
+     {
+      "id": "019a9420-0000-7000-8000-00000000aa01",
+      "width": 1000,
+      "height": 800,
+      "depth": null,
+      "z_max": 0,
+      "scale": null,
+      "location": null,
+      "parent_map": null
+     },
+     {
+      "id": "019a9420-0000-7000-8000-00000000aa02",
+      "width": 100,
+      "height": 50,
+      "depth": null,
+      "z_max": 0,
+      "scale": null,
+      "location": null,
+      "parent_map": "019a9420-0000-7000-8000-00000000aa01"
+     }
+    ],
+    "zones": [
+     {
+      "zone": "019a9420-0000-7000-8000-0000000b0001",
+      "map": "019a9420-0000-7000-8000-00000000aa01",
+      "shape": "line",
+      "points": [
+       [
+        40,
+        210,
+        0
+       ],
+       [
+        160,
+        230,
+        0
+       ],
+       [
+        440,
+        250,
+        0
+       ]
+      ]
+     },
+     {
+      "zone": "019a9420-0000-7000-8000-0000000b0001",
+      "map": "019a9420-0000-7000-8000-00000000aa02",
+      "shape": "line",
+      "points": [
+       [
+        0,
+        10,
+        0
+       ],
+       [
+        20,
+        10,
+        0
+       ]
+      ]
+     }
+    ],
+    "pins": [],
+    "out": {}
+   }
+  },
+  {
+   "name": "zone-placed-on-a-parent-and-not-on-its-child",
+   "claim": "rule 4: a Zone with placed Markers on a parent Map and one Marker on its child whose x is not a whole number has an outline on the parent only; the child has none, not one with no points, and the Marker is counted no_point",
+   "elements": [
+    {
+     "type": "map",
+     "id": "019a9421-0000-7000-8000-00000000aa01",
+     "name": "land",
+     "width": 1000,
+     "height": 800
+    },
+    {
+     "type": "map",
+     "id": "019a9421-0000-7000-8000-00000000aa02",
+     "name": "town",
+     "width": 100,
+     "height": 50,
+     "parent_map": "019a9421-0000-7000-8000-00000000aa01",
+     "x_parent_frame": [
+      100,
+      200,
+      300,
+      300
+     ]
+    },
+    {
+     "type": "zone",
+     "id": "019a9421-0000-7000-8000-0000000b0001",
+     "name": "marsh"
+    },
+    {
+     "type": "marker",
+     "id": "019a9421-0000-7000-8000-0000000c0001",
+     "name": "marsh: land 1",
+     "map": "019a9421-0000-7000-8000-00000000aa01",
+     "zone": "019a9421-0000-7000-8000-0000000b0001",
+     "x": 40,
+     "y": 210,
+     "order": 0
+    },
+    {
+     "type": "marker",
+     "id": "019a9421-0000-7000-8000-0000000c0002",
+     "name": "marsh: land 2",
+     "map": "019a9421-0000-7000-8000-00000000aa01",
+     "zone": "019a9421-0000-7000-8000-0000000b0001",
+     "x": 160,
+     "y": 230,
+     "order": 1
+    },
+    {
+     "type": "marker",
+     "id": "019a9421-0000-7000-8000-0000000c0003",
+     "name": "marsh: town 1",
+     "map": "019a9421-0000-7000-8000-00000000aa02",
+     "zone": "019a9421-0000-7000-8000-0000000b0001",
+     "x": 1.5,
+     "y": 10,
+     "order": 0
+    }
+   ],
+   "want": {
+    "maps": [
+     {
+      "id": "019a9421-0000-7000-8000-00000000aa01",
+      "width": 1000,
+      "height": 800,
+      "depth": null,
+      "z_max": 0,
+      "scale": null,
+      "location": null,
+      "parent_map": null
+     },
+     {
+      "id": "019a9421-0000-7000-8000-00000000aa02",
+      "width": 100,
+      "height": 50,
+      "depth": null,
+      "z_max": null,
+      "scale": null,
+      "location": null,
+      "parent_map": "019a9421-0000-7000-8000-00000000aa01"
+     }
+    ],
+    "zones": [
+     {
+      "zone": "019a9421-0000-7000-8000-0000000b0001",
+      "map": "019a9421-0000-7000-8000-00000000aa01",
+      "shape": "polygon",
+      "points": [
+       [
+        40,
+        210,
+        0
+       ],
+       [
+        160,
+        230,
+        0
+       ]
+      ]
+     }
+    ],
+    "pins": [],
+    "out": {
+     "no_point": 1
+    }
+   }
+  },
+  {
+   "name": "zone-outlined-on-a-child-alone",
+   "claim": "rule 4: a Zone with placed Markers on a child Map with a parent frame and none on its parent has an outline on the child only; the parent has none, and the child's points are not carried up to make one",
+   "elements": [
+    {
+     "type": "map",
+     "id": "019a9422-0000-7000-8000-00000000aa01",
+     "name": "land",
+     "width": 1000,
+     "height": 800
+    },
+    {
+     "type": "map",
+     "id": "019a9422-0000-7000-8000-00000000aa02",
+     "name": "town",
+     "width": 100,
+     "height": 50,
+     "parent_map": "019a9422-0000-7000-8000-00000000aa01",
+     "x_parent_frame": [
+      100,
+      200,
+      300,
+      300
+     ]
+    },
+    {
+     "type": "zone",
+     "id": "019a9422-0000-7000-8000-0000000b0001",
+     "name": "pond"
+    },
+    {
+     "type": "marker",
+     "id": "019a9422-0000-7000-8000-0000000c0001",
+     "name": "pond 1",
+     "map": "019a9422-0000-7000-8000-00000000aa02",
+     "zone": "019a9422-0000-7000-8000-0000000b0001",
+     "x": 20,
+     "y": 10,
+     "order": 0
+    },
+    {
+     "type": "marker",
+     "id": "019a9422-0000-7000-8000-0000000c0002",
+     "name": "pond 2",
+     "map": "019a9422-0000-7000-8000-00000000aa02",
+     "zone": "019a9422-0000-7000-8000-0000000b0001",
+     "x": 40,
+     "y": 30,
+     "order": 1
+    },
+    {
+     "type": "marker",
+     "id": "019a9422-0000-7000-8000-0000000c0003",
+     "name": "pond 3",
+     "map": "019a9422-0000-7000-8000-00000000aa02",
+     "zone": "019a9422-0000-7000-8000-0000000b0001",
+     "x": 20,
+     "y": 30,
+     "order": 2
+    }
+   ],
+   "want": {
+    "maps": [
+     {
+      "id": "019a9422-0000-7000-8000-00000000aa01",
+      "width": 1000,
+      "height": 800,
+      "depth": null,
+      "z_max": null,
+      "scale": null,
+      "location": null,
+      "parent_map": null
+     },
+     {
+      "id": "019a9422-0000-7000-8000-00000000aa02",
+      "width": 100,
+      "height": 50,
+      "depth": null,
+      "z_max": 0,
+      "scale": null,
+      "location": null,
+      "parent_map": "019a9422-0000-7000-8000-00000000aa01"
+     }
+    ],
+    "zones": [
+     {
+      "zone": "019a9422-0000-7000-8000-0000000b0001",
+      "map": "019a9422-0000-7000-8000-00000000aa02",
+      "shape": "polygon",
+      "points": [
+       [
+        20,
+        10,
+        0
+       ],
+       [
+        40,
+        30,
+        0
+       ],
+       [
+        20,
+        30,
+        0
+       ]
+      ]
+     }
+    ],
+    "pins": [],
+    "out": {}
+   }
   }
  ],
  "layout_cases": [
