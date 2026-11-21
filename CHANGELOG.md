@@ -4,6 +4,8 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+- Docstrings describe onlyworlds.com's wrong-PIN limit as it stands since 2026-11-21: ten different wrong PINs on one key or account within fifteen minutes refuse every PIN there, and the same wrong PIN never counts twice. No behaviour changes: a `429` `rate_limited` is still never retried and still stops `push`.
+
 ## 0.139.1 (2026-11-21)
 
 - **`push` goes on past a refusal about one element.** A world's Charter and the elements it names now change only by the owner and co-builders (`403` `keeper_only`); a contributor's push that met one of them stopped every later patch, as it does for a refused key. `keeper_only`, `review_by_another` and `not_reader` now join `not_author`: that patch is failed and the run goes on. Any other `403`, and one whose code is new, still stops the run (`push.ELEMENT_403`).

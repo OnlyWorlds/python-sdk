@@ -12,8 +12,10 @@ OpenAPI document, which ``tests/test_wire.py`` compares the client with):
   writes refuse one before sending, and strip any other ``known_of``;
 - lists are ``{data, has_more, next_cursor}``, continued with ``?cursor=``;
 - ``Idempotency-Key`` on POST and ``/bulk`` replays the first successful answer for 24 h;
-- 429 carries ``Retry-After``; on v2 its only 429 is ``rate_limited``, the failed-PIN
-  throttle (10 failures lock the key for 15 minutes); under load keel answers 503 ``server_busy`` with
+- 429 carries ``Retry-After``: ``rate_limited`` is the wrong-PIN limit (ten different wrong PINs on
+  one key or account within fifteen minutes refuse every PIN there, the right one included, for up
+  to 900 seconds; the same wrong PIN never counts twice), ``too_many_requests`` the request budget,
+  ``quota_exceeded`` a daily cap; under load keel answers 503 ``server_busy`` with
   ``Retry-After: 5`` (2026-09-28).
 
 One difference from the TypeScript SDK, on purpose: this client retries 429, 5xx and
@@ -252,8 +254,9 @@ class RetryPolicy:
     Idempotency-Key is still running, which is what a retry after a timeout meets: the
     retry, same key and body, replays its answer once the first has finished.
 
-    Never a 429 with code ``rate_limited``: keel sends it for a wrong PIN, and each retry is
-    one more failure toward locking the key. keel's 500 is an unhandled exception, almost
+    Never a 429 with code ``rate_limited``: keel sends it once ten different wrong PINs have
+    been tried on the key or account, and it refuses every PIN there, the right one included,
+    for up to fifteen minutes, so a retry inside the run only waits. keel's 500 is an unhandled exception, almost
     always the same on every try, so it gets one retry, not the full budget.
 
     Waits ``Retry-After`` when the server sends a valid one (whole seconds or an HTTP

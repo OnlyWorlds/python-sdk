@@ -247,7 +247,7 @@ def test_generic_pair_is_sent_whole(tmp_path: Path) -> None:
     ],
 )
 def test_a_refused_key_stops_the_run(tmp_path: Path, make_client: MakeClient, status: int, code: str) -> None:
-    """A wrong PIN on every patch would lock the key (10 failures, 15 minutes) for every tool that uses it."""
+    """A refused key refuses every later patch too: the run stops at the first."""
     chars = [wire_char(f"c0000000-0000-7000-8000-00000000000{i}", "A") for i in range(5)]
     edited = [{**c, "name": "B"} for c in chars]
     base, edit = folders(tmp_path, {"character": chars}, {"character": edited})

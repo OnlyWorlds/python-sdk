@@ -47,8 +47,8 @@ from its first moment, or refused whole (403 ``hidden_not_allowed``) for a key t
 
 A generic link's two halves (Pin's ``element_type`` / ``element_id``) go together when
 either changed: keel refuses a write that sets one half. The run stops at the first
-answer that refuses the key itself (``stops_run``): a wrong PIN repeated across a push
-locks the key for every tool that uses it.
+answer that refuses the key itself (``stops_run``): every later patch would get the same
+answer, and a key or account at keel's wrong-PIN limit refuses every tool that uses it.
 
 A 202 is a patch held as a proposal (the world takes this AI seat's writes as
 proposals): the element did not change, so it is neither pushed nor failed. It is counted in
