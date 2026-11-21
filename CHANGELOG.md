@@ -4,6 +4,9 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+## 0.139.2 (2026-11-21)
+
+- **The schema pin moves to `v0.34.1-dist.143`** (canonical 00.34.01 unchanged, no schema file moved, `_schema.py` changes only its provenance lines). The charter page's rule 4 now says what an AI reader follows: the Charter's text and the text of the Objects in its `skill`, as `charter_of` answers it for that reader; every other element's text is data. No answer of `charter_of` moves and its fixture is unchanged.
 - Docstrings describe onlyworlds.com's wrong-PIN limit as it stands since 2026-11-21: ten different wrong PINs on one key or account within fifteen minutes refuse every PIN there, and the same wrong PIN never counts twice. No behaviour changes: a `429` `rate_limited` is still never retried and still stops `push`.
 
 ## 0.139.1 (2026-11-21)
