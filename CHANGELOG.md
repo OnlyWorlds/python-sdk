@@ -4,6 +4,10 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+## 0.138.2 (2026-11-21)
+
+- **`push` never sends `atlas_baseline_unknown`.** Atlas 1.124.30 marks a copy whose stamp came from OnlyWorlds with no record of what OnlyWorlds held, and keeps that mark on the device only. A folder Atlas wrote can carry it; `push` now leaves it out of every patch, as it does Atlas's other local-only fields.
+
 ## 0.138.1 (2026-11-21)
 
 - **The schema pin moves to `v0.34.1-dist.142`** (canonical 00.34.01 unchanged, no schema file moved, `_schema.py` changes only its provenance lines). The map-space page gains a note at the end of rule 14: where a Zone has an outline on a child Map and on its parent, no reading joins the two outlines or adds a point on the edge of the child's rectangle or of its parent frame, and what a tool draws there is the tool's; rule 4 now says one outline per Map the Zone has placed Markers on. Three new cases (46 in all) hold it: a Zone on a child Map and on its parent, a Zone placed on a parent and only unplaced on its child, and a Zone outlined on a child alone. `map_space` already answered all three; no answer on an earlier case moved.

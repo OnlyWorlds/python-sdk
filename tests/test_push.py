@@ -212,6 +212,7 @@ def test_atlas_local_only_fields_stay_home(tmp_path: Path) -> None:
                     atlas_aliases=["Al"],
                     atlas_page_pub=True,
                     atlas_hidden_shown_online=False,
+                    atlas_baseline_unknown=True,
                     atlas_color="#fff",
                 )
             ]
