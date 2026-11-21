@@ -186,7 +186,7 @@ Each element heading becomes an element, its description the description. The fi
 
 ## Export to OKF
 
-A world folder can be exported as a valid [Open Knowledge Format](https://github.com/GoogleCloudPlatform/open-knowledge-format) (OKF) 0.2 bundle, as the spec stands at one pinned commit (`onlyworlds.okf.OKF_COMMIT`): one markdown file per element, with its fields in the frontmatter, its text under headings and its links (in-prose `ow://` references included) as markdown links, plus an index per type. This needs PyYAML, which the rest of the package does not:
+A world folder can be exported as a valid [Open Knowledge Format](https://github.com/open-knowledge-format/open-knowledge-format) (OKF) 0.2 bundle, as the spec stands at one pinned commit (`onlyworlds.okf.OKF_COMMIT`): one markdown file per element, with its fields in the frontmatter, its text under headings and its links (in-prose `ow://` references included) as markdown links, plus an index per type. This needs PyYAML, which the rest of the package does not:
 
 ```bash
 pip install "onlyworlds[okf]"
