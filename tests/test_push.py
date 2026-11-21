@@ -237,7 +237,14 @@ def test_generic_pair_is_sent_whole(tmp_path: Path) -> None:
 
 @pytest.mark.parametrize(
     ("status", "code"),
-    [(401, "invalid_credentials"), (401, "key_revoked"), (429, "rate_limited"), (403, "permission_error")],
+    [
+        (401, "invalid_credentials"),
+        (401, "key_revoked"),
+        (429, "rate_limited"),
+        (403, "permission_error"),
+        (403, "guest_not_supported"),
+        (403, "a_code_keel_adds_later"),
+    ],
 )
 def test_a_refused_key_stops_the_run(tmp_path: Path, make_client: MakeClient, status: int, code: str) -> None:
     """A wrong PIN on every patch would lock the key (10 failures, 15 minutes) for every tool that uses it."""
@@ -252,12 +259,13 @@ def test_a_refused_key_stops_the_run(tmp_path: Path, make_client: MakeClient, st
     assert push(base, edit, client=make_client(t2), log_path=log, workers=1).ok == 5  # nothing was marked done
 
 
-def test_not_author_does_not_stop_the_run(tmp_path: Path, make_client: MakeClient) -> None:
+@pytest.mark.parametrize("code", ["not_author", "keeper_only", "review_by_another", "not_reader"])
+def test_an_element_403_does_not_stop_the_run(tmp_path: Path, make_client: MakeClient, code: str) -> None:
     base, edit = folders(
         tmp_path, {"character": [wire_char(C1, "A"), wire_char(C2, "A")]},
         {"character": [wire_char(C1, "B"), wire_char(C2, "B")]},
     )  # fmt: skip
-    t = FakeTransport(script=[jresp(403, {"error": {"code": "not_author"}})], handler=echo())
+    t = FakeTransport(script=[jresp(403, {"error": {"code": code}})], handler=echo())
     res = push(base, edit, client=make_client(t), log_path=tmp_path / "log.jsonl", workers=1)
     assert (res.ok, len(res.failed), res.aborted) == (1, 1, None)
 

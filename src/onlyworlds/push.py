@@ -324,15 +324,22 @@ def _origin_to_send(world: Mapping[str, Any], folder_world: Mapping[str, Any] | 
     return body
 
 
+#: The 403 codes about one element, not the key: the run goes on to the next patch.
+#: ``not_author`` (a contributor's change to an element someone else made), ``keeper_only``
+#: (a world's Charter and the elements it names change only by the owner and co-builders),
+#: ``review_by_another`` (a review mark below co-builder) and ``not_reader`` (another reader's Read mark).
+ELEMENT_403 = frozenset({"not_author", "keeper_only", "review_by_another", "not_reader"})
+
+
 def stops_run(error: ApiError) -> bool:
     """An answer about the key, not the element: every later patch would get it too.
 
     401 (``invalid_credentials``, ``key_revoked``), 429 ``rate_limited`` (keel's failed-PIN
-    throttle, its only 429), and any 403 but ``not_author``, which is about one element.
+    throttle), and any 403 whose code is not in ``ELEMENT_403``.
     """
     if error.status == 401 or (error.status == 429 and error.code == "rate_limited"):
         return True
-    return error.status == 403 and not error.is_not_author
+    return error.status == 403 and error.code not in ELEMENT_403
 
 
 def _load_done(log_path: Path) -> tuple[set[str], set[str], set[str]]:
