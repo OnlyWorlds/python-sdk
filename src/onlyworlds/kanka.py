@@ -182,7 +182,7 @@ import uuid
 from collections.abc import Callable, Iterable, Mapping
 from contextlib import ExitStack
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from html.parser import HTMLParser
 from importlib.resources import files
 from pathlib import Path
@@ -365,7 +365,7 @@ def _when(value: Any) -> datetime | None:
         moment = datetime.fromisoformat(value.replace("Z", "+00:00"))
     except ValueError:
         return None
-    return moment if moment.tzinfo is not None else moment.replace(tzinfo=timezone.utc)
+    return moment if moment.tzinfo is not None else moment.replace(tzinfo=UTC)
 
 
 def _int_id(value: Any) -> int | None:

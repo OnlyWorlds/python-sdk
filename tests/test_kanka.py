@@ -321,7 +321,8 @@ def test_a_time_with_no_offset_is_read_as_utc(tmp_path: Path) -> None:
     campaign = variant(tmp_path, naive, "campaign.json", "naive-campaign.zip")
     _, report = run(tmp_path, campaign, "naive-campaign")
     assert sorted(report.possibly_starter) == sorted(STARTER)
-    entity = variant(tmp_path, lambda d: naive(d, "entity"), "characters/your-character-name_10074596.json", "naive-entity.zip")
+    you = "characters/your-character-name_10074596.json"
+    entity = variant(tmp_path, lambda d: naive(d, "entity"), you, "naive-entity.zip")
     _, report = run(tmp_path, entity, "naive-entity")
     assert sorted(report.possibly_starter) == sorted(STARTER)
 
