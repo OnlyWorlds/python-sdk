@@ -397,7 +397,7 @@ Not yet: typed element models, the account routes, a snapshot writer.
 ## Develop
 
 ```bash
-uv sync
+uv sync --locked
 uv run pytest -q
 uv run ruff check . && uv run ruff format --check . && uv run mypy --strict src tests
 uv run python codegen/generate_schema.py --check
@@ -406,19 +406,22 @@ uv run python codegen/generate_anchors.py --check
 uv run python codegen/generate_directions.py --check
 uv run python codegen/generate_casefold.py --check
 uv run python codegen/generate_nfc.py --check
+uv run python scripts/public_words.py
 ```
 
 To move the schema pin to a new [schema-dist](https://github.com/OnlyWorlds/schema-dist) tag: `uv run python codegen/repin.py <tag> "<what the new pin moved>"` vendors the tag's tree from a local checkout of schema-dist (the directory beside this one, `$OW_SCHEMA_DIST`, or `--schema-dist <path>`) and rewrites `codegen/schema-pin.json`. It writes nothing unless the tree agrees with its own MANIFEST and with the MANIFEST GitHub serves at the tag. Then run `codegen/generate_schema.py` and the checks above.
 
-Three groups of tests skip unless their variable is set:
+Five groups of tests use environment variables to enable their checks:
 
 - `OW_CONFORMANCE_FIXTURE=<path>`: the folder-format conformance fixture from the Atlas repo.
 - `OW_OPENAPI=https://www.onlyworlds.com/api/v2/openapi.json` (or a saved copy): checks the client's routes, parameters and fields against the API's own OpenAPI document.
 - `OW_LIVE=1`: read-only calls against the demo world, and a few writes to the practice world (its published key and PIN, reset every night), each deleted again.
+- `OKF_REFERENCE_SRC=<path>`: the `src/` of an open-knowledge-format checkout, for its reference parser and viewer. The check skips when that code cannot be imported.
+- `OW_STAGING_BASE`, `OW_STAGING_OWNER_KEY`, `OW_STAGING_OWNER_PIN`, `OW_STAGING_CONTRIB_KEY`, `OW_STAGING_CONTRIB_PIN` and `OW_STAGING_MEMBERSHIP`: all six are needed for the staging write checks. Each element made is deleted after the test.
 
-CI's `wire` job sets the last two on every push. Red there with the other jobs green means the server moved under the client, not that a change broke it.
+Other checks skip when PyYAML or Git is missing, when NTFS cannot hold the test names, or when symlinks are unavailable or the platform is Windows. These have no environment switch.
 
-`OKF_REFERENCE_SRC=<path>` (the `src/` of an open-knowledge-format checkout) also runs OKF's own parser and viewer over an exported bundle.
+CI's `wire` job sets `OW_OPENAPI` and `OW_LIVE` on pushes to `main` and on pull requests. Red there with the other jobs green means the server moved under the client, not that a change broke it.
 
 
 ## Licence and contributions

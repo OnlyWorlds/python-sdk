@@ -62,10 +62,14 @@ jobs:
       - run: uv sync --locked
       - run: uv run pytest -q
       - run: uv run ruff check .
+      - run: uv run ruff format --check .
       - run: uv run mypy --strict src tests
       - run: uv run python codegen/generate_schema.py --check
       - run: uv run python codegen/generate_tools.py --check
       - run: uv run python codegen/generate_anchors.py --check
+      - run: uv run python codegen/generate_directions.py --check
+      - run: uv run python codegen/generate_casefold.py --check
+      - run: uv run python codegen/generate_nfc.py --check
       # Published text names no one inside the team and points at no internal room or tracker.
       - run: uv run python scripts/public_words.py
       - run: uv build
