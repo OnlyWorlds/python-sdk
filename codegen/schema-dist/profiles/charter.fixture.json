@@ -3827,6 +3827,229 @@
         ]
       },
       "note": "No Guide: the Domains by folded name, then id, the name compared first and whole. The first name is Ash followed by U+0001, a control character with no White_Space property, so the trim keeps it; ash is the start of it, so Ash comes first, whatever the ids. A reader that sorts one key made of the folded name, a separator below U+001F and the id joined puts the longer name first whenever the separator is above U+0000."
+    },
+    {
+      "name": "a-newer-charter-whose-description-holds-nothing-leads-and-its-skill-is-empty",
+      "kind": "charter",
+      "world": {
+        "id": "019a7f00-0000-7000-8000-00000000f1a5",
+        "name": "One case 145",
+        "hidden": [],
+        "readers": {
+          "owner": {
+            "rung": "owner",
+            "character": null
+          }
+        },
+        "elements": [
+          {
+            "id": "019a7f00-0000-7000-8000-0000000014a0",
+            "type": "law",
+            "name": "House Rules",
+            "supertype": "Charter",
+            "x_charter_of": "019a7f00-0000-7000-8000-00000000f1a5",
+            "created_at": "2026-10-01T12:00:00Z",
+            "description": "Write in your own room. The way of working is ow://object/019a7f00-0000-7000-8000-0000000014a2."
+          },
+          {
+            "id": "019a7f00-0000-7000-8000-0000000014a1",
+            "type": "law",
+            "name": "House Rules, rewritten",
+            "supertype": "Charter",
+            "x_charter_of": "019a7f00-0000-7000-8000-00000000f1a5",
+            "created_at": "2026-10-10T12:00:00Z",
+            "description": " \n　",
+            "declaration": "Write in your own room. The way of working is ow://object/019a7f00-0000-7000-8000-0000000014a2."
+          },
+          {
+            "id": "019a7f00-0000-7000-8000-0000000014a2",
+            "type": "object",
+            "name": "The way of working",
+            "created_at": "2026-10-01T12:00:00Z",
+            "description": "One line for each change."
+          }
+        ]
+      },
+      "reader": "owner",
+      "want": {
+        "charter": {
+          "id": "019a7f00-0000-7000-8000-0000000014a1",
+          "type": "law",
+          "name": "House Rules, rewritten",
+          "rules": [],
+          "skill": []
+        },
+        "guide": null,
+        "domains": []
+      },
+      "note": "The newer marked Charter's description holds nothing (a space, a line feed and U+3000, White_Space alone), and it leads all the same: the selection never reads the text. That reader has no house rules and its skill is empty. Its declaration names the Object and so does the older Charter's description; neither is read, since the skill is read from the leading Charter's description alone."
+    },
+    {
+      "name": "a-newer-charter-with-no-description-leads-and-its-skill-is-empty",
+      "kind": "charter",
+      "world": {
+        "id": "019a7f00-0000-7000-8000-00000000f1a6",
+        "name": "One case 145b",
+        "hidden": [],
+        "readers": {
+          "owner": {
+            "rung": "owner",
+            "character": null
+          }
+        },
+        "elements": [
+          {
+            "id": "019a7f00-0000-7000-8000-0000000014b0",
+            "type": "law",
+            "name": "House Rules",
+            "supertype": "Charter",
+            "x_charter_of": "019a7f00-0000-7000-8000-00000000f1a6",
+            "created_at": "2026-10-01T12:00:00Z",
+            "description": "Write in your own room. The way of working is ow://object/019a7f00-0000-7000-8000-0000000014b2."
+          },
+          {
+            "id": "019a7f00-0000-7000-8000-0000000014b1",
+            "type": "law",
+            "name": "House Rules, in the declaration",
+            "supertype": "Charter",
+            "x_charter_of": "019a7f00-0000-7000-8000-00000000f1a6",
+            "created_at": "2026-10-10T12:00:00Z",
+            "declaration": "Write in your own room. The way of working is ow://object/019a7f00-0000-7000-8000-0000000014b2."
+          },
+          {
+            "id": "019a7f00-0000-7000-8000-0000000014b2",
+            "type": "object",
+            "name": "The way of working",
+            "created_at": "2026-10-01T12:00:00Z",
+            "description": "One line for each change."
+          }
+        ]
+      },
+      "reader": "owner",
+      "want": {
+        "charter": {
+          "id": "019a7f00-0000-7000-8000-0000000014b1",
+          "type": "law",
+          "name": "House Rules, in the declaration",
+          "rules": [],
+          "skill": []
+        },
+        "guide": null,
+        "domains": []
+      },
+      "note": "The newer marked Charter carries no description at all, only a declaration that names the Object; it leads all the same, that reader has no house rules and its skill is empty. An absent description holds nothing as White_Space alone does, so neither the declaration nor the older Charter's description is read."
+    },
+    {
+      "name": "a-newer-charter-whose-description-is-a-space-and-a-tab-leads-and-its-skill-is-empty",
+      "kind": "charter",
+      "world": {
+        "id": "019a7f00-0000-7000-8000-00000000f1a7",
+        "name": "One case 145c",
+        "hidden": [],
+        "readers": {
+          "owner": {
+            "rung": "owner",
+            "character": null
+          }
+        },
+        "elements": [
+          {
+            "id": "019a7f00-0000-7000-8000-0000000014c0",
+            "type": "law",
+            "name": "House Rules",
+            "supertype": "Charter",
+            "x_charter_of": "019a7f00-0000-7000-8000-00000000f1a7",
+            "created_at": "2026-10-01T12:00:00Z",
+            "description": "Write in your own room. The way of working is ow://object/019a7f00-0000-7000-8000-0000000014c2."
+          },
+          {
+            "id": "019a7f00-0000-7000-8000-0000000014c1",
+            "type": "law",
+            "name": "House Rules, blank",
+            "supertype": "Charter",
+            "x_charter_of": "019a7f00-0000-7000-8000-00000000f1a7",
+            "created_at": "2026-10-10T12:00:00Z",
+            "description": " \t",
+            "declaration": "Write in your own room. The way of working is ow://object/019a7f00-0000-7000-8000-0000000014c2."
+          },
+          {
+            "id": "019a7f00-0000-7000-8000-0000000014c2",
+            "type": "object",
+            "name": "The way of working",
+            "created_at": "2026-10-01T12:00:00Z",
+            "description": "One line for each change."
+          }
+        ]
+      },
+      "reader": "owner",
+      "want": {
+        "charter": {
+          "id": "019a7f00-0000-7000-8000-0000000014c1",
+          "type": "law",
+          "name": "House Rules, blank",
+          "rules": [],
+          "skill": []
+        },
+        "guide": null,
+        "domains": []
+      },
+      "note": "The newer marked Charter's description is a space and a tab, White_Space alone by the room profile's set and by an ASCII trim alike, and its declaration names the Object; it leads all the same, that reader has no house rules and its skill is empty. Neither the declaration nor the older Charter's description is read."
+    },
+    {
+      "name": "a-newer-charter-whose-description-is-null-leads-and-its-skill-is-empty",
+      "kind": "charter",
+      "world": {
+        "id": "019a7f00-0000-7000-8000-00000000f1a8",
+        "name": "One case 145d",
+        "hidden": [],
+        "readers": {
+          "owner": {
+            "rung": "owner",
+            "character": null
+          }
+        },
+        "elements": [
+          {
+            "id": "019a7f00-0000-7000-8000-0000000014d0",
+            "type": "law",
+            "name": "House Rules",
+            "supertype": "Charter",
+            "x_charter_of": "019a7f00-0000-7000-8000-00000000f1a8",
+            "created_at": "2026-10-01T12:00:00Z",
+            "description": "Write in your own room. The way of working is ow://object/019a7f00-0000-7000-8000-0000000014d2."
+          },
+          {
+            "id": "019a7f00-0000-7000-8000-0000000014d1",
+            "type": "law",
+            "name": "House Rules, null",
+            "supertype": "Charter",
+            "x_charter_of": "019a7f00-0000-7000-8000-00000000f1a8",
+            "created_at": "2026-10-10T12:00:00Z",
+            "description": null,
+            "declaration": "Write in your own room. The way of working is ow://object/019a7f00-0000-7000-8000-0000000014d2."
+          },
+          {
+            "id": "019a7f00-0000-7000-8000-0000000014d2",
+            "type": "object",
+            "name": "The way of working",
+            "created_at": "2026-10-01T12:00:00Z",
+            "description": "One line for each change."
+          }
+        ]
+      },
+      "reader": "owner",
+      "want": {
+        "charter": {
+          "id": "019a7f00-0000-7000-8000-0000000014d1",
+          "type": "law",
+          "name": "House Rules, null",
+          "rules": [],
+          "skill": []
+        },
+        "guide": null,
+        "domains": []
+      },
+      "note": "The newer marked Charter's description is null, which holds nothing as an absent one does, and its declaration names the Object; it leads all the same, that reader has no house rules and its skill is empty. Neither the declaration nor the older Charter's description is read."
     }
   ],
   "design_cases": [
