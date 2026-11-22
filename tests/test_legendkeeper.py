@@ -37,7 +37,7 @@ from pathlib import Path
 from typing import Any
 
 import pytest
-from conftest import FakeTransport, jresp
+from conftest import FakeTransport, MadeCheck, jresp
 
 from onlyworlds import read_folder, write_folder
 from onlyworlds.folder import FORMAT_VERSION
@@ -45,6 +45,7 @@ from onlyworlds.http import Response
 from onlyworlds.legendkeeper import (
     API_BASE,
     LEGENDKEEPER_NAMESPACE,
+    MADE_NAMES,
     PRODUCER_INPUT,
     ApiSource,
     ImportReport,
@@ -415,7 +416,7 @@ def test_a_hidden_page_becomes_its_own_hidden_narrative(tmp_path: Path) -> None:
     assert (report.hidden.documents, report.hidden.secrets_inside) == (1, 1)
 
 
-def test_hidden_properties_and_events_are_hidden(tmp_path: Path) -> None:
+def test_hidden_properties_and_events_are_hidden(tmp_path: Path, made_in: MadeCheck) -> None:
     ans = answers()
     for prop in ans[f"{P}/resources/{ALDRIC}"]["properties"]:
         prop["isHidden"] = True  # Alignment, and the Allies link
@@ -432,6 +433,7 @@ def test_hidden_properties_and_events_are_hidden(tmp_path: Path) -> None:
     h = report.hidden
     assert (h.properties, h.property_narratives, h.events, h.relations) == (2, 1, 1, 1)
     assert "1 hidden-properties Narrative holding 2 hidden properties" in report.render()
+    assert made_in(MADE_NAMES, report.made_names, out)["hidden-properties"] == 1
 
 
 def test_ids_are_stable_across_two_runs(tmp_path: Path) -> None:

@@ -119,6 +119,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
+from ._made import ANY_TYPE, MadeName, _counts, _lines
 from ._schema import FIELD_KINDS, LINK_TARGETS
 from ._version import __version__
 from .folder import FORMAT_VERSION, ONE_SOURCE_ONE_WORLD, write_folder
@@ -127,6 +128,7 @@ from .kanka import _blocks, _clean, _inline, _Node, _norm, _Tree
 __all__ = [
     "DATE_KEYS",
     "EXT_PREFIX",
+    "MADE_NAMES",
     "PRODUCER_INPUT",
     "PROVEN_TEMPLATES",
     "TEMPLATE_TYPES",
@@ -134,6 +136,7 @@ __all__ = [
     "Folded",
     "HiddenArticle",
     "ImportReport",
+    "MadeName",
     "TemplatePlan",
     "Unplaced",
     "Unresolved",
@@ -154,6 +157,14 @@ EXT_PREFIX = "x_worldanvil_"
 #: The supertype of a Narrative made from an article whose template has no OnlyWorlds type: what
 #: the thing is, never where it came from (the producer line says that; ruled 2026-10-23).
 UNTYPED_SUPERTYPE = "Article"
+
+#: The names this door makes (``MadeName``: one for a thing World Anvil never names, or leaves unnamed), one
+#: record a kind, each kind counted in the report. A Secret block's Narrative is numbered when its article has
+#: several.
+MADE_NAMES: tuple[MadeName, ...] = (
+    MadeName("secret-block", "narrative", "<article>: Secret", "ours", r".+: Secret(?: [0-9]+)?"),
+    MadeName("untitled-article", ANY_TYPE, "Untitled (<article id>)", "ours", r"Untitled \(.+\)"),
+)
 
 #: The most an export may hold, in bytes: a file past it is refused, not read.
 MAX_EXPORT_BYTES = 256 * 1024 * 1024
@@ -442,6 +453,8 @@ class ImportReport:
     dates: int = 0
     #: (element, label, the text as printed): a date not parsed exactly, kept as printed
     dates_unparsed: list[tuple[str, str, str]] = field(default_factory=list)
+    #: names made here, not taken whole from the export: a ``MADE_NAMES`` kind -> its elements, in declared order
+    made_names: dict[str, int] = field(default_factory=dict)
     notes: list[str] = field(default_factory=list)
     #: where the folder was written; None for a plan
     out: Path | None = None
@@ -505,6 +518,7 @@ class ImportReport:
         if self.authors:
             who = ", ".join(f"{a!r} ({n} article{'' if n == 1 else 's'})" for a, n in self.authors.items())
             lines.append(f"Author, named here and never on an element: {who}")
+        lines += _lines(MADE_NAMES, self.made_names)
         if self.notes:
             lines.append(f"Notes ({len(self.notes)}):")
             lines += [f"  - {n}" for n in self.notes]
@@ -576,6 +590,8 @@ class _Importer:
         self.links: list[_Link] = []
         self.codex: dict[str, tuple[str, list[str]]] = {}
         self.narratives: list[dict[str, Any]] = []
+        #: element id -> the MADE_NAMES kind of the name it was given, for the report's count
+        self._named: dict[str, str] = {}
         self.page_consumed: set[int] = set()
         self._unplaced_seen: set[Unplaced] = set()
         self.editor_links = 0
@@ -687,12 +703,15 @@ class _Importer:
             icons = frozenset(id(i) for i in _walk(h1) if "article-title-icon" in _classes(i))
             name = _plain(h1, icons)
         codex_name = self.codex.get(aid, ("", []))[0]
+        h1_name = name
         if not name:
             name = codex_name or f"Untitled ({aid[:8]})"
             self.report.notes.append(f"article {aid} has no title; named {name!r}")
         elif codex_name and codex_name != name:
             self.report.notes.append(f"article {name!r}: the World Codex names it {codex_name!r}")
         item = _Item(aid, node, name, template, self._id(aid), meta, consumed=consumed)
+        if not h1_name and not codex_name:
+            self._named[item.eid] = "untitled-article"
         self._links(item, node)
         return item
 
@@ -902,6 +921,7 @@ class _Importer:
             story = self._resolve(item, _markdown(block), mentions, shown=False)
             name = f"{item.name}: Secret" + (f" {n}" if len(found) > 1 else "")
             body: dict[str, Any] = {"type": "narrative", "id": self._id("secret", item.aid, str(n)), "name": name}
+            self._named[body["id"]] = "secret-block"
             body["hidden"] = True
             if story:
                 body["story"] = story
@@ -1113,6 +1133,7 @@ class _Importer:
         for body in self.narratives:
             out.setdefault(body["type"], []).append(body)
         self.report.counts = {t: len(b) for t, b in sorted(out.items())}
+        self.report.made_names = _counts(MADE_NAMES, self._named, (b["id"] for bs in out.values() for b in bs))
         self._notes()
         return out
 

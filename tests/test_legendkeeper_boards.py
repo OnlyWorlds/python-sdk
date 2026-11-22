@@ -27,11 +27,13 @@ from pathlib import Path
 from typing import Any
 
 import pytest
+from conftest import MadeCheck
 
 from onlyworlds import read_folder
 from onlyworlds._jsonfmt import encode
 from onlyworlds.legendkeeper import (
     LEGENDKEEPER_NAMESPACE,
+    MADE_NAMES,
     FileSource,
     ImportReport,
     SourceError,
@@ -336,7 +338,7 @@ def synthetic(tmp: Path) -> tuple[Path, ImportReport]:
     return run(tmp, write(tmp, data))
 
 
-def test_a_synthetic_board_by_hand(tmp_path: Path) -> None:
+def test_a_synthetic_board_by_hand(tmp_path: Path, made_in: MadeCheck) -> None:
     out, report = synthetic(tmp_path)
     # A: top level at (100, 200), 40 x 60: centre (120, 230); corners x 100..140, y 200..260.
     # F: at (1000, 0) turned 90 degrees, 300 x 200: R(90)(u, v) = (-v, u), so its corners are (1000, 0),
@@ -371,6 +373,8 @@ def test_a_synthetic_board_by_hand(tmp_path: Path) -> None:
     assert (framed["name"], framed["zones"], framed["locations"]) == ("Board link", [zone], [uid(LOCATION)])
     assert (framed["x_legendkeeper_source"], framed["x_legendkeeper_target"]) == (zone, uid(LOCATION))
     assert board.loose_arrows == 2 and board.made["relations"] == 2
+    named = made_in(MADE_NAMES, report.made_names, out)
+    assert (named["board-link"], named["frame-corner"]) == (1, 4)  # R3, which has no label; F's corners
 
 
 def test_an_arrow_needs_both_ends_bound_to_cards(tmp_path: Path) -> None:
@@ -429,7 +433,7 @@ def test_a_hidden_board_hides_everything_made_from_it(tmp_path: Path) -> None:
 # --- a card that shows a board or a map ----------------------------------------------------
 
 
-def test_a_card_showing_a_board_makes_that_board_a_child_map(tmp_path: Path) -> None:
+def test_a_card_showing_a_board_makes_that_board_a_child_map(tmp_path: Path, made_in: MadeCheck) -> None:
     """The tutorial has no card showing a board: Wiki City gets a second board, "Plans", a card on Main
     shows it, a card on Plans shows Main back (a loop, never followed), and a card on Main shows the
     Realm of Tutoria's map document. Board Bastion comes before Wiki City in the tree, so Main's cards
@@ -467,6 +471,8 @@ def test_a_card_showing_a_board_makes_that_board_a_child_map(tmp_path: Path) -> 
     back = next(b for b in bodies(out) if b.get("x_legendkeeper_id") == "shape:back" and b["type"] == "pin")
     assert (back["element_type"], back["element_id"], back["map"]) == ("map", BOARD_MAP, plans_id)
     assert {b.name: b.made["child maps"] for b in report.boards} == {"Board Bastion: Main": 1, "Wiki City: Plans": 0}
+    # the three cards that show a map or a board are named by its Map: toPlans, toMap and back
+    assert made_in(MADE_NAMES, report.made_names, out)["map-card"] == 3
 
 
 # --- the two roads, and ids ------------------------------------------------------------------

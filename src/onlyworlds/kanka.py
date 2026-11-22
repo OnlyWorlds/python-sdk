@@ -183,6 +183,7 @@ from html.parser import HTMLParser
 from pathlib import Path
 from typing import Any
 
+from ._made import ANY_TYPE, MadeName, _counts, _lines
 from ._schema import FIELD_KINDS, LINK_TARGETS
 from ._version import __version__
 from .folder import FORMAT_VERSION, ONE_SOURCE_ONE_WORLD, write_folder
@@ -191,6 +192,7 @@ from .notion import _open_tree
 __all__ = [
     "EXT_PREFIX",
     "KANKA_NAMESPACE",
+    "MADE_NAMES",
     "MODULE_TYPES",
     "PRODUCER_INPUT",
     "PROVEN_MODULES",
@@ -198,6 +200,7 @@ __all__ = [
     "Folded",
     "Hidden",
     "ImportReport",
+    "MadeName",
     "ModulePlan",
     "Picture",
     "Unplaced",
@@ -255,6 +258,15 @@ _PARENT_FIELD: dict[str, str] = {
     "species": "parent_species",
     "map": "parent_map",
 }
+
+#: The names this door makes (``MadeName``: one for a thing Kanka never names, or leaves unnamed), one
+#: record a kind, each kind counted in the report.
+MADE_NAMES: tuple[MadeName, ...] = (
+    MadeName("hidden-details", "narrative", "<entity>: hidden details", "ours", r".+: hidden details"),
+    MadeName("untitled-post", "narrative", "Post", "ours", r"Post"),
+    MadeName("untitled-relationship", "relation", "Relationship", "ours", r"Relationship"),
+    MadeName("untitled-entity", ANY_TYPE, "Untitled (<entity id>)", "ours", r"Untitled \(.+\)"),
+)
 
 #: Kanka's image store: per upload ``<uuid>.json`` and the image ``<uuid>.<ext>``; not a module.
 _GALLERY = "gallery"
@@ -743,6 +755,8 @@ class ImportReport:
     pictures: list[Picture] = field(default_factory=list)
     #: carriers of a tag its Narrative does not link (a hidden element under a visible tag, a type with no field)
     untagged: list[Untagged] = field(default_factory=list)
+    #: names made here, not taken whole from the export: a ``MADE_NAMES`` kind -> its elements, in declared order
+    made_names: dict[str, int] = field(default_factory=dict)
     notes: list[str] = field(default_factory=list)
     #: where the folder was written; None for a plan
     out: Path | None = None
@@ -842,6 +856,7 @@ class ImportReport:
         if self.unresolved:
             lines.append(f"Links and mentions whose target is not in the folder ({len(self.unresolved)}):")
             lines += [f"  - {u.element!r}, {u.where}: {u.target}: {u.why}" for u in self.unresolved]
+        lines += _lines(MADE_NAMES, self.made_names)
         if self.notes:
             lines.append(f"Notes ({len(self.notes)}):")
             lines += [f"  - {n}" for n in self.notes]
@@ -891,6 +906,8 @@ class _Importer:
         self.relations: list[dict[str, Any]] = []
         #: hidden Narratives: one per private post, one per entity's hidden details
         self.narratives: list[dict[str, Any]] = []
+        #: element id -> the MADE_NAMES kind of the name it was given, for the report's count
+        self._named: dict[str, str] = {}
         #: gallery/: upload uuid -> (its JSON's path without ``.json``, the JSON); the uuids an entity names
         self.uploads: dict[str, tuple[str, dict[str, Any]]] = {}
         self.named_uploads: set[str] = set()
@@ -957,6 +974,8 @@ class _Importer:
             item = _Item(
                 folder, rel, row, ent, entity_id, etype, self._id(str(entity_id)), name, folder in MODULE_TYPES
             )
+            if not str(ent.get("name") or row.get("name") or "").strip():
+                self._named[item.eid] = "untitled-entity"
             if _on(ent.get("is_private")) or _on(row.get("is_private")):
                 item.hidden = True
                 self.report.hidden.entities += 1
@@ -1224,6 +1243,8 @@ class _Importer:
             if _on(p.get(k)):
                 ext[f"{EXT_PREFIX}{k}"] = p[k]
         self._hidden_narrative(f"post:{p.get('id')}", name, text, item, ext, mentions)
+        if not str(p.get("name") or "").strip():
+            self._named[self._id(f"post:{p.get('id')}")] = "untitled-post"
         self.report.hidden.posts += 1
 
     def _details(self, item: _Item) -> None:
@@ -1235,6 +1256,7 @@ class _Importer:
         self._hidden_narrative(
             f"hidden:{item.entity_id}", f"{item.name}: hidden details", story, item, ext, item.secret_mentions
         )
+        self._named[self._id(f"hidden:{item.entity_id}")] = "hidden-details"
         self.report.hidden.details += 1
 
     def _character(self, item: _Item) -> None:
@@ -1546,6 +1568,8 @@ class _Importer:
             if end.eid not in links:
                 links.append(end.eid)
         body: dict[str, Any] = {"type": "relation", "id": self._id("relation", str(rid)), "name": name}
+        if not text:
+            self._named[body["id"]] = "untitled-relationship"
         sides = (rel, mirror) if mirror is not None else (rel,)
         if owner.hidden or target.hidden or any(not _public(s.get("visibility_id")) for s in sides):
             body["hidden"] = True
@@ -1590,6 +1614,7 @@ class _Importer:
         for body in self.narratives + self.relations:
             out.setdefault(body["type"], []).append(body)
         self.report.counts = {t: len(b) for t, b in sorted(out.items())}
+        self.report.made_names = _counts(MADE_NAMES, self._named, (b["id"] for bs in out.values() for b in bs))
         if self.items:
             self.report.notes.append(f"not kept: {_NOT_KEPT}")
         return out

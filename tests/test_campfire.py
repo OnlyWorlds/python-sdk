@@ -23,10 +23,12 @@ from pathlib import Path
 from typing import Any
 
 import pytest
+from conftest import MadeCheck
 
 from onlyworlds import campfire, read_folder, write_folder
 from onlyworlds.campfire import (
     CAMPFIRE_NAMESPACE,
+    MADE_NAMES,
     MODULE_TYPES,
     PRODUCER_INPUT,
     SEEN_MODULES,
@@ -352,6 +354,13 @@ def test_round_trip_is_byte_equal(tmp_path: Path) -> None:
     again = tmp_path / "again"
     write_folder(again, folder.world, by_type)
     assert tree(again) == tree(out)
+
+
+def test_an_element_with_no_heading_is_named_by_its_place(tmp_path: Path, made_in: MadeCheck) -> None:
+    out, report = run(tmp_path, with_elements(tmp_path, element("", description="A stall by the water.")))
+    assert made_in(MADE_NAMES, report.made_names, out)["untitled-element"] == 1
+    assert "Untitled (3)" in by_name(out)  # the third element of the file
+    assert "  - untitled-element, any type 'Untitled (<n>)': 1 (ours: the export gives it no name)" in report.render()
 
 
 def test_plan_writes_nothing(tmp_path: Path) -> None:

@@ -26,11 +26,13 @@ from pathlib import Path
 from typing import Any
 
 import pytest
+from conftest import MadeCheck
 
 from onlyworlds import read_folder, write_folder
 from onlyworlds.folder import FORMAT_VERSION
 from onlyworlds.worldanvil import (
     DATE_KEYS,
+    MADE_NAMES,
     PRODUCER_INPUT,
     PROVEN_TEMPLATES,
     TEMPLATE_TYPES,
@@ -411,7 +413,7 @@ def test_a_missing_privacy_where_another_place_gives_one_hides(tmp_path: Path) -
     ]
 
 
-def test_a_secret_block_is_its_own_hidden_narrative(tmp_path: Path) -> None:
+def test_a_secret_block_is_its_own_hidden_narrative(tmp_path: Path, made_in: MadeCheck) -> None:
     body = "<p>The ferry crossing is the quay where Ada keeps her flat boat, a day below the falls.</p>"
     secret = '<div class="secret-container"><p>The rope was cut on purpose.</p></div>'
     out, report = run(tmp_path, planted(tmp_path, ONE, (body, body + secret)))
@@ -422,7 +424,17 @@ def test_a_secret_block_is_its_own_hidden_narrative(tmp_path: Path) -> None:
     assert narr["id"] == str(uuid.uuid5(WORLDANVIL_NAMESPACE, f"worldanvil:{WORLD}:secret:{FERRY}:1"))
     assert "hidden" not in els["The ferry crossing"] and "rope was cut" not in visible(out)
     assert report.secret_blocks == 1 and "1 Secret block in a visible article" in report.render()
+    assert made_in(MADE_NAMES, report.made_names, out)["secret-block"] == 1
     hidden_lint_ok(out)
+
+
+def test_an_article_with_no_title_anywhere_is_named_by_its_id(tmp_path: Path, made_in: MadeCheck) -> None:
+    title = " " * 57 + "The ferry crossing\n" + " " * 54 + "</h1>"
+    codex = ">The ferry crossing</a></li>"
+    blank = (title, title.replace("The ferry crossing", "")), (codex, "></a></li>")
+    out, report = run(tmp_path, planted(tmp_path, ONE, *blank))
+    assert bodies(out)[eid(FERRY)]["name"] == f"Untitled ({FERRY[:8]})"
+    assert made_in(MADE_NAMES, report.made_names, out)["untitled-article"] == 1
 
 
 # --- what the real files do not show (planted) --------------------------------

@@ -123,6 +123,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
+from ._made import MadeName, _lines
 from ._schema import ELEMENT_TYPES, FIELD_KINDS, LINK_TARGETS
 from ._version import __version__
 from .folder import FORMAT_VERSION, ONE_SOURCE_ONE_WORLD, write_folder
@@ -130,11 +131,13 @@ from .folder import FORMAT_VERSION, ONE_SOURCE_ONE_WORLD, write_folder
 __all__ = [
     "CATEGORY_WORDS",
     "EXT_PREFIX",
+    "MADE_NAMES",
     "NOTION_NAMESPACE",
     "PRODUCER_INPUT",
     "DatabasePlan",
     "IdFromPath",
     "ImportReport",
+    "MadeName",
     "Unplaced",
     "Unresolved",
     "category_of",
@@ -153,6 +156,10 @@ NOTION_NAMESPACE = uuid.uuid5(uuid.NAMESPACE_URL, "https://onlyworlds.com/ns/not
 
 #: Every extension key this door writes starts with this.
 EXT_PREFIX = "x_notion_"
+
+#: The names this door makes (``MadeName``): none. A page is named by its title, a database row by its first
+#: cell or else its page's title, each as Notion wrote it.
+MADE_NAMES: tuple[MadeName, ...] = ()
 _EXT_ID = f"{EXT_PREFIX}id"
 _EXT_PARENT = f"{EXT_PREFIX}parent"
 _EXT_BODY = f"{EXT_PREFIX}body"
@@ -343,6 +350,8 @@ class ImportReport:
     ids_from_path: list[IdFromPath] = field(default_factory=list)
     #: folder-relative paths of the attachments copied
     media: list[str] = field(default_factory=list)
+    #: names made here, not taken whole from the export, by ``MADE_NAMES`` kind: always empty, as that is
+    made_names: dict[str, int] = field(default_factory=dict)
     #: anything read past or left out, one line each
     notes: list[str] = field(default_factory=list)
     #: where the folder was written; None for a plan
@@ -389,6 +398,7 @@ class ImportReport:
             lines += [f"  - {p.path}: {p.why}" for p in self.ids_from_path]
         if self.media:
             lines.append(f"Attachments copied to {MEDIA_DIR}/: {len(self.media)}.")
+        lines += _lines(MADE_NAMES, self.made_names)
         if self.notes:
             lines.append(f"Notes ({len(self.notes)}):")
             lines += [f"  - {n}" for n in self.notes]

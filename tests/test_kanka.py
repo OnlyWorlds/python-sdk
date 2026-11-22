@@ -41,11 +41,13 @@ from pathlib import Path
 from typing import Any
 
 import pytest
+from conftest import MadeCheck
 
 from onlyworlds import read_folder, write_folder
 from onlyworlds.folder import FORMAT_VERSION
 from onlyworlds.kanka import (
     KANKA_NAMESPACE,
+    MADE_NAMES,
     PRODUCER_INPUT,
     ImportReport,
     Picture,
@@ -375,6 +377,27 @@ def test_a_private_post_is_its_own_hidden_narrative(tmp_path: Path) -> None:
     assert friend["hidden"] is True and friend["x_kanka_mirror"] == {"visibility_id": 1}  # Mara's side
     assert (report.hidden.posts, report.hidden.relationships) == (1, 1)  # each folded first
     assert "1 post not visible to all, its own Narrative (visibility_id)" in report.render()
+
+
+def test_what_has_no_name_is_named_and_counted(tmp_path: Path, made_in: MadeCheck) -> None:
+    """Ada with no name, her posts hidden and nameless, her relationships with no text."""
+
+    def change(doc: dict[str, Any]) -> None:
+        doc["name"] = doc["entity"]["name"] = ""
+        for post in doc["entity"]["posts"]:
+            post.update(name="", visibility_id=2)
+        for rel in doc["entity"]["relationships"]:
+            rel["relation"] = ""
+
+    out, report = run(tmp_path, variant(tmp_path, change, ADA_FILE))
+    named = made_in(MADE_NAMES, report.made_names, out)
+    assert named["untitled-entity"] == 1 and bodies(out)[eid(ADA)]["name"] == f"Untitled ({ADA})"
+    assert named["untitled-post"] == 1  # her two posts, now alike, fold into one
+    assert named["untitled-relationship"] == report.relations["Relationship"] >= 1
+    assert named["hidden-details"] == 2  # the two starter characters', as on the real file
+    assert "  - untitled-entity, any type 'Untitled (<entity id>)': 1 (ours: the export gives it no name)" in (
+        report.render()
+    )
 
 
 def test_folder_lint_passes_with_the_hidden_mark(tmp_path: Path) -> None:

@@ -4,6 +4,8 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+- **Each import door tells the names it made.** A name an element gets that is not one string of the export taken as written is now declared and counted, by kind. A joined name is the export's words with the door's between them (a LegendKeeper map document becomes a Map named `<resource>: <document>`); the door's own is a name for a thing the export never names (a frame's corner Marker, `<frame>: corner 1`; an arrow with no label, `Board link`). Each door lists its kinds in `MADE_NAMES`, a tuple of `MadeName` (`kind`, `type`, `pattern`, `source` `joined` or `ours`, and `regex`, read by `MadeName.fits(type, name)`); Notion's is empty. Each `ImportReport` gains `made_names` (kind to count) and prints one line a kind with its count and pattern. Nothing is added to an element. On the doors' real test exports: LegendKeeper's JSON export 80 made names of 280 (17 Narratives and 6 Maps `<resource>: <document>`, 56 frame corners, one nameless pin), its .lk export 78, each Kanka export 2 (`<entity>: hidden details`), World Anvil, Notion and Campfire none.
+
 ## 0.139.3 (2026-11-21)
 
 - **The schema pin moves to `v0.34.1-dist.144`** (canonical 00.34.01 unchanged, no schema file moved, `_schema.py` changes only its provenance lines). The map-space page gains rule 15, bringing a point down to a child Map, with the reading `down_of` and a fourth fixture list, `down_cases` (28 cases). This package does not read it yet; no other case moves.

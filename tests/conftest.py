@@ -1,15 +1,18 @@
 from __future__ import annotations
 
 import json
-from collections.abc import Callable, Mapping
+from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
 import pytest
 
+from onlyworlds._made import MadeName
+from onlyworlds.folder import read_folder
 from onlyworlds.http import Client, Response, RetryPolicy
 
+MadeCheck = Callable[[Sequence[MadeName], Mapping[str, int], Path], dict[str, int]]
 Handler = Callable[[str, str, Mapping[str, str], bytes | None], Response | Exception]
 
 
@@ -70,3 +73,19 @@ def make_client(sleeps: list[float]) -> Callable[[FakeTransport], Client]:
 def write_json(path: Path, data: Any) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_bytes((json.dumps(data, indent=2, ensure_ascii=False) + "\n").encode("utf-8"))
+
+
+@pytest.fixture
+def made_in() -> MadeCheck:
+    """``made_in(MADE_NAMES, report.made_names, out)``: each declared kind counted over the folder's elements by
+    its pattern (``MadeName.fits``), checked against what the door's report counted, and returned (every kind,
+    zero included). What a door says it made is what its names show."""
+
+    def check(made: Sequence[MadeName], said: Mapping[str, int], out: Path) -> dict[str, int]:
+        bodies = [e.body for e in read_folder(out).elements.values()]
+        seen = {m.kind: sum(1 for b in bodies if m.fits(str(b["type"]), str(b["name"]))) for m in made}
+        assert {k: n for k, n in seen.items() if n} == dict(said), "the names made, by pattern and by the report"
+        assert list(said) == [m.kind for m in made if m.kind in said], "the report's kinds in their declared order"
+        return seen
+
+    return check

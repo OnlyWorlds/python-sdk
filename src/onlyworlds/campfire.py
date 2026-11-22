@@ -92,6 +92,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
+from ._made import ANY_TYPE, MadeName, _counts, _lines
 from ._version import __version__
 from .folder import FORMAT_VERSION, ONE_SOURCE_ONE_WORLD, write_folder
 from .kanka import _blocks, _Node, _Tree
@@ -99,6 +100,7 @@ from .kanka import _blocks, _Node, _Tree
 __all__ = [
     "CAMPFIRE_NAMESPACE",
     "EXT_PREFIX",
+    "MADE_NAMES",
     "MODULE_TYPES",
     "PRODUCER_INPUT",
     "SEEN_MODULES",
@@ -107,6 +109,7 @@ __all__ = [
     "ElementPlan",
     "Folded",
     "ImportReport",
+    "MadeName",
     "ModuleEvidence",
     "import_campfire",
     "main",
@@ -125,6 +128,12 @@ EXT_PREFIX = "x_campfire_"
 #: The supertype of a Narrative whose module has no OnlyWorlds type: what it is, never where it
 #: came from (the World Anvil ruling, 2026-10-23, and the same for Campfire).
 UNTYPED_SUPERTYPE = "Article"
+
+#: The names this door makes (``MadeName``: one for a thing Campfire leaves unnamed), one record a kind, each
+#: kind counted in the report. An element with no heading is named by its place among the file's elements.
+MADE_NAMES: tuple[MadeName, ...] = (
+    MadeName("untitled-element", ANY_TYPE, "Untitled (<n>)", "ours", r"Untitled \([0-9]+\)"),
+)
 
 #: The most an export may hold, in bytes: a file past it is refused, not read.
 MAX_EXPORT_BYTES = 256 * 1024 * 1024
@@ -329,6 +338,8 @@ class ImportReport:
     #: (element, the key it got): a second element of one type and name
     renamed: list[tuple[str, str]] = field(default_factory=list)
     folded: list[Folded] = field(default_factory=list)
+    #: names made here, not taken whole from the export: a ``MADE_NAMES`` kind -> its elements, in declared order
+    made_names: dict[str, int] = field(default_factory=dict)
     notes: list[str] = field(default_factory=list)
     #: where the folder was written; None for a plan
     out: Path | None = None
@@ -413,6 +424,7 @@ class ImportReport:
         if self.renamed:
             lines.append(f"A second element of one type and name ({len(self.renamed)}), keyed apart:")
             lines += [f"  - {e!r}: id from {k!r}" for e, k in self.renamed]
+        lines += _lines(MADE_NAMES, self.made_names)
         if self.notes:
             lines.append(f"Notes ({len(self.notes)}):")
             lines += [f"  - {n}" for n in self.notes]
@@ -446,6 +458,8 @@ class _Item:
     etype: str = "narrative"
     eid: str = ""
     consumed: set[int] = field(default_factory=set)
+    #: the MADE_NAMES kind of its name, when the door made it; never written on the element
+    made: str = ""
 
 
 class _Importer:
@@ -490,6 +504,7 @@ class _Importer:
         name = _plain(title) if title is not None else ""
         if title is not None:
             consumed.add(id(title))
+        title_text = name
         if not name:
             name = f"Untitled ({len(self.items) + 1})"
             self.report.notes.append(f"an element with no heading; named {name!r}")
@@ -498,7 +513,7 @@ class _Importer:
         if desc is not None:
             consumed.add(id(desc))
             description = _markdown(desc)
-        item = _Item(node, name, description, [], consumed=consumed)
+        item = _Item(node, name, description, [], consumed=consumed, made="" if title_text else "untitled-element")
         for page in (n for n in _walk(node) if "page-section" in _classes(n)):
             self.pages += 1
             ptitle = _find(page, _has("page-title"))
@@ -642,6 +657,8 @@ class _Importer:
             self._guard(item, body)
             out.setdefault(item.etype, []).append(body)
         self.report.counts = {t: len(b) for t, b in sorted(out.items())}
+        named = {item.eid: item.made for item in self.items if item.made}
+        self.report.made_names = _counts(MADE_NAMES, named, (b["id"] for bs in out.values() for b in bs))
         self._page_guard()
         if self.pages:
             self.report.notes.append(f"{self.pages} page(s) of panels; a page's name is layout, not kept")

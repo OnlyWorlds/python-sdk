@@ -383,6 +383,7 @@ from pathlib import Path
 from typing import Any, Protocol
 
 from ._jsonfmt import encode
+from ._made import ANY_TYPE, MadeName, _counts, _lines
 from ._schema import ELEMENT_TYPES, FIELD_KINDS, LINK_TARGETS
 from ._version import __version__
 from .calendar import CALENDAR_FIELD, CALENDAR_SUPERTYPE
@@ -397,6 +398,7 @@ __all__ = [
     "IMPORT_MAP_SOURCE",
     "KEY_ENV",
     "LEGENDKEEPER_NAMESPACE",
+    "MADE_NAMES",
     "PRODUCER_INPUT",
     "PRODUCER_INPUT_FILE",
     "ApiSource",
@@ -406,6 +408,7 @@ __all__ = [
     "ImportMap",
     "ImportMapOffer",
     "ImportReport",
+    "MadeName",
     "MapMade",
     "NotImported",
     "RecordedSource",
@@ -577,6 +580,38 @@ _SAFE_NAME = re.compile(r"[A-Za-z0-9_-]+")
 
 #: The supertype of a Relation made from a board's arrow, and its name when the arrow has no label.
 BOARD_LINK = "Board link"
+
+#: The names this door makes (``MadeName``: a joined name is LegendKeeper's words with ours between them, an
+#: ours name one for a thing LegendKeeper never names), one record a kind, each kind counted in the report. A
+#: document with no name takes the word LegendKeeper gives its kind (``Page``, ``Timeline``, ``Map``,
+#: ``Board``), and a secret block's Narrative is named by the block's title (LegendKeeper's default is
+#: ``Secret``, the word used when there is none), numbered when a resource has several: each reads as
+#: ``<resource>: <document>``. A Pin or Zone named by the page it places takes that page's name, a made one
+#: included.
+MADE_NAMES: tuple[MadeName, ...] = (
+    MadeName("page-document", "narrative", "<resource>: <document>", "joined", r"(?!.*: hidden properties$).+: .+"),
+    MadeName("hidden-properties", "narrative", "<resource>: hidden properties", "ours", r".+: hidden properties"),
+    MadeName("untitled-lane", "narrative", "Lane (<lane id>)", "ours", r"Lane \(.+\)"),
+    MadeName("map-document", "map", "<resource>: <document>", "joined", r".+: .+"),
+    MadeName("map-card", "pin", "<resource>: <document>", "joined", r".+: .+"),
+    MadeName("untitled-pin", "pin", "Untitled pin (<pin id>)", "ours", r"Untitled pin \(.+\)"),
+    MadeName("untitled-card", "pin", "Untitled card (<shape id>)", "ours", r"Untitled card \(.+\)"),
+    MadeName(
+        "untitled-feature",
+        "zone",
+        "Untitled region (<feature id>), Untitled path (<feature id>)",
+        "ours",
+        r"Untitled (?:region|path) \(.+\)",
+    ),
+    MadeName("region-part", "zone", "<zone>: part <n>", "ours", r".+: part [0-9]+"),
+    MadeName("untitled-frame", "zone", "Frame", "ours", r"Frame"),
+    MadeName("feature-point", "marker", "<zone>: point <n>", "ours", r".+: point [0-9]+"),
+    MadeName("frame-corner", "marker", "<frame>: corner <n>", "ours", r".+: corner [1-4]"),
+    MadeName("board-link", "relation", BOARD_LINK, "ours", r"Board link"),
+    MadeName("untitled-event", "event", "Untitled event", "ours", r"Untitled event"),
+    MadeName("untitled-calendar", "construct", "Calendar (<calendar id>)", "ours", r"Calendar \(.+\)"),
+    MadeName("untitled-resource", ANY_TYPE, "Untitled (<resource id>)", "ours", r"Untitled \(.+\)"),
+)
 
 #: tldraw's sticky note is 200 by 200 (its ``growY`` added to the height), times its ``scale``: its
 #: props carry no ``w`` or ``h``.
@@ -1974,6 +2009,8 @@ class ImportReport:
     ow_unmapped: list[str] = field(default_factory=list)
     #: the import map's offer for this project (None when it would type nothing), and whether it was applied
     import_map: ImportMapOffer | None = None
+    #: names made here, not taken whole from the export: a ``MADE_NAMES`` kind -> its elements, in declared order
+    made_names: dict[str, int] = field(default_factory=dict)
     #: where the folder was written; None for a plan
     out: Path | None = None
 
@@ -2163,6 +2200,7 @@ class ImportReport:
         if self.pins_unlinked:
             lines.append(f"Pins with no element ({len(self.pins_unlinked)}):")
             lines += [f"  - {p}" for p in self.pins_unlinked]
+        lines += _lines(MADE_NAMES, self.made_names)
         if self.not_imported:
             lines.append(f"Documents not imported ({len(self.not_imported)}):")
             lines += [
@@ -2251,6 +2289,8 @@ class _Converter:
         self._secrets: dict[str, list[_Item]] = {}
         self._secret_n: dict[str, int] = {}
         self._hidden_props: dict[str, _Item] = {}
+        #: element id -> the MADE_NAMES kind of the name it was given, for the report's count
+        self._named: dict[str, str] = {}
         #: the document whose blocks are being read (keys a secret block's id)
         self._doc = ""
         self.relations: list[dict[str, Any]] = []
@@ -2376,6 +2416,8 @@ class _Converter:
             item.fields.update(ow_tags)
             if own is not None:
                 self.own_ids += 1
+            if not str(row.get("name") or "").strip():
+                self._named[item.eid] = "untitled-resource"
             self.items[rid] = item
             self.report.typed.append(Typed(name, rid, etype, by))
         self.report.untyped_tags = untyped_tags
@@ -2493,17 +2535,28 @@ class _Converter:
 
     # -- what the source hides on a visible resource ---------------------------
 
-    def _narrative(self, owner: _Item, key: str, name: str) -> _Item:
-        """A hidden Narrative beside ``owner``, linked back to it when its body is made."""
+    def _narrative(self, owner: _Item, key: str, name: str, made: str) -> _Item:
+        """A hidden Narrative beside ``owner``, linked back to it when its body is made; ``made`` is its name's
+        MADE_NAMES kind."""
         narr = _Item(
             "narrative", self._id(key), name, owner.lk_id, typed=False, row=owner.row, hidden=True, owner=owner
         )
         narr.taken |= _RESERVED
         self.extra.append(narr)
+        self._named[narr.eid] = made
         return narr
 
+    def _named_as(self, eid: str, target: _Item | None, untitled: str) -> None:
+        """The kind of a Pin's or Zone's name when it has none of its own: its page's, when that page's name was
+        made (LegendKeeper shows the page's name on it), ``untitled`` when it places no page."""
+        if target is None:
+            self._named[eid] = untitled
+        elif target.eid in self._named:
+            self._named[eid] = self._named[target.eid]
+
     def _hidden_page(self, item: _Item, doc: dict[str, Any], dname: str, blocks: list[dict[str, Any]]) -> None:
-        narr = self._narrative(item, f"document:{item.lk_id}:{doc.get('id')}", f"{item.name}: {dname or 'Page'}")
+        key = f"document:{item.lk_id}:{doc.get('id')}"
+        narr = self._narrative(item, key, f"{item.name}: {dname or 'Page'}", "page-document")
         narr.ext[f"{EXT_PREFIX}document"] = doc.get("id")
         story = "\n\n".join(self._blocks(narr, blocks))
         if story:
@@ -2515,7 +2568,7 @@ class _Converter:
         where = f"{item.lk_id}:{self._doc}"
         n = self._secret_n[where] = self._secret_n.get(where, 0) + 1
         title = str(b.get("title") or "").strip() or "Secret"
-        narr = self._narrative(item, f"secret:{where}:{n}", f"{item.name}: {title}")
+        narr = self._narrative(item, f"secret:{where}:{n}", f"{item.name}: {title}", "page-document")
         if self._doc != "properties":
             narr.ext[f"{EXT_PREFIX}document"] = self._doc
         story = self._children(narr, b)
@@ -2527,7 +2580,8 @@ class _Converter:
     def _props_narrative(self, item: _Item) -> _Item:
         narr = self._hidden_props.get(item.lk_id)
         if narr is None:
-            narr = self._narrative(item, f"properties:{item.lk_id}", f"{item.name}: hidden properties")
+            key = f"properties:{item.lk_id}"
+            narr = self._narrative(item, key, f"{item.name}: hidden properties", "hidden-properties")
             self._hidden_props[item.lk_id] = narr
             self.report.hidden.property_narratives += 1
         return narr
@@ -2979,6 +3033,8 @@ class _Converter:
             name = str(ev.get("name") or "").strip()
             if not name:
                 name = str(ev.get("formattedStart") or "Untitled event")
+                if not ev.get("formattedStart"):
+                    self._named[self._id("event", ev_id)] = "untitled-event"
                 self.report.notes.append(f"an event with no name on {item.name!r} is named {name!r}")
             fields: dict[str, Any] = {}
             image = ev.get("imageUrl")
@@ -3077,6 +3133,8 @@ class _Converter:
         ext[f"{EXT_PREFIX}id"] = cid
         ext[f"{EXT_PREFIX}calendar"] = copy.deepcopy(cal)
         body = self._body("construct", self._id("calendar", cid), name, not shown, fields, ext)
+        if not str(cal.get("name") or "").strip():
+            self._named[body["id"]] = "untitled-calendar"
         self.constructs.append(body)
         self._cal_bodies[cid] = body
         day = _minutes_in_day(cal) if config is not None else None
@@ -3110,6 +3168,7 @@ class _Converter:
         if doc.get("calendarId"):
             ext[f"{EXT_PREFIX}calendar"] = doc.get("calendarId")
         self.timelines.append(self._body("narrative", tl_id, f"{item.name}: {dname}", hidden, fields, ext))
+        self._named[tl_id] = "page-document"
         if hidden:
             self.report.hidden.timelines += 1
         for lid, lane in lanes.items():
@@ -3119,9 +3178,10 @@ class _Converter:
                 lf["events"] = per_lane[lid]
             lname = str(lane.get("name") or "").strip() or f"Lane ({lid})"
             lext = {f"{EXT_PREFIX}id": lid, f"{EXT_PREFIX}parent": item.eid}
-            self.timelines.append(
-                self._body("narrative", self._id("lane", item.lk_id, did, lid), lname, lane_hidden, lf, lext)
-            )
+            lane_id = self._id("lane", item.lk_id, did, lid)
+            if not str(lane.get("name") or "").strip():
+                self._named[lane_id] = "untitled-lane"
+            self.timelines.append(self._body("narrative", lane_id, lname, lane_hidden, lf, lext))
 
     # -- maps ----------------------------------------------------------------
 
@@ -3175,6 +3235,7 @@ class _Converter:
                 body[fname] = fields[fname]
         body.update(ext)
         self.maps.append(body)
+        self._named[map_id] = "map-document"
         self._made[(item.lk_id, did)] = body
         pins = [p for p in doc.get("pins") or [] if isinstance(p, dict)]
         for n, pin in enumerate(pins, 1):
@@ -3244,6 +3305,8 @@ class _Converter:
             self.unplaced_pins += 1
         hidden = map_hidden or pin.get("isHidden") is True
         body: dict[str, Any] = {"type": "pin", "id": self._id("pin", item.lk_id, did, pid), "name": name}
+        if not str(pin.get("name") or "").strip():
+            self._named_as(body["id"], target, "untitled-pin")
         if hidden:
             body["hidden"] = True
             self.report.hidden.pins += 1
@@ -3374,6 +3437,8 @@ class _Converter:
             if rest:
                 ext[f"{EXT_PREFIX}feature"] = rest
             zfields: dict[str, Any] = {"shape": shape, "linked_zones": part_ids} if part_ids else {"shape": shape}
+            if not name:
+                self._named_as(zone_id, target, "untitled-feature")
             self.zones.append(self._body("zone", zone_id, zname, hidden, zfields, ext))
         if target is not None and target.hidden and not hidden:
             note = f"{label!r}: a visible {kind} on {map_name!r} places the hidden {target.name!r}"
@@ -3387,6 +3452,7 @@ class _Converter:
             for (k, ring), part_id in zip(parts, part_ids, strict=True):
                 pname = f"{zname}: part {k}"
                 pext = {f"{EXT_PREFIX}id": fid}
+                self._named[part_id] = "region-part"
                 self.zones.append(self._body("zone", part_id, pname, part_hidden, {"shape": shape}, pext))
                 made += self._feature_markers(
                     ring, (item.lk_id, did, fid, "part", str(k)), map_id, part_id, pname, hidden, bounds, zoom
@@ -3433,6 +3499,7 @@ class _Converter:
                 self.unplaced_markers += 1
             mext = {f"{EXT_PREFIX}id": fid, f"{EXT_PREFIX}pos": pt}
             mid = self._id("marker", *id_parts, str(order))
+            self._named[mid] = "feature-point"
             self.markers.append(self._body("marker", mid, f"{zname}: point {order + 1}", hidden, fields, mext))
         return len(points)
 
@@ -3533,6 +3600,7 @@ class _Converter:
         if hidden:
             self.report.hidden.boards += 1
         self.maps.append(board_map)
+        self._named[map_id] = "map-document"
         self._made[(item.lk_id, did)] = board_map
         n = made.made
         # a frame's Zone is an element an arrow can link: each frame's, before any arrow is read
@@ -3574,6 +3642,7 @@ class _Converter:
                     rid = props.get("resourceId")
                     why = f"its resource {rid}, {self._MISSING}" if isinstance(rid, str) and rid else "no resource"
                     self.report.pins_unlinked.append(f"card {sid} on {name!r}: {why}; a Pin with no element")
+                    self._named[pin_id] = "untitled-card"
                     self.pins.append(self._body("pin", pin_id, f"Untitled card ({sid})", hidden, at, card_ext))
                 else:
                     # a card shows its page: a hidden page (its resource or the document shown) is a hidden Pin
@@ -3582,9 +3651,12 @@ class _Converter:
                         self.report.hidden.board_pins += 1
                         self.report.records_private = True  # its records name a hidden page
                     at.update(element_type=target.etype, element_id=target.eid)
+                    self._named_as(pin_id, target, "untitled-card")
                     self.pins.append(self._body("pin", pin_id, target.name, hidden or on_hidden, at, card_ext))
             elif kind == "frame":
                 zname, zone_id = zones[sid].name, zones[sid].eid
+                if not str(props.get("name") or "").strip():
+                    self._named[zone_id] = "untitled-frame"
                 zone = {"subtype": "Frame", "shape": "polygon"}
                 self.zones.append(self._body("zone", zone_id, zname, hidden, zone, mine))
                 n["zones"] += 1
@@ -3592,6 +3664,7 @@ class _Converter:
                     at = {"map": map_id, "zone": zone_id, **where(pt), "order": order}
                     mid = self._id("board", item.lk_id, did, sid, str(order))
                     marker_ext = {**mine, f"{EXT_PREFIX}board_pos": list(pt)}
+                    self._named[mid] = "frame-corner"
                     self.markers.append(
                         self._body("marker", mid, f"{zname}: corner {order + 1}", hidden, at, marker_ext)
                     )
@@ -3630,6 +3703,8 @@ class _Converter:
                     self.report.hidden.relations += 1
                 rel_ext = {**mine, f"{EXT_PREFIX}source": src.eid, f"{EXT_PREFIX}target": dst.eid}
                 rel_id = self._id("board", item.lk_id, did, sid)
+                if title == BOARD_LINK and not _shape_text(props).split():
+                    self._named[rel_id] = "board-link"
                 self.relations.append(self._body("relation", rel_id, title, rel_hidden, links, rel_ext))
                 n["relations"] += 1
             else:
@@ -3649,12 +3724,14 @@ class _Converter:
         if child is None:  # its content was not read (named under unread): the card places its page
             fields.update(element_type=card.target.etype, element_id=card.target.eid)
             name, on_hidden = card.target.name, card.target.hidden or bool(card.doc.get("isHidden"))
+            self._named_as(card.pin_id, card.target, "untitled-card")
             self.report.notes.append(
                 f"a card on {card.board.name!r} shows the {what}, which was not made: its Pin places {name!r}"
             )
         else:
             fields.update(element_type="map", element_id=child["id"])
             name, on_hidden = child["name"], child.get("hidden") is True
+            self._named[card.pin_id] = "map-card"
             if card.doc.get("type") == "board":
                 self._parent_map(child, card)
         if on_hidden and not card.board_hidden:
@@ -3726,6 +3803,7 @@ class _Converter:
         ):
             out.setdefault(body["type"], []).append(body)
         self.report.counts = {t: len(b) for t, b in sorted(out.items())}
+        self.report.made_names = _counts(MADE_NAMES, self._named, (b["id"] for bs in out.values() for b in bs))
         self._notes()
         return out
 

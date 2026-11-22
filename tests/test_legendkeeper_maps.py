@@ -19,8 +19,10 @@ import uuid
 from pathlib import Path
 from typing import Any
 
+from conftest import MadeCheck
+
 from onlyworlds import read_folder
-from onlyworlds.legendkeeper import LEGENDKEEPER_NAMESPACE, RecordedSource, import_legendkeeper
+from onlyworlds.legendkeeper import LEGENDKEEPER_NAMESPACE, MADE_NAMES, RecordedSource, import_legendkeeper
 
 FIX = Path(__file__).resolve().parent / "fixtures" / "legendkeeper"
 PID = "tutorial0"
@@ -154,7 +156,7 @@ def of(out: Path, etype: str) -> list[dict[str, Any]]:
     return [e.body for e in read_folder(out).elements.values() if e.body["type"] == etype]
 
 
-def test_regions_and_paths_become_zones_of_markers(tmp_path: Path) -> None:
+def test_regions_and_paths_become_zones_of_markers(tmp_path: Path, made_in: MadeCheck) -> None:
     report = import_legendkeeper(RecordedSource(answers(drawn([REGION, ROAD, TRACK, SLIVER]))), PID, tmp_path / "w")
     zones = {z["name"]: z for z in of(tmp_path / "w", "zone")}
     markers = of(tmp_path / "w", "marker")
@@ -190,6 +192,8 @@ def test_regions_and_paths_become_zones_of_markers(tmp_path: Path) -> None:
     assert (made.zones, made.zones_own, made.markers) == (3, 1, 9)
     text = report.render()
     assert "3 regions and paths read as Zones (1 on Zones of the project, 2 new) with 9 Markers" in text
+    named = made_in(MADE_NAMES, report.made_names, tmp_path / "w")
+    assert (named["untitled-feature"], named["feature-point"]) == (1, 9)  # the track's Zone; every Marker
     assert any(n.startswith("3 map regions and paths read as Zones (1 on Zones of the project") for n in report.notes)
     # the same project read again: the same ids
     import_legendkeeper(RecordedSource(answers(drawn([REGION, ROAD, TRACK, SLIVER]))), PID, tmp_path / "again")
@@ -239,7 +243,7 @@ def polygons(fid: str, rings: list[list[list[float]]], uri: str | None = None, n
     return f
 
 
-def test_a_region_of_several_polygons_is_a_zone_drawn_as_its_parts(tmp_path: Path) -> None:
+def test_a_region_of_several_polygons_is_a_zone_drawn_as_its_parts(tmp_path: Path, made_in: MadeCheck) -> None:
     """The standard's rule (2026-09-28): a Zone with no Markers whose linked_zones are its parts is
     drawn as its parts. The region's Zone carries no Markers; each polygon is a part Zone of Markers."""
     isles = polygons("isles1", [RING_A, RING_B], name="The Isles")
@@ -274,6 +278,8 @@ def test_a_region_of_several_polygons_is_a_zone_drawn_as_its_parts(tmp_path: Pat
     assert "1 region or path read as Zones (0 on Zones of the project, 1 new) and 2 part Zones" in text
     said = "1 region of several polygons is a Zone with no Markers whose linked_zones are 2 part Zones"
     assert any(said in n for n in report.notes)
+    named = made_in(MADE_NAMES, report.made_names, tmp_path / "w")
+    assert (named["region-part"], named["feature-point"]) == (2, 7)
     # the same project read again: the same ids
     import_legendkeeper(RecordedSource(answers(drawn([isles]))), PID, tmp_path / "again")
     assert {e for e in read_folder(tmp_path / "w").elements} == {e for e in read_folder(tmp_path / "again").elements}
