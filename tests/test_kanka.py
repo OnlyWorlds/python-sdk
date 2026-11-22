@@ -310,6 +310,22 @@ def test_a_near_duplicate_is_kept(tmp_path: Path) -> None:
     assert not any(f.element == "Ada Okafor" for f in report.folded)
 
 
+def test_a_time_with_no_offset_is_read_as_utc(tmp_path: Path) -> None:
+    """A campaign's created_at with no offset beside entities' with one (or the other way) compares, read as UTC."""
+
+    def naive(doc: dict[str, Any], holder: str | None = None) -> None:
+        row = doc[holder] if holder else doc
+        assert row["created_at"].endswith(".000000Z"), row["created_at"]
+        row["created_at"] = row["created_at"][: -len(".000000Z")]
+
+    campaign = variant(tmp_path, naive, "campaign.json", "naive-campaign.zip")
+    _, report = run(tmp_path, campaign, "naive-campaign")
+    assert sorted(report.possibly_starter) == sorted(STARTER)
+    entity = variant(tmp_path, lambda d: naive(d, "entity"), "characters/your-character-name_10074596.json", "naive-entity.zip")
+    _, report = run(tmp_path, entity, "naive-entity")
+    assert sorted(report.possibly_starter) == sorted(STARTER)
+
+
 def test_starter_entries_are_imported_and_named(tmp_path: Path) -> None:
     """Nothing in the data marks them, so they travel; the report names them as possible starters."""
     out, report = run(tmp_path)

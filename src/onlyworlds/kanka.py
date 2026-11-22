@@ -182,7 +182,7 @@ import uuid
 from collections.abc import Callable, Iterable, Mapping
 from contextlib import ExitStack
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import datetime, timezone
 from html.parser import HTMLParser
 from importlib.resources import files
 from pathlib import Path
@@ -357,12 +357,15 @@ def _content(row: Mapping[str, Any]) -> str:
 
 
 def _when(value: Any) -> datetime | None:
+    """A moment, or None when the value is not one. A time with no offset is read as UTC, the zone Kanka
+    writes, so a campaign's time and an entity's compare whichever of them carries an offset."""
     if not isinstance(value, str) or not value:
         return None
     try:
-        return datetime.fromisoformat(value.replace("Z", "+00:00"))
+        moment = datetime.fromisoformat(value.replace("Z", "+00:00"))
     except ValueError:
         return None
+    return moment if moment.tzinfo is not None else moment.replace(tzinfo=timezone.utc)
 
 
 def _int_id(value: Any) -> int | None:
