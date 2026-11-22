@@ -44,6 +44,10 @@ organisation's ``members`` (``character_id``), of ``is_dead``, of ``[entity:N|te
 campaign's ``entry``; that ``character_traits`` section 1 is appearance and 2 personality (Kanka's
 own API names them so, read live on 2026-07-18; the export carries the number only).
 
+The door's tables (the folders to types, the keys to fields, the fixed key lists, the names it makes) and every
+line of its report are data, ``convert/kanka.json``: the same bytes the npm SDK's ``convertKanka`` reads, which
+writes the same folder. The rules are this module.
+
 What becomes what (the type map follows a table ruled 2026-10-23):
 
 - **An entity becomes an element** of its module's type: ``characters`` Character, ``locations``
@@ -180,10 +184,11 @@ from contextlib import ExitStack
 from dataclasses import dataclass, field
 from datetime import datetime
 from html.parser import HTMLParser
+from importlib.resources import files
 from pathlib import Path
 from typing import Any
 
-from ._made import ANY_TYPE, MadeName, _counts, _lines
+from ._made import MadeName, _counts, _lines
 from ._schema import FIELD_KINDS, LINK_TARGETS
 from ._version import __version__
 from .folder import FORMAT_VERSION, ONE_SOURCE_ONE_WORLD, write_folder
@@ -211,162 +216,96 @@ __all__ = [
     "main",
 ]
 
+#: The door's tables and wording (``convert/kanka.json``, the same bytes as the npm SDK's copy): Kanka's folders
+#: to element types, its keys to fields, the fixed key lists, the names it makes and every line of its report.
+#: The rules that read them are the code below.
+_DATA: dict[str, Any] = json.loads(files("onlyworlds").joinpath("convert", "kanka.json").read_bytes())
+_WORDS: dict[str, str] = _DATA["words"]
+_WHERE: dict[str, str] = _DATA["where"]
+_WHY: dict[str, str] = _DATA["why"]
+_NOTE: dict[str, str] = _DATA["notes"]
+_REPORT: dict[str, Any] = _DATA["report"]
+
 #: The ``producer.input`` word for this door; new to the folder spec's list.
-PRODUCER_INPUT = "kanka-export"
+PRODUCER_INPUT: str = _DATA["producer_input"]
 
 #: The namespace every id this door mints is UUIDv5 in. Fixed for good: changing it would give
 #: every element of every re-imported campaign a new id.
-KANKA_NAMESPACE = uuid.uuid5(uuid.NAMESPACE_URL, "https://onlyworlds.com/ns/kanka")
+KANKA_NAMESPACE = uuid.uuid5(uuid.NAMESPACE_URL, _DATA["namespace_url"])
 
 #: Every extension key this door writes starts with this.
-EXT_PREFIX = "x_kanka_"
+EXT_PREFIX: str = _DATA["ext_prefix"]
 
-#: The supertype of a Narrative made from a module with no OnlyWorlds type: what it is, never where
-#: it came from (the producer line and the x_kanka_ keys say that; ruled 2026-10-23).
-UNTYPED_SUPERTYPE = "Article"
+#: The supertype of a Narrative made from a module with no OnlyWorlds type: what it is, never where it came from
+#: (the producer line and the x_kanka_ keys say that; ruled 2026-10-23); ``_UNTYPED`` is its type.
+UNTYPED_SUPERTYPE: str = _DATA["untyped_supertype"]
+_UNTYPED: str = _DATA["untyped_type"]
 
 #: Export folder -> element type (the ruled table; the four in ``PROVEN_MODULES`` read on a real file).
-MODULE_TYPES: dict[str, str] = {
-    "characters": "character",
-    "locations": "location",
-    "organisations": "institution",
-    "notes": "narrative",
-    "families": "family",
-    "races": "species",
-    "items": "object",
-    "creatures": "creature",
-    "events": "event",
-    "abilities": "ability",
-    "quests": "narrative",
-    "journals": "narrative",
-    "maps": "map",
-}
-PROVEN_MODULES = frozenset({"characters", "locations", "organisations", "notes"})
+MODULE_TYPES: dict[str, str] = dict(_DATA["module_types"])
+PROVEN_MODULES = frozenset(_DATA["proven_modules"])
 
 #: Modules whose text is a Narrative's ``story`` rather than its ``description``.
-_STORY_MODULES = frozenset({"notes", "quests", "journals"})
+_STORY_MODULES = frozenset(_DATA["story_modules"])
 
 #: Seconds after the campaign's ``created_at`` within which an entity is named possible starter content.
-STARTER_WINDOW = 5.0
+STARTER_WINDOW = float(_DATA["starter_window"])
+
+#: The export version this door was proven on; another is named in the report.
+_PROVEN_VERSION: str = _DATA["proven_export_version"]
 
 #: An element type -> its own parent field, which takes a parent of the same type.
-_PARENT_FIELD: dict[str, str] = {
-    "location": "parent_location",
-    "institution": "parent_institution",
-    "narrative": "parent_narrative",
-    "object": "parent_object",
-    "species": "parent_species",
-    "map": "parent_map",
-}
+_PARENT_FIELD: dict[str, str] = dict(_DATA["parent_fields"])
 
 #: The names this door makes (``MadeName``: one for a thing Kanka never names, or leaves unnamed), one
 #: record a kind, each kind counted in the report.
-MADE_NAMES: tuple[MadeName, ...] = (
-    MadeName("hidden-details", "narrative", "<entity>: hidden details", "ours", r".+: hidden details"),
-    MadeName("untitled-post", "narrative", "Post", "ours", r"Post"),
-    MadeName("untitled-relationship", "relation", "Relationship", "ours", r"Relationship"),
-    MadeName("untitled-entity", ANY_TYPE, "Untitled (<entity id>)", "ours", r"Untitled \(.+\)"),
+MADE_NAMES: tuple[MadeName, ...] = tuple(
+    MadeName(m["kind"], m["type"], m["pattern"], m["source"], m["regex"]) for m in _DATA["made_names"]
 )
+
+#: The two root files the door reads.
+_CAMPAIGN: str = _DATA["campaign_file"]
+_INFO: str = _DATA["info_file"]
 
 #: Kanka's image store: per upload ``<uuid>.json`` and the image ``<uuid>.<ext>``; not a module.
-_GALLERY = "gallery"
+_GALLERY: str = _DATA["gallery"]
+
+#: Kanka's settings folder, the files in it the door knows, and the one that defines custom modules.
+_SETTINGS: str = _DATA["settings"]
+_SETTINGS_FILES = frozenset(_DATA["settings_files"])
+_CUSTOM_MODULES: str = _DATA["custom_modules_file"]
+
+#: The module whose rows carry ``members``, linked from each Character.
+_ORGANISATIONS: str = _DATA["organisations"]
 
 #: Root files the door reads; anything else at the root is named in the report.
-_ROOT_FILES = frozenset({"info.json", "campaign.json"})
+_ROOT_FILES = frozenset(_DATA["root_files"])
 
 #: Keys read by the door itself (never kept as ``x_kanka_<key>`` by the generic rule).
-_ROW_HANDLED = frozenset(
-    {
-        "id",
-        "name",
-        "entry",
-        "type",
-        "is_private",
-        "entity",
-        "location_id",
-        "race_id",
-        "is_dead",
-        "character_traits",
-        "character_families",
-        "character_races",
-        "organisation_memberships",
-        "members",
-        "is_personality_visible",
-        "image_uuid",
-    }
-)
-_ENTITY_HANDLED = frozenset(
-    {
-        "id",
-        "entity_id",
-        "parent_id",
-        "name",
-        "type",
-        "entry",
-        "is_private",
-        "is_attributes_private",
-        "posts",
-        "relationships",
-        "entityLocations",
-        "entityAttributes",
-        "image_uuid",
-    }
-)
+_ROW_HANDLED = frozenset(_DATA["row_handled"])
+_ENTITY_HANDLED = frozenset(_DATA["entity_handled"])
 
 #: What a row or entity carries that the folder does not keep (one report line).
-_NOT_KEPT_KEYS = frozenset(
-    {
-        "campaign_id",
-        "type_id",
-        "created_at",
-        "updated_at",
-        "deleted_at",
-        "created_by",
-        "updated_by",
-        "deleted_by",
-        "focus_x",
-        "focus_y",
-        "header_uuid",
-        "marketplace_uuid",
-        "is_personality_pinned",
-        "is_appearance_pinned",
-        "is_pinned",
-        "mentions",
-        "characterTraits",
-        "characterFamilies",
-        "characterRaces",
-        "organisationMemberships",
-    }
-)
+_NOT_KEPT_KEYS = frozenset(_DATA["not_kept_keys"])
 #: Flags kept only when true.
-_KEPT_WHEN_TRUE = frozenset({"is_template"})
-_NOT_KEPT = (
-    "timestamps and who made or changed a row (created_at, updated_at, created_by, updated_by), "
-    "campaign_id and type_id, image focus points and the header image's upload uuid, marketplace ids, "
-    "pin and display flags, "
-    "the server's mentions index (the text holds the mentions), and the camelCase twins of a character's lists "
-    "(characterTraits and the rest: the same rows without their ids)"
-)
+_KEPT_WHEN_TRUE = frozenset(_DATA["kept_when_true"])
 
 #: Fields that make two copies the same thing; every other key (ids, order, times) may differ.
-_NOT_CONTENT = frozenset(
-    {
-        "id",
-        "mirror_id",
-        "position",
-        "default_order",
-        "created_at",
-        "updated_at",
-        "created_by",
-        "updated_by",
-        "deleted_at",
-        "deleted_by",
-        "marketplace_uuid",
-        "entity_id",
-        "character_id",
-        "words",
-    }
-)
+_NOT_CONTENT = frozenset(_DATA["not_content"])
+
+#: A post's keys kept when set, and the ``settings`` keys that say how the page shows it (not content).
+_POST_KEPT: tuple[str, ...] = tuple(_DATA["post_kept"])
+_POST_DISPLAY = frozenset(_DATA["post_display_settings"])
+
+#: A character trait's section -> the field its lines fill and the heading it takes when hidden.
+_TRAIT_SECTIONS: dict[int, dict[str, str]] = {int(k): v for k, v in _DATA["trait_sections"].items()}
+_PERSONALITY: int = _DATA["personality_section"]
+#: The field a dead Character's ``[Deceased] `` goes before.
+_DECEASED_FIELD: str = _DATA["deceased_field"]
+
+#: A character's lists: the row's key, the key of the id in each item, the module the ids are rows of, the
+#: field they fill, and the row's own single id key beside the list (or None).
+_CHARACTER_LISTS: tuple[dict[str, str | None], ...] = tuple(_DATA["character_lists"])
 
 _MENTION = re.compile(r"\[entity:(?P<id>\d+)(?:\|(?P<text>[^\]]*))?\]")
 _FILE_ID = re.compile(r"_(?P<id>\d+)\.json$")
@@ -766,101 +705,73 @@ class ImportReport:
         return sum(self.counts.values())
 
     def render(self) -> str:
-        """The report in prose, one finding a line."""
+        """The report in prose, one finding a line; its wording is the data file's ``report``."""
+        r = _REPORT
         lines: list[str] = []
         name = self.world.get("name", "")
         by_type = ", ".join(f"{t} {n}" for t, n in sorted(self.counts.items()))
-        lines.append(f"Kanka export {self.source} ({name!r}): {self.total} elements ({by_type or 'none'}).")
+        lines.append(
+            r["head"].format(source=self.source, name=name, total=self.total, by_type=by_type or r["head_none"])
+        )
         if self.modules:
-            lines.append("What became what:")
+            lines.append(r["modules"])
             for m in self.modules:
-                how = {
-                    "proven": "read on a real export",
-                    "believed": "believed, not yet seen in a real export",
-                    "untyped": f"no OnlyWorlds type: Narratives, supertype {UNTYPED_SUPERTYPE}, subtype {m.folder!r}",
-                }[m.status]
-                lines.append(f"  - {m.folder}/ ({m.entities}): {m.type}; {how}")
+                how = r["how"][m.status].format(supertype=UNTYPED_SUPERTYPE, folder=m.folder)
+                lines.append(r["module"].format(folder=m.folder, entities=m.entities, type=m.type, how=how))
         if self.relations:
             listed = ", ".join(f"{t!r} {n}" for t, n in sorted(self.relations.items()))
-            lines.append(f"Relationships kept as Relation elements ({sum(self.relations.values())}): {listed}.")
+            lines.append(r["relations"].format(n=sum(self.relations.values()), listed=listed))
         if self.folded:
-            lines.append(f"Exact duplicates folded into one ({len(self.folded)}):")
-            lines += [f"  - {f.element!r}: {f.copies} identical {f.what}s {f.name!r}, kept once" for f in self.folded]
+            lines.append(r["folded"].format(n=len(self.folded)))
+            lines += [
+                r["fold"].format(element=f.element, copies=f.copies, what=f.what, name=f.name) for f in self.folded
+            ]
         if self.possibly_starter:
             listed = ", ".join(repr(n) for n in self.possibly_starter)
-            lines.append(
-                f"Possibly Kanka's starter content (made within {STARTER_WINDOW:g} seconds of the campaign;"
-                f" nothing in the data marks it, so it is imported): {listed}."
-            )
+            lines.append(r["starter"].format(window=STARTER_WINDOW, listed=listed))
         h = self.hidden
-        elements = [
-            (h.entities, "private entity (is_private)", "private entities (is_private)"),
-            (
-                h.posts,
-                "post not visible to all, its own Narrative (visibility_id)",
-                "posts not visible to all, each its own Narrative (visibility_id)",
-            ),
-            (
-                h.relationships,
-                "relationship hidden on a side or touching a hidden entity (visibility_id)",
-                "relationships hidden on a side or touching a hidden entity (visibility_id)",
-            ),
-        ]
-        held = [
-            (h.traits, "private trait (is_private)", "private traits (is_private)"),
-            (
-                h.personality,
-                "personality trait not visible to players (is_personality_visible)",
-                "personality traits not visible to players (is_personality_visible)",
-            ),
-            (
-                h.attributes,
-                "private or hidden attribute (is_private, is_hidden, is_attributes_private)",
-                "private or hidden attributes (is_private, is_hidden, is_attributes_private)",
-            ),
-            (h.links, "private link (is_private)", "private links (is_private)"),
-        ]
-        said = [f"{n} {one if n == 1 else many}" for n, one, many in elements if n]
-        inside = [f"{n} {one if n == 1 else many}" for n, one, many in held if n]
+
+        def counted(n: int, pair: list[str]) -> str:
+            return f"{n} {pair[0] if n == 1 else pair[1]}"
+
+        said = [counted(getattr(h, k), pair) for k, pair in r["hidden_elements"].items() if getattr(h, k)]
+        inside = [counted(getattr(h, k), pair) for k, pair in r["hidden_held"].items() if getattr(h, k)]
         if inside:
-            said.append(
-                f"{h.details} hidden-details Narrative{'' if h.details == 1 else 's'} holding " + ", ".join(inside)
-            )
+            said.append(r["hidden_details"][0 if h.details == 1 else 1].format(n=h.details, held=", ".join(inside)))
         if said:
-            lines.append("Hidden as the source hides it (elements carrying hidden: true): " + "; ".join(said) + ".")
+            lines.append(r["hidden"].format(said="; ".join(said)))
         if self.untagged:
-            lines.append(f"Tags not linked to an element that carries them ({len(self.untagged)}):")
-            lines += [f"  - {u.tag!r} on {u.element!r}: {u.why}" for u in self.untagged]
+            lines.append(r["untagged"].format(n=len(self.untagged)))
+            lines += [r["untag"].format(tag=u.tag, element=u.element, why=u.why) for u in self.untagged]
         if self.uploads:
-            lines.append(
-                f"gallery/: {self.uploads} upload{'' if self.uploads == 1 else 's'} read as Kanka's image store;"
-                f" {self.uploads_named} named by an entity."
-            )
+            lines.append(r["uploads"][0 if self.uploads == 1 else 1].format(n=self.uploads, named=self.uploads_named))
         if self.pictures:
-            lines.append(
-                f"Pictures named but not imported ({len(self.pictures)}): an OnlyWorlds image_url is a URL, and the"
-                " folder format has no place for image files yet; each element keeps x_kanka_image:"
-            )
-            lines += [
-                f"  - {p.element!r}: upload {p.uuid} is not visible to all; its name and file stay out of this"
-                " visible element, the uuid kept alone"
-                if p.private
-                else f"  - {p.element!r}: {p.path}" + (f" ({p.original})" if p.original else "")
-                if p.path is not None
-                else f"  - {p.element!r}: upload {p.uuid} is not in gallery/; the uuid kept alone"
-                for p in self.pictures
-            ]
+            lines.append(r["pictures"].format(n=len(self.pictures)))
+            for p in self.pictures:
+                if p.private:
+                    lines.append(r["picture_private"].format(element=p.element, uuid=p.uuid))
+                elif p.path is None:
+                    lines.append(r["picture_missing"].format(element=p.element, uuid=p.uuid))
+                else:
+                    line = r["picture_original"] if p.original else r["picture"]
+                    lines.append(line.format(element=p.element, path=p.path, original=p.original))
         if self.unplaced:
-            lines.append(f"Keys not placed on a field ({len(self.unplaced)}), kept as extensions:")
-            lines += [f"  - {u.element!r} / {u.key!r}: {u.why}; kept as {u.kept_as}" for u in self.unplaced]
+            lines.append(r["unplaced"].format(n=len(self.unplaced)))
+            lines += [
+                r["unplaced_item"].format(element=u.element, key=u.key, why=u.why, kept_as=u.kept_as)
+                for u in self.unplaced
+            ]
         if self.unresolved:
-            lines.append(f"Links and mentions whose target is not in the folder ({len(self.unresolved)}):")
-            lines += [f"  - {u.element!r}, {u.where}: {u.target}: {u.why}" for u in self.unresolved]
+            lines.append(r["unresolved"].format(n=len(self.unresolved)))
+            lines += [
+                r["unresolved_item"].format(element=u.element, where=u.where, target=u.target, why=u.why)
+                for u in self.unresolved
+            ]
         lines += _lines(MADE_NAMES, self.made_names)
         if self.notes:
-            lines.append(f"Notes ({len(self.notes)}):")
-            lines += [f"  - {n}" for n in self.notes]
-        lines.append(f"Wrote {self.out}." if self.out is not None else "Plan only: nothing written.")
+            lines.append(r["notes"].format(n=len(self.notes)))
+            lines += [r["note"].format(note=n) for n in self.notes]
+        lines.append(r["wrote"].format(out=self.out) if self.out is not None else r["plan"])
         return "\n".join(lines) + "\n"
 
 
@@ -917,7 +828,7 @@ class _Importer:
         try:
             return json.loads(self.files[rel]().decode("utf-8-sig"))
         except (ValueError, UnicodeDecodeError) as exc:
-            self.report.notes.append(f"{rel}: not readable JSON ({type(exc).__name__}); skipped")
+            self.report.notes.append(_NOTE["not_json"].format(rel=rel, error=type(exc).__name__))
             return None
 
     def _id(self, *parts: str) -> str:
@@ -926,16 +837,16 @@ class _Importer:
     # -- pass 1: every entity, with its type and id ---------------------------
 
     def collect(self) -> None:
-        campaign = self._json("campaign.json") if "campaign.json" in self.files else None
+        campaign = self._json(_CAMPAIGN) if _CAMPAIGN in self.files else None
         if not isinstance(campaign, dict) or _empty(campaign.get("id")):
-            raise ValueError(f"{self.report.source}: no campaign.json with an id (is it Kanka's JSON export?)")
+            raise ValueError(_DATA["errors"]["no_campaign"].format(source=self.report.source))
         self.campaign = campaign
-        info = self._json("info.json") if "info.json" in self.files else None
+        info = self._json(_INFO) if _INFO in self.files else None
         if isinstance(info, dict):
             version = info.get("export_version")
             self.report.notes.append(
-                f"Kanka {info.get('kanka_version')}, export version {version}"
-                + ("" if str(version) == "3.15" else " (this door was proven on 3.15)")
+                _NOTE["version"].format(kanka_version=info.get("kanka_version"), version=version)
+                + ("" if str(version) == _PROVEN_VERSION else _NOTE["version_unproven"].format(proven=_PROVEN_VERSION))
             )
         born = _when(campaign.get("created_at"))
         plans: dict[str, int] = {}
@@ -943,17 +854,17 @@ class _Importer:
             parts = rel.split("/")
             if len(parts) == 1:
                 if rel not in _ROOT_FILES:
-                    self.report.notes.append(f"{rel}: a file at the export's root this door does not read")
+                    self.report.notes.append(_NOTE["root_file"].format(rel=rel))
                 continue
             folder = parts[0]
-            if folder == "settings":
+            if folder == _SETTINGS:
                 self._setting(rel)
                 continue
             if folder == _GALLERY:
                 self._upload(rel, parts)
                 continue
             if len(parts) != 2 or not rel.lower().endswith(".json"):
-                self.report.notes.append(f"{rel}: not an entity file (one JSON per entity in a module folder); skipped")
+                self.report.notes.append(_NOTE["not_entity_file"].format(rel=rel))
                 continue
             row = self._json(rel)
             if row is None:
@@ -961,16 +872,18 @@ class _Importer:
             ent = row.get("entity") if isinstance(row, dict) else None
             entity_id = _int_id(ent.get("id")) if isinstance(ent, dict) else None
             if not isinstance(row, dict) or not isinstance(ent, dict) or entity_id is None:
-                self.report.notes.append(f"{rel}: no entity object with an id; skipped")
+                self.report.notes.append(_NOTE["no_entity"].format(rel=rel))
                 continue
             m = _FILE_ID.search(rel)
             if m is not None and int(m["id"]) != entity_id:
-                self.report.notes.append(f"{rel}: the filename's number is not the entity's id {entity_id}")
+                self.report.notes.append(_NOTE["filename_id"].format(rel=rel, entity_id=entity_id))
             if entity_id in self.by_entity:
-                self.report.notes.append(f"{rel}: a second file for entity {entity_id}; the first is kept")
+                self.report.notes.append(_NOTE["second_file"].format(rel=rel, entity_id=entity_id))
                 continue
-            name = str(ent.get("name") or row.get("name") or "").strip() or f"Untitled ({entity_id})"
-            etype = MODULE_TYPES.get(folder, "narrative")
+            name = str(ent.get("name") or row.get("name") or "").strip() or _WORDS["untitled"].format(
+                entity_id=entity_id
+            )
+            etype = MODULE_TYPES.get(folder, _UNTYPED)
             item = _Item(
                 folder, rel, row, ent, entity_id, etype, self._id(str(entity_id)), name, folder in MODULE_TYPES
             )
@@ -990,16 +903,14 @@ class _Importer:
                 self.report.possibly_starter.append(name)
         for folder, n in sorted(plans.items()):
             status = "proven" if folder in PROVEN_MODULES else "believed" if folder in MODULE_TYPES else "untyped"
-            self.report.modules.append(ModulePlan(folder, MODULE_TYPES.get(folder, "narrative"), n, status))
+            self.report.modules.append(ModulePlan(folder, MODULE_TYPES.get(folder, _UNTYPED), n, status))
 
     def _setting(self, rel: str) -> None:
         data = self._json(rel)
-        if rel == "settings/custom-modules.json" and data:
-            self.report.notes.append(
-                f"{rel}: custom modules are defined; their entities, if exported, are read by folder"
-            )
-        elif rel not in ("settings/modules.json", "settings/custom-modules.json"):
-            self.report.notes.append(f"{rel}: a settings file this door does not read")
+        if rel == _CUSTOM_MODULES and data:
+            self.report.notes.append(_NOTE["custom_modules"].format(rel=rel))
+        elif rel not in _SETTINGS_FILES:
+            self.report.notes.append(_NOTE["settings_file"].format(rel=rel))
 
     def _upload(self, rel: str, parts: list[str]) -> None:
         """One file of ``gallery/``: an upload's JSON is read; its image (and anything else) is left."""
@@ -1048,7 +959,7 @@ class _Importer:
 
     @staticmethod
     def _why_missing(entity_id: int | None) -> str:
-        return "no such entity in the export"
+        return _WHY["no_entity"]
 
     def _fold(self, item: _Item, what: str, rows: list[dict[str, Any]], name_key: str = "name") -> list[dict[str, Any]]:
         """Exact copies kept once, the first in order; each fold reported."""
@@ -1078,13 +989,13 @@ class _Importer:
             target = self.by_entity.get(int(m["id"]))
             if target is None:
                 self.report.unresolved.append(
-                    Unresolved(item.name, "mention", m["id"], self._why_missing(int(m["id"])))
+                    Unresolved(item.name, _WHERE["mention"], m["id"], self._why_missing(int(m["id"])))
                 )
                 return m[0]
             if target is not item and target.eid not in into:
                 into.append(target.eid)
             if shown and not item.hidden and target.hidden:
-                self.report.notes.append(f"{item.name!r}: visible text mentions the hidden {target.name!r} by name")
+                self.report.notes.append(_NOTE["mentions_hidden"].format(element=item.name, target=target.name))
             return m["text"] if m["text"] else target.name
 
         return _MENTION.sub(swap, md)
@@ -1107,7 +1018,7 @@ class _Importer:
             item.fields["supertype"] = UNTYPED_SUPERTYPE
             item.fields["subtype"] = item.folder
             if not _empty(kind):
-                self._keep(item, "type", kind, "a module with no OnlyWorlds type keeps its own type")
+                self._keep(item, "type", kind, _WHY["untyped_type"])
         self._parent(item)
         self._image(item)
 
@@ -1118,7 +1029,7 @@ class _Importer:
         if text:
             parts.append(text)
         if not _empty(row.get("entry")) and not _empty(ent.get("entry")) and row.get("entry") != ent.get("entry"):
-            self._keep(item, "entry", row.get("entry"), "the row's entry differs from the entity's (kept as written)")
+            self._keep(item, "entry", row.get("entry"), _WHY["entry_differs"])
         parts += self._posts(item)
         body = "\n\n".join(parts)
         if body:
@@ -1130,8 +1041,8 @@ class _Importer:
             self._character(item)
         self._places(item)
         self._attributes(item)
-        if item.folder != "organisations" and not _empty(row.get("members")):  # organisations: _memberships
-            self._keep(item, "members", row.get("members"), "members on a module that is not organisations")
+        if item.folder != _ORGANISATIONS and not _empty(row.get("members")):  # organisations: _memberships
+            self._keep(item, "members", row.get("members"), _WHY["members_elsewhere"])
         self._generic(item)
 
     def _parent(self, item: _Item) -> None:
@@ -1141,12 +1052,12 @@ class _Importer:
         pid = _int_id(raw)
         if pid is None:
             if not _empty(raw):
-                self._keep(item, "parent_id", raw, "not an entity id")
+                self._keep(item, "parent_id", raw, _WHY["parent_not_id"])
             return
         parent = self.by_entity.get(pid)
         if parent is None:
-            self.report.unresolved.append(Unresolved(item.name, "parent", str(pid), self._why_missing(pid)))
-            self._keep(item, "parent_id", pid, "its parent is not in the folder")
+            self.report.unresolved.append(Unresolved(item.name, _WHERE["parent"], str(pid), self._why_missing(pid)))
+            self._keep(item, "parent_id", pid, _WHY["parent_missing"])
             return
         self._own(item, "parent", parent.eid)
         pfield = _PARENT_FIELD.get(item.etype)
@@ -1192,22 +1103,22 @@ class _Importer:
         out: list[str] = []
         meta: list[dict[str, Any]] = []
         for p in posts:
-            name = str(p.get("name") or "").strip() or "Post"
+            name = str(p.get("name") or "").strip() or _WORDS["post"]
             if not item.hidden and not _public(p.get("visibility_id")):
                 self._post_narrative(item, p, name)
                 continue
             text = self._text(item, p.get("entry"))
             out.append(f"## {name}\n\n{text}" if text else f"## {name}")
-            extra = {k: p[k] for k in ("location_id", "layout_id", "is_pinned", "is_template") if _on(p.get(k))}
+            extra = {k: p[k] for k in _POST_KEPT if _on(p.get(k))}
             settings = p.get("settings")
-            if isinstance(settings, dict) and any(k != "collapsed" for k in settings):
+            if isinstance(settings, dict) and any(k not in _POST_DISPLAY for k in settings):
                 extra["settings"] = settings  # "collapsed" is how the page shows the post, not content
             if not _public(p.get("visibility_id")):
                 extra["visibility_id"] = p.get("visibility_id")
             if extra:
                 meta.append({"name": name, **extra})
         if meta:
-            self._keep(item, "posts_meta", meta, "a post's layout, place, pins or visibility have no field")
+            self._keep(item, "posts_meta", meta, _WHY["posts_meta"])
         return out
 
     @staticmethod
@@ -1239,7 +1150,7 @@ class _Importer:
         text = self._text(item, p.get("entry"), mentions, shown=False)
         ext: dict[str, Any] = {f"{EXT_PREFIX}id": p.get("id"), f"{EXT_PREFIX}module": "posts"}
         ext[f"{EXT_PREFIX}visibility_id"] = p.get("visibility_id")
-        for k in ("location_id", "layout_id", "is_pinned", "is_template"):
+        for k in _POST_KEPT:
             if _on(p.get(k)):
                 ext[f"{EXT_PREFIX}{k}"] = p[k]
         self._hidden_narrative(f"post:{p.get('id')}", name, text, item, ext, mentions)
@@ -1254,7 +1165,12 @@ class _Importer:
         story = "\n\n".join(f"## {h}\n\n" + "\n".join(lines) for h, lines in item.secret.items())
         ext = {f"{EXT_PREFIX}entity_id": item.entity_id, **item.secret_ext}
         self._hidden_narrative(
-            f"hidden:{item.entity_id}", f"{item.name}: hidden details", story, item, ext, item.secret_mentions
+            f"hidden:{item.entity_id}",
+            _WORDS["hidden_details"].format(name=item.name),
+            story,
+            item,
+            ext,
+            item.secret_mentions,
         )
         self._named[self._id(f"hidden:{item.entity_id}")] = "hidden-details"
         self.report.hidden.details += 1
@@ -1271,9 +1187,9 @@ class _Importer:
         for t in traits:
             section = _int_id(t.get("section_id"))
             private = _on(t.get("is_private"))
-            if not item.hidden and (private or (section == 2 and personality_hidden)):
+            if not item.hidden and (private or (section == _PERSONALITY and personality_hidden)):
                 entry = self._text(item, t.get("entry"), item.secret_mentions, shown=False)
-                heading = {1: "Appearance", 2: "Personality"}.get(section or 0, "Traits")
+                heading = _TRAIT_SECTIONS.get(section or 0, {}).get("heading", _WORDS["traits_heading"])
                 self._hide(item, heading, f"{str(t.get('name') or '').strip()}: {entry}".strip())
                 if private:
                     self.report.hidden.traits += 1
@@ -1281,27 +1197,26 @@ class _Importer:
                     self.report.hidden.personality += 1
                 continue
             line = f"{str(t.get('name') or '').strip()}: {self._text(item, t.get('entry'))}".strip()
-            if section in (1, 2):
+            if section is not None and section in _TRAIT_SECTIONS:
                 sections.setdefault(section, []).append(line)
             else:
                 other.append({"name": t.get("name"), "entry": t.get("entry"), "section_id": t.get("section_id")})
-        physicality = "\n".join(sections.get(1, []))
-        if _on(row.get("is_dead")):
-            physicality = f"[Deceased] {physicality}".rstrip()
-        if physicality:
-            item.fields["physicality"] = physicality
-        if sections.get(2):
-            item.fields["mentality"] = "\n".join(sections[2])
+        dead = _on(row.get("is_dead"))
+        for section, to in _TRAIT_SECTIONS.items():
+            text = "\n".join(sections.get(section, []))
+            if dead and to["field"] == _DECEASED_FIELD:
+                text = f"{_WORDS['deceased']}{text}".rstrip()
+            if text:
+                item.fields[to["field"]] = text
         if other:
-            self._keep(item, "traits", other, "a trait section other than appearance (1) and personality (2)")
-        races = self._list(item, "character_races", "race_id")
-        if _int_id(row.get("race_id")) is not None:
-            races.append(row["race_id"])
-        self._link_rows(item, "species", "races", races, "character_races")
-        families = self._list(item, "character_families", "family_id")
-        self._link_rows(item, "family", "families", families, "character_families")
-        orgs = self._list(item, "organisation_memberships", "organisation_id")
-        self._link_rows(item, "institutions", "organisations", orgs, "organisation_memberships")
+            self._keep(item, "traits", other, _WHY["traits_other"])
+        for lst in _CHARACTER_LISTS:
+            key, id_key, folder, fname, row_key = lst["key"], lst["id_key"], lst["folder"], lst["field"], lst["row_key"]
+            assert key is not None and id_key is not None and folder is not None and fname is not None
+            ids = self._list(item, key, id_key)
+            if row_key is not None and _int_id(row.get(row_key)) is not None:
+                ids.append(row[row_key])
+            self._link_rows(item, fname, folder, ids, key)
 
     def _list(self, item: _Item, key: str, id_key: str) -> list[Any]:
         """The ids a row's list names (``[{"race_id": 3}, ...]`` or ``[3, ...]``); the list kept when it says more."""
@@ -1323,7 +1238,7 @@ class _Importer:
             shown = [
                 x for x in row.get(key) or [] if item.hidden or not (isinstance(x, dict) and _on(x.get("is_private")))
             ]
-            self._keep(item, key, shown, "an item carries more than the id it links")
+            self._keep(item, key, shown, _WHY["list_more"])
         return ids
 
     def _link_rows(self, item: _Item, fname: str, folder: str, raw_ids: list[Any], where: str) -> None:
@@ -1333,7 +1248,9 @@ class _Importer:
             rid = _int_id(raw)
             target = self.by_row.get((folder, rid)) if rid is not None else None
             if target is None:
-                self.report.unresolved.append(Unresolved(item.name, where, str(raw), f"no {folder} row with that id"))
+                self.report.unresolved.append(
+                    Unresolved(item.name, where, str(raw), _WHY["no_row"].format(folder=folder))
+                )
             elif target.eid not in eids:
                 eids.append(target.eid)
         if eids:
@@ -1349,7 +1266,9 @@ class _Importer:
             rid = _int_id(r)
             target = self.by_row.get(("locations", rid)) if rid is not None else None
             if target is None:
-                self.report.unresolved.append(Unresolved(item.name, "entityLocations", str(r), "no locations row"))
+                self.report.unresolved.append(
+                    Unresolved(item.name, "entityLocations", str(r), _WHY["no_locations_row"])
+                )
             elif target.eid not in eids:
                 eids.append(target.eid)
         if not eids:
@@ -1358,11 +1277,11 @@ class _Importer:
         if kinds.get("location") == "single_link" and LINK_TARGETS[item.etype].get("location") == "location":
             item.fields["location"] = eids[0]
             if len(eids) > 1:
-                self._keep(item, "locations", eids, "location links one; every place kept")
+                self._keep(item, "locations", eids, _WHY["locations_one"])
         elif kinds.get("locations") == "multi_link" and LINK_TARGETS[item.etype].get("locations") == "location":
             item.fields["locations"] = eids
         else:
-            self._keep(item, "locations", eids, f"{item.etype} has no location field")
+            self._keep(item, "locations", eids, _WHY["no_location_field"].format(type=item.etype))
 
     def _attributes(self, item: _Item) -> None:
         attrs = [a for a in item.ent.get("entityAttributes") or [] if isinstance(a, dict)]
@@ -1373,7 +1292,7 @@ class _Importer:
                 if _empty(raw) or not str(a.get("name") or "").strip():
                     continue  # a name with no value (a section heading) carries nothing
                 value = self._text(item, str(raw), item.secret_mentions, shown=False) if isinstance(raw, str) else raw
-                self._hide(item, "Attributes", f"{str(a.get('name')).strip()}: {value}")
+                self._hide(item, _WORDS["attributes_heading"], f"{str(a.get('name')).strip()}: {value}")
                 self.report.hidden.attributes += 1
                 continue
             self._attribute(item, a)
@@ -1387,9 +1306,9 @@ class _Importer:
         text = self._text(item, str(raw)) if isinstance(raw, str) else raw
         fname = _FIELD_BY_LOWER[item.etype].get(_norm(key))
         if fname is None:
-            why = f"{item.etype} has no field {_norm(key)!r}"
+            why = _WHY["no_field"].format(type=item.etype, field=_norm(key))
         elif fname in ("name", "supertype", "subtype") or fname in item.fields:
-            why = f"{fname} is already set"
+            why = _WHY["already_set"].format(field=fname)
         else:
             kind = FIELD_KINDS[item.etype][fname]
             if kind == "text":
@@ -1399,18 +1318,18 @@ class _Importer:
                 if isinstance(raw, int) or (isinstance(raw, str) and _INT.fullmatch(raw)):
                     item.fields[fname] = int(raw)
                     return
-                why = f"the value is not a whole number ({fname} is an integer)"
+                why = _WHY["not_integer"].format(field=fname)
             else:
                 target_type = LINK_TARGETS[item.etype][fname]
                 ids = [int(m["id"]) for m in _MENTION.finditer(str(raw))]
                 rest = _MENTION.sub("", str(raw)).strip(" ,;\n")
                 hits = [self.by_entity.get(i) for i in ids]
                 if not ids or rest:
-                    why = f"{fname} links a {target_type}; the value is not a list of mentions"
+                    why = _WHY["not_mentions"].format(field=fname, target=target_type)
                 elif any(h is None or h.etype != target_type for h in hits):
-                    why = f"{fname} links a {target_type}; a mention is not one in the folder"
+                    why = _WHY["mention_not_found"].format(field=fname, target=target_type)
                 elif kind == "single_link" and len(set(ids)) > 1:
-                    why = f"{fname} links one; the value names {len(set(ids))}"
+                    why = _WHY["links_one"].format(field=fname, n=len(set(ids)))
                 else:
                     eids = list(dict.fromkeys(h.eid for h in hits if h is not None))
                     item.fields[fname] = eids[0] if kind == "single_link" else eids
@@ -1426,13 +1345,13 @@ class _Importer:
                     continue
                 if key in _KEPT_WHEN_TRUE and not _on(value):
                     continue
-                self._keep(item, key, value, f"no field for the {where}'s {key}")
+                self._keep(item, key, value, _WHY["no_field_for_key"].format(where=where, key=key))
 
     # -- links that need every element ---------------------------------------
 
     def _memberships(self) -> None:
         for org in self.items:
-            if org.folder != "organisations":
+            if org.folder != _ORGANISATIONS:
                 continue
             for m in org.row.get("members") or []:
                 cid = _int_id(m.get("character_id")) if isinstance(m, dict) else _int_id(m)
@@ -1442,7 +1361,7 @@ class _Importer:
                     continue
                 member = self.by_row.get(("characters", cid)) if cid is not None else None
                 if member is None:
-                    self.report.unresolved.append(Unresolved(org.name, "members", str(cid), "no characters row"))
+                    self.report.unresolved.append(Unresolved(org.name, "members", str(cid), _WHY["no_characters_row"]))
                     continue
                 links = member.fields.setdefault("institutions", [])
                 if org.eid not in links:
@@ -1461,7 +1380,7 @@ class _Importer:
                 )
                 for m in members
             ):
-                self._keep(org, "members", members, "a member carries more than the character it links (a role)")
+                self._keep(org, "members", members, _WHY["member_role"])
 
     def _tags(self) -> None:
         """A tag's Narrative links each element that carries it (``entityTags``, whose ``tag_id`` is the
@@ -1474,19 +1393,19 @@ class _Importer:
                 rid = _int_id(raw)
                 tag = self.by_row.get(("tags", rid)) if rid is not None else None
                 if tag is None:
-                    self.report.unresolved.append(Unresolved(item.name, "entityTags", str(raw), "no tags row"))
+                    self.report.unresolved.append(Unresolved(item.name, "entityTags", str(raw), _WHY["no_tags_row"]))
                     continue
                 carried.setdefault(tag.entity_id, {})[item.entity_id] = item
         for tag_id in sorted(carried):
             tag = self.by_entity[tag_id]
             for _, item in sorted(carried[tag_id].items()):
                 if item.hidden and not tag.hidden:
-                    why = "the element is hidden and the tag is not; the element keeps x_kanka_entity_tags"
+                    why = _WHY["tag_hidden"]
                     self.report.untagged.append(Untagged(tag.name, item.name, why))
                     continue
                 fname = _NARRATIVE_FIELD_FOR.get(item.etype)
                 if fname is None:
-                    why = f"Narrative has no field for a {item.etype}; the element keeps x_kanka_entity_tags"
+                    why = _WHY["tag_no_field"].format(type=item.etype)
                     self.report.untagged.append(Untagged(tag.name, item.name, why))
                     continue
                 links = tag.fields.setdefault(fname, [])
@@ -1516,8 +1435,7 @@ class _Importer:
                 used.add(rid)
                 if mid is not None and mid not in rows:
                     self.report.notes.append(
-                        f"relationship {rel.get('relation')!r} on {item.name!r}: its mirror {mid} is not in the export;"
-                        " kept one-way"
+                        _NOTE["mirror_missing"].format(relation=rel.get("relation"), element=item.name, mirror=mid)
                     )
                 units.append((rid, item, rel, None))
         # fold exact copies: the same owner, target, text and every other field, on both sides
@@ -1545,14 +1463,17 @@ class _Importer:
         target = self.by_entity.get(tid) if tid is not None else None
         if target is None:
             self.report.unresolved.append(
-                Unresolved(owner.name, f"relationship {text!r}", str(rel.get("target_id")), self._why_missing(tid))
+                Unresolved(
+                    owner.name,
+                    _WHERE["relationship"].format(text=text),
+                    str(rel.get("target_id")),
+                    self._why_missing(tid),
+                )
             )
             return
-        name = text or "Relationship"
+        name = text or _WORDS["relationship"]
         if not text:
-            self.report.notes.append(
-                f"a relationship from {owner.name!r} to {target.name!r} has no text; named {name!r}"
-            )
+            self.report.notes.append(_NOTE["no_text"].format(owner=owner.name, target=target.name, name=name))
         fields: dict[str, Any] = {}
         if owner.etype == "character":
             fields["actor"] = owner.eid
@@ -1560,8 +1481,7 @@ class _Importer:
             fname = _RELATION_FIELD_FOR.get(end.etype)
             if fname is None:
                 self.report.notes.append(
-                    f"Relation {name!r} from {owner.name!r}: Relation has no field for a {end.etype};"
-                    f" {end.name!r} is in x_kanka_source/target only"
+                    _NOTE["no_relation_field"].format(name=name, owner=owner.name, type=end.etype, end=end.name)
                 )
                 continue
             links = fields.setdefault(fname, [])
@@ -1616,12 +1536,12 @@ class _Importer:
         self.report.counts = {t: len(b) for t, b in sorted(out.items())}
         self.report.made_names = _counts(MADE_NAMES, self._named, (b["id"] for bs in out.values() for b in bs))
         if self.items:
-            self.report.notes.append(f"not kept: {_NOT_KEPT}")
+            self.report.notes.append(_NOTE["not_kept"])
         return out
 
     def world(self) -> dict[str, Any]:
         cid = self.campaign.get("id")
-        name = str(self.campaign.get("name") or "").strip() or f"Kanka campaign {cid}"
+        name = str(self.campaign.get("name") or "").strip() or _WORDS["campaign"].format(id=cid)
         world: dict[str, Any] = {"id": _uuid(f"kanka:{cid}"), "name": name}
         if not _empty(self.campaign.get("entry")):
             world["description"] = html_to_markdown(str(self.campaign["entry"]))

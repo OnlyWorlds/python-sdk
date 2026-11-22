@@ -213,6 +213,16 @@ def test_namespace_is_pinned() -> None:
     assert PRODUCER_INPUT == "kanka-export"
 
 
+#: The door's tables and wording: the same bytes as the npm SDK's ``src/convert/kanka.json``, its test this hash too.
+DATA_SHA256 = "53394eee55d8afe0b2b5b5bdc99795a42543600ca085ec282ef1acd66a37106a"
+
+
+def test_the_data_file_is_the_bytes_the_npm_sdk_reads() -> None:
+    data = ROOT / "src" / "onlyworlds" / "convert" / "kanka.json"
+    assert hashlib.sha256(data.read_bytes()).hexdigest() == DATA_SHA256
+    assert json.loads(data.read_bytes())["producer_input"] == PRODUCER_INPUT
+
+
 def test_what_was_typed_is_what_comes_out(tmp_path: Path) -> None:
     """Six typed entities and Kanka's four starters, each its module's type; one Relation a pair;
     the two starters' hidden personality traits in two hidden Narratives."""

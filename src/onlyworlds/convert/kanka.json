@@ -1,0 +1,187 @@
+{
+  "about": "The Kanka import door's tables and wording, read by the Python package (onlyworlds.kanka) and the npm SDK (convertKanka), the same bytes in both. The rules are code in each; this file holds what they read: Kanka's folders to element types, its keys to fields, the fixed key lists, the names the door makes, and every line of its report. A template is Python format syntax: {name}, {name!r} for a quoted name, {n:g} for a number.",
+  "version": 1,
+  "producer_input": "kanka-export",
+  "namespace_url": "https://onlyworlds.com/ns/kanka",
+  "ext_prefix": "x_kanka_",
+  "untyped_supertype": "Article",
+  "untyped_type": "narrative",
+  "module_types": {
+    "characters": "character",
+    "locations": "location",
+    "organisations": "institution",
+    "notes": "narrative",
+    "families": "family",
+    "races": "species",
+    "items": "object",
+    "creatures": "creature",
+    "events": "event",
+    "abilities": "ability",
+    "quests": "narrative",
+    "journals": "narrative",
+    "maps": "map"
+  },
+  "proven_modules": ["characters", "locations", "organisations", "notes"],
+  "story_modules": ["notes", "quests", "journals"],
+  "starter_window": 5.0,
+  "proven_export_version": "3.15",
+  "parent_fields": {
+    "location": "parent_location",
+    "institution": "parent_institution",
+    "narrative": "parent_narrative",
+    "object": "parent_object",
+    "species": "parent_species",
+    "map": "parent_map"
+  },
+  "made_names": [
+    {"kind": "hidden-details", "type": "narrative", "pattern": "<entity>: hidden details", "source": "ours", "regex": ".+: hidden details"},
+    {"kind": "untitled-post", "type": "narrative", "pattern": "Post", "source": "ours", "regex": "Post"},
+    {"kind": "untitled-relationship", "type": "relation", "pattern": "Relationship", "source": "ours", "regex": "Relationship"},
+    {"kind": "untitled-entity", "type": "*", "pattern": "Untitled (<entity id>)", "source": "ours", "regex": "Untitled \\(.+\\)"}
+  ],
+  "campaign_file": "campaign.json",
+  "info_file": "info.json",
+  "root_files": ["info.json", "campaign.json"],
+  "gallery": "gallery",
+  "settings": "settings",
+  "settings_files": ["settings/modules.json", "settings/custom-modules.json"],
+  "custom_modules_file": "settings/custom-modules.json",
+  "organisations": "organisations",
+  "row_handled": [
+    "id", "name", "entry", "type", "is_private", "entity", "location_id", "race_id", "is_dead", "character_traits",
+    "character_families", "character_races", "organisation_memberships", "members", "is_personality_visible", "image_uuid"
+  ],
+  "entity_handled": [
+    "id", "entity_id", "parent_id", "name", "type", "entry", "is_private", "is_attributes_private", "posts", "relationships",
+    "entityLocations", "entityAttributes", "image_uuid"
+  ],
+  "not_kept_keys": [
+    "campaign_id", "type_id", "created_at", "updated_at", "deleted_at", "created_by", "updated_by", "deleted_by", "focus_x",
+    "focus_y", "header_uuid", "marketplace_uuid", "is_personality_pinned", "is_appearance_pinned", "is_pinned", "mentions",
+    "characterTraits", "characterFamilies", "characterRaces", "organisationMemberships"
+  ],
+  "kept_when_true": ["is_template"],
+  "not_content": [
+    "id", "mirror_id", "position", "default_order", "created_at", "updated_at", "created_by", "updated_by", "deleted_at",
+    "deleted_by", "marketplace_uuid", "entity_id", "character_id", "words"
+  ],
+  "post_kept": ["location_id", "layout_id", "is_pinned", "is_template"],
+  "post_display_settings": ["collapsed"],
+  "trait_sections": {
+    "1": {"field": "physicality", "heading": "Appearance"},
+    "2": {"field": "mentality", "heading": "Personality"}
+  },
+  "personality_section": 2,
+  "deceased_field": "physicality",
+  "character_lists": [
+    {"key": "character_races", "id_key": "race_id", "folder": "races", "field": "species", "row_key": "race_id"},
+    {"key": "character_families", "id_key": "family_id", "folder": "families", "field": "family", "row_key": null},
+    {"key": "organisation_memberships", "id_key": "organisation_id", "folder": "organisations", "field": "institutions", "row_key": null}
+  ],
+  "words": {
+    "untitled": "Untitled ({entity_id})",
+    "post": "Post",
+    "relationship": "Relationship",
+    "hidden_details": "{name}: hidden details",
+    "campaign": "Kanka campaign {id}",
+    "deceased": "[Deceased] ",
+    "traits_heading": "Traits",
+    "attributes_heading": "Attributes"
+  },
+  "where": {
+    "mention": "mention",
+    "parent": "parent",
+    "relationship": "relationship {text!r}"
+  },
+  "why": {
+    "no_entity": "no such entity in the export",
+    "no_row": "no {folder} row with that id",
+    "no_locations_row": "no locations row",
+    "no_characters_row": "no characters row",
+    "no_tags_row": "no tags row",
+    "untyped_type": "a module with no OnlyWorlds type keeps its own type",
+    "entry_differs": "the row's entry differs from the entity's (kept as written)",
+    "members_elsewhere": "members on a module that is not organisations",
+    "parent_not_id": "not an entity id",
+    "parent_missing": "its parent is not in the folder",
+    "posts_meta": "a post's layout, place, pins or visibility have no field",
+    "traits_other": "a trait section other than appearance (1) and personality (2)",
+    "list_more": "an item carries more than the id it links",
+    "locations_one": "location links one; every place kept",
+    "no_location_field": "{type} has no location field",
+    "no_field": "{type} has no field {field!r}",
+    "already_set": "{field} is already set",
+    "not_integer": "the value is not a whole number ({field} is an integer)",
+    "not_mentions": "{field} links a {target}; the value is not a list of mentions",
+    "mention_not_found": "{field} links a {target}; a mention is not one in the folder",
+    "links_one": "{field} links one; the value names {n}",
+    "no_field_for_key": "no field for the {where}'s {key}",
+    "member_role": "a member carries more than the character it links (a role)",
+    "tag_hidden": "the element is hidden and the tag is not; the element keeps x_kanka_entity_tags",
+    "tag_no_field": "Narrative has no field for a {type}; the element keeps x_kanka_entity_tags"
+  },
+  "notes": {
+    "not_json": "{rel}: not readable JSON ({error}); skipped",
+    "version": "Kanka {kanka_version}, export version {version}",
+    "version_unproven": " (this door was proven on {proven})",
+    "root_file": "{rel}: a file at the export's root this door does not read",
+    "not_entity_file": "{rel}: not an entity file (one JSON per entity in a module folder); skipped",
+    "no_entity": "{rel}: no entity object with an id; skipped",
+    "filename_id": "{rel}: the filename's number is not the entity's id {entity_id}",
+    "second_file": "{rel}: a second file for entity {entity_id}; the first is kept",
+    "custom_modules": "{rel}: custom modules are defined; their entities, if exported, are read by folder",
+    "settings_file": "{rel}: a settings file this door does not read",
+    "mentions_hidden": "{element!r}: visible text mentions the hidden {target!r} by name",
+    "mirror_missing": "relationship {relation!r} on {element!r}: its mirror {mirror} is not in the export; kept one-way",
+    "no_text": "a relationship from {owner!r} to {target!r} has no text; named {name!r}",
+    "no_relation_field": "Relation {name!r} from {owner!r}: Relation has no field for a {type}; {end!r} is in x_kanka_source/target only",
+    "not_kept": "not kept: timestamps and who made or changed a row (created_at, updated_at, created_by, updated_by), campaign_id and type_id, image focus points and the header image's upload uuid, marketplace ids, pin and display flags, the server's mentions index (the text holds the mentions), and the camelCase twins of a character's lists (characterTraits and the rest: the same rows without their ids)"
+  },
+  "errors": {
+    "no_campaign": "{source}: no campaign.json with an id (is it Kanka's JSON export?)"
+  },
+  "report": {
+    "head": "Kanka export {source} ({name!r}): {total} elements ({by_type}).",
+    "head_none": "none",
+    "modules": "What became what:",
+    "module": "  - {folder}/ ({entities}): {type}; {how}",
+    "how": {
+      "proven": "read on a real export",
+      "believed": "believed, not yet seen in a real export",
+      "untyped": "no OnlyWorlds type: Narratives, supertype {supertype}, subtype {folder!r}"
+    },
+    "relations": "Relationships kept as Relation elements ({n}): {listed}.",
+    "folded": "Exact duplicates folded into one ({n}):",
+    "fold": "  - {element!r}: {copies} identical {what}s {name!r}, kept once",
+    "starter": "Possibly Kanka's starter content (made within {window:g} seconds of the campaign; nothing in the data marks it, so it is imported): {listed}.",
+    "hidden": "Hidden as the source hides it (elements carrying hidden: true): {said}.",
+    "hidden_elements": {
+      "entities": ["private entity (is_private)", "private entities (is_private)"],
+      "posts": ["post not visible to all, its own Narrative (visibility_id)", "posts not visible to all, each its own Narrative (visibility_id)"],
+      "relationships": ["relationship hidden on a side or touching a hidden entity (visibility_id)", "relationships hidden on a side or touching a hidden entity (visibility_id)"]
+    },
+    "hidden_held": {
+      "traits": ["private trait (is_private)", "private traits (is_private)"],
+      "personality": ["personality trait not visible to players (is_personality_visible)", "personality traits not visible to players (is_personality_visible)"],
+      "attributes": ["private or hidden attribute (is_private, is_hidden, is_attributes_private)", "private or hidden attributes (is_private, is_hidden, is_attributes_private)"],
+      "links": ["private link (is_private)", "private links (is_private)"]
+    },
+    "hidden_details": ["{n} hidden-details Narrative holding {held}", "{n} hidden-details Narratives holding {held}"],
+    "untagged": "Tags not linked to an element that carries them ({n}):",
+    "untag": "  - {tag!r} on {element!r}: {why}",
+    "uploads": ["gallery/: {n} upload read as Kanka's image store; {named} named by an entity.", "gallery/: {n} uploads read as Kanka's image store; {named} named by an entity."],
+    "pictures": "Pictures named but not imported ({n}): an OnlyWorlds image_url is a URL, and the folder format has no place for image files yet; each element keeps x_kanka_image:",
+    "picture": "  - {element!r}: {path}",
+    "picture_original": "  - {element!r}: {path} ({original})",
+    "picture_private": "  - {element!r}: upload {uuid} is not visible to all; its name and file stay out of this visible element, the uuid kept alone",
+    "picture_missing": "  - {element!r}: upload {uuid} is not in gallery/; the uuid kept alone",
+    "unplaced": "Keys not placed on a field ({n}), kept as extensions:",
+    "unplaced_item": "  - {element!r} / {key!r}: {why}; kept as {kept_as}",
+    "unresolved": "Links and mentions whose target is not in the folder ({n}):",
+    "unresolved_item": "  - {element!r}, {where}: {target}: {why}",
+    "notes": "Notes ({n}):",
+    "note": "  - {note}",
+    "wrote": "Wrote {out}.",
+    "plan": "Plan only: nothing written."
+  }
+}
