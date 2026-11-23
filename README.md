@@ -365,7 +365,30 @@ reading = parse_ow_link(text)  # AddressReading: form, world, world_is_slug, typ
 # a refusal raises AddressError: err.reason is the profile's name ("bad_id", "uppercase", ...)
 ```
 
-A field that holds an address is text: never fetch or resolve it on the server. `parse_ow_link` reads one string whole, so `ow://object/<id>.` is refused. In prose, `read_ow_link_at(text, index)` reads the address that starts at `index` and answers an `AddressAt` (`reading`, `end`: the index just past it) or `None`; the address continues past its id only with `@` and a moment and `?lens=` and a lens, so a full stop, another query key and a fragment are left as prose. Finding where an address starts is yours. The profile: [`profiles/address.md`](https://github.com/OnlyWorlds/schema-dist/blob/main/profiles/address.md), with its fixture, which is this module's test.
+A field that holds an address is text: never fetch or resolve it on the server. `parse_ow_link` reads one string whole, so `ow://object/<id>.` is refused. In prose, `read_ow_link_at(text, index)` reads the address that starts at `index` and answers an `AddressAt` (`reading`, `end`: the index just past it) or `None`; the address continues past its id only with `@` and a moment and `?lens=` and a lens, so a full stop, another query key and a fragment are left as prose. `find_ow_links(text)` finds every address in a text, each an `AddressFound` (`start`, `end`, `reading`). The profile: [`profiles/address.md`](https://github.com/OnlyWorlds/schema-dist/blob/main/profiles/address.md), with its fixture, which is this module's test.
+
+### Names in prose
+
+`name_finder` reads a world's element names once and answers a function that finds them in any text, so a tool can show which words are elements: a mark for a reader, a suggestion, a link a person chooses to make. It finds and never writes.
+
+```python
+from onlyworlds import name_finder
+
+elements = [{"id": "a1", "name": "Iron Gate"}, {"id": "b2", "name": "Kira"}]
+find = name_finder(elements, case="exact")  # once per world
+found = find("Kira's watch ends at the Iron Gate.")
+# [NameFound(start=0, end=4, element=elements[1]), NameFound(start=25, end=34, element=elements[0])]
+```
+
+`case` must be given: `"exact"` for a page that marks names unasked, `"folded"` (case ignored) for an editor that only suggests. The rule, the same in the npm SDK's `nameFinder`:
+
+- A whole name only: the character on each side is not a letter, a combining mark, a decimal digit or an underscore, in any script. `Kira's` and `Kira-led` hold the name; `Kiran` does not.
+- A name is trimmed and is three characters at least. Where several names start at one place, the longest whole one is taken.
+- A name two elements share is never answered, and nothing inside it is: the text stays plain there.
+- Nothing is read inside an address or a Markdown link `[label](target)`.
+- Every mention is answered, in order. `element` is the object you passed in; `start` and `end` count code points (the npm SDK counts UTF-16 units).
+
+`names` gives the names an element is found by, such as a tool's own aliases: `name_finder(elements, case="folded", names=lambda el: [el["name"], *el.get("aliases", [])])`. Which elements go in is yours to choose. Three limits: text is compared as written, with no Unicode normalisation; a space in a name matches that one space; and in a script written without spaces between words (Chinese, Japanese, Thai) a name is whole only between punctuation or spaces. The work for one text is at most its length times the longest name's length, whatever the number of names.
 
 ### Open with
 

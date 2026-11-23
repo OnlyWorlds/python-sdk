@@ -24,5 +24,7 @@ codegen/layout/directions.json -text
 tests/fixtures/layout/** -text
 # The address-in-prose cases (serial 123), the same bytes as the npm SDK's copy (the test holds its sha256).
 tests/fixtures/address-in-prose.json -text
+# The name finder's shared cases, the same bytes as the npm SDK's copy (both tests hold its sha256).
+tests/fixtures/name-finder.cases.json -text
 # The Kanka door's tables and wording, the same bytes as the npm SDK's copy (both tests hold its sha256).
 src/onlyworlds/convert/kanka.json -text

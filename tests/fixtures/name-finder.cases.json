@@ -1,0 +1,1225 @@
+{
+  "about": "Cases for nameFinder (@onlyworlds/sdk) and name_finder (the onlyworlds Python package): the same bytes in both repositories. In a case, an element with a names list is found by those names (the names option), one without by its name; want lists what find(text) answers, in order, each the place of its first character and its length, both in code points, and the id of its element. A timed case is built from its recipe ({i} is the count from 0) and must answer count names in under underMs milliseconds. Made by test/fixtures/generate-name-finder-cases.mjs in the SDK repository; every want is written by hand there.",
+  "version": 1,
+  "underMs": 2000,
+  "cases": [
+    {
+      "name": "two names, in order",
+      "case": "exact",
+      "elements": [
+        {
+          "id": "a",
+          "name": "Iron Gate"
+        },
+        {
+          "id": "b",
+          "name": "Kira"
+        }
+      ],
+      "text": "Kira's watch ends at the Iron Gate.",
+      "want": [
+        {
+          "at": 0,
+          "length": 4,
+          "id": "b"
+        },
+        {
+          "at": 25,
+          "length": 9,
+          "id": "a"
+        }
+      ]
+    },
+    {
+      "name": "a possessive and a hyphen leave the name whole",
+      "case": "exact",
+      "elements": [
+        {
+          "id": "t",
+          "name": "Odran"
+        },
+        {
+          "id": "j",
+          "name": "Tamsin"
+        }
+      ],
+      "text": "Odran's map, a Tamsin-led crew.",
+      "want": [
+        {
+          "at": 0,
+          "length": 5,
+          "id": "t"
+        },
+        {
+          "at": 15,
+          "length": 6,
+          "id": "j"
+        }
+      ]
+    },
+    {
+      "name": "a name inside a longer word is not found, at either end",
+      "case": "exact",
+      "elements": [
+        {
+          "id": "k",
+          "name": "Kira"
+        }
+      ],
+      "text": "Kiran and McKira and McKiran.",
+      "want": []
+    },
+    {
+      "name": "a digit on either side is inside a word",
+      "case": "exact",
+      "elements": [
+        {
+          "id": "u",
+          "name": "Unit 7"
+        },
+        {
+          "id": "k",
+          "name": "Kira"
+        }
+      ],
+      "text": "Unit 7. Unit 73. 2Kira. Kira2.",
+      "want": [
+        {
+          "at": 0,
+          "length": 6,
+          "id": "u"
+        }
+      ]
+    },
+    {
+      "name": "an underscore on either side is inside a word",
+      "case": "exact",
+      "elements": [
+        {
+          "id": "k",
+          "name": "Kira"
+        }
+      ],
+      "text": "Kira_x, _Kira, Kira.",
+      "want": [
+        {
+          "at": 15,
+          "length": 4,
+          "id": "k"
+        }
+      ]
+    },
+    {
+      "name": "a name that starts or ends with a letter outside ASCII is found whole",
+      "case": "exact",
+      "elements": [
+        {
+          "id": "e",
+          "name": "\u00c9lodie"
+        },
+        {
+          "id": "z",
+          "name": "Zo\u00eb"
+        }
+      ],
+      "text": "Then \u00c9lodie rode with Zo\u00eb.",
+      "want": [
+        {
+          "at": 5,
+          "length": 6,
+          "id": "e"
+        },
+        {
+          "at": 22,
+          "length": 3,
+          "id": "z"
+        }
+      ]
+    },
+    {
+      "name": "a letter outside ASCII after or before a name is inside a word",
+      "case": "exact",
+      "elements": [
+        {
+          "id": "a",
+          "name": "Ana"
+        },
+        {
+          "id": "z",
+          "name": "Zo\u00eb"
+        },
+        {
+          "id": "w",
+          "name": "lodie"
+        }
+      ],
+      "text": "Ana\u00efs and Zo\u00ebx and \u00c9lodie.",
+      "want": []
+    },
+    {
+      "name": "a combining mark after a name is inside a word",
+      "case": "exact",
+      "elements": [
+        {
+          "id": "a",
+          "name": "Ana"
+        }
+      ],
+      "text": "Ana\u0301 came, then Ana.",
+      "want": [
+        {
+          "at": 16,
+          "length": 3,
+          "id": "a"
+        }
+      ]
+    },
+    {
+      "name": "a decimal digit of another script is inside a word; a superscript is not",
+      "case": "exact",
+      "elements": [
+        {
+          "id": "k",
+          "name": "Kira"
+        }
+      ],
+      "text": "Kira\u0663 and Kira\u00b2.",
+      "want": [
+        {
+          "at": 10,
+          "length": 4,
+          "id": "k"
+        }
+      ]
+    },
+    {
+      "name": "places count code points: a character above the BMP before a name",
+      "case": "exact",
+      "elements": [
+        {
+          "id": "k",
+          "name": "Kira"
+        }
+      ],
+      "text": "\ud83d\udc09 Kira \ud83d\udc09\ud83d\udc09 Kira",
+      "want": [
+        {
+          "at": 2,
+          "length": 4,
+          "id": "k"
+        },
+        {
+          "at": 10,
+          "length": 4,
+          "id": "k"
+        }
+      ]
+    },
+    {
+      "name": "a name of letters above the BMP; two of them are too short",
+      "case": "exact",
+      "elements": [
+        {
+          "id": "d",
+          "name": "\ud801\udc00\ud801\udc01\ud801\udc02"
+        },
+        {
+          "id": "s",
+          "name": "\ud801\udc00\ud801\udc01"
+        }
+      ],
+      "text": "\ud801\udc00\ud801\udc01\ud801\udc02 and \ud801\udc00\ud801\udc01.",
+      "want": [
+        {
+          "at": 0,
+          "length": 3,
+          "id": "d"
+        }
+      ]
+    },
+    {
+      "name": "the longest whole name wins",
+      "case": "exact",
+      "elements": [
+        {
+          "id": "i",
+          "name": "Iron"
+        },
+        {
+          "id": "g",
+          "name": "Iron Gate"
+        }
+      ],
+      "text": "The Iron Gate and the Iron Gates and Iron.",
+      "want": [
+        {
+          "at": 4,
+          "length": 9,
+          "id": "g"
+        },
+        {
+          "at": 22,
+          "length": 4,
+          "id": "i"
+        },
+        {
+          "at": 37,
+          "length": 4,
+          "id": "i"
+        }
+      ]
+    },
+    {
+      "name": "the leftmost name is taken, and the search goes on after it",
+      "case": "exact",
+      "elements": [
+        {
+          "id": "g",
+          "name": "Iron Gate"
+        },
+        {
+          "id": "k",
+          "name": "Gate Keeper"
+        }
+      ],
+      "text": "The Iron Gate Keeper and the Gate Keeper.",
+      "want": [
+        {
+          "at": 4,
+          "length": 9,
+          "id": "g"
+        },
+        {
+          "at": 29,
+          "length": 11,
+          "id": "k"
+        }
+      ]
+    },
+    {
+      "name": "every mention is answered",
+      "case": "exact",
+      "elements": [
+        {
+          "id": "k",
+          "name": "Kira"
+        },
+        {
+          "id": "m",
+          "name": "Mira"
+        }
+      ],
+      "text": "Kira,Mira;Kira Kira",
+      "want": [
+        {
+          "at": 0,
+          "length": 4,
+          "id": "k"
+        },
+        {
+          "at": 5,
+          "length": 4,
+          "id": "m"
+        },
+        {
+          "at": 10,
+          "length": 4,
+          "id": "k"
+        },
+        {
+          "at": 15,
+          "length": 4,
+          "id": "k"
+        }
+      ]
+    },
+    {
+      "name": "a name two elements share stays plain",
+      "case": "exact",
+      "elements": [
+        {
+          "id": "a",
+          "name": "Ember"
+        },
+        {
+          "id": "b",
+          "name": "Ember"
+        },
+        {
+          "id": "k",
+          "name": "Kira"
+        }
+      ],
+      "text": "Ember called to Kira.",
+      "want": [
+        {
+          "at": 16,
+          "length": 4,
+          "id": "k"
+        }
+      ]
+    },
+    {
+      "name": "nothing inside a shared name is answered",
+      "case": "exact",
+      "elements": [
+        {
+          "id": "a",
+          "name": "Old Ember"
+        },
+        {
+          "id": "b",
+          "name": "Old Ember"
+        },
+        {
+          "id": "e",
+          "name": "Ember"
+        }
+      ],
+      "text": "Old Ember, then Ember.",
+      "want": [
+        {
+          "at": 16,
+          "length": 5,
+          "id": "e"
+        }
+      ]
+    },
+    {
+      "name": "a shared name is plain where a longer name is not whole",
+      "case": "exact",
+      "elements": [
+        {
+          "id": "a",
+          "name": "Ember"
+        },
+        {
+          "id": "b",
+          "name": "Ember"
+        },
+        {
+          "id": "l",
+          "name": "Ember Lake"
+        }
+      ],
+      "text": "Ember Lakes, then Ember Lake.",
+      "want": [
+        {
+          "at": 18,
+          "length": 10,
+          "id": "l"
+        }
+      ]
+    },
+    {
+      "name": "one element listed twice, or found by the same name twice, is one element",
+      "case": "exact",
+      "elements": [
+        {
+          "id": "k",
+          "name": "Kira"
+        },
+        {
+          "id": "k",
+          "name": "Kira"
+        },
+        {
+          "id": "m",
+          "names": [
+            "Mira",
+            "Mira"
+          ]
+        }
+      ],
+      "text": "Kira and Mira.",
+      "want": [
+        {
+          "at": 0,
+          "length": 4,
+          "id": "k"
+        },
+        {
+          "at": 9,
+          "length": 4,
+          "id": "m"
+        }
+      ]
+    },
+    {
+      "name": "an element is found by each of its names",
+      "case": "exact",
+      "elements": [
+        {
+          "id": "v",
+          "names": [
+            "Consul Varro",
+            "Varro",
+            "the Consul"
+          ]
+        }
+      ],
+      "text": "Consul Varro spoke. Varro sat. So did the Consul.",
+      "want": [
+        {
+          "at": 0,
+          "length": 12,
+          "id": "v"
+        },
+        {
+          "at": 20,
+          "length": 5,
+          "id": "v"
+        },
+        {
+          "at": 38,
+          "length": 10,
+          "id": "v"
+        }
+      ]
+    },
+    {
+      "name": "two elements that share one of several names: that name is plain, the others are found",
+      "case": "exact",
+      "elements": [
+        {
+          "id": "v",
+          "names": [
+            "Varro",
+            "the Consul"
+          ]
+        },
+        {
+          "id": "w",
+          "names": [
+            "Wren",
+            "the Consul"
+          ]
+        }
+      ],
+      "text": "Varro and Wren: which is the Consul?",
+      "want": [
+        {
+          "at": 0,
+          "length": 5,
+          "id": "v"
+        },
+        {
+          "at": 10,
+          "length": 4,
+          "id": "w"
+        }
+      ]
+    },
+    {
+      "name": "a name under three characters is never looked for; three is enough",
+      "case": "exact",
+      "elements": [
+        {
+          "id": "a",
+          "name": "Al"
+        },
+        {
+          "id": "b",
+          "name": "  Bo  "
+        },
+        {
+          "id": "c",
+          "name": "Ada"
+        }
+      ],
+      "text": "Al met Bo and Ada.",
+      "want": [
+        {
+          "at": 14,
+          "length": 3,
+          "id": "c"
+        }
+      ]
+    },
+    {
+      "name": "a name is trimmed of white space, every kind of it",
+      "case": "exact",
+      "elements": [
+        {
+          "id": "k",
+          "name": "  Kira\u00a0"
+        },
+        {
+          "id": "m",
+          "name": "\u2003Mira\u0085"
+        }
+      ],
+      "text": "Kira and Mira.",
+      "want": [
+        {
+          "at": 0,
+          "length": 4,
+          "id": "k"
+        },
+        {
+          "at": 9,
+          "length": 4,
+          "id": "m"
+        }
+      ]
+    },
+    {
+      "name": "a byte order mark and a file separator are not white space: the name keeps them",
+      "case": "exact",
+      "elements": [
+        {
+          "id": "k",
+          "name": "\ufeffKira"
+        },
+        {
+          "id": "m",
+          "name": "\u001cMira"
+        }
+      ],
+      "text": "Kira and Mira.",
+      "want": []
+    },
+    {
+      "name": "exact: another case is another word",
+      "case": "exact",
+      "elements": [
+        {
+          "id": "c",
+          "name": "Consul"
+        }
+      ],
+      "text": "The consul and the CONSUL and the Consul.",
+      "want": [
+        {
+          "at": 34,
+          "length": 6,
+          "id": "c"
+        }
+      ]
+    },
+    {
+      "name": "folded: case is ignored, and the answer is the text as written",
+      "case": "folded",
+      "elements": [
+        {
+          "id": "c",
+          "name": "Consul"
+        }
+      ],
+      "text": "The consul and the CONSUL and the Consul.",
+      "want": [
+        {
+          "at": 4,
+          "length": 6,
+          "id": "c"
+        },
+        {
+          "at": 19,
+          "length": 6,
+          "id": "c"
+        },
+        {
+          "at": 34,
+          "length": 6,
+          "id": "c"
+        }
+      ]
+    },
+    {
+      "name": "folded: two names that differ only by case are shared",
+      "case": "folded",
+      "elements": [
+        {
+          "id": "a",
+          "name": "Ember"
+        },
+        {
+          "id": "b",
+          "name": "EMBER"
+        },
+        {
+          "id": "k",
+          "name": "Kira"
+        }
+      ],
+      "text": "Ember, ember, KIRA.",
+      "want": [
+        {
+          "at": 14,
+          "length": 4,
+          "id": "k"
+        }
+      ]
+    },
+    {
+      "name": "exact: two names that differ only by case are two names",
+      "case": "exact",
+      "elements": [
+        {
+          "id": "a",
+          "name": "Ember"
+        },
+        {
+          "id": "b",
+          "name": "EMBER"
+        }
+      ],
+      "text": "Ember, ember, EMBER.",
+      "want": [
+        {
+          "at": 0,
+          "length": 5,
+          "id": "a"
+        },
+        {
+          "at": 14,
+          "length": 5,
+          "id": "b"
+        }
+      ]
+    },
+    {
+      "name": "folded: letters outside ASCII fold too, and above the BMP",
+      "case": "folded",
+      "elements": [
+        {
+          "id": "e",
+          "name": "\u00c9lodie"
+        },
+        {
+          "id": "d",
+          "name": "\ud801\udc00\ud801\udc01\ud801\udc02"
+        }
+      ],
+      "text": "\u00e9lodie and \ud801\udc28\ud801\udc29\ud801\udc2a.",
+      "want": [
+        {
+          "at": 0,
+          "length": 6,
+          "id": "e"
+        },
+        {
+          "at": 11,
+          "length": 3,
+          "id": "d"
+        }
+      ]
+    },
+    {
+      "name": "folded: the long s and the Kelvin sign fold to s and k",
+      "case": "folded",
+      "elements": [
+        {
+          "id": "r",
+          "name": "Rose"
+        },
+        {
+          "id": "k",
+          "name": "Kira"
+        }
+      ],
+      "text": "Ro\u017fe and \u212aira.",
+      "want": [
+        {
+          "at": 0,
+          "length": 4,
+          "id": "r"
+        },
+        {
+          "at": 9,
+          "length": 4,
+          "id": "k"
+        }
+      ]
+    },
+    {
+      "name": "folded: simple folding only: a dotted capital I stays itself, and a sharp s is never two letters",
+      "case": "folded",
+      "elements": [
+        {
+          "id": "i",
+          "name": "\u0130stan"
+        },
+        {
+          "id": "s",
+          "name": "Stra\u00dfe"
+        }
+      ],
+      "text": "istan, Istan, \u0130STAN, STRASSE, STRA\u1e9eE.",
+      "want": [
+        {
+          "at": 14,
+          "length": 5,
+          "id": "i"
+        },
+        {
+          "at": 30,
+          "length": 6,
+          "id": "s"
+        }
+      ]
+    },
+    {
+      "name": "text is compared as written: a letter with a combining mark is not its one-character form",
+      "case": "folded",
+      "elements": [
+        {
+          "id": "e",
+          "name": "\u00c9lodie"
+        }
+      ],
+      "text": "E\u0301lodie rode.",
+      "want": []
+    },
+    {
+      "name": "a space in a name is that one space",
+      "case": "exact",
+      "elements": [
+        {
+          "id": "g",
+          "name": "Iron Gate"
+        }
+      ],
+      "text": "Iron  Gate, Iron\nGate, Iron-Gate, Iron Gate.",
+      "want": [
+        {
+          "at": 34,
+          "length": 9,
+          "id": "g"
+        }
+      ]
+    },
+    {
+      "name": "a name may hold punctuation, and may start or end with it",
+      "case": "exact",
+      "elements": [
+        {
+          "id": "s",
+          "name": "St. Brannoc's"
+        },
+        {
+          "id": "q",
+          "name": "\"Lucky\" Finn"
+        },
+        {
+          "id": "w",
+          "name": "Who?"
+        }
+      ],
+      "text": "At St. Brannoc's, \"Lucky\" Finn asked Who? and Who?s.",
+      "want": [
+        {
+          "at": 3,
+          "length": 13,
+          "id": "s"
+        },
+        {
+          "at": 18,
+          "length": 12,
+          "id": "q"
+        },
+        {
+          "at": 37,
+          "length": 4,
+          "id": "w"
+        }
+      ]
+    },
+    {
+      "name": "nothing is read inside an address, in either form",
+      "case": "folded",
+      "elements": [
+        {
+          "id": "c",
+          "name": "character"
+        },
+        {
+          "id": "i",
+          "name": "iron"
+        },
+        {
+          "id": "k",
+          "name": "Kira"
+        }
+      ],
+      "text": "ow://character/01a1d4ef-0000-7000-8000-000000000084 and https://www.onlyworlds.com/w/iron-gate/character/01a1d4ef-0000-7000-8000-000000000084 and ow://0193a1c2-7d3e-7f00-8a11-3c5e7b9d2f40/character/01a1d4ef-0000-7000-8000-000000000084, said Kira.",
+      "want": [
+        {
+          "at": 241,
+          "length": 4,
+          "id": "k"
+        }
+      ]
+    },
+    {
+      "name": "an address that is not one is prose",
+      "case": "folded",
+      "elements": [
+        {
+          "id": "c",
+          "name": "character"
+        }
+      ],
+      "text": "elbow://character/x and ow://character/not-an-id",
+      "want": [
+        {
+          "at": 8,
+          "length": 9,
+          "id": "c"
+        },
+        {
+          "at": 29,
+          "length": 9,
+          "id": "c"
+        }
+      ]
+    },
+    {
+      "name": "nothing is read inside a Markdown link, label or target",
+      "case": "exact",
+      "elements": [
+        {
+          "id": "k",
+          "name": "Kira"
+        },
+        {
+          "id": "g",
+          "name": "Iron Gate"
+        }
+      ],
+      "text": "[Kira](ow://character/01a1d4ef-0000-7000-8000-000000000084) met Kira at [the Iron Gate](https://example.com/Kira).",
+      "want": [
+        {
+          "at": 64,
+          "length": 4,
+          "id": "k"
+        }
+      ]
+    },
+    {
+      "name": "an address inside a link's target does not end the link",
+      "case": "exact",
+      "elements": [
+        {
+          "id": "k",
+          "name": "Kira"
+        },
+        {
+          "id": "m",
+          "name": "Mira"
+        }
+      ],
+      "text": "[x](ow://character/01a1d4ef-0000-7000-8000-000000000084 Kira) Mira",
+      "want": [
+        {
+          "at": 62,
+          "length": 4,
+          "id": "m"
+        }
+      ]
+    },
+    {
+      "name": "brackets that are not a link are prose",
+      "case": "exact",
+      "elements": [
+        {
+          "id": "k",
+          "name": "Kira"
+        }
+      ],
+      "text": "[Kira] and [Kira] (x) and [Kira](unclosed",
+      "want": [
+        {
+          "at": 1,
+          "length": 4,
+          "id": "k"
+        },
+        {
+          "at": 12,
+          "length": 4,
+          "id": "k"
+        },
+        {
+          "at": 27,
+          "length": 4,
+          "id": "k"
+        }
+      ]
+    },
+    {
+      "name": "a bracket that is not a link does not hide a later link",
+      "case": "exact",
+      "elements": [
+        {
+          "id": "k",
+          "name": "Kira"
+        }
+      ],
+      "text": "[sic] [Kira](x) and Kira.",
+      "want": [
+        {
+          "at": 20,
+          "length": 4,
+          "id": "k"
+        }
+      ]
+    },
+    {
+      "name": "a link takes its label from the first bracket and its target to the first parenthesis",
+      "case": "exact",
+      "elements": [
+        {
+          "id": "k",
+          "name": "Kira"
+        },
+        {
+          "id": "m",
+          "name": "Mira"
+        }
+      ],
+      "text": "[a [Kira](Mira) Mira) and [Kira]Mira[x](y)",
+      "want": [
+        {
+          "at": 16,
+          "length": 4,
+          "id": "m"
+        },
+        {
+          "at": 27,
+          "length": 4,
+          "id": "k"
+        },
+        {
+          "at": 32,
+          "length": 4,
+          "id": "m"
+        }
+      ]
+    },
+    {
+      "name": "no name is read across the edge of a link; a shorter whole one before it is",
+      "case": "exact",
+      "elements": [
+        {
+          "id": "n",
+          "name": "Gate [1"
+        },
+        {
+          "id": "g",
+          "name": "Gate"
+        }
+      ],
+      "text": "Gate [1](note) and Gate [1.",
+      "want": [
+        {
+          "at": 0,
+          "length": 4,
+          "id": "g"
+        },
+        {
+          "at": 19,
+          "length": 7,
+          "id": "n"
+        }
+      ]
+    },
+    {
+      "name": "a name is found right beside a link",
+      "case": "exact",
+      "elements": [
+        {
+          "id": "k",
+          "name": "Kira"
+        }
+      ],
+      "text": "Kira[x](y)Kira",
+      "want": [
+        {
+          "at": 0,
+          "length": 4,
+          "id": "k"
+        },
+        {
+          "at": 10,
+          "length": 4,
+          "id": "k"
+        }
+      ]
+    },
+    {
+      "name": "a script written without spaces: a name is whole only between punctuation or spaces",
+      "case": "exact",
+      "elements": [
+        {
+          "id": "t",
+          "name": "\u6771\u4eac\u90fd"
+        }
+      ],
+      "text": "\u306f\u6771\u4eac\u90fd\u306b\u3002\u6771\u4eac\u90fd\u3002",
+      "want": [
+        {
+          "at": 6,
+          "length": 3,
+          "id": "t"
+        }
+      ]
+    },
+    {
+      "name": "a name that is not a string is passed over",
+      "case": "exact",
+      "elements": [
+        {
+          "id": "n",
+          "name": null
+        },
+        {
+          "id": "x",
+          "name": 7
+        },
+        {
+          "id": "m"
+        },
+        {
+          "id": "l",
+          "names": [
+            "Kira",
+            null,
+            7
+          ]
+        }
+      ],
+      "text": "Kira and 7 and null.",
+      "want": [
+        {
+          "at": 0,
+          "length": 4,
+          "id": "l"
+        }
+      ]
+    },
+    {
+      "name": "a name alone is the whole text",
+      "case": "exact",
+      "elements": [
+        {
+          "id": "k",
+          "name": "Kira"
+        }
+      ],
+      "text": "Kira",
+      "want": [
+        {
+          "at": 0,
+          "length": 4,
+          "id": "k"
+        }
+      ]
+    },
+    {
+      "name": "no elements, and no text",
+      "case": "exact",
+      "elements": [],
+      "text": "Kira.",
+      "want": []
+    },
+    {
+      "name": "an empty text",
+      "case": "exact",
+      "elements": [
+        {
+          "id": "k",
+          "name": "Kira"
+        }
+      ],
+      "text": "",
+      "want": []
+    }
+  ],
+  "timed": [
+    {
+      "name": "open brackets only",
+      "elements": {
+        "count": 1000,
+        "pattern": "Name{i} Thing"
+      },
+      "text": {
+        "repeat": "[",
+        "times": 300000
+      },
+      "count": 0
+    },
+    {
+      "name": "links that never close",
+      "elements": {
+        "count": 1000,
+        "pattern": "Name{i} Thing"
+      },
+      "text": {
+        "repeat": "[x](",
+        "times": 100000
+      },
+      "count": 0
+    },
+    {
+      "name": "closing brackets with no link",
+      "elements": {
+        "count": 1000,
+        "pattern": "Name{i} Thing"
+      },
+      "text": {
+        "repeat": "[x] ",
+        "times": 100000
+      },
+      "count": 0
+    },
+    {
+      "name": "twenty thousand names, each found five times",
+      "elements": {
+        "count": 20000,
+        "pattern": "Name{i} Thing"
+      },
+      "text": {
+        "cycle": "Name{i} Thing and ",
+        "count": 20000,
+        "times": 100000
+      },
+      "count": 100000
+    },
+    {
+      "name": "one name two hundred thousand times",
+      "elements": {
+        "count": 1,
+        "pattern": "Kira"
+      },
+      "text": {
+        "repeat": "Kira ",
+        "times": 200000
+      },
+      "count": 200000
+    },
+    {
+      "name": "a long name that almost matches at every word",
+      "elements": {
+        "count": 1,
+        "pattern": "a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a b"
+      },
+      "text": {
+        "repeat": "a ",
+        "times": 200000
+      },
+      "count": 0
+    },
+    {
+      "name": "address prefixes with no address",
+      "elements": {
+        "count": 1000,
+        "pattern": "Name{i} Thing"
+      },
+      "text": {
+        "repeat": "ow://character/",
+        "times": 60000
+      },
+      "count": 0
+    }
+  ]
+}
