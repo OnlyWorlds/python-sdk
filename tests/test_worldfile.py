@@ -614,29 +614,94 @@ def test_a_hidden_element_travels_byte_for_byte_unless_the_file_is_a_share(tmp_p
     assert written.read_bytes() == share and again == left and again_unread == unread
 
 
-def test_only_a_file_directly_in_a_type_folder_is_an_element_for_the_hidden_mark(tmp_path: Path) -> None:
-    # elements/<type>/*.json is the layout (spec §4), as the npm SDK's writer reads it: a marked file one
-    # level up or deeper is no element, so a share carries it as it is.
-    files = {
-        "world.json": world_json(),
-        "elements/character/cy--c-2.json": encode({"id": "c-2", "name": "Cy", "hidden": True}),
-        "elements/stray.json": encode({"id": "c-4", "name": "Up", "hidden": True}),
-        "elements/character/old/cy--c-5.json": encode({"id": "c-5", "name": "Deep", "hidden": True}),
-        "spatial/pin/extra/p--p-2.json": encode({"id": "p-2", "name": "Deep pin", "hidden": True}),
-    }
-    src = make_folder(tmp_path / "w", files)
+def _shared(folder: Path) -> tuple[set[str], list[str], list[str]]:
+    """A share of the folder: the paths it carries beside world.json, the hidden left out, the unread left out."""
     left: list[str] = []
-    entries = read_world_file(world_file_bytes(src, include_hidden=False, hidden_left_out=left)).entries
-    assert left == ["elements/character/cy--c-2.json"]
-    elsewhere = {"elements/stray.json", "elements/character/old/cy--c-5.json", "spatial/pin/extra/p--p-2.json"}
-    assert elsewhere <= set(entries)
+    unread: list[str] = []
+    data = world_file_bytes(folder, include_hidden=False, hidden_left_out=left, unread_left_out=unread)
+    return set(read_world_file(data).entries) - {"world.json"}, left, unread
+
+
+def test_a_share_carries_under_the_element_folders_only_what_the_reader_serves(tmp_path: Path) -> None:
+    """Ruled 2026-11-23: on a share nothing under elements/ or spatial/ travels except a file read as an
+    element with no mark, and "read as an element" is the folder reader's own verdict. A file that holds
+    a mark is unread too when the reader does not serve it. The npm SDK's test holds the same list."""
+    marked = {"name": "H", "hidden": True, "changed_by": "m-1"}
+    plain = {"name": "P", "changed_by": "m-1"}
+    unread: dict[str, bytes] = {
+        # Cut short, not UTF-8, not an object.
+        "elements/character/broken.json": b'{"id": "x", "hidden": true',
+        "elements/character/latin.json": bytes([0x7B, 0x22, 0xE9, 0x22, 0x3A, 0x31, 0x7D]),
+        "elements/character/list.json": b'[{"hidden": true}]',
+        # The extension in another spelling, another extension, a swap file.
+        "spatial/pin/cut.JSON": b'{"id": "p"',
+        "elements/map/M.JSON": encode({"id": "M", **marked}),
+        "elements/map/N.JSON": encode({"id": "N", **plain}),
+        "elements/character/notes.txt": encode({"id": "t", **marked}),
+        "spatial/pin/notes.txt": encode({"id": "t2", **marked}),
+        "elements/character/x.json.crswap": encode({"id": "sw", **marked}),
+        # Deeper than a type folder (a hidden element's file moved into old/ by hand), directly under
+        # elements/, and in a folder that is no type or no legacy type.
+        "elements/character/old/s.json": encode({"id": "s", **marked}),
+        "elements/top.json": encode({"id": "top", **marked}),
+        "elements/widgets/w.json": encode({"id": "w", **marked}),
+        "elements/Relation/c.json": encode({"id": "C", **plain}),
+        "spatial/character/x.json": encode({"id": "sc", **plain}),
+        # No id: absent, empty, not a string; with a mark and without.
+        "elements/character/noid-h.json": encode(marked),
+        "elements/character/noid.json": encode(plain),
+        "elements/character/empty-id.json": encode({"id": "", **plain}),
+        "elements/character/number-id.json": encode({"id": 7, **plain}),
+        # Text after the one JSON value.
+        "elements/character/two.json": b'{"id": "c-9"} {"hidden": true}',
+        "elements/character/tail.json": b'{"id": "c-8"} x',
+        # An id two files hold travels in neither, in either order and across the two layouts.
+        "elements/event/t1-first.json": encode({"id": "t1", **marked}),
+        "elements/event/t1-second.json": encode({"id": "t1", **plain}),
+        "elements/event/t2-first.json": encode({"id": "t2", **plain}),
+        "elements/event/t2-second.json": encode({"id": "t2", **marked}),
+        "elements/pin/both.json": encode({"id": "b1", **marked}),
+        "spatial/pin/both.json": encode({"id": "b1", **plain}),
+    }
+    control = {"world.json": world_json(), "elements/character/a.json": encode({"id": "a"})}
+    whole = make_folder(tmp_path / "whole", {**control, **unread})
+    assert _shared(whole) == ({"elements/character/a.json"}, [], sorted(unread))
+    # One at a time too, so no file's verdict rests on another's (the pairs go together).
+    paths = list(unread)
+    groups = [[p] for p in paths[:20]] + [paths[20:22], paths[22:24], paths[24:26]]
+    assert sum(len(g) for g in groups) == len(unread) == 26
+    for n, group in enumerate(groups):
+        alone = make_folder(tmp_path / f"alone-{n}", {"world.json": world_json(), **{p: unread[p] for p in group}})
+        assert _shared(alone) == (set(), [], sorted(group)), group
+    # A copy carries each of them byte for byte, and so does one that leaves author fields out: a file
+    # not read as an element is never rewritten.
+    for with_authors in (True, False):
+        copy = read_world_file(world_file_bytes(whole, include_author_fields=with_authors)).entries
+        assert all(copy[p] == data for p, data in unread.items()), with_authors
+        assert set(copy) == {*control, *unread}
+    # Kept: a null mark, a nested mark, whitespace after the value, a byte order mark, hidden: true
+    # outside the element folders, and one UUID in two spellings, which is two ids, each judged by its own mark.
+    keep: dict[str, bytes] = {
+        "elements/character/n.json": encode({"id": "n", "hidden": None}),
+        "elements/character/deep.json": encode({"id": "d", "x_meta": {"hidden": True}}),
+        "elements/character/space.json": b'{"id": "sp"} \n\t\r\n',
+        "elements/character/bom.json": b"\xef\xbb\xbf" + b'{"id": "bom"}',
+        "elements/trait/lower.json": encode({"id": "abcdef00-0000-4000-8000-00000000000a"}),
+        "media/m.json": encode({"hidden": True}),
+        "records/lab/r.json": encode({"hidden": True}),
+    }
+    kept = make_folder(tmp_path / "kept", {"world.json": world_json(), **keep})
+    assert _shared(kept) == (set(keep), [], [])
+    upper = "elements/trait/UPPER.json"
+    (kept / upper).write_bytes(encode({"id": "ABCDEF00-0000-4000-8000-00000000000A", "hidden": True}))
+    assert _shared(kept) == (set(keep), [upper], []), "another spelling is another id"
 
 
 # --- author fields: which member and which tool wrote each element, left out of a file handed on
 
 # The same bytes as the npm SDK's test/fixtures/author-fields.fixture.json (both suites hold its sha256).
 AUTHOR_FIXTURE = REPO / "tests" / "fixtures" / "author-fields.fixture.json"
-AUTHOR_FIXTURE_SHA256 = "ed9e2a6161b0b6b276b71680750943f7ee6fe5d49fdbd932995a1b93555a1e4f"
+AUTHOR_FIXTURE_SHA256 = "481db037f008ceff9989bbe44b2c27a41ba4205d7e7fd258792cbadc2365787d"
 AUTHOR_CASES = 5
 AUTHOR_FIELDS = ["created_by", "changed_by", "changed_via", "changed_client", "doors"]
 

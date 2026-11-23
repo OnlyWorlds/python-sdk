@@ -76,7 +76,7 @@ from . import _outside_json
 from ._casefold import FOLD_RUNS
 from ._jsonfmt import encode
 from ._nfc import CLASS_RUNS, DECOMPOSITIONS, EXCLUSIONS
-from .folder import ELEMENTS_DIR, LEGACY_SPATIAL_DIR, WORLD_FILE, is_hidden, slugify
+from .folder import ELEMENTS_DIR, LEGACY_SPATIAL_DIR, WORLD_FILE, is_hidden, read_folder, slugify
 
 __all__ = [
     "MARKER_NAME",
@@ -835,28 +835,33 @@ def _default_top(world: Mapping[str, Any]) -> str:
     return f"{slugify(name if isinstance(name, str) else None) or 'world'}-{str(world['id'])[:8]}"
 
 
-class _Unread:
-    """An element file the writer could not read as an element."""
+def _element_files(root: Path) -> dict[str, dict[str, Any]]:
+    """The folder's element files, path inside the folder -> JSON object: the files this package's
+    folder reader serves as an element (``read_folder``), and no others. So "read as an element" is
+    one verdict in the package, the reader's own: a ``.json`` file directly in a type folder of
+    ``elements/`` or legacy ``spatial/`` that holds one JSON object with a non-empty string ``id``.
+    An id that two files hold is in neither: the reader serves one and skips the other, and which
+    of the two marks is the element's cannot be said.
+
+    Every other file under ``elements/`` or ``spatial/`` (``_under_element_folders``) was not read as
+    an element: not UTF-8, not JSON (a write cut short, or text after the one JSON value), JSON the
+    reader refuses (nested past its depth, a number it cannot hold), not an object, without an id,
+    holding an id another file holds too, with another extension, deeper than a type folder or in
+    a folder that is no type. What such a file holds cannot be told, its hidden mark included."""
+    folder = read_folder(root)
+    twice = {d.id for d in folder.duplicates} | set(folder.in_both_layouts)
+    return {
+        el.path.relative_to(root).as_posix(): el.body
+        for sink in (folder.elements, folder.legacy)
+        for el in sink.values()
+        if el.id not in twice
+    }
 
 
-_UNREAD = _Unread()
-
-
-def _element_body(rel: str, src: Path) -> dict[str, Any] | _Unread | None:
-    """What an element file holds (a ``.json`` file directly in a type folder of ``elements/`` or legacy
-    ``spatial/``): its JSON object. None for a file anywhere else, which is no element file.
-
-    ``_UNREAD`` for a file there that could not be read as an element: not UTF-8, not JSON (a write cut
-    short), JSON this package's reader refuses (nested past its depth, a number it cannot hold), or not an
-    object. What such a file holds cannot be told, its hidden mark included."""
-    segs = rel.split("/")
-    if len(segs) != 3 or segs[0] not in (ELEMENTS_DIR, LEGACY_SPATIAL_DIR) or not rel.lower().endswith(".json"):
-        return None
-    try:
-        body = _outside_json.loads(src.read_bytes().decode("utf-8-sig"))
-    except ValueError:  # not UTF-8, not JSON, or JSON the reader refuses
-        return _UNREAD
-    return body if isinstance(body, dict) else _UNREAD
+def _under_element_folders(rel: str) -> bool:
+    """Whether a path sits under ``elements/`` or legacy ``spatial/``, where a share carries only
+    what was read as an element."""
+    return rel.split("/")[0] in (ELEMENTS_DIR, LEGACY_SPATIAL_DIR)
 
 
 #: Which member and which tool wrote an element (a membership id, a door): nothing to someone the
@@ -864,14 +869,13 @@ def _element_body(rel: str, src: Path) -> dict[str, Any] | _Unread | None:
 _AUTHOR_FIELDS: tuple[str, ...] = ("created_by", "changed_by", "changed_via", "changed_client", "doors")
 
 
-def _without_author_fields(rel: str, src: Path) -> bytes | None:
-    """An element file (``.json`` directly in a type folder of ``elements/`` or legacy ``spatial/``,
-    as the TypeScript writer reads one) without its author fields, in the folder's own form
-    (``_jsonfmt.encode``: two-space indent, a trailing newline, the other keys in their order), or
-    None when it holds none of them or could not be read as an element: then it travels byte for byte.
-    Only top-level keys go; an ``x_*`` value that holds one of the names is the extension's, and stays."""
-    body = _element_body(rel, src)
-    if not isinstance(body, dict) or not any(k in body for k in _AUTHOR_FIELDS):
+def _without_author_fields(body: dict[str, Any] | None) -> bytes | None:
+    """An element file's object (``_element_files``) without its author fields, in the folder's own
+    form (``_jsonfmt.encode``: two-space indent, a trailing newline, the other keys in their order),
+    or None when it holds none of them or the file was not read as an element (``body`` None): then
+    it travels byte for byte. Only top-level keys go; an ``x_*`` value that holds one of the names is
+    the extension's, and stays."""
+    if body is None or not any(k in body for k in _AUTHOR_FIELDS):
         return None
     return encode({k: v for k, v in body.items() if k not in _AUTHOR_FIELDS})
 
@@ -907,17 +911,21 @@ def _plan(
             return len(segs) > 2 and segs[0] == "records" and _fold_name(segs[1]) in private
 
         files = {rel: src for rel, src in files.items() if not in_private(rel)}
+    # Read only when something is to be left out: a byte copy of everything reads no element file.
+    elements = {} if include_hidden and include_author_fields else _element_files(root)
     if not include_hidden:
-        # A share (§4.8): it carries an element file only when it was read as an element and no mark was
-        # found. A hidden element's file is left out whole, and so is one that could not be read, listed
-        # apart; nothing else is rewritten.
+        # A share (§4.8): it carries a file under elements/ or spatial/ only when it was read as an
+        # element and no mark was found. A hidden element's file is left out whole, and so is every
+        # file there that was not read as an element, listed apart; nothing else is rewritten.
         hidden: list[str] = []
         unread: list[str] = []
         for rel in sorted(files):
-            body = _element_body(rel, files[rel])
-            if isinstance(body, _Unread):
+            if not _under_element_folders(rel):
+                continue
+            body = elements.get(rel)
+            if body is None:
                 unread.append(rel)
-            elif body is not None and is_hidden(body):
+            elif is_hidden(body):
                 hidden.append(rel)
         left = {*hidden, *unread}
         files = {rel: src for rel, src in files.items() if rel not in left}
@@ -951,7 +959,7 @@ def _plan(
         if rel == WORLD_FILE:
             plan.append((rel, world_bytes))
             continue
-        bare = None if include_author_fields else _without_author_fields(rel, files[rel])
+        bare = None if include_author_fields else _without_author_fields(elements.get(rel))
         plan.append((rel, files[rel] if bare is None else bare))
     return top, plan
 
@@ -1048,20 +1056,28 @@ def write_world_file(
       passes, receives each left-out file's path inside the folder (``elements/character/x.json``),
       sorted, and its length is the count. Nothing else is rewritten: a visible element that links
       to a hidden one keeps the id, which dangles in the file (a reader meets it as a link to an
-      element the world does not hold). A share carries a file in a type folder only when it
-      was read as an element and no mark was found: one that could not be read (not UTF-8 JSON, a
-      write cut short, nested more than 200 deep, a number that is not finite, not an object) is
-      left out too, since its mark cannot be told, and ``unread_left_out``, a second list the
-      caller passes, receives those paths, sorted. They are counted apart: a broken file is one a
-      person may want to mend. A copy carries such a file byte for byte.
+      element the world does not hold). A share carries a file under ``elements/`` or ``spatial/``
+      only when it was read as an element and no mark was found, and "read as an element" is
+      the folder reader's own verdict (``read_folder``): a ``.json`` file directly in a type
+      folder, one JSON object with a non-empty string ``id`` that no other file holds. Every
+      other file there is left out too, since its mark cannot be told: one that is not UTF-8
+      JSON (a write cut short, or text after the one JSON value), nested more than 200 deep,
+      holding a number that is not finite, not an object, without an id, holding an id another
+      file holds too (neither of the two travels), with another extension, deeper than a type
+      folder (a hidden element's file moved into ``old/`` by hand) or in a folder that is no
+      type. ``unread_left_out``, a second list the caller passes, receives those paths, sorted.
+      They are counted apart: a file a person may want to mend or move. Versions before 0.145.0
+      carried a file with another extension, or one not directly in a type folder, whatever it
+      held, and judged the other kinds by their own mark alone. A copy carries every such file
+      byte for byte and never rewrites it.
     - Author fields are left out: ``created_by``, ``changed_by``, ``changed_via``,
       ``changed_client`` and ``doors`` record which member and which tool wrote each element (a
       membership id, a door), which means nothing to someone the world is handed to, so every
-      element file directly in a type folder of ``elements/`` or ``spatial/`` loses them;
+      element file (one the folder reader serves, as above) loses them;
       ``created_at`` and ``updated_at`` stay. A file
       holding any of them is rewritten without them in the folder's own form (two-space indent, a
-      trailing newline, the other keys in their order); one holding none, or that is not a JSON
-      object, travels byte for byte, and nothing outside the element files is touched.
+      trailing newline, the other keys in their order); one holding none, or that was not read
+      as an element, travels byte for byte, and nothing outside the element files is touched.
       ``include_author_fields=True`` carries every element file byte for byte, for an archive of
       your own folder.
     - ``world.json`` is carried byte for byte, ``producer``, ``source`` and

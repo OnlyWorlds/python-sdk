@@ -127,7 +127,8 @@ def test_every_json_loads_is_the_outside_reader_or_named() -> None:
     assert len(files) > 40  # the search saw the package
     assert {p.name: calls(p, "json") for p in files if calls(p, "json")} == NAMED
     used = {p.name: calls(p, "_outside_json") for p in files if calls(p, "_outside_json")}
-    assert used == {"folder.py": 1, "kanka.py": 1, "legendkeeper.py": 2, "lint.py": 1, "worldfile.py": 3}
+    # worldfile.py: an archive's world.json and a folder's records manifest; folder.py's reader reads its element files.
+    assert used == {"folder.py": 1, "kanka.py": 1, "legendkeeper.py": 2, "lint.py": 1, "worldfile.py": 2}
 
 
 # --- a writer that must read a file to leave something out ------------------------------------------------
@@ -253,6 +254,26 @@ def test_the_kanka_door_skips_a_file_it_cannot_hold_with_a_note_as_one_that_is_n
         else:
             assert got[0] == broken[0], name
             assert got[1] == [note.replace("(JSONDecodeError)", f"({error})") for note in broken[1]], name
+
+
+def test_the_kanka_door_text_after_the_one_json_value_is_no_json(tmp_path: Path) -> None:
+    """Ruled 2026-11-23: a file's text is one JSON value and nothing after it but whitespace."""
+
+    def with_tail(name: str, tail: str) -> Path:
+        out = tmp_path / f"{name}.zip"
+        with zipfile.ZipFile(KANKA) as src, zipfile.ZipFile(out, "w", zipfile.ZIP_DEFLATED) as dst:
+            for info in src.infolist():
+                data = src.read(info.filename)
+                if info.filename == ENTITY:
+                    data = data.decode("utf-8").rstrip().encode() + tail.encode()
+                dst.writestr(info.filename, data)
+        return out
+
+    whole = _door(KANKA)
+    broken = _door(_export_with(tmp_path, "broken", None))
+    for n, tail in enumerate([' {"hidden": true}', " x", "{}"]):
+        assert _door(with_tail(f"tail-{n}", tail)) == broken, tail
+    assert _door(with_tail("space", " \n\t\r\n")) == whole
 
 
 def test_the_kanka_door_writes_no_file_holding_a_number_the_export_does_not(tmp_path: Path) -> None:

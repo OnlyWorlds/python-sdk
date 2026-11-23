@@ -454,6 +454,11 @@ def read_folder(root: str | os.PathLike[str], *, legacy: bool = True) -> Folder:
     - Every ``*.json`` in a type directory is ingested and keyed on its in-file ``id``;
       the filename is never parsed (§3.1). A dot-prefixed file there is a tool's litter,
       not an element: skipped and listed (clarified 2026-10-17).
+    - Names are read as written (ruled 2026-11-23): the extension is ``.json`` in lower case, so
+      ``M.JSON`` is skipped and listed, and a type directory is the type word in lower case, so
+      ``elements/Character/`` lands in ``ignored_dirs``. Two ids are the same id when they are
+      written the same: one UUID in capitals and in lower case is two elements. Versions before
+      0.145.0 read an extension and a directory name in any case.
     - A file that is not JSON, not an object, or has no non-empty string ``id`` is
       skipped, recorded in ``skipped``, and left where it is (§4.1).
     - A declared ``type`` beats the directory the file sits in; an absent one is
@@ -494,7 +499,8 @@ def read_folder(root: str | os.PathLike[str], *, legacy: bool = True) -> Folder:
         # By name in code point order (the format's one order), never by Path: a Windows path sorts
         # case-blind, so a duplicate id would keep a different file there than on Linux or macOS.
         for tdir in sorted((p for p in base.iterdir() if p.is_dir()), key=lambda p: p.name):
-            dir_type = tdir.name.lower()
+            # Names are read as written: a type folder is the type word in lower case, one of the 22.
+            dir_type = tdir.name
             if dir_type not in allowed:
                 folder.ignored_dirs.append(tdir)
                 continue
@@ -502,6 +508,9 @@ def read_folder(root: str | os.PathLike[str], *, legacy: bool = True) -> Folder:
             for path in sorted(files, key=lambda p: p.name):
                 if path.name.startswith("."):
                     folder.skipped.append(SkippedFile(path, "a dot-prefixed file: a tool's litter, not an element"))
+                    continue
+                if not path.name.endswith(".json"):
+                    folder.skipped.append(SkippedFile(path, "the extension is not .json in lower case: not read"))
                     continue
                 try:
                     body = _load_json(path)

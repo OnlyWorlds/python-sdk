@@ -32,7 +32,7 @@
    "stripped": 0
   },
   {
-   "name": "only the fields present are removed, a null one too; an element left with nothing is an empty object",
+   "name": "only the fields present are removed, a null one too; a file with no id is not read as an element and keeps its bytes",
    "files": {
     "world.json": "{\n  \"id\": \"0192a000-aaaa-7bbb-8ccc-000000000001\",\n  \"name\": \"W\"\n}\n",
     "elements/location/hall--l1.json": "{\r\n    \"id\": \"l1\",\r\n    \"name\": \"Hall\",\r\n    \"changed_by\": null,\r\n    \"doors\": {}\r\n}\r\n",
@@ -41,9 +41,9 @@
    "default": {
     "world.json": "{\n  \"id\": \"0192a000-aaaa-7bbb-8ccc-000000000001\",\n  \"name\": \"W\"\n}\n",
     "elements/location/hall--l1.json": "{\n  \"id\": \"l1\",\n  \"name\": \"Hall\"\n}\n",
-    "elements/event/only--e2.json": "{}\n"
+    "elements/event/only--e2.json": "{\"created_by\":\"u\",\"doors\":{\"x\":\"2026-10-29T10:00:00Z\"}}"
    },
-   "stripped": 2
+   "stripped": 1
   },
   {
    "name": "a rewritten file is in the folder's own form: no byte order mark, strings, numbers and nesting as JSON.stringify writes them",
@@ -58,7 +58,7 @@
    "stripped": 1
   },
   {
-   "name": "only element files: elements/<type>/ and the legacy spatial/<type>/, .json in any case; world.json, records, media and every other file byte for byte",
+   "name": "only element files: a .json file, the extension in lower case, directly in elements/<type>/ or the legacy spatial/<type>/; world.json, records, media and every other file byte for byte",
    "files": {
     "world.json": "{\n  \"id\": \"0192a000-aaaa-7bbb-8ccc-000000000001\",\n  \"name\": \"W\",\n  \"created_by\": \"u\"\n}\n",
     "spatial/pin/p--p1.json": "{\"id\":\"p1\",\"name\":\"P\",\"changed_via\":\"site\"}",
@@ -74,7 +74,7 @@
    "default": {
     "world.json": "{\n  \"id\": \"0192a000-aaaa-7bbb-8ccc-000000000001\",\n  \"name\": \"W\",\n  \"created_by\": \"u\"\n}\n",
     "spatial/pin/p--p1.json": "{\n  \"id\": \"p1\",\n  \"name\": \"P\"\n}\n",
-    "elements/map/M--m1.JSON": "{\n  \"id\": \"m1\",\n  \"name\": \"M\"\n}\n",
+    "elements/map/M--m1.JSON": "{\"id\":\"m1\",\"name\":\"M\",\"changed_client\":\"atlas\"}",
     "elements/character/sub/s.json": "{\"id\":\"s\",\"created_by\":\"u\"}",
     "elements/character/notes.txt": "{\"created_by\":\"u\"}",
     "elements/character/list.json": "[{\"created_by\":\"u\"}]",
@@ -83,7 +83,7 @@
     "records/RECORDS.json": "[{\"producer\":\"lab\",\"format\":\"f\",\"version\":\"1\",\"deltas\":false,\"created_by\":\"u\"}]",
     "records/lab/r.json": "{\"created_by\":\"u\",\"doors\":{}}"
    },
-   "stripped": 2
+   "stripped": 1
   }
  ]
 }

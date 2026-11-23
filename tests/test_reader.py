@@ -96,6 +96,9 @@ def test_reader_edges(tmp_path: Path) -> None:
     _w(tmp_path / "elements" / "character" / "notes.txt", "not json")
     _w(tmp_path / "elements" / "Species" / "s.json", '{"id": "4", "name": "cased dir"}')
     _w(tmp_path / "elements" / "banana" / "b.json", '{"id": "5"}')
+    _w(tmp_path / "elements" / "character" / "UP.JSON", '{"id": "8", "name": "cased extension"}')
+    _w(tmp_path / "elements" / "trait" / "a.json", '{"id": "ABCDEF00-0000-4000-8000-00000000000A"}')
+    _w(tmp_path / "elements" / "trait" / "b.json", '{"id": "abcdef00-0000-4000-8000-00000000000a"}')
     _w(tmp_path / "spatial" / "pin" / "p.json", '{"id": "6", "map_id": "m"}')
     _w(tmp_path / "spatial" / "pin" / "q.json", '{"id": "1", "type": "pin"}')
     _w(tmp_path / "spatial" / "character" / "c.json", '{"id": "7"}')
@@ -104,12 +107,18 @@ def test_reader_edges(tmp_path: Path) -> None:
     f = read_folder(tmp_path)
 
     assert fingerprint(tmp_path) == before
-    assert set(f.elements) == {"1", "2", "4"}
+    # Names are read as written (ruled 2026-11-23): Species/ is no type folder, UP.JSON is skipped by name,
+    # and one UUID in two spellings is two ids.
+    spellings = {"ABCDEF00-0000-4000-8000-00000000000A", "abcdef00-0000-4000-8000-00000000000a"}
+    assert set(f.elements) == {"1", "2"} | spellings
+    assert "4" not in f.all_elements() and "8" not in f.all_elements()
     assert f.elements["1"].body["name"] == "first"
     assert [(d.id, d.ignored.name) for d in f.duplicates] == [("1", "b.json")]
-    assert f.elements["4"].type == "species"
-    assert {s.path.name for s in f.skipped} == {"nan.json", "list.json"}
-    assert {p.name for p in f.ignored_dirs} == {"banana", "character"}
+    assert {s.path.name for s in f.skipped} == {"nan.json", "list.json", "UP.JSON"}
+    assert [s.reason for s in f.skipped if s.path.name == "UP.JSON"] == [
+        "the extension is not .json in lower case: not read"
+    ]
+    assert {p.name for p in f.ignored_dirs} == {"banana", "character", "Species"}
     assert set(f.legacy) == {"6", "1"}
     assert f.all_elements()["1"].layout == "elements"  # elements/ wins the union
     assert f.server_world_id == "srv"
