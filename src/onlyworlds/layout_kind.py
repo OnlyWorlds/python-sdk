@@ -40,11 +40,14 @@ class KindPoint(TypedDict):
 
 
 class KindLayout(TypedDict):
-    """What ``layout_by_kind`` answers: one point per node, in the graph's node order, and the method that made them."""
+    """What ``layout_by_kind`` answers: one point per node, in the graph's node order, and the method that made them.
+
+    ``version`` is deprecated. It is always 1: a method's word is its version, so read ``method``, never this
+    number. The layout profile's mark carries no version key, and this one leaves when the npm SDK's does, at
+    its 5.0."""
 
     method: Literal["by-kind"]
-    # Always 1: a method's word is its version, so read ``method``, never this number. The layout profile's
-    # mark carries no version key; this one leaves when the npm SDK's does, at its 5.0.
+    #: Deprecated: always 1 (the class docstring says when it leaves).
     version: int
     points: list[KindPoint]
 
@@ -60,11 +63,14 @@ class AroundPoint(TypedDict):
 
 
 class AroundLayout(TypedDict):
-    """What ``layout_around`` answers: the focus and every element within the steps, in the graph's node order."""
+    """What ``layout_around`` answers: the focus and every element within the steps, in the graph's node order.
+
+    ``version`` is deprecated. It is always 1: a method's word is its version, so read ``method``, never this
+    number. The layout profile's mark carries no version key, and this one leaves when the npm SDK's does, at
+    its 5.0."""
 
     method: Literal["around"]
-    # Always 1: a method's word is its version, so read ``method``, never this number. The layout profile's
-    # mark carries no version key; this one leaves when the npm SDK's does, at its 5.0.
+    #: Deprecated: always 1 (the class docstring says when it leaves).
     version: int
     points: list[AroundPoint]
 
