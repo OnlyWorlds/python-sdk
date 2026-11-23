@@ -59,7 +59,6 @@ means nothing to someone the world is handed to.
 from __future__ import annotations
 
 import io
-import json
 import os
 import re
 import shutil
@@ -73,6 +72,7 @@ from functools import cache
 from pathlib import Path
 from typing import IO, Any, Literal, NoReturn
 
+from . import _outside_json
 from ._casefold import FOLD_RUNS
 from ._jsonfmt import encode
 from ._nfc import CLASS_RUNS, DECOMPOSITIONS, EXCLUSIONS
@@ -556,7 +556,7 @@ def _reject_constant(token: str) -> Any:
 def _parse_world(data: bytes) -> dict[str, Any]:
     text = data.decode("utf-8", errors="replace").removeprefix(_BOM)
     try:
-        meta = json.loads(text, parse_constant=_reject_constant)
+        meta = _outside_json.loads(text, parse_constant=_reject_constant)
     except ValueError:
         _refuse("not_a_world")
     if not isinstance(meta, dict):
@@ -812,7 +812,7 @@ def _private_producers(raw: bytes, where: Path) -> set[str]:
         )
 
     try:
-        doc = json.loads(raw.decode("utf-8").removeprefix(_BOM), parse_constant=_reject_constant)
+        doc = _outside_json.loads(raw.decode("utf-8").removeprefix(_BOM), parse_constant=_reject_constant)
     except ValueError:  # not UTF-8, or not JSON
         unreadable("is not JSON")
     if not isinstance(doc, list) or not all(isinstance(e, dict) for e in doc):
@@ -843,7 +843,7 @@ def _hidden_element_file(rel: str, src: Path) -> bool:
     if len(segs) != 3 or segs[0] not in (ELEMENTS_DIR, LEGACY_SPATIAL_DIR) or not rel.lower().endswith(".json"):
         return False
     try:
-        body = json.loads(src.read_bytes().decode("utf-8-sig"))
+        body = _outside_json.loads(src.read_bytes().decode("utf-8-sig"))
     except (UnicodeDecodeError, ValueError):
         return False
     return isinstance(body, dict) and is_hidden(body)
@@ -864,7 +864,7 @@ def _without_author_fields(rel: str, src: Path) -> bytes | None:
     if len(segs) != 3 or segs[0] not in (ELEMENTS_DIR, LEGACY_SPATIAL_DIR) or not rel.lower().endswith(".json"):
         return None
     try:
-        body = json.loads(src.read_bytes().decode("utf-8").removeprefix(_BOM), parse_constant=_reject_constant)
+        body = _outside_json.loads(src.read_bytes().decode("utf-8").removeprefix(_BOM), parse_constant=_reject_constant)
     except ValueError:  # not UTF-8, or not JSON
         return None
     if not isinstance(body, dict) or not any(k in body for k in _AUTHOR_FIELDS):

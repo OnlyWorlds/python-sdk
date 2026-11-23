@@ -382,6 +382,7 @@ from itertools import pairwise
 from pathlib import Path
 from typing import Any, Protocol
 
+from . import _outside_json
 from ._jsonfmt import encode
 from ._made import ANY_TYPE, MadeName, _counts, _lines
 from ._schema import ELEMENT_TYPES, FIELD_KINDS, LINK_TARGETS
@@ -629,7 +630,7 @@ def _json_or_text(text: str) -> Any:
     or an object cannot ride a key-value row otherwise), else the text itself."""
     if text[:1] in "[{":
         try:
-            return json.loads(text)
+            return _outside_json.loads(text)
         except ValueError:
             pass
     return text
@@ -935,7 +936,7 @@ class FileSource:
             raise FileNotFoundError(f"{self.path}: no such export file")
         raw = _export_bytes(self.path)
         try:
-            data = json.loads(raw.decode("utf-8-sig"))
+            data = _outside_json.loads(raw.decode("utf-8-sig"))
         except ValueError:  # UnicodeDecodeError and JSONDecodeError both
             raise ValueError(f"{self.path}: not a LegendKeeper export (not UTF-8 JSON)") from None
         if not isinstance(data, dict) or not isinstance(data.get("resources"), list):

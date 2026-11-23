@@ -141,7 +141,7 @@ def test_the_clean_world_has_nothing_to_look_at(tmp_path: Path) -> None:
 
 def test_the_json_report_keeps_its_key_order(tmp_path: Path) -> None:
     r = folder_report(tmp_path, clean())
-    assert list(r.as_dict()) == ["world", "ran", "not_run", "findings", "compared", "written"]
+    assert list(r.as_dict()) == ["world", "ran", "not_run", "findings", "compared", "written", "unread"]
     assert set(r.compared) <= set(FLAGS)
 
 
@@ -2263,3 +2263,71 @@ def test_14_through_the_api_by_role() -> None:
     assert contributor.compared[AIDS]["not_checked"] == ["hidden"]
     guest = api_report(FakeReader(planted, role="guest"))
     assert AIDS not in guest.ran and AIDS in {x["flag"] for x in guest.not_run}
+
+
+# --- what the folder reader did not read as an element ---------------------------
+
+
+def _file_of(root: Path, element_id: str) -> Path:
+    (path,) = [
+        p for p in (root / "elements").rglob("*.json") if json.loads(p.read_text(encoding="utf-8"))["id"] == element_id
+    ]
+    return path
+
+
+def _body(element_id: str, extra: str) -> str:
+    return '{"id": "' + element_id + '", "name": "Harbor", ' + extra + "}"
+
+
+@pytest.mark.parametrize(
+    ("text", "why"),
+    [
+        ('{"id": ', "unparseable JSON"),  # a file cut off mid-write
+        (_body(L1, '"x_count": ' + "7" * 4301), "a number of more than 4300 digits"),
+        (_body(L1, '"x_deep": ' + "[" * 100_000 + "]" * 100_000), "nested too deep to read"),
+        ("[]", "not a JSON object"),
+        ('{"name": "Harbor"}', "no id: not an element"),
+    ],
+)
+def test_a_file_the_reader_could_not_read_is_named_before_any_finding(tmp_path: Path, text: str, why: str) -> None:
+    root = tmp_path / "w"
+    write_folder(root, WORLD, clean())
+    whole = doctor_folder(read_folder(root), now=NOW)
+    assert whole.unread == [] and whole.exit_code == 0 and "Not read" not in render_prose(whole)
+
+    path = _file_of(root, L1)
+    path.write_text(text, encoding="utf-8")
+    rel = path.relative_to(root).as_posix()
+    r = doctor_folder(read_folder(root), now=NOW)
+    assert [u["file"] for u in r.unread] == [rel]
+    assert why in r.unread[0]["why"]
+    assert r.exit_code == 1
+    prose = render_prose(r)
+    assert "Not read (1): everything below is about the rest of the folder" in prose
+    assert f"  - {rel}: " in prose
+    # It stands before the first finding: the links to the unread element read as links to nothing.
+    assert found(r, "1") and prose.index("Not read (1)") < prose.index("1. A link to an element that is not there")
+    code, out, err = run_main([str(root), "--json"])
+    assert code == 1 and err == ""
+    assert json.loads(out)["unread"] == r.unread
+
+
+def test_unread_lists_a_second_file_of_one_id_and_a_stray_directory_but_not_a_tools_litter(tmp_path: Path) -> None:
+    root = tmp_path / "w"
+    write_folder(root, WORLD, clean())
+    first = _file_of(root, L1)
+    twin = first.with_name("zz-copy.json")
+    twin.write_bytes(first.read_bytes())
+    (first.parent / ".sync-temp.json").write_text("{", encoding="utf-8")
+    (root / "elements" / "notes").mkdir()
+    r = doctor_folder(read_folder(root), now=NOW)
+    files = {u["file"]: u["why"] for u in r.unread}
+    assert [u["file"] for u in r.unread] == [twin.relative_to(root).as_posix(), "elements/notes/"]
+    assert files["elements/notes/"] == "not a type directory"
+    kept = first.relative_to(root).as_posix()
+    assert files[twin.relative_to(root).as_posix()] == f"its id {L1} is also in {kept}, which was read"
+    assert r.exit_code == 1
+
+
+def test_the_api_door_has_nothing_unread() -> None:
+    assert Report(world={}).unread == [] and Report(world={}).exit_code == 0

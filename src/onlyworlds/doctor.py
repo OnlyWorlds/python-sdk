@@ -28,6 +28,12 @@ The flags (the first list):
 7. a message unread by its addressee after N days;
 8. a charter (a Law with supertype Charter) untouched after N changes;
 
+On the folder door the report also says what it did not read as an element (``Report.unread``, each a
+``file`` and a ``why``, printed before any finding): a file the folder reader skipped (not JSON, not an
+object, no ``id``), a second file of one id, a directory that is no type's. Every flag runs on the rest,
+so an element in such a file counts as not there; any entry makes the exit code 1. It is no flag and has
+no number. A dot-prefixed file is a tool's litter and is not listed.
+
 and two from the file side, on the folder door only: (9) a ``format_version`` older than
 this package's ``FORMAT_VERSION``; (10) an ``api_key`` in ``world.json``'s ``api`` block
 when ``world.json`` is tracked by git.
@@ -313,6 +319,10 @@ class Report:
     compared: dict[str, dict[str, Any]] = field(default_factory=dict)
     #: always 0: the doctor never writes
     written: int = 0
+    #: the folder door: what the folder reader did not read as an element, each ``{file, why}``
+    #: (a file that is not JSON, not an object or has no id; a second file of one id; a directory
+    #: that is no type's). Every flag ran on the rest. Always empty on the API door.
+    unread: list[dict[str, str]] = field(default_factory=list)
 
     def as_dict(self) -> dict[str, Any]:
         return {
@@ -322,12 +332,13 @@ class Report:
             "findings": self.findings,
             "compared": self.compared,
             "written": self.written,
+            "unread": self.unread,
         }
 
     @property
     def exit_code(self) -> int:
-        """1 for any finding, a message-shaped one too; 0 for none."""
-        return 1 if self.findings else 0
+        """1 for any finding, a message-shaped one too, or any unread file; 0 for none."""
+        return 1 if self.findings or self.unread else 0
 
     @property
     def to_look_at(self) -> list[dict[str, Any]]:
@@ -1240,7 +1251,26 @@ def doctor_folder(folder: Folder, *, days: int = 14, changes: int = 50, now: _dt
     run.skip("8", "no feed in a folder")
     run.skip(PROPOSALS_FLAG, "proposals are kept on the server, not in a folder")
     _file_side(run, folder)
-    return run.done()
+    report = run.done()
+    report.unread = _unread(folder)
+    return report
+
+
+def _unread(folder: Folder) -> list[dict[str, str]]:
+    """What ``read_folder`` did not read as an element, by path: every flag ran without it, so an
+    element in such a file counts as not there and a link to it reads as a link to a missing element.
+    A dot-prefixed file is a tool's litter, never an element, and is not listed."""
+
+    def rel(path: Path) -> str:
+        return path.relative_to(folder.root).as_posix()
+
+    out = [{"file": rel(s.path), "why": s.reason} for s in folder.skipped if not s.path.name.startswith(".")]
+    out += [
+        {"file": rel(d.ignored), "why": f"its id {d.id} is also in {rel(d.kept)}, which was read"}
+        for d in folder.duplicates
+    ]
+    out += [{"file": rel(d) + "/", "why": "not a type directory"} for d in folder.ignored_dirs]
+    return sorted(out, key=lambda x: x["file"])
 
 
 # ---------------------------------------------------------------------------
@@ -1493,6 +1523,13 @@ def _lines(report: Report) -> Iterable[str]:
         f"{len(report.not_run)} could not run, {report.written} things written"
         + (f" ({len(messages)} on messages and room things, listed last)" if messages else "")
     )
+    if report.unread:
+        n = len(report.unread)
+        yield ""
+        yield f"Not read ({n}): everything below is about the rest of the folder"
+        yield "  An element in one of these counts as not there, and a link to it reads as a link to a missing element."
+        for item in report.unread:
+            yield f"  - {item['file']}: {item['why']}"
     yield from _by_flag(report.to_look_at)
     yield ""
     yield "What was checked"

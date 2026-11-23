@@ -34,6 +34,8 @@ from pathlib import Path
 from types import ModuleType
 from typing import Any
 
+from . import _outside_json
+
 _WALK = Path(__file__).resolve().parent / "_walk"
 
 
@@ -71,7 +73,7 @@ def lint(folder: str | Path) -> Any:
 
 def _linked(src: Path) -> bool:
     try:
-        world = json.loads((src / "world.json").read_text(encoding="utf-8"))
+        world = _outside_json.loads((src / "world.json").read_text(encoding="utf-8"))
     except (OSError, ValueError):
         return False
     return isinstance(world, dict) and bool(world.get("api"))

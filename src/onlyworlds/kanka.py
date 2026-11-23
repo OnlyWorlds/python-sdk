@@ -188,6 +188,7 @@ from importlib.resources import files
 from pathlib import Path
 from typing import Any
 
+from . import _outside_json
 from ._made import MadeName, _counts, _lines
 from ._schema import FIELD_KINDS, LINK_TARGETS
 from ._version import __version__
@@ -829,7 +830,7 @@ class _Importer:
 
     def _json(self, rel: str) -> Any:
         try:
-            return json.loads(self.files[rel]().decode("utf-8-sig"))
+            return _outside_json.loads(self.files[rel]().decode("utf-8-sig"))
         except (ValueError, UnicodeDecodeError) as exc:
             self.report.notes.append(_NOTE["not_json"].format(rel=rel, error=type(exc).__name__))
             return None

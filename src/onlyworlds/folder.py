@@ -15,7 +15,6 @@ Filenames are presentation only (§3.1). Identity is the ``id`` inside the file.
 
 from __future__ import annotations
 
-import json
 import os
 import re
 import shutil
@@ -26,6 +25,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Literal
 
+from . import _outside_json
 from ._jsonfmt import encode
 from ._schema import ELEMENT_TYPES
 
@@ -445,7 +445,7 @@ def _reject_constant(token: str) -> Any:
 
 def _load_json(path: Path) -> Any:
     text = path.read_bytes().decode("utf-8-sig")
-    return json.loads(text, parse_constant=_reject_constant)
+    return _outside_json.loads(text, parse_constant=_reject_constant)
 
 
 def read_folder(root: str | os.PathLike[str], *, legacy: bool = True) -> Folder:
