@@ -356,9 +356,10 @@ def write_folder(
 @dataclass(frozen=True)
 class FolderElement:
     id: str
-    #: the declared ``type`` from the body when it has one (lowercased), else the directory's
+    #: the declared ``type`` from the body when it is one of the 22 slugs as written, else the directory's
     type: str
-    #: True when ``type`` came from the directory (fixture README: infer it, but FLAG the inference)
+    #: True when ``type`` came from the directory: the body declared none, or held something that
+    #: declares nothing (fixture README: infer it, but FLAG the inference)
     type_inferred: bool
     #: the parsed body exactly as on disk; the reader adds nothing to it (no ``type`` is injected)
     body: dict[str, Any]
@@ -461,8 +462,11 @@ def read_folder(root: str | os.PathLike[str], *, legacy: bool = True) -> Folder:
       0.145.0 read an extension and a directory name in any case.
     - A file that is not JSON, not an object, or has no non-empty string ``id`` is
       skipped, recorded in ``skipped``, and left where it is (§4.1).
-    - A declared ``type`` beats the directory the file sits in; an absent one is
-      inferred from the directory and flagged (``type_inferred``).
+    - A declared ``type`` beats the directory the file sits in. A declared type is a string exactly
+      equal to one of the 22 type slugs (§4.1): anything else in ``type`` (an unknown word, another
+      case such as ``"Location"``, a number, null) declares nothing, so the type is inferred from
+      the directory and flagged (``type_inferred``), as for an absent one. Versions before 0.146.0
+      took any non-empty string, in lower case.
     - ``spatial/{map,pin,zone,marker}/`` (Atlas through v1.0) is read into ``legacy``
       unless ``legacy=False``. A missing type directory is "none of that type".
     - A repeated id keeps the first file in path order (each name by code point, on every platform);
@@ -524,11 +528,13 @@ def read_folder(root: str | os.PathLike[str], *, legacy: bool = True) -> Folder:
                 if not isinstance(eid, str) or not eid:
                     folder.skipped.append(SkippedFile(path, "no id: not an element"))
                     continue
+                # A declared type is a string exactly equal to one of the 22 slugs (§4.1): anything
+                # else in `type` declares nothing, and the directory fills it.
                 declared = body.get("type")
-                has_declared = isinstance(declared, str) and bool(declared)
+                has_declared = isinstance(declared, str) and declared in ELEMENT_TYPES
                 element = FolderElement(
                     id=eid,
-                    type=str(declared).lower() if has_declared else dir_type,
+                    type=str(declared) if has_declared else dir_type,
                     type_inferred=not has_declared,
                     body=body,
                     path=path,

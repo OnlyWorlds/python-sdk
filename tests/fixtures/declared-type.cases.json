@@ -1,0 +1,26 @@
+{
+  "about": "What a folder reader serves as an element's type when the file declares one. The folder spec's 4.1 (since 2026-11-22): a declared type is a string exactly equal to one of the 22 type slugs as the standard spells them; anything else in `type` declares nothing, and the directory fills it. Each case is one file; `text` is the file's JSON as written, `want` the type a conforming reader serves.",
+  "cases": [
+    {"name": "no type key", "path": "elements/character/x.json", "text": "{\"id\":\"x1\",\"name\":\"X\"}", "want": "character"},
+    {"name": "the directory's own slug", "path": "elements/character/x.json", "text": "{\"id\":\"x1\",\"name\":\"X\",\"type\":\"character\"}", "want": "character"},
+    {"name": "another type's slug", "path": "elements/character/x.json", "text": "{\"id\":\"x1\",\"name\":\"X\",\"type\":\"location\"}", "want": "location"},
+    {"name": "another type, capital first", "path": "elements/character/x.json", "text": "{\"id\":\"x1\",\"name\":\"X\",\"type\":\"Location\"}", "want": "character"},
+    {"name": "another type, all capitals", "path": "elements/character/x.json", "text": "{\"id\":\"x1\",\"name\":\"X\",\"type\":\"LOCATION\"}", "want": "character"},
+    {"name": "another type, a space before", "path": "elements/character/x.json", "text": "{\"id\":\"x1\",\"name\":\"X\",\"type\":\" location\"}", "want": "character"},
+    {"name": "another type, a space after", "path": "elements/character/x.json", "text": "{\"id\":\"x1\",\"name\":\"X\",\"type\":\"location \"}", "want": "character"},
+    {"name": "a slug with a long s", "path": "elements/character/x.json", "text": "{\"id\":\"x1\",\"name\":\"X\",\"type\":\"\\u017fpecies\"}", "want": "character"},
+    {"name": "an unknown word", "path": "elements/character/x.json", "text": "{\"id\":\"x1\",\"name\":\"X\",\"type\":\"widget\"}", "want": "character"},
+    {"name": "a plural", "path": "elements/character/x.json", "text": "{\"id\":\"x1\",\"name\":\"X\",\"type\":\"locations\"}", "want": "character"},
+    {"name": "an empty string", "path": "elements/character/x.json", "text": "{\"id\":\"x1\",\"name\":\"X\",\"type\":\"\"}", "want": "character"},
+    {"name": "null", "path": "elements/character/x.json", "text": "{\"id\":\"x1\",\"name\":\"X\",\"type\":null}", "want": "character"},
+    {"name": "a number", "path": "elements/character/x.json", "text": "{\"id\":\"x1\",\"name\":\"X\",\"type\":7}", "want": "character"},
+    {"name": "true", "path": "elements/character/x.json", "text": "{\"id\":\"x1\",\"name\":\"X\",\"type\":true}", "want": "character"},
+    {"name": "a list holding a slug", "path": "elements/character/x.json", "text": "{\"id\":\"x1\",\"name\":\"X\",\"type\":[\"location\"]}", "want": "character"},
+    {"name": "an object", "path": "elements/character/x.json", "text": "{\"id\":\"x1\",\"name\":\"X\",\"type\":{\"slug\":\"location\"}}", "want": "character"},
+    {"name": "the key twice, the last one no slug", "path": "elements/character/x.json", "text": "{\"id\":\"x1\",\"name\":\"X\",\"type\":\"location\",\"type\":\"Location\"}", "want": "character"},
+    {"name": "the key twice, the last one a slug", "path": "elements/character/x.json", "text": "{\"id\":\"x1\",\"name\":\"X\",\"type\":\"Location\",\"type\":\"location\"}", "want": "location"},
+    {"name": "the old layout, no type key", "path": "spatial/pin/x.json", "text": "{\"id\":\"x1\",\"name\":\"X\"}", "want": "pin"},
+    {"name": "the old layout, another slug", "path": "spatial/pin/x.json", "text": "{\"id\":\"x1\",\"name\":\"X\",\"type\":\"map\"}", "want": "map"},
+    {"name": "the old layout, a capital", "path": "spatial/pin/x.json", "text": "{\"id\":\"x1\",\"name\":\"X\",\"type\":\"Map\"}", "want": "pin"}
+  ]
+}

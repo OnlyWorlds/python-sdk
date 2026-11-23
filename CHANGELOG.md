@@ -4,6 +4,10 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+## 0.146.0 (2026-11-23)
+
+- **`read_folder` takes a declared type only when it is one of the 22 slugs as written.** The folder format says a declared type is a string exactly equal to one of the 22 type slugs, and that anything else in `type` declares nothing, so the directory fills it. The reader took any non-empty string, in lower case: `"type": "Location"` in `elements/character/` was served as a location, and `"type": "widget"` as an element of type `widget`. Each is now a character, flagged `type_inferred`, its body left as the file wrote it. A slug as written still beats the directory: `"type": "location"` in `elements/character/` is a location. What follows for callers: `push` sends such an element to its directory's route, and a file whose `type` was an unknown word, which `pack` left out and the OKF export skipped, is now read as an element of its directory's type. The npm SDK's folder source already read it this way; both packages hold the same 21 cases (`tests/fixtures/declared-type.cases.json`).
+
 ## 0.145.0 (2026-11-23)
 
 - **A share carries under `elements/` and `spatial/` only what the folder reader serves.** `write_world_file(include_hidden=False)` and `world_file_bytes` now ask `read_folder` which files are elements, and carry those that hold no hidden mark. Every other file there is left out and listed in `unread_left_out=`: a file with another extension (`notes.txt`, a browser's swap file), one deeper than a type folder (a hidden element's file moved into `old/` by hand), one directly under `elements/`, one in a folder that is no type and an object with no non-empty string `id`. Until now a share carried a file with another extension, or one not directly in a type folder, whatever it held, a hidden element's text included, and judged the other kinds by their own mark alone. A file that holds a mark and is not served as an element is listed with the unread, not the hidden.

@@ -180,3 +180,35 @@ def test_a_repeated_id_keeps_the_first_file_by_code_point_on_every_platform(tmp_
     f = read_folder(tmp_path)
     assert f.elements["1"].body["name"] == "upper"  # "B" (U+0042) before "a" (U+0061)
     assert [d.ignored.name for d in f.duplicates] == ["a.json"]
+
+
+DECLARED_TYPE = Path(__file__).parent / "fixtures" / "declared-type.cases.json"
+DECLARED_TYPE_SHA256 = "89968d85deaa4d5974a20a4d73aab80c7e8ec374ee4236b0809e00c405831b96"
+
+
+def test_a_declared_type_is_one_of_the_22_slugs_as_written_or_the_directory_fills_it(tmp_path: Path) -> None:
+    """Folder spec 4.1: a declared type is a string exactly equal to one of the 22 type slugs; anything
+    else in ``type`` declares nothing, and the directory fills it. The cases are the same bytes as the
+    npm SDK's ``test/fixtures/declared-type.cases.json``; both suites hold the file's sha256."""
+    assert hashlib.sha256(DECLARED_TYPE.read_bytes()).hexdigest() == DECLARED_TYPE_SHA256
+    cases = json.loads(DECLARED_TYPE.read_text(encoding="utf-8"))["cases"]
+    assert len(cases) == 21
+    served: dict[str, Any] = {}
+    off = []
+    for number, case in enumerate(cases):
+        root = tmp_path / f"case-{number:02d}"
+        _w(root / "world.json", '{"id": "w", "name": "W"}')
+        _w(root / case["path"], case["text"])
+        element = read_folder(root).all_elements().get("x1")
+        served[case["name"]] = element
+        got = None if element is None else element.type
+        if got != case["want"]:
+            off.append(f"{case['name']}: served {got!r}, want {case['want']!r}")
+    assert off == []
+    # The flag says where the type came from, and the body stays as the file wrote it.
+    assert served["another type's slug"].type_inferred is False
+    assert served["the directory's own slug"].type_inferred is False
+    assert served["no type key"].type_inferred is True
+    assert served["another type, capital first"].type_inferred is True
+    assert served["another type, capital first"].body["type"] == "Location"
+    assert served["the old layout, another slug"].layout == "spatial"
