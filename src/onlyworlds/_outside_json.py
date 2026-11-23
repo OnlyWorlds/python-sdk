@@ -1,6 +1,6 @@
 """``json.loads`` for text this package did not write: a world folder's file, an archive, another tool's export.
 
-Two inputs that are JSON by the grammar make ``json.loads`` do something its callers do not expect.
+Three inputs make ``json.loads`` do something its callers do not expect.
 
 A value nested very deep: where the interpreter's own limit is met first, ``json.loads`` raises
 ``RecursionError``, which is no ``ValueError``, so every reader that catches "not JSON" let it through as
@@ -10,12 +10,18 @@ whole and the next recursive walk over it fails instead. So the depth is refused
 
 An integer of more than 4,300 digits: a plain ``ValueError`` whose message advises a Python setting.
 
-Here both are a ``ValueError`` in plain words, so a caller's ``except ValueError`` reads either as a file
-it cannot read, and says why."""
+A number that is not finite: ``1e400`` reads as infinity, and ``NaN``, ``Infinity`` and ``-Infinity``, which
+are no JSON, are read as floats. No writer of this package can write such a value back, and a JavaScript
+reader serves it as ``null``.
+
+Here each is a ``ValueError`` in plain words that is no ``json.JSONDecodeError``, so a caller's
+``except ValueError`` reads it as a file it cannot read, and says why; a caller that must tell text that is
+no JSON from JSON this reader refuses catches the decode error first."""
 
 from __future__ import annotations
 
 import json
+import math
 import sys
 from typing import Any
 
@@ -24,6 +30,17 @@ from typing import Any
 MAX_DEPTH = 200
 
 _TOO_DEEP = f"nested more than {MAX_DEPTH} deep"
+
+
+def _float(text: str) -> float:
+    value = float(text)
+    if not math.isfinite(value):
+        raise ValueError("a number too large to read")
+    return value
+
+
+def _constant(token: str) -> Any:
+    raise ValueError(f"{token} is not JSON")
 
 
 def _int(text: str) -> int:
@@ -51,8 +68,10 @@ def _too_deep(value: Any) -> bool:
 
 
 def loads(text: str, **kwargs: Any) -> Any:
-    """``json.loads(text, **kwargs)``, with the two cases above raised as ``ValueError``."""
+    """``json.loads(text, **kwargs)``, with the cases above raised as ``ValueError``."""
     kwargs.setdefault("parse_int", _int)
+    kwargs.setdefault("parse_float", _float)
+    kwargs.setdefault("parse_constant", _constant)
     try:
         value = json.loads(text, **kwargs)
     except RecursionError:

@@ -59,6 +59,7 @@ means nothing to someone the world is handed to.
 from __future__ import annotations
 
 import io
+import json
 import os
 import re
 import shutil
@@ -835,17 +836,34 @@ def _default_top(world: Mapping[str, Any]) -> str:
     return f"{slugify(name if isinstance(name, str) else None) or 'world'}-{str(world['id'])[:8]}"
 
 
-def _hidden_element_file(rel: str, src: Path) -> bool:
-    """An element file (a ``.json`` file directly in a type folder of ``elements/`` or legacy ``spatial/``)
-    whose JSON object carries the hidden mark at the top level (``folder.is_hidden``). A file anywhere
-    else, or that is not a JSON object, is not an element and is carried as it is, as ever."""
+def _element_body(rel: str, src: Path, to: str) -> Any:
+    """What an element file holds (a ``.json`` file directly in a type folder of ``elements/`` or legacy
+    ``spatial/``), for a writer that must read it ``to`` leave something out. None for a file anywhere else,
+    or one that is not UTF-8 JSON: no reader takes that as an element, and it is carried as it is, as ever.
+
+    A file that is JSON this package's reader refuses (nested past its depth, a number it cannot hold) raises
+    ``ValueError``: what it holds cannot be read, so the writer leaves nothing in by guess, as with a records
+    manifest it cannot read (OW-8)."""
     segs = rel.split("/")
     if len(segs) != 3 or segs[0] not in (ELEMENTS_DIR, LEGACY_SPATIAL_DIR) or not rel.lower().endswith(".json"):
-        return False
+        return None
     try:
-        body = _outside_json.loads(src.read_bytes().decode("utf-8-sig"))
-    except (UnicodeDecodeError, ValueError):
-        return False
+        return _outside_json.loads(src.read_bytes().decode("utf-8-sig"))
+    except (UnicodeDecodeError, json.JSONDecodeError):
+        return None
+    except ValueError as exc:
+        raise ValueError(
+            f"{src} cannot be read ({exc}), so the writer cannot {to} and carries nothing by guess. Fix or "
+            "remove the file, or pass include_hidden=True and include_author_fields=True to carry every file "
+            "as it is."
+        ) from None
+
+
+def _hidden_element_file(rel: str, src: Path) -> bool:
+    """An element file whose JSON object carries the hidden mark at the top level (``folder.is_hidden``).
+    A file that is not an element file, or not a JSON object, is carried as it is, as ever; one the reader
+    refuses raises (``_element_body``)."""
+    body = _element_body(rel, src, "tell whether it is hidden")
     return isinstance(body, dict) and is_hidden(body)
 
 
@@ -859,14 +877,9 @@ def _without_author_fields(rel: str, src: Path) -> bytes | None:
     as the TypeScript writer reads one) without its author fields, in the folder's own form
     (``_jsonfmt.encode``: two-space indent, a trailing newline, the other keys in their order), or
     None when it holds none of them or is not a JSON object: then it travels byte for byte. Only
-    top-level keys go; an ``x_*`` value that holds one of the names is the extension's, and stays."""
-    segs = rel.split("/")
-    if len(segs) != 3 or segs[0] not in (ELEMENTS_DIR, LEGACY_SPATIAL_DIR) or not rel.lower().endswith(".json"):
-        return None
-    try:
-        body = _outside_json.loads(src.read_bytes().decode("utf-8").removeprefix(_BOM), parse_constant=_reject_constant)
-    except ValueError:  # not UTF-8, or not JSON
-        return None
+    top-level keys go; an ``x_*`` value that holds one of the names is the extension's, and stays.
+    A file the reader refuses raises (``_element_body``): its author fields cannot be told from its bytes."""
+    body = _element_body(rel, src, "take out its author fields")
     if not isinstance(body, dict) or not any(k in body for k in _AUTHOR_FIELDS):
         return None
     return encode({k: v for k, v in body.items() if k not in _AUTHOR_FIELDS})

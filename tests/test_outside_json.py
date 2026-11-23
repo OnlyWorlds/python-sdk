@@ -1,17 +1,23 @@
 """Text this package did not write (a folder's file, an archive, another tool's export) is parsed through
-``_outside_json.loads``: two inputs that are JSON by the grammar must come back as a ``ValueError`` a reader
-catches, never a traceback. And every ``json.loads`` in the package is either that one or named here."""
+``_outside_json.loads``: JSON it cannot hold as written (nested past its depth, an integer past Python's
+digit limit, a number that is not finite) must come back as a ``ValueError`` a reader catches, never a
+traceback and never a value the file does not hold. A writer that must read a file to leave something out
+refuses to write when the reader refuses the file. And every ``json.loads`` in the package is either that
+one or named here."""
 
 from __future__ import annotations
 
 import ast
 import json
+import zipfile
 from pathlib import Path
 
 import pytest
 
 from onlyworlds import _outside_json, read_folder, write_folder
 from onlyworlds.folder import FORMAT_VERSION
+from onlyworlds.kanka import import_kanka
+from onlyworlds.worldfile import read_world_file, world_file_bytes, write_world_file
 
 SRC = Path(__file__).resolve().parent.parent / "src" / "onlyworlds"
 DEEP = "[" * 100_000 + "]" * 100_000
@@ -19,7 +25,12 @@ LONG = "7" * 4301
 
 
 def test_what_json_reads_it_reads_the_same() -> None:
-    for text in ('{"a": [1, 2.5, -3, 1e400, "x", null, true]}', "12345678901234567890", "-" + "7" * 4300, "[[[[1]]]]"):
+    for text in (
+        '{"a": [1, 2.5, -3, 1.7976931348623157e308, "x", null, true]}',
+        "12345678901234567890",
+        "-" + "7" * 4300,
+        "[[[[1]]]]",
+    ):
         assert _outside_json.loads(text) == json.loads(text)
     assert _outside_json.loads("1", parse_int=float) == 1.0
 
@@ -32,6 +43,11 @@ def test_what_json_reads_it_reads_the_same() -> None:
         (LONG, "a number of more than 4300 digits"),
         ("-" + LONG, "a number of more than 4300 digits"),
         ('{"a": [' + LONG + "]}", "a number of more than 4300 digits"),
+        ("1e400", "a number too large to read"),
+        ('{"a": [1, {"b": -1e999}]}', "a number too large to read"),
+        ('{"a": NaN}', "NaN is not JSON"),
+        ("[Infinity]", "Infinity is not JSON"),
+        ("-Infinity", "-Infinity is not JSON"),
     ],
 )
 def test_too_deep_and_too_long_are_value_errors_in_plain_words(text: str, why: str) -> None:
@@ -63,7 +79,12 @@ def test_text_that_is_not_json_is_still_a_decode_error() -> None:
 
 
 @pytest.mark.parametrize(
-    ("value", "why"), [(DEEP, "nested more than 200 deep"), (LONG, "a number of more than 4300 digits")]
+    ("value", "why"),
+    [
+        (DEEP, "nested more than 200 deep"),
+        (LONG, "a number of more than 4300 digits"),
+        ("1e400", "a number too large to read"),
+    ],
 )
 def test_the_folder_reader_skips_such_a_file_with_the_reason(tmp_path: Path, value: str, why: str) -> None:
     eid = "l0000000-0000-7000-8000-000000000001"
@@ -106,4 +127,119 @@ def test_every_json_loads_is_the_outside_reader_or_named() -> None:
     assert len(files) > 40  # the search saw the package
     assert {p.name: calls(p, "json") for p in files if calls(p, "json")} == NAMED
     used = {p.name: calls(p, "_outside_json") for p in files if calls(p, "_outside_json")}
-    assert used == {"folder.py": 1, "kanka.py": 1, "legendkeeper.py": 2, "lint.py": 1, "worldfile.py": 4}
+    assert used == {"folder.py": 1, "kanka.py": 1, "legendkeeper.py": 2, "lint.py": 1, "worldfile.py": 3}
+
+
+# --- a writer that must read a file to leave something out ------------------------------------------------
+
+#: What stands where a key's value goes in a hidden element's file, and whether the reader holds the file.
+REFUSED = {
+    "nested 201 deep": "[" * 200 + "]" * 200,
+    "nested 100,000 deep": DEEP,
+    "an integer of 4,301 digits": LONG,
+    "a number past the largest double": "1e400",
+    "NaN": "NaN",
+}
+
+
+def _folder_with_hidden(root: Path, planted: str) -> tuple[Path, bytes]:
+    """A folder of two elements; the second is hidden, names who changed it, and holds ``planted``."""
+    world = {"id": "w0000000-0000-7000-8000-000000000000", "name": "W", "format_version": FORMAT_VERSION}
+    write_folder(root, world, {"character": [{"id": "c-1", "name": "Bo"}]})
+    secret = root / "elements" / "character" / "cy--c-2.json"
+    data = ('{"id": "c-2", "name": "Cy", "hidden": true, "changed_by": "m-1", "x": ' + planted + "}").encode()
+    secret.write_bytes(data)
+    return secret, data
+
+
+@pytest.mark.parametrize("planted", REFUSED.values(), ids=REFUSED.keys())
+def test_a_share_is_refused_when_a_file_it_must_read_cannot_be_held(tmp_path: Path, planted: str) -> None:
+    """0.142.0 carried such a hidden element into a share with its author fields: the reader refused the file,
+    and the writer took the refusal for "not an element"."""
+    secret, data = _folder_with_hidden(tmp_path / "w", planted)
+    out = tmp_path / "share.owworld"
+    # A share, a plain copy (author fields left out by default), and the hidden mark alone.
+    for hidden, authors in ((False, False), (True, False), (False, True)):
+        with pytest.raises(ValueError, match="carries nothing by guess") as err:
+            write_world_file(tmp_path / "w", out, include_hidden=hidden, include_author_fields=authors)
+        assert not isinstance(err.value, json.JSONDecodeError)
+        assert str(secret) in str(err.value) and not out.exists()
+    # A copy that leaves nothing out reads nothing, and carries the file byte for byte.
+    whole = read_world_file(world_file_bytes(tmp_path / "w", include_author_fields=True)).entries
+    assert whole["elements/character/cy--c-2.json"] == data
+
+
+def test_a_share_leaves_out_a_hidden_element_at_the_depth_line_and_carries_text_that_is_no_json(tmp_path: Path) -> None:
+    secret, _ = _folder_with_hidden(tmp_path / "w", "[" * 199 + "]" * 199)
+    left: list[str] = []
+    share = read_world_file(world_file_bytes(tmp_path / "w", include_hidden=False, hidden_left_out=left)).entries
+    assert left == ["elements/character/cy--c-2.json"] and "elements/character/cy--c-2.json" not in share
+    # Text that is no JSON is no element to any reader: carried as it is, as ever.
+    secret.write_bytes(b'{"id": "c-2", "hidden": true, ')
+    left = []
+    share = read_world_file(world_file_bytes(tmp_path / "w", include_hidden=False, hidden_left_out=left)).entries
+    assert left == [] and share["elements/character/cy--c-2.json"] == b'{"id": "c-2", "hidden": true, '
+
+
+# --- the Kanka door ----------------------------------------------------------------------------------------
+
+KANKA = Path(__file__).resolve().parent / "fixtures" / "kanka" / "quay-export-world_20261025_011029.zip"
+ENTITY = "characters/your-character-name_10074596.json"
+
+
+def _export_with(tmp_path: Path, name: str, change: str | None) -> Path:
+    """The export with ``change`` put in the entity's object as a new key's value; None cuts its last brace."""
+    out = tmp_path / f"{name}.zip"
+    with zipfile.ZipFile(KANKA) as src, zipfile.ZipFile(out, "w", zipfile.ZIP_DEFLATED) as dst:
+        for info in src.infolist():
+            data = src.read(info.filename)
+            if info.filename == ENTITY:
+                text = data.decode("utf-8").rstrip()
+                assert text.endswith("}")
+                data = (text[:-1] if change is None else text[:-1] + ',"x_planted":' + change + "}").encode()
+            dst.writestr(info.filename, data)
+    return out
+
+
+def _door(path: Path) -> tuple[dict[str, int], list[str]]:
+    """What the door would write, by type, and its notes."""
+    report = import_kanka(path, None, plan_only=True)
+    return dict(report.counts), list(report.notes)
+
+
+#: [the planted value, the error class the note names, or None when the file is read]
+KANKA_CASES: dict[str, tuple[str, str | None]] = {
+    "nested 200 deep, the line": ("[" * 199 + "]" * 199, None),
+    "nested 201 deep, one past it": ("[" * 200 + "]" * 200, "ValueError"),
+    "nested 100,000 deep": (DEEP, "ValueError"),
+    "an integer of 4,301 digits": (LONG, "ValueError"),
+    "a number past the largest double": ("1e400", "ValueError"),
+    "NaN": ("NaN", "ValueError"),
+    "-Infinity": ("-Infinity", "ValueError"),
+    "2^53 - 1": ("9007199254740991", None),
+    # The one difference from the npm SDK's door, which skips these two: Python holds the integer exactly.
+    "2^53 + 1": ("9007199254740993", None),
+    "an integer of 4,300 digits": ("9" * 4300, None),
+}
+
+
+def test_the_kanka_door_skips_a_file_it_cannot_hold_with_a_note_as_one_that_is_no_json(tmp_path: Path) -> None:
+    whole = _door(KANKA)
+    broken = _door(_export_with(tmp_path, "broken", None))
+    assert [n for n in broken[1] if n.startswith(ENTITY)] == [f"{ENTITY}: not readable JSON (JSONDecodeError); skipped"]
+    assert broken[0] != whole[0]
+    for n, (name, (planted, error)) in enumerate(KANKA_CASES.items()):
+        got = _door(_export_with(tmp_path, f"case-{n}", planted))
+        if error is None:
+            assert got == whole, name
+        else:
+            assert got[0] == broken[0], name
+            assert got[1] == [note.replace("(JSONDecodeError)", f"({error})") for note in broken[1]], name
+
+
+def test_the_kanka_door_writes_no_file_holding_a_number_the_export_does_not(tmp_path: Path) -> None:
+    out = tmp_path / "world"
+    import_kanka(_export_with(tmp_path, "inf", "1e400"), out)
+    written = sorted(out.rglob("*.json"))
+    assert len(written) > 10
+    assert not any("Infinity" in p.read_text(encoding="utf-8") for p in written)
