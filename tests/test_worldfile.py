@@ -590,23 +590,28 @@ def test_a_hidden_element_travels_byte_for_byte_unless_the_file_is_a_share(tmp_p
         "elements/character/cy--c-2.json": secret,
         "elements/character/dee--c-3.json": encode({"id": "c-3", "name": "Dee", "hidden": False}),
         "spatial/pin/p--p-1.json": encode({"id": "p-1", "name": "P", "hidden": True}),
-        "elements/character/notes.json": b"[1, 2]",  # not an element object: carried as ever
+        "elements/character/notes.json": b"[1, 2]",  # not an element object: a copy carries it, a share cannot read it
         "media/hidden.json": encode({"hidden": True}),  # not an element file
     }
     src = make_folder(tmp_path / "w", files)
     kept = read_world_file(world_file_bytes(src)).entries
     assert kept["elements/character/cy--c-2.json"] == secret and len(kept) == len(files)
     left: list[str] = []
-    share = world_file_bytes(src, include_hidden=False, hidden_left_out=left)
+    unread: list[str] = []
+    share = world_file_bytes(src, include_hidden=False, hidden_left_out=left, unread_left_out=unread)
     assert left == ["elements/character/cy--c-2.json", "spatial/pin/p--p-1.json"]
+    assert unread == ["elements/character/notes.json"]  # listed apart from the hidden (since 0.144.0; carried before)
     entries = read_world_file(share).entries
-    assert set(kept) - set(entries) == set(left)
+    assert set(kept) - set(entries) == {*left, *unread}
     assert all(entries[p] == kept[p] for p in entries), "nothing else rewritten"
     assert b'"c-2"' in entries["elements/character/ann--c-1.json"]  # the link id dangles, as ruled
     assert world_file_bytes(src, include_hidden=False) == share and world_file_bytes(src) == world_file_bytes(src)
     again: list[str] = []
-    written = write_world_file(src, tmp_path / "share.owworld", include_hidden=False, hidden_left_out=again)
-    assert written.read_bytes() == share and again == left
+    again_unread: list[str] = []
+    written = write_world_file(
+        src, tmp_path / "share.owworld", include_hidden=False, hidden_left_out=again, unread_left_out=again_unread
+    )
+    assert written.read_bytes() == share and again == left and again_unread == unread
 
 
 def test_only_a_file_directly_in_a_type_folder_is_an_element_for_the_hidden_mark(tmp_path: Path) -> None:
@@ -704,15 +709,19 @@ def test_author_fields_a_share_and_a_tools_dot_folder(tmp_path: Path) -> None:
         },
     )
     left: list[str] = []
-    share = world_file_bytes(src, private_dir=".atlas", include_hidden=False, hidden_left_out=left)
+    unread: list[str] = []
+    share = world_file_bytes(
+        src, private_dir=".atlas", include_hidden=False, hidden_left_out=left, unread_left_out=unread
+    )
     out = read_world_file(share).entries
     assert left == ["elements/character/ada.json"]
+    assert unread == ["elements/character/latin.json"]  # not UTF-8: its mark cannot be told
     assert list(out) == [
         ".atlas/elements/character/c.json",
         "elements/character/bo.json",
-        "elements/character/latin.json",
         "world.json",
     ]
+    copy = read_world_file(world_file_bytes(src, private_dir=".atlas")).entries
+    assert copy["elements/character/latin.json"] == b'{"\xe9":1}'  # a copy carries it byte for byte
     assert out["elements/character/bo.json"] == encode({"id": "b"})
     assert out[".atlas/elements/character/c.json"] == encode({"id": "c", "created_by": "u"})
-    assert out["elements/character/latin.json"] == b'{"\xe9":1}', "not UTF-8: travels as it is"

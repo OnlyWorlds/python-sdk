@@ -59,7 +59,6 @@ means nothing to someone the world is handed to.
 from __future__ import annotations
 
 import io
-import json
 import os
 import re
 import shutil
@@ -836,35 +835,28 @@ def _default_top(world: Mapping[str, Any]) -> str:
     return f"{slugify(name if isinstance(name, str) else None) or 'world'}-{str(world['id'])[:8]}"
 
 
-def _element_body(rel: str, src: Path, to: str) -> Any:
-    """What an element file holds (a ``.json`` file directly in a type folder of ``elements/`` or legacy
-    ``spatial/``), for a writer that must read it ``to`` leave something out. None for a file anywhere else,
-    or one that is not UTF-8 JSON: no reader takes that as an element, and it is carried as it is, as ever.
+class _Unread:
+    """An element file the writer could not read as an element."""
 
-    A file that is JSON this package's reader refuses (nested past its depth, a number it cannot hold) raises
-    ``ValueError``: what it holds cannot be read, so the writer leaves nothing in by guess, as with a records
-    manifest it cannot read (OW-8)."""
+
+_UNREAD = _Unread()
+
+
+def _element_body(rel: str, src: Path) -> dict[str, Any] | _Unread | None:
+    """What an element file holds (a ``.json`` file directly in a type folder of ``elements/`` or legacy
+    ``spatial/``): its JSON object. None for a file anywhere else, which is no element file.
+
+    ``_UNREAD`` for a file there that could not be read as an element: not UTF-8, not JSON (a write cut
+    short), JSON this package's reader refuses (nested past its depth, a number it cannot hold), or not an
+    object. What such a file holds cannot be told, its hidden mark included."""
     segs = rel.split("/")
     if len(segs) != 3 or segs[0] not in (ELEMENTS_DIR, LEGACY_SPATIAL_DIR) or not rel.lower().endswith(".json"):
         return None
     try:
-        return _outside_json.loads(src.read_bytes().decode("utf-8-sig"))
-    except (UnicodeDecodeError, json.JSONDecodeError):
-        return None
-    except ValueError as exc:
-        raise ValueError(
-            f"{src} cannot be read ({exc}), so the writer cannot {to} and carries nothing by guess. Fix or "
-            "remove the file, or pass include_hidden=True and include_author_fields=True to carry every file "
-            "as it is."
-        ) from None
-
-
-def _hidden_element_file(rel: str, src: Path) -> bool:
-    """An element file whose JSON object carries the hidden mark at the top level (``folder.is_hidden``).
-    A file that is not an element file, or not a JSON object, is carried as it is, as ever; one the reader
-    refuses raises (``_element_body``)."""
-    body = _element_body(rel, src, "tell whether it is hidden")
-    return isinstance(body, dict) and is_hidden(body)
+        body = _outside_json.loads(src.read_bytes().decode("utf-8-sig"))
+    except ValueError:  # not UTF-8, not JSON, or JSON the reader refuses
+        return _UNREAD
+    return body if isinstance(body, dict) else _UNREAD
 
 
 #: Which member and which tool wrote an element (a membership id, a door): nothing to someone the
@@ -876,10 +868,9 @@ def _without_author_fields(rel: str, src: Path) -> bytes | None:
     """An element file (``.json`` directly in a type folder of ``elements/`` or legacy ``spatial/``,
     as the TypeScript writer reads one) without its author fields, in the folder's own form
     (``_jsonfmt.encode``: two-space indent, a trailing newline, the other keys in their order), or
-    None when it holds none of them or is not a JSON object: then it travels byte for byte. Only
-    top-level keys go; an ``x_*`` value that holds one of the names is the extension's, and stays.
-    A file the reader refuses raises (``_element_body``): its author fields cannot be told from its bytes."""
-    body = _element_body(rel, src, "take out its author fields")
+    None when it holds none of them or could not be read as an element: then it travels byte for byte.
+    Only top-level keys go; an ``x_*`` value that holds one of the names is the extension's, and stays."""
+    body = _element_body(rel, src)
     if not isinstance(body, dict) or not any(k in body for k in _AUTHOR_FIELDS):
         return None
     return encode({k: v for k, v in body.items() if k not in _AUTHOR_FIELDS})
@@ -893,6 +884,7 @@ def _plan(
     include_hidden: bool = True,
     hidden_left_out: list[str] | None = None,
     include_author_fields: bool = False,
+    unread_left_out: list[str] | None = None,
 ) -> tuple[str, list[tuple[str, Path | bytes]]]:
     root = Path(folder)
     if not root.is_dir():
@@ -916,11 +908,23 @@ def _plan(
 
         files = {rel: src for rel, src in files.items() if not in_private(rel)}
     if not include_hidden:
-        # A share (§4.8): each hidden element's file left out whole; nothing else rewritten.
-        hidden = sorted(rel for rel, src in files.items() if _hidden_element_file(rel, src))
-        files = {rel: src for rel, src in files.items() if rel not in set(hidden)}
+        # A share (§4.8): it carries an element file only when it was read as an element and no mark was
+        # found. A hidden element's file is left out whole, and so is one that could not be read, listed
+        # apart; nothing else is rewritten.
+        hidden: list[str] = []
+        unread: list[str] = []
+        for rel in sorted(files):
+            body = _element_body(rel, files[rel])
+            if isinstance(body, _Unread):
+                unread.append(rel)
+            elif body is not None and is_hidden(body):
+                hidden.append(rel)
+        left = {*hidden, *unread}
+        files = {rel: src for rel, src in files.items() if rel not in left}
         if hidden_left_out is not None:
             hidden_left_out.extend(hidden)
+        if unread_left_out is not None:
+            unread_left_out.extend(unread)
     raw = files[WORLD_FILE].read_bytes()
     world_bytes, world = _without_link(raw, _parse_world(raw))
     top = _default_top(world) if top_dir is None else top_dir
@@ -983,13 +987,21 @@ def world_file_bytes(
     include_hidden: bool = True,
     hidden_left_out: list[str] | None = None,
     include_author_fields: bool = False,
+    unread_left_out: list[str] | None = None,
 ) -> bytes:
     """The world file for the folder at ``folder``, as bytes. See ``write_world_file``: the
     same keywords, the same refusals, private records left out unless
     ``include_private_records=True``, hidden elements kept unless ``include_hidden=False``,
     author fields left out unless ``include_author_fields=True``."""
     top, plan = _plan(
-        folder, top_dir, private_dir, include_private_records, include_hidden, hidden_left_out, include_author_fields
+        folder,
+        top_dir,
+        private_dir,
+        include_private_records,
+        include_hidden,
+        hidden_left_out,
+        include_author_fields,
+        unread_left_out,
     )
     buf = io.BytesIO()
     _write(buf, top, plan)
@@ -1006,6 +1018,7 @@ def write_world_file(
     include_hidden: bool = True,
     hidden_left_out: list[str] | None = None,
     include_author_fields: bool = False,
+    unread_left_out: list[str] | None = None,
 ) -> Path:
     """Write the folder at ``folder`` as one world file at ``path``; returns ``path``.
 
@@ -1035,7 +1048,12 @@ def write_world_file(
       passes, receives each left-out file's path inside the folder (``elements/character/x.json``),
       sorted, and its length is the count. Nothing else is rewritten: a visible element that links
       to a hidden one keeps the id, which dangles in the file (a reader meets it as a link to an
-      element the world does not hold).
+      element the world does not hold). A share carries a file in a type folder only when it
+      was read as an element and no mark was found: one that could not be read (not UTF-8 JSON, a
+      write cut short, nested more than 200 deep, a number that is not finite, not an object) is
+      left out too, since its mark cannot be told, and ``unread_left_out``, a second list the
+      caller passes, receives those paths, sorted. They are counted apart: a broken file is one a
+      person may want to mend. A copy carries such a file byte for byte.
     - Author fields are left out: ``created_by``, ``changed_by``, ``changed_via``,
       ``changed_client`` and ``doors`` record which member and which tool wrote each element (a
       membership id, a door), which means nothing to someone the world is handed to, so every
@@ -1062,7 +1080,14 @@ def write_world_file(
     a crash never leaves half a file.
     """
     top, plan = _plan(
-        folder, top_dir, private_dir, include_private_records, include_hidden, hidden_left_out, include_author_fields
+        folder,
+        top_dir,
+        private_dir,
+        include_private_records,
+        include_hidden,
+        hidden_left_out,
+        include_author_fields,
+        unread_left_out,
     )
     target = Path(path)
     tmp = target.parent / f".{target.name}.tmp-{uuid.uuid4().hex[:8]}"

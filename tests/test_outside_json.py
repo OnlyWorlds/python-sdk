@@ -1,9 +1,9 @@
 """Text this package did not write (a folder's file, an archive, another tool's export) is parsed through
 ``_outside_json.loads``: JSON it cannot hold as written (nested past its depth, an integer past Python's
 digit limit, a number that is not finite) must come back as a ``ValueError`` a reader catches, never a
-traceback and never a value the file does not hold. A writer that must read a file to leave something out
-refuses to write when the reader refuses the file. And every ``json.loads`` in the package is either that
-one or named here."""
+traceback and never a value the file does not hold. The world file's writer leaves a file it could not read
+as an element out of a share, listed apart from the hidden, and carries it byte for byte in a copy. And every
+``json.loads`` in the package is either that one or named here."""
 
 from __future__ import annotations
 
@@ -17,7 +17,7 @@ import pytest
 from onlyworlds import _outside_json, read_folder, write_folder
 from onlyworlds.folder import FORMAT_VERSION
 from onlyworlds.kanka import import_kanka
-from onlyworlds.worldfile import read_world_file, world_file_bytes, write_world_file
+from onlyworlds.worldfile import read_world_file, world_file_bytes
 
 SRC = Path(__file__).resolve().parent.parent / "src" / "onlyworlds"
 DEEP = "[" * 100_000 + "]" * 100_000
@@ -132,7 +132,7 @@ def test_every_json_loads_is_the_outside_reader_or_named() -> None:
 
 # --- a writer that must read a file to leave something out ------------------------------------------------
 
-#: What stands where a key's value goes in a hidden element's file, and whether the reader holds the file.
+#: What stands where a key's value goes in a hidden element's file that the reader does not hold.
 REFUSED = {
     "nested 201 deep": "[" * 200 + "]" * 200,
     "nested 100,000 deep": DEEP,
@@ -153,32 +153,50 @@ def _folder_with_hidden(root: Path, planted: str) -> tuple[Path, bytes]:
 
 
 @pytest.mark.parametrize("planted", REFUSED.values(), ids=REFUSED.keys())
-def test_a_share_is_refused_when_a_file_it_must_read_cannot_be_held(tmp_path: Path, planted: str) -> None:
+def test_a_share_leaves_out_a_file_it_could_not_read_and_a_copy_carries_it(tmp_path: Path, planted: str) -> None:
     """0.142.0 carried such a hidden element into a share with its author fields: the reader refused the file,
-    and the writer took the refusal for "not an element"."""
+    and the writer took the refusal for "not an element". 0.143.0 refused the write. As ruled since: a share
+    carries a file in a type folder only when it was read as an element and no mark was found."""
     secret, data = _folder_with_hidden(tmp_path / "w", planted)
-    out = tmp_path / "share.owworld"
-    # A share, a plain copy (author fields left out by default), and the hidden mark alone.
-    for hidden, authors in ((False, False), (True, False), (False, True)):
-        with pytest.raises(ValueError, match="carries nothing by guess") as err:
-            write_world_file(tmp_path / "w", out, include_hidden=hidden, include_author_fields=authors)
-        assert not isinstance(err.value, json.JSONDecodeError)
-        assert str(secret) in str(err.value) and not out.exists()
-    # A copy that leaves nothing out reads nothing, and carries the file byte for byte.
-    whole = read_world_file(world_file_bytes(tmp_path / "w", include_author_fields=True)).entries
-    assert whole["elements/character/cy--c-2.json"] == data
+    rel = "elements/character/cy--c-2.json"
+    hidden: list[str] = []
+    unread: list[str] = []
+    share = read_world_file(
+        world_file_bytes(tmp_path / "w", include_hidden=False, hidden_left_out=hidden, unread_left_out=unread)
+    ).entries
+    assert rel not in share
+    assert (hidden, unread) == ([], [rel]), "listed apart from the hidden"
+    # A copy carries it byte for byte, with author fields left out of the others (the default) or not.
+    for authors in (False, True):
+        whole = read_world_file(world_file_bytes(tmp_path / "w", include_author_fields=authors)).entries
+        assert whole[rel] == data
+    assert secret.read_bytes() == data
 
 
-def test_a_share_leaves_out_a_hidden_element_at_the_depth_line_and_carries_text_that_is_no_json(tmp_path: Path) -> None:
+def test_a_share_at_the_depth_line_and_on_text_that_is_no_json(tmp_path: Path) -> None:
     secret, _ = _folder_with_hidden(tmp_path / "w", "[" * 199 + "]" * 199)
-    left: list[str] = []
-    share = read_world_file(world_file_bytes(tmp_path / "w", include_hidden=False, hidden_left_out=left)).entries
-    assert left == ["elements/character/cy--c-2.json"] and "elements/character/cy--c-2.json" not in share
-    # Text that is no JSON is no element to any reader: carried as it is, as ever.
-    secret.write_bytes(b'{"id": "c-2", "hidden": true, ')
-    left = []
-    share = read_world_file(world_file_bytes(tmp_path / "w", include_hidden=False, hidden_left_out=left)).entries
-    assert left == [] and share["elements/character/cy--c-2.json"] == b'{"id": "c-2", "hidden": true, '
+    rel = "elements/character/cy--c-2.json"
+    hidden: list[str] = []
+    unread: list[str] = []
+    share = read_world_file(
+        world_file_bytes(tmp_path / "w", include_hidden=False, hidden_left_out=hidden, unread_left_out=unread)
+    ).entries
+    assert (hidden, unread) == ([rel], []) and rel not in share, "read at the line: hidden, left out as hidden"
+    # A hidden element's file cut short: no JSON, so its mark cannot be told. Left out of a share, carried by a copy.
+    cut = b'{"id": "c-2", "hidden": true, '
+    secret.write_bytes(cut)
+    for broken in (cut, b"[1, 2]", b'{"\xe9":1}'):
+        secret.write_bytes(broken)
+        hidden, unread = [], []
+        share = read_world_file(
+            world_file_bytes(tmp_path / "w", include_hidden=False, hidden_left_out=hidden, unread_left_out=unread)
+        ).entries
+        assert (hidden, unread) == ([], [rel]) and rel not in share
+        assert read_world_file(world_file_bytes(tmp_path / "w")).entries[rel] == broken
+    # Without the lists the same bytes are written.
+    assert world_file_bytes(tmp_path / "w", include_hidden=False) == world_file_bytes(
+        tmp_path / "w", include_hidden=False, unread_left_out=[]
+    )
 
 
 # --- the Kanka door ----------------------------------------------------------------------------------------
