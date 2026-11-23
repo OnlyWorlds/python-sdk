@@ -317,6 +317,19 @@ def test_read_ow_link_at_answers_the_reading_and_its_end() -> None:
         read_ow_link_at(text, 1.0)  # type: ignore[arg-type]
 
 
+# int() raises a plain ValueError on a string of more than 4,300 digits (sys.get_int_max_str_digits()), which no
+# reader of prose catches: a moment's length is read before the run is converted, so the refusal is the parser's own.
+@pytest.mark.parametrize("step", ["7" * 12, "7" * 4301, "-" + "7" * 4301, "7" * 100_000])
+def test_a_moment_too_long_to_be_a_step_is_refused_before_it_is_converted(step: str) -> None:
+    base = f"ow://object/{E}"
+    with pytest.raises(AddressError) as err:
+        parse_ow_link(f"{base}@{step}")
+    assert err.value.reason == "bad_moment"
+    found = read_ow_link_at(f"{base}@{step}")
+    assert found is not None and found.end == len(base) and found.reading.moment is None
+    assert [(f.start, f.end) for f in find_ow_links(f"See {base}@{step}.")] == [(4, 4 + len(base))]
+
+
 # What stands before ow:// (since serial 127): a letter of any
 # script, a combining mark or an underscore glues the start into a word, the same set as the cut after a
 # run; a hyphen or a digit does not.
