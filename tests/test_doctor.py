@@ -2284,7 +2284,7 @@ def _body(element_id: str, extra: str) -> str:
     [
         ('{"id": ', "unparseable JSON"),  # a file cut off mid-write
         (_body(L1, '"x_count": ' + "7" * 4301), "a number of more than 4300 digits"),
-        (_body(L1, '"x_deep": ' + "[" * 100_000 + "]" * 100_000), "nested too deep to read"),
+        (_body(L1, '"x_deep": ' + "[" * 100_000 + "]" * 100_000), "nested more than 200 deep"),
         ("[]", "not a JSON object"),
         ('{"name": "Harbor"}', "no id: not an element"),
     ],

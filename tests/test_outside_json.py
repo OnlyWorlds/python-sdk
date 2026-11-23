@@ -27,8 +27,8 @@ def test_what_json_reads_it_reads_the_same() -> None:
 @pytest.mark.parametrize(
     ("text", "why"),
     [
-        (DEEP, "nested too deep to read"),
-        ('{"a": ' + DEEP + "}", "nested too deep to read"),
+        (DEEP, "nested more than 200 deep"),
+        ('{"a": ' + DEEP + "}", "nested more than 200 deep"),
         (LONG, "a number of more than 4300 digits"),
         ("-" + LONG, "a number of more than 4300 digits"),
         ('{"a": [' + LONG + "]}", "a number of more than 4300 digits"),
@@ -41,13 +41,29 @@ def test_too_deep_and_too_long_are_value_errors_in_plain_words(text: str, why: s
     assert "set_int_max_str_digits" not in str(err.value)
 
 
+def test_the_depth_refused_is_one_number_on_every_platform() -> None:
+    def nest(depth: int, open_: str, close: str) -> str:
+        return open_ * depth + close * depth
+
+    assert _outside_json.MAX_DEPTH == 200
+    for open_, close in (("[", "]"), ('{"a": ', "}")):
+        inner = "1" if open_ != "[" else ""
+        text = open_ * 200 + inner + close * 200
+        assert _outside_json.loads(text) == json.loads(text)
+        with pytest.raises(ValueError, match="nested more than 200 deep"):
+            _outside_json.loads(open_ * 201 + inner + close * 201)
+    assert _outside_json.loads('{"a": ' + nest(199, "[", "]") + "}") is not None
+    with pytest.raises(ValueError, match="nested more than 200 deep"):
+        _outside_json.loads('{"a": ' + nest(200, "[", "]") + "}")
+
+
 def test_text_that_is_not_json_is_still_a_decode_error() -> None:
     with pytest.raises(json.JSONDecodeError):
         _outside_json.loads('{"id": ')
 
 
 @pytest.mark.parametrize(
-    ("value", "why"), [(DEEP, "nested too deep to read"), (LONG, "a number of more than 4300 digits")]
+    ("value", "why"), [(DEEP, "nested more than 200 deep"), (LONG, "a number of more than 4300 digits")]
 )
 def test_the_folder_reader_skips_such_a_file_with_the_reason(tmp_path: Path, value: str, why: str) -> None:
     eid = "l0000000-0000-7000-8000-000000000001"

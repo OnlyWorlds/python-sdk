@@ -1,16 +1,29 @@
 """``json.loads`` for text this package did not write: a world folder's file, an archive, another tool's export.
 
-Two inputs that are JSON by the grammar make ``json.loads`` raise something its callers do not expect.
-A value nested thousands deep raises ``RecursionError``, which is no ``ValueError``, so every reader
-that catches "not JSON" let it through as a traceback. An integer of more than 4,300 digits raises a
-plain ``ValueError`` whose message advises a Python setting. Here both are a ``ValueError`` in plain
-words, so a caller's ``except ValueError`` reads either as a file it cannot read, and says why."""
+Two inputs that are JSON by the grammar make ``json.loads`` do something its callers do not expect.
+
+A value nested very deep: where the interpreter's own limit is met first, ``json.loads`` raises
+``RecursionError``, which is no ``ValueError``, so every reader that catches "not JSON" let it through as
+a traceback. Where the limit is higher (Python 3.14 on Linux reads 100,000 levels), the value comes back
+whole and the next recursive walk over it fails instead. So the depth is refused here by one number,
+``MAX_DEPTH``, the same on every platform.
+
+An integer of more than 4,300 digits: a plain ``ValueError`` whose message advises a Python setting.
+
+Here both are a ``ValueError`` in plain words, so a caller's ``except ValueError`` reads either as a file
+it cannot read, and says why."""
 
 from __future__ import annotations
 
 import json
 import sys
 from typing import Any
+
+#: The deepest nesting read: a value at the top is depth 0, an object or array there depth 1, what it holds
+#: depth 2. No world data comes near it; every supported interpreter parses this deep.
+MAX_DEPTH = 200
+
+_TOO_DEEP = f"nested more than {MAX_DEPTH} deep"
 
 
 def _int(text: str) -> int:
@@ -20,10 +33,30 @@ def _int(text: str) -> int:
     return int(text)
 
 
+def _too_deep(value: Any) -> bool:
+    """Whether any object or array sits deeper than ``MAX_DEPTH``. A loop with its own stack, never recursion."""
+    stack: list[tuple[Any, int]] = [(value, 1)]
+    while stack:
+        item, depth = stack.pop()
+        if isinstance(item, dict):
+            children: Any = item.values()
+        elif isinstance(item, list):
+            children = item
+        else:
+            continue
+        if depth > MAX_DEPTH:
+            return True
+        stack.extend((child, depth + 1) for child in children if isinstance(child, (dict, list)))
+    return False
+
+
 def loads(text: str, **kwargs: Any) -> Any:
     """``json.loads(text, **kwargs)``, with the two cases above raised as ``ValueError``."""
     kwargs.setdefault("parse_int", _int)
     try:
-        return json.loads(text, **kwargs)
+        value = json.loads(text, **kwargs)
     except RecursionError:
-        raise ValueError("nested too deep to read") from None
+        raise ValueError(_TOO_DEEP) from None
+    if _too_deep(value):
+        raise ValueError(_TOO_DEEP)
+    return value
