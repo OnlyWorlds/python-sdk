@@ -4,6 +4,10 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+## 0.148.2 (2026-11-24)
+
+- **Fixed: a stored calendar no longer sets what one date label costs.** `format_step` collapsed the separators around an empty token with a regular expression that took cubic time on a long run of white space (a template with 1,000 spaces: about half a second for one label; 4,000 spaces: about a minute), and trimmed a label's edges with one that took quadratic time on a long run of commas; both are one pass now. A year was built as a list of every day on each call, so a month of 5,000,000 days cost seconds a label in `format_step`, `weekday_for_step`, `breakdown_step` and `parse_date`; a month is one run now, and each answer is arithmetic. Every answer is the same as before: the profile's fixture, the old and new builds compared on 7,071 steps of the fixture's calendars and of made ones (formats, weekdays, breakdowns and parses), and eight timed cases in `tests/fixtures/calendar-cost.cases.json`, the same bytes as the npm SDK's, each inside its bound. Not changed: a calendar with 1,500 eras still costs about 20 milliseconds a label, and one with 800 leap rules about a tenth of a second.
+
 ## 0.148.1 (2026-11-24)
 
 - **Fixed: `read_world_file` no longer refuses a world file whose world holds a tool's own `world.json` under a dot-folder** (`abbey/.atlas/world.json`, or deeper, `abbey/elements/character/.trash/world.json`). A dot-folder is never a world, wherever it sits, as the folder reader already had it: `read_folder` never reads a dot-folder. So the same world now opens as a file and as a folder. Only the check for a second `world.json` inside the world skips those paths; every other check still runs on their entries (paths, names, duplicates, collisions, size and count), and they are still returned in `entries`. A nested `world.json` outside a dot-folder and outside `records/` (`abbey/inner/world.json`) is still refused. This follows a ruling on the world-file conformance checks OW-4 and OW-5; the conformance case comes with the next schema distribution serial.

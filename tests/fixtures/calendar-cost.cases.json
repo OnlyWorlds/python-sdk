@@ -1,0 +1,62 @@
+{
+  "about": "Timed cases for the calendar renderer: a stored calendar must not set what one label costs. Each case is a calendar readCalendarConfig accepts, a step, a call (format: formatStep; weekday: weekdayForStep; roundtrip: formatStep, then parseDate of its label) and its words. A string written as {\"$repeat\": [[piece, times], ...]} is the pieces joined, each repeated. Before 4.201.2 and onlyworlds 0.148.2 the template collapse was cubic on a run of white space, the edge trim quadratic on a run of marks, and a year was built one entry a day: every case here ran past its bound on one of the two packages. Held byte for byte in the Python package's tests/fixtures.",
+  "underMs": 50,
+  "cases": [
+    {
+      "name": "a template with 4000 spaces before its last word",
+      "call": "format",
+      "step": 370,
+      "cfg": { "version": 1, "grain": "year", "format": { "$repeat": [["Year {year} {era}", 1], [" ", 4000], ["x", 1]] }, "eras": [{ "name": "Before Time", "abbrev": "BT", "start": 250, "direction": "down" }, { "name": "Years Since Landing", "abbrev": "YSL", "start": 250, "year_base": 0 }] },
+      "want": "Year 120 YSL x"
+    },
+    {
+      "name": "a template of one word and 3000 spaces",
+      "call": "format",
+      "step": 370,
+      "cfg": { "version": 1, "grain": "year", "format": { "$repeat": [["x", 1], [" ", 3000]] }, "eras": [{ "name": "Years Since Landing", "abbrev": "YSL", "start": 250, "year_base": 0 }] },
+      "want": "x"
+    },
+    {
+      "name": "a template with 20000 commas before its year",
+      "call": "format",
+      "step": 370,
+      "cfg": { "version": 1, "grain": "year", "format": { "$repeat": [["x", 1], [",", 20000], ["{year}", 1]] } },
+      "want": { "$repeat": [["x", 1], [",", 20000], ["370", 1]] }
+    },
+    {
+      "name": "a template with 20000 commas after its year",
+      "call": "format",
+      "step": 370,
+      "cfg": { "version": 1, "grain": "year", "format": { "$repeat": [["{year}", 1], [",", 20000], ["x", 1]] } },
+      "want": { "$repeat": [["370", 1], [",", 20000], ["x", 1]] }
+    },
+    {
+      "name": "a month name with 3000 spaces inside",
+      "call": "format",
+      "step": 3,
+      "cfg": { "version": 1, "grain": "day", "bundles": { "months": { "names": [{ "$repeat": [["A", 1], [" ", 3000], ["B", 1]] }, "C"], "lengths": [10, 10] } } },
+      "want": "4 A B, 0"
+    },
+    {
+      "name": "the last day of one month of 5000000 days",
+      "call": "format",
+      "step": 4999999,
+      "cfg": { "version": 1, "grain": "day", "bundles": { "months": { "names": ["Long"], "lengths": [5000000] } } },
+      "want": "5000000 Long, 0"
+    },
+    {
+      "name": "the weekday of the last day of one month of 5000000 days",
+      "call": "weekday",
+      "step": 4999999,
+      "cfg": { "version": 1, "grain": "day", "bundles": { "months": { "names": ["Long"], "lengths": [5000000] }, "week": { "length": 7, "names": ["a", "b", "c", "d", "e", "f", "g"] } }, "intercalary": [{ "name": "Pause", "after_month": 0, "in_week": false }] },
+      "want": "d"
+    },
+    {
+      "name": "the last day of one month of 5000000 days read back",
+      "call": "roundtrip",
+      "step": 4999999,
+      "cfg": { "version": 1, "grain": "day", "bundles": { "months": { "names": ["Long"], "lengths": [5000000] } } },
+      "want": ["5000000 Long, 0", { "step": 4999999 }]
+    }
+  ]
+}

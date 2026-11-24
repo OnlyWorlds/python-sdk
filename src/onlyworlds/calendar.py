@@ -77,6 +77,7 @@ Python                     TypeScript (``@onlyworlds/sdk``)
 
 from __future__ import annotations
 
+import bisect
 import json
 import math
 import re
@@ -245,7 +246,6 @@ _JS_SPACE: Final = "".join(
 ) + "".join(map(chr, (0x202F, 0x205F, 0x3000, 0xFEFF)))
 _S: Final = "[" + re.escape(_JS_SPACE) + "]"
 _MIDDOT: Final = chr(0xB7)
-_SEP: Final = "[" + re.escape(_JS_SPACE) + ",;" + _MIDDOT + "]"
 
 
 def _js_trim(s: str) -> str:
@@ -1021,11 +1021,129 @@ def _year_slots(cfg: object, y: float) -> list[_Slot]:
     return slots
 
 
+class _Run(NamedTuple):
+    start: int
+    length: int
+    month: int  # 0 for an intercalary day
+    slot: _Slot | None  # the intercalary day's slot; None for a month's run of days
+
+
+class _Year:
+    """One year's slots, in ``_year_slots``' order, asked four questions. Where every month length is a
+    whole ``int`` a month is one run and each answer is arithmetic, so a long month costs nothing; any
+    other config keeps ``_year_slots``' list and the questions are asked of it as before, so an odd input
+    answers as it did."""
+
+    __slots__ = ("_list", "_runs", "_starts", "total")
+
+    def __init__(self, cfg: object, y: float) -> None:
+        runs = _year_runs(cfg, y)
+        self._list: list[_Slot] | None = _year_slots(cfg, y) if runs is None else None
+        self._runs: list[_Run] = runs or []
+        self._starts = [r.start for r in self._runs]
+        if self._list is not None:
+            self.total = len(self._list)
+        else:
+            self.total = self._runs[-1].start + self._runs[-1].length if self._runs else 0
+
+    def at(self, i: float) -> Any:
+        """``slots[i]``: undefined unless ``i`` is a whole index inside the year."""
+        if self._list is not None:
+            return _at(self._list, i)
+        if not (i.is_integer() and 0 <= i < self.total):
+            return _UNDEF
+        k = int(i)
+        r = self._runs[bisect.bisect_right(self._starts, k) - 1]
+        return r.slot if r.slot is not None else _Slot("month", r.month, k - r.start + 1, None)
+
+    def skipped_before(self, offset: float) -> float:
+        """The intercalary days out of the week at the indexes 0, 1, ... below ``offset``; reading past the
+        year's last slot throws, as the reference's loop does."""
+        n = 0.0
+        if self._list is not None:
+            i = 0
+            while i < offset:
+                s = _at(self._list, i)
+                if s is _UNDEF:
+                    raise TypeError("Cannot read properties of undefined (reading 'kind')")
+                if s.kind == "intercalary" and _prop(s.intercalary, "in_week") is False:
+                    n += 1
+                i += 1
+            return n
+        if not offset > 0:  # the loop never runs: zero, a negative or NaN
+            return n
+        if offset > self.total:
+            raise TypeError("Cannot read properties of undefined (reading 'kind')")
+        for r in self._runs:
+            if r.start >= offset:
+                break
+            if r.slot is not None and _prop(r.slot.intercalary, "in_week") is False:
+                n += 1
+        return n
+
+    def index_of_intercalary(self, intercalary: object) -> int:
+        if self._list is not None:
+            return next(
+                (i for i, s in enumerate(self._list) if s.kind == "intercalary" and s.intercalary is intercalary), -1
+            )
+        return next((r.start for r in self._runs if r.slot is not None and r.slot.intercalary is intercalary), -1)
+
+    def index_of_day(self, month: object, day: object) -> int:
+        if self._list is not None:
+            return next(
+                (i for i, s in enumerate(self._list) if s.kind == "month" and s.month == month and s.day == day), -1
+            )
+        if not _is_finite_number(day):
+            return -1
+        d = cast(float, day)
+        for r in self._runs:
+            if r.slot is None and r.month == month:
+                k = int(d)
+                return r.start + k - 1 if k == d and 1 <= k <= r.length else -1
+        return -1
+
+
+def _is_finite_number(v: object) -> bool:
+    return isinstance(v, (int, float)) and math.isfinite(v)
+
+
+def _year_runs(cfg: object, y: float) -> list[_Run] | None:
+    """``_year_slots`` as runs, or None where a month's length is not a whole ``int`` (or the names and
+    lengths are not lists, or fewer lengths than names): the list is built for those."""
+    months = _bundle(cfg, "months")
+    if not _truthy(months):
+        return []
+    names, lengths = _get(months, "names"), _get(months, "lengths")
+    if not isinstance(names, list) or not isinstance(lengths, list) or len(lengths) < len(names):
+        return None
+    if any(type(v) is not int for v in lengths[: len(names)]):
+        return None
+    inter = _list_or_empty(_prop(cfg, "intercalary"))
+    runs: list[_Run] = []
+    at = 0
+
+    def push(after: int) -> None:
+        nonlocal at
+        for ic in inter:
+            if _strict_eq(_get(ic, "after_month"), after) and _in_year(cfg, ic, y):
+                runs.append(_Run(at, 1, 0, _Slot("intercalary", 0, 0, ic)))
+                at += 1
+
+    push(0)
+    for m in range(1, len(names) + 1):
+        days = lengths[m - 1]
+        if days > 0:
+            runs.append(_Run(at, days, m, None))
+            at += days
+        push(m)
+    return runs
+
+
 class _Position(NamedTuple):
     abs_year: float
     offset: float
     slot: _Slot | None
-    slots: list[_Slot] | None
+    slots: _Year | None
 
 
 def _position(cfg: object, step: float) -> _Position:
@@ -1033,8 +1151,8 @@ def _position(cfg: object, step: float) -> _Position:
     offset = step - _year_start(cfg, y)
     if not _truthy(_bundle(cfg, "months")):
         return _Position(y, offset, None, None)
-    slots = _year_slots(cfg, y)
-    slot = _at(slots, offset)
+    slots = _Year(cfg, y)
+    slot = slots.at(offset)
     return _Position(y, offset, None if slot is _UNDEF else slot, slots)
 
 
@@ -1061,16 +1179,7 @@ def _weekday(cfg: object, step: float, pos: _Position) -> Any:
     skipped_before = y * len([i for i in skipped if _nullish(_get(i, "every_years"))])
     for r in _leap_rules(cfg, skipped):
         skipped_before += _leap_years_before(y, r)
-    skipped_in_year = 0.0
-    if pos.slots is not None:
-        i = 0
-        while i < pos.offset:
-            s = _at(pos.slots, i)
-            if s is _UNDEF:
-                raise TypeError("Cannot read properties of undefined (reading 'kind')")
-            if s.kind == "intercalary" and _prop(s.intercalary, "in_week") is False:
-                skipped_in_year += 1
-            i += 1
+    skipped_in_year = pos.slots.skipped_before(pos.offset) if pos.slots is not None else 0.0
     counted = step - skipped_before - skipped_in_year
     return _none(_at(names, _floor_mod(counted, _to_number(length))))
 
@@ -1134,9 +1243,41 @@ _DEFAULT_FORMAT_INTERCALARY: Final = "{intercalary}, {year} {era}"
 #: U+E000, a private-use code point, as the reference's (never NUL).
 _EMPTY_KNOWN: Final = chr(0xE000)
 _TOKEN = re.compile(r"\{([a-z_]+)\}")
-_COLLAPSE = re.compile(_S + "*[,;" + _MIDDOT + "]?" + _S + "*" + _EMPTY_KNOWN + _S + "*[,;" + _MIDDOT + "]?" + _S + "*")
 _SPACES = re.compile(_S + "{2,}")
-_EDGES = re.compile(r"\A" + _SEP + "+|" + _SEP + r"+\Z")
+_MARKS: Final = ",;" + _MIDDOT
+_EDGE_CHARS: Final = _JS_SPACE + _MARKS
+
+
+def _collapse(text: str) -> str:
+    """The reference's ``/\\s*[,;·]?\\s*\\uE000\\s*[,;·]?\\s*/g`` replaced by one space, in one pass: each
+    marker takes the white space, at most one mark and white space before it (back to where the last
+    replacement ended) and the same after it. A regular expression took cubic time on a long run of white
+    space that held no marker."""
+    i = text.find(_EMPTY_KNOWN)
+    if i == -1:
+        return text
+    n, done, parts = len(text), 0, []
+    while i != -1:
+        j = i
+        while j > done and text[j - 1] in _JS_SPACE:
+            j -= 1
+        if j > done and text[j - 1] in _MARKS:
+            j -= 1
+            while j > done and text[j - 1] in _JS_SPACE:
+                j -= 1
+        k = i + 1
+        while k < n and text[k] in _JS_SPACE:
+            k += 1
+        if k < n and text[k] in _MARKS:
+            k += 1
+            while k < n and text[k] in _JS_SPACE:
+                k += 1
+        parts.append(text[done:j])
+        parts.append(" ")
+        done = k
+        i = text.find(_EMPTY_KNOWN, done)
+    parts.append(text[done:])
+    return "".join(parts)
 
 
 def _render(template: object, values: dict[str, Any]) -> str:
@@ -1152,8 +1293,9 @@ def _render(template: object, values: dict[str, Any]) -> str:
         return _EMPTY_KNOWN if _nullish(v) or v == "" else _js_string(v)
 
     out = _TOKEN.sub(token, template)
-    out = _js_trim(_SPACES.sub(" ", _COLLAPSE.sub(" ", out)))
-    return _EDGES.sub("", out)
+    out = _js_trim(_SPACES.sub(" ", _collapse(out)))
+    # The reference's /^[\s,;·]+|[\s,;·]+$/g: its second half took quadratic time on a long run of marks.
+    return out.strip(_EDGE_CHARS)
 
 
 def _era_label(era: object) -> Any:
@@ -1428,16 +1570,14 @@ def parse_date(cfg: Mapping[str, Any], text: str, *, now: int | None = None) -> 
         start = _year_start(cfg, abs_year)
         if month_index is None and intercalary is None:
             return {"step": _out(start)}
-        slots = _year_slots(cfg, abs_year)
+        slots = _Year(cfg, abs_year)
         if intercalary is not None:
-            idx = next((i for i, s in enumerate(slots) if s.kind == "intercalary" and s.intercalary is intercalary), -1)
+            idx = slots.index_of_intercalary(intercalary)
             if idx == -1:
                 return {"error": f"{_js_string(_get(intercalary, 'name'))} does not occur in that year"}
             return {"step": _out(start + idx)}
         want = 1.0 if day is None else day
-        idx = next(
-            (i for i, s in enumerate(slots) if s.kind == "month" and s.month == month_index and s.day == want), -1
-        )
+        idx = slots.index_of_day(month_index, want)
         if idx == -1:
             return {"error": "that day does not exist in that month"}
         return {"step": _out(start + idx)}
