@@ -127,8 +127,9 @@ def test_every_json_loads_is_the_outside_reader_or_named() -> None:
     assert len(files) > 40  # the search saw the package
     assert {p.name: calls(p, "json") for p in files if calls(p, "json")} == NAMED
     used = {p.name: calls(p, "_outside_json") for p in files if calls(p, "_outside_json")}
-    # worldfile.py: an archive's world.json and a folder's records manifest; folder.py's reader reads its element files.
-    assert used == {"folder.py": 1, "kanka.py": 1, "legendkeeper.py": 2, "lint.py": 1, "worldfile.py": 2}
+    # worldfile.py: an archive's world.json, a folder's records manifest, and an element-folder file the reader
+    # passed over, read for its author fields; folder.py's reader reads its element files.
+    assert used == {"folder.py": 1, "kanka.py": 1, "legendkeeper.py": 2, "lint.py": 1, "worldfile.py": 3}
 
 
 # --- a writer that must read a file to leave something out ------------------------------------------------

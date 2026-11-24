@@ -754,12 +754,31 @@ def test_a_share_carries_under_the_element_folders_only_what_the_reader_serves(t
     for n, group in enumerate(groups):
         alone = make_folder(tmp_path / f"alone-{n}", {"world.json": world_json(), **{p: unread[p] for p in group}})
         assert _shared(alone) == (set(), [], sorted(group)), group
-    # A copy carries each of them byte for byte, and so does one that leaves author fields out: a file
-    # not read as an element is never rewritten.
-    for with_authors in (True, False):
-        copy = read_world_file(world_file_bytes(whole, include_author_fields=with_authors)).entries
-        assert all(copy[p] == data for p, data in unread.items()), with_authors
-        assert set(copy) == {*control, *unread}
+    # A copy carries each of them byte for byte. One that leaves author fields out carries them all too,
+    # and removes the five from every one that is one JSON object by the reader's own JSON rules, read as
+    # an element or not (since 0.150.1: the folder spec's guidance; 0.145.0 to 0.150.0 kept them); a file
+    # that is no such object travels byte for byte.
+    copy = read_world_file(world_file_bytes(whole, include_author_fields=True)).entries
+    assert all(copy[p] == data for p, data in unread.items())
+    assert set(copy) == {*control, *unread}
+    not_objects = {
+        "elements/character/broken.json",
+        "elements/character/latin.json",
+        "elements/character/list.json",
+        "spatial/pin/cut.JSON",
+        "elements/character/two.json",
+        "elements/character/tail.json",
+    }
+    assert not_objects <= set(unread)
+    bare = read_world_file(world_file_bytes(whole)).entries
+    assert set(bare) == {*control, *unread}
+    for p, data in unread.items():
+        if p in not_objects:
+            assert bare[p] == data, p
+            continue
+        rest = json.loads(data)
+        assert rest.pop("changed_by") == "m-1", p
+        assert bare[p] == encode(rest), f"{p}: the file the reader passed over loses its author field"
     # Kept: a null mark, a nested mark, whitespace after the value, a byte order mark, hidden: true
     # outside the element folders, and one UUID in two spellings, which is two ids, each judged by its own mark.
     keep: dict[str, bytes] = {
@@ -782,8 +801,8 @@ def test_a_share_carries_under_the_element_folders_only_what_the_reader_serves(t
 
 # The same bytes as the npm SDK's test/fixtures/author-fields.fixture.json (both suites hold its sha256).
 AUTHOR_FIXTURE = REPO / "tests" / "fixtures" / "author-fields.fixture.json"
-AUTHOR_FIXTURE_SHA256 = "481db037f008ceff9989bbe44b2c27a41ba4205d7e7fd258792cbadc2365787d"
-AUTHOR_CASES = 5
+AUTHOR_FIXTURE_SHA256 = "6943ce5a8c2cd7bf69f82facb6f1d545d87d68f5ea0104cc4d711d94e035898a"
+AUTHOR_CASES = 7
 AUTHOR_FIELDS = ["created_by", "changed_by", "changed_via", "changed_client", "doors"]
 
 

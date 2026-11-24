@@ -874,12 +874,26 @@ def _under_element_folders(rel: str) -> bool:
 _AUTHOR_FIELDS: tuple[str, ...] = ("created_by", "changed_by", "changed_via", "changed_client", "doors")
 
 
+def _unread_object(src: Path | bytes) -> dict[str, Any] | None:
+    """A carried file under ``elements/`` or ``spatial/`` that the folder reader did not serve as an
+    element (a name or a depth it passes over, no id, an id two files hold), read as the reader reads
+    JSON (UTF-8, a byte order mark dropped, at most 200 deep, every number a double holds), when it
+    holds one JSON object. None otherwise: an array, text that is not JSON, or JSON the reader
+    refuses, which a rewrite would change, so it travels byte for byte."""
+    data = src if isinstance(src, bytes) else src.read_bytes()
+    try:
+        doc = _outside_json.loads(data.decode("utf-8").removeprefix(_BOM), parse_constant=_reject_constant)
+    except ValueError:  # not UTF-8 (UnicodeDecodeError is a ValueError), not JSON, or refused
+        return None
+    return doc if isinstance(doc, dict) else None
+
+
 def _without_author_fields(body: dict[str, Any] | None) -> bytes | None:
-    """An element file's object (``_element_files``) without its author fields, in the folder's own
-    form (``_jsonfmt.encode``: two-space indent, a trailing newline, the other keys in their order),
-    or None when it holds none of them or the file was not read as an element (``body`` None): then
-    it travels byte for byte. Only top-level keys go; an ``x_*`` value that holds one of the names is
-    the extension's, and stays."""
+    """An element-folder file's object (``_element_files``, else ``_unread_object``) without its
+    author fields, in the folder's own form (``_jsonfmt.encode``: two-space indent, a trailing
+    newline, the other keys in their order), or None when it holds none of them or holds no JSON
+    object (``body`` None): then it travels byte for byte. Only top-level keys go; an ``x_*`` value
+    that holds one of the names is the extension's, and stays."""
     if body is None or not any(k in body for k in _AUTHOR_FIELDS):
         return None
     return encode({k: v for k, v in body.items() if k not in _AUTHOR_FIELDS})
@@ -964,7 +978,10 @@ def _plan(
         if rel == WORLD_FILE:
             plan.append((rel, world_bytes))
             continue
-        bare = None if include_author_fields else _without_author_fields(elements.get(rel))
+        body = elements.get(rel)
+        if body is None and not include_author_fields and _under_element_folders(rel):
+            body = _unread_object(files[rel])
+        bare = None if include_author_fields else _without_author_fields(body)
         plan.append((rel, files[rel] if bare is None else bare))
     return top, plan
 
@@ -1078,11 +1095,13 @@ def write_world_file(
     - Author fields are left out: ``created_by``, ``changed_by``, ``changed_via``,
       ``changed_client`` and ``doors`` record which member and which tool wrote each element (a
       membership id, a door), which means nothing to someone the world is handed to, so every
-      element file (one the folder reader serves, as above) loses them;
-      ``created_at`` and ``updated_at`` stay. A file
-      holding any of them is rewritten without them in the folder's own form (two-space indent, a
-      trailing newline, the other keys in their order); one holding none, or that was not read
-      as an element, travels byte for byte, and nothing outside the element files is touched.
+      carried file under ``elements/`` or ``spatial/`` that holds one JSON object loses them,
+      whether or not the folder reader serves it as an element; ``created_at`` and
+      ``updated_at`` stay. A file holding any of them is rewritten without them in the folder's
+      own form (two-space indent, a trailing newline, the other keys in their order); one holding
+      none, one that holds an array or is not JSON, and one whose JSON the reader refuses (nested
+      past 200, or a number a double cannot hold, which a rewrite would change) travel byte for
+      byte, and nothing outside those two folders is touched.
       ``include_author_fields=True`` carries every element file byte for byte, for an archive of
       your own folder.
     - ``world.json`` is carried byte for byte, ``producer``, ``source`` and

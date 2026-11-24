@@ -1,6 +1,6 @@
 {
  "what": "The world file writers' author fields: writeWorldFile (npm SDK) and world_file_bytes (Python package) on the same folders. Every expected file is written by hand. The same bytes in both packages; each test holds this file's sha256.",
- "keys": "fields are the five a world file leaves out of every element file by default. Each case's files is a folder, path to text (UTF-8); every file in it travels. default is the archive's entries with the default, path to text; with includeAuthorFields (include_author_fields) true the entries are files, each byte for byte. stripped counts the element files that lost a field.",
+ "keys": "fields are the five a world file leaves out by default of every file under elements/ or the legacy spatial/ that holds one JSON object, read as an element or not. Each case's files is a folder, path to text (UTF-8); every file in it travels. default is the archive's entries with the default, path to text; with includeAuthorFields (include_author_fields) true the entries are files, each byte for byte. stripped counts the files that lost a field.",
  "fields": ["created_by", "changed_by", "changed_via", "changed_client", "doors"],
  "cases": [
   {
@@ -32,7 +32,7 @@
    "stripped": 0
   },
   {
-   "name": "only the fields present are removed, a null one too; a file with no id is not read as an element and keeps its bytes",
+   "name": "only the fields present are removed, a null one too; a file with no id is not read as an element and loses them all the same",
    "files": {
     "world.json": "{\n  \"id\": \"0192a000-aaaa-7bbb-8ccc-000000000001\",\n  \"name\": \"W\"\n}\n",
     "elements/location/hall--l1.json": "{\r\n    \"id\": \"l1\",\r\n    \"name\": \"Hall\",\r\n    \"changed_by\": null,\r\n    \"doors\": {}\r\n}\r\n",
@@ -41,9 +41,9 @@
    "default": {
     "world.json": "{\n  \"id\": \"0192a000-aaaa-7bbb-8ccc-000000000001\",\n  \"name\": \"W\"\n}\n",
     "elements/location/hall--l1.json": "{\n  \"id\": \"l1\",\n  \"name\": \"Hall\"\n}\n",
-    "elements/event/only--e2.json": "{\"created_by\":\"u\",\"doors\":{\"x\":\"2026-10-29T10:00:00Z\"}}"
+    "elements/event/only--e2.json": "{}\n"
    },
-   "stripped": 1
+   "stripped": 2
   },
   {
    "name": "a rewritten file is in the folder's own form: no byte order mark, strings, numbers and nesting as JSON.stringify writes them",
@@ -58,7 +58,7 @@
    "stripped": 1
   },
   {
-   "name": "only element files: a .json file, the extension in lower case, directly in elements/<type>/ or the legacy spatial/<type>/; world.json, records, media and every other file byte for byte",
+   "name": "every file under elements/ or the legacy spatial/ that holds one JSON object loses them, whatever its name, extension or depth; one that holds an array or is not JSON keeps its bytes, and so do world.json, records and media",
    "files": {
     "world.json": "{\n  \"id\": \"0192a000-aaaa-7bbb-8ccc-000000000001\",\n  \"name\": \"W\",\n  \"created_by\": \"u\"\n}\n",
     "spatial/pin/p--p1.json": "{\"id\":\"p1\",\"name\":\"P\",\"changed_via\":\"site\"}",
@@ -74,16 +74,46 @@
    "default": {
     "world.json": "{\n  \"id\": \"0192a000-aaaa-7bbb-8ccc-000000000001\",\n  \"name\": \"W\",\n  \"created_by\": \"u\"\n}\n",
     "spatial/pin/p--p1.json": "{\n  \"id\": \"p1\",\n  \"name\": \"P\"\n}\n",
-    "elements/map/M--m1.JSON": "{\"id\":\"m1\",\"name\":\"M\",\"changed_client\":\"atlas\"}",
-    "elements/character/sub/s.json": "{\"id\":\"s\",\"created_by\":\"u\"}",
-    "elements/character/notes.txt": "{\"created_by\":\"u\"}",
+    "elements/map/M--m1.JSON": "{\n  \"id\": \"m1\",\n  \"name\": \"M\"\n}\n",
+    "elements/character/sub/s.json": "{\n  \"id\": \"s\"\n}\n",
+    "elements/character/notes.txt": "{}\n",
     "elements/character/list.json": "[{\"created_by\":\"u\"}]",
     "elements/character/broken.json": "{\"id\":\"x\",\"created_by\":\"u\"",
     "media/m.json": "{\"created_by\":\"u\"}",
     "records/RECORDS.json": "[{\"producer\":\"lab\",\"format\":\"f\",\"version\":\"1\",\"deltas\":false,\"created_by\":\"u\"}]",
     "records/lab/r.json": "{\"created_by\":\"u\",\"doors\":{}}"
    },
-   "stripped": 1
+   "stripped": 4
+  },
+  {
+   "name": "two files that hold one id are no element, and both lose them; a file holding a number no double can hold is not rewritten, so it keeps its bytes",
+   "files": {
+    "world.json": "{\n  \"id\": \"0192a000-aaaa-7bbb-8ccc-000000000001\",\n  \"name\": \"W\"\n}\n",
+    "elements/character/a--d1.json": "{\"id\":\"d1\",\"name\":\"A\",\"created_by\":\"u\"}",
+    "elements/character/b--d1.json": "{\"id\":\"d1\",\"name\":\"B\",\"changed_by\":\"v\"}",
+    "elements/object/big--o1.json": "{\"id\":\"o1\",\"name\":\"Big\",\"weight\":1e400,\"created_by\":\"u\"}"
+   },
+   "default": {
+    "world.json": "{\n  \"id\": \"0192a000-aaaa-7bbb-8ccc-000000000001\",\n  \"name\": \"W\"\n}\n",
+    "elements/character/a--d1.json": "{\n  \"id\": \"d1\",\n  \"name\": \"A\"\n}\n",
+    "elements/character/b--d1.json": "{\n  \"id\": \"d1\",\n  \"name\": \"B\"\n}\n",
+    "elements/object/big--o1.json": "{\"id\":\"o1\",\"name\":\"Big\",\"weight\":1e400,\"created_by\":\"u\"}"
+   },
+   "stripped": 2
+  },
+  {
+   "name": "a file the reader passed over that holds none of the five at its top level is not rewritten: its spacing and its bytes travel as written, a name inside an extension's value included",
+   "files": {
+    "world.json": "{\n  \"id\": \"0192a000-aaaa-7bbb-8ccc-000000000001\",\n  \"name\": \"W\"\n}\n",
+    "elements/character/old/odd.json": "{ \"id\" :  \"o\",\n\t\"name\":\"Odd\",   \"created_at\" : \"2026-10-01T09:00:00Z\" }\n\n",
+    "elements/character/Spaced.JSON": "{\"id\":\"sp\",  \"x_note\":{\"created_by\":\"kept, an extension's own\"}}"
+   },
+   "default": {
+    "world.json": "{\n  \"id\": \"0192a000-aaaa-7bbb-8ccc-000000000001\",\n  \"name\": \"W\"\n}\n",
+    "elements/character/old/odd.json": "{ \"id\" :  \"o\",\n\t\"name\":\"Odd\",   \"created_at\" : \"2026-10-01T09:00:00Z\" }\n\n",
+    "elements/character/Spaced.JSON": "{\"id\":\"sp\",  \"x_note\":{\"created_by\":\"kept, an extension's own\"}}"
+   },
+   "stripped": 0
   }
  ]
 }
