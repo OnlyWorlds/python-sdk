@@ -78,6 +78,7 @@ Python                     TypeScript (``@onlyworlds/sdk``)
 from __future__ import annotations
 
 import bisect
+import contextvars
 import json
 import math
 import re
@@ -763,6 +764,36 @@ def _leap_rule(cfg: object, ic: object) -> _LeapRule:
     )
 
 
+# ---- One calendar's work, done once for many steps ----
+
+# ``format_steps``' memo: while it runs, what depends only on the calendar (its year shape, its eras in
+# order) or on the calendar and one year (that year's start, its slots) is worked out once and read back.
+# Outside it the memo is None and every function computes as it always did. A key names an object by
+# ``id`` and the memo holds that object for as long as it lives, so no id is reused while it is read.
+_MEMO: contextvars.ContextVar[dict[tuple[Any, ...], Any] | None] = contextvars.ContextVar(
+    "onlyworlds_calendar_memo", default=None
+)
+
+
+def _memo(key: tuple[Any, ...], anchor: object, make: Callable[[], Any]) -> Any:
+    """``make()``, read once per ``key`` while ``format_steps`` runs; ``key[1]`` is ``id(anchor)``."""
+    memo = _MEMO.get()
+    if memo is None:
+        return make()
+    try:
+        return memo[key]
+    except KeyError:  # NaN never equals itself, so a key holding one is made again each time: the same answer
+        value = make()
+        memo[key] = value
+        memo[("held", id(anchor))] = anchor
+        return value
+
+
+def _year_key(y: float) -> tuple[float, float]:
+    """A year as a memo key, its sign kept: -0.0 and 0.0 are equal keys, and a year's start keeps the sign."""
+    return (y, math.copysign(1.0, y))
+
+
 def _leap_rules(cfg: object, inter: list[Any]) -> list[_LeapRule]:
     return [_leap_rule(cfg, i) for i in inter if not _nullish(_get(i, "every_years"))]
 
@@ -770,6 +801,10 @@ def _leap_rules(cfg: object, inter: list[Any]) -> list[_LeapRule]:
 def _year_shape(cfg: object) -> tuple[float, list[_LeapRule]]:
     """The base year length (months and the days outside them that are not leap days, or
     ``bundles.year.steps``, or 1) and the leap entries' rules."""
+    return cast("tuple[float, list[_LeapRule]]", _memo(("shape", id(cfg)), cfg, lambda: _year_shape_of(cfg)))
+
+
+def _year_shape_of(cfg: object) -> tuple[float, list[_LeapRule]]:
     months = _bundle(cfg, "months")
     inter = _list_or_empty(_prop(cfg, "intercalary"))
     rules = _leap_rules(cfg, inter)
@@ -824,6 +859,10 @@ def intercalary_in_year(cfg: Mapping[str, Any], ic: Mapping[str, Any], y: int) -
 
 
 def _year_start(cfg: object, y: float) -> float:
+    return cast(float, _memo(("start", id(cfg), *_year_key(y)), cfg, lambda: _year_start_of(cfg, y)))
+
+
+def _year_start_of(cfg: object, y: float) -> float:
     base, rules = _year_shape(cfg)
     start = y * base
     for r in rules:
@@ -897,6 +936,10 @@ def _direction(era: object) -> Any:
 
 
 def _era_domains(eras: list[Any]) -> list[EraDomain]:
+    return cast("list[EraDomain]", _memo(("eras", id(eras)), eras, lambda: _era_domains_of(eras)))
+
+
+def _era_domains_of(eras: list[Any]) -> list[EraDomain]:
     ordered = _js_sorted(eras, lambda a, b: _to_number(_get(a, "start")) - _to_number(_get(b, "start")))
     out: list[EraDomain] = []
     for i, era in enumerate(ordered):
@@ -919,11 +962,32 @@ def resolve_era_domains(eras: list[Mapping[str, Any]]) -> list[EraDomain]:
     return _era_domains(_items(eras))
 
 
+def _era_bounds(eras: list[Any]) -> list[tuple[EraDomain, float | None, float | None]]:
+    """Each era's domain with its two bounds as numbers, or None for a bound that is not one."""
+    return [
+        (d, _num(d.lo) if _is_num(d.lo) else None, _num(d.hi) if _is_num(d.hi) else None) for d in _era_domains(eras)
+    ]
+
+
 def _era_for(cfg: object, step: float) -> Any:
     eras = _list_or_empty(_prop(cfg, "eras"))
     if len(eras) == 0:
         return None
-    holding = [d for d in _era_domains(eras) if _js_le(d.lo, step) and _js_lt(step, d.hi)]
+    if _MEMO.get() is None:
+        holding = [d for d in _era_domains(eras) if _js_le(d.lo, step) and _js_lt(step, d.hi)]
+    else:
+        # Under format_steps: each bound that is a number read once as one; JavaScript's <= and < on two
+        # numbers are Python's on two floats (NaN false both ways), and any other bound keeps _js_le.
+        bounds = cast(
+            "list[tuple[EraDomain, float | None, float | None]]",
+            _memo(("bounds", id(eras)), eras, lambda: _era_bounds(eras)),
+        )
+        holding = [
+            d
+            for d, lo, hi in bounds
+            if (lo <= step if lo is not None else _js_le(d.lo, step))
+            and (step < hi if hi is not None else _js_lt(step, d.hi))
+        ]
     if not holding:
         return None
     place = {id(e): i for i, e in enumerate(eras)}
@@ -1121,9 +1185,19 @@ def _year_runs(cfg: object, y: float) -> list[_Run] | None:
     inter = _list_or_empty(_prop(cfg, "intercalary"))
     runs: list[_Run] = []
     at = 0
+    # Under format_steps: which entries follow each month, and each one's leap rule, read once per calendar.
+    groups: list[list[tuple[Any, _LeapRule | None]]] | None = None
+    if _MEMO.get() is not None:
+        groups = _memo(("after", id(cfg)), cfg, lambda: _after_groups(cfg, inter, len(names)))
 
     def push(after: int) -> None:
         nonlocal at
+        if groups is not None:
+            for ic, rule in groups[after]:
+                if rule is None or _rule_holds(rule, y):
+                    runs.append(_Run(at, 1, 0, _Slot("intercalary", 0, 0, ic)))
+                    at += 1
+            return
         for ic in inter:
             if _strict_eq(_get(ic, "after_month"), after) and _in_year(cfg, ic, y):
                 runs.append(_Run(at, 1, 0, _Slot("intercalary", 0, 0, ic)))
@@ -1139,6 +1213,19 @@ def _year_runs(cfg: object, y: float) -> list[_Run] | None:
     return runs
 
 
+def _after_groups(cfg: object, inter: list[Any], months: int) -> list[list[tuple[Any, _LeapRule | None]]]:
+    """For each ``after`` from 0 to ``months``, the intercalary entries ``push(after)`` reads, in order, each
+    with its leap rule (None for an entry in every year): ``_in_year``'s two halves, read once."""
+    return [
+        [
+            (ic, None if _nullish(_get(ic, "every_years")) else _leap_rule(cfg, ic))
+            for ic in inter
+            if _strict_eq(_get(ic, "after_month"), after)
+        ]
+        for after in range(months + 1)
+    ]
+
+
 class _Position(NamedTuple):
     abs_year: float
     offset: float
@@ -1151,7 +1238,7 @@ def _position(cfg: object, step: float) -> _Position:
     offset = step - _year_start(cfg, y)
     if not _truthy(_bundle(cfg, "months")):
         return _Position(y, offset, None, None)
-    slots = _Year(cfg, y)
+    slots = cast(_Year, _memo(("year", id(cfg), *_year_key(y)), cfg, lambda: _Year(cfg, y)))
     slot = slots.at(offset)
     return _Position(y, offset, None if slot is _UNDEF else slot, slots)
 
@@ -1174,14 +1261,20 @@ def _weekday(cfg: object, step: float, pos: _Position) -> Any:
     # Free: the counted steps leave out in_week false days outside the months; counted 0 is names[0].
     if pos.slot is not None and pos.slot.kind == "intercalary" and _prop(pos.slot.intercalary, "in_week") is False:
         return None
-    skipped = [i for i in _list_or_empty(_prop(cfg, "intercalary")) if _get(i, "in_week") is False]
+    every, rules = cast("tuple[int, list[_LeapRule]]", _memo(("week", id(cfg)), cfg, lambda: _week_skipped(cfg)))
     y = pos.abs_year
-    skipped_before = y * len([i for i in skipped if _nullish(_get(i, "every_years"))])
-    for r in _leap_rules(cfg, skipped):
+    skipped_before = y * every
+    for r in rules:
         skipped_before += _leap_years_before(y, r)
     skipped_in_year = pos.slots.skipped_before(pos.offset) if pos.slots is not None else 0.0
     counted = step - skipped_before - skipped_in_year
     return _none(_at(names, _floor_mod(counted, _to_number(length))))
+
+
+def _week_skipped(cfg: object) -> tuple[int, list[_LeapRule]]:
+    """The days outside the week (``in_week`` false): how many fall in every year, and the leap rules of the rest."""
+    skipped = [i for i in _list_or_empty(_prop(cfg, "intercalary")) if _get(i, "in_week") is False]
+    return len([i for i in skipped if _nullish(_get(i, "every_years"))]), _leap_rules(cfg, skipped)
 
 
 def weekday_for_step(cfg: Mapping[str, Any], step: int) -> str | None:
@@ -1329,6 +1422,18 @@ def format_step(cfg: Mapping[str, Any], step: int) -> str:
         if not isinstance(template, str):
             template = _DEFAULT_FORMAT_MONTHS if _truthy(_bundle(cfg, "months")) else _DEFAULT_FORMAT_PLAIN
     return _render(template, values)
+
+
+def format_steps(cfg: Mapping[str, Any], steps: Iterable[int]) -> list[str]:
+    """``[format_step(cfg, s) for s in steps]``, the same words for every step, with the calendar's own
+    work done once: its year shape and its eras in order once for the call, each year's start and slots
+    once per year. For a page of dates in one calendar; a step that ``format_step`` refuses is refused
+    here the same way."""
+    token = _MEMO.set({})
+    try:
+        return [format_step(cfg, s) for s in steps]
+    finally:
+        _MEMO.reset(token)
 
 
 def _year_label(cfg: object, step: float) -> str:

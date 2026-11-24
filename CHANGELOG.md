@@ -4,6 +4,10 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+## 0.149.0 (2026-11-24)
+
+- **Added: `calendar.format_steps(cfg, steps)`, a page of dates in one calendar.** The same words as `format_step` for every step, with the calendar's own work done once: its year shape, its eras in order, which months each day outside the months follows and the week's skipped days once for the call, each year's start and slots once per year. On a calendar of 64 eras, four leap rules and a year of 1,000 slots, 200 dates across the 32-bit range take about a sixth of the time `format_step` takes for them one by one; on two of the profile fixture's real calendars, about a quarter to a third. Held against `format_step` on every valid calendar of the fixture (the fixture's steps, a dense run inside a few years, a step in each of many years, the far edges); a step `format_step` refuses is refused the same way. `format_step` itself is unchanged.
+
 ## 0.148.2 (2026-11-24)
 
 - **Fixed: a stored calendar no longer sets what one date label costs.** `format_step` collapsed the separators around an empty token with a regular expression that took cubic time on a long run of white space (a template with 1,000 spaces: about half a second for one label; 4,000 spaces: about a minute), and trimmed a label's edges with one that took quadratic time on a long run of commas; both are one pass now. A year was built as a list of every day on each call, so a month of 5,000,000 days cost seconds a label in `format_step`, `weekday_for_step`, `breakdown_step` and `parse_date`; a month is one run now, and each answer is arithmetic. Every answer is the same as before: the profile's fixture, the old and new builds compared on 7,071 steps of the fixture's calendars and of made ones (formats, weekdays, breakdowns and parses), and eight timed cases in `tests/fixtures/calendar-cost.cases.json`, the same bytes as the npm SDK's, each inside its bound. Not changed: a calendar with 1,500 eras still costs about 20 milliseconds a label, and one with 800 leap rules about a tenth of a second.
