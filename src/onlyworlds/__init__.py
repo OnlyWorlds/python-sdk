@@ -84,7 +84,7 @@ from .http import (
     check_kinds,
     sanitize_payload,
 )
-from .landing import Landing, LandingCluster, LandingGap, LandingMember, landing_of
+from .landing import Landing, LandingCluster, LandingGap, LandingMember, Linked, MostLinked, landing_of, most_linked_of
 from .layout_kind import (
     AroundLayout,
     AroundPoint,
@@ -243,11 +243,13 @@ __all__ = [
     "LayoutByLinks3d",
     "LensMail",
     "LensReading",
+    "Linked",
     "MapLayout",
     "MapSpace",
     "MapSpaceMap",
     "MapSpaceOutline",
     "MapSpacePin",
+    "MostLinked",
     "NameFinder",
     "NameFound",
     "NameShared",
@@ -331,6 +333,7 @@ __all__ = [
     "layout_of",
     "lenses_in_use",
     "map_space",
+    "most_linked_of",
     "name_finder",
     "note_of",
     "openers_for",

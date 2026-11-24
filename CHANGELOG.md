@@ -4,6 +4,10 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+## 0.150.0 (2026-11-24)
+
+- **Added: `most_linked_of(graph, *, per_type=None)`, the most linked elements of each type.** From the graph `world_graph` answers for a reader, so only what that reader is served is counted (map space, hidden, proposed and room elements stay out unless the graph brought them in). For each type, at most `per_type` (default 3) of its elements by the landing profile's degree, highest first, ties by id in code point order; a node of degree 0 and a known-of node are never picked, and a type with nothing to pick is left out. It answers `{"per_type", "by_type"}`, each entry `{"id", "name", "degree"}`, the name as the graph holds it or None. A few of every type, never one ranking; it is "the most linked", not "where to start": in a world with a secret, the secret is often the hub, so where a world has a Guide, the Guide is the start. A draft reading, held to the package's own fixture (`tests/fixtures/most-linked.fixture.json`, the same bytes as the npm SDK's) until the landing profile takes it. A `per_type` that is not a whole number of 1 or more is a ValueError naming it. The npm SDK's `mostLinkedOf` answers the same.
+
 ## 0.149.0 (2026-11-24)
 
 - **Added: `calendar.format_steps(cfg, steps)`, a page of dates in one calendar.** The same words as `format_step` for every step, with the calendar's own work done once: its year shape, its eras in order, which months each day outside the months follows and the week's skipped days once for the call, each year's start and slots once per year. On a calendar of 64 eras, four leap rules and a year of 1,000 slots, 200 dates across the 32-bit range take about a sixth of the time `format_step` takes for them one by one; on two of the profile fixture's real calendars, about a quarter to a third. Held against `format_step` on every valid calendar of the fixture (the fixture's steps, a dense run inside a few years, a step in each of many years, the far edges); a step `format_step` refuses is refused the same way. `format_step` itself is unchanged.

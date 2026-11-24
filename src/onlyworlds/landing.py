@@ -171,3 +171,69 @@ def landing_of(
         "unclustered": unclustered,
         "gaps": gaps,
     }
+
+
+class Linked(TypedDict):
+    id: str
+    #: The name as the graph holds it, or None when it has none.
+    name: str | None
+    degree: int
+
+
+class MostLinked(TypedDict):
+    #: The count per type it was read at.
+    per_type: int
+    #: By type, the types in code point order; a type with nothing to pick is left out.
+    by_type: dict[str, list[Linked]]
+
+
+_SAFE = 2**53 - 1
+
+
+def most_linked_of(graph: Mapping[str, Any], *, per_type: int | None = None) -> MostLinked:
+    """The most linked elements of each type, from the graph ``world_graph`` answered for the asker, so it holds
+    exactly what that reader may see (map space, hidden, proposed and room elements are out unless the graph
+    brought them in). For each type, its most linked elements by the landing profile's degree (``degree_of``'s
+    count), highest first, ties by id in code point order, at most ``per_type`` of each (default 3): a few of every
+    type, never one ranking. It is "the most linked", never "where to start": where a world has a Guide, the Guide
+    is the start, and a door says so. A node of degree 0 and a known-of node are never picked. It reads the graph
+    it is given and folds nothing: a node's type and name are echoed as written. The same graph and options give
+    the same answer, byte for byte. A draft reading, held to the package's own fixture until the landing profile
+    takes it. ``per_type`` that is not a whole number of 1 or more (and at most 2**53 - 1, as JavaScript reads
+    one) is a ValueError naming it; None is its default. The npm SDK's ``mostLinkedOf`` gives the same answer on
+    the same graph."""
+    if (
+        not isinstance(graph, Mapping)
+        or not isinstance(graph.get("nodes"), list)
+        or not isinstance(graph.get("edges"), list)
+    ):
+        raise TypeError("most_linked_of: graph is what world_graph answers, a mapping with nodes and edges lists.")
+    per = 3
+    if per_type is not None:
+        w = _whole(per_type)
+        if w is None or w < 1 or w > _SAFE:
+            raise ValueError(f"most_linked_of: per_type is a whole number, 1 or more; got {per_type!r}.")
+        per = w
+
+    nodes: list[Mapping[str, Any]] = graph["nodes"]
+    degree: dict[str, int] = {n["id"]: 0 for n in nodes}
+    for e in graph["edges"]:
+        s, t = e["source"], e["target"]
+        if s in degree:
+            degree[s] += 1
+        if t != s and t in degree:
+            degree[t] += 1
+
+    grouped: dict[str, list[Linked]] = {}
+    for n in nodes:
+        d = degree.get(n["id"], 0)
+        if d == 0 or n.get("known_of") is True:
+            continue
+        name = n.get("name")
+        grouped.setdefault(n["type"], []).append(
+            {"id": n["id"], "name": name if isinstance(name, str) else None, "degree": d}
+        )
+    out: dict[str, list[Linked]] = {}
+    for t in sorted(grouped):
+        out[t] = sorted(grouped[t], key=lambda x: (-x["degree"], x["id"]))[:per]
+    return {"per_type": per, "by_type": out}

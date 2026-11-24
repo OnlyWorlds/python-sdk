@@ -1,0 +1,238 @@
+{
+  "profile": "most-linked",
+  "status": "draft: the packages' own until the landing profile takes it as a section (a serial); held byte for byte in the SDK and the Python package",
+  "notes": "Each case is a graph as worldGraph answers it, the options, and the whole answer. Degree is the landing profile's: every edge counted once at each node it touches, a link to itself once. Options are written as the Python keyword (per_type); the SDK reads it as perType. A refusal names the option.",
+  "cases": [
+    {
+      "name": "a few of each type, most linked first, ties by id",
+      "graph": {
+        "nodes": [
+          {"id": "c1", "type": "character", "name": "Ada"},
+          {"id": "c2", "type": "character", "name": "Brin"},
+          {"id": "c3", "type": "character", "name": "Cass"},
+          {"id": "c4", "type": "character", "name": "Dov"},
+          {"id": "l1", "type": "location", "name": "Port"},
+          {"id": "l2", "type": "location", "name": "Hill"},
+          {"id": "e1", "type": "event", "name": "Feast"}
+        ],
+        "edges": [
+          {"source": "e1", "field": "characters", "target": "c1", "index": 0},
+          {"source": "e1", "field": "characters", "target": "c2", "index": 1},
+          {"source": "e1", "field": "characters", "target": "c3", "index": 2},
+          {"source": "c1", "field": "location", "target": "l1", "index": 0},
+          {"source": "c2", "field": "location", "target": "l1", "index": 0},
+          {"source": "c3", "field": "location", "target": "l2", "index": 0},
+          {"source": "c4", "field": "friends", "target": "c1", "index": 0}
+        ]
+      },
+      "options": {},
+      "want": {"per_type": 3, "by_type": {
+        "character": [{"id": "c1", "name": "Ada", "degree": 3}, {"id": "c2", "name": "Brin", "degree": 2}, {"id": "c3", "name": "Cass", "degree": 2}],
+        "event": [{"id": "e1", "name": "Feast", "degree": 3}],
+        "location": [{"id": "l1", "name": "Port", "degree": 2}, {"id": "l2", "name": "Hill", "degree": 1}]
+      }}
+    },
+    {
+      "name": "one of each type",
+      "graph": {
+        "nodes": [
+          {"id": "c1", "type": "character", "name": "Ada"},
+          {"id": "c2", "type": "character", "name": "Brin"},
+          {"id": "c3", "type": "character", "name": "Cass"},
+          {"id": "c4", "type": "character", "name": "Dov"},
+          {"id": "l1", "type": "location", "name": "Port"},
+          {"id": "l2", "type": "location", "name": "Hill"},
+          {"id": "e1", "type": "event", "name": "Feast"}
+        ],
+        "edges": [
+          {"source": "e1", "field": "characters", "target": "c1", "index": 0},
+          {"source": "e1", "field": "characters", "target": "c2", "index": 1},
+          {"source": "e1", "field": "characters", "target": "c3", "index": 2},
+          {"source": "c1", "field": "location", "target": "l1", "index": 0},
+          {"source": "c2", "field": "location", "target": "l1", "index": 0},
+          {"source": "c3", "field": "location", "target": "l2", "index": 0},
+          {"source": "c4", "field": "friends", "target": "c1", "index": 0}
+        ]
+      },
+      "options": {"per_type": 1},
+      "want": {"per_type": 1, "by_type": {
+        "character": [{"id": "c1", "name": "Ada", "degree": 3}],
+        "event": [{"id": "e1", "name": "Feast", "degree": 3}],
+        "location": [{"id": "l1", "name": "Port", "degree": 2}]
+      }}
+    },
+    {
+      "name": "degree 0 is never picked, a type with nothing to pick is left out, a name as written or null",
+      "graph": {
+        "nodes": [
+          {"id": "a", "type": "character", "name": " Ada "},
+          {"id": "b", "type": "character"},
+          {"id": "t", "type": "trait", "name": "Brave"}
+        ],
+        "edges": [
+          {"source": "a", "field": "friends", "target": "b", "index": 0}
+        ]
+      },
+      "options": {},
+      "want": {"per_type": 3, "by_type": {
+        "character": [{"id": "a", "name": " Ada ", "degree": 1}, {"id": "b", "name": null, "degree": 1}]
+      }}
+    },
+    {
+      "name": "a known-of node is never picked",
+      "graph": {
+        "nodes": [
+          {"id": "g", "type": "character", "name": "Ghost", "known_of": true},
+          {"id": "h", "type": "character", "name": "Hal"},
+          {"id": "e", "type": "event", "name": "Wake"}
+        ],
+        "edges": [
+          {"source": "e", "field": "characters", "target": "g", "index": 0},
+          {"source": "e", "field": "characters", "target": "h", "index": 1}
+        ]
+      },
+      "options": {},
+      "want": {"per_type": 3, "by_type": {
+        "character": [{"id": "h", "name": "Hal", "degree": 1}],
+        "event": [{"id": "e", "name": "Wake", "degree": 2}]
+      }}
+    },
+    {
+      "name": "a mirror pair is two edges, a link to itself counts once",
+      "graph": {
+        "nodes": [
+          {"id": "p", "type": "character", "name": "P"},
+          {"id": "q", "type": "character", "name": "Q"},
+          {"id": "s", "type": "object", "name": "S"}
+        ],
+        "edges": [
+          {"source": "p", "field": "friends", "target": "q", "index": 0},
+          {"source": "q", "field": "friends", "target": "p", "index": 0},
+          {"source": "s", "field": "parent_object", "target": "s", "index": 0}
+        ]
+      },
+      "options": {},
+      "want": {"per_type": 3, "by_type": {
+        "character": [{"id": "p", "name": "P", "degree": 2}, {"id": "q", "name": "Q", "degree": 2}],
+        "object": [{"id": "s", "name": "S", "degree": 1}]
+      }}
+    },
+    {
+      "name": "ties by id in code point order, an id above U+FFFF after one below it",
+      "graph": {
+        "nodes": [
+          {"id": "😀", "type": "character"},
+          {"id": "～", "type": "character"},
+          {"id": "a", "type": "character"},
+          {"id": "B", "type": "character"},
+          {"id": "x", "type": "event", "name": "Gathering"}
+        ],
+        "edges": [
+          {"source": "x", "field": "characters", "target": "😀", "index": 0},
+          {"source": "x", "field": "characters", "target": "～", "index": 1},
+          {"source": "x", "field": "characters", "target": "a", "index": 2},
+          {"source": "x", "field": "characters", "target": "B", "index": 3}
+        ]
+      },
+      "options": {"per_type": 4},
+      "want": {"per_type": 4, "by_type": {
+        "character": [{"id": "B", "name": null, "degree": 1}, {"id": "a", "name": null, "degree": 1}, {"id": "～", "name": null, "degree": 1}, {"id": "😀", "name": null, "degree": 1}],
+        "event": [{"id": "x", "name": "Gathering", "degree": 4}]
+      }}
+    },
+    {
+      "name": "a secret is a hub: the cover-up comes first in its type (the lean a door must not call where to start)",
+      "graph": {
+        "nodes": [
+          {"id": "cover", "type": "construct", "name": "The Cover-Up"},
+          {"id": "song", "type": "construct", "name": "The Anthem"},
+          {"id": "hero", "type": "character", "name": "Admiral"},
+          {"id": "heir", "type": "character", "name": "Heir"},
+          {"id": "war", "type": "event", "name": "The War"},
+          {"id": "port", "type": "location", "name": "Port"}
+        ],
+        "edges": [
+          {"source": "cover", "field": "characters", "target": "hero", "index": 0},
+          {"source": "cover", "field": "characters", "target": "heir", "index": 1},
+          {"source": "cover", "field": "events", "target": "war", "index": 0},
+          {"source": "cover", "field": "locations", "target": "port", "index": 0},
+          {"source": "song", "field": "characters", "target": "hero", "index": 0},
+          {"source": "war", "field": "characters", "target": "hero", "index": 0},
+          {"source": "heir", "field": "location", "target": "port", "index": 0}
+        ]
+      },
+      "options": {},
+      "want": {"per_type": 3, "by_type": {
+        "character": [{"id": "hero", "name": "Admiral", "degree": 3}, {"id": "heir", "name": "Heir", "degree": 2}],
+        "construct": [{"id": "cover", "name": "The Cover-Up", "degree": 4}, {"id": "song", "name": "The Anthem", "degree": 1}],
+        "event": [{"id": "war", "name": "The War", "degree": 2}],
+        "location": [{"id": "port", "name": "Port", "degree": 2}]
+      }}
+    },
+    {
+      "name": "null is the default, and a whole number written 2.0 is 2",
+      "graph": {
+        "nodes": [
+          {"id": "a", "type": "character"},
+          {"id": "b", "type": "character"},
+          {"id": "c", "type": "character"}
+        ],
+        "edges": [
+          {"source": "a", "field": "friends", "target": "b", "index": 0},
+          {"source": "a", "field": "friends", "target": "c", "index": 1}
+        ]
+      },
+      "options": {"per_type": 2.0},
+      "want": {"per_type": 2, "by_type": {
+        "character": [{"id": "a", "name": null, "degree": 2}, {"id": "b", "name": null, "degree": 1}]
+      }}
+    },
+    {
+      "name": "per_type null reads as 3",
+      "graph": {
+        "nodes": [
+          {"id": "a", "type": "character"},
+          {"id": "b", "type": "character"}
+        ],
+        "edges": [
+          {"source": "a", "field": "friends", "target": "b", "index": 0}
+        ]
+      },
+      "options": {"per_type": null},
+      "want": {"per_type": 3, "by_type": {
+        "character": [{"id": "a", "name": null, "degree": 1}, {"id": "b", "name": null, "degree": 1}]
+      }}
+    },
+    {
+      "name": "an empty graph",
+      "graph": {"nodes": [], "edges": []},
+      "options": {},
+      "want": {"per_type": 3, "by_type": {}}
+    },
+    {
+      "name": "a name that is not a string reads as null",
+      "graph": {
+        "nodes": [
+          {"id": "a", "type": "character", "name": 7},
+          {"id": "b", "type": "character", "name": null},
+          {"id": "c", "type": "character", "name": ["Cass"]}
+        ],
+        "edges": [
+          {"source": "a", "field": "friends", "target": "b", "index": 0},
+          {"source": "c", "field": "friends", "target": "a", "index": 0}
+        ]
+      },
+      "options": {},
+      "want": {"per_type": 3, "by_type": {
+        "character": [{"id": "a", "name": null, "degree": 2}, {"id": "b", "name": null, "degree": 1}, {"id": "c", "name": null, "degree": 1}]
+      }}
+    },
+    {"name": "refused: {\"lens\": \"x\"}", "graph": {"nodes": [], "edges": []}, "options": {"lens": "x"}, "want": {"refused": "lens"}},
+    {"name": "refused: {\"per_type\": 0}", "graph": {"nodes": [], "edges": []}, "options": {"per_type": 0}, "want": {"refused": "per_type"}},
+    {"name": "refused: {\"per_type\": -1}", "graph": {"nodes": [], "edges": []}, "options": {"per_type": -1}, "want": {"refused": "per_type"}},
+    {"name": "refused: {\"per_type\": 1.5}", "graph": {"nodes": [], "edges": []}, "options": {"per_type": 1.5}, "want": {"refused": "per_type"}},
+    {"name": "refused: {\"per_type\": \"3\"}", "graph": {"nodes": [], "edges": []}, "options": {"per_type": "3"}, "want": {"refused": "per_type"}},
+    {"name": "refused: {\"per_type\": true}", "graph": {"nodes": [], "edges": []}, "options": {"per_type": true}, "want": {"refused": "per_type"}},
+    {"name": "refused: {\"per_type\": 9007199254740992}", "graph": {"nodes": [], "edges": []}, "options": {"per_type": 9007199254740992}, "want": {"refused": "per_type"}}
+  ]
+}
