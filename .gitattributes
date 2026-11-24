@@ -28,3 +28,5 @@ tests/fixtures/address-in-prose.json -text
 tests/fixtures/name-finder.cases.json -text
 # The Kanka door's tables and wording, the same bytes as the npm SDK's copy (both tests hold its sha256).
 src/onlyworlds/convert/kanka.json -text
+# The known Pins reader's shared cases, the same bytes as the npm SDK's copy (both tests hold its sha256).
+tests/fixtures/pins-known-to.cases.json -text

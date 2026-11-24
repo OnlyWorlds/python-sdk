@@ -1,0 +1,1588 @@
+{
+  "about": "Cases for pinsKnownTo (@onlyworlds/sdk) and pins_known_to (the onlyworlds Python package): the same bytes in both repositories. A case passes pins and served as they stand and wants the whole answer, key order included: known by Pin id in code point order, each as pin, map, element_type, element_id, how; unknown as a count; out with no_link only when one was counted. A refusal passes its two values and wants a TypeError that names the argument in refuses. Made by test/fixtures/generate-pins-known-to-cases.mjs in the SDK repository; every want is written by hand there.",
+  "version": 1,
+  "cases": [
+    {
+      "name": "a Pin whose element was served whole",
+      "pins": [
+        {
+          "type": "pin",
+          "id": "p1",
+          "map": "m1",
+          "element_type": "location",
+          "element_id": "loc-1",
+          "x": 10,
+          "y": 20
+        }
+      ],
+      "served": [
+        {
+          "type": "location",
+          "id": "loc-1",
+          "name": "location loc-1"
+        }
+      ],
+      "want": {
+        "known": [
+          {
+            "pin": "p1",
+            "map": "m1",
+            "element_type": "location",
+            "element_id": "loc-1",
+            "how": "whole"
+          }
+        ],
+        "unknown": 0,
+        "out": {}
+      }
+    },
+    {
+      "name": "a Pin whose element was served as a stub",
+      "pins": [
+        {
+          "type": "pin",
+          "id": "p1",
+          "map": "m1",
+          "element_type": "location",
+          "element_id": "loc-1",
+          "x": 10,
+          "y": 20
+        }
+      ],
+      "served": [
+        {
+          "type": "location",
+          "id": "loc-1",
+          "name": "location loc-1",
+          "known_of": true
+        }
+      ],
+      "want": {
+        "known": [
+          {
+            "pin": "p1",
+            "map": "m1",
+            "element_type": "location",
+            "element_id": "loc-1",
+            "how": "known_of"
+          }
+        ],
+        "unknown": 0,
+        "out": {}
+      }
+    },
+    {
+      "name": "a Pin whose element was not served",
+      "pins": [
+        {
+          "type": "pin",
+          "id": "p1",
+          "map": "m1",
+          "element_type": "location",
+          "element_id": "loc-1",
+          "x": 10,
+          "y": 20
+        }
+      ],
+      "served": [
+        {
+          "type": "location",
+          "id": "loc-2",
+          "name": "location loc-2"
+        }
+      ],
+      "want": {
+        "known": [],
+        "unknown": 1,
+        "out": {}
+      }
+    },
+    {
+      "name": "nothing served: every linked Pin is unknown",
+      "pins": [
+        {
+          "type": "pin",
+          "id": "p1",
+          "map": "m1",
+          "element_type": "location",
+          "element_id": "loc-1",
+          "x": 10,
+          "y": 20
+        },
+        {
+          "type": "pin",
+          "id": "p2",
+          "map": "m1",
+          "element_type": "character",
+          "element_id": "cha-1",
+          "x": 10,
+          "y": 20
+        }
+      ],
+      "served": [],
+      "want": {
+        "known": [],
+        "unknown": 2,
+        "out": {}
+      }
+    },
+    {
+      "name": "no Pins",
+      "pins": [],
+      "served": [
+        {
+          "type": "location",
+          "id": "loc-1",
+          "name": "location loc-1"
+        }
+      ],
+      "want": {
+        "known": [],
+        "unknown": 0,
+        "out": {}
+      }
+    },
+    {
+      "name": "one of each: whole, stub, unseen, no link",
+      "pins": [
+        {
+          "type": "pin",
+          "id": "p4",
+          "map": "m1",
+          "x": 10,
+          "y": 20
+        },
+        {
+          "type": "pin",
+          "id": "p3",
+          "map": "m1",
+          "element_type": "event",
+          "element_id": "eve-1",
+          "x": 10,
+          "y": 20
+        },
+        {
+          "type": "pin",
+          "id": "p2",
+          "map": "m2",
+          "element_type": "institution",
+          "element_id": "ins-1",
+          "x": 10,
+          "y": 20
+        },
+        {
+          "type": "pin",
+          "id": "p1",
+          "map": "m1",
+          "element_type": "character",
+          "element_id": "cha-1",
+          "x": 10,
+          "y": 20
+        }
+      ],
+      "served": [
+        {
+          "type": "character",
+          "id": "cha-1",
+          "name": "character cha-1"
+        },
+        {
+          "type": "institution",
+          "id": "ins-1",
+          "name": "institution ins-1",
+          "known_of": true
+        },
+        {
+          "type": "event",
+          "id": "eve-2",
+          "name": "event eve-2"
+        }
+      ],
+      "want": {
+        "known": [
+          {
+            "pin": "p1",
+            "map": "m1",
+            "element_type": "character",
+            "element_id": "cha-1",
+            "how": "whole"
+          },
+          {
+            "pin": "p2",
+            "map": "m2",
+            "element_type": "institution",
+            "element_id": "ins-1",
+            "how": "known_of"
+          }
+        ],
+        "unknown": 1,
+        "out": {
+          "no_link": 1
+        }
+      }
+    },
+    {
+      "name": "the type is read as written: the Pin says Location, the row location",
+      "pins": [
+        {
+          "type": "pin",
+          "id": "p1",
+          "map": "m1",
+          "element_type": "Location",
+          "element_id": "loc-1",
+          "x": 10,
+          "y": 20
+        }
+      ],
+      "served": [
+        {
+          "type": "location",
+          "id": "loc-1",
+          "name": "location loc-1"
+        }
+      ],
+      "want": {
+        "known": [],
+        "unknown": 1,
+        "out": {}
+      }
+    },
+    {
+      "name": "the type is read as written: the row says Location, the Pin location",
+      "pins": [
+        {
+          "type": "pin",
+          "id": "p1",
+          "map": "m1",
+          "element_type": "location",
+          "element_id": "loc-1",
+          "x": 10,
+          "y": 20
+        }
+      ],
+      "served": [
+        {
+          "type": "Location",
+          "id": "loc-1",
+          "name": "Location loc-1"
+        }
+      ],
+      "want": {
+        "known": [],
+        "unknown": 1,
+        "out": {}
+      }
+    },
+    {
+      "name": "a type that is no element type is matched as written all the same",
+      "pins": [
+        {
+          "type": "pin",
+          "id": "p1",
+          "map": "m1",
+          "element_type": "wizard",
+          "element_id": "w-1",
+          "x": 10,
+          "y": 20
+        }
+      ],
+      "served": [
+        {
+          "type": "wizard",
+          "id": "w-1",
+          "name": "wizard w-1"
+        }
+      ],
+      "want": {
+        "known": [
+          {
+            "pin": "p1",
+            "map": "m1",
+            "element_type": "wizard",
+            "element_id": "w-1",
+            "how": "whole"
+          }
+        ],
+        "unknown": 0,
+        "out": {}
+      }
+    },
+    {
+      "name": "the same id under another type is another element",
+      "pins": [
+        {
+          "type": "pin",
+          "id": "p1",
+          "map": "m1",
+          "element_type": "location",
+          "element_id": "x-1",
+          "x": 10,
+          "y": 20
+        }
+      ],
+      "served": [
+        {
+          "type": "character",
+          "id": "x-1",
+          "name": "character x-1"
+        }
+      ],
+      "want": {
+        "known": [],
+        "unknown": 1,
+        "out": {}
+      }
+    },
+    {
+      "name": "the id is read as written: another case is another id",
+      "pins": [
+        {
+          "type": "pin",
+          "id": "p1",
+          "map": "m1",
+          "element_type": "location",
+          "element_id": "LOC-1",
+          "x": 10,
+          "y": 20
+        }
+      ],
+      "served": [
+        {
+          "type": "location",
+          "id": "loc-1",
+          "name": "location loc-1"
+        }
+      ],
+      "want": {
+        "known": [],
+        "unknown": 1,
+        "out": {}
+      }
+    },
+    {
+      "name": "two served rows of one type and id, whole then stub: the last decides",
+      "pins": [
+        {
+          "type": "pin",
+          "id": "p1",
+          "map": "m1",
+          "element_type": "location",
+          "element_id": "loc-1",
+          "x": 10,
+          "y": 20
+        }
+      ],
+      "served": [
+        {
+          "type": "location",
+          "id": "loc-1",
+          "name": "location loc-1"
+        },
+        {
+          "type": "location",
+          "id": "loc-1",
+          "name": "location loc-1",
+          "known_of": true
+        }
+      ],
+      "want": {
+        "known": [
+          {
+            "pin": "p1",
+            "map": "m1",
+            "element_type": "location",
+            "element_id": "loc-1",
+            "how": "known_of"
+          }
+        ],
+        "unknown": 0,
+        "out": {}
+      }
+    },
+    {
+      "name": "two served rows of one type and id, stub then whole: the last decides",
+      "pins": [
+        {
+          "type": "pin",
+          "id": "p1",
+          "map": "m1",
+          "element_type": "location",
+          "element_id": "loc-1",
+          "x": 10,
+          "y": 20
+        }
+      ],
+      "served": [
+        {
+          "type": "location",
+          "id": "loc-1",
+          "name": "location loc-1",
+          "known_of": true
+        },
+        {
+          "type": "location",
+          "id": "loc-1",
+          "name": "location loc-1"
+        }
+      ],
+      "want": {
+        "known": [
+          {
+            "pin": "p1",
+            "map": "m1",
+            "element_type": "location",
+            "element_id": "loc-1",
+            "how": "whole"
+          }
+        ],
+        "unknown": 0,
+        "out": {}
+      }
+    },
+    {
+      "name": "a stub of another type with the same id does not make a whole element a stub",
+      "pins": [
+        {
+          "type": "pin",
+          "id": "p1",
+          "map": "m1",
+          "element_type": "location",
+          "element_id": "x-1",
+          "x": 10,
+          "y": 20
+        }
+      ],
+      "served": [
+        {
+          "type": "location",
+          "id": "x-1",
+          "name": "location x-1"
+        },
+        {
+          "type": "character",
+          "id": "x-1",
+          "name": "character x-1",
+          "known_of": true
+        }
+      ],
+      "want": {
+        "known": [
+          {
+            "pin": "p1",
+            "map": "m1",
+            "element_type": "location",
+            "element_id": "x-1",
+            "how": "whole"
+          }
+        ],
+        "unknown": 0,
+        "out": {}
+      }
+    },
+    {
+      "name": "known_of is a stub only when it is true",
+      "pins": [
+        {
+          "type": "pin",
+          "id": "p1",
+          "map": "m1",
+          "element_type": "location",
+          "element_id": "loc-1",
+          "x": 10,
+          "y": 20
+        },
+        {
+          "type": "pin",
+          "id": "p2",
+          "map": "m1",
+          "element_type": "location",
+          "element_id": "loc-2",
+          "x": 10,
+          "y": 20
+        },
+        {
+          "type": "pin",
+          "id": "p3",
+          "map": "m1",
+          "element_type": "location",
+          "element_id": "loc-3",
+          "x": 10,
+          "y": 20
+        },
+        {
+          "type": "pin",
+          "id": "p4",
+          "map": "m1",
+          "element_type": "location",
+          "element_id": "loc-4",
+          "x": 10,
+          "y": 20
+        },
+        {
+          "type": "pin",
+          "id": "p5",
+          "map": "m1",
+          "element_type": "location",
+          "element_id": "loc-5",
+          "x": 10,
+          "y": 20
+        }
+      ],
+      "served": [
+        {
+          "type": "location",
+          "id": "loc-1",
+          "name": "location loc-1",
+          "known_of": "true"
+        },
+        {
+          "type": "location",
+          "id": "loc-2",
+          "name": "location loc-2",
+          "known_of": 1
+        },
+        {
+          "type": "location",
+          "id": "loc-3",
+          "name": "location loc-3",
+          "known_of": false
+        },
+        {
+          "type": "location",
+          "id": "loc-4",
+          "name": "location loc-4",
+          "known_of": null
+        },
+        {
+          "type": "location",
+          "id": "loc-5",
+          "name": "location loc-5",
+          "known_of": true
+        }
+      ],
+      "want": {
+        "known": [
+          {
+            "pin": "p1",
+            "map": "m1",
+            "element_type": "location",
+            "element_id": "loc-1",
+            "how": "whole"
+          },
+          {
+            "pin": "p2",
+            "map": "m1",
+            "element_type": "location",
+            "element_id": "loc-2",
+            "how": "whole"
+          },
+          {
+            "pin": "p3",
+            "map": "m1",
+            "element_type": "location",
+            "element_id": "loc-3",
+            "how": "whole"
+          },
+          {
+            "pin": "p4",
+            "map": "m1",
+            "element_type": "location",
+            "element_id": "loc-4",
+            "how": "whole"
+          },
+          {
+            "pin": "p5",
+            "map": "m1",
+            "element_type": "location",
+            "element_id": "loc-5",
+            "how": "known_of"
+          }
+        ],
+        "unknown": 0,
+        "out": {}
+      }
+    },
+    {
+      "name": "a served row that is no element is not read",
+      "pins": [
+        {
+          "type": "pin",
+          "id": "p1",
+          "map": "m1",
+          "element_type": "location",
+          "element_id": "loc-1",
+          "x": 10,
+          "y": 20
+        },
+        {
+          "type": "pin",
+          "id": "p2",
+          "map": "m1",
+          "element_type": "location",
+          "element_id": "loc-2",
+          "x": 10,
+          "y": 20
+        },
+        {
+          "type": "pin",
+          "id": "p3",
+          "map": "m1",
+          "element_type": "location",
+          "element_id": "7",
+          "x": 10,
+          "y": 20
+        },
+        {
+          "type": "pin",
+          "id": "p4",
+          "map": "m1",
+          "element_type": "location",
+          "element_id": "loc-4",
+          "x": 10,
+          "y": 20
+        }
+      ],
+      "served": [
+        {
+          "id": "loc-1",
+          "name": "no type"
+        },
+        {
+          "type": 7,
+          "id": "loc-2"
+        },
+        {
+          "type": "location",
+          "id": 7
+        },
+        {
+          "type": "location",
+          "id": ""
+        },
+        {
+          "type": "location"
+        },
+        null,
+        "loc-4",
+        [
+          "location",
+          "loc-4"
+        ],
+        [
+          {
+            "type": "location",
+            "id": "loc-4"
+          }
+        ]
+      ],
+      "want": {
+        "known": [],
+        "unknown": 4,
+        "out": {}
+      }
+    },
+    {
+      "name": "a Pin with only a type, only an id, empty words or nulls places nothing",
+      "pins": [
+        {
+          "type": "pin",
+          "id": "p1",
+          "map": "m1",
+          "element_type": "location"
+        },
+        {
+          "type": "pin",
+          "id": "p2",
+          "map": "m1",
+          "element_id": "loc-1"
+        },
+        {
+          "type": "pin",
+          "id": "p3",
+          "map": "m1",
+          "element_type": "",
+          "element_id": "loc-1"
+        },
+        {
+          "type": "pin",
+          "id": "p4",
+          "map": "m1",
+          "element_type": "location",
+          "element_id": ""
+        },
+        {
+          "type": "pin",
+          "id": "p5",
+          "map": "m1",
+          "element_type": null,
+          "element_id": null
+        },
+        {
+          "type": "pin",
+          "id": "p6",
+          "map": "m1"
+        },
+        {
+          "type": "pin",
+          "id": "p7",
+          "map": "m1",
+          "element_type": "location",
+          "element_id": 7
+        },
+        {
+          "type": "pin",
+          "id": "p8",
+          "map": "m1",
+          "element_type": [
+            "location"
+          ],
+          "element_id": "loc-1"
+        }
+      ],
+      "served": [
+        {
+          "type": "location",
+          "id": "loc-1",
+          "name": "location loc-1"
+        },
+        {
+          "type": "location",
+          "id": "",
+          "name": "location "
+        },
+        {
+          "type": "",
+          "id": "loc-1",
+          "name": " loc-1"
+        },
+        {
+          "type": "location",
+          "id": 7
+        }
+      ],
+      "want": {
+        "known": [],
+        "unknown": 0,
+        "out": {
+          "no_link": 8
+        }
+      }
+    },
+    {
+      "name": "the map is echoed as written, and null when it is no id",
+      "pins": [
+        {
+          "type": "pin",
+          "id": "p1",
+          "map": "m-not-served",
+          "element_type": "location",
+          "element_id": "loc-1",
+          "x": 10,
+          "y": 20
+        },
+        {
+          "type": "pin",
+          "id": "p2",
+          "map": "",
+          "element_type": "location",
+          "element_id": "loc-1",
+          "x": 10,
+          "y": 20
+        },
+        {
+          "type": "pin",
+          "id": "p3",
+          "map": null,
+          "element_type": "location",
+          "element_id": "loc-1",
+          "x": 10,
+          "y": 20
+        },
+        {
+          "type": "pin",
+          "id": "p4",
+          "map": 7,
+          "element_type": "location",
+          "element_id": "loc-1",
+          "x": 10,
+          "y": 20
+        },
+        {
+          "type": "pin",
+          "id": "p5",
+          "element_type": "location",
+          "element_id": "loc-1"
+        },
+        {
+          "type": "pin",
+          "id": "p6",
+          "map": " m1 ",
+          "element_type": "location",
+          "element_id": "loc-1",
+          "x": 10,
+          "y": 20
+        }
+      ],
+      "served": [
+        {
+          "type": "location",
+          "id": "loc-1",
+          "name": "location loc-1"
+        }
+      ],
+      "want": {
+        "known": [
+          {
+            "pin": "p1",
+            "map": "m-not-served",
+            "element_type": "location",
+            "element_id": "loc-1",
+            "how": "whole"
+          },
+          {
+            "pin": "p2",
+            "map": null,
+            "element_type": "location",
+            "element_id": "loc-1",
+            "how": "whole"
+          },
+          {
+            "pin": "p3",
+            "map": null,
+            "element_type": "location",
+            "element_id": "loc-1",
+            "how": "whole"
+          },
+          {
+            "pin": "p4",
+            "map": null,
+            "element_type": "location",
+            "element_id": "loc-1",
+            "how": "whole"
+          },
+          {
+            "pin": "p5",
+            "map": null,
+            "element_type": "location",
+            "element_id": "loc-1",
+            "how": "whole"
+          },
+          {
+            "pin": "p6",
+            "map": " m1 ",
+            "element_type": "location",
+            "element_id": "loc-1",
+            "how": "whole"
+          }
+        ],
+        "unknown": 0,
+        "out": {}
+      }
+    },
+    {
+      "name": "a Pin with no point is answered all the same",
+      "pins": [
+        {
+          "type": "pin",
+          "id": "p1",
+          "map": "m1",
+          "element_type": "location",
+          "element_id": "loc-1"
+        },
+        {
+          "type": "pin",
+          "id": "p2",
+          "map": "m1",
+          "element_type": "location",
+          "element_id": "loc-1",
+          "x": "ten",
+          "y": null
+        }
+      ],
+      "served": [
+        {
+          "type": "location",
+          "id": "loc-1",
+          "name": "location loc-1"
+        }
+      ],
+      "want": {
+        "known": [
+          {
+            "pin": "p1",
+            "map": "m1",
+            "element_type": "location",
+            "element_id": "loc-1",
+            "how": "whole"
+          },
+          {
+            "pin": "p2",
+            "map": "m1",
+            "element_type": "location",
+            "element_id": "loc-1",
+            "how": "whole"
+          }
+        ],
+        "unknown": 0,
+        "out": {}
+      }
+    },
+    {
+      "name": "two Pin rows with one id, known then unseen: the last is read",
+      "pins": [
+        {
+          "type": "pin",
+          "id": "p1",
+          "map": "m1",
+          "element_type": "location",
+          "element_id": "loc-1",
+          "x": 10,
+          "y": 20
+        },
+        {
+          "type": "pin",
+          "id": "p1",
+          "map": "m2",
+          "element_type": "location",
+          "element_id": "loc-9",
+          "x": 10,
+          "y": 20
+        }
+      ],
+      "served": [
+        {
+          "type": "location",
+          "id": "loc-1",
+          "name": "location loc-1"
+        }
+      ],
+      "want": {
+        "known": [],
+        "unknown": 1,
+        "out": {}
+      }
+    },
+    {
+      "name": "two Pin rows with one id, unseen then known: the last is read",
+      "pins": [
+        {
+          "type": "pin",
+          "id": "p1",
+          "map": "m1",
+          "element_type": "location",
+          "element_id": "loc-9",
+          "x": 10,
+          "y": 20
+        },
+        {
+          "type": "pin",
+          "id": "p1",
+          "map": "m2",
+          "element_type": "location",
+          "element_id": "loc-1",
+          "x": 10,
+          "y": 20
+        }
+      ],
+      "served": [
+        {
+          "type": "location",
+          "id": "loc-1",
+          "name": "location loc-1"
+        }
+      ],
+      "want": {
+        "known": [
+          {
+            "pin": "p1",
+            "map": "m2",
+            "element_type": "location",
+            "element_id": "loc-1",
+            "how": "whole"
+          }
+        ],
+        "unknown": 0,
+        "out": {}
+      }
+    },
+    {
+      "name": "two Pin rows with one id, linked then with no link: the last is read",
+      "pins": [
+        {
+          "type": "pin",
+          "id": "p1",
+          "map": "m1",
+          "element_type": "location",
+          "element_id": "loc-1",
+          "x": 10,
+          "y": 20
+        },
+        {
+          "type": "pin",
+          "id": "p1",
+          "map": "m1"
+        }
+      ],
+      "served": [
+        {
+          "type": "location",
+          "id": "loc-1",
+          "name": "location loc-1"
+        }
+      ],
+      "want": {
+        "known": [],
+        "unknown": 0,
+        "out": {
+          "no_link": 1
+        }
+      }
+    },
+    {
+      "name": "rows that are no Pin are not read and not counted",
+      "pins": [
+        {
+          "type": "map",
+          "id": "m1",
+          "name": "map m1"
+        },
+        {
+          "type": "location",
+          "id": "loc-1",
+          "name": "location loc-1",
+          "element_type": "location",
+          "element_id": "loc-1"
+        },
+        {
+          "type": "Pin",
+          "id": "p1",
+          "map": "m1",
+          "element_type": "location",
+          "element_id": "loc-1"
+        },
+        {
+          "type": "pin",
+          "map": "m1",
+          "element_type": "location",
+          "element_id": "loc-1"
+        },
+        {
+          "type": "pin",
+          "id": "",
+          "map": "m1",
+          "element_type": "location",
+          "element_id": "loc-1"
+        },
+        {
+          "type": "pin",
+          "id": 7,
+          "map": "m1",
+          "element_type": "location",
+          "element_id": "loc-1"
+        },
+        {
+          "id": "p2",
+          "map": "m1",
+          "element_type": "location",
+          "element_id": "loc-1"
+        },
+        null,
+        "pin",
+        [
+          {
+            "type": "pin",
+            "id": "p3",
+            "map": "m1",
+            "element_type": "location",
+            "element_id": "loc-1",
+            "x": 10,
+            "y": 20
+          }
+        ],
+        {
+          "type": "pin",
+          "id": "p9",
+          "map": "m1",
+          "element_type": "location",
+          "element_id": "loc-1",
+          "x": 10,
+          "y": 20
+        }
+      ],
+      "served": [
+        {
+          "type": "location",
+          "id": "loc-1",
+          "name": "location loc-1"
+        }
+      ],
+      "want": {
+        "known": [
+          {
+            "pin": "p9",
+            "map": "m1",
+            "element_type": "location",
+            "element_id": "loc-1",
+            "how": "whole"
+          }
+        ],
+        "unknown": 0,
+        "out": {}
+      }
+    },
+    {
+      "name": "a served Pin does not make what it places known",
+      "pins": [
+        {
+          "type": "pin",
+          "id": "p1",
+          "map": "m1",
+          "element_type": "location",
+          "element_id": "loc-1",
+          "x": 10,
+          "y": 20
+        }
+      ],
+      "served": [
+        {
+          "type": "pin",
+          "id": "p1",
+          "map": "m1",
+          "element_type": "location",
+          "element_id": "loc-1",
+          "x": 10,
+          "y": 20
+        },
+        {
+          "type": "map",
+          "id": "m1",
+          "name": "map m1"
+        }
+      ],
+      "want": {
+        "known": [],
+        "unknown": 1,
+        "out": {}
+      }
+    },
+    {
+      "name": "a Pin that places a Pin is known when that Pin was served",
+      "pins": [
+        {
+          "type": "pin",
+          "id": "p1",
+          "map": "m1",
+          "element_type": "pin",
+          "element_id": "p2",
+          "x": 10,
+          "y": 20
+        },
+        {
+          "type": "pin",
+          "id": "p2",
+          "map": "m1",
+          "element_type": "location",
+          "element_id": "loc-1",
+          "x": 10,
+          "y": 20
+        }
+      ],
+      "served": [
+        {
+          "type": "pin",
+          "id": "p2",
+          "map": "m1",
+          "element_type": "location",
+          "element_id": "loc-1",
+          "x": 10,
+          "y": 20
+        }
+      ],
+      "want": {
+        "known": [
+          {
+            "pin": "p1",
+            "map": "m1",
+            "element_type": "pin",
+            "element_id": "p2",
+            "how": "whole"
+          }
+        ],
+        "unknown": 1,
+        "out": {}
+      }
+    },
+    {
+      "name": "a Pin that places the reader's own Character",
+      "pins": [
+        {
+          "type": "pin",
+          "id": "p1",
+          "map": "m1",
+          "element_type": "character",
+          "element_id": "cha-self",
+          "x": 10,
+          "y": 20
+        }
+      ],
+      "served": [
+        {
+          "type": "character",
+          "id": "cha-self",
+          "name": "character cha-self",
+          "self": true
+        }
+      ],
+      "want": {
+        "known": [
+          {
+            "pin": "p1",
+            "map": "m1",
+            "element_type": "character",
+            "element_id": "cha-self",
+            "how": "whole"
+          }
+        ],
+        "unknown": 0,
+        "out": {}
+      }
+    },
+    {
+      "name": "several Pins on several Maps place one element: each is known",
+      "pins": [
+        {
+          "type": "pin",
+          "id": "p3",
+          "map": "m3",
+          "element_type": "location",
+          "element_id": "loc-1",
+          "x": 10,
+          "y": 20
+        },
+        {
+          "type": "pin",
+          "id": "p1",
+          "map": "m1",
+          "element_type": "location",
+          "element_id": "loc-1",
+          "x": 10,
+          "y": 20
+        },
+        {
+          "type": "pin",
+          "id": "p2",
+          "map": "m2",
+          "element_type": "location",
+          "element_id": "loc-1",
+          "x": 10,
+          "y": 20
+        }
+      ],
+      "served": [
+        {
+          "type": "location",
+          "id": "loc-1",
+          "name": "location loc-1",
+          "known_of": true
+        }
+      ],
+      "want": {
+        "known": [
+          {
+            "pin": "p1",
+            "map": "m1",
+            "element_type": "location",
+            "element_id": "loc-1",
+            "how": "known_of"
+          },
+          {
+            "pin": "p2",
+            "map": "m2",
+            "element_type": "location",
+            "element_id": "loc-1",
+            "how": "known_of"
+          },
+          {
+            "pin": "p3",
+            "map": "m3",
+            "element_type": "location",
+            "element_id": "loc-1",
+            "how": "known_of"
+          }
+        ],
+        "unknown": 0,
+        "out": {}
+      }
+    },
+    {
+      "name": "known is ordered by Pin id as text: a capital before a small letter, 10 before 9",
+      "pins": [
+        {
+          "type": "pin",
+          "id": "pin-a",
+          "map": "m1",
+          "element_type": "location",
+          "element_id": "loc-1",
+          "x": 10,
+          "y": 20
+        },
+        {
+          "type": "pin",
+          "id": "pin-9",
+          "map": "m1",
+          "element_type": "location",
+          "element_id": "loc-1",
+          "x": 10,
+          "y": 20
+        },
+        {
+          "type": "pin",
+          "id": "pin-B",
+          "map": "m1",
+          "element_type": "location",
+          "element_id": "loc-1",
+          "x": 10,
+          "y": 20
+        },
+        {
+          "type": "pin",
+          "id": "pin-10",
+          "map": "m1",
+          "element_type": "location",
+          "element_id": "loc-1",
+          "x": 10,
+          "y": 20
+        }
+      ],
+      "served": [
+        {
+          "type": "location",
+          "id": "loc-1",
+          "name": "location loc-1"
+        }
+      ],
+      "want": {
+        "known": [
+          {
+            "pin": "pin-10",
+            "map": "m1",
+            "element_type": "location",
+            "element_id": "loc-1",
+            "how": "whole"
+          },
+          {
+            "pin": "pin-9",
+            "map": "m1",
+            "element_type": "location",
+            "element_id": "loc-1",
+            "how": "whole"
+          },
+          {
+            "pin": "pin-B",
+            "map": "m1",
+            "element_type": "location",
+            "element_id": "loc-1",
+            "how": "whole"
+          },
+          {
+            "pin": "pin-a",
+            "map": "m1",
+            "element_type": "location",
+            "element_id": "loc-1",
+            "how": "whole"
+          }
+        ],
+        "unknown": 0,
+        "out": {}
+      }
+    },
+    {
+      "name": "known is ordered by code point, not by UTF-16 unit",
+      "pins": [
+        {
+          "type": "pin",
+          "id": "pin-🐉",
+          "map": "m1",
+          "element_type": "location",
+          "element_id": "loc-1",
+          "x": 10,
+          "y": 20
+        },
+        {
+          "type": "pin",
+          "id": "pin-～",
+          "map": "m1",
+          "element_type": "location",
+          "element_id": "loc-1",
+          "x": 10,
+          "y": 20
+        }
+      ],
+      "served": [
+        {
+          "type": "location",
+          "id": "loc-1",
+          "name": "location loc-1"
+        }
+      ],
+      "want": {
+        "known": [
+          {
+            "pin": "pin-～",
+            "map": "m1",
+            "element_type": "location",
+            "element_id": "loc-1",
+            "how": "whole"
+          },
+          {
+            "pin": "pin-🐉",
+            "map": "m1",
+            "element_type": "location",
+            "element_id": "loc-1",
+            "how": "whole"
+          }
+        ],
+        "unknown": 0,
+        "out": {}
+      }
+    },
+    {
+      "name": "an id above the BMP is matched whole",
+      "pins": [
+        {
+          "type": "pin",
+          "id": "p1",
+          "map": "m1",
+          "element_type": "location",
+          "element_id": "loc-🐉",
+          "x": 10,
+          "y": 20
+        },
+        {
+          "type": "pin",
+          "id": "p2",
+          "map": "m1",
+          "element_type": "location",
+          "element_id": "loc-🐊",
+          "x": 10,
+          "y": 20
+        }
+      ],
+      "served": [
+        {
+          "type": "location",
+          "id": "loc-🐉",
+          "name": "location loc-🐉"
+        }
+      ],
+      "want": {
+        "known": [
+          {
+            "pin": "p1",
+            "map": "m1",
+            "element_type": "location",
+            "element_id": "loc-🐉",
+            "how": "whole"
+          }
+        ],
+        "unknown": 1,
+        "out": {}
+      }
+    },
+    {
+      "name": "the answer carries no name or body of the element",
+      "pins": [
+        {
+          "type": "pin",
+          "id": "p1",
+          "map": "m1",
+          "element_type": "character",
+          "element_id": "cha-1",
+          "x": 10,
+          "y": 20,
+          "name": "the Pin's own name",
+          "description": "x"
+        }
+      ],
+      "served": [
+        {
+          "type": "character",
+          "id": "cha-1",
+          "name": "A secret name",
+          "description": "A body",
+          "known_of": true,
+          "supertype": "Spy"
+        }
+      ],
+      "want": {
+        "known": [
+          {
+            "pin": "p1",
+            "map": "m1",
+            "element_type": "character",
+            "element_id": "cha-1",
+            "how": "known_of"
+          }
+        ],
+        "unknown": 0,
+        "out": {}
+      }
+    }
+  ],
+  "refusals": [
+    {
+      "name": "pins is null",
+      "pins": null,
+      "served": [],
+      "refuses": "pins"
+    },
+    {
+      "name": "pins is an object",
+      "pins": {
+        "type": "pin",
+        "id": "p1"
+      },
+      "served": [],
+      "refuses": "pins"
+    },
+    {
+      "name": "pins is a string",
+      "pins": "pin",
+      "served": [],
+      "refuses": "pins"
+    },
+    {
+      "name": "pins is a number",
+      "pins": 7,
+      "served": [],
+      "refuses": "pins"
+    },
+    {
+      "name": "served is null",
+      "pins": [],
+      "served": null,
+      "refuses": "served"
+    },
+    {
+      "name": "served is an object",
+      "pins": [],
+      "served": {
+        "type": "location",
+        "id": "loc-1"
+      },
+      "refuses": "served"
+    },
+    {
+      "name": "served is a string",
+      "pins": [],
+      "served": "location",
+      "refuses": "served"
+    },
+    {
+      "name": "both are wrong: pins is named",
+      "pins": null,
+      "served": null,
+      "refuses": "pins"
+    }
+  ]
+}

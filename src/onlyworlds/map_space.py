@@ -16,11 +16,14 @@ whole by ``tests/test_map_space.py``.
 (``x_layout`` with a non-empty string ``method``; ``"hand"`` is a board), the served Map its layout stands on, and
 the Pins a new lay-out keeps where they are. ``map_space`` reads none of these keys. The fixture's ``layout_cases``
 are replayed whole by ``tests/test_layout_of.py``.
+
+``pins_known_to(pins, served)`` is not the profile's: a rule of this package and the npm SDK. It answers which of a
+map's Pins one reader knows, from the elements that reader was served and nothing else.
 """
 
 from __future__ import annotations
 
-from collections.abc import Iterable, Mapping
+from collections.abc import Iterable, Mapping, Sequence
 from typing import Any, Literal, NotRequired, TypedDict
 
 from .lens import _whole
@@ -90,6 +93,29 @@ class MapLayout(TypedDict):
     #: The ids of the Pins a new lay-out keeps where they are, in code point order: every Pin of a board, the Pins
     #: whose ``x_hand`` is exactly ``True`` on any other layout map, and none on a Map that is not a layout map.
     hand: list[str]
+
+
+PinKnownHow = Literal["whole", "known_of"]
+
+
+class PinKnown(TypedDict):
+    """A Pin a reader knows: the element it places was served to that reader, ``whole`` or as a stub (``known_of``)."""
+
+    pin: str
+    #: The Pin's ``map`` as written when it is a non-empty string, else None. Not checked against any Map.
+    map: str | None
+    element_type: str
+    element_id: str
+    how: PinKnownHow
+
+
+class PinsKnownTo(TypedDict):
+    """``pins_known_to``'s answer: ``known`` by Pin id in code point order, ``unknown`` a count of the Pins that place
+    an element the reader was not served, ``out`` with ``no_link`` (a Pin that places nothing) when one was counted."""
+
+    known: list[PinKnown]
+    unknown: int
+    out: dict[str, int]
 
 
 def _id(value: Any) -> str | None:
@@ -252,3 +278,67 @@ def layout_of(
         if this is not None and pin.get("map") == this and (method == "hand" or pin.get("x_hand") is True)
     )
     return {"layout": method, "ground": ground, "hand": hand}
+
+
+def pins_known_to(pins: Sequence[Any], served: Sequence[Any]) -> PinsKnownTo:
+    """Which of ``pins`` a reader knows, for a map drawn as one Character sees it: ``{known, unknown, out}``, all
+    three keys always present.
+
+    ``pins`` is a list of elements, of which the rows of type ``pin`` are read (so a whole world's list can be
+    passed). ``served`` is the list of elements as that reader was served them, stubs included: a list read with the
+    reader's own key, or the owner's read as that Character (``view_as``). The function reads nothing else, so it
+    cannot show a reader more than the world told them. It does not ask whether a Pin has a point or its Map exists:
+    that is ``map_space``'s reading, and a drawing keeps the Pins both name.
+
+    A Pin is known when a row of ``served`` has the Pin's ``element_type`` as its ``type`` and the Pin's
+    ``element_id`` as its ``id``, both as written (``Location`` is no ``location``, and the same id under another
+    type is another element). ``how`` is ``known_of`` when that row is a stub (``known_of`` exactly ``True``), else
+    ``whole``; of two served rows with one type and id, the last one decides. A Pin with only one of ``element_type``
+    and ``element_id`` places nothing: it is counted in ``out["no_link"]`` and never known. A row without a string
+    ``type`` and a non-empty string ``id`` is no element and is not counted; of two Pin rows with one id, the last
+    one is read. ``known`` is in Pin id order by code point; ``unknown`` is a count, never ids.
+
+    The answer carries ids and the two words only, never an element's name or body. A rule of this package and the
+    npm SDK (``pinsKnownTo``), not of the standard; the shared cases are ``tests/fixtures/pins-known-to.cases.json``.
+    Raises ``TypeError`` when ``pins`` or ``served`` is not a list or a tuple.
+    """
+    if not isinstance(pins, (list, tuple)):
+        raise TypeError("pins_known_to: pins is a list of elements.")
+    if not isinstance(served, (list, tuple)):
+        raise TypeError("pins_known_to: served is a list of elements.")
+
+    served_how: dict[str, dict[str, PinKnownHow]] = {}
+    for element in served:
+        if not isinstance(element, Mapping) or not isinstance(element.get("type"), str):
+            continue
+        element_id = _id(element.get("id"))
+        if element_id is None:
+            continue
+        served_how.setdefault(element["type"], {})[element_id] = (
+            "known_of" if element.get("known_of") is True else "whole"
+        )
+
+    rows: dict[str, Mapping[str, Any]] = {}
+    for pin in pins:
+        if isinstance(pin, Mapping) and pin.get("type") == "pin" and (pin_id := _id(pin.get("id"))) is not None:
+            rows[pin_id] = pin
+
+    known: list[PinKnown] = []
+    unknown = 0
+    no_link = 0
+    for pin_id in sorted(rows):
+        pin = rows[pin_id]
+        placed_type, placed_id = _id(pin.get("element_type")), _id(pin.get("element_id"))
+        if placed_type is None or placed_id is None:
+            no_link += 1
+            continue
+        how = served_how.get(placed_type, {}).get(placed_id)
+        if how is None:
+            unknown += 1
+            continue
+        placed_map = _id(pin.get("map"))
+        known.append(
+            {"pin": pin_id, "map": placed_map, "element_type": placed_type, "element_id": placed_id, "how": how}
+        )
+    out: dict[str, int] = {"no_link": no_link} if no_link else {}
+    return {"known": known, "unknown": unknown, "out": out}

@@ -115,7 +115,18 @@ from .layout_trail import (
     trail_by_place,
 )
 from .lens import DATE_FIELD, LensMail, LensReading, date_of, is_lens, is_template, lenses_in_use, resolve_lens
-from .map_space import MapLayout, MapSpace, MapSpaceMap, MapSpaceOutline, MapSpacePin, layout_of, map_space
+from .map_space import (
+    MapLayout,
+    MapSpace,
+    MapSpaceMap,
+    MapSpaceOutline,
+    MapSpacePin,
+    PinKnown,
+    PinsKnownTo,
+    layout_of,
+    map_space,
+    pins_known_to,
+)
 from .message import (
     EditRead,
     SenderRead,
@@ -242,6 +253,8 @@ __all__ = [
     "NameShared",
     "Opener",
     "Patch",
+    "PinKnown",
+    "PinsKnownTo",
     "PreconditionFailed",
     "ProposedError",
     "ProposedMark",
@@ -324,6 +337,7 @@ __all__ = [
     "out_degree_of",
     "parse_ow_link",
     "parse_retry_after",
+    "pins_known_to",
     "plan_push",
     "proposed_mark_of",
     "push",
