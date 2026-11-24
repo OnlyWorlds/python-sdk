@@ -417,6 +417,87 @@ def test_to_folder_writes_every_entry_byte_for_byte_and_never_over_a_folder(tmp_
     assert not (tmp_path / "evil.json").exists() and not (tmp_path / "forged").exists()
 
 
+# A dot-folder is never a world, wherever it sits: OW-5 does not look under one. The same five
+# cases, in the same order, are in the npm SDK's test/world-file.test.mjs.
+ABBEY = "0192a000-aaaa-7bbb-8ccc-0000000000ab"
+ADA = "0192a000-aaaa-7bbb-8ccc-0000000000a1"
+ELSEWHERE = encode({"id": "0192a000-aaaa-7bbb-8ccc-0000000000ef", "name": "Elsewhere"})
+
+
+def abbey_tree(more: dict[str, bytes] | None = None) -> dict[str, bytes]:
+    """Abbey's world folder, path -> bytes: its world.json, one character, and ``more``."""
+    return {
+        "world.json": encode({"id": ABBEY, "name": "Abbey"}),
+        "elements/character/ada.json": encode({"id": ADA, "name": "Ada"}),
+        **(more or {}),
+    }
+
+
+def abbey_zip(files: dict[str, bytes]) -> bytes:
+    """The tree zipped under one top-level folder ``abbey/``, built here: the writer never emits a
+    dot-folder unprompted."""
+    return zip_of({f"abbey/{rel}": data for rel, data in files.items()})
+
+
+def folder_view(root: Path) -> dict[str, Any]:
+    """What ``read_folder`` makes of a folder, every path relative to it."""
+    folder = read_folder(root)
+
+    def rel(p: Path) -> str:
+        return p.relative_to(root).as_posix()
+
+    return {
+        "world": folder.world,
+        "elements": sorted(
+            (el.layout, rel(el.path), el.id, el.type, encode(el.body)) for el in folder.all_elements().values()
+        ),
+        "skipped": [(rel(s.path), s.reason) for s in folder.skipped],
+        "duplicates": [(d.id, rel(d.kept), rel(d.ignored)) for d in folder.duplicates],
+        "ignored_dirs": [rel(p) for p in folder.ignored_dirs],
+    }
+
+
+def reads_as_its_folder(files: dict[str, bytes], tmp_path: Path) -> None:
+    """The file is accepted as abbey, carries every entry, and reads to exactly what the folder reads to."""
+    r = read_world_file(abbey_zip(files))
+    assert (r.world_id, r.name, r.top) == (ABBEY, "Abbey", "abbey")
+    assert list(r.entries) == sorted(files)
+    from_file = folder_view(r.to_folder(tmp_path / "from-file"))
+    assert [e[1] for e in from_file["elements"]] == ["elements/character/ada.json"]
+    assert from_file == folder_view(make_folder(tmp_path / "folder", files))
+
+
+def test_ow5_a_tools_world_json_in_a_dot_folder_at_the_root_is_no_second_world(tmp_path: Path) -> None:
+    reads_as_its_folder(
+        abbey_tree({".atlas/world.json": ELSEWHERE, ".atlas/world-prefs.json": encode({"zoom": 2})}), tmp_path
+    )
+
+
+def test_ow5_a_dot_folder_deeper_in_the_world_is_no_second_world_either(tmp_path: Path) -> None:
+    reads_as_its_folder(abbey_tree({"elements/character/.trash/world.json": ELSEWHERE}), tmp_path)
+
+
+def test_ow5_a_name_that_is_dots_and_more_is_a_dot_folder_name(tmp_path: Path) -> None:
+    reads_as_its_folder(abbey_tree({"..atlas/world.json": ELSEWHERE}), tmp_path)
+
+
+def test_ow5_still_refused_each_by_its_own_reason() -> None:
+    refuses("more_than_one", abbey_zip(abbey_tree({"inner/world.json": ELSEWHERE})))
+    refuses("unsafe_path", abbey_zip(abbey_tree({"inner/.atlas/../world.json": ELSEWHERE})))
+    refuses("unsafe_path", abbey_zip(abbey_tree({".atlas/./world.json": ELSEWHERE})))
+    # Only a folder's name counts: the dot-folder beside it is skipped, inner/world.json is not, and a
+    # dot file is no folder.
+    for beside in ({"inner/.hidden/world.json": ELSEWHERE}, {"inner/.hidden": b"x"}):
+        error = refuses("more_than_one", abbey_zip(abbey_tree({**beside, "inner/world.json": ELSEWHERE})))
+        assert str(error) == "A second world.json sits inside the world: abbey/inner/world.json."
+
+
+def test_ow5_records_is_still_excepted() -> None:
+    r = read_world_file(abbey_zip(abbey_tree({"records/lab/world.json": ELSEWHERE})))
+    assert r.world_id == ABBEY
+    assert list(r.entries) == ["elements/character/ada.json", "records/lab/world.json", "world.json"]
+
+
 # --- the writer --------------------------------------------------------------------------------
 
 

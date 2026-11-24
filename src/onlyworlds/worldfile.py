@@ -30,8 +30,9 @@ the reference checker's order:
 - ``marker`` (OW-6): a root ``mimetype`` entry with other bytes than the media type.
   A marker is never required.
 - ``not_a_world``, ``more_than_one`` (OW-2, OW-3, OW-5): no world, two worlds, a second
-  ``world.json`` inside the world (one under ``records/`` is a producer's data), a
-  ``world.json`` that will not parse or has no string id.
+  ``world.json`` inside the world (one under ``records/`` is a producer's data; one under a
+  dot-folder is a tool's, since a dot-folder is never a world), a ``world.json`` that will not
+  parse or has no string id.
 
 Files beside the world's folder and archive junk (``__MACOSX``, ``.DS_Store``,
 ``Thumbs.db``) are ignored (OW-4), still checked and counted. An ``api`` block in
@@ -711,10 +712,14 @@ def read_world_file(
         if len(roots) > 1:
             _refuse("more_than_one", f"The file holds worlds in {', '.join(roots)}.")
         prefix = roots[0]
-    # OW-5: no world.json inside the world but its own, except a producer's under records/.
+    # OW-5: no world.json inside the world but its own, except a producer's under records/. A dot-folder is
+    # never a world, wherever it sits: a tool's own world.json under one is not looked at here, as a folder
+    # reader never reads it. Only this check skips those paths; every check above ran on them.
     inside = {n for n in candidates if n.startswith(prefix)}
     for n in sorted(inside):
         rel = n[len(prefix) :]
+        if any(seg.startswith(".") for seg in rel.split("/")[:-1]):
+            continue
         if rel != WORLD_FILE and rel.endswith(f"/{WORLD_FILE}") and not rel.startswith("records/"):
             _refuse("more_than_one", f"A second world.json sits inside the world: {n}.")
 
