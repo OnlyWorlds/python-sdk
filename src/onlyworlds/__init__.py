@@ -134,7 +134,7 @@ from .message import (
     thread_of,
     unread_for,
 )
-from .name_finder import NameFound, name_finder
+from .name_finder import NameFinder, NameFound, NameShared, name_finder
 from .names import type_word
 from .openers import Opener, Tool, ToolOpen, openers_for
 from .push import Patch, PushPlan, PushResult, plan_push, push, verify_level
@@ -237,7 +237,9 @@ __all__ = [
     "MapSpaceMap",
     "MapSpaceOutline",
     "MapSpacePin",
+    "NameFinder",
     "NameFound",
+    "NameShared",
     "Opener",
     "Patch",
     "PreconditionFailed",

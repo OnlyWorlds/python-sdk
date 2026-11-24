@@ -1,6 +1,6 @@
 {
-  "about": "Cases for nameFinder (@onlyworlds/sdk) and name_finder (the onlyworlds Python package): the same bytes in both repositories. In a case, an element with a names list is found by those names (the names option), one without by its name; want lists what find(text) answers, in order, each the place of its first character and its length, both in code points, and the id of its element. A timed case is built from its recipe ({i} is the count from 0) and must answer count names in under underMs milliseconds. Made by test/fixtures/generate-name-finder-cases.mjs in the SDK repository; every want is written by hand there.",
-  "version": 1,
+  "about": "Cases for nameFinder (@onlyworlds/sdk) and name_finder (the onlyworlds Python package): the same bytes in both repositories. In a case, an element with a names list is found by those names (the names option), one without by its name; want lists what find(text) answers, in order, each the place of its first character and its length, both in code points, and the id of its element; shared lists what find.shared holds, in order, each a name as it is compared and the ids of the elements that hold it. A timed case is built from its recipe ({i} is the count from 0; a long name is its repeat, times over, and then its then) and must answer count names in under underMs milliseconds. Made by test/fixtures/generate-name-finder-cases.mjs in the SDK repository; every want is written by hand there.",
+  "version": 2,
   "underMs": 2000,
   "cases": [
     {
@@ -28,7 +28,8 @@
           "length": 9,
           "id": "a"
         }
-      ]
+      ],
+      "shared": []
     },
     {
       "name": "a possessive and a hyphen leave the name whole",
@@ -55,7 +56,8 @@
           "length": 6,
           "id": "j"
         }
-      ]
+      ],
+      "shared": []
     },
     {
       "name": "a name inside a longer word is not found, at either end",
@@ -67,7 +69,8 @@
         }
       ],
       "text": "Kiran and McKira and McKiran.",
-      "want": []
+      "want": [],
+      "shared": []
     },
     {
       "name": "a digit on either side is inside a word",
@@ -89,7 +92,8 @@
           "length": 6,
           "id": "u"
         }
-      ]
+      ],
+      "shared": []
     },
     {
       "name": "an underscore on either side is inside a word",
@@ -107,7 +111,8 @@
           "length": 4,
           "id": "k"
         }
-      ]
+      ],
+      "shared": []
     },
     {
       "name": "a name that starts or ends with a letter outside ASCII is found whole",
@@ -134,7 +139,8 @@
           "length": 3,
           "id": "z"
         }
-      ]
+      ],
+      "shared": []
     },
     {
       "name": "a letter outside ASCII after or before a name is inside a word",
@@ -154,7 +160,8 @@
         }
       ],
       "text": "Ana\u00efs and Zo\u00ebx and \u00c9lodie.",
-      "want": []
+      "want": [],
+      "shared": []
     },
     {
       "name": "a combining mark after a name is inside a word",
@@ -172,7 +179,8 @@
           "length": 3,
           "id": "a"
         }
-      ]
+      ],
+      "shared": []
     },
     {
       "name": "a decimal digit of another script is inside a word; a superscript is not",
@@ -190,7 +198,8 @@
           "length": 4,
           "id": "k"
         }
-      ]
+      ],
+      "shared": []
     },
     {
       "name": "places count code points: a character above the BMP before a name",
@@ -213,7 +222,8 @@
           "length": 4,
           "id": "k"
         }
-      ]
+      ],
+      "shared": []
     },
     {
       "name": "a name of letters above the BMP; two of them are too short",
@@ -235,7 +245,8 @@
           "length": 3,
           "id": "d"
         }
-      ]
+      ],
+      "shared": []
     },
     {
       "name": "the longest whole name wins",
@@ -267,7 +278,8 @@
           "length": 4,
           "id": "i"
         }
-      ]
+      ],
+      "shared": []
     },
     {
       "name": "the leftmost name is taken, and the search goes on after it",
@@ -294,7 +306,8 @@
           "length": 11,
           "id": "k"
         }
-      ]
+      ],
+      "shared": []
     },
     {
       "name": "every mention is answered",
@@ -331,7 +344,8 @@
           "length": 4,
           "id": "k"
         }
-      ]
+      ],
+      "shared": []
     },
     {
       "name": "a name two elements share stays plain",
@@ -356,6 +370,15 @@
           "at": 16,
           "length": 4,
           "id": "k"
+        }
+      ],
+      "shared": [
+        {
+          "name": "Ember",
+          "ids": [
+            "a",
+            "b"
+          ]
         }
       ]
     },
@@ -383,6 +406,15 @@
           "length": 5,
           "id": "e"
         }
+      ],
+      "shared": [
+        {
+          "name": "Old Ember",
+          "ids": [
+            "a",
+            "b"
+          ]
+        }
       ]
     },
     {
@@ -408,6 +440,15 @@
           "at": 18,
           "length": 10,
           "id": "l"
+        }
+      ],
+      "shared": [
+        {
+          "name": "Ember",
+          "ids": [
+            "a",
+            "b"
+          ]
         }
       ]
     },
@@ -443,7 +484,8 @@
           "length": 4,
           "id": "m"
         }
-      ]
+      ],
+      "shared": []
     },
     {
       "name": "an element is found by each of its names",
@@ -475,7 +517,8 @@
           "length": 10,
           "id": "v"
         }
-      ]
+      ],
+      "shared": []
     },
     {
       "name": "two elements that share one of several names: that name is plain, the others are found",
@@ -508,6 +551,15 @@
           "length": 4,
           "id": "w"
         }
+      ],
+      "shared": [
+        {
+          "name": "the Consul",
+          "ids": [
+            "v",
+            "w"
+          ]
+        }
       ]
     },
     {
@@ -534,7 +586,8 @@
           "length": 3,
           "id": "c"
         }
-      ]
+      ],
+      "shared": []
     },
     {
       "name": "a name is trimmed of white space, every kind of it",
@@ -561,7 +614,8 @@
           "length": 4,
           "id": "m"
         }
-      ]
+      ],
+      "shared": []
     },
     {
       "name": "a byte order mark and a file separator are not white space: the name keeps them",
@@ -577,7 +631,8 @@
         }
       ],
       "text": "Kira and Mira.",
-      "want": []
+      "want": [],
+      "shared": []
     },
     {
       "name": "exact: another case is another word",
@@ -595,7 +650,8 @@
           "length": 6,
           "id": "c"
         }
-      ]
+      ],
+      "shared": []
     },
     {
       "name": "folded: case is ignored, and the answer is the text as written",
@@ -623,7 +679,8 @@
           "length": 6,
           "id": "c"
         }
-      ]
+      ],
+      "shared": []
     },
     {
       "name": "folded: two names that differ only by case are shared",
@@ -648,6 +705,15 @@
           "at": 14,
           "length": 4,
           "id": "k"
+        }
+      ],
+      "shared": [
+        {
+          "name": "ember",
+          "ids": [
+            "a",
+            "b"
+          ]
         }
       ]
     },
@@ -676,7 +742,8 @@
           "length": 5,
           "id": "b"
         }
-      ]
+      ],
+      "shared": []
     },
     {
       "name": "folded: letters outside ASCII fold too, and above the BMP",
@@ -703,7 +770,8 @@
           "length": 3,
           "id": "d"
         }
-      ]
+      ],
+      "shared": []
     },
     {
       "name": "folded: the long s and the Kelvin sign fold to s and k",
@@ -730,7 +798,8 @@
           "length": 4,
           "id": "k"
         }
-      ]
+      ],
+      "shared": []
     },
     {
       "name": "folded: simple folding only: a dotted capital I stays itself, and a sharp s is never two letters",
@@ -757,7 +826,8 @@
           "length": 6,
           "id": "s"
         }
-      ]
+      ],
+      "shared": []
     },
     {
       "name": "text is compared as written: a letter with a combining mark is not its one-character form",
@@ -769,7 +839,8 @@
         }
       ],
       "text": "E\u0301lodie rode.",
-      "want": []
+      "want": [],
+      "shared": []
     },
     {
       "name": "a space in a name is that one space",
@@ -787,7 +858,8 @@
           "length": 9,
           "id": "g"
         }
-      ]
+      ],
+      "shared": []
     },
     {
       "name": "a name may hold punctuation, and may start or end with it",
@@ -823,7 +895,8 @@
           "length": 4,
           "id": "w"
         }
-      ]
+      ],
+      "shared": []
     },
     {
       "name": "nothing is read inside an address, in either form",
@@ -849,7 +922,8 @@
           "length": 4,
           "id": "k"
         }
-      ]
+      ],
+      "shared": []
     },
     {
       "name": "an address that is not one is prose",
@@ -872,7 +946,8 @@
           "length": 9,
           "id": "c"
         }
-      ]
+      ],
+      "shared": []
     },
     {
       "name": "nothing is read inside a Markdown link, label or target",
@@ -894,7 +969,8 @@
           "length": 4,
           "id": "k"
         }
-      ]
+      ],
+      "shared": []
     },
     {
       "name": "an address inside a link's target does not end the link",
@@ -916,7 +992,8 @@
           "length": 4,
           "id": "m"
         }
-      ]
+      ],
+      "shared": []
     },
     {
       "name": "brackets that are not a link are prose",
@@ -944,7 +1021,8 @@
           "length": 4,
           "id": "k"
         }
-      ]
+      ],
+      "shared": []
     },
     {
       "name": "a bracket that is not a link does not hide a later link",
@@ -962,7 +1040,8 @@
           "length": 4,
           "id": "k"
         }
-      ]
+      ],
+      "shared": []
     },
     {
       "name": "a link takes its label from the first bracket and its target to the first parenthesis",
@@ -994,7 +1073,8 @@
           "length": 4,
           "id": "m"
         }
-      ]
+      ],
+      "shared": []
     },
     {
       "name": "no name is read across the edge of a link; a shorter whole one before it is",
@@ -1021,7 +1101,8 @@
           "length": 7,
           "id": "n"
         }
-      ]
+      ],
+      "shared": []
     },
     {
       "name": "a name is found right beside a link",
@@ -1044,7 +1125,8 @@
           "length": 4,
           "id": "k"
         }
-      ]
+      ],
+      "shared": []
     },
     {
       "name": "a script written without spaces: a name is whole only between punctuation or spaces",
@@ -1062,7 +1144,8 @@
           "length": 3,
           "id": "t"
         }
-      ]
+      ],
+      "shared": []
     },
     {
       "name": "a name that is not a string is passed over",
@@ -1095,7 +1178,8 @@
           "length": 4,
           "id": "l"
         }
-      ]
+      ],
+      "shared": []
     },
     {
       "name": "a name alone is the whole text",
@@ -1113,14 +1197,16 @@
           "length": 4,
           "id": "k"
         }
-      ]
+      ],
+      "shared": []
     },
     {
       "name": "no elements, and no text",
       "case": "exact",
       "elements": [],
       "text": "Kira.",
-      "want": []
+      "want": [],
+      "shared": []
     },
     {
       "name": "an empty text",
@@ -1132,7 +1218,486 @@
         }
       ],
       "text": "",
-      "want": []
+      "want": [],
+      "shared": []
+    },
+    {
+      "name": "shared: three elements hold one name, and the list keeps the order the names were first met",
+      "case": "exact",
+      "elements": [
+        {
+          "id": "k",
+          "name": "Kira"
+        },
+        {
+          "id": "a",
+          "name": "Ember"
+        },
+        {
+          "id": "z",
+          "name": "Old Gate"
+        },
+        {
+          "id": "b",
+          "name": "Ember"
+        },
+        {
+          "id": "y",
+          "name": "Old Gate"
+        },
+        {
+          "id": "c",
+          "name": "Ember"
+        }
+      ],
+      "text": "Kira saw Ember at the Old Gate.",
+      "want": [
+        {
+          "at": 0,
+          "length": 4,
+          "id": "k"
+        }
+      ],
+      "shared": [
+        {
+          "name": "Ember",
+          "ids": [
+            "a",
+            "b",
+            "c"
+          ]
+        },
+        {
+          "name": "Old Gate",
+          "ids": [
+            "z",
+            "y"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "shared: the name is listed as it is compared, trimmed and folded",
+      "case": "folded",
+      "elements": [
+        {
+          "id": "a",
+          "name": "  Iron GATE "
+        },
+        {
+          "id": "b",
+          "name": "iron gate"
+        }
+      ],
+      "text": "The Iron Gate.",
+      "want": [],
+      "shared": [
+        {
+          "name": "iron gate",
+          "ids": [
+            "a",
+            "b"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "shared: a name too short to be looked for is not listed",
+      "case": "exact",
+      "elements": [
+        {
+          "id": "a",
+          "name": "Al"
+        },
+        {
+          "id": "b",
+          "name": "Al"
+        },
+        {
+          "id": "c",
+          "name": "Ada"
+        },
+        {
+          "id": "d",
+          "name": "Ada"
+        }
+      ],
+      "text": "Al and Ada.",
+      "want": [],
+      "shared": [
+        {
+          "name": "Ada",
+          "ids": [
+            "c",
+            "d"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "shared: one element twice is not two, by listing or by two of its own names",
+      "case": "exact",
+      "elements": [
+        {
+          "id": "k",
+          "name": "Kira"
+        },
+        {
+          "id": "k",
+          "name": "Kira"
+        },
+        {
+          "id": "m",
+          "names": [
+            "Mira",
+            "Mira"
+          ]
+        },
+        {
+          "id": "n",
+          "name": "Mira"
+        }
+      ],
+      "text": "Kira and Mira.",
+      "want": [
+        {
+          "at": 0,
+          "length": 4,
+          "id": "k"
+        }
+      ],
+      "shared": [
+        {
+          "name": "Mira",
+          "ids": [
+            "m",
+            "n"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "shared: an element that holds a shared name more than once is listed once",
+      "case": "exact",
+      "elements": [
+        {
+          "id": "a",
+          "names": [
+            "Ember",
+            "Ember"
+          ]
+        },
+        {
+          "id": "b",
+          "name": "Ember"
+        },
+        {
+          "id": "a",
+          "name": "Ember"
+        }
+      ],
+      "text": "Ember.",
+      "want": [],
+      "shared": [
+        {
+          "name": "Ember",
+          "ids": [
+            "a",
+            "b"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "a name that ends another name is found where the longer one is not",
+      "case": "exact",
+      "elements": [
+        {
+          "id": "o",
+          "name": "Old Iron Gate"
+        },
+        {
+          "id": "g",
+          "name": "Gate"
+        },
+        {
+          "id": "i",
+          "name": "Iron Gate"
+        }
+      ],
+      "text": "The Old Iron Gate, a New Iron Gate, the Cold Gate.",
+      "want": [
+        {
+          "at": 4,
+          "length": 13,
+          "id": "o"
+        },
+        {
+          "at": 25,
+          "length": 9,
+          "id": "i"
+        },
+        {
+          "at": 45,
+          "length": 4,
+          "id": "g"
+        }
+      ],
+      "shared": []
+    },
+    {
+      "name": "folded: a name that ends another name is found in its own case",
+      "case": "folded",
+      "elements": [
+        {
+          "id": "o",
+          "name": "OLD iron gate"
+        },
+        {
+          "id": "g",
+          "name": "GATE"
+        }
+      ],
+      "text": "The Old Iron Gate and the cold gate.",
+      "want": [
+        {
+          "at": 4,
+          "length": 13,
+          "id": "o"
+        },
+        {
+          "at": 31,
+          "length": 4,
+          "id": "g"
+        }
+      ],
+      "shared": []
+    },
+    {
+      "name": "a name of words that repeat is found where the text stops repeating",
+      "case": "exact",
+      "elements": [
+        {
+          "id": "t",
+          "name": "the the end"
+        }
+      ],
+      "text": "the the the the the end.",
+      "want": [
+        {
+          "at": 12,
+          "length": 11,
+          "id": "t"
+        }
+      ],
+      "shared": []
+    },
+    {
+      "name": "a name of marks alone: every place is a start, and the next name starts after the last",
+      "case": "exact",
+      "elements": [
+        {
+          "id": "d",
+          "name": "---"
+        }
+      ],
+      "text": "-----, -------.",
+      "want": [
+        {
+          "at": 0,
+          "length": 3,
+          "id": "d"
+        },
+        {
+          "at": 7,
+          "length": 3,
+          "id": "d"
+        },
+        {
+          "at": 10,
+          "length": 3,
+          "id": "d"
+        }
+      ],
+      "shared": []
+    },
+    {
+      "name": "a name that ends in a mark is whole only where no word character follows",
+      "case": "exact",
+      "elements": [
+        {
+          "id": "w",
+          "name": "Who?"
+        },
+        {
+          "id": "h",
+          "name": "Who"
+        }
+      ],
+      "text": "Who? Who?s Who.",
+      "want": [
+        {
+          "at": 0,
+          "length": 4,
+          "id": "w"
+        },
+        {
+          "at": 5,
+          "length": 3,
+          "id": "h"
+        },
+        {
+          "at": 11,
+          "length": 3,
+          "id": "h"
+        }
+      ],
+      "shared": []
+    },
+    {
+      "name": "a name that ends in a mark is not whole against the first letter of an address",
+      "case": "exact",
+      "elements": [
+        {
+          "id": "w",
+          "name": "Who?"
+        }
+      ],
+      "text": "Who?ow://character/01a1d4ef-0000-7000-8000-000000000084 and Who? ow://character/01a1d4ef-0000-7000-8000-000000000084",
+      "want": [
+        {
+          "at": 60,
+          "length": 4,
+          "id": "w"
+        }
+      ],
+      "shared": []
+    },
+    {
+      "name": "a name that starts with a mark starts only where no word character stands before it",
+      "case": "exact",
+      "elements": [
+        {
+          "id": "h",
+          "name": "'t Hooft"
+        }
+      ],
+      "text": "x't Hooft and 't Hooft.",
+      "want": [
+        {
+          "at": 14,
+          "length": 8,
+          "id": "h"
+        }
+      ],
+      "shared": []
+    },
+    {
+      "name": "names nested in one another: the longest that is whole is taken",
+      "case": "exact",
+      "elements": [
+        {
+          "id": "a",
+          "name": "a-b"
+        },
+        {
+          "id": "b",
+          "name": "a-b-c"
+        },
+        {
+          "id": "c",
+          "name": "a-b-c-d"
+        }
+      ],
+      "text": "a-b-c-d a-b-c-dx a-bx a-b-cx",
+      "want": [
+        {
+          "at": 0,
+          "length": 7,
+          "id": "c"
+        },
+        {
+          "at": 8,
+          "length": 5,
+          "id": "b"
+        },
+        {
+          "at": 22,
+          "length": 3,
+          "id": "a"
+        }
+      ],
+      "shared": []
+    },
+    {
+      "name": "names that overlap: the leftmost is taken, and the next starts after it",
+      "case": "exact",
+      "elements": [
+        {
+          "id": "x",
+          "name": "aaa bbb"
+        },
+        {
+          "id": "y",
+          "name": "bbb ccc"
+        },
+        {
+          "id": "z",
+          "name": "ccc ddd"
+        }
+      ],
+      "text": "aaa bbb ccc ddd and bbb ccc ddd",
+      "want": [
+        {
+          "at": 0,
+          "length": 7,
+          "id": "x"
+        },
+        {
+          "at": 8,
+          "length": 7,
+          "id": "z"
+        },
+        {
+          "at": 20,
+          "length": 7,
+          "id": "y"
+        }
+      ],
+      "shared": []
+    },
+    {
+      "name": "a name beside a character above the BMP, at both ends of a text",
+      "case": "exact",
+      "elements": [
+        {
+          "id": "k",
+          "name": "Kira"
+        },
+        {
+          "id": "d",
+          "name": "\ud83d\udc09 den"
+        }
+      ],
+      "text": "Kira\ud83d\udc09 \ud83d\udc09 den \ud83d\udc09Kira",
+      "want": [
+        {
+          "at": 0,
+          "length": 4,
+          "id": "k"
+        },
+        {
+          "at": 6,
+          "length": 5,
+          "id": "d"
+        },
+        {
+          "at": 13,
+          "length": 4,
+          "id": "k"
+        }
+      ],
+      "shared": []
     }
   ],
   "timed": [
@@ -1220,6 +1785,54 @@
         "times": 60000
       },
       "count": 0
+    },
+    {
+      "name": "a name of five thousand characters that almost matches at every word",
+      "elements": {
+        "count": 1,
+        "long": {
+          "repeat": "a ",
+          "times": 2500,
+          "then": "b"
+        }
+      },
+      "text": {
+        "repeat": "a ",
+        "times": 200000
+      },
+      "count": 0
+    },
+    {
+      "name": "a name of five thousand marks and a letter, in a text of marks",
+      "elements": {
+        "count": 1,
+        "long": {
+          "repeat": "-",
+          "times": 5000,
+          "then": "x"
+        }
+      },
+      "text": {
+        "repeat": "-",
+        "times": 400000
+      },
+      "count": 0
+    },
+    {
+      "name": "a name of five thousand marks, found eighty times",
+      "elements": {
+        "count": 1,
+        "long": {
+          "repeat": "-",
+          "times": 5000,
+          "then": ""
+        }
+      },
+      "text": {
+        "repeat": "-",
+        "times": 400000
+      },
+      "count": 80
     }
   ]
 }

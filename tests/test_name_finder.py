@@ -1,7 +1,8 @@
 """``name_finder``: a world's element names found in prose. The shared cases (``tests/fixtures/name-finder.cases.json``,
 the same bytes as the npm SDK's ``test/fixtures/name-finder.cases.json``; both suites hold its sha256, every want
-written by hand in the SDK's generator), their timed recipes, then what the cases cannot hold: the object answered,
-purity and the refusals."""
+written by hand in the SDK's generator): what ``find(text)`` answers and what ``find.shared`` lists, then their
+timed recipes, then what the cases cannot hold: the objects answered, purity, the refusals and the one fact about
+folding the matcher stands on."""
 
 from __future__ import annotations
 
@@ -13,15 +14,18 @@ from typing import Any
 
 import pytest
 
-from onlyworlds import NameFound, name_finder
+from onlyworlds import NameFinder, NameFound, NameShared, name_finder
+from onlyworlds.name_finder import _in_a_word
+from onlyworlds.worldfile import simple_case_fold
 
 FIXTURE = Path(__file__).resolve().parent / "fixtures" / "name-finder.cases.json"
-FIXTURE_SHA256 = "4c4d7d3b4480e4c20bab799972faf90c542b5b570c1b43f7882291444c31007a"
+FIXTURE_SHA256 = "8e91e79981830511055976011f9fc6d4f4b62fb0183c29bad61c2d05fd4b13e4"
 DATA: dict[str, Any] = json.loads(FIXTURE.read_bytes())
 PYTHON_FACTOR = 5
 """The cases' ``underMs`` is the npm SDK's line, where the slowest recipe takes about a tenth of a second. Here the
-slowest recipe's whole test took 0.76 s when this was written, so the line is five times ``underMs``: far above a
-slow machine's run, and far below a search that is not linear, which takes minutes on these texts."""
+slowest recipe's whole test took 0.76 s when this was first written (0.62 s once the text was read once, from its
+end), so the line is five times ``underMs``: far above a slow machine's run, and far below a search that is not
+linear, which takes minutes on these texts."""
 
 
 def _names_of(element: dict[str, Any]) -> list[Any]:
@@ -36,8 +40,8 @@ def _answer(case: dict[str, Any]) -> list[dict[str, Any]]:
 
 def test_the_cases_file_is_the_pinned_bytes_the_ones_the_npm_sdk_runs() -> None:
     assert hashlib.sha256(FIXTURE.read_bytes()).hexdigest() == FIXTURE_SHA256
-    assert DATA["version"] == 1
-    assert len(DATA["cases"]) >= 47
+    assert DATA["version"] == 2
+    assert len(DATA["cases"]) >= 62
 
 
 def test_every_shared_case() -> None:
@@ -49,6 +53,24 @@ def test_every_shared_case() -> None:
     assert not wrong, f"{len(wrong)} case(s) disagree:\n  " + "\n  ".join(wrong)
 
 
+def _shared(case: dict[str, Any]) -> list[dict[str, Any]]:
+    find = name_finder(case["elements"], case=case["case"], names=_names_of)
+    return [{"name": s.name, "ids": [e["id"] for e in s.elements]} for s in find.shared]
+
+
+def test_every_shared_case_what_find_shared_lists() -> None:
+    wrong = [
+        f"{case['name']}\n    want {case['shared']}\n    got  {got}"
+        for case in DATA["cases"]
+        if (got := _shared(case)) != case["shared"]
+    ]
+    assert not wrong, f"{len(wrong)} case(s) disagree:\n  " + "\n  ".join(wrong)
+    assert sum(1 for case in DATA["cases"] if case["shared"]) >= 10
+    assert any(len(case["shared"]) > 1 for case in DATA["cases"])
+    for fold in ("exact", "folded"):
+        assert any(case["case"] == fold and case["shared"] for case in DATA["cases"]), fold
+
+
 def test_the_shared_cases_hold_answers_of_both_kinds() -> None:
     assert any(case["want"] for case in DATA["cases"])
     assert any(not case["want"] for case in DATA["cases"])
@@ -58,7 +80,16 @@ def test_the_shared_cases_hold_answers_of_both_kinds() -> None:
 
 def _build(recipe: dict[str, Any]) -> tuple[list[dict[str, str]], str]:
     made = recipe["elements"]
-    elements = [{"id": f"e{i}", "name": made["pattern"].replace("{i}", str(i))} for i in range(made["count"])]
+    long = made.get("long")
+    elements = [
+        {
+            "id": f"e{i}",
+            "name": made["pattern"].replace("{i}", str(i))
+            if long is None
+            else long["repeat"] * long["times"] + long["then"],
+        }
+        for i in range(made["count"])
+    ]
     text = recipe["text"]
     if "repeat" in text:
         return elements, text["repeat"] * text["times"]
@@ -76,8 +107,10 @@ def test_linear_in_the_text_on_the_timed_recipes(recipe: dict[str, Any]) -> None
     assert ms < DATA["underMs"] * PYTHON_FACTOR, f"{round(ms)} ms"
 
 
-def test_the_timed_recipes_are_the_seven() -> None:
-    assert len(DATA["timed"]) >= 7
+def test_the_timed_recipes_are_the_ten_three_with_a_name_of_thousands_of_characters() -> None:
+    assert len(DATA["timed"]) >= 10
+    long = [r for r in DATA["timed"] if "long" in r["elements"] and r["elements"]["long"]["times"] >= 2500]
+    assert len(long) >= 3
 
 
 def test_start_and_end_count_code_points_and_the_slice_is_the_name_as_written() -> None:
@@ -93,6 +126,53 @@ def test_element_is_the_object_passed_in_and_the_default_name_is_its_name() -> N
     assert found == NameFound(0, 4, kira)
     assert found.element is kira
     assert name_finder(iter([kira]), case="exact")("Kira.")[0].element is kira
+
+
+def test_find_shared_the_objects_passed_in_in_the_order_given_a_tuple_read_only_and_read_once() -> None:
+    a = {"id": "a", "name": "Ember"}
+    b = {"id": "b", "name": "EMBER "}
+    k = {"id": "k", "name": "Kira"}
+    elements = [k, b, a, b]
+    find = name_finder(elements, case="folded", names=lambda e: [e["name"], e["name"]])
+    assert isinstance(find, NameFinder)
+    assert isinstance(find.shared, tuple)
+    (listed,) = find.shared
+    assert isinstance(listed, NameShared)
+    assert listed.name == "ember"
+    assert isinstance(listed.elements, tuple)
+    assert len(listed.elements) == 2
+    assert listed.elements[0] is b
+    assert listed.elements[1] is a
+    with pytest.raises(AttributeError):
+        find.shared = ()  # type: ignore[misc]
+    with pytest.raises(AttributeError):
+        listed.name = "x"  # type: ignore[misc]
+    elements.append({"id": "x", "name": "Kira"})
+    assert len(find.shared) == 1, "the names were read once, when the finder was made"
+    assert [s.name for s in name_finder(elements, case="exact").shared] == ["Kira"]
+    assert name_finder([], case="exact").shared == ()
+    assert name_finder([{"id": "a", "name": "Al"}, {"id": "b", "name": "Al"}], case="exact").shared == ()
+    assert [f.element["id"] for f in find("Ember, ember, Kira")] == ["k"], "a listed name is never answered"
+
+
+def test_folding_never_moves_a_character_into_or_out_of_a_word() -> None:
+    # The matcher lays a mark before every character of a name that is not a word character, read from the name
+    # as folded, and before every such character of the text, read as written. The two agree only while no
+    # character changes kind when it is folded: held here on every code point.
+    folds = 0
+    moved: list[str] = []
+    for cp in range(0x110000):
+        if 0xD800 <= cp <= 0xDFFF:
+            continue
+        ch = chr(cp)
+        folded = simple_case_fold(ch)
+        if folded == ch:
+            continue
+        folds += 1
+        if _in_a_word(ch) != _in_a_word(folded):
+            moved.append(f"U+{cp:04X}")
+    assert folds > 1400, f"{folds} code points fold"
+    assert moved == []
 
 
 def test_nothing_given_is_changed_and_the_names_are_read_once() -> None:

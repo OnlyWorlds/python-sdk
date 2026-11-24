@@ -386,11 +386,11 @@ found = find("Kira's watch ends at the Iron Gate.")
 
 - A whole name only: the character on each side is not a letter, a combining mark, a decimal digit or an underscore, in any script. `Kira's` and `Kira-led` hold the name; `Kiran` does not.
 - A name is trimmed and is three characters at least. Where several names start at one place, the longest whole one is taken.
-- A name two elements share is never answered, and nothing inside it is: the text stays plain there.
+- A name two elements share is never answered, and nothing inside it is: the text stays plain there. `find.shared` lists those names, each a `NameShared` (`name`, `elements`), so a tool can say why a name never links.
 - Nothing is read inside an address or a Markdown link `[label](target)`.
 - Every mention is answered, in order. `element` is the object you passed in; `start` and `end` count code points (the npm SDK counts UTF-16 units).
 
-`names` gives the names an element is found by, such as a tool's own aliases: `name_finder(elements, case="folded", names=lambda el: [el["name"], *el.get("aliases", [])])`. Which elements go in is yours to choose. Three limits: text is compared as written, with no Unicode normalisation; a space in a name matches that one space; and in a script written without spaces between words (Chinese, Japanese, Thai) a name is whole only between punctuation or spaces. The work for one text is at most its length times the longest name's length, whatever the number of names.
+`names` gives the names an element is found by, such as a tool's own aliases: `name_finder(elements, case="folded", names=lambda el: [el["name"], *el.get("aliases", [])])`. Which elements go in is yours to choose. Three limits: text is compared as written, with no Unicode normalisation; a space in a name matches that one space; and in a script written without spaces between words (Chinese, Japanese, Thai) a name is whole only between punctuation or spaces. The work for one text grows with its length alone, whatever the names and however many.
 
 ### Open with
 
