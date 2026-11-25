@@ -114,6 +114,20 @@
     "elements/character/Spaced.JSON": "{\"id\":\"sp\",  \"x_note\":{\"created_by\":\"kept, an extension's own\"}}"
    },
    "stripped": 0
+  },
+  {
+   "name": "an integer no double holds (9007199254740993, which a double reads as ...992) keeps the file's bytes, the five with them, in an element read as an element too; one past 2^53 that a double holds exactly (9007199254740994) is rewritten",
+   "files": {
+    "world.json": "{\n  \"id\": \"0192a000-aaaa-7bbb-8ccc-000000000001\",\n  \"name\": \"W\"\n}\n",
+    "elements/object/held--o2.json": "{\"id\":\"o2\",\"name\":\"Held\",\"x_ref\":9007199254740994,\"created_by\":\"u\"}",
+    "elements/object/unheld--o3.json": "{\"id\":\"o3\",\"name\":\"Unheld\",\"x_ref\":9007199254740993,\"created_by\":\"u\"}"
+   },
+   "default": {
+    "world.json": "{\n  \"id\": \"0192a000-aaaa-7bbb-8ccc-000000000001\",\n  \"name\": \"W\"\n}\n",
+    "elements/object/held--o2.json": "{\n  \"id\": \"o2\",\n  \"name\": \"Held\",\n  \"x_ref\": 9007199254740994\n}\n",
+    "elements/object/unheld--o3.json": "{\"id\":\"o3\",\"name\":\"Unheld\",\"x_ref\":9007199254740993,\"created_by\":\"u\"}"
+   },
+   "stripped": 1
   }
  ]
 }

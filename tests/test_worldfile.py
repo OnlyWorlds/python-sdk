@@ -801,8 +801,8 @@ def test_a_share_carries_under_the_element_folders_only_what_the_reader_serves(t
 
 # The same bytes as the npm SDK's test/fixtures/author-fields.fixture.json (both suites hold its sha256).
 AUTHOR_FIXTURE = REPO / "tests" / "fixtures" / "author-fields.fixture.json"
-AUTHOR_FIXTURE_SHA256 = "6943ce5a8c2cd7bf69f82facb6f1d545d87d68f5ea0104cc4d711d94e035898a"
-AUTHOR_CASES = 7
+AUTHOR_FIXTURE_SHA256 = "33835ede8b407868da8fef2857699c53e763879ad4bef7909376c75b31c48645"
+AUTHOR_CASES = 8
 AUTHOR_FIELDS = ["created_by", "changed_by", "changed_via", "changed_client", "doors"]
 
 

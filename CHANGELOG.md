@@ -4,6 +4,12 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+## 0.150.2 (2026-11-25)
+
+### Fixed
+
+- **A world file keeps a file whose integer no double holds as written.** `world_file_bytes` and `write_world_file` rewrote such a file exact when they left the author fields out, while the npm SDK rewrote it rounded (`9007199254740993` as `...992`): one input, two answers. A file holding an integer a double cannot hold, or one too large for a double at all, now travels byte for byte, its author fields with it, in both packages. An integer past 2**53 that a double holds exactly (`9007199254740994`) is rewritten as before. The shared author-fields fixture's case 8 pins it.
+
 ## 0.150.1 (2026-11-24)
 
 ### Fixed

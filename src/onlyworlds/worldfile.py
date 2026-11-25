@@ -888,6 +888,28 @@ def _unread_object(src: Path | bytes) -> dict[str, Any] | None:
     return doc if isinstance(doc, dict) else None
 
 
+def _holds_unheld_integer(value: Any) -> bool:
+    """Whether a read file holds an integer no double holds (``9007199254740993``, which the npm
+    SDK and every JavaScript reader read as ``...992``; an integer too large for a double at all):
+    rewriting it would leave the five readers with five answers, so the file travels byte for
+    byte, its author fields with it (the author-fields fixture's case 8). One past 2**53 that a
+    double holds exactly (``9007199254740994``) does not count. ``bool`` is no integer here."""
+    stack = [value]
+    while stack:
+        v = stack.pop()
+        if isinstance(v, dict):
+            stack.extend(v.values())
+        elif isinstance(v, list):
+            stack.extend(v)
+        elif isinstance(v, int) and not isinstance(v, bool) and not -(2**53) <= v <= 2**53:
+            try:
+                if float(v) != v:
+                    return True
+            except OverflowError:
+                return True
+    return False
+
+
 def _without_author_fields(body: dict[str, Any] | None) -> bytes | None:
     """An element-folder file's object (``_element_files``, else ``_unread_object``) without its
     author fields, in the folder's own form (``_jsonfmt.encode``: two-space indent, a trailing
@@ -981,7 +1003,7 @@ def _plan(
         body = elements.get(rel)
         if body is None and not include_author_fields and _under_element_folders(rel):
             body = _unread_object(files[rel])
-        bare = None if include_author_fields else _without_author_fields(body)
+        bare = None if include_author_fields or _holds_unheld_integer(body) else _without_author_fields(body)
         plan.append((rel, files[rel] if bare is None else bare))
     return top, plan
 
