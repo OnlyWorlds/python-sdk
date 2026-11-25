@@ -941,6 +941,14 @@ def _era_domains(eras: list[Any]) -> list[EraDomain]:
 
 def _era_domains_of(eras: list[Any]) -> list[EraDomain]:
     ordered = _js_sorted(eras, lambda a, b: _to_number(_get(a, "start")) - _to_number(_get(b, "start")))
+    # The next UP era after each, found in one pass from the end: a search of the rest of the list for each era
+    # made this quadratic in the era count.
+    next_ups: list[Any] = [None] * len(ordered)
+    after: Any = None
+    for i in range(len(ordered) - 1, -1, -1):
+        next_ups[i] = after
+        if _strict_eq(_direction(ordered[i]), "up"):
+            after = ordered[i]
     out: list[EraDomain] = []
     for i, era in enumerate(ordered):
         end = _get(era, "end")
@@ -949,7 +957,7 @@ def _era_domains_of(eras: list[Any]) -> list[EraDomain]:
             out.append(EraDomain(era, -math.inf if _nullish(end) else end, _get(era, "start")))
         else:
             # An open end runs to the next UP era's start: a down era holds no step at or above its pivot.
-            next_up = next((e for e in ordered[i + 1 :] if _strict_eq(_direction(e), "up")), None)
+            next_up = next_ups[i]
             hi = end
             if _nullish(hi):
                 hi = math.inf if next_up is None or _nullish(_get(next_up, "start")) else _get(next_up, "start")
