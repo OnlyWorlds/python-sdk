@@ -1,6 +1,6 @@
 {
-  "about": "Cases for nameFinder (@onlyworlds/sdk) and name_finder (the onlyworlds Python package): the same bytes in both repositories. In a case, an element with a names list is found by those names (the names option), one without by its name; want lists what find(text) answers, in order, each the place of its first character and its length, both in code points, and the id of its element; shared lists what find.shared holds, in order, each a name as it is compared and the ids of the elements that hold it. A timed case is built from its recipe ({i} is the count from 0; a long name is its repeat, times over, and then its then) and must answer count names in under underMs milliseconds. Made by test/fixtures/generate-name-finder-cases.mjs in the SDK repository; every want is written by hand there.",
-  "version": 2,
+  "about": "Cases for nameFinder (@onlyworlds/sdk) and name_finder (the onlyworlds Python package): the same bytes in both repositories. In a case, an element with a names list is found by those names (the names option), one without by its name; want lists what find(text) answers, in order, each the place of its first character and its length, both in code points, and the id of its element; shared lists what find.shared holds, in order, each a name as it is compared and the ids of the elements that hold it. A case or a timed recipe with markdown: true is found with that option on the call (since version 3). A timed case is built from its recipe ({i} is the count from 0; a long name is its repeat, times over, and then its then) and must answer count names in under underMs milliseconds. Made by test/fixtures/generate-name-finder-cases.mjs in the SDK repository; every want is written by hand there.",
+  "version": 3,
   "underMs": 2000,
   "cases": [
     {
@@ -1698,6 +1698,535 @@
         }
       ],
       "shared": []
+    },
+    {
+      "name": "a bare web address is passed over, its scheme in any ASCII case",
+      "case": "exact",
+      "elements": [
+        {
+          "id": "k",
+          "name": "Kira"
+        }
+      ],
+      "text": "See https://kira.example/kira and HtTp://Kira.example/Kira, then Kira.",
+      "want": [
+        {
+          "at": 65,
+          "length": 4,
+          "id": "k"
+        }
+      ],
+      "shared": []
+    },
+    {
+      "name": "a bare web address ends at white space or <",
+      "case": "exact",
+      "elements": [
+        {
+          "id": "k",
+          "name": "Kira"
+        }
+      ],
+      "text": "https://x.example/Kira<b>Kira</b> and https://x.example/Kira\u00a0Kira",
+      "want": [
+        {
+          "at": 25,
+          "length": 4,
+          "id": "k"
+        },
+        {
+          "at": 61,
+          "length": 4,
+          "id": "k"
+        }
+      ],
+      "shared": []
+    },
+    {
+      "name": "a scheme that is not http or https, or not in ASCII, is prose",
+      "case": "exact",
+      "elements": [
+        {
+          "id": "k",
+          "name": "Kira"
+        }
+      ],
+      "text": "ftp://Kira.example and httpx://Kira and http\u017f://Kira",
+      "want": [
+        {
+          "at": 6,
+          "length": 4,
+          "id": "k"
+        },
+        {
+          "at": 31,
+          "length": 4,
+          "id": "k"
+        },
+        {
+          "at": 48,
+          "length": 4,
+          "id": "k"
+        }
+      ],
+      "shared": []
+    },
+    {
+      "name": "an autolink is passed over, whatever its scheme",
+      "case": "exact",
+      "elements": [
+        {
+          "id": "k",
+          "name": "Kira"
+        }
+      ],
+      "text": "<https://example.com/Kira> and <mailto:kira@example.com> beside Kira",
+      "want": [
+        {
+          "at": 64,
+          "length": 4,
+          "id": "k"
+        }
+      ],
+      "shared": []
+    },
+    {
+      "name": "what is not an autolink is prose",
+      "case": "exact",
+      "elements": [
+        {
+          "id": "k",
+          "name": "Kira"
+        }
+      ],
+      "text": "<Kira> and <x:Kira> and <ab:Kira x> and <ab:Kira",
+      "want": [
+        {
+          "at": 1,
+          "length": 4,
+          "id": "k"
+        },
+        {
+          "at": 14,
+          "length": 4,
+          "id": "k"
+        },
+        {
+          "at": 28,
+          "length": 4,
+          "id": "k"
+        },
+        {
+          "at": 44,
+          "length": 4,
+          "id": "k"
+        }
+      ],
+      "shared": []
+    },
+    {
+      "name": "without the markdown option, code, HTML and definitions are prose",
+      "case": "exact",
+      "elements": [
+        {
+          "id": "k",
+          "name": "Kira"
+        }
+      ],
+      "text": "`Kira` <b title=\"Kira\"> <!-- Kira -->\n[r]: x \"Kira\"",
+      "want": [
+        {
+          "at": 1,
+          "length": 4,
+          "id": "k"
+        },
+        {
+          "at": 17,
+          "length": 4,
+          "id": "k"
+        },
+        {
+          "at": 29,
+          "length": 4,
+          "id": "k"
+        },
+        {
+          "at": 46,
+          "length": 4,
+          "id": "k"
+        }
+      ],
+      "shared": []
+    },
+    {
+      "name": "markdown: an inline code span is passed over, its backticks matched by length",
+      "case": "exact",
+      "elements": [
+        {
+          "id": "k",
+          "name": "Kira"
+        }
+      ],
+      "text": "Say `Kira` or ``a `Kira` b`` to Kira.",
+      "want": [
+        {
+          "at": 32,
+          "length": 4,
+          "id": "k"
+        }
+      ],
+      "shared": [],
+      "markdown": true
+    },
+    {
+      "name": "markdown: backticks with no closing run of their length are prose",
+      "case": "exact",
+      "elements": [
+        {
+          "id": "k",
+          "name": "Kira"
+        }
+      ],
+      "text": "a ``Kira` and `Kira",
+      "want": [
+        {
+          "at": 4,
+          "length": 4,
+          "id": "k"
+        },
+        {
+          "at": 15,
+          "length": 4,
+          "id": "k"
+        }
+      ],
+      "shared": [],
+      "markdown": true
+    },
+    {
+      "name": "markdown: a fenced code block is passed over, closed or open to the end",
+      "case": "exact",
+      "elements": [
+        {
+          "id": "k",
+          "name": "Kira"
+        }
+      ],
+      "text": "Before Kira\n```js\nKira\n```\nKira after\n~~~\nKira and Kira",
+      "want": [
+        {
+          "at": 7,
+          "length": 4,
+          "id": "k"
+        },
+        {
+          "at": 27,
+          "length": 4,
+          "id": "k"
+        }
+      ],
+      "shared": [],
+      "markdown": true
+    },
+    {
+      "name": "markdown: a fence closes only with its own character, at least as long",
+      "case": "exact",
+      "elements": [
+        {
+          "id": "k",
+          "name": "Kira"
+        }
+      ],
+      "text": "````\nKira\n```\nKira\n~~~~\nKira\n````\nKira",
+      "want": [
+        {
+          "at": 34,
+          "length": 4,
+          "id": "k"
+        }
+      ],
+      "shared": [],
+      "markdown": true
+    },
+    {
+      "name": "markdown: a closing fence holds nothing but spaces after it, a carriage return included",
+      "case": "exact",
+      "elements": [
+        {
+          "id": "k",
+          "name": "Kira"
+        }
+      ],
+      "text": "```\r\nKira\r\n``` x\r\nKira\r\n```  \r\nKira",
+      "want": [
+        {
+          "at": 31,
+          "length": 4,
+          "id": "k"
+        }
+      ],
+      "shared": [],
+      "markdown": true
+    },
+    {
+      "name": "markdown: a backtick line that also holds a backtick is no fence",
+      "case": "exact",
+      "elements": [
+        {
+          "id": "k",
+          "name": "Kira"
+        }
+      ],
+      "text": "```a`b Kira\nKira",
+      "want": [
+        {
+          "at": 7,
+          "length": 4,
+          "id": "k"
+        },
+        {
+          "at": 12,
+          "length": 4,
+          "id": "k"
+        }
+      ],
+      "shared": [],
+      "markdown": true
+    },
+    {
+      "name": "markdown: a fence indented four spaces is no fence",
+      "case": "exact",
+      "elements": [
+        {
+          "id": "k",
+          "name": "Kira"
+        }
+      ],
+      "text": "    ```\nKira",
+      "want": [
+        {
+          "at": 8,
+          "length": 4,
+          "id": "k"
+        }
+      ],
+      "shared": [],
+      "markdown": true
+    },
+    {
+      "name": "markdown: a run that is no fence opens a code span to the next run of its length, across lines",
+      "case": "exact",
+      "elements": [
+        {
+          "id": "k",
+          "name": "Kira"
+        }
+      ],
+      "text": "```a`b Kira\n    ```\nKira",
+      "want": [
+        {
+          "at": 20,
+          "length": 4,
+          "id": "k"
+        }
+      ],
+      "shared": [],
+      "markdown": true
+    },
+    {
+      "name": "markdown: a fence up to three spaces in is a fence",
+      "case": "exact",
+      "elements": [
+        {
+          "id": "k",
+          "name": "Kira"
+        }
+      ],
+      "text": "   ~~~\nKira\n   ~~~\nKira",
+      "want": [
+        {
+          "at": 19,
+          "length": 4,
+          "id": "k"
+        }
+      ],
+      "shared": [],
+      "markdown": true
+    },
+    {
+      "name": "markdown: backticks inside a fence open no span outside it",
+      "case": "exact",
+      "elements": [
+        {
+          "id": "k",
+          "name": "Kira"
+        }
+      ],
+      "text": "```\n`\n```\nKira `x",
+      "want": [
+        {
+          "at": 10,
+          "length": 4,
+          "id": "k"
+        }
+      ],
+      "shared": [],
+      "markdown": true
+    },
+    {
+      "name": "markdown: an HTML tag and comment are passed over, the text between tags is read",
+      "case": "exact",
+      "elements": [
+        {
+          "id": "k",
+          "name": "Kira"
+        }
+      ],
+      "text": "<span title=\"Kira\">Kira</span> <!-- Kira --> <br/> Kira",
+      "want": [
+        {
+          "at": 19,
+          "length": 4,
+          "id": "k"
+        },
+        {
+          "at": 51,
+          "length": 4,
+          "id": "k"
+        }
+      ],
+      "shared": [],
+      "markdown": true
+    },
+    {
+      "name": "markdown: what is not a tag or a comment is prose",
+      "case": "exact",
+      "elements": [
+        {
+          "id": "k",
+          "name": "Kira"
+        }
+      ],
+      "text": "< Kira> and <1 Kira> and <!-- Kira and <a Kira",
+      "want": [
+        {
+          "at": 2,
+          "length": 4,
+          "id": "k"
+        },
+        {
+          "at": 15,
+          "length": 4,
+          "id": "k"
+        },
+        {
+          "at": 30,
+          "length": 4,
+          "id": "k"
+        },
+        {
+          "at": 42,
+          "length": 4,
+          "id": "k"
+        }
+      ],
+      "shared": [],
+      "markdown": true
+    },
+    {
+      "name": "markdown: a reference definition's line is passed over",
+      "case": "exact",
+      "elements": [
+        {
+          "id": "k",
+          "name": "Kira"
+        }
+      ],
+      "text": "[ref]: https://example.com \"Kira\"\n   [kira]: x Kira\n    [k]: Kira\n[Kira] is Kira\n[]: x Kira",
+      "want": [
+        {
+          "at": 61,
+          "length": 4,
+          "id": "k"
+        },
+        {
+          "at": 67,
+          "length": 4,
+          "id": "k"
+        },
+        {
+          "at": 76,
+          "length": 4,
+          "id": "k"
+        },
+        {
+          "at": 87,
+          "length": 4,
+          "id": "k"
+        }
+      ],
+      "shared": [],
+      "markdown": true
+    },
+    {
+      "name": "markdown: what is always passed over still is",
+      "case": "exact",
+      "elements": [
+        {
+          "id": "k",
+          "name": "Kira"
+        }
+      ],
+      "text": "[Kira](x) https://k.example/Kira ow://character/01a1d4ef-0000-7000-8000-000000000084 Kira",
+      "want": [
+        {
+          "at": 85,
+          "length": 4,
+          "id": "k"
+        }
+      ],
+      "shared": [],
+      "markdown": true
+    },
+    {
+      "name": "markdown: folded names are passed over the same way",
+      "case": "folded",
+      "elements": [
+        {
+          "id": "k",
+          "name": "KIRA"
+        }
+      ],
+      "text": "`kira` <i>Kira</i> <i title=\"kira\">",
+      "want": [
+        {
+          "at": 10,
+          "length": 4,
+          "id": "k"
+        }
+      ],
+      "shared": [],
+      "markdown": true
+    },
+    {
+      "name": "markdown: Temper's probe, seven places that are no mention",
+      "case": "exact",
+      "elements": [
+        {
+          "id": "k",
+          "name": "Kira"
+        }
+      ],
+      "text": "Inline `Kira`.\n\n```\nKira\n```\n\nhttps://kira.example/kira and <https://example.com/Kira>, <abbr title=\"Kira\">K</abbr>, ![Kira](pic.png)\n\n[k]: https://example.com \"Kira\"\n\nAnd Kira herself.",
+      "want": [
+        {
+          "at": 172,
+          "length": 4,
+          "id": "k"
+        }
+      ],
+      "shared": [],
+      "markdown": true
     }
   ],
   "timed": [
@@ -1833,6 +2362,57 @@
         "times": 400000
       },
       "count": 80
+    },
+    {
+      "name": "markdown: backtick runs of two lengths, one never closed",
+      "elements": {
+        "count": 1000,
+        "pattern": "Name{i} Thing"
+      },
+      "text": {
+        "repeat": "``` ` ",
+        "times": 100000
+      },
+      "count": 0,
+      "markdown": true
+    },
+    {
+      "name": "markdown: tags that never close",
+      "elements": {
+        "count": 1000,
+        "pattern": "Name{i} Thing"
+      },
+      "text": {
+        "repeat": "<a ",
+        "times": 200000
+      },
+      "count": 0,
+      "markdown": true
+    },
+    {
+      "name": "markdown: comments that never close, and definition lines with no bracket",
+      "elements": {
+        "count": 1000,
+        "pattern": "Name{i} Thing"
+      },
+      "text": {
+        "repeat": "<!-- [x\n",
+        "times": 100000
+      },
+      "count": 0,
+      "markdown": true
+    },
+    {
+      "name": "web address schemes with nothing after them",
+      "elements": {
+        "count": 1000,
+        "pattern": "Name{i} Thing"
+      },
+      "text": {
+        "repeat": "https://<ab:",
+        "times": 60000
+      },
+      "count": 0
     }
   ]
 }

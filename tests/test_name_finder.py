@@ -19,7 +19,7 @@ from onlyworlds.name_finder import _in_a_word
 from onlyworlds.worldfile import simple_case_fold
 
 FIXTURE = Path(__file__).resolve().parent / "fixtures" / "name-finder.cases.json"
-FIXTURE_SHA256 = "8e91e79981830511055976011f9fc6d4f4b62fb0183c29bad61c2d05fd4b13e4"
+FIXTURE_SHA256 = "9c6fcf52eaa7a435b88f7524fdd1020a696b97ecc31d2a1efcf9431a49384b57"
 DATA: dict[str, Any] = json.loads(FIXTURE.read_bytes())
 PYTHON_FACTOR = 5
 """The cases' ``underMs`` is the npm SDK's line, where the slowest recipe takes about a tenth of a second. Here the
@@ -35,12 +35,16 @@ def _names_of(element: dict[str, Any]) -> list[Any]:
 
 def _answer(case: dict[str, Any]) -> list[dict[str, Any]]:
     find = name_finder(case["elements"], case=case["case"], names=_names_of)
-    return [{"at": f.start, "length": f.end - f.start, "id": f.element["id"]} for f in find(case["text"])]
+    return [
+        {"at": f.start, "length": f.end - f.start, "id": f.element["id"]}
+        for f in find(case["text"], markdown=case.get("markdown", False))
+    ]
 
 
 def test_the_cases_file_is_the_pinned_bytes_the_ones_the_npm_sdk_runs() -> None:
     assert hashlib.sha256(FIXTURE.read_bytes()).hexdigest() == FIXTURE_SHA256
-    assert DATA["version"] == 2
+    assert DATA["version"] == 3
+    assert sum(1 for c in DATA["cases"] if c.get("markdown") is True) == 16  # version 3: the markdown option
     assert len(DATA["cases"]) >= 62
 
 
@@ -101,7 +105,7 @@ def test_linear_in_the_text_on_the_timed_recipes(recipe: dict[str, Any]) -> None
     elements, text = _build(recipe)
     find = name_finder(elements, case="exact")
     start = time.perf_counter()
-    found = find(text)
+    found = find(text, markdown=recipe.get("markdown", False))
     ms = (time.perf_counter() - start) * 1000
     assert len(found) == recipe["count"]
     assert ms < DATA["underMs"] * PYTHON_FACTOR, f"{round(ms)} ms"

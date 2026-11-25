@@ -4,6 +4,10 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+## 0.154.0 (2026-11-25)
+
+- **`name_finder` passes over what is no mention**, as the npm SDK's `nameFinder` 4.208.0 does. In any text, a bare web address (`http://` or `https://`, in any ASCII case, to the next white space or `<`) and an autolink (`<scheme:…>`) are now passed over, beside the addresses and Markdown links they were before. A call can say its text is Markdown, `find(text, markdown=True)`: then nothing is read inside an inline code span (backtick runs matched by length), a fenced code block (closed by its own character, at least as long, or open to the end), an HTML tag or comment, or a reference definition's line either. The option is off by default, so the answers without it change only inside web addresses. An indented code block, a fence inside a quote or a list, and a definition's title on the next line are read as prose. Held by version 3 of the shared cases (84 cases, 16 with the option; 14 timed recipes), with eight planted faults each red; the two packages gave the same answers on 4,000 made texts, read with the option and without.
+
 ## 0.153.0 (2026-11-25)
 
 - **`calendar.speaking_calendar(world, elements)`: the calendar the world's dates speak in, by the World's own choice** (the calendar profile's "Which calendar speaks", schema-dist serial 147; the npm SDK's `speakingCalendar`). The World names it in `x_calendar` (`WORLD_CALENDAR_KEY`), the id of the element that carries it, matched as written. A named element among the elements that carries a calendar speaks; anything else named speaks none, never another calendar in its place; with none named (the key absent or None) the only calendar speaks, and several leave none. Pass the whole world's elements. A `world` that is not a mapping is a `TypeError`. Held by the fixture's 12 cases that carry `speaks`.
