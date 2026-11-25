@@ -38,6 +38,8 @@ from onlyworlds.worldfile import REASONS, WORLD_FILE_MAX_BYTES, WORLD_FILE_MAX_E
 REPO = Path(__file__).resolve().parent.parent
 SET_ROOT = Path(os.environ.get("OW_OWWORLD_FIXTURES") or REPO / "codegen" / "schema-dist" / "fixtures" / "owworld")
 FIXTURES = SET_ROOT if (SET_ROOT / "verdicts.json").is_file() else SET_ROOT / "fixtures"
+#: Causes the package names before the vendored set lists them, at the end of REASONS.
+AHEAD_OF_THE_SET: tuple[str, ...] = ("name_case",)
 CASE_FOLDING = REPO / "codegen" / "schema-dist" / "fixtures" / "owworld" / "CaseFolding-15.1.0.txt"
 # Unicode's conformance file as published (unicode.org/Public/15.1.0/ucd/NormalizationTest.txt), byte for byte.
 NORMALIZATION_TEST = REPO / "tests" / "fixtures" / "NormalizationTest-15.1.0.txt"
@@ -82,7 +84,15 @@ def tree(root: Path) -> dict[str, bytes]:
 def test_the_owworld_fixture_set_every_verdict_and_every_cause(tmp_path: Path) -> None:
     assert (FIXTURES / "verdicts.json").is_file(), f"no verdicts.json at {SET_ROOT} or under its fixtures/"
     doc = json.loads((FIXTURES / "verdicts.json").read_text(encoding="utf-8"))
-    assert tuple(doc["reasons"]) == REASONS, "the set's causes are the package's, in the spec's order"
+    # The package may know a cause before the vendored set does (name_case, folder spec 4.8, until the serial that
+    # vendors its cases); once the set lists it, AHEAD_OF_THE_SET is emptied at that repin, or this goes red.
+    set_reasons = tuple(doc["reasons"])
+    if set_reasons == REASONS:
+        assert not AHEAD_OF_THE_SET or os.environ.get("OW_OWWORLD_FIXTURES"), (
+            f"the vendored set now lists {AHEAD_OF_THE_SET}: empty AHEAD_OF_THE_SET"
+        )
+    else:
+        assert set_reasons + AHEAD_OF_THE_SET == REASONS, "the set's causes are the package's, in the spec's order"
     assert doc["floor"] == {"entries": WORLD_FILE_MAX_ENTRIES, "bytes": WORLD_FILE_MAX_BYTES}
     assert doc["marker"] == WORLD_FILE_MEDIA_TYPE
     on_disk = sorted(p.name for p in FIXTURES.iterdir() if p.suffix in (".owworld", ".zip"))
