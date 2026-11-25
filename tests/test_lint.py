@@ -101,10 +101,28 @@ def test_not_a_world_folder(tmp_path: Path, capsys: pytest.CaptureFixture[str]) 
     assert "not a world folder" in capsys.readouterr().out
 
 
-@pytest.mark.parametrize("which", ["clean", "broken"])
+def _unread(tmp_path: Path) -> Path:
+    """A world whose one element file is nested deeper than Python's parser goes: not read, never a problem."""
+    (tmp_path / "world.json").write_text(json.dumps(WORLD), encoding="utf-8")
+    chars = tmp_path / "elements" / "character"
+    chars.mkdir(parents=True)
+    deep = "[" * 100_000 + "]" * 100_000
+    text = '{"id": "0190f2c4-0000-7000-8000-000000000002", "name": "Ash", "description": ' + deep + "}"
+    (chars / "ash--00000002.json").write_text(text, encoding="utf-8")
+    return tmp_path
+
+
+def test_a_file_not_read_exits_3_and_is_named(tmp_path: Path, capsys: pytest.CaptureFixture[str]) -> None:
+    assert lint.main([str(_unread(tmp_path))]) == 3
+    out = capsys.readouterr().out.splitlines()
+    assert any(ln.startswith("elements/character/ash--00000002.json: not read") for ln in out), out
+    assert out[-1].endswith(", 1 not read")
+
+
+@pytest.mark.parametrize("which", ["clean", "broken", "unread"])
 def test_the_same_report_as_the_dists_own_command(which: str, tmp_path: Path) -> None:
     """One checker: the dist's command (which decodes the YAML itself) and this one print the same lines."""
-    folder = HYPERION if which == "clean" else _broken(tmp_path)
+    folder = HYPERION if which == "clean" else _broken(tmp_path) if which == "broken" else _unread(tmp_path)
     theirs = subprocess.run(
         [sys.executable, "-B", str(DIST / "walk" / "lint_folder.py"), str(folder)],
         capture_output=True,

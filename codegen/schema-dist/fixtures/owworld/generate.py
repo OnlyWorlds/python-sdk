@@ -8,9 +8,8 @@
     python generate.py --out DIR --without records/lab/world.json
                                        # a diagnostic copy without one base file, to read a reader past one gap
 
-Standard library only. The tests are OW-1..OW-22 of folder spec section 4.7; each fixture names the test it
-serves and carries one cause, so a
-reader cannot pass a refusal by luck.
+Standard library only. The tests are OW-1..OW-22 of folder spec section 4.7, OW-23, the share of section 4.8, and
+OW-24, which folders under spatial/ a reader serves (section 4.8); each fixture names the test it serves and carries one cause, so a reader cannot pass a refusal by luck.
 
 DETERMINISM. Every zip is written by `build_zip` below, by hand: entries in the order given (sorted by the UTF-8 bytes
 of their names unless a fixture tests order), every entry stamped 1980-01-01 00:00, no extra fields, no comments. No
@@ -361,6 +360,36 @@ def private_files():
     return files
 
 
+HIDDEN_FILE = "elements/character/veiled--0000ab05.json"
+UNREAD_FILE = "elements/character/torn--0000ab06.json"
+NOTES_FILE = "elements/character/notes.txt"
+MOVED_FILE = "elements/character/old/kept--0000ab07.json"
+TWIN_PLAIN_FILE = "elements/character/pair-a--0000ab08.json"
+TWIN_HIDDEN_FILE = "elements/character/pair-b--0000ab08.json"
+UNTYPED_FILE = "elements/vessel/skiff--0000ab0b.json"
+SHARE_UNREAD = sorted([UNREAD_FILE, NOTES_FILE, MOVED_FILE, TWIN_PLAIN_FILE, TWIN_HIDDEN_FILE, UNTYPED_FILE],
+                      key=lambda rel: rel.encode("utf-8"))
+
+
+def hidden_files():
+    """The base world plus seven files under elements/ (section 4.8, OW-23): one element whole and marked hidden, one cut
+    short after its mark (no writer can read it as an element), a person's notes.txt in the type folder, a hidden
+    element's file moved by hand into a deeper folder, old/, two files holding one id (the unmarked one sorting first,
+    so a reader serves it and skips the hidden one after it), and an element in a folder that is not one of the 22
+    types. A share leaves the last six out whole, counted apart from the hidden one: no reader serves the first three
+    as an element, the share cannot say which of the two files' marks is the element's, and a folder no type names is
+    unread on a share. The share case's source. The base world itself never changes, so no other fixture's bytes move."""
+    files = base_files()
+    files[HIDDEN_FILE] = element(5, "Veiled", hidden=True)
+    files[UNREAD_FILE] = b'{"id": "0695db83-0000-7000-8000-00000000ab06", "hidden": true, '
+    files[NOTES_FILE] = b"Brother Tomas keeps the second key; ask before moving the old ledgers.\n"
+    files[MOVED_FILE] = element(7, "Kept", hidden=True)
+    files[TWIN_PLAIN_FILE] = element(8, "Pair")
+    files[TWIN_HIDDEN_FILE] = element(8, "Pair", hidden=True)
+    files[UNTYPED_FILE] = element(0x0b, "The Skiff")
+    return files
+
+
 def world_entries(files, top=TOP, **kw):
     return [Entry(top + rel, data, **kw) for rel, data in files.items()]
 
@@ -394,7 +423,8 @@ def fixtures():
     F = []
 
     def add(file, content, *, test, rule, reader="accept", writer=None, role="reader", reason=None, open_=None,
-            lean=None, covers=None, roundtrip=False, strips=None, should=None, budget=None, source=None, side=None):
+            lean=None, covers=None, roundtrip=False, strips=None, should=None, budget=None, source=None, side=None,
+            left_out=None):
         if writer is None:
             writer = "accept" if reader == "accept" else "refuse"
         v = {"file": file, "test": test, "role": role, "reader": reader, "writer": writer, "rule": rule}
@@ -402,6 +432,8 @@ def fixtures():
             v["source"] = source
         if side:
             v["side"] = side
+        if left_out:
+            v["left_out"] = left_out
         if reason:
             v["reason"] = reason
         if strips:
@@ -480,6 +512,22 @@ def fixtures():
         test="OW-5", reader="refuse", reason="more_than_one",
         rule="A world.json inside the world (abbey/inner/world.json), not under records/: refused. (pass-good "
              "holds records/lab/world.json, which must pass.)")
+    add("pass-OW-5-dot-folder-inside.owworld",
+        build_zip(base(extra=[
+            (".atlas/world.json", jbytes(dict(WORLD, id="0695db52-0000-7000-8000-00000000a7a5"))),
+            (".atlas/world-prefs.json", jbytes({"zoom": 2, "open": ["ana--0000ab01"]})),
+            ("elements/character/.trash/world.json", jbytes(dict(WORLD, id="0695db52-0000-7000-8000-00000000a7a6"))),
+            ("..atlas/world.json", jbytes(dict(WORLD, id="0695db52-0000-7000-8000-00000000a7a7"))),
+        ])), test="OW-5", writer="refuse",
+        rule="Dot-folders inside the world, each holding a well-formed world.json of another world's id: a tool's "
+             "abbey/.atlas/ (beside its world-prefs.json), deeper, abbey/elements/character/.trash/, and "
+             "abbey/..atlas/, a name of dots and more: any path segment that begins with a dot is a dot-folder, once "
+             "OW-16 has refused a segment that is exactly . or .. . A dot-folder "
+             "is never a world, wherever it sits, so the second-world check does not look under a folder whose name "
+             "starts with a dot; accepted. The world read is abbey's own id, and nothing under any dot-folder is "
+             "among its elements or changes its counts. Only that check skips them: every other check still reads "
+             "their entries. A reader ignores them; a writer never emits a dot-folder unless the caller hands it in, "
+             "so never in a portable .owworld.")
 
     # -- OW-6: the marker entry (ruled: a writer SHOULD place it; a reader never requires it, refuses other bytes) --
     def marker(data=MIMETYPE, method=0):
@@ -731,6 +779,21 @@ def fixtures():
     add("fail-OW-18-folder-case.owworld", build_zip(base(extra=[("Elements/character/cora--0000ab04.json", cora)])),
         test="OW-18", reader="refuse", reason="collision",
         rule="abbey/Elements/ beside abbey/elements/: one folder on a case-insensitive disk, refused.")
+    moved = [rel for rel in base_files() if rel.startswith("elements/")]
+    add("fail-OW-18-folder-case-alone.owworld",
+        build_zip(base(drop=moved, extra=[("E" + rel[1:], base_files()[rel]) for rel in moved])),
+        test="OW-18", reader="refuse", reason="name_case",
+        rule="abbey/Elements/ and no abbey/elements/: the three fixed names (world.json, elements/, spatial/) are "
+             "read as written, so Elements/ is no element folder, and a world holding one of them in another case (by OW-18's fold) "
+             "without the name itself is refused with that cause, never read as empty (section 4.8, ruled "
+             "2026-11-25). On a disk that ignores case a writer's elements/ lands inside Elements/ and is never read "
+             "back. The pair side by side is fail-OW-18-folder-case; this is the one alone.")
+    add("fail-OW-18-world-case-alone.owworld",
+        build_zip(base(drop=["world.json"], extra=[("World.JSON", base_files()["world.json"])])),
+        test="OW-18", reader="refuse", reason="name_case",
+        rule="abbey/World.JSON and no abbey/world.json: the name is read as written, so this holds no world, and "
+             "a world.json in another case (by OW-18's fold) without the name itself is refused with that cause, never answered as "
+             "no world (section 4.8, ruled 2026-11-25).")
     add("fail-OW-18-nfc-then-fold.owworld",
         build_zip(base(extra=[("media/Café.png", PNG), ("media/café.png", PNG)])), test="OW-18",
         reader="refuse", reason="collision",
@@ -872,6 +935,74 @@ def fixtures():
         build_zip(base(extra=[("elements/character/con--0000e1.json", element(0xe1, "Con"))])), test="OW-22",
         rule="con--0000e1.json: its base name is con--0000e1, not a reserved name; accepted.")
 
+    # -- OW-23: a share carries under elements/ only an element it read with no mark (section 4.8; writer, two-sided) --
+    # One source (hidden_files: the base plus a whole hidden element, a file cut short after its mark, a notes.txt in
+    # the type folder, a hidden element's file moved into old/, two files holding one id with the unmarked one first,
+    # and an element in a folder no type names), the two sides a writer emits, and the ways to get the share wrong.
+    # The want is written by hand: the share leaves all seven out whole, the first counted hidden and the other six
+    # counted apart as unread, each named in the writer's report; the copy carries all seven byte for byte. Every
+    # reader opens every one of them.
+    hid = hidden_files()
+    left = [HIDDEN_FILE] + SHARE_UNREAD
+
+    def hidden_world(drop=()):
+        return build_zip(world_entries({rel: data for rel, data in hid.items() if rel not in drop}))
+
+    add("pass-OW-23-share-leaves-unread-out.owworld", hidden_world(drop=left), test="OW-23", role="writer",
+        source="hidden", side="share", left_out={"hidden": [HIDDEN_FILE], "unread": SHARE_UNREAD},
+        rule="Writer, a share (includeHidden false): nothing under elements/ travels but a file the folder reader "
+             "serves as an element with no mark. The hidden element's file is left out whole and named as hidden; the "
+             "file cut short, the notes.txt, the hidden file moved into old/, both files of the id two files hold and "
+             "the element in a folder that is not one of the 22 types are left out whole and named apart, as unread.")
+    add("pass-OW-23-copy-carries-unread.owworld", hidden_world(), test="OW-23", role="writer", source="hidden",
+        side="copy",
+        rule="Writer, a copy (the default): all ten files under elements/, the seven the share leaves out among them, "
+             "travel byte for byte, the cut one included, since a copy is "
+             "how a person moves their own world, broken file and all. Nothing is reported left out.")
+    add("fail-OW-23-share-carries-unread.owworld", hidden_world(drop=[f for f in left if f != UNREAD_FILE]),
+        test="OW-23", role="writer", writer="refuse", source="hidden", side="share",
+        rule="Writer, a share: the file cut short after its mark carried; a writer that read a refusal as 'no "
+             "element' made it. A file whose mark cannot be read never travels in a share.")
+    add("fail-OW-23-share-carries-hidden.owworld", hidden_world(drop=[f for f in left if f != HIDDEN_FILE]),
+        test="OW-23", role="writer", writer="refuse", source="hidden", side="share",
+        rule="Writer, a share: the whole hidden element's file carried; the mark keeps it out.")
+    add("fail-OW-23-share-carries-moved.owworld", hidden_world(drop=[f for f in left if f != MOVED_FILE]),
+        test="OW-23", role="writer", writer="refuse", source="hidden", side="share",
+        rule="Writer, a share: another hidden element's file (Kept, ab07), moved by hand into old/, carried, since no folder reader "
+             "serves it; a share carries under elements/ only an element it read with no mark.")
+    add("fail-OW-23-share-carries-notes.owworld", hidden_world(drop=[f for f in left if f != NOTES_FILE]),
+        test="OW-23", role="writer", writer="refuse", source="hidden", side="share",
+        rule="Writer, a share: the notes.txt in the type folder carried; a file of another kind under elements/ is "
+             "left out with the unread.")
+    add("fail-OW-23-share-carries-twin.owworld", hidden_world(drop=[f for f in left if f != TWIN_PLAIN_FILE]),
+        test="OW-23", role="writer", writer="refuse", source="hidden", side="share",
+        rule="Writer, a share: the unmarked file of an id two files hold carried, because it sorts first and a reader "
+             "serves it with no mark while the hidden file after it is skipped. With two files for one id the share "
+             "cannot say which mark is the element's, so it carries neither.")
+    add("fail-OW-23-share-carries-untyped.owworld", hidden_world(drop=[f for f in left if f != UNTYPED_FILE]),
+        test="OW-23", role="writer", writer="refuse", source="hidden", side="share",
+        rule="Writer, a share: an element in elements/vessel/, a folder that is not one of the 22 types, carried; such "
+             "a folder is unread on a share.")
+
+    # -- OW-24: under spatial/ a reader reads the four and only the four (section 4.8, ruled 2026-11-25) -------------
+    # map, pin, zone, marker, lower case as under elements/. A reader accepts the world and serves nothing from any
+    # other folder there; the claim on what it serves lives in the rule, as pass-OW-5-dot-folder-inside's does.
+    add("pass-OW-24-spatial-untyped.owworld",
+        build_zip(base(extra=[("spatial/character/cleric--0000ab0c.json", element(0xc, "The Cleric"))])),
+        test="OW-24",
+        rule="A Character's file under abbey/spatial/character/: spatial/ holds only map, pin, zone and marker, so "
+             "the folder is unread and holds no Character; accepted. The world read holds the base's three elements "
+             "and nothing from spatial/. What a reader says about a folder it does not read is its own. A copy "
+             "carries the file as written; a share leaves it out as unread. No side: the writer verdict is a "
+             "copy's.")
+    add("pass-OW-24-spatial-type-case.owworld",
+        build_zip(base(extra=[("spatial/Pin/well--0000ab0d.json", element(0xd, "The Well"))])),
+        test="OW-24",
+        rule="A Pin's file under abbey/spatial/Pin/: the type word is read as written, lower case as under "
+             "elements/, so Pin/ is no pin folder and holds no Pin; accepted. The world read holds the base's three "
+             "elements and no Pin. What a reader says about a folder it does not read is its own. A copy carries "
+             "the file as written; a share leaves it out as unread. No side: the writer verdict is a copy's.")
+
     return F
 
 
@@ -897,9 +1028,10 @@ NOT_GENERATED = [
             "`generate.py --large DIR`."},
 ]
 
-# Spec 4.7 (line 229): the TypeScript reader's six (world-file.ts, as that reader names them) plus six.
+# Spec 4.7 (line 229): the TypeScript reader's six (world-file.ts, as that reader names them) plus six, and 4.8's
+# name_case (2026-11-25: one fixed name alone in another case).
 READER_REASONS = ["unsafe_path", "too_big", "too_many", "not_a_world", "more_than_one", "not_openable",
-                  "duplicate", "collision", "link", "method", "name", "marker"]
+                  "duplicate", "collision", "link", "method", "name", "marker", "name_case"]
 
 
 def verdicts_doc(entries):
@@ -907,7 +1039,9 @@ def verdicts_doc(entries):
     return {
         "set": "owworld-conformance",
         "generated_by": "generate.py",
-        "spec": "folder format spec section 4.7, the archive (drafted 2026-10-22), on 0.3.12; tests OW-1..OW-22",
+        "spec": "folder format spec section 4.7, the archive (drafted 2026-10-22), on 0.3.12; tests OW-1..OW-22; "
+                "OW-23, the share, section 4.8 (ruled 2026-11-23); OW-24, which folders under spatial/ a reader serves, "
+                "section 4.8 (ruled 2026-11-25)",
         "notes": [
             "reader: what a reader does with the file (accept, or refuse with `reason`). Every reader runner checks "
             "this field.",
@@ -922,7 +1056,8 @@ def verdicts_doc(entries):
             "open: what section 4.7 still leaves open on this fixture (the question, with the spec's line); the "
             "verdict follows `lean` and moves when the spec says otherwise. Every other verdict is the spec's.",
             "reason: one of `reasons` (section 4.7: the TypeScript reader's six plus duplicate, collision, link, "
-            "method, name, marker). A reader that refuses for another cause fails the case.",
+            "method, name, marker, and section 4.8's name_case). A reader that refuses for another cause fails the "
+            "case.",
             "budget: reader verdicts hold for a reader whose budget is the floor (`floor`: 500,000 entries, 2 GiB). "
             "A reader whose budget is larger reads the fixtures marked `budget: floor` with the floor's budget; one "
             "whose budget is smaller fails the floor cases (pass-OW-15-floor, pass-OW-15-floor-bytes).",
@@ -933,6 +1068,14 @@ def verdicts_doc(entries):
             "side: on the private case, which side of the export the file is: `default` (private records left out) "
             "or `asked` (the caller asked for them). Both are files a conforming writer emits; which one depends on "
             "the call, not the bytes.",
+            "side, on the share case (OW-23, section 4.8, source `hidden`): `share` (includeHidden false) or `copy` "
+            "(the default). A source's `hidden` and `unread` are the two sets of paths a share leaves out whole: the "
+            "hidden ones for their mark, the unread ones because the folder reader would not serve them as an element "
+            "(it could not read them, or they are no element file) or a second file holds the same id. On a `share` side each is absent; on a `copy` side "
+            "each is present byte-exact.",
+            "left_out: on the share side a writer emits, the two sets of paths its report names, inside the world: "
+            "`hidden` and, counted apart, `unread`. A writer runner compares its own report with it; the shape of "
+            "each writer's report stays its own.",
         ],
         "reasons": READER_REASONS,
         "floor": {"entries": FLOOR_ENTRIES, "bytes": FLOOR_BYTES},
@@ -941,7 +1084,11 @@ def verdicts_doc(entries):
                    "files": {rel: hashlib.sha256(data).hexdigest() for rel, data in sorted(src.items())}},
         "sources": {"private": {"world_id": WORLD_ID, "top": TOP.rstrip("/"), "private": [PRIVATE_PRODUCER],
                                 "files": {rel: hashlib.sha256(data).hexdigest()
-                                          for rel, data in sorted(private_files().items())}}},
+                                          for rel, data in sorted(private_files().items())}},
+                    "hidden": {"world_id": WORLD_ID, "top": TOP.rstrip("/"), "hidden": [HIDDEN_FILE],
+                               "unread": SHARE_UNREAD,
+                               "files": {rel: hashlib.sha256(data).hexdigest()
+                                         for rel, data in sorted(hidden_files().items())}}},
         "fixtures": entries,
     }
 

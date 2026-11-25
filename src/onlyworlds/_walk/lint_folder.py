@@ -2,8 +2,9 @@
 
     python walk/lint_folder.py PATH/TO/WORLD-FOLDER [--schema DIR]
 
-Reads `world.json` and every `elements/<type>/*.json` under the folder and
-reports, one line each: a file outside the 22 type folders, a missing or
+Reads `world.json` and every `elements/<type>/*.json` under the folder (a name that ends in
+`.json` in exactly that case and does not begin with a dot, as the readers take one, and
+none under a dot-named folder; any other file is passed over) and reports, one line each: a file outside the 22 type folders, a missing or
 duplicate UUID `id`, a key that is not a field of its type (the shape one real
 world's profile found three hundred of: `creature.characters`,
 `event.location`, `event.actor`), a value of the wrong shape for its kind, and
@@ -27,9 +28,14 @@ the lookups stay as written. A multi-link, or an extension list a profile reads 
 (`x_spine_depends_on`, `x_lens_leads_to`: the lens profile's closed table), that names one
 element more than once gets one warning line per element, with how many times, never a
 problem (each names each element once; a reader reads a repeat once, in its first place);
-entries are compared as written, so `[a, A]` is no repeat. The last line is the count it checked, so an empty
+entries are compared as written, so `[a, A]` is no repeat. A `world.json` or an element
+file whose JSON this Python cannot hold (nested deeper than its parser goes, or a number
+longer than it converts) gets one line saying it was not read, and the check goes on:
+a third verdict beside clean and a problem, since a newer Python on another system may read
+the same file. The last line is the count it checked, so an empty
 report is a result and not a silence. Exit 0 clean, 1 with problems, 2 when
-the folder is not a world folder.
+the folder is not a world folder, 3 when nothing it read has a problem but a file was not
+read.
 
 The same function gates the published example world (publish_dist.py), so the
 check a stranger runs is the check the dist itself passed. Decoding goes
@@ -112,6 +118,8 @@ class Report:
     def __init__(self) -> None:
         self.problems: list[str] = []
         self.warnings: list[str] = []  # printed, never counted: the exit code is the problems'
+        # Files this Python could not parse (serial 146): neither clean nor a problem.
+        self.unread: list[str] = []
         self.files = 0
         self.types: set[str] = set()
 
@@ -120,8 +128,9 @@ class Report:
 
     @property
     def summary(self) -> str:
-        return (f"checked {self.files} element files in {len(self.types)} types: "
+        line = (f"checked {self.files} element files in {len(self.types)} types: "
                 f"{len(self.problems)} problems")
+        return line + (f", {len(self.unread)} not read" if self.unread else "")
 
 
 def is_uuid(value) -> bool:
@@ -132,6 +141,25 @@ def is_uuid(value) -> bool:
     except ValueError:
         return False
     return True
+
+
+# A file whose JSON the Python running the check cannot hold is neither an element nor a
+# problem: another Python may read it (serial 146). Two causes: nested deeper than its parser
+# goes (RecursionError, which is no ValueError), or a number longer than it converts (a bare
+# ValueError, which is no JSONDecodeError). A file that is not JSON or not UTF-8 is a problem.
+NOT_READ = ("not read: the Python running this check cannot hold its JSON (nested too deep, "
+            "or a number too long for it), so nothing is said about it here")
+
+
+def _load(path: Path) -> tuple[str, object]:
+    """Read one JSON file: ("ok", value), ("problem", the line's words) or ("unread", the
+    line's words)."""
+    try:
+        return "ok", json.loads(path.read_text(encoding="utf-8"))
+    except (json.JSONDecodeError, UnicodeDecodeError) as e:
+        return "problem", f"not JSON ({e})"
+    except (ValueError, RecursionError):
+        return "unread", NOT_READ
 
 
 INSIDE = ("inside a world it is another id than the lowercase one (address profile, The same id)")
@@ -168,6 +196,25 @@ def git_tracks(path: Path) -> bool:
     return r.returncode == 0
 
 
+def _json_files(elements: Path) -> list[Path]:
+    """The files under `elements/` the check looks at, sorted: a name that ends in `.json` in
+    exactly that case and does not begin with a dot, as the readers take them (serial 146).
+    Compared by the name as written, never by the disk's own matching, so one folder gives
+    one count on every system (a glob for `*.json` ignores case on Windows, not on Linux).
+    A file anywhere under a folder inside `elements/` whose name begins with a dot (a tool's
+    own, `.trash/`, `.obsidian/`) is passed over too: a tool's folder never fails a world.
+    Any other file is passed over in silence, as a file of another kind always was; of these,
+    one that is not directly in a type folder is reported below, as before. The order is the
+    path below `elements/` as written, compared by code point, never the system's comparison of
+    path objects (which ignores case on Windows): which file of a repeated id is kept, and so
+    what is reported, is the same on every system."""
+    if not elements.is_dir():
+        return []
+    return sorted((p for p in elements.rglob("*") if p.is_file() and p.name.endswith(".json")
+                   and not any(part.startswith(".") for part in p.relative_to(elements).parts)),
+                  key=lambda p: p.relative_to(elements).as_posix())
+
+
 def lint_folder(src: Path, decoded: dict) -> Report:
     """Check the folder at `src` against `decoded` (decode_schema's output)."""
     report = Report()
@@ -175,12 +222,16 @@ def lint_folder(src: Path, decoded: dict) -> Report:
     if not world_path.exists():
         report.add("world.json: missing")
     else:
-        try:
-            world = json.loads(world_path.read_text(encoding="utf-8"))
-        except ValueError as e:
+        kind, world = _load(world_path)
+        if kind == "problem":
+            report.add(f"world.json: {world}")
             world = {}
-            report.add(f"world.json: not JSON ({e})")
-        if not isinstance(world, dict) or not world.get("id") or "name" not in world:
+        elif kind == "unread":
+            report.unread.append(f"world.json: {world}")
+            world = {}
+        if kind == "unread":
+            pass
+        elif not isinstance(world, dict) or not world.get("id") or "name" not in world:
             report.add("world.json: needs `id` and `name`")
         else:
             _spelling_warning(report, "world.json", "id", world["id"], WORLD_ID)
@@ -199,18 +250,23 @@ def lint_folder(src: Path, decoded: dict) -> Report:
     base = {f["name"]: f for f in decoded["base"] if f["name"] != "world"}
     bodies: dict[str, tuple[str, dict, str]] = {}
     elements = src / "elements"
-    for path in sorted(elements.rglob("*.json")) if elements.is_dir() else []:
+    for path in _json_files(elements):
         rel = path.relative_to(src).as_posix()
-        report.files += 1
         slug = path.parent.name
         if slug not in decoded["types"] or path.parent.parent != elements:
+            report.files += 1
             report.add(f"{rel}: not under elements/<one of the 22 types>/")
             continue
+        kind, body = _load(path)
+        if kind == "unread":
+            # Not among the files checked, and its folder not a type checked on its account
+            # (serial 146): the count line counts what was read.
+            report.unread.append(f"{rel}: {body}")
+            continue
+        report.files += 1
         report.types.add(slug)
-        try:
-            body = json.loads(path.read_text(encoding="utf-8"))
-        except ValueError as e:
-            report.add(f"{rel}: not JSON ({e})")
+        if kind == "problem":
+            report.add(f"{rel}: {body}")
             continue
         if not isinstance(body, dict):
             report.add(f"{rel}: not a JSON object")
@@ -370,10 +426,12 @@ def main(argv=None) -> int:
     report = lint_folder(src, decoded)
     for w in report.warnings:
         print(w)
+    for u in report.unread:
+        print(u)
     for p in report.problems:
         print(p)
     print(report.summary)
-    return 1 if report.problems else 0
+    return 1 if report.problems else 3 if report.unread else 0
 
 
 if __name__ == "__main__":

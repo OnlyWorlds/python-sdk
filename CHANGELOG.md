@@ -4,6 +4,11 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+## 0.152.0 (2026-11-25)
+
+- **The lint says when it could not read a file.** `python -m onlyworlds.lint` runs the checker of schema-dist serial 146: a `world.json` or an element file whose JSON this Python cannot hold (nested deeper than its parser goes, or a number longer than it converts) gets one line saying it was not read, the check goes on, and the last line counts it. The command exits 3 when nothing it read has a problem but a file was not read. Before, a file nested too deep stopped the check with a `RecursionError`, and a number too long was counted as a problem, `not JSON`. The checker also takes a file only directly in a type folder, with a name ending in `.json` in that case and not beginning with a dot, and passes over everything under a dot-named folder.
+- The schema pin moves to `v0.34.1-dist.146` (canonical 00.34.01 unchanged, no schema file moved). The tests replay what the serial adds: one more address prose case, the calendar's 79th case, and the `.owworld` set at 109 archives, among them the four on a fixed name held only in another case, which 0.151.0 already answers.
+
 ## 0.151.0 (2026-11-25)
 
 ### Changed

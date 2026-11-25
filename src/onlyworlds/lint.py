@@ -8,8 +8,10 @@ One line per problem: a file outside the 22 type folders, a missing or duplicate
 that is not a field of its type, a value of the wrong shape for its kind, a link that does not
 resolve inside the folder or resolves to the wrong type. A ``world.json`` stamped with a newer
 folder format than the checker knows gets one warning line, never a problem. The last line is the
-count it checked, so an empty report is a result and not a silence. Exit 0 clean, 1 with problems,
-2 when the folder is not a world folder.
+count it checked, so an empty report is a result and not a silence. A file whose JSON this Python
+cannot hold (nested too deep, or a number too long) gets one line saying it was not read, and the
+check goes on. Exit 0 clean, 1 with problems, 2 when the folder is not a world folder, 3 when
+nothing it read has a problem but a file was not read.
 
 The checker is schema-dist's ``walk/lint_folder.py``, copied byte for byte at this package's pin
 into ``_walk/`` beside the dist's ``schema.json``, and run on that file: the check this command
@@ -93,10 +95,12 @@ def main(argv: list[str] | None = None) -> int:
     report = lint(src)
     for w in report.warnings:
         print(w)
+    for u in report.unread:
+        print(u)
     for p in report.problems:
         print(p)
     print(report.summary)
-    return 1 if report.problems else 0
+    return 1 if report.problems else 3 if report.unread else 0
 
 
 if __name__ == "__main__":

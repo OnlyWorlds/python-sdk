@@ -2,15 +2,20 @@
   "_what": "The recorded pin for the vendored OnlyWorlds schema distribution (codegen/schema-dist/, copied byte-exact). Do not edit by hand; re-vendor from the pinned tag and review the diff. Kept equal to the npm SDK's pin (github.com/OnlyWorlds/sdk, codegen/schema-pin.json) on purpose: two clients, one schema.",
   "_why_manifest_sha256": "Verifying the tree against its own MANIFEST.json only proves internal consistency. If the tag moved, the manifest moved with it. The hash recorded here is the one first accepted, which is what makes a moved tag visible.",
   "repo": "https://github.com/OnlyWorlds/schema-dist",
-  "tag": "v0.34.1-dist.145",
-  "commit": "f73146c2941b27bb82814a23b393fe9de1c7eee1",
-  "manifest_sha256": "55c71236d409108a99d6336170bbc309c2d0a8309e7bd61fe20484bac19c7231",
+  "tag": "v0.34.1-dist.146",
+  "commit": "7f29ae431bd37d9f779153aac175f63fa3551432",
+  "manifest_sha256": "1d948463a5e8c13026ac069dd4ae91c22ba3f5fc4ba81508a7d08a600638f367",
   "canonical_version": "00.34.01",
-  "dist_serial": 145,
-  "published": "2026-11-22",
-  "pinned_at": "2026-11-22",
-  "pinned_by": "The maintainer: tree from `git archive` of the tag in a schema-dist checkout (216 files: the 215 the MANIFEST lists, and MANIFEST.json itself); files re-hashed against MANIFEST.json by verify_dist.py; MANIFEST self-hash matched against the raw file GitHub serves at the tag, whose ref resolves to the commit above.",
+  "dist_serial": 146,
+  "published": "2026-11-25",
+  "pinned_at": "2026-11-25",
+  "pinned_by": "The maintainer: tree from `git archive` of the tag in a schema-dist checkout (229 files: the 228 the MANIFEST lists, and MANIFEST.json itself); files re-hashed against MANIFEST.json by verify_dist.py; MANIFEST self-hash matched against the raw file GitHub serves at the tag, whose ref resolves to the commit above.",
   "previous_pins": [
+    {
+      "tag": "v0.34.1-dist.145",
+      "manifest_sha256": "55c71236d409108a99d6336170bbc309c2d0a8309e7bd61fe20484bac19c7231",
+      "note": "serial 146: one address prose case, the calendar's date fields case, the world-file set at 109 with OW-23, OW-24 and name_case, lint_folder's not-read verdict"
+    },
     {
       "tag": "v0.34.1-dist.144",
       "manifest_sha256": "ebf8c6b472cb6cdd9494d244efdafe743cdefce0a83f4468ce59fdf05d6e3a89",

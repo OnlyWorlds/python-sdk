@@ -39,7 +39,7 @@ REPO = Path(__file__).resolve().parent.parent
 SET_ROOT = Path(os.environ.get("OW_OWWORLD_FIXTURES") or REPO / "codegen" / "schema-dist" / "fixtures" / "owworld")
 FIXTURES = SET_ROOT if (SET_ROOT / "verdicts.json").is_file() else SET_ROOT / "fixtures"
 #: Causes the package names before the vendored set lists them, at the end of REASONS.
-AHEAD_OF_THE_SET: tuple[str, ...] = ("name_case",)
+AHEAD_OF_THE_SET: tuple[str, ...] = ()
 CASE_FOLDING = REPO / "codegen" / "schema-dist" / "fixtures" / "owworld" / "CaseFolding-15.1.0.txt"
 # Unicode's conformance file as published (unicode.org/Public/15.1.0/ucd/NormalizationTest.txt), byte for byte.
 NORMALIZATION_TEST = REPO / "tests" / "fixtures" / "NormalizationTest-15.1.0.txt"
@@ -130,7 +130,7 @@ def test_the_owworld_fixture_set_every_verdict_and_every_cause(tmp_path: Path) -
     print(f"the .owworld set: {run} fixtures run, {len(diffs)} disagreeing, from {FIXTURES}")
     for d in diffs:
         print(f"  disagrees: {d}")
-    assert run == len(on_disk) == 96, f"the set holds {run} fixtures"  # dist.58: two OW-14 deflate cases, one NFC
+    assert run == len(on_disk) == 109, f"the set holds {run} fixtures"  # serial 146: OW-23, OW-24 and name_case
     assert diffs == []
 
 

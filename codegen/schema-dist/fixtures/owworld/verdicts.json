@@ -1,17 +1,19 @@
 {
   "set": "owworld-conformance",
   "generated_by": "generate.py",
-  "spec": "folder format spec section 4.7, the archive (drafted 2026-10-22), on 0.3.12; tests OW-1..OW-22",
+  "spec": "folder format spec section 4.7, the archive (drafted 2026-10-22), on 0.3.12; tests OW-1..OW-22; OW-23, the share, section 4.8 (ruled 2026-11-23); OW-24, which folders under spatial/ a reader serves, section 4.8 (ruled 2026-11-25)",
   "notes": [
     "reader: what a reader does with the file (accept, or refuse with `reason`). Every reader runner checks this field.",
     "writer: whether the file is one a conforming writer may emit as a portable .owworld, checked against `source` (every source file present byte-exact) and the writer's MUST rules (only the folder's parts, a marker only in its shape, no api, 1980 stamps, UTF-8 byte order, methods 0 and 8). A SHOULD never makes it refuse; `should` names one a fixture breaks. Only a reference checker checks it; the role says which side the test is about.",
     "role: reader | writer | roundtrip. A writer fixture is still opened by every reader: its `reader` verdict says so.",
     "strips: a key a reader removes from world.json and never returns (OW-10: `api`), the file still read.",
     "open: what section 4.7 still leaves open on this fixture (the question, with the spec's line); the verdict follows `lean` and moves when the spec says otherwise. Every other verdict is the spec's.",
-    "reason: one of `reasons` (section 4.7: the TypeScript reader's six plus duplicate, collision, link, method, name, marker). A reader that refuses for another cause fails the case.",
+    "reason: one of `reasons` (section 4.7: the TypeScript reader's six plus duplicate, collision, link, method, name, marker, and section 4.8's name_case). A reader that refuses for another cause fails the case.",
     "budget: reader verdicts hold for a reader whose budget is the floor (`floor`: 500,000 entries, 2 GiB). A reader whose budget is larger reads the fixtures marked `budget: floor` with the floor's budget; one whose budget is smaller fails the floor cases (pass-OW-15-floor, pass-OW-15-floor-bytes).",
     "source: a fixture's writer verdict is checked against `source` unless it names one of `sources` (the private case's world, OW-8). A source's `private` lists producers marked private in its RECORDS.json (section 4.5 rule 11): each one's directory is present whole and byte-exact, or absent whole; the manifest itself travels byte-exact either way.",
-    "side: on the private case, which side of the export the file is: `default` (private records left out) or `asked` (the caller asked for them). Both are files a conforming writer emits; which one depends on the call, not the bytes."
+    "side: on the private case, which side of the export the file is: `default` (private records left out) or `asked` (the caller asked for them). Both are files a conforming writer emits; which one depends on the call, not the bytes.",
+    "side, on the share case (OW-23, section 4.8, source `hidden`): `share` (includeHidden false) or `copy` (the default). A source's `hidden` and `unread` are the two sets of paths a share leaves out whole: the hidden ones for their mark, the unread ones because the folder reader would not serve them as an element (it could not read them, or they are no element file) or a second file holds the same id. On a `share` side each is absent; on a `copy` side each is present byte-exact.",
+    "left_out: on the share side a writer emits, the two sets of paths its report names, inside the world: `hidden` and, counted apart, `unread`. A writer runner compares its own report with it; the shape of each writer's report stays its own."
   ],
   "reasons": [
     "unsafe_path",
@@ -25,7 +27,8 @@
     "link",
     "method",
     "name",
-    "marker"
+    "marker",
+    "name_case"
   ],
   "floor": {
     "entries": 500000,
@@ -63,6 +66,40 @@
         "records/RECORDS.json": "c08c1860b1a5d9deea0a8a9562bec7af6bbf65196477a10b58034a159e341ad8",
         "records/fold/.head": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
         "records/fold/spine.jsonl": "e8c67cbf6866f7d3273a0b247c4296d73d470dd77489c1fd556050afcce95e6b",
+        "records/lab/.cursor": "084c799cd551dd1d8d5c5f9a5d593b2e931f5e36122ee5c793c1d08a19839cc0",
+        "records/lab/ledger.bin": "0334a98f4f7a57273b73b6854df3d72960f8e20f08d64d141918c6f8df4932b2",
+        "records/lab/ledger.bin.meta": "f5a67c172404428fbd1057b1f8e35af69a6174bacca421080f407ae07b1b48b1",
+        "records/lab/world.json": "a7b085e5ac3d34de33024c40db1e38f0526a2b03711ac492340d138b85871447",
+        "world.json": "bf6ff0507a982839e2dbbdd98995dc3da22926fd9b9291c21ac1cdb55b824f60"
+      }
+    },
+    "hidden": {
+      "world_id": "0695db52-0000-7000-8000-00000000abbe",
+      "top": "abbey",
+      "hidden": [
+        "elements/character/veiled--0000ab05.json"
+      ],
+      "unread": [
+        "elements/character/notes.txt",
+        "elements/character/old/kept--0000ab07.json",
+        "elements/character/pair-a--0000ab08.json",
+        "elements/character/pair-b--0000ab08.json",
+        "elements/character/torn--0000ab06.json",
+        "elements/vessel/skiff--0000ab0b.json"
+      ],
+      "files": {
+        "elements/character/ana--0000ab01.json": "1fb89188a024f91cf4ce2ef88c04fcd62ac7bd6a3162f7706f1387e718a4d1bf",
+        "elements/character/brother-tomas--0000ab02.json": "581efb60de6430fbc29c57a11bc02dc3f4e58d98c4e6465cbc55b0241d6ea295",
+        "elements/character/notes.txt": "86dabc2a9aae0c3c2af9dce864f077d44bb48535e4629b41b81767dfdabe8ccd",
+        "elements/character/old/kept--0000ab07.json": "7cad7439d50a6ae41ea21e6e62a95664445825a32a2c47cf35732c960463c045",
+        "elements/character/pair-a--0000ab08.json": "25531cbf557ce56d83745aacd03a82f0dfcfa5846f8bacfc421c0a14f5f3e271",
+        "elements/character/pair-b--0000ab08.json": "31b10a7db8501b07489d8194b30aeb4b8513b0388ded4049479cffeba573fa53",
+        "elements/character/torn--0000ab06.json": "83a11081e8cc2f12e63f3283ff5e1e2ed3b837aaf8c6a6cdda52d86dc53d1812",
+        "elements/character/veiled--0000ab05.json": "6c278502c03ff79fe2979b0068b31597eb4799abc33b80ed099c4425e7a8cc05",
+        "elements/location/abbey--0000ab03.json": "51551b550b02851005b9e9ea2d573cf9c8a059ccabbc806b943816c131ddb556",
+        "elements/vessel/skiff--0000ab0b.json": "c2a8c258261f678ca6714e0db2cb117bf3749bc48dbfac2c363ec4ec27b8271f",
+        "media/a.png": "68aa60a5f1ac10e88f44f6e4a462540949808b813c736db8201d2590f3fc30e0",
+        "records/RECORDS.json": "3a701d11c2698b44ca050fd31e591771036876da812ce9ba3c9e583f4970aba0",
         "records/lab/.cursor": "084c799cd551dd1d8d5c5f9a5d593b2e931f5e36122ee5c793c1d08a19839cc0",
         "records/lab/ledger.bin": "0334a98f4f7a57273b73b6854df3d72960f8e20f08d64d141918c6f8df4932b2",
         "records/lab/ledger.bin.meta": "f5a67c172404428fbd1057b1f8e35af69a6174bacca421080f407ae07b1b48b1",
@@ -270,6 +307,16 @@
       "reason": "more_than_one",
       "sha256": "33dda35d4d8cd4901a6abb425466ad0f5b21b86e95bb409a06579d24473b9b91",
       "bytes": 2944
+    },
+    {
+      "file": "pass-OW-5-dot-folder-inside.owworld",
+      "test": "OW-5",
+      "role": "reader",
+      "reader": "accept",
+      "writer": "refuse",
+      "rule": "Dot-folders inside the world, each holding a well-formed world.json of another world's id: a tool's abbey/.atlas/ (beside its world-prefs.json), deeper, abbey/elements/character/.trash/, and abbey/..atlas/, a name of dots and more: any path segment that begins with a dot is a dot-folder, once OW-16 has refused a segment that is exactly . or .. . A dot-folder is never a world, wherever it sits, so the second-world check does not look under a folder whose name starts with a dot; accepted. The world read is abbey's own id, and nothing under any dot-folder is among its elements or changes its counts. Only that check skips them: every other check still reads their entries. A reader ignores them; a writer never emits a dot-folder unless the caller hands it in, so never in a portable .owworld.",
+      "sha256": "1c5526d2a56712cccb9c66d503de22460d436fbb0581b214567ac15bff46bc83",
+      "bytes": 4312
     },
     {
       "file": "pass-OW-6-marker.owworld",
@@ -791,6 +838,28 @@
       "bytes": 2659
     },
     {
+      "file": "fail-OW-18-folder-case-alone.owworld",
+      "test": "OW-18",
+      "role": "reader",
+      "reader": "refuse",
+      "writer": "refuse",
+      "rule": "abbey/Elements/ and no abbey/elements/: the three fixed names (world.json, elements/, spatial/) are read as written, so Elements/ is no element folder, and a world holding one of them in another case (by OW-18's fold) without the name itself is refused with that cause, never read as empty (section 4.8, ruled 2026-11-25). On a disk that ignores case a writer's elements/ lands inside Elements/ and is never read back. The pair side by side is fail-OW-18-folder-case; this is the one alone.",
+      "reason": "name_case",
+      "sha256": "25d17b76b22bcf51728e6cf500abbd4e4e38ece72230ab07bd108432aea1ae64",
+      "bytes": 2424
+    },
+    {
+      "file": "fail-OW-18-world-case-alone.owworld",
+      "test": "OW-18",
+      "role": "reader",
+      "reader": "refuse",
+      "writer": "refuse",
+      "rule": "abbey/World.JSON and no abbey/world.json: the name is read as written, so this holds no world, and a world.json in another case (by OW-18's fold) without the name itself is refused with that cause, never answered as no world (section 4.8, ruled 2026-11-25).",
+      "reason": "name_case",
+      "sha256": "2c849b2c2b17159b4342f5bd62fe232558e809f4fe647298d3658c061467db5e",
+      "bytes": 2424
+    },
+    {
       "file": "fail-OW-18-nfc-then-fold.owworld",
       "test": "OW-18",
       "role": "reader",
@@ -1124,6 +1193,135 @@
       "rule": "con--0000e1.json: its base name is con--0000e1, not a reserved name; accepted.",
       "sha256": "42ab3a54ec99c0a36eeffb4473dfc3bfc805220b816b61e51f3db6f62ed4d897",
       "bytes": 2652
+    },
+    {
+      "file": "pass-OW-23-share-leaves-unread-out.owworld",
+      "test": "OW-23",
+      "role": "writer",
+      "reader": "accept",
+      "writer": "accept",
+      "rule": "Writer, a share (includeHidden false): nothing under elements/ travels but a file the folder reader serves as an element with no mark. The hidden element's file is left out whole and named as hidden; the file cut short, the notes.txt, the hidden file moved into old/, both files of the id two files hold and the element in a folder that is not one of the 22 types are left out whole and named apart, as unread.",
+      "source": "hidden",
+      "side": "share",
+      "left_out": {
+        "hidden": [
+          "elements/character/veiled--0000ab05.json"
+        ],
+        "unread": [
+          "elements/character/notes.txt",
+          "elements/character/old/kept--0000ab07.json",
+          "elements/character/pair-a--0000ab08.json",
+          "elements/character/pair-b--0000ab08.json",
+          "elements/character/torn--0000ab06.json",
+          "elements/vessel/skiff--0000ab0b.json"
+        ]
+      },
+      "sha256": "11a577b054b87cc8e7d66f8070d791d413f3ab7527d4de82a9d19abbf5d1e856",
+      "bytes": 2424
+    },
+    {
+      "file": "pass-OW-23-copy-carries-unread.owworld",
+      "test": "OW-23",
+      "role": "writer",
+      "reader": "accept",
+      "writer": "accept",
+      "rule": "Writer, a copy (the default): all ten files under elements/, the seven the share leaves out among them, travel byte for byte, the cut one included, since a copy is how a person moves their own world, broken file and all. Nothing is reported left out.",
+      "source": "hidden",
+      "side": "copy",
+      "sha256": "bf02ce9ee885bea0d677d917bc83dda4e8b4833595818cdb5140ce2ac6f2ef05",
+      "bytes": 4120
+    },
+    {
+      "file": "fail-OW-23-share-carries-unread.owworld",
+      "test": "OW-23",
+      "role": "writer",
+      "reader": "accept",
+      "writer": "refuse",
+      "rule": "Writer, a share: the file cut short after its mark carried; a writer that read a refusal as 'no element' made it. A file whose mark cannot be read never travels in a share.",
+      "source": "hidden",
+      "side": "share",
+      "sha256": "3f1b2e7f7ca3e411f519e869c1ae3a8849ff2bdd7626ee28c55f09be68b205e9",
+      "bytes": 2653
+    },
+    {
+      "file": "fail-OW-23-share-carries-hidden.owworld",
+      "test": "OW-23",
+      "role": "writer",
+      "reader": "accept",
+      "writer": "refuse",
+      "rule": "Writer, a share: the whole hidden element's file carried; the mark keeps it out.",
+      "source": "hidden",
+      "side": "share",
+      "sha256": "39f9df63b670ea3d57f7ed7ad84f3b3294fa026949939835ac35e964649f2ae9",
+      "bytes": 2683
+    },
+    {
+      "file": "fail-OW-23-share-carries-moved.owworld",
+      "test": "OW-23",
+      "role": "writer",
+      "reader": "accept",
+      "writer": "refuse",
+      "rule": "Writer, a share: another hidden element's file (Kept, ab07), moved by hand into old/, carried, since no folder reader serves it; a share carries under elements/ only an element it read with no mark.",
+      "source": "hidden",
+      "side": "share",
+      "sha256": "d3653fb3e858183e8e890add1323b51a05921b3ebbdd7cccc84a6bc2d20f0085",
+      "bytes": 2685
+    },
+    {
+      "file": "fail-OW-23-share-carries-notes.owworld",
+      "test": "OW-23",
+      "role": "writer",
+      "reader": "accept",
+      "writer": "refuse",
+      "rule": "Writer, a share: the notes.txt in the type folder carried; a file of another kind under elements/ is left out with the unread.",
+      "source": "hidden",
+      "side": "share",
+      "sha256": "41ea479cc05ab3cec1a5ef234232b89137d63963503ff98c5fbd76313f00a730",
+      "bytes": 2639
+    },
+    {
+      "file": "fail-OW-23-share-carries-twin.owworld",
+      "test": "OW-23",
+      "role": "writer",
+      "reader": "accept",
+      "writer": "refuse",
+      "rule": "Writer, a share: the unmarked file of an id two files hold carried, because it sorts first and a reader serves it with no mark while the hidden file after it is skipped. With two files for one id the share cannot say which mark is the element's, so it carries neither.",
+      "source": "hidden",
+      "side": "share",
+      "sha256": "3d14536c777e1b9b53832479d4b6aee06036063f70aa590279e0afe5200cb566",
+      "bytes": 2663
+    },
+    {
+      "file": "fail-OW-23-share-carries-untyped.owworld",
+      "test": "OW-23",
+      "role": "writer",
+      "reader": "accept",
+      "writer": "refuse",
+      "rule": "Writer, a share: an element in elements/vessel/, a folder that is not one of the 22 types, carried; such a folder is unread on a share.",
+      "source": "hidden",
+      "side": "share",
+      "sha256": "8a4ea219edac7fc018cb14d82f5457a0f5c2e77367d0b456eb33f388530adb0f",
+      "bytes": 2660
+    },
+    {
+      "file": "pass-OW-24-spatial-untyped.owworld",
+      "test": "OW-24",
+      "role": "reader",
+      "reader": "accept",
+      "writer": "accept",
+      "rule": "A Character's file under abbey/spatial/character/: spatial/ holds only map, pin, zone and marker, so the folder is unread and holds no Character; accepted. The world read holds the base's three elements and nothing from spatial/. What a reader says about a folder it does not read is its own. A copy carries the file as written; a share leaves it out as unread. No side: the writer verdict is a copy's.",
+      "sha256": "cc39ecd74848be036925a5aeb12bfa0390b470525baf0a7d87cf3b6fc160379d",
+      "bytes": 2667
+    },
+    {
+      "file": "pass-OW-24-spatial-type-case.owworld",
+      "test": "OW-24",
+      "role": "reader",
+      "reader": "accept",
+      "writer": "accept",
+      "rule": "A Pin's file under abbey/spatial/Pin/: the type word is read as written, lower case as under elements/, so Pin/ is no pin folder and holds no Pin; accepted. The world read holds the base's three elements and no Pin. What a reader says about a folder it does not read is its own. A copy carries the file as written; a share leaves it out as unread. No side: the writer verdict is a copy's.",
+      "sha256": "51e50436e02ccd8bd2978380fb64ea5688da32ee7fc697fc7adb480ab39e5be1",
+      "bytes": 2649
     },
     {
       "file": "fail-OW-14-count.owworld",

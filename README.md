@@ -265,7 +265,7 @@ The lint checks a world folder's shape against the schema: a file outside the 22
 python -m onlyworlds.lint moppetopia
 ```
 
-One line per problem, then the count it checked. Exit 0 when clean, 1 with problems, 2 when the folder is not a world folder. The checker is schema-dist's own `walk/lint_folder.py`, copied byte for byte at this package's schema pin and run on the dist's `schema.json`, so it gives the same report as the dist's command and needs no YAML library. From code: `onlyworlds.lint.lint(folder)` returns the report (`problems`, `warnings`, `summary`).
+One line per problem, then the count it checked. A file whose JSON Python cannot hold (nested too deep, or a number too long) gets one line saying it was not read, and the check goes on. Exit 0 when clean, 1 with problems, 2 when the folder is not a world folder, 3 when nothing it read has a problem but a file was not read. The checker is schema-dist's own `walk/lint_folder.py`, copied byte for byte at this package's schema pin and run on the dist's `schema.json`, so it gives the same report as the dist's command and needs no YAML library. From code: `onlyworlds.lint.lint(folder)` returns the report (`problems`, `warnings`, `summary`).
 
 ## Errors
 

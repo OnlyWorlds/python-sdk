@@ -10,7 +10,8 @@
   "notes": [
     "value: the raw atlas_calendar field value (an object, or a JSON string). valid: the SDK reader (readCalendarValue) returns a calendar; false means not a calendar, the reader shows bare numbers.",
     "words: exactly what formatStep prints. breakdown: breakdownStep with its keys, except era, which is the era's name (or null) in place of the era object.",
-    "elements and found (one case, found-by-the-field-never-by-type): a world's elements, and the ids of those a reader finds a calendar on, in list order: by the atlas_calendar field being present (null is absent), never by type or supertype. value is the calendar they carry, and its steps read as in any case."
+    "elements and found (one case, found-by-the-field-never-by-type): a world's elements, and the ids of those a reader finds a calendar on, in list order: by the atlas_calendar field being present (null is absent), never by type or supertype. value is the calendar they carry, and its steps read as in any case.",
+    "date_fields and world_points (one case, date-fields-by-their-name): the element fields that hold a date, each as type.field in sorted order, by the name alone (date, or ending in _date) in the schema of this serial; and the World's three fields on the same line, sorted. value is the smallest calendar, and its steps read as in any case."
   ],
   "cases": [
     {
@@ -5319,6 +5320,84 @@
             "weekday": null
           }
         }
+      ]
+    },
+    {
+      "name": "date-fields-by-their-name",
+      "why": "which fields a calendar reads: every field of an element whose name is date or ends in _date, each a whole number of steps, and the World's three points on the same line; a length (duration, life_span) is neither. The calendar is the smallest valid one, read as no-year-structure reads it",
+      "value": {
+        "version": 1,
+        "grain": "year"
+      },
+      "valid": true,
+      "steps": [
+        {
+          "step": -5,
+          "words": "-5",
+          "breakdown": {
+            "absYear": -5,
+            "year": -5,
+            "era": null,
+            "month": null,
+            "monthName": null,
+            "day": null,
+            "intercalary": null,
+            "weekday": null
+          }
+        },
+        {
+          "step": 0,
+          "words": "0",
+          "breakdown": {
+            "absYear": 0,
+            "year": 0,
+            "era": null,
+            "month": null,
+            "monthName": null,
+            "day": null,
+            "intercalary": null,
+            "weekday": null
+          }
+        },
+        {
+          "step": 7,
+          "words": "7",
+          "breakdown": {
+            "absYear": 7,
+            "year": 7,
+            "era": null,
+            "month": null,
+            "monthName": null,
+            "day": null,
+            "intercalary": null,
+            "weekday": null
+          }
+        }
+      ],
+      "date_fields": [
+        "character.birth_date",
+        "collective.formation_date",
+        "construct.end_date",
+        "construct.start_date",
+        "creature.birth_date",
+        "event.end_date",
+        "event.start_date",
+        "institution.founding_date",
+        "law.date",
+        "location.founding_date",
+        "narrative.end_date",
+        "narrative.start_date",
+        "relation.end_date",
+        "relation.start_date",
+        "title.grant_date",
+        "title.revoke_date",
+        "zone.end_date",
+        "zone.start_date"
+      ],
+      "world_points": [
+        "time_current",
+        "time_range_max",
+        "time_range_min"
       ]
     }
   ]
