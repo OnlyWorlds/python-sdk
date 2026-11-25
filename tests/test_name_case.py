@@ -49,7 +49,9 @@ E = json.dumps({"id": CID, "name": "Ada"})
         (f"{LONG_S}/pin/p.json", f"{LONG_S}/", "spatial/"),
     ],
 )
-def test_a_folder_holding_a_fixed_folder_only_in_another_case_raises(tmp_path: Path, rel: str, found: str, wanted: str) -> None:
+def test_a_folder_holding_a_fixed_folder_only_in_another_case_raises(
+    tmp_path: Path, rel: str, found: str, wanted: str
+) -> None:
     _world(tmp_path)
     _element(tmp_path, rel)
     with pytest.raises(FolderNameCaseError) as exc:
