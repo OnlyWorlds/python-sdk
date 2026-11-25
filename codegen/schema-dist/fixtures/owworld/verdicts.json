@@ -860,6 +860,28 @@
       "bytes": 2424
     },
     {
+      "file": "fail-OW-18-world-fold-alone.owworld",
+      "test": "OW-18",
+      "role": "reader",
+      "reader": "refuse",
+      "writer": "refuse",
+      "rule": "abbey/World.jſon (U+017F, LATIN SMALL LETTER LONG S, which OW-18's fold makes s) and no abbey/world.json: the fold, not only upper and lower case, makes another case of a fixed name, so this is refused name_case like fail-OW-18-world-case-alone (section 4.8, ruled 2026-11-25).",
+      "reason": "name_case",
+      "sha256": "be40b3821da4a83623a6f675465719af2418a75a27d62f60587041750d30531b",
+      "bytes": 2424
+    },
+    {
+      "file": "fail-OW-18-spatial-fold-alone.owworld",
+      "test": "OW-18",
+      "role": "reader",
+      "reader": "refuse",
+      "writer": "refuse",
+      "rule": "abbey/ſpatial/pin/ (U+017F, which OW-18's fold makes s) and no abbey/spatial/: a folder holding the fixed name spatial/ in another case by the fold, without the name itself, is refused name_case, never read as a world with no spatial part (section 4.8, ruled 2026-11-25).",
+      "reason": "name_case",
+      "sha256": "118e955a2cbd8e20b139a48220431c2dc1044e1ba0e864fddbe6cca7adddb763",
+      "bytes": 2651
+    },
+    {
       "file": "fail-OW-18-nfc-then-fold.owworld",
       "test": "OW-18",
       "role": "reader",

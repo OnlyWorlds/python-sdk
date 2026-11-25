@@ -1,0 +1,201 @@
+{
+  "profile": "file_names",
+  "profile_page": "README.md",
+  "notes": [
+    "element_name: a new element's name; slug: what a conforming writer makes of it.",
+    "An empty slug means the name leaves none, and the file is `<full-id>.json`; otherwise the file is `<slug>--<uuid-tail>.json`. The tail and the writer's collision rule are not this set's.",
+    "Every code point here is assigned in Unicode 11.0."
+  ],
+  "cases": [
+    {
+      "name": "plain-ascii",
+      "element_name": "Ana",
+      "slug": "ana"
+    },
+    {
+      "name": "acute-precomposed",
+      "element_name": "Brother Tomás",
+      "slug": "brother-tomas"
+    },
+    {
+      "name": "acute-decomposed",
+      "element_name": "José",
+      "slug": "jose"
+    },
+    {
+      "name": "acute-decomposed-inside-a-word",
+      "element_name": "Cafés Rún",
+      "slug": "cafes-run"
+    },
+    {
+      "name": "caron-and-capitals",
+      "element_name": "Žižkov",
+      "slug": "zizkov"
+    },
+    {
+      "name": "ae-and-o-slash-no-decomposition",
+      "element_name": "Ærøskøbing",
+      "slug": "r-sk-bing"
+    },
+    {
+      "name": "ligature-fi",
+      "element_name": "ﬁre",
+      "slug": "fire"
+    },
+    {
+      "name": "sharp-s",
+      "element_name": "Straße",
+      "slug": "stra-e"
+    },
+    {
+      "name": "upper-case",
+      "element_name": "ÉCOLE NORMALE",
+      "slug": "ecole-normale"
+    },
+    {
+      "name": "spaces-and-punctuation-runs",
+      "element_name": "  --Hello__World!! ",
+      "slug": "hello-world"
+    },
+    {
+      "name": "leading-and-trailing-hyphens",
+      "element_name": "-lead and trail-",
+      "slug": "lead-and-trail"
+    },
+    {
+      "name": "digits-and-hyphen",
+      "element_name": "R2-D2",
+      "slug": "r2-d2"
+    },
+    {
+      "name": "tab-and-newline",
+      "element_name": "Line\tOne\nTwo",
+      "slug": "line-one-two"
+    },
+    {
+      "name": "cut-lands-on-a-hyphen",
+      "element_name": "aaaaaaaaaa aaaaaaaaaa aaaaaaaaaa aaaaaa b",
+      "slug": "aaaaaaaaaa-aaaaaaaaaa-aaaaaaaaaa-aaaaaa"
+    },
+    {
+      "name": "cut-mid-word",
+      "element_name": "aaaaaaaaaa aaaaaaaaaa aaaaaaaaaa aaaaaaaa b",
+      "slug": "aaaaaaaaaa-aaaaaaaaaa-aaaaaaaaaa-aaaaaaa"
+    },
+    {
+      "name": "ligatures-longer-after-folding",
+      "element_name": "ﬃﬃﬃﬃﬃﬃﬃﬃﬃﬃﬃﬃﬃﬃ",
+      "slug": "ffiffiffiffiffiffiffiffiffiffiffiffiffif"
+    },
+    {
+      "name": "supplementary-letters-at-the-cut",
+      "element_name": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa𝐀𝐁",
+      "slug": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    },
+    {
+      "name": "emoji-at-the-cut",
+      "element_name": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa😀bb",
+      "slug": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa-b"
+    },
+    {
+      "name": "greek",
+      "element_name": "Ἀθῆναι",
+      "slug": ""
+    },
+    {
+      "name": "greek-and-a-digit",
+      "element_name": "Ἀθῆναι 2",
+      "slug": "2"
+    },
+    {
+      "name": "cyrillic",
+      "element_name": "Москва",
+      "slug": ""
+    },
+    {
+      "name": "cjk",
+      "element_name": "日本",
+      "slug": ""
+    },
+    {
+      "name": "hangul",
+      "element_name": "서울",
+      "slug": ""
+    },
+    {
+      "name": "arabic",
+      "element_name": "القاهرة",
+      "slug": ""
+    },
+    {
+      "name": "a-mark-outside-the-block",
+      "element_name": "aَb",
+      "slug": "a-b"
+    },
+    {
+      "name": "a-supplementary-mark",
+      "element_name": "a𝅧b",
+      "slug": "a-b"
+    },
+    {
+      "name": "emoji-and-a-word",
+      "element_name": "🐉 Dragon",
+      "slug": "dragon"
+    },
+    {
+      "name": "only-punctuation",
+      "element_name": "!!!",
+      "slug": ""
+    },
+    {
+      "name": "empty",
+      "element_name": "",
+      "slug": ""
+    },
+    {
+      "name": "only-white-space",
+      "element_name": "   ",
+      "slug": ""
+    },
+    {
+      "name": "windows-reserved-con",
+      "element_name": "con",
+      "slug": "con"
+    },
+    {
+      "name": "windows-reserved-nul",
+      "element_name": "NUL",
+      "slug": "nul"
+    },
+    {
+      "name": "trailing-dot",
+      "element_name": "Mr. Smith.",
+      "slug": "mr-smith"
+    },
+    {
+      "name": "roman-numeral-twelve",
+      "element_name": "Ⅻ Legion",
+      "slug": "xii-legion"
+    },
+    {
+      "name": "vulgar-fraction-one-half",
+      "element_name": "½ moon",
+      "slug": "1-2-moon"
+    },
+    {
+      "name": "full-width-letters",
+      "element_name": "Ｆｕｌｌ",
+      "slug": "full"
+    },
+    {
+      "name": "dotted-capital-i",
+      "element_name": "İstanbul",
+      "slug": "istanbul"
+    },
+    {
+      "name": "kelvin-sign",
+      "element_name": "K2",
+      "slug": "k2"
+    }
+  ]
+}

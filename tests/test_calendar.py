@@ -76,11 +76,11 @@ def test_the_vendored_fixture_reads_every_case_as_written() -> None:
     assert doc["profile"] == "atlas_calendar"
     cases = doc["cases"]
     # Counted, so a fixture that stops loading (or loses cases) fails here rather than passing on nothing.
-    assert len(cases) == 79
-    assert sum(c["valid"] for c in cases) == 36 and sum(not c["valid"] for c in cases) == 43
+    assert len(cases) == 91  # serial 147
+    assert sum(c["valid"] for c in cases) == 48 and sum(not c["valid"] for c in cases) == 43
     # Serial 109: an era's year_base is 0 or 1, so a whole number like 5 is refused.
     assert any(c["name"] == "refuse-year-base-five" and not c["valid"] for c in cases)
-    assert sum(len(c.get("steps", [])) for c in cases) == 232
+    assert sum(len(c.get("steps", [])) for c in cases) == 256
     assert len(next(c for c in cases if c["name"] == "v2-except-chain-gregorian")["steps"]) == 29
     failed = []
     replayed = 0
@@ -107,7 +107,7 @@ def test_the_vendored_fixture_reads_every_case_as_written() -> None:
                 failed.append(f"{c['name']} step {s['step']}: {words!r} {got} for {s['words']!r} {s['breakdown']}")
             replayed += 1
     assert failed == []
-    assert replayed == 232
+    assert replayed == 256
 
 
 def test_the_reader_returns_the_value_itself_unknown_keys_kept() -> None:

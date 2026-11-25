@@ -794,6 +794,18 @@ def fixtures():
         rule="abbey/World.JSON and no abbey/world.json: the name is read as written, so this holds no world, and "
              "a world.json in another case (by OW-18's fold) without the name itself is refused with that cause, never answered as "
              "no world (section 4.8, ruled 2026-11-25).")
+    add("fail-OW-18-world-fold-alone.owworld",
+        build_zip(base(drop=["world.json"], extra=[("World.jſon", base_files()["world.json"])])),
+        test="OW-18", reader="refuse", reason="name_case",
+        rule="abbey/World.jſon (U+017F, LATIN SMALL LETTER LONG S, which OW-18's fold makes s) and no "
+             "abbey/world.json: the fold, not only upper and lower case, makes another case of a fixed name, so "
+             "this is refused name_case like fail-OW-18-world-case-alone (section 4.8, ruled 2026-11-25).")
+    add("fail-OW-18-spatial-fold-alone.owworld",
+        build_zip(base(extra=[("ſpatial/pin/well--0000ab0d.json", element(0xd, "The Well"))])),
+        test="OW-18", reader="refuse", reason="name_case",
+        rule="abbey/ſpatial/pin/ (U+017F, which OW-18's fold makes s) and no abbey/spatial/: a folder holding "
+             "the fixed name spatial/ in another case by the fold, without the name itself, is refused name_case, "
+             "never read as a world with no spatial part (section 4.8, ruled 2026-11-25).")
     add("fail-OW-18-nfc-then-fold.owworld",
         build_zip(base(extra=[("media/Café.png", PNG), ("media/café.png", PNG)])), test="OW-18",
         reader="refuse", reason="collision",

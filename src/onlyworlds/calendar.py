@@ -1870,6 +1870,35 @@ def resolve_calendar(
     return next((c for c in world_calendars(elements) if _strict_eq(c.id, active_id)), None)
 
 
+WORLD_CALENDAR_KEY: Final = "x_calendar"
+"""The World's key that names its calendar: the id of the element that carries it."""
+
+
+def speaking_calendar(world: Mapping[str, Any], elements: Iterable[Mapping[str, Any]]) -> WorldCalendar | None:
+    """The calendar the world's dates speak in, by the World's own choice (the calendar profile, "Which calendar
+    speaks"). ``world`` is the World's keys (the body ``GET /world`` returns, ``world.json`` in a folder);
+    ``elements`` are the world's elements.
+
+    - The World names, in ``x_calendar``, the id of an element among ``elements`` that carries a calendar: that
+      calendar speaks. The id is matched as written, letter case included.
+    - The World names anything else (an id no element has, an element with no calendar or one whose value is not
+      a calendar, an empty string, a value that is no string): none speaks, and the dates stay bare numbers.
+      Another calendar never speaks in its place.
+    - The World names none (the key absent or None): the only calendar among ``elements`` speaks; with several,
+      none.
+
+    Pass the whole world's elements: a reader that holds part of a world can miss the named element or a second
+    calendar. A tool with a person in front of it may keep that person's own pick over the World's
+    (``resolve_calendar``). A ``world`` that is not a mapping is a TypeError.
+    """
+    if not isinstance(world, Mapping):
+        raise TypeError(f"speaking_calendar: world must be the World's keys, a mapping, not {type(world).__name__}")
+    named = world.get(WORLD_CALENDAR_KEY)
+    if named is None:
+        return resolve_calendar(elements, fallback_to_only=True)
+    return resolve_calendar(elements, named) if isinstance(named, str) else None
+
+
 def resolve_calendar_lens(
     elements: Iterable[Mapping[str, Any]],
     active_id: str | _NotChosen | None = _NOT_CHOSEN,

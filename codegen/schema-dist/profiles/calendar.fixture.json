@@ -10,8 +10,9 @@
   "notes": [
     "value: the raw atlas_calendar field value (an object, or a JSON string). valid: the SDK reader (readCalendarValue) returns a calendar; false means not a calendar, the reader shows bare numbers.",
     "words: exactly what formatStep prints. breakdown: breakdownStep with its keys, except era, which is the era's name (or null) in place of the era object.",
-    "elements and found (one case, found-by-the-field-never-by-type): a world's elements, and the ids of those a reader finds a calendar on, in list order: by the atlas_calendar field being present (null is absent), never by type or supertype. value is the calendar they carry, and its steps read as in any case.",
-    "date_fields and world_points (one case, date-fields-by-their-name): the element fields that hold a date, each as type.field in sorted order, by the name alone (date, or ending in _date) in the schema of this serial; and the World's three fields on the same line, sorted. value is the smallest calendar, and its steps read as in any case."
+    "elements and found (found-by-the-field-never-by-type, and the world cases below): a world's elements, and the ids of those a reader finds a calendar on, in list order: by the atlas_calendar field holding one (null is absent, and a value that is not a calendar holds none), never by type or supertype. value is the calendar they carry, and its steps read as in any case.",
+    "date_fields and world_points (one case, date-fields-by-their-name): the element fields that hold a date, each as type.field in sorted order, by the name alone (date, or ending in _date) in the schema of this serial; and the World's three fields on the same line, sorted. value is the smallest calendar, and its steps read as in any case.",
+    "world and speaks (twelve cases, the world-names ones): the World's own keys, x_calendar among them when the World names a calendar, absent or null when it names none; and the id of the element whose calendar speaks, or null when none does. Every calendar in such a case is value, and its steps read as in any case; an element that carries a value that is not a calendar carries refuse-version's value."
   ],
   "cases": [
     {
@@ -5399,6 +5400,1166 @@
         "time_range_max",
         "time_range_min"
       ]
+    },
+    {
+      "name": "world-names-one-of-two-calendars",
+      "why": "the World's x_calendar names the second of two calendars, so that one speaks, never the first in the list",
+      "value": {
+        "version": 1,
+        "grain": "day",
+        "bundles": {
+          "months": {
+            "names": [
+              "Frost",
+              "Thaw"
+            ],
+            "lengths": [
+              10,
+              10
+            ]
+          }
+        }
+      },
+      "valid": true,
+      "steps": [
+        {
+          "step": 0,
+          "words": "1 Frost, 0",
+          "breakdown": {
+            "absYear": 0,
+            "year": 0,
+            "era": null,
+            "month": 1,
+            "monthName": "Frost",
+            "day": 1,
+            "intercalary": null,
+            "weekday": null
+          }
+        },
+        {
+          "step": 12,
+          "words": "3 Thaw, 0",
+          "breakdown": {
+            "absYear": 0,
+            "year": 0,
+            "era": null,
+            "month": 2,
+            "monthName": "Thaw",
+            "day": 3,
+            "intercalary": null,
+            "weekday": null
+          }
+        }
+      ],
+      "elements": [
+        {
+          "id": "019a3b10-0000-7000-8000-00000000cb01",
+          "type": "construct",
+          "supertype": "calendar",
+          "name": "The old calendar",
+          "atlas_calendar": {
+            "version": 1,
+            "grain": "day",
+            "bundles": {
+              "months": {
+                "names": [
+                  "Frost",
+                  "Thaw"
+                ],
+                "lengths": [
+                  10,
+                  10
+                ]
+              }
+            }
+          }
+        },
+        {
+          "id": "019a3b10-0000-7000-8000-00000000cb02",
+          "type": "construct",
+          "supertype": "calendar",
+          "name": "The calendar the World names",
+          "atlas_calendar": {
+            "version": 1,
+            "grain": "day",
+            "bundles": {
+              "months": {
+                "names": [
+                  "Frost",
+                  "Thaw"
+                ],
+                "lengths": [
+                  10,
+                  10
+                ]
+              }
+            }
+          }
+        }
+      ],
+      "found": [
+        "019a3b10-0000-7000-8000-00000000cb01",
+        "019a3b10-0000-7000-8000-00000000cb02"
+      ],
+      "world": {
+        "id": "019a3b10-0000-7000-8000-00000000cb00",
+        "name": "A world of two seasons",
+        "x_calendar": "019a3b10-0000-7000-8000-00000000cb02"
+      },
+      "speaks": "019a3b10-0000-7000-8000-00000000cb02"
+    },
+    {
+      "name": "world-names-an-id-no-element-has",
+      "why": "the World's x_calendar names an id no element of the world has: no calendar speaks, and the one calendar the world holds does not speak in its place",
+      "value": {
+        "version": 1,
+        "grain": "day",
+        "bundles": {
+          "months": {
+            "names": [
+              "Frost",
+              "Thaw"
+            ],
+            "lengths": [
+              10,
+              10
+            ]
+          }
+        }
+      },
+      "valid": true,
+      "steps": [
+        {
+          "step": 0,
+          "words": "1 Frost, 0",
+          "breakdown": {
+            "absYear": 0,
+            "year": 0,
+            "era": null,
+            "month": 1,
+            "monthName": "Frost",
+            "day": 1,
+            "intercalary": null,
+            "weekday": null
+          }
+        },
+        {
+          "step": 12,
+          "words": "3 Thaw, 0",
+          "breakdown": {
+            "absYear": 0,
+            "year": 0,
+            "era": null,
+            "month": 2,
+            "monthName": "Thaw",
+            "day": 3,
+            "intercalary": null,
+            "weekday": null
+          }
+        }
+      ],
+      "elements": [
+        {
+          "id": "019a3b10-0000-7000-8000-00000000cb01",
+          "type": "construct",
+          "supertype": "calendar",
+          "name": "The only calendar",
+          "atlas_calendar": {
+            "version": 1,
+            "grain": "day",
+            "bundles": {
+              "months": {
+                "names": [
+                  "Frost",
+                  "Thaw"
+                ],
+                "lengths": [
+                  10,
+                  10
+                ]
+              }
+            }
+          }
+        },
+        {
+          "id": "019a3b10-0000-7000-8000-00000000cb03",
+          "type": "character",
+          "supertype": "",
+          "name": "A Character"
+        }
+      ],
+      "found": [
+        "019a3b10-0000-7000-8000-00000000cb01"
+      ],
+      "world": {
+        "id": "019a3b10-0000-7000-8000-00000000cb00",
+        "name": "A world of two seasons",
+        "x_calendar": "019a3b10-0000-7000-8000-00000000cb09"
+      },
+      "speaks": null
+    },
+    {
+      "name": "world-names-none-the-only-calendar-speaks",
+      "why": "the World names no calendar and the world holds exactly one, so that one speaks",
+      "value": {
+        "version": 1,
+        "grain": "day",
+        "bundles": {
+          "months": {
+            "names": [
+              "Frost",
+              "Thaw"
+            ],
+            "lengths": [
+              10,
+              10
+            ]
+          }
+        }
+      },
+      "valid": true,
+      "steps": [
+        {
+          "step": 0,
+          "words": "1 Frost, 0",
+          "breakdown": {
+            "absYear": 0,
+            "year": 0,
+            "era": null,
+            "month": 1,
+            "monthName": "Frost",
+            "day": 1,
+            "intercalary": null,
+            "weekday": null
+          }
+        },
+        {
+          "step": 12,
+          "words": "3 Thaw, 0",
+          "breakdown": {
+            "absYear": 0,
+            "year": 0,
+            "era": null,
+            "month": 2,
+            "monthName": "Thaw",
+            "day": 3,
+            "intercalary": null,
+            "weekday": null
+          }
+        }
+      ],
+      "elements": [
+        {
+          "id": "019a3b10-0000-7000-8000-00000000cb01",
+          "type": "construct",
+          "supertype": "calendar",
+          "name": "The only calendar",
+          "atlas_calendar": {
+            "version": 1,
+            "grain": "day",
+            "bundles": {
+              "months": {
+                "names": [
+                  "Frost",
+                  "Thaw"
+                ],
+                "lengths": [
+                  10,
+                  10
+                ]
+              }
+            }
+          }
+        },
+        {
+          "id": "019a3b10-0000-7000-8000-00000000cb03",
+          "type": "character",
+          "supertype": "",
+          "name": "A Character"
+        }
+      ],
+      "found": [
+        "019a3b10-0000-7000-8000-00000000cb01"
+      ],
+      "world": {
+        "id": "019a3b10-0000-7000-8000-00000000cb00",
+        "name": "A world of two seasons"
+      },
+      "speaks": "019a3b10-0000-7000-8000-00000000cb01"
+    },
+    {
+      "name": "world-names-none-two-calendars-none-speaks",
+      "why": "the World names no calendar and the world holds two, so none speaks",
+      "value": {
+        "version": 1,
+        "grain": "day",
+        "bundles": {
+          "months": {
+            "names": [
+              "Frost",
+              "Thaw"
+            ],
+            "lengths": [
+              10,
+              10
+            ]
+          }
+        }
+      },
+      "valid": true,
+      "steps": [
+        {
+          "step": 0,
+          "words": "1 Frost, 0",
+          "breakdown": {
+            "absYear": 0,
+            "year": 0,
+            "era": null,
+            "month": 1,
+            "monthName": "Frost",
+            "day": 1,
+            "intercalary": null,
+            "weekday": null
+          }
+        },
+        {
+          "step": 12,
+          "words": "3 Thaw, 0",
+          "breakdown": {
+            "absYear": 0,
+            "year": 0,
+            "era": null,
+            "month": 2,
+            "monthName": "Thaw",
+            "day": 3,
+            "intercalary": null,
+            "weekday": null
+          }
+        }
+      ],
+      "elements": [
+        {
+          "id": "019a3b10-0000-7000-8000-00000000cb01",
+          "type": "construct",
+          "supertype": "calendar",
+          "name": "The first calendar",
+          "atlas_calendar": {
+            "version": 1,
+            "grain": "day",
+            "bundles": {
+              "months": {
+                "names": [
+                  "Frost",
+                  "Thaw"
+                ],
+                "lengths": [
+                  10,
+                  10
+                ]
+              }
+            }
+          }
+        },
+        {
+          "id": "019a3b10-0000-7000-8000-00000000cb02",
+          "type": "construct",
+          "supertype": "calendar",
+          "name": "The second calendar",
+          "atlas_calendar": {
+            "version": 1,
+            "grain": "day",
+            "bundles": {
+              "months": {
+                "names": [
+                  "Frost",
+                  "Thaw"
+                ],
+                "lengths": [
+                  10,
+                  10
+                ]
+              }
+            }
+          }
+        }
+      ],
+      "found": [
+        "019a3b10-0000-7000-8000-00000000cb01",
+        "019a3b10-0000-7000-8000-00000000cb02"
+      ],
+      "world": {
+        "id": "019a3b10-0000-7000-8000-00000000cb00",
+        "name": "A world of two seasons"
+      },
+      "speaks": null
+    },
+    {
+      "name": "world-names-none-a-value-not-a-calendar-listed-first",
+      "why": "the World names no calendar; the first element's atlas_calendar is not a calendar, so it carries none and is not counted, and the one calendar the world holds speaks",
+      "value": {
+        "version": 1,
+        "grain": "day",
+        "bundles": {
+          "months": {
+            "names": [
+              "Frost",
+              "Thaw"
+            ],
+            "lengths": [
+              10,
+              10
+            ]
+          }
+        }
+      },
+      "valid": true,
+      "steps": [
+        {
+          "step": 0,
+          "words": "1 Frost, 0",
+          "breakdown": {
+            "absYear": 0,
+            "year": 0,
+            "era": null,
+            "month": 1,
+            "monthName": "Frost",
+            "day": 1,
+            "intercalary": null,
+            "weekday": null
+          }
+        },
+        {
+          "step": 12,
+          "words": "3 Thaw, 0",
+          "breakdown": {
+            "absYear": 0,
+            "year": 0,
+            "era": null,
+            "month": 2,
+            "monthName": "Thaw",
+            "day": 3,
+            "intercalary": null,
+            "weekday": null
+          }
+        }
+      ],
+      "elements": [
+        {
+          "id": "019a3b10-0000-7000-8000-00000000cb01",
+          "type": "construct",
+          "supertype": "calendar",
+          "name": "A value that is not a calendar",
+          "atlas_calendar": {
+            "version": 3,
+            "grain": "day",
+            "bundles": {
+              "months": {
+                "names": [
+                  "Frost",
+                  "Thaw"
+                ],
+                "lengths": [
+                  10,
+                  10
+                ]
+              }
+            }
+          }
+        },
+        {
+          "id": "019a3b10-0000-7000-8000-00000000cb02",
+          "type": "construct",
+          "supertype": "calendar",
+          "name": "The only calendar",
+          "atlas_calendar": {
+            "version": 1,
+            "grain": "day",
+            "bundles": {
+              "months": {
+                "names": [
+                  "Frost",
+                  "Thaw"
+                ],
+                "lengths": [
+                  10,
+                  10
+                ]
+              }
+            }
+          }
+        }
+      ],
+      "found": [
+        "019a3b10-0000-7000-8000-00000000cb02"
+      ],
+      "world": {
+        "id": "019a3b10-0000-7000-8000-00000000cb00",
+        "name": "A world of two seasons"
+      },
+      "speaks": "019a3b10-0000-7000-8000-00000000cb02"
+    },
+    {
+      "name": "world-names-none-a-value-not-a-calendar-listed-second",
+      "why": "the same world with its elements in the other order: the value that is not a calendar is still not counted, and the one calendar speaks",
+      "value": {
+        "version": 1,
+        "grain": "day",
+        "bundles": {
+          "months": {
+            "names": [
+              "Frost",
+              "Thaw"
+            ],
+            "lengths": [
+              10,
+              10
+            ]
+          }
+        }
+      },
+      "valid": true,
+      "steps": [
+        {
+          "step": 0,
+          "words": "1 Frost, 0",
+          "breakdown": {
+            "absYear": 0,
+            "year": 0,
+            "era": null,
+            "month": 1,
+            "monthName": "Frost",
+            "day": 1,
+            "intercalary": null,
+            "weekday": null
+          }
+        },
+        {
+          "step": 12,
+          "words": "3 Thaw, 0",
+          "breakdown": {
+            "absYear": 0,
+            "year": 0,
+            "era": null,
+            "month": 2,
+            "monthName": "Thaw",
+            "day": 3,
+            "intercalary": null,
+            "weekday": null
+          }
+        }
+      ],
+      "elements": [
+        {
+          "id": "019a3b10-0000-7000-8000-00000000cb01",
+          "type": "construct",
+          "supertype": "calendar",
+          "name": "The only calendar",
+          "atlas_calendar": {
+            "version": 1,
+            "grain": "day",
+            "bundles": {
+              "months": {
+                "names": [
+                  "Frost",
+                  "Thaw"
+                ],
+                "lengths": [
+                  10,
+                  10
+                ]
+              }
+            }
+          }
+        },
+        {
+          "id": "019a3b10-0000-7000-8000-00000000cb02",
+          "type": "construct",
+          "supertype": "calendar",
+          "name": "A value that is not a calendar",
+          "atlas_calendar": {
+            "version": 3,
+            "grain": "day",
+            "bundles": {
+              "months": {
+                "names": [
+                  "Frost",
+                  "Thaw"
+                ],
+                "lengths": [
+                  10,
+                  10
+                ]
+              }
+            }
+          }
+        }
+      ],
+      "found": [
+        "019a3b10-0000-7000-8000-00000000cb01"
+      ],
+      "world": {
+        "id": "019a3b10-0000-7000-8000-00000000cb00",
+        "name": "A world of two seasons"
+      },
+      "speaks": "019a3b10-0000-7000-8000-00000000cb01"
+    },
+    {
+      "name": "world-names-an-element-whose-value-is-not-a-calendar",
+      "why": "the World's x_calendar names an element whose atlas_calendar is not a calendar: it carries none, so no calendar speaks, and the good calendar beside it does not speak in its place",
+      "value": {
+        "version": 1,
+        "grain": "day",
+        "bundles": {
+          "months": {
+            "names": [
+              "Frost",
+              "Thaw"
+            ],
+            "lengths": [
+              10,
+              10
+            ]
+          }
+        }
+      },
+      "valid": true,
+      "steps": [
+        {
+          "step": 0,
+          "words": "1 Frost, 0",
+          "breakdown": {
+            "absYear": 0,
+            "year": 0,
+            "era": null,
+            "month": 1,
+            "monthName": "Frost",
+            "day": 1,
+            "intercalary": null,
+            "weekday": null
+          }
+        },
+        {
+          "step": 12,
+          "words": "3 Thaw, 0",
+          "breakdown": {
+            "absYear": 0,
+            "year": 0,
+            "era": null,
+            "month": 2,
+            "monthName": "Thaw",
+            "day": 3,
+            "intercalary": null,
+            "weekday": null
+          }
+        }
+      ],
+      "elements": [
+        {
+          "id": "019a3b10-0000-7000-8000-00000000cb01",
+          "type": "construct",
+          "supertype": "calendar",
+          "name": "A value that is not a calendar",
+          "atlas_calendar": {
+            "version": 3,
+            "grain": "day",
+            "bundles": {
+              "months": {
+                "names": [
+                  "Frost",
+                  "Thaw"
+                ],
+                "lengths": [
+                  10,
+                  10
+                ]
+              }
+            }
+          }
+        },
+        {
+          "id": "019a3b10-0000-7000-8000-00000000cb02",
+          "type": "construct",
+          "supertype": "calendar",
+          "name": "The good calendar",
+          "atlas_calendar": {
+            "version": 1,
+            "grain": "day",
+            "bundles": {
+              "months": {
+                "names": [
+                  "Frost",
+                  "Thaw"
+                ],
+                "lengths": [
+                  10,
+                  10
+                ]
+              }
+            }
+          }
+        }
+      ],
+      "found": [
+        "019a3b10-0000-7000-8000-00000000cb02"
+      ],
+      "world": {
+        "id": "019a3b10-0000-7000-8000-00000000cb00",
+        "name": "A world of two seasons",
+        "x_calendar": "019a3b10-0000-7000-8000-00000000cb01"
+      },
+      "speaks": null
+    },
+    {
+      "name": "world-names-the-id-in-upper-case",
+      "why": "the World's x_calendar holds the one calendar's id in upper case: ids are matched as written, so it names nothing and no calendar speaks",
+      "value": {
+        "version": 1,
+        "grain": "day",
+        "bundles": {
+          "months": {
+            "names": [
+              "Frost",
+              "Thaw"
+            ],
+            "lengths": [
+              10,
+              10
+            ]
+          }
+        }
+      },
+      "valid": true,
+      "steps": [
+        {
+          "step": 0,
+          "words": "1 Frost, 0",
+          "breakdown": {
+            "absYear": 0,
+            "year": 0,
+            "era": null,
+            "month": 1,
+            "monthName": "Frost",
+            "day": 1,
+            "intercalary": null,
+            "weekday": null
+          }
+        },
+        {
+          "step": 12,
+          "words": "3 Thaw, 0",
+          "breakdown": {
+            "absYear": 0,
+            "year": 0,
+            "era": null,
+            "month": 2,
+            "monthName": "Thaw",
+            "day": 3,
+            "intercalary": null,
+            "weekday": null
+          }
+        }
+      ],
+      "elements": [
+        {
+          "id": "019a3b10-0000-7000-8000-00000000cb01",
+          "type": "construct",
+          "supertype": "calendar",
+          "name": "The only calendar",
+          "atlas_calendar": {
+            "version": 1,
+            "grain": "day",
+            "bundles": {
+              "months": {
+                "names": [
+                  "Frost",
+                  "Thaw"
+                ],
+                "lengths": [
+                  10,
+                  10
+                ]
+              }
+            }
+          }
+        },
+        {
+          "id": "019a3b10-0000-7000-8000-00000000cb03",
+          "type": "character",
+          "supertype": "",
+          "name": "A Character"
+        }
+      ],
+      "found": [
+        "019a3b10-0000-7000-8000-00000000cb01"
+      ],
+      "world": {
+        "id": "019a3b10-0000-7000-8000-00000000cb00",
+        "name": "A world of two seasons",
+        "x_calendar": "019A3B10-0000-7000-8000-00000000CB01"
+      },
+      "speaks": null
+    },
+    {
+      "name": "world-names-null-the-only-calendar-speaks",
+      "why": "the World's x_calendar is null, which is absent, so it names none and the only calendar speaks",
+      "value": {
+        "version": 1,
+        "grain": "day",
+        "bundles": {
+          "months": {
+            "names": [
+              "Frost",
+              "Thaw"
+            ],
+            "lengths": [
+              10,
+              10
+            ]
+          }
+        }
+      },
+      "valid": true,
+      "steps": [
+        {
+          "step": 0,
+          "words": "1 Frost, 0",
+          "breakdown": {
+            "absYear": 0,
+            "year": 0,
+            "era": null,
+            "month": 1,
+            "monthName": "Frost",
+            "day": 1,
+            "intercalary": null,
+            "weekday": null
+          }
+        },
+        {
+          "step": 12,
+          "words": "3 Thaw, 0",
+          "breakdown": {
+            "absYear": 0,
+            "year": 0,
+            "era": null,
+            "month": 2,
+            "monthName": "Thaw",
+            "day": 3,
+            "intercalary": null,
+            "weekday": null
+          }
+        }
+      ],
+      "elements": [
+        {
+          "id": "019a3b10-0000-7000-8000-00000000cb01",
+          "type": "construct",
+          "supertype": "calendar",
+          "name": "The only calendar",
+          "atlas_calendar": {
+            "version": 1,
+            "grain": "day",
+            "bundles": {
+              "months": {
+                "names": [
+                  "Frost",
+                  "Thaw"
+                ],
+                "lengths": [
+                  10,
+                  10
+                ]
+              }
+            }
+          }
+        },
+        {
+          "id": "019a3b10-0000-7000-8000-00000000cb03",
+          "type": "character",
+          "supertype": "",
+          "name": "A Character"
+        }
+      ],
+      "found": [
+        "019a3b10-0000-7000-8000-00000000cb01"
+      ],
+      "world": {
+        "id": "019a3b10-0000-7000-8000-00000000cb00",
+        "name": "A world of two seasons",
+        "x_calendar": null
+      },
+      "speaks": "019a3b10-0000-7000-8000-00000000cb01"
+    },
+    {
+      "name": "world-names-an-empty-string",
+      "why": "the World's x_calendar is an empty string, a value that is no id and not absent: no calendar speaks, and the only calendar does not speak in its place",
+      "value": {
+        "version": 1,
+        "grain": "day",
+        "bundles": {
+          "months": {
+            "names": [
+              "Frost",
+              "Thaw"
+            ],
+            "lengths": [
+              10,
+              10
+            ]
+          }
+        }
+      },
+      "valid": true,
+      "steps": [
+        {
+          "step": 0,
+          "words": "1 Frost, 0",
+          "breakdown": {
+            "absYear": 0,
+            "year": 0,
+            "era": null,
+            "month": 1,
+            "monthName": "Frost",
+            "day": 1,
+            "intercalary": null,
+            "weekday": null
+          }
+        },
+        {
+          "step": 12,
+          "words": "3 Thaw, 0",
+          "breakdown": {
+            "absYear": 0,
+            "year": 0,
+            "era": null,
+            "month": 2,
+            "monthName": "Thaw",
+            "day": 3,
+            "intercalary": null,
+            "weekday": null
+          }
+        }
+      ],
+      "elements": [
+        {
+          "id": "019a3b10-0000-7000-8000-00000000cb01",
+          "type": "construct",
+          "supertype": "calendar",
+          "name": "The only calendar",
+          "atlas_calendar": {
+            "version": 1,
+            "grain": "day",
+            "bundles": {
+              "months": {
+                "names": [
+                  "Frost",
+                  "Thaw"
+                ],
+                "lengths": [
+                  10,
+                  10
+                ]
+              }
+            }
+          }
+        },
+        {
+          "id": "019a3b10-0000-7000-8000-00000000cb03",
+          "type": "character",
+          "supertype": "",
+          "name": "A Character"
+        }
+      ],
+      "found": [
+        "019a3b10-0000-7000-8000-00000000cb01"
+      ],
+      "world": {
+        "id": "019a3b10-0000-7000-8000-00000000cb00",
+        "name": "A world of two seasons",
+        "x_calendar": ""
+      },
+      "speaks": null
+    },
+    {
+      "name": "world-names-a-list-holding-the-id",
+      "why": "the World's x_calendar is a list holding the only calendar's id, a value that is no id: no calendar speaks",
+      "value": {
+        "version": 1,
+        "grain": "day",
+        "bundles": {
+          "months": {
+            "names": [
+              "Frost",
+              "Thaw"
+            ],
+            "lengths": [
+              10,
+              10
+            ]
+          }
+        }
+      },
+      "valid": true,
+      "steps": [
+        {
+          "step": 0,
+          "words": "1 Frost, 0",
+          "breakdown": {
+            "absYear": 0,
+            "year": 0,
+            "era": null,
+            "month": 1,
+            "monthName": "Frost",
+            "day": 1,
+            "intercalary": null,
+            "weekday": null
+          }
+        },
+        {
+          "step": 12,
+          "words": "3 Thaw, 0",
+          "breakdown": {
+            "absYear": 0,
+            "year": 0,
+            "era": null,
+            "month": 2,
+            "monthName": "Thaw",
+            "day": 3,
+            "intercalary": null,
+            "weekday": null
+          }
+        }
+      ],
+      "elements": [
+        {
+          "id": "019a3b10-0000-7000-8000-00000000cb01",
+          "type": "construct",
+          "supertype": "calendar",
+          "name": "The only calendar",
+          "atlas_calendar": {
+            "version": 1,
+            "grain": "day",
+            "bundles": {
+              "months": {
+                "names": [
+                  "Frost",
+                  "Thaw"
+                ],
+                "lengths": [
+                  10,
+                  10
+                ]
+              }
+            }
+          }
+        },
+        {
+          "id": "019a3b10-0000-7000-8000-00000000cb03",
+          "type": "character",
+          "supertype": "",
+          "name": "A Character"
+        }
+      ],
+      "found": [
+        "019a3b10-0000-7000-8000-00000000cb01"
+      ],
+      "world": {
+        "id": "019a3b10-0000-7000-8000-00000000cb00",
+        "name": "A world of two seasons",
+        "x_calendar": [
+          "019a3b10-0000-7000-8000-00000000cb01"
+        ]
+      },
+      "speaks": null
+    },
+    {
+      "name": "world-names-an-element-that-carries-no-calendar",
+      "why": "the World's x_calendar names an element of the world that carries no atlas_calendar: no calendar speaks, and the one calendar elsewhere does not speak in its place",
+      "value": {
+        "version": 1,
+        "grain": "day",
+        "bundles": {
+          "months": {
+            "names": [
+              "Frost",
+              "Thaw"
+            ],
+            "lengths": [
+              10,
+              10
+            ]
+          }
+        }
+      },
+      "valid": true,
+      "steps": [
+        {
+          "step": 0,
+          "words": "1 Frost, 0",
+          "breakdown": {
+            "absYear": 0,
+            "year": 0,
+            "era": null,
+            "month": 1,
+            "monthName": "Frost",
+            "day": 1,
+            "intercalary": null,
+            "weekday": null
+          }
+        },
+        {
+          "step": 12,
+          "words": "3 Thaw, 0",
+          "breakdown": {
+            "absYear": 0,
+            "year": 0,
+            "era": null,
+            "month": 2,
+            "monthName": "Thaw",
+            "day": 3,
+            "intercalary": null,
+            "weekday": null
+          }
+        }
+      ],
+      "elements": [
+        {
+          "id": "019a3b10-0000-7000-8000-00000000cb01",
+          "type": "construct",
+          "supertype": "calendar",
+          "name": "The only calendar",
+          "atlas_calendar": {
+            "version": 1,
+            "grain": "day",
+            "bundles": {
+              "months": {
+                "names": [
+                  "Frost",
+                  "Thaw"
+                ],
+                "lengths": [
+                  10,
+                  10
+                ]
+              }
+            }
+          }
+        },
+        {
+          "id": "019a3b10-0000-7000-8000-00000000cb03",
+          "type": "character",
+          "supertype": "",
+          "name": "A Character"
+        }
+      ],
+      "found": [
+        "019a3b10-0000-7000-8000-00000000cb01"
+      ],
+      "world": {
+        "id": "019a3b10-0000-7000-8000-00000000cb00",
+        "name": "A world of two seasons",
+        "x_calendar": "019a3b10-0000-7000-8000-00000000cb03"
+      },
+      "speaks": null
     }
   ]
 }

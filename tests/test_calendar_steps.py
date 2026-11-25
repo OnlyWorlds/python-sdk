@@ -30,7 +30,7 @@ def steps_for(c: dict[str, Any], cfg: Any) -> list[int]:
 
 
 def test_every_fixture_calendar_says_the_same_words_as_format_step() -> None:
-    assert len(CASES) == 36  # counted, so a fixture that stops loading fails here rather than passing on nothing
+    assert len(CASES) == 48  # counted, so a fixture that stops loading fails here rather than passing on nothing
     compared = 0
     for c in CASES:
         cfg = cal.read_calendar_value(c["value"])

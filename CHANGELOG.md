@@ -4,6 +4,11 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+## 0.153.0 (2026-11-25)
+
+- **`calendar.speaking_calendar(world, elements)`: the calendar the world's dates speak in, by the World's own choice** (the calendar profile's "Which calendar speaks", schema-dist serial 147; the npm SDK's `speakingCalendar`). The World names it in `x_calendar` (`WORLD_CALENDAR_KEY`), the id of the element that carries it, matched as written. A named element among the elements that carries a calendar speaks; anything else named speaks none, never another calendar in its place; with none named (the key absent or None) the only calendar speaks, and several leave none. Pass the whole world's elements. A `world` that is not a mapping is a `TypeError`. Held by the fixture's 12 cases that carry `speaks`.
+- The schema pin moves to `v0.34.1-dist.147` (canonical 00.34.01 unchanged, no schema file moved). The tests replay what the serial adds: the calendar's twelve cases for which calendar speaks (91 cases, 256 steps), eleven address cases (230), the `.owworld` set at 111 archives with two more where `world.json` or `spatial/` is named only through the case fold (`World.jſon`), and the new file-name set: `folder.slugify` gives all 38 of its slugs as written.
+
 ## 0.152.0 (2026-11-25)
 
 - **The lint says when it could not read a file.** `python -m onlyworlds.lint` runs the checker of schema-dist serial 146: a `world.json` or an element file whose JSON this Python cannot hold (nested deeper than its parser goes, or a number longer than it converts) gets one line saying it was not read, the check goes on, and the last line counts it. The command exits 3 when nothing it read has a problem but a file was not read. Before, a file nested too deep stopped the check with a `RecursionError`, and a number too long was counted as a problem, `not JSON`. The checker also takes a file only directly in a type folder, with a name ending in `.json` in that case and not beginning with a dot, and passes over everything under a dot-named folder.

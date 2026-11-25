@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import itertools
+import json
+from pathlib import Path
 
 import pytest
 
@@ -65,3 +67,19 @@ def test_collision_is_case_folded() -> None:
 def test_duplicate_id_is_refused() -> None:
     with pytest.raises(ValueError):
         resolve_filenames([(UUID, "a"), (UUID, "b")])
+
+
+FILE_NAMES = Path(__file__).resolve().parents[1] / "codegen" / "schema-dist" / "fixtures" / "file-names.fixture.json"
+
+
+def test_the_file_names_set_every_slug_as_written() -> None:
+    """The schema dist's file-name set (serial 147): what a conforming writer makes of a new element's name."""
+    cases = json.loads(FILE_NAMES.read_text(encoding="utf-8"))["cases"]
+    wrong = [
+        f"{c['name']}: {slugify(c['element_name'])!r} for {c['slug']!r}"
+        for c in cases
+        if slugify(c["element_name"]) != c["slug"]
+    ]
+    assert wrong == []
+    # After the cases, so a red count never hides a wrong slug.
+    assert len(cases) == 38, f"the set holds {len(cases)} names, serial 147 has 38"

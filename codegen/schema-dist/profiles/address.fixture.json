@@ -7,7 +7,7 @@
     "format cases: address gives form (human or text), world (absent for the in-world text form), type and id (both absent for a world's own address), and optionally lens and moment; expect is the exact string a writer writes, or refuse the reason.",
     "parse cases: text is the string as a reader receives it; expect is the reading (form, world, world_is_slug, type, id, lens, moment, canonical; type and id null for a world's own address), or refuse the reason. canonical is true when the string as received is exactly what a writer writes for that reading.",
     "ids: any UUID version, in the hyphenated 8-4-4-4-12 form; read in either case of hex, always written lowercase.",
-    "prose cases: text is a line as a reader finds it and index where an address starts in it; expect gives the address (the slice of text from index that the address covers, where it ends in prose) and its reading (what the parse cases answer for that slice). The whole-string parser is unchanged: handed the line's tail whole it may refuse. Every prose case is ASCII up to the end of its address but six: four hold a letter or a combining mark before the index (one of them followed by a space and then the address), and two hold one right after a slug's run, where no address is found. Where a letter above U+FFFF stands before the index (prose-start-glued-astral-letter, prose-start-astral-letter-then-space), `index` counts code points and `index_utf16` UTF-16 units, and a reader that indexes by UTF-16 units reads `index_utf16`; everywhere else the two counts agree. A reader that indexes by another unit (UTF-8 bytes) converts the code point `index` to its own.",
+    "prose cases: text is a line as a reader finds it, and index is where in it the read is made; expect gives the address (the slice of text from index that the address covers, where it ends in prose) and its reading (what the parse cases answer for that slice). The whole-string parser is unchanged: handed the line's tail whole it may refuse. Every prose case is ASCII up to the end of its address but six: four hold a letter or a combining mark before the index (one of them followed by a space and then the address), and two hold one right after a slug's run, where no address is found. Where a letter above U+FFFF stands before the index (prose-start-glued-astral-letter, prose-start-astral-letter-then-space), `index` counts code points and `index_utf16` UTF-16 units, and a reader that indexes by UTF-16 units reads `index_utf16`; everywhere else the two counts agree. A reader that indexes by another unit (UTF-8 bytes) converts the code point `index` to its own.",
     "prose-all cases: text is a text read whole for every address it holds; found is the addresses found in it, in order, each the string as it stands in the text (the slice a finder answers), never indexes, so it reads the same in every language. Addresses do not overlap: read left to right, at each prefix the finder is asked; an address found takes its whole run and the reading goes on past its end, and a prefix inside that run is no start. A prose-all case carries found and neither expect nor refuse (every other kind carries one of the two)."
   ],
   "types": [
@@ -775,6 +775,27 @@
       "refuse": "bad_world"
     },
     {
+      "name": "human-refuse-slug-letter-outside-a-to-z",
+      "claim": "a slug's letters are the ASCII letters a to z: caf\u00e9 is no slug",
+      "kind": "parse",
+      "text": "https://www.onlyworlds.com/w/caf\u00e9/character/01890000-0000-7000-8000-000000000001",
+      "refuse": "bad_world"
+    },
+    {
+      "name": "human-refuse-slug-digit-outside-ascii",
+      "claim": "a slug's digits are the ASCII digits 0 to 9: a slug holding an Arabic-Indic five (U+0665) is no slug",
+      "kind": "parse",
+      "text": "https://www.onlyworlds.com/w/world\u0665/character/01890000-0000-7000-8000-000000000001",
+      "refuse": "bad_world"
+    },
+    {
+      "name": "human-refuse-slug-that-is-a-type-word",
+      "claim": "a slug is never one of the 22 type words: event is no slug",
+      "kind": "parse",
+      "text": "https://www.onlyworlds.com/w/event/character/01890000-0000-7000-8000-000000000001",
+      "refuse": "bad_world"
+    },
+    {
       "name": "human-refuse-unknown-type",
       "claim": "an unknown type word refuses",
       "kind": "parse",
@@ -993,6 +1014,20 @@
       "claim": "one moment at most",
       "kind": "parse",
       "text": "ow://event/019a1f3c-2b4e-7d10-8c3a-6f2e9b0d4a71@1@2",
+      "refuse": "bad_moment"
+    },
+    {
+      "name": "moment-refuse-minus-after-digits",
+      "claim": "a moment is one optional minus and then digits: 5-3 is no moment",
+      "kind": "parse",
+      "text": "ow://character/01890000-0000-7000-8000-000000000001@5-3",
+      "refuse": "bad_moment"
+    },
+    {
+      "name": "moment-refuse-digit-outside-ascii",
+      "claim": "a moment's digits are the ASCII digits 0 to 9: an Arabic-Indic five (U+0665) is no digit of a moment",
+      "kind": "parse",
+      "text": "ow://character/01890000-0000-7000-8000-000000000001@\u0665",
       "refuse": "bad_moment"
     },
     {
@@ -2261,6 +2296,117 @@
           "world_is_slug": false,
           "type": "object",
           "id": "01a1d4ef-0000-7000-8000-000000000084",
+          "lens": null,
+          "moment": null,
+          "canonical": true
+        }
+      }
+    },
+    {
+      "name": "prose-a-moment-ends-where-its-grammar-ends",
+      "claim": "in prose a moment is one optional minus and then digits, so in @5-3 the address takes the moment 5 and -3 is prose",
+      "kind": "prose",
+      "text": "see ow://character/01890000-0000-7000-8000-000000000001@5-3 here",
+      "index": 4,
+      "expect": {
+        "address": "ow://character/01890000-0000-7000-8000-000000000001@5",
+        "reading": {
+          "form": "text",
+          "world": null,
+          "world_is_slug": false,
+          "type": "character",
+          "id": "01890000-0000-7000-8000-000000000001",
+          "lens": null,
+          "moment": 5,
+          "canonical": true
+        }
+      }
+    },
+    {
+      "name": "prose-a-digit-outside-ascii-is-no-moment",
+      "claim": "in prose an Arabic-Indic five (U+0665) after the @ is no digit of a moment, so no moment is taken and the address ends before the @",
+      "kind": "prose",
+      "text": "see ow://character/01890000-0000-7000-8000-000000000001@\u0665 here",
+      "index": 4,
+      "expect": {
+        "address": "ow://character/01890000-0000-7000-8000-000000000001",
+        "reading": {
+          "form": "text",
+          "world": null,
+          "world_is_slug": false,
+          "type": "character",
+          "id": "01890000-0000-7000-8000-000000000001",
+          "lens": null,
+          "moment": null,
+          "canonical": true
+        }
+      }
+    },
+    {
+      "name": "prose-a-read-at-an-index-never-searches-forward",
+      "claim": "a read at an index answers an address only where one begins exactly there: at the start of this line no address begins, though one begins four characters on",
+      "kind": "prose",
+      "text": "see ow://character/01890000-0000-7000-8000-000000000001 here",
+      "index": 0,
+      "expect": {
+        "address": null,
+        "reading": null
+      }
+    },
+    {
+      "name": "prose-a-digit-outside-ascii-ends-a-slugs-run",
+      "claim": "a slug's digits are the ASCII digits 0 to 9: in prose an Arabic-Indic five (U+0665) after a slug ends its run and is no letter, mark or underscore, so the address is the world abc's own",
+      "kind": "prose",
+      "text": "see https://www.onlyworlds.com/w/abc\u0665 here",
+      "index": 4,
+      "expect": {
+        "address": "https://www.onlyworlds.com/w/abc",
+        "reading": {
+          "form": "human",
+          "world": "abc",
+          "world_is_slug": true,
+          "type": null,
+          "id": null,
+          "lens": null,
+          "moment": null,
+          "canonical": false
+        }
+      }
+    },
+    {
+      "name": "prose-a-letter-after-a-moment-is-prose",
+      "claim": "the run cut inside a word is the run after /w/: a letter after a moment is prose, so the address takes the moment 5 and x is prose",
+      "kind": "prose",
+      "text": "see ow://character/01890000-0000-7000-8000-000000000001@5x here",
+      "index": 4,
+      "expect": {
+        "address": "ow://character/01890000-0000-7000-8000-000000000001@5",
+        "reading": {
+          "form": "text",
+          "world": null,
+          "world_is_slug": false,
+          "type": "character",
+          "id": "01890000-0000-7000-8000-000000000001",
+          "lens": null,
+          "moment": 5,
+          "canonical": true
+        }
+      }
+    },
+    {
+      "name": "read-at-an-index-inside-an-earlier-run",
+      "claim": "a read at an index looks back no further than the one code point before it: at the inner ow:// of a site address whose slug ends 3ow, the code point before is 3, which glues nothing, so the read answers the element, though a find over the whole text finds only the site address",
+      "kind": "prose",
+      "text": "https://www.onlyworlds.com/w/ab3ow://character/01890000-0000-7000-8000-000000000001",
+      "index": 32,
+      "expect": {
+        "address": "ow://character/01890000-0000-7000-8000-000000000001",
+        "reading": {
+          "form": "text",
+          "world": null,
+          "world_is_slug": false,
+          "type": "character",
+          "id": "01890000-0000-7000-8000-000000000001",
           "lens": null,
           "moment": null,
           "canonical": true
