@@ -4,6 +4,8 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+## 0.154.1 (2026-11-26)
+
 - **A calendar's era walk is linear in its eras**, as the npm SDK's is. Each era's domain looked for the next up era in a slice of the rest of the sorted list, so the walk was quadratic: one `format_step` label took 331 ms under 15,000 eras; now 101 ms, the same labels.
 
 ## 0.154.0 (2026-11-25)
