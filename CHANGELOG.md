@@ -4,6 +4,8 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+- **Depth is counted in a file's text, before the parse** (folder format, serial 148), as the npm SDK counts it. Text this package did not write is past 200 levels when it opens an object or array deeper than 200, so each value of a repeated key counts and a file past the line is refused as nested too deep whatever else is wrong with it. Brackets inside a string are not counted, and a string left open runs to the end of the text. Before, the depth was read from the parsed value: a repeated key's plain value hid a deep one, and a file broken and deep was refused as not JSON.
+
 ## 0.154.1 (2026-11-26)
 
 - **A calendar's era walk is linear in its eras**, as the npm SDK's is. Each era's domain looked for the next up era in a slice of the rest of the sorted list, so the walk was quadratic: one `format_step` label took 331 ms under 15,000 eras; now 101 ms, the same labels.
