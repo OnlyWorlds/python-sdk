@@ -46,6 +46,7 @@ __all__ = [
     "DuplicateId",
     "Folder",
     "FolderElement",
+    "FolderNameCaseError",
     "SkippedFile",
     "WriteReport",
     "element_filename",
@@ -54,6 +55,7 @@ __all__ = [
     "is_hidden",
     "is_known_of",
     "known_of_for_disk",
+    "misnamed_fixed_name",
     "read_folder",
     "resolve_filenames",
     "slugify",
@@ -449,12 +451,50 @@ def _load_json(path: Path) -> Any:
     return _outside_json.loads(text, parse_constant=_reject_constant)
 
 
+_FIXED_NAMES: tuple[tuple[str, bool], ...] = (("world.json", False), ("elements", True), ("spatial", True))
+
+
+def misnamed_fixed_name(paths: Iterable[str]) -> tuple[str, str] | None:
+    """The first of the three fixed names (``world.json``, ``elements/``, ``spatial/``) that the paths
+    (relative, ``/``-separated) hold only in another case: the name as written and the name the
+    format wants, or None. A name held as written is never misnamed, whatever sits beside it. Names
+    fold as OW-18 folds them, NFC and then simple case folding at Unicode 15.1, so ``spatial/``
+    written with a long s (U+017F) first is ``spatial/`` in another case (folder spec 4.8)."""
+    from .worldfile import _fold_name  # worldfile imports this module
+
+    firsts: dict[str, bool] = {}
+    for p in paths:
+        first, slash, _ = p.partition("/")
+        firsts[first] = firsts.get(first, False) or bool(slash)
+    for name, is_folder in _FIXED_NAMES:
+        if firsts.get(name) is is_folder:
+            continue
+        for first, folder in firsts.items():
+            if folder is is_folder and first != name and _fold_name(first) == name:
+                return (f"{first}/", f"{name}/") if is_folder else (first, name)
+    return None
+
+
+class FolderNameCaseError(ValueError):
+    """A world folder holds ``world.json``, ``elements/`` or ``spatial/`` only in another case:
+    refused with that cause, never read as a world with no elements (folder spec 4.8). ``found`` is
+    the name as written, ``wanted`` the name the format wants."""
+
+    def __init__(self, root: Path, found: str, wanted: str) -> None:
+        self.root, self.found, self.wanted = root, found, wanted
+        super().__init__(f"{root} holds {found} where the folder format names {wanted}: rename it {wanted}")
+
+
 def read_folder(root: str | os.PathLike[str], *, legacy: bool = True) -> Folder:
     """Read a world folder. Opens files for reading only; the folder is never mutated.
 
     - Every ``*.json`` in a type directory is ingested and keyed on its in-file ``id``;
       the filename is never parsed (§3.1). A dot-prefixed file there is a tool's litter,
       not an element: skipped and listed (clarified 2026-10-17).
+    - The three fixed names are read as written (from 0.151.0): ``world.json``, ``elements/`` and
+      ``spatial/`` exactly so, by a listing of the root, so a disk that ignores case answers the same
+      as one that does not. A folder holding one of them only in another case (``Elements/`` and no
+      ``elements/``) raises ``FolderNameCaseError`` naming it, never reads as a world with none.
     - Names are read as written (ruled 2026-11-23): the extension is ``.json`` in lower case, so
       ``M.JSON`` is skipped and listed, and a type directory is the type word in lower case, so
       ``elements/Character/`` lands in ``ignored_dirs``. Two ids are the same id when they are
@@ -475,10 +515,14 @@ def read_folder(root: str | os.PathLike[str], *, legacy: bool = True) -> Folder:
       and listed in ``Folder.known_of``; nothing is filled in for the fields it lacks.
     """
     root = Path(root)
+    listed = {p.name: p.is_dir() for p in root.iterdir()} if root.is_dir() else {}
+    misnamed = misnamed_fixed_name(f"{n}/" if d else n for n, d in listed.items())
+    if misnamed:
+        raise FolderNameCaseError(root, *misnamed)
     world_path = root / WORLD_FILE
     world: dict[str, Any] | None = None
     folder = Folder(root=root, world=None)
-    if world_path.is_file():
+    if listed.get(WORLD_FILE) is False:
         try:
             parsed = _load_json(world_path)
         except (ValueError, UnicodeDecodeError) as exc:
@@ -497,8 +541,9 @@ def read_folder(root: str | os.PathLike[str], *, legacy: bool = True) -> Folder:
         layouts.append(("spatial", LEGACY_SPATIAL_TYPES, folder.legacy))
 
     for layout, allowed, sink in layouts:
-        base = root / (ELEMENTS_DIR if layout == "elements" else LEGACY_SPATIAL_DIR)
-        if not base.is_dir():
+        dir_name = ELEMENTS_DIR if layout == "elements" else LEGACY_SPATIAL_DIR
+        base = root / dir_name
+        if listed.get(dir_name) is not True:  # as written: a disk that ignores case would open Elements/ here
             continue
         # By name in code point order (the format's one order), never by Path: a Windows path sorts
         # case-blind, so a duplicate id would keep a different file there than on Linux or macOS.

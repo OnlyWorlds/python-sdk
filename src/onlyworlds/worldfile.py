@@ -77,7 +77,7 @@ from . import _outside_json
 from ._casefold import FOLD_RUNS
 from ._jsonfmt import encode
 from ._nfc import CLASS_RUNS, DECOMPOSITIONS, EXCLUSIONS
-from .folder import ELEMENTS_DIR, LEGACY_SPATIAL_DIR, WORLD_FILE, is_hidden, read_folder, slugify
+from .folder import ELEMENTS_DIR, LEGACY_SPATIAL_DIR, WORLD_FILE, is_hidden, misnamed_fixed_name, read_folder, slugify
 
 __all__ = [
     "MARKER_NAME",
@@ -120,6 +120,7 @@ WorldFileReason = Literal[
     "method",
     "name",
     "marker",
+    "name_case",
 ]
 
 #: The spec's one list of causes (§4.7), as the TypeScript reader names them.
@@ -136,6 +137,7 @@ REASONS: tuple[WorldFileReason, ...] = (
     "method",
     "name",
     "marker",
+    "name_case",
 )
 
 _MESSAGES: Mapping[WorldFileReason, str] = {
@@ -143,6 +145,7 @@ _MESSAGES: Mapping[WorldFileReason, str] = {
     "too_big": "The world file is bigger than the budget allows, or a file in it is bigger than it says.",
     "too_many": "The world file holds more files than the budget allows.",
     "not_a_world": "The file is not a world: it has no readable world.json with an id.",
+    "name_case": "The world file holds world.json, elements/ or spatial/ in another case, and not the name itself.",
     "more_than_one": "The file holds more than one world.",
     "not_openable": "The file is not a zip that can be read.",
     "duplicate": "The world file holds two entries with the same name.",
@@ -708,6 +711,13 @@ def read_world_file(
             }
         )
         if not roots:
+            # A world.json in another case, at the root or in one top-level folder, is said as such (folder spec 4.8).
+            for n in sorted(candidates):
+                segs = n.split("/")
+                last = segs[-1]
+                at_top = len(segs) <= 2 and not segs[0].startswith(".")
+                if at_top and last != WORLD_FILE and _fold_name(last) == WORLD_FILE:
+                    _refuse("name_case", f"It holds {n} where the folder format names {n[: -len(last)]}{WORLD_FILE}.")
             _refuse("not_a_world", "There is no world.json at the root or in one top-level folder.")
         if len(roots) > 1:
             _refuse("more_than_one", f"The file holds worlds in {', '.join(roots)}.")
@@ -722,6 +732,11 @@ def read_world_file(
             continue
         if rel != WORLD_FILE and rel.endswith(f"/{WORLD_FILE}") and not rel.startswith("records/"):
             _refuse("more_than_one", f"A second world.json sits inside the world: {n}.")
+
+    # elements/ or spatial/ only in another case is refused, never read as a world with none (folder spec 4.8).
+    misnamed = misnamed_fixed_name(n[len(prefix) :] for n in inside)
+    if misnamed:
+        _refuse("name_case", f"It holds {prefix}{misnamed[0]} where the folder format names {prefix}{misnamed[1]}.")
 
     # Every entry inflated within what it declares (OW-14), kept only when it is the world's.
     content: dict[str, bytes] = {}

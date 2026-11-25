@@ -4,6 +4,12 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+## 0.151.0 (2026-11-25)
+
+### Changed
+
+- **The three fixed names are read as written, and one held only in another case is refused.** `read_folder` lists the folder's root and reads `world.json`, `elements/` and `spatial/` exactly so: on a disk that ignores case it opened `Elements/` as `elements/`. A folder holding one of them only in another case now raises `FolderNameCaseError` (a `ValueError`, with `found` and `wanted`), never reads as a world with none; `misnamed_fixed_name(paths)` is the check. A world file holding them so is refused with the new reason `name_case` (`World.JSON` alone was `not_a_world`). Two names side by side stay `collision`. The `.owworld` fixture set's four new cases agree with this reader in their working copy; the package's tests replay them once the next schema serial vendors them.
+
 ## 0.150.2 (2026-11-25)
 
 ### Fixed
