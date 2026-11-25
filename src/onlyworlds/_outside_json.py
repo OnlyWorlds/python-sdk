@@ -22,7 +22,9 @@ from __future__ import annotations
 
 import json
 import math
+import re
 import sys
+from itertools import accumulate
 from typing import Any
 
 #: The deepest nesting read: a value at the top is depth 0, an object or array there depth 1, what it holds
@@ -50,21 +52,26 @@ def _int(text: str) -> int:
     return int(text)
 
 
-def _too_deep(value: Any) -> bool:
-    """Whether any object or array sits deeper than ``MAX_DEPTH``. A loop with its own stack, never recursion."""
-    stack: list[tuple[Any, int]] = [(value, 1)]
-    while stack:
-        item, depth = stack.pop()
-        if isinstance(item, dict):
-            children: Any = item.values()
-        elif isinstance(item, list):
-            children = item
-        else:
-            continue
-        if depth > MAX_DEPTH:
-            return True
-        stack.extend((child, depth + 1) for child in children if isinstance(child, (dict, list)))
-    return False
+#: A whole JSON string: a backslash escapes the character after it.
+_STRING = re.compile(r'"[^"\\]*(?:\\.[^"\\]*)*"', re.DOTALL)
+_BRACKET = re.compile(r"[\[\]{}]")
+_STEP = {"[": 1, "{": 1, "]": -1, "}": -1}
+
+
+def _text_too_deep(text: str) -> bool:
+    """Whether the text opens an object or array deeper than ``MAX_DEPTH``, counted in the text itself as each
+    one opens, before any parse (the folder format's rule since serial 148): so each value of a repeated key
+    counts, and a text past the line is too deep whatever else is wrong with it. Brackets inside a string are
+    not counted; a string left open runs to the end of the text, as the npm SDK's scan reads it."""
+    outside = _STRING.sub("", text)
+    open_quote = outside.find('"')
+    if open_quote >= 0:
+        outside = outside[:open_quote]
+    brackets = "".join(_BRACKET.findall(outside))
+    # No text can open more levels than it has opening brackets.
+    if brackets.count("[") + brackets.count("{") <= MAX_DEPTH:
+        return False
+    return max(accumulate(_STEP[b] for b in brackets)) > MAX_DEPTH
 
 
 def loads(text: str, **kwargs: Any) -> Any:
@@ -72,10 +79,10 @@ def loads(text: str, **kwargs: Any) -> Any:
     kwargs.setdefault("parse_int", _int)
     kwargs.setdefault("parse_float", _float)
     kwargs.setdefault("parse_constant", _constant)
+    if _text_too_deep(text):
+        raise ValueError(_TOO_DEEP)
     try:
         value = json.loads(text, **kwargs)
     except RecursionError:
         raise ValueError(_TOO_DEEP) from None
-    if _too_deep(value):
-        raise ValueError(_TOO_DEEP)
     return value

@@ -73,6 +73,38 @@ def test_the_depth_refused_is_one_number_on_every_platform() -> None:
         _outside_json.loads('{"a": ' + nest(200, "[", "]") + "}")
 
 
+NEST_200 = "[" * 200 + "]" * 200  # as a field's value in an element object, it reaches 201
+
+
+@pytest.mark.parametrize(
+    ("text", "deep"),
+    [
+        # Counted in the text as each object or array opens (serial 148): what the parse keeps does not decide it.
+        ('{"x": ' + NEST_200 + ', "x": 1}', True),
+        ('{"x": , ' + NEST_200 + "}", True),
+        ('{"x": ' + "[" * 199 + "{}" + "]" * 199 + "}", True),
+        ('{"x": ' + json.dumps("[" * 300) + "}", False),
+        ('{"x": "a\\"' + "{" * 300 + '"}', False),
+        ('{"x": ["\\\\", ' + "[" * 199 + "]" * 199 + "]}", True),
+        ('{"x": "open ' + "[" * 300, False),
+    ],
+    ids=[
+        "a repeated key, its deep value first",
+        "broken JSON before a part past the line",
+        "an empty object at 201",
+        "brackets inside a string",
+        "an escaped quote, then brackets still inside the string",
+        "an escaped backslash, then a real bracket at 201",
+        "a string left open runs to the end",
+    ],
+)
+def test_the_depth_is_counted_in_the_text_before_the_parse(text: str, deep: bool) -> None:
+    assert _outside_json._text_too_deep(text) is deep
+    if deep:
+        with pytest.raises(ValueError, match="nested more than 200 deep"):
+            _outside_json.loads(text)
+
+
 def test_text_that_is_not_json_is_still_a_decode_error() -> None:
     with pytest.raises(json.JSONDecodeError):
         _outside_json.loads('{"id": ')

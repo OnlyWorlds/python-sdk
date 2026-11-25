@@ -4,6 +4,8 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+- **Depth is counted in a file's text, before the parse** (folder format, serial 148), as the npm SDK counts it. Text this package did not write is past 200 levels when it opens an object or array deeper than 200, so each value of a repeated key counts and a file past the line is refused as nested too deep whatever else is wrong with it. Brackets inside a string are not counted, and a string left open runs to the end of the text. Before, the depth was read from the parsed value: a repeated key's plain value hid a deep one, and a file broken and deep was refused as not JSON.
+
 ## 0.154.0 (2026-11-25)
 
 - **`name_finder` passes over what is no mention**, as the npm SDK's `nameFinder` 4.208.0 does. In any text, a bare web address (`http://` or `https://`, in any ASCII case, to the next white space or `<`) and an autolink (`<scheme:…>`) are now passed over, beside the addresses and Markdown links they were before. A call can say its text is Markdown, `find(text, markdown=True)`: then nothing is read inside an inline code span (backtick runs matched by length), a fenced code block (closed by its own character, at least as long, or open to the end), an HTML tag or comment, or a reference definition's line either. The option is off by default, so the answers without it change only inside web addresses. An indented code block, a fence inside a quote or a list, and a definition's title on the next line are read as prose. Held by version 3 of the shared cases (84 cases, 16 with the option; 14 timed recipes), with eight planted faults each red; the two packages gave the same answers on 4,000 made texts, read with the option and without.
