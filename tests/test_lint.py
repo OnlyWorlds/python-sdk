@@ -102,12 +102,13 @@ def test_not_a_world_folder(tmp_path: Path, capsys: pytest.CaptureFixture[str]) 
 
 
 def _unread(tmp_path: Path) -> Path:
-    """A world whose one element file is nested deeper than Python's parser goes: not read, never a problem."""
+    """A world whose one element file holds a number longer than Python converts (4,300 digits by default): not
+    read, never a problem. Not a file nested too deep: how deep a parser goes differs between Pythons (3.14 on
+    Linux reads 100,000 levels), which is why the checker says not read rather than a problem."""
     (tmp_path / "world.json").write_text(json.dumps(WORLD), encoding="utf-8")
     chars = tmp_path / "elements" / "character"
     chars.mkdir(parents=True)
-    deep = "[" * 100_000 + "]" * 100_000
-    text = '{"id": "0190f2c4-0000-7000-8000-000000000002", "name": "Ash", "description": ' + deep + "}"
+    text = '{"id": "0190f2c4-0000-7000-8000-000000000002", "name": "Ash", "description": ' + "1" * 5000 + "}"
     (chars / "ash--00000002.json").write_text(text, encoding="utf-8")
     return tmp_path
 
