@@ -4,6 +4,8 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+- **The Kanka door's docstring no longer says the folder lint flags hidden elements.** The lint has known the `hidden` key since folder spec §4.8 and checks only that it is true or false: the third real Kanka export in the tests converts to 6 hidden elements and lints with 0 problems.
+
 ## 0.155.0 (2026-11-26)
 
 - **The schema pin is v0.34.1-dist.148** (canonical 00.34.01 unchanged). The folder format is 0.3.25, so `FORMAT_VERSION` and a new folder's `format_version` say `0.3.25`; the vendored folder check counts depth itself, the same on every Python, and refuses a `world.json` past 200 levels. The `.owworld` set holds 120 archives, nine new for the depth rule, every one read as its verdict says.

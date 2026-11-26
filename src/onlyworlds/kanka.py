@@ -163,8 +163,8 @@ twice gives byte-equal folders and a later export of the same campaign finds the
 ..., "input": "kanka-export"}`` (``PRODUCER_INPUT``; on the folder spec's list, §4.2, from
 v0.3.17), ``format_version`` this package's.
 
-The folder lint of the schema distribution does not know the ``hidden`` key yet (keel serves it
-on a hidden element to a reader who still sees it): it reports one line for each hidden element.
+The folder lint of the schema distribution knows the ``hidden`` key (folder spec §4.8) and checks
+only that it is true or false, so a hidden element passes it.
 
 From the command line: exit 0 written (or planned), 2 on bad arguments (a missing source, an
 OUT-DIR that is not empty, a file that is not a zip, an export with no ``campaign.json``).
