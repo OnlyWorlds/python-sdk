@@ -278,3 +278,25 @@ def test_only_a_report_is_shown_with_talks() -> None:
     no_report: tuple[Any, ...] = (None, [], "a report", 7)
     for nothing in no_report:
         assert report_talks_of(nothing) == []
+
+
+def test_report_threads_of_is_pure() -> None:
+    cases = {c["name"]: c for c in load_fixture()["thread_cases"]}
+    narratives: list[dict[str, Any]] = cases["chain-as-written"]["narratives"]
+    before = json.dumps(narratives, sort_keys=True)
+    got = report_threads_of(narratives)
+    assert json.dumps(narratives, sort_keys=True) == before, "report_threads_of moved its input"
+    first = json.dumps(got, sort_keys=True)
+    assert got["parents"] and got["groups"] and got["lints"]
+    first_report = next(iter(got["parents"]))
+    got["parents"][first_report] = "missing"
+    got["groups"][0]["parent"] = "planted"
+    got["groups"][0]["reports"][0] = "planted"
+    got["groups"][0]["reports"].append("extra")
+    got["lints"][0]["report"] = "planted"
+    assert json.dumps(narratives, sort_keys=True) == before
+    again = report_threads_of(narratives)
+    assert json.dumps(again, sort_keys=True) == first
+    assert again["parents"][first_report] != "missing"
+    assert again["groups"][0]["parent"] != "planted"
+    assert again["groups"][0]["reports"] != got["groups"][0]["reports"]

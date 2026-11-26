@@ -63,3 +63,23 @@ def test_a_whole_float_reads_as_its_integer_and_a_boolean_is_no_number() -> None
     assert got["zones"] == [{"zone": "z", "map": "m", "shape": "polygon", "points": [[2, 3, 0]]}]
     assert got["out"] == {"no_point": 3}
     assert all(type(n) is int for n in got["zones"][0]["points"][0])
+
+
+def test_map_space_is_pure() -> None:
+    cases = {c["name"]: c for c in load_fixture()["cases"]}
+    elements: list[dict[str, Any]] = cases["measured-frame-from-placed-points"]["elements"]
+    before = json.dumps(elements, sort_keys=True)
+    got = map_space(elements)
+    assert json.dumps(elements, sort_keys=True) == before, "map_space moved its input"
+    first = json.dumps(got, sort_keys=True)
+    assert got["maps"] and got["zones"] and got["pins"] and got["out"]
+    got["maps"][0]["id"] = "planted"
+    got["zones"][0]["points"][0][0] = -1
+    got["zones"][0]["points"].append([-2, -2, -2])
+    got["pins"][0]["x"] = -1
+    got["out"]["no_point"] = -1
+    assert json.dumps(elements, sort_keys=True) == before
+    again = map_space(elements)
+    assert json.dumps(again, sort_keys=True) == first
+    assert again["maps"][0]["id"] != "planted"
+    assert again["zones"][0]["points"] != got["zones"][0]["points"]

@@ -137,3 +137,25 @@ def test_a_map_row_without_a_string_id_is_no_map() -> None:
             this["id"] = no_id
         pins = [{"type": "pin", "id": "p", "map": no_id, "x_hand": True}]
         assert layout_of(this, [this, ground], pins) == {"layout": None, "ground": None, "hand": []}, no_id
+
+
+def test_layout_of_is_pure() -> None:
+    cases = {c["name"]: c for c in load_fixture()["layout_cases"]}
+    case = cases["hand-in-id-order"]
+    elements: list[dict[str, Any]] = case["elements"]
+    maps = [e for e in elements if e["type"] == "map"]
+    pins = [e for e in elements if e["type"] == "pin"]
+    this = rows_read(case, elements)[0]
+    before = json.dumps([this, maps, pins], sort_keys=True)
+    got = layout_of(this, maps, pins)
+    assert json.dumps([this, maps, pins], sort_keys=True) == before, "layout_of moved its input"
+    first = json.dumps(got, sort_keys=True)
+    assert got["layout"] is not None and got["hand"]
+    got["layout"] = "planted"
+    got["hand"][0] = "planted"
+    got["hand"].append("extra")
+    assert json.dumps([this, maps, pins], sort_keys=True) == before
+    again = layout_of(this, maps, pins)
+    assert json.dumps(again, sort_keys=True) == first
+    assert again["layout"] != "planted"
+    assert again["hand"] != got["hand"]
