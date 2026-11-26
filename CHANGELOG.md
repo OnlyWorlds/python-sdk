@@ -4,6 +4,10 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+## 0.155.0 (2026-11-26)
+
+- **The schema pin is v0.34.1-dist.148** (canonical 00.34.01 unchanged). The folder format is 0.3.25, so `FORMAT_VERSION` and a new folder's `format_version` say `0.3.25`; the vendored folder check counts depth itself, the same on every Python, and refuses a `world.json` past 200 levels. The `.owworld` set holds 120 archives, nine new for the depth rule, every one read as its verdict says.
+- **`date_labels` is never sent by `push`.** The MCP server on onlyworlds.com gives a date in the words of the world's calendar as `date_labels` beside the numbers, and a write that carries the key is refused (422); a body copied from it into a folder now pushes as if the key were not there.
 - **Depth is counted in a file's text, before the parse** (folder format, serial 148), as the npm SDK counts it. Text this package did not write is past 200 levels when it opens an object or array deeper than 200, so each value of a repeated key counts and a file past the line is refused as nested too deep whatever else is wrong with it. Brackets inside a string are not counted, and a string left open runs to the end of the text. Before, the depth was read from the parsed value: a repeated key's plain value hid a deep one, and a file broken and deep was refused as not JSON.
 
 ## 0.154.1 (2026-11-26)

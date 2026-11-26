@@ -1,7 +1,7 @@
 {
   "set": "owworld-conformance",
   "generated_by": "generate.py",
-  "spec": "folder format spec section 4.7, the archive (drafted 2026-10-22), on 0.3.12; tests OW-1..OW-22; OW-23, the share, section 4.8 (ruled 2026-11-23); OW-24, which folders under spatial/ a reader serves, section 4.8 (ruled 2026-11-25)",
+  "spec": "folder format spec section 4.7, the archive (drafted 2026-10-22), on 0.3.12; tests OW-1..OW-22; OW-23, the share, section 4.8 (ruled 2026-11-23); OW-24, which folders under spatial/ a reader serves, section 4.8 (ruled 2026-11-25); OW-25, an element file nested past 200 not read (ruled 2026-11-25)",
   "notes": [
     "reader: what a reader does with the file (accept, or refuse with `reason`). Every reader runner checks this field.",
     "writer: whether the file is one a conforming writer may emit as a portable .owworld, checked against `source` (every source file present byte-exact) and the writer's MUST rules (only the folder's parts, a marker only in its shape, no api, 1980 stamps, UTF-8 byte order, methods 0 and 8). A SHOULD never makes it refuse; `should` names one a fixture breaks. Only a reference checker checks it; the role says which side the test is about.",
@@ -13,7 +13,8 @@
     "source: a fixture's writer verdict is checked against `source` unless it names one of `sources` (the private case's world, OW-8). A source's `private` lists producers marked private in its RECORDS.json (section 4.5 rule 11): each one's directory is present whole and byte-exact, or absent whole; the manifest itself travels byte-exact either way.",
     "side: on the private case, which side of the export the file is: `default` (private records left out) or `asked` (the caller asked for them). Both are files a conforming writer emits; which one depends on the call, not the bytes.",
     "side, on the share case (OW-23, section 4.8, source `hidden`): `share` (includeHidden false) or `copy` (the default). A source's `hidden` and `unread` are the two sets of paths a share leaves out whole: the hidden ones for their mark, the unread ones because the folder reader would not serve them as an element (it could not read them, or they are no element file) or a second file holds the same id. On a `share` side each is absent; on a `copy` side each is present byte-exact.",
-    "left_out: on the share side a writer emits, the two sets of paths its report names, inside the world: `hidden` and, counted apart, `unread`. A writer runner compares its own report with it; the shape of each writer's report stays its own."
+    "left_out: on the share side a writer emits, the two sets of paths its report names, inside the world: `hidden` and, counted apart, `unread`. A writer runner compares its own report with it; the shape of each writer's report stays its own.",
+    "left_out on a reader case (OW-25): the element files a reader leaves out of the world it reads, by reason, inside the world (`too_deep`: any object or array past 200, the file's top object at 1); an empty list says the reader leaves none out for that reason. A reader runner compares the files it left out with it; the world is accepted either way."
   ],
   "reasons": [
     "unsafe_path",
@@ -1344,6 +1345,133 @@
       "rule": "A Pin's file under abbey/spatial/Pin/: the type word is read as written, lower case as under elements/, so Pin/ is no pin folder and holds no Pin; accepted. The world read holds the base's three elements and no Pin. What a reader says about a folder it does not read is its own. A copy carries the file as written; a share leaves it out as unread. No side: the writer verdict is a copy's.",
       "sha256": "51e50436e02ccd8bd2978380fb64ea5688da32ee7fc697fc7adb480ab39e5be1",
       "bytes": 2649
+    },
+    {
+      "file": "pass-OW-25-depth-200-read.owworld",
+      "test": "OW-25",
+      "role": "reader",
+      "reader": "accept",
+      "writer": "accept",
+      "rule": "A Character whose x_depth nests an array and an object in turn so its deepest one sits at 200, the element's own object at 1, a plain value inside it: read whole. The world read holds the base's three elements and this one, nothing cut or flattened.",
+      "left_out": {
+        "too_deep": []
+      },
+      "sha256": "faabbd23cbcd4bf4502ef10b438e36566f97e43244e9d2f91b7e6d0986b99c5d",
+      "bytes": 83968
+    },
+    {
+      "file": "pass-OW-25-depth-201-left-out.owworld",
+      "test": "OW-25",
+      "role": "reader",
+      "reader": "accept",
+      "writer": "accept",
+      "rule": "The same Character one level deeper, its deepest array or object at 201: the file is not read, reason too_deep, and is named among the files the reader left out; the world is accepted and holds the base's three elements. A reader that counts only objects reads it and fails. A writer may emit it: only a reader leaves it out.",
+      "left_out": {
+        "too_deep": [
+          "elements/character/deep--0000ab0e.json"
+        ]
+      },
+      "sha256": "a5dffe6d0f68f5ab277176b330388030fed7210c69422a5ecbd340fe5d53f6a4",
+      "bytes": 84779
+    },
+    {
+      "file": "pass-OW-25-dup-key-deep-first-left-out.owworld",
+      "test": "OW-25",
+      "role": "reader",
+      "reader": "accept",
+      "writer": "accept",
+      "rule": "The 201 Character with its x_depth key given twice, the deep value first and a plain 1 after it: the count is made in the file's text as each object or array opens, so every value of a repeated key counts and the file is not read, too_deep. A reader that parses first keeps the last value, depth 1, reads it and fails.",
+      "left_out": {
+        "too_deep": [
+          "elements/character/deep--0000ab0e.json"
+        ]
+      },
+      "sha256": "9784b98f18dd4e855e81b5b35d26d8aeade6b96b0ffab5cf1178f3b6f8cb42fd",
+      "bytes": 84795
+    },
+    {
+      "file": "pass-OW-25-dup-key-deep-last-left-out.owworld",
+      "test": "OW-25",
+      "role": "reader",
+      "reader": "accept",
+      "writer": "accept",
+      "rule": "The 201 Character with its x_depth key given twice, a plain 1 first and the deep value last: every value of a repeated key counts, so the file is not read, too_deep. A reader that parses first and keeps the first value reads it and fails.",
+      "left_out": {
+        "too_deep": [
+          "elements/character/deep--0000ab0e.json"
+        ]
+      },
+      "sha256": "683857a8d8d073f1613b90438d356d9095292a6af03fc72daa4c4649a41105bb",
+      "bytes": 84795
+    },
+    {
+      "file": "pass-OW-25-brackets-in-string-read.owworld",
+      "test": "OW-25",
+      "role": "reader",
+      "reader": "accept",
+      "writer": "accept",
+      "rule": "A Character whose x_note is a string of 200 brackets, [ and { in turn, and nothing nested: a bracket inside a string opens no object or array, so the file is at 1 and read whole. A reader that counts brackets without knowing strings leaves it out and fails.",
+      "left_out": {
+        "too_deep": []
+      },
+      "sha256": "1869a10b261c7d605389358cbd198a7ded58080a57763adc0814fba95e972369",
+      "bytes": 2879
+    },
+    {
+      "file": "pass-OW-25-escaped-backslash-then-deep-left-out.owworld",
+      "test": "OW-25",
+      "role": "reader",
+      "reader": "accept",
+      "writer": "accept",
+      "rule": "A Character whose x_note ends in an escaped backslash (C:\\ as a value), then x_depth nested to 201: the string ends at its quote, so the levels after it count and the file is not read, too_deep. A reader that takes a quote after a backslash as escaped stays inside the string, reads the file and fails.",
+      "left_out": {
+        "too_deep": [
+          "elements/character/deep--0000ab0e.json"
+        ]
+      },
+      "sha256": "f0f2edf04efc91e36d75fd09b427b4392db2bb2840f93390fd78aa08204ef138",
+      "bytes": 84799
+    },
+    {
+      "file": "pass-OW-25-empty-array-at-201-left-out.owworld",
+      "test": "OW-25",
+      "role": "reader",
+      "reader": "accept",
+      "writer": "accept",
+      "rule": "A Character whose deepest container is an empty array at 201, nothing inside it: an object or array past 200 is past whether or not it holds anything, so the file is not read, too_deep.",
+      "left_out": {
+        "too_deep": [
+          "elements/character/deep--0000ab0e.json"
+        ]
+      },
+      "sha256": "7d2c9d67ac769610b7ccccd8b0f140b6caec9f0fabd9601b881941b3949a4136",
+      "bytes": 83969
+    },
+    {
+      "file": "pass-OW-25-empty-object-at-201-left-out.owworld",
+      "test": "OW-25",
+      "role": "reader",
+      "reader": "accept",
+      "writer": "accept",
+      "rule": "A Character whose deepest container is an empty object at 201, nothing inside it: an object or array past 200 is past whether or not it holds anything, so the file is not read, too_deep.",
+      "left_out": {
+        "too_deep": [
+          "elements/character/deep--0000ab0e.json"
+        ]
+      },
+      "sha256": "def2a965df80ef83e3913accfd18306bc418bda27569ac314e38d8509143d6f8",
+      "bytes": 83969
+    },
+    {
+      "file": "fail-OW-25-world-json-too-deep.owworld",
+      "test": "OW-25",
+      "role": "reader",
+      "reader": "refuse",
+      "writer": "refuse",
+      "rule": "world.json nested past 200, an object or array at 201, its own object at 1: counted as an element file is, it is a world.json the reader cannot read, so the world is refused as fail-OW-3-unparseable is, not a world. A writer refuses it for the same reason: it emits no world whose world.json a reader cannot read.",
+      "reason": "not_a_world",
+      "sha256": "cf8aae17d3080df240b06c89f58e84078c7fab26d6d3438fc9e16c3ab463f8a4",
+      "bytes": 84540
     },
     {
       "file": "fail-OW-14-count.owworld",

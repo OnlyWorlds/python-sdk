@@ -114,6 +114,7 @@ NOT_SENT = frozenset(
         "doors",
         "known_of",
         "x_served_trimmed",  # the message and lens profiles: served only, kept in the file, never sent
+        "date_labels",  # the MCP server's words for a date, served beside the numbers; a write carrying it is 422
         "hidden",
         "local_updated_at",
         "server_updated_at",

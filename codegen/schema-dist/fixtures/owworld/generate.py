@@ -1015,6 +1015,94 @@ def fixtures():
              "elements and no Pin. What a reader says about a folder it does not read is its own. A copy carries "
              "the file as written; a share leaves it out as unread. No side: the writer verdict is a copy's.")
 
+    # -- OW-25: an element file nested more than 200 deep is not read, too_deep (ruled 2026-11-25) --
+    # Depth counts objects and arrays both, the file's top object at 1; a file is not read when any object or array
+    # sits past 200, and a plain value inside the 200th is read. Both cases nest an object and an array in turn under
+    # one x_ key, so a reader that counts only objects reads the 201 file and fails; `left_out` names what a reader
+    # leaves out of the world it reads, by reason.
+    def nested_element(n, name, depth):
+        value = 1
+        for level in range(depth, 1, -1):  # levels depth..2 under the element's own object, level 1
+            value = {"a": value} if level % 2 else [value]
+        return element(n, name, x_depth=value)
+
+    deep_file = "elements/character/deep--0000ab0e.json"
+    add("pass-OW-25-depth-200-read.owworld", build_zip(base(extra=[(deep_file, nested_element(0xe, "The Deep", 200))])),
+        test="OW-25", left_out={"too_deep": []},
+        rule="A Character whose x_depth nests an array and an object in turn so its deepest one sits at 200, the "
+             "element's own object at 1, a plain value inside it: read whole. The world read holds the base's three "
+             "elements and this one, nothing cut or flattened.")
+    add("pass-OW-25-depth-201-left-out.owworld", build_zip(base(extra=[(deep_file, nested_element(0xe, "The Deep", 201))])),
+        test="OW-25", left_out={"too_deep": [deep_file]},
+        rule="The same Character one level deeper, its deepest array or object at 201: the file is not read, reason "
+             "too_deep, and is named among the files the reader left out; the world is accepted and holds the base's "
+             "three elements. A reader that counts only objects reads it and fails. A writer may emit it: only a "
+             "reader leaves it out.")
+
+    # The rulings of 2026-11-25: the count is made in the file's text as each
+    # object or array opens, so every value of a repeated key counts; an empty object or array at 201 is past; the
+    # world's own file is counted the same way. No case carries a second fault.
+    dup = nested_element(0xe, "The Deep", 201)
+    assert dup.endswith(b"\n}\n")
+    dup = dup[:-3] + b',\n  "x_depth": 1\n}\n'  # the same key again, plain: a parser keeps this one, the text count does not
+    add("pass-OW-25-dup-key-deep-first-left-out.owworld", build_zip(base(extra=[(deep_file, dup)])),
+        test="OW-25", left_out={"too_deep": [deep_file]},
+        rule="The 201 Character with its x_depth key given twice, the deep value first and a plain 1 after it: the "
+             "count is made in the file's text as each object or array opens, so every value of a repeated key "
+             "counts and the file is not read, too_deep. A reader that parses first keeps the last value, depth 1, "
+             "reads it and fails.")
+    last = nested_element(0xe, "The Deep", 201)
+    assert last.count(b'\n  "x_depth": [') == 1
+    last = last.replace(b'\n  "x_depth": [', b'\n  "x_depth": 1,\n  "x_depth": [')  # plain first, deep last
+    add("pass-OW-25-dup-key-deep-last-left-out.owworld", build_zip(base(extra=[(deep_file, last)])),
+        test="OW-25", left_out={"too_deep": [deep_file]},
+        rule="The 201 Character with its x_depth key given twice, a plain 1 first and the deep value last: every "
+             "value of a repeated key counts, so the file is not read, too_deep. A reader that parses first and "
+             "keeps the first value reads it and fails.")
+
+    # Counted in the text means counted outside strings: brackets inside a string are no level, and a string's end is
+    # found past its escapes, an escaped backslash included.
+    in_string = "[{" * 100  # 200 brackets: a counter blind to strings reaches 201
+    add("pass-OW-25-brackets-in-string-read.owworld",
+        build_zip(base(extra=[(deep_file, element(0xe, "The Deep", x_note=in_string))])),
+        test="OW-25", left_out={"too_deep": []},
+        rule="A Character whose x_note is a string of 200 brackets, [ and { in turn, and nothing nested: a bracket "
+             "inside a string opens no object or array, so the file is at 1 and read whole. A reader that counts "
+             "brackets without knowing strings leaves it out and fails.")
+    escaped = element(0xe, "The Deep", x_note="C:\\", x_depth=0)
+    assert escaped.count(b'"C:\\\\"') == 1 and escaped.count(b'"x_depth": 0') == 1
+    deep_value = nested_element(0xe, "The Deep", 201).split(b'"x_depth": ', 1)[1].rsplit(b"\n}", 1)[0]
+    escaped = escaped.replace(b'"x_depth": 0', b'"x_depth": ' + deep_value)
+    add("pass-OW-25-escaped-backslash-then-deep-left-out.owworld", build_zip(base(extra=[(deep_file, escaped)])),
+        test="OW-25", left_out={"too_deep": [deep_file]},
+        rule="A Character whose x_note ends in an escaped backslash (C:\\ as a value), then x_depth nested to 201: "
+             "the string ends at its quote, so the levels after it count and the file is not read, too_deep. A "
+             "reader that takes a quote after a backslash as escaped stays inside the string, reads the file and "
+             "fails.")
+
+    def empty_at(depth, empty):
+        value = empty
+        for level in range(depth - 1, 1, -1):  # the empty one at `depth`, then levels depth-1..2 around it
+            value = {"a": value} if level % 2 else [value]
+        return element(0xe, "The Deep", x_depth=value)
+
+    for slug, empty, what in [("array", [], "an empty array"), ("object", {}, "an empty object")]:
+        add("pass-OW-25-empty-%s-at-201-left-out.owworld" % slug,
+            build_zip(base(extra=[(deep_file, empty_at(201, empty))])),
+            test="OW-25", left_out={"too_deep": [deep_file]},
+            rule="A Character whose deepest container is %s at 201, nothing inside it: an object or array past 200 "
+                 "is past whether or not it holds anything, so the file is not read, too_deep." % what)
+
+    world_value = 1
+    for level in range(201, 1, -1):  # world.json's own object at 1
+        world_value = {"a": world_value} if level % 2 else [world_value]
+    add("fail-OW-25-world-json-too-deep.owworld", world_with(dict(WORLD, x_depth=world_value)), test="OW-25",
+        reader="refuse", reason="not_a_world",
+        rule="world.json nested past 200, an object or array at 201, its own object at 1: counted as an element file "
+             "is, it is a world.json the reader cannot read, so the world is refused as fail-OW-3-unparseable is, "
+             "not a world. A writer refuses it for the same reason: it emits no world whose world.json a reader "
+             "cannot read.")
+
     return F
 
 
@@ -1041,7 +1129,8 @@ NOT_GENERATED = [
 ]
 
 # Spec 4.7 (line 229): the TypeScript reader's six (world-file.ts, as that reader names them) plus six, and 4.8's
-# name_case (2026-11-25: one fixed name alone in another case).
+# name_case (2026-11-25: one fixed name alone in another case). The words for a refused archive only: OW-25's
+# too_deep names an element file left out, and a world.json past 200 is refused as not_a_world (ruled 2026-11-25).
 READER_REASONS = ["unsafe_path", "too_big", "too_many", "not_a_world", "more_than_one", "not_openable",
                   "duplicate", "collision", "link", "method", "name", "marker", "name_case"]
 
@@ -1053,7 +1142,8 @@ def verdicts_doc(entries):
         "generated_by": "generate.py",
         "spec": "folder format spec section 4.7, the archive (drafted 2026-10-22), on 0.3.12; tests OW-1..OW-22; "
                 "OW-23, the share, section 4.8 (ruled 2026-11-23); OW-24, which folders under spatial/ a reader serves, "
-                "section 4.8 (ruled 2026-11-25)",
+                "section 4.8 (ruled 2026-11-25); OW-25, an element file nested past 200 not read "
+                "(ruled 2026-11-25)",
         "notes": [
             "reader: what a reader does with the file (accept, or refuse with `reason`). Every reader runner checks "
             "this field.",
@@ -1088,6 +1178,10 @@ def verdicts_doc(entries):
             "left_out: on the share side a writer emits, the two sets of paths its report names, inside the world: "
             "`hidden` and, counted apart, `unread`. A writer runner compares its own report with it; the shape of "
             "each writer's report stays its own.",
+            "left_out on a reader case (OW-25): the element files a reader leaves out of the world it reads, by "
+            "reason, inside the world (`too_deep`: any object or array past 200, the file's top object at 1); an "
+            "empty list says the reader leaves none out for that reason. A reader runner compares the files it "
+            "left out with it; the world is accepted either way.",
         ],
         "reasons": READER_REASONS,
         "floor": {"entries": FLOOR_ENTRIES, "bytes": FLOOR_BYTES},

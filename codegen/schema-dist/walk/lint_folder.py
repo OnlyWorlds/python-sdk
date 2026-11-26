@@ -28,14 +28,16 @@ the lookups stay as written. A multi-link, or an extension list a profile reads 
 (`x_spine_depends_on`, `x_lens_leads_to`: the lens profile's closed table), that names one
 element more than once gets one warning line per element, with how many times, never a
 problem (each names each element once; a reader reads a repeat once, in its first place);
-entries are compared as written, so `[a, A]` is no repeat. A `world.json` or an element
-file whose JSON this Python cannot hold (nested deeper than its parser goes, or a number
-longer than it converts) gets one line saying it was not read, and the check goes on:
-a third verdict beside clean and a problem, since a newer Python on another system may read
-the same file. The last line is the count it checked, so an empty
-report is a result and not a silence. Exit 0 clean, 1 with problems, 2 when
-the folder is not a world folder, 3 when nothing it read has a problem but a file was not
-read.
+entries are compared as written, so `[a, A]` is no repeat. An element file in which an
+object or array sits more than 200 levels deep (objects and arrays both count, the file's
+top object at 1) is not read, and its line says so with the reason `too_deep`; a `world.json`
+that deep is a problem in the same words, as one that does not parse is. The check counts
+the depth in the text itself, so the verdict is the same on every Python. A file with a number longer than this Python converts is not read either, and
+a newer Python on another system may read it. Either way the file gets one line saying it was
+not read, and the check goes on: a third verdict beside clean and a problem. The last line is
+the count it checked, so an empty report is a result and not a silence. Exit 0 clean, 1
+with problems, 2 when the folder is not a world folder, 3 when nothing it read has a problem
+but a file was not read.
 
 The same function gates the published example world (publish_dist.py), so the
 check a stranger runs is the check the dist itself passed. Decoding goes
@@ -57,7 +59,9 @@ from pathlib import Path
 
 # The folder format's version this lint was written against: the folder spec's
 # own version line, the one source. It moves when the spec's version moves, and
-# publish_dist.py writes the dist README's version sentence from it. 0.3.24
+# publish_dist.py writes the dist README's version sentence from it. 0.3.25
+# (2026-11-25, serial 148) says an element file in which an object or array sits more than 200
+# levels deep is not read, `too_deep`; this lint counts the depth itself (_too_deep). 0.3.24
 # (2026-11-14, serial 128) says a multi-link names each element once: a reader served a
 # list that names one element twice reads it once, in its first place, a writer served
 # one writes it back as served, and a writer that builds a list builds it with each
@@ -66,7 +70,7 @@ from pathlib import Path
 # this lint reads no prose and gained no check. 0.3.22 (2026-11-12) says what a draft
 # world is and that a writer adds no `world` key to an element file (already reported
 # as no field of its type).
-FORMAT_VERSION = "0.3.24"
+FORMAT_VERSION = "0.3.25"
 
 # Keys an element body carries that the schema does not declare: the type
 # slug and the server-managed fields (elements/serialize.py READONLY_FIELDS
@@ -118,7 +122,7 @@ class Report:
     def __init__(self) -> None:
         self.problems: list[str] = []
         self.warnings: list[str] = []  # printed, never counted: the exit code is the problems'
-        # Files this Python could not parse (serial 146): neither clean nor a problem.
+        # Files not read (serial 146; depth by the count, serial 148): neither clean nor a problem.
         self.unread: list[str] = []
         self.files = 0
         self.types: set[str] = set()
@@ -143,22 +147,71 @@ def is_uuid(value) -> bool:
     return True
 
 
-# A file whose JSON the Python running the check cannot hold is neither an element nor a
-# problem: another Python may read it (serial 146). Two causes: nested deeper than its parser
-# goes (RecursionError, which is no ValueError), or a number longer than it converts (a bare
-# ValueError, which is no JSONDecodeError). A file that is not JSON or not UTF-8 is a problem.
-NOT_READ = ("not read: the Python running this check cannot hold its JSON (nested too deep, "
-            "or a number too long for it), so nothing is said about it here")
+# A file that is not read is neither an element nor a problem (serial 146). Two causes, each
+# with its own words. Depth (serial 148): an object or array more than MAX_DEPTH levels deep,
+# objects and arrays both counted and the file's top object at 1, counted in the text before
+# any parse, so the verdict is the number's and never this Python's. A number longer than this
+# Python converts (a bare ValueError, which is no JSONDecodeError): another Python may read it.
+# A file that is not JSON or not UTF-8 is a problem.
+MAX_DEPTH = 200
+TOO_DEEP = ("not read, too_deep: an object or array in it sits more than 200 levels deep "
+            "(its top object at 1), so nothing is said about it here")
+NOT_READ = ("not read: the Python running this check cannot hold a number in it (a number too "
+            "long for it), so nothing is said about it here")
+
+
+def _too_deep(text: str) -> bool:
+    """Whether any object or array in `text` sits past MAX_DEPTH, the top one at 1. One pass
+    over the characters, with no recursion: a bracket inside a string is not counted, and a
+    backslash in a string takes the character after it, so an escaped quote does not end the
+    string."""
+    depth = 0
+    in_string = escaped = False
+    for c in text:
+        if in_string:
+            if escaped:
+                escaped = False
+            elif c == "\\":
+                escaped = True
+            elif c == '"':
+                in_string = False
+        elif c == '"':
+            in_string = True
+        elif c in "[{":
+            depth += 1
+            if depth > MAX_DEPTH:
+                return True
+        elif c in "]}":
+            depth -= 1
+    return False
+
+
+def _parse(text: str) -> object:
+    """json.loads with room for MAX_DEPTH levels above wherever the recursion limit was set: a
+    decoder written in Python spends frames on each level, and a limit set low must not turn a
+    file of 200 levels into one not read. The limit is put back after."""
+    limit = sys.getrecursionlimit()
+    sys.setrecursionlimit(limit + 4 * MAX_DEPTH)
+    try:
+        return json.loads(text)
+    finally:
+        sys.setrecursionlimit(limit)
 
 
 def _load(path: Path) -> tuple[str, object]:
     """Read one JSON file: ("ok", value), ("problem", the line's words) or ("unread", the
     line's words)."""
     try:
-        return "ok", json.loads(path.read_text(encoding="utf-8"))
-    except (json.JSONDecodeError, UnicodeDecodeError) as e:
+        text = path.read_text(encoding="utf-8")
+    except UnicodeDecodeError as e:
         return "problem", f"not JSON ({e})"
-    except (ValueError, RecursionError):
+    if _too_deep(text):
+        return "unread", TOO_DEEP
+    try:
+        return "ok", _parse(text)
+    except json.JSONDecodeError as e:
+        return "problem", f"not JSON ({e})"
+    except ValueError:
         return "unread", NOT_READ
 
 
@@ -224,6 +277,11 @@ def lint_folder(src: Path, decoded: dict) -> Report:
     else:
         kind, world = _load(world_path)
         if kind == "problem":
+            report.add(f"world.json: {world}")
+            world = {}
+        elif kind == "unread" and world == TOO_DEEP:
+            # Serial 148: a world.json past 200 is one the check cannot read, as one that does not
+            # parse, so it is a problem, in the words an element file's line uses.
             report.add(f"world.json: {world}")
             world = {}
         elif kind == "unread":

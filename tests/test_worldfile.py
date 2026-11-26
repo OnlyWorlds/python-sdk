@@ -132,7 +132,7 @@ def test_the_owworld_fixture_set_every_verdict_and_every_cause(tmp_path: Path) -
         print(f"  disagrees: {d}")
     assert diffs == []
     # After the verdicts, so a red count never hides a disagreeing fixture.
-    assert run == len(on_disk) == 111, f"the set holds {run} fixtures"  # serial 147: two OW-18 fold cases
+    assert run == len(on_disk) == 120, f"the set holds {run} fixtures"  # serial 148: nine OW-25 depth cases
 
 
 # Serial 58's three cases (ruled 2026-10-24), named on their own: the deflate stream read to its

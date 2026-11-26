@@ -2,15 +2,20 @@
   "_what": "The recorded pin for the vendored OnlyWorlds schema distribution (codegen/schema-dist/, copied byte-exact). Do not edit by hand; re-vendor from the pinned tag and review the diff. Kept equal to the npm SDK's pin (github.com/OnlyWorlds/sdk, codegen/schema-pin.json) on purpose: two clients, one schema.",
   "_why_manifest_sha256": "Verifying the tree against its own MANIFEST.json only proves internal consistency. If the tag moved, the manifest moved with it. The hash recorded here is the one first accepted, which is what makes a moved tag visible.",
   "repo": "https://github.com/OnlyWorlds/schema-dist",
-  "tag": "v0.34.1-dist.147",
-  "commit": "9d7fb973fd4842c68c7d39111003b7f3dbcfc9a1",
-  "manifest_sha256": "beaa7093c2ae47b4f47afd8ce3672223f72015f3d014f7a890af5ebb15fecc8f",
+  "tag": "v0.34.1-dist.148",
+  "commit": "93e7232e2814579947720e17b008377b802e67f9",
+  "manifest_sha256": "4cbe4d923e47d9f1899d9a3f865d3b0169dede546921dfc89557bce215577c1a",
   "canonical_version": "00.34.01",
-  "dist_serial": 147,
-  "published": "2026-11-25",
-  "pinned_at": "2026-11-25",
-  "pinned_by": "The maintainer: tree from `git archive` of the tag in a schema-dist checkout (232 files: the 231 the MANIFEST lists, and MANIFEST.json itself); files re-hashed against MANIFEST.json by verify_dist.py; MANIFEST self-hash matched against the raw file GitHub serves at the tag, whose ref resolves to the commit above.",
+  "dist_serial": 148,
+  "published": "2026-11-26",
+  "pinned_at": "2026-11-26",
+  "pinned_by": "The maintainer: tree from `git archive` of the tag in a schema-dist checkout (241 files: the 240 the MANIFEST lists, and MANIFEST.json itself); files re-hashed against MANIFEST.json by verify_dist.py; MANIFEST self-hash matched against the raw file GitHub serves at the tag, whose ref resolves to the commit above.",
   "previous_pins": [
+    {
+      "tag": "v0.34.1-dist.147",
+      "manifest_sha256": "beaa7093c2ae47b4f47afd8ce3672223f72015f3d014f7a890af5ebb15fecc8f",
+      "note": "superseded by v0.34.1-dist.148 (an element file past 200 levels is too_deep, counted in the text; world.json the same; folder format 0.3.25; 120 owworld archives)"
+    },
     {
       "tag": "v0.34.1-dist.146",
       "manifest_sha256": "1d948463a5e8c13026ac069dd4ae91c22ba3f5fc4ba81508a7d08a600638f367",
