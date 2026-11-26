@@ -347,6 +347,20 @@ def test_starter_entries_are_imported_and_named(tmp_path: Path) -> None:
     assert kingdom["x_kanka_population"] == "~50'000"
 
 
+def test_a_second_location_is_kept_beside_the_single_link(tmp_path: Path) -> None:
+    """A Character's `location` takes one place; a second in entityLocations is kept, never dropped."""
+
+    def change(doc: dict[str, Any]) -> None:
+        doc["entity"]["entityLocations"].append({"location_id": 2270244})  # The quay's row id
+
+    src = variant(tmp_path, change, "characters/allied-character-name_10074597.json")
+    out, report = run(tmp_path, src)
+    allied = by_name(out)["[Allied Character Name]"]
+    assert allied["location"] == eid(CAPITAL)
+    assert allied["x_kanka_locations"] == [eid(CAPITAL), eid(10074604)]
+    assert "location links one; every place kept" in report.render()
+
+
 def test_personality_not_visible_to_players_is_hidden_not_dropped(tmp_path: Path) -> None:
     """The starters' is_personality_visible is false: their personality traits go to a hidden Narrative."""
     out, report = run(tmp_path)
