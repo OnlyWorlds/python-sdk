@@ -4,6 +4,10 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+## 0.156.4 (2026-11-27)
+
+- **Fixed: `calendar.validate_calendar_config` names the profile's size bounds.** Since 0.156.0 the reader refuses a calendar past a bound (more than 256 eras, 64 months, a week of more than 64 steps or names, 16 festival days, an `except` longer than 8, a name or template longer than 256 characters, a year longer than 2^53 - 1 steps), but the validator said nothing about it. It now gives the npm SDK's words for each, such as `A calendar holds at most 256 eras`; a calendar with no months whose `year.steps` is past 2^53 - 1 included, which the npm SDK names from 4.212.2. Held to the npm SDK's validator on 3,000 randomized calendars near each bound, none differing.
+
 ## 0.156.3 (2026-11-27)
 
 - **Faster: the depth check before a parse reads a dense file in about half the time of 0.156.1.** 0.156.1 made the check linear by stepping through every bracket, quote and backslash in Python, which on many small objects (50,000 of them, 2.2 MB) took 129 ms where 0.156.0 took 54. The strings are now cut out by one pattern that never backtracks, and the brackets left are counted as a running sum: 61 ms on the same file, and still linear on a string left open and full of escaped quotes (17 ms at 1 MB). Its answers were held to 0.156.1's on 500,000 random texts; none differed.

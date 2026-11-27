@@ -392,6 +392,37 @@ def test_surface_helpers() -> None:
     assert format_duration({"version": 1, "grain": "day", "step_name": "sol"}, 14) == "14 sols"
 
 
+def test_validate_names_each_size_bound_as_the_sdk_does() -> None:
+    """The SDK's words for each size bound (``calendar-kernel.test.mjs``), a year of ``year.steps`` with no
+    months included; the reader refuses each."""
+    day: dict[str, Any] = {"version": 2, "grain": "day"}
+
+    def words(cfg: Mapping[str, Any]) -> list[str]:
+        return [w for w in validate_calendar_config(cfg) if "at most" in w]
+
+    def names(n: int, p: str) -> list[str]:
+        return [f"{p}{i}" for i in range(n)]
+
+    eras = [{"name": n, "start": i * 10, "end": i * 10 + 10} for i, n in enumerate(names(257, "E"))]
+    assert words({**day, "eras": eras}) == ["A calendar holds at most 256 eras"]
+    months = {"months": {"names": names(65, "M"), "lengths": [30] * 65}}
+    assert words({**day, "bundles": months}) == ["A calendar holds at most 64 months"]
+    week = {"week": {"length": 65, "names": names(65, "D")}}
+    assert words({**day, "bundles": week}) == ["A week holds at most 64 steps and 64 names"]
+    two = {"months": {"names": ["A", "B"], "lengths": [30, 30]}}
+    festivals = [{"name": n, "after_month": 1} for n in names(17, "F")]
+    assert words({**day, "bundles": two, "intercalary": festivals}) == ["A calendar holds at most 16 festival days"]
+    leap = {"name": "F", "after_month": 1, "every_years": 4, "except": [8, 16, 32, 64, 128, 256, 512, 1024, 2048]}
+    assert words({**day, "bundles": two, "intercalary": [leap]}) == ["An except list holds at most 8 numbers"]
+    assert words({**day, "grain": "g" * 257}) == ["A name or template holds at most 256 characters"]
+    long_months = {"months": {"names": ["A", "B"], "lengths": [9007199254740990, 2]}}
+    assert words({**day, "bundles": long_months}) == ["A year holds at most 2^53 - 1 steps"]
+    past = {**day, "bundles": {"year": {"steps": 9007199254740992}}}
+    assert words(past) == ["A year holds at most 2^53 - 1 steps"]
+    assert words({**day, "bundles": {"year": {"steps": 9007199254740991}}}) == []
+    assert read_calendar_config(past) is None
+
+
 def test_duration_wrong_kind_step_name_and_whole_counts() -> None:
     """A step_name that is not a string reads as absent; a whole count is exact up to the safe integers."""
     day = {"version": 2, "grain": "day"}

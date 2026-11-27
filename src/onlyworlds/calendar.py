@@ -628,6 +628,9 @@ def validate_calendar_config(cfg: Mapping[str, Any]) -> list[str]:
             errors.append(f'Era "{name}": end must be after start')
         if _strict_eq(direction, "down") and not _nullish(end) and _js_le(start, end):
             errors.append(f'Era "{name}": a counting-down era must end below its start')
+    bound = _bound_words(cfg)
+    if bound:
+        errors.append(bound)
     domains = _era_domains(_items(eras))
     for i, a in enumerate(domains):
         for b in domains[i + 1 :]:
@@ -765,6 +768,53 @@ def _past_a_bound(cfg: object, months: object, eras: list[Any], entries: list[An
         if longest + len(entries) > _SAFE:
             return True
     return False
+
+
+def _bound_words(cfg: object) -> str | None:
+    """The words of the first size bound ``cfg`` is past, as the npm SDK's validator gives them, or None:
+    more than 256 eras, 64 months, a week of more than 64 steps or 64 names, 16 intercalary entries, a
+    version-2 ``except`` longer than 8, a name or template longer than 256 characters, or a longest year (the
+    months' lengths plus every intercalary entry, or with no months ``year.steps``) past 2**53 - 1. Shapes
+    it does not hold are left to the other checks."""
+
+    def listed(v: object) -> list[Any]:
+        return v if isinstance(v, list) else []
+
+    months, week = _bundle(cfg, "months"), _bundle(cfg, "week")
+    eras, inter = listed(_prop(cfg, "eras")), listed(_prop(cfg, "intercalary"))
+    month_names, day_names = listed(_prop(months, "names")), listed(_prop(week, "names"))
+    if len(eras) > _MAX_ERAS:
+        return f"A calendar holds at most {_MAX_ERAS} eras"
+    if len(month_names) > _MAX_MONTHS:
+        return f"A calendar holds at most {_MAX_MONTHS} months"
+    week_length = _prop(week, "length")
+    if (_is_num(week_length) and _num(week_length) > _MAX_WEEK) or len(day_names) > _MAX_WEEK:
+        return f"A week holds at most {_MAX_WEEK} steps and {_MAX_WEEK} names"
+    if len(inter) > _MAX_INTERCALARY:
+        return f"A calendar holds at most {_MAX_INTERCALARY} festival days"
+    if _strict_eq(_prop(cfg, "version"), 2) and any(len(listed(_prop(i, "except"))) > _MAX_EXCEPT for i in inter):
+        return f"An except list holds at most {_MAX_EXCEPT} numbers"
+    if (
+        any(_too_long(_prop(cfg, k)) for k in ("grain", "step_name", "format", "format_intercalary"))
+        or any(_too_long(_prop(e, "name")) or _too_long(_prop(e, "abbrev")) for e in eras)
+        or any(map(_too_long, month_names))
+        or any(map(_too_long, day_names))
+        or any(_too_long(_prop(i, "name")) for i in inter)
+    ):
+        return f"A name or template holds at most {_MAX_TEXT} characters"
+    lengths = _prop(months, "lengths")
+    if _truthy(months) and isinstance(lengths, list):
+        longest = float(len(inter))
+        for length in lengths:
+            if _is_num(length):
+                longest = longest + _num(length)  # left to right from the entries, as the SDK's validator sums
+        if longest > _SAFE:
+            return "A year holds at most 2^53 - 1 steps"
+    elif _truthy(_bundle(cfg, "year")):
+        steps = _prop(_bundle(cfg, "year"), "steps")
+        if _is_num(steps) and _num(steps) > _SAFE:
+            return "A year holds at most 2^53 - 1 steps"
+    return None
 
 
 def _leap_rule_problem(ic: object) -> str | None:
