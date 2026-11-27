@@ -315,3 +315,48 @@ def test_the_kanka_door_writes_no_file_holding_a_number_the_export_does_not(tmp_
     written = sorted(out.rglob("*.json"))
     assert len(written) > 10
     assert not any("Infinity" in p.read_text(encoding="utf-8") for p in written)
+
+
+def _too_deep_by_strings_removed(text: str, limit: int) -> bool:
+    """The scan as 0.156.0 wrote it (closed strings cut out by a pattern, an open one to the end): its
+    answers, kept as the reading the one-pass scan must give. Its time grew with the square of the length."""
+    import re
+    from itertools import accumulate
+
+    outside = re.sub(r'"[^"\\]*(?:\\.[^"\\]*)*"', "", text, flags=re.DOTALL)
+    if '"' in outside:
+        outside = outside[: outside.find('"')]
+    steps = [1 if c in "[{" else -1 for c in outside if c in "[]{}"]
+    return bool(steps) and max(accumulate(steps)) > limit
+
+
+def test_the_depth_scan_answers_as_the_strings_removed_reading(monkeypatch: pytest.MonkeyPatch) -> None:
+    import random
+
+    monkeypatch.setattr(_outside_json, "MAX_DEPTH", 3)
+    rng = random.Random(149)
+    alphabet = '[]{}"\\a,'
+    for _ in range(20_000):
+        text = "".join(rng.choice(alphabet) for _ in range(rng.randint(0, 40)))
+        assert _outside_json._text_too_deep(text) == _too_deep_by_strings_removed(text, 3), repr(text)
+
+
+def test_the_depth_scan_is_linear_on_a_string_left_open_full_of_escaped_quotes() -> None:
+    import time
+
+    # The shape that took the square of its length in 0.156.0: about a second at 16 KB, here 40 KB.
+    text = "[" * 300 + '"' + '\\"' * 20_000
+    start = time.perf_counter()
+    assert _outside_json._text_too_deep(text) is True
+    ms = (time.perf_counter() - start) * 1000
+    assert ms < 2000, f"{round(ms)} ms"
+
+
+def test_valid_json_heavy_with_quotes_reads_in_linear_time() -> None:
+    import time
+
+    text = json.dumps({"x": '"' * 500_000, "y": ["[" * 300]})
+    start = time.perf_counter()
+    assert _outside_json.loads(text)["y"] == ["[" * 300]
+    ms = (time.perf_counter() - start) * 1000
+    assert ms < 2000, f"{round(ms)} ms"

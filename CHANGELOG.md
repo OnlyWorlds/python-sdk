@@ -4,6 +4,10 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+## 0.156.1 (2026-11-27)
+
+- **Fixed: the depth check before a parse took time growing with the square of a text's length.** Since 0.155.0 every reader of a file this package did not write (`read_folder`, `read_world_file`, the import doors) first counts the text's nesting, and that scan cut the strings out with a pattern that, on a string left open, retried from every quote to the end of the text: a 16 KB file of escaped quotes took about a second, and a 1 MB one would take about an hour. Valid JSON heavy with quotes read several times slower than before the check. The scan is now one pass over the brackets, quotes and backslashes, linear in the length, with the same answers: held to the old reading on 20,000 random texts, and a 40 KB text of that shape is timed (the old scan took 6.7 s on it).
+
 ## 0.156.0 (2026-11-27)
 
 - **A world file refused for a `world.json` it cannot read says what is wrong with it**: `WorldFileError.world_fault` is `too_deep` (nested past 200 levels), `not_json` or `number_out_of_range` (a number too large to read), beside the reason `not_a_world` the folder format gives it, so a tool reads the field, never the message. It is None on every other refusal, a missing `world.json` or one with no id included.
