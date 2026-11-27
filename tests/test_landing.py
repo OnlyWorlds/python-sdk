@@ -111,3 +111,30 @@ def test_a_list_naming_one_target_twice_reads_degree_1_and_two_near_orphans() ->
         ],
     }
     assert [m["degree"] for m in landing_of(two)["clusters"][0]["members"]] == [2, 2]
+
+
+def test_landing_of_is_pure() -> None:
+    doc: dict[str, Any] = json.loads(FIXTURE.read_text(encoding="utf-8"))
+    cases = {c["name"]: c for c in doc["cases"]}
+    case = cases["a head reaches one hop by default; what lies further is unclustered"]
+    graph: dict[str, Any] = case["graph"]
+    opts: dict[str, Any] = case.get("options") or {}
+    before = json.dumps(graph, sort_keys=True)
+    got = landing_of(graph, **opts)
+    assert json.dumps(graph, sort_keys=True) == before, "landing_of moved its input"
+    first = json.dumps(got, sort_keys=True)
+    assert got["clusters"] and got["clusters"][0]["members"] and len(got["unclustered"]) >= 2 and got["gaps"]
+    got["clusters"][0]["head"] = "planted"
+    got["clusters"][0]["members"][0]["id"] = "planted"
+    got["clusters"][0]["members"].append({"id": "extra", "hops": 99, "degree": 0})
+    got["unclustered"][0]["id"] = "planted"
+    got["unclustered"][1] = {"id": "extra", "degree": -1}
+    got["gaps"][0]["id"] = "planted"
+    got["gaps"].append({"kind": "orphan", "id": "extra"})
+    assert json.dumps(graph, sort_keys=True) == before
+    again = landing_of(graph, **opts)
+    assert json.dumps(again, sort_keys=True) == first
+    assert again["clusters"][0]["head"] != "planted"
+    assert again["clusters"][0]["members"] != got["clusters"][0]["members"]
+    assert again["unclustered"] != got["unclustered"]
+    assert again["gaps"] != got["gaps"]

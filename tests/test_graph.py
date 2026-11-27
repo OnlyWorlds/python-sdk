@@ -489,3 +489,32 @@ def test_degree_and_out_degree_count_a_repeat_once() -> None:
     g = world_graph(world, {"rung": "owner"})
     assert degree_of(g) == {"ev": 1, "mara": 1}
     assert out_degree_of(g) == {"ev": 1, "mara": 0}
+
+
+def test_world_graph_is_pure() -> None:
+    doc: dict[str, Any] = json.loads(FIXTURE.read_text(encoding="utf-8"))
+    cases = {c["name"]: c for c in doc["cases"] if c["kind"] == "graph"}
+    case = cases["rooms brings room elements back, marked"]
+    world: dict[str, Any] = case["world"]
+    reader: dict[str, Any] = case["reader"]
+    opts: dict[str, Any] = case.get("options", {})
+    before = json.dumps([world, reader, opts], sort_keys=True)
+    got = world_graph(world, reader, **opts)
+    assert json.dumps([world, reader, opts], sort_keys=True) == before, "world_graph moved its input"
+    first = json.dumps(got, sort_keys=True)
+    assert got["nodes"] and got["edges"] and got["cut"] and got["edges_cut"]
+    marked = next(n for n in got["nodes"] if "marks" in n)
+    got["nodes"][0]["name"] = "planted"
+    marked["marks"][0] = "hidden"
+    marked["marks"].append("proposed")
+    got["nodes"].append({**got["nodes"][0], "id": "planted"})
+    got["edges"][0]["target"] = "planted"
+    got["edges"].append({"source": "planted", "field": "friends", "target": "planted", "index": 0})
+    got["cut"]["hidden"] = -1
+    got["edges_cut"]["hidden"] = -1
+    assert json.dumps([world, reader, opts], sort_keys=True) == before
+    again = world_graph(world, reader, **opts)
+    assert json.dumps(again, sort_keys=True) == first
+    assert again["nodes"][0]["name"] != "planted"
+    assert again["nodes"] != got["nodes"]
+    assert again["edges"] != got["edges"]

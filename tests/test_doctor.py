@@ -1258,6 +1258,27 @@ def test_11_apply_checks_never_changes_the_rules() -> None:
     assert rules == before
 
 
+def test_apply_checks_is_pure() -> None:
+    fx: dict[str, Any] = json.loads(CHECKS_FIXTURE.read_text(encoding="utf-8"))
+    rules: list[dict[str, Any]] = fx["rules"]
+    elements: list[dict[str, Any]] = [c["element"] for c in fx["cases"]]
+    before = json.dumps([rules, elements], sort_keys=True)
+    got = apply_checks(rules, elements)
+    assert json.dumps([rules, elements], sort_keys=True) == before, "apply_checks moved its input"
+    first = json.dumps([r.as_dict() for r in got], sort_keys=True)
+    row = next(r for r in got if len(r.short) >= 2)
+    row.short[0]["name"] = "planted"
+    row.short[1] = {"type": "character", "id": "planted", "name": "planted"}
+    row.short.append({"type": "character", "id": "extra", "name": "extra"})
+    got.append(CheckRow(index=len(got), rule="planted", field="planted"))
+    assert json.dumps([rules, elements], sort_keys=True) == before
+    again = apply_checks(rules, elements)
+    assert json.dumps([r.as_dict() for r in again], sort_keys=True) == first
+    assert again[row.index].short[0]["name"] != "planted"
+    assert again[row.index].short != row.short
+    assert len(again) != len(got)
+
+
 def fernhollow_world(rules: Any = None, *, key: bool = True) -> Elements:
     """The clean world, its Charter carrying Fernhollow's three rules (the fixture's first three), one
     Character without a reputation, a Funding line short of Next and roles, and two lines that hold."""
