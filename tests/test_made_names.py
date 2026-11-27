@@ -176,8 +176,9 @@ REAL: list[tuple[str, Path, dict[str, int]]] = [
 def test_the_list_holds_every_real_export_in_the_fixtures() -> None:
     held = {p for _, p, _ in REAL}
     real = {p for d in DOORS for p in (FIX / d).iterdir() if p.suffix in (".json", ".lk", ".zip", ".html")}
-    # LegendKeeper's other files are answers of its API, recorded, not exports
-    real = {p for p in real if p.parent.name != "legendkeeper" or p in (LK3, LK)}
+    # LegendKeeper's other files are answers of its API, recorded, not exports; a fixture made by hand from a
+    # real export (its name ends in -made, as kanka-4-made.zip) is not an export either
+    real = {p for p in real if (p.parent.name != "legendkeeper" or p in (LK3, LK)) and not p.stem.endswith("-made")}
     assert held == real
 
 

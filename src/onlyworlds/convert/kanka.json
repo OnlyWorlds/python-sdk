@@ -21,10 +21,11 @@
     "journals": "narrative",
     "maps": "map"
   },
-  "proven_modules": ["characters", "locations", "organisations", "notes"],
+  "proven_modules": ["characters", "locations", "organisations", "notes", "races", "families"],
   "story_modules": ["notes", "quests", "journals"],
   "starter_window": 5.0,
-  "proven_export_version": "3.15",
+  "proven_export_versions": ["3.15", "4.0"],
+  "dead_status_ids": [3],
   "parent_fields": {
     "location": "parent_location",
     "institution": "parent_institution",
@@ -49,7 +50,7 @@
   "organisations": "organisations",
   "row_handled": [
     "id", "name", "entry", "type", "is_private", "entity", "location_id", "race_id", "is_dead", "character_traits",
-    "character_families", "character_races", "organisation_memberships", "members", "is_personality_visible", "image_uuid"
+    "character_families", "character_races", "organisation_memberships", "members", "pivotMembers", "is_personality_visible", "image_uuid"
   ],
   "entity_handled": [
     "id", "entity_id", "parent_id", "name", "type", "entry", "is_private", "is_attributes_private", "posts", "relationships",
@@ -102,6 +103,7 @@
     "untyped_type": "a module with no OnlyWorlds type keeps its own type",
     "entry_differs": "the row's entry differs from the entity's (kept as written)",
     "members_elsewhere": "members on a module that is not organisations",
+    "pivot_members": "who belongs, as Kanka 4.0 writes it; a Character's own family link comes from its character_families",
     "parent_not_id": "not an entity id",
     "parent_missing": "its parent is not in the folder",
     "posts_meta": "a post's layout, place, pins or visibility have no field",

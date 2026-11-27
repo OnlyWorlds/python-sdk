@@ -4,6 +4,11 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+## 0.157.0 (2026-11-27)
+
+- **The Kanka door reads Kanka 4.0's exports.** A Character whose `entity.status_id` is 3, the `dead` row of the character statuses every Kanka campaign shares, gets `[Deceased] ` before `physicality`, as `is_dead` does; neither the 3.15 nor the 4.0 export writes `is_dead`. A campaign's own statuses are not in the export, so only the shared one reads as dead, and a `status_id` that is set is still kept as `x_kanka_status_id`. A family's `pivotMembers`, where 4.0 lists its people, is kept as `x_kanka_pivot_members` with its reason in the report, on any module. Races and families now read as proven on a real export, and the report names an export version other than 3.15 or 4.0. Exports of 3.15 come out as before.
+- `tests/fixtures/kanka/kanka-4-made.zip`, made by `make_kanka_4_made.py` from the first fixture with 4.0's two changes, is the case both packages are held to; the npm SDK's `convertKanka` writes the same folder and report on it.
+
 ## 0.156.5 (2026-11-27)
 
 - **The two deprecations say since which release and that they leave in onlyworlds 1.0**: `calendar.resolve_calendar_lens` (since 0.69.0; its warning now names the release) and the `version` key of `KindLayout` and `AroundLayout` (since 0.133.0), which said it would leave with the npm SDK.

@@ -36,11 +36,18 @@ file numbers them: Only me ``visibility_id`` 4, Members of the campaign 5, Admin
 own text names the visibility it was set to). Each comes in as its own hidden Narrative, the
 Character visible: the hidden-post rule below, read on a real file.
 
-**Believed**, not yet seen in a file: the folders ``families/``, ``races/``, ``items/``,
-``creatures/``, ``events/``, ``abilities/``, ``quests/``, ``journals/``, ``maps/`` and every other
-module; the shapes of ``character_families``, ``character_races`` and
-``organisation_memberships`` items (``family_id``, ``race_id``, ``organisation_id``), of an
-organisation's ``members`` (``character_id``), of ``is_dead``, of ``[entity:N|text]``, of a
+**And on a fourth** (Kanka 4.0, ``export_version`` ``"4.0"``, a new campaign made 2026-11-27; not
+committed, as it carries the account's ids): ``races/`` and ``families/``; a Character's
+``character_races``, ``character_families`` and ``organisation_memberships`` items (``race_id``,
+``family_id``, ``organisation_id``); an organisation's ``members`` (``character_id``, a ``role``
+on one). Two keys this door was built for are not written: a dead Character carries no ``is_dead``
+but ``entity.status_id`` 3, and a family holds its people under ``pivotMembers`` (``character_id``, ``family_id``), not
+``members``. ``tests/fixtures/kanka/kanka-4-made.zip`` is the first export with those two
+changes made by hand, the case both packages are held to.
+
+**Believed**, not yet seen in a file: the folders ``items/``, ``creatures/``, ``events/``,
+``abilities/``, ``quests/``, ``journals/``, ``maps/`` and every other module; the shapes of
+``is_dead`` (which neither the 3.15 nor the 4.0 export writes), of a family's ``members``, of ``[entity:N|text]``, of a
 campaign's ``entry``; that ``character_traits`` section 1 is appearance and 2 personality (Kanka's
 own API names them so, read live on 2026-07-18; the export carries the number only).
 
@@ -94,10 +101,12 @@ What becomes what (the type map follows a table ruled 2026-10-23):
   file name.
 - **A character's traits**: appearance (section 1) to ``physicality`` and personality (section 2)
   to ``mentality``, one ``Name: entry`` line each; another section is kept as ``x_kanka_traits``.
-  ``is_dead`` puts ``[Deceased] `` before ``physicality`` (the schema skill's convention for a
-  dead Character until a status field lands). ``status_id`` (1 on the two characters made in
-  the editor, null on the starters) is kept as ``x_kanka_status_id``: what its numbers mean is
-  not in the file.
+  A dead Character, ``is_dead`` set or ``entity.status_id`` 3, gets
+  ``[Deceased] `` before ``physicality`` (the schema skill's convention for a dead Character
+  until a status field lands). The 3 is the ``dead`` row of the character statuses every
+  campaign shares (Kanka's API documents them under ``category_statuses``: 1 ``alive``, 2
+  ``missing``, 3 ``dead``); a campaign's own statuses are not in the export. A ``status_id``
+  that is set is kept as ``x_kanka_status_id``, whatever it says.
 - **Attributes** (``entityAttributes``): one whose name, lowercased with spaces as underscores, is
   a field of the type fills it when the value fits (text; a whole number for an integer; only
   mentions, of the linked type, for a link); every other is kept as ``x_kanka_<name>`` with its
@@ -252,8 +261,13 @@ _STORY_MODULES = frozenset(_DATA["story_modules"])
 #: Seconds after the campaign's ``created_at`` within which an entity is named possible starter content.
 STARTER_WINDOW = float(_DATA["starter_window"])
 
-#: The export version this door was proven on; another is named in the report.
-_PROVEN_VERSION: str = _DATA["proven_export_version"]
+#: The export versions this door was proven on; another is named in the report.
+_PROVEN_VERSIONS: tuple[str, ...] = tuple(_DATA["proven_export_versions"])
+
+#: Kanka's own character statuses that read as dead: an entity's ``status_id`` names a row of the
+#: ``category_statuses`` every campaign shares (id 3, key ``dead``, on characters). Neither the 3.15
+#: nor the 4.0 export writes ``is_dead``. A campaign's own statuses are not in the export.
+_DEAD_STATUS_IDS = frozenset(_DATA["dead_status_ids"])
 
 #: An element type -> its own parent field, which takes a parent of the same type.
 _PARENT_FIELD: dict[str, str] = dict(_DATA["parent_fields"])
@@ -850,7 +864,11 @@ class _Importer:
             version = info.get("export_version")
             self.report.notes.append(
                 _NOTE["version"].format(kanka_version=info.get("kanka_version"), version=version)
-                + ("" if str(version) == _PROVEN_VERSION else _NOTE["version_unproven"].format(proven=_PROVEN_VERSION))
+                + (
+                    ""
+                    if str(version) in _PROVEN_VERSIONS
+                    else _NOTE["version_unproven"].format(proven=" and ".join(_PROVEN_VERSIONS))
+                )
             )
         born = _when(campaign.get("created_at"))
         plans: dict[str, int] = {}
@@ -1047,6 +1065,8 @@ class _Importer:
         self._attributes(item)
         if item.folder != _ORGANISATIONS and not _empty(row.get("members")):  # organisations: _memberships
             self._keep(item, "members", row.get("members"), _WHY["members_elsewhere"])
+        if not _empty(row.get("pivotMembers")):
+            self._keep(item, "pivotMembers", row.get("pivotMembers"), _WHY["pivot_members"])
         self._generic(item)
 
     def _parent(self, item: _Item) -> None:
@@ -1205,7 +1225,9 @@ class _Importer:
                 sections.setdefault(section, []).append(line)
             else:
                 other.append({"name": t.get("name"), "entry": t.get("entry"), "section_id": t.get("section_id")})
-        dead = _on(row.get("is_dead"))
+        ent = row.get("entity")
+        status = _int_id(ent.get("status_id")) if isinstance(ent, dict) else None
+        dead = _on(row.get("is_dead")) or status in _DEAD_STATUS_IDS
         for section, to in _TRAIT_SECTIONS.items():
             text = "\n".join(sections.get(section, []))
             if dead and to["field"] == _DECEASED_FIELD:

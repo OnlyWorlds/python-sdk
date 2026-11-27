@@ -24,6 +24,12 @@ scrubbed the same way. It adds a public Character (Perrin Shaw) with three posts
 visibility Kanka's menu offers short of all: Only me (``visibility_id`` 4), Members of the campaign
 (5) and Admins (2), each post's own text naming the visibility it was set to. The hidden post on a
 visible element, planted in the first export, read on a real file.
+
+``fixtures/kanka/kanka-4-made.zip`` is made, not exported: the first export with what a real Kanka 4.0
+export (2026-11-27, not committed: it carries the account's ids) showed in two places, made by hand
+by ``fixtures/kanka/make_kanka_4_made.py``. Mara Voss is dead by ``entity.status_id`` 3, and a family
+(The Voss line) holds her under ``pivotMembers``; ``info.json`` names 4.0. The npm SDK holds its door
+to the Python door's output on it, as on the three real ones.
 """
 
 from __future__ import annotations
@@ -96,6 +102,11 @@ PERRIN_POSTS = {
     1577356: ("A note, members of the campaign", 5, "Members of the campaign"),
     1577357: ("A note, admins", 2, "Admins"),
 }
+
+# the fourth: the first export with Kanka 4.0's two changes made by hand (fixtures/kanka/make_kanka_4_made.py)
+EXPORT4 = EXPORT.parent / "kanka-4-made.zip"
+SHA256_4 = "6ede34b66f2b3114292cc3678c24f3186fcc66c82ebc339d9fd6649aaac2fb65"
+VOSS_LINE = 10074650
 
 # planted in the first export: a tag shaped like the second export's, and gallery uploads
 KEEPER, KEEPER_ROW, KEEPER_FILE = 10074699, 346600, "tags/keeper_10074699.json"
@@ -214,7 +225,7 @@ def test_namespace_is_pinned() -> None:
 
 
 #: The door's tables and wording: the same bytes as the npm SDK's ``src/convert/kanka.json``, its test this hash too.
-DATA_SHA256 = "53394eee55d8afe0b2b5b5bdc99795a42543600ca085ec282ef1acd66a37106a"
+DATA_SHA256 = "ac453c68f54e0d96217e08763169fee7bf53ced6b43f7b24f7054d67f3a8880e"
 
 
 def test_the_data_file_is_the_bytes_the_npm_sdk_reads() -> None:
@@ -689,6 +700,80 @@ def test_third_export_each_post_not_visible_to_all_is_its_own_hidden_narrative(t
 def test_third_export_deterministic_and_lint_clean(tmp_path: Path) -> None:
     run(tmp_path, EXPORT3, name="one")
     run(tmp_path, EXPORT3, name="two")
+    assert tree(tmp_path / "one") == tree(tmp_path / "two")
+    pytest.importorskip("yaml", reason="the dist's lint decodes the schema YAML")
+    r = subprocess.run([sys.executable, str(LINT), str(tmp_path / "one")], capture_output=True, text=True)
+    problems = [line for line in r.stdout.strip().splitlines()[:-1] if not line.startswith("walk note:")]
+    assert problems == [] and r.returncode == 0, r.stdout + r.stderr
+
+
+# --- the fourth: Kanka 4.0's shapes, made from the first ---------------------------
+
+
+def test_the_fourth_fixture_is_the_made_file() -> None:
+    assert hashlib.sha256(EXPORT4.read_bytes()).hexdigest() == SHA256_4
+
+
+def test_kanka_4_a_dead_status_marks_the_character_deceased(tmp_path: Path) -> None:
+    """status_id 3, the shared `dead` row, is what is_dead was; 1 (alive) and none mark nothing."""
+    out, _ = run(tmp_path, EXPORT4)
+    people = by_name(out)
+    assert people["Mara Voss"]["physicality"] == "[Deceased]"
+    assert people["Mara Voss"]["x_kanka_status_id"] == 3
+    assert "physicality" not in people["Ada Okafor"] and people["Ada Okafor"]["x_kanka_status_id"] == 1
+    out1, _ = run(tmp_path, EXPORT, name="first")
+    assert "physicality" not in by_name(out1)["Mara Voss"]
+
+
+def test_kanka_4_a_status_that_is_not_the_shared_dead_marks_nothing(tmp_path: Path) -> None:
+    """A campaign's own status, or a 3 that is not a whole number, is kept and read as nothing more."""
+    for value in (2, 4, 3.0, True, None, "x"):
+
+        def change(doc: dict[str, Any], v: Any = value) -> None:
+            doc["entity"]["status_id"] = v
+
+        src = variant(tmp_path, change, MARA_FILE, name=f"status-{value!r}.zip")
+        out, _ = run(tmp_path, src, name=f"status-{value!r}")
+        assert "physicality" not in by_name(out)["Mara Voss"], value
+    src = variant(tmp_path, lambda doc: doc["entity"].update(status_id="3"), MARA_FILE, name="status-digits.zip")
+    out, _ = run(tmp_path, src, name="status-digits")
+    assert by_name(out)["Mara Voss"]["physicality"] == "[Deceased]"  # an id written as digits, as every id here
+
+
+def test_kanka_4_a_familys_pivot_members_are_kept_with_their_reason(tmp_path: Path) -> None:
+    out, report = run(tmp_path, EXPORT4)
+    line = by_name(out)["The Voss line"]
+    assert line["id"] == eid(VOSS_LINE) and line["type"] == "family"
+    assert line["x_kanka_pivot_members"] == [{"character_id": 2607497, "family_id": 2607510}]
+    text = report.render()
+    assert "'The Voss line' / 'pivotMembers': who belongs, as Kanka 4.0 writes it" in text
+    assert "families/ (1): family; read on a real export" in text
+    assert "proven on" not in text  # 4.0 is a version this door was proven on
+
+
+def test_pivot_members_on_any_module_are_kept_never_dropped(tmp_path: Path) -> None:
+    """The organisation's members feed its links; a pivotMembers beside them is kept all the same."""
+
+    def change(doc: dict[str, Any]) -> None:
+        doc["pivotMembers"] = [{"character_id": 2607497, "organisation_id": 1}]
+
+    src = variant(tmp_path, change, "organisations/the-ferry-guild_10074606.json")
+    out, _ = run(tmp_path, src)
+    assert by_name(out)["The Ferry Guild"]["x_kanka_pivot_members"] == [{"character_id": 2607497, "organisation_id": 1}]
+
+
+def test_an_export_version_not_proven_names_both_that_were(tmp_path: Path) -> None:
+    def change(doc: dict[str, Any]) -> None:
+        doc["export_version"] = "4.1"
+
+    src = variant(tmp_path, change, "info.json")
+    _, report = run(tmp_path, src)
+    assert "(this door was proven on 3.15 and 4.0)" in report.render()
+
+
+def test_fourth_export_deterministic_and_lint_clean(tmp_path: Path) -> None:
+    run(tmp_path, EXPORT4, name="one")
+    run(tmp_path, EXPORT4, name="two")
     assert tree(tmp_path / "one") == tree(tmp_path / "two")
     pytest.importorskip("yaml", reason="the dist's lint decodes the schema YAML")
     r = subprocess.run([sys.executable, str(LINT), str(tmp_path / "one")], capture_output=True, text=True)
