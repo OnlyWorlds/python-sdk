@@ -341,6 +341,14 @@ def test_the_depth_scan_answers_as_the_strings_removed_reading(monkeypatch: pyte
         assert _outside_json._text_too_deep(text) == _too_deep_by_strings_removed(text, 3), repr(text)
 
 
+def test_a_string_left_open_on_a_lone_backslash_runs_to_the_end(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(_outside_json, "MAX_DEPTH", 3)
+    assert _outside_json._text_too_deep("[[[[" + '"ab\\') is True
+    assert _outside_json._text_too_deep("[[[" + '"ab\\' + "[[[[") is False
+    assert _outside_json._text_too_deep("[[[" + '"a\\"' + "[[[[") is False
+    assert _outside_json._text_too_deep("[[[" + '"a\\\\"' + "[") is True
+
+
 def test_the_depth_scan_is_linear_on_a_string_left_open_full_of_escaped_quotes() -> None:
     import time
 

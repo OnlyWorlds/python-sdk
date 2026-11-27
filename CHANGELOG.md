@@ -4,6 +4,10 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+## 0.156.3 (2026-11-27)
+
+- **Faster: the depth check before a parse reads a dense file in about half the time of 0.156.1.** 0.156.1 made the check linear by stepping through every bracket, quote and backslash in Python, which on many small objects (50,000 of them, 2.2 MB) took 129 ms where 0.156.0 took 54. The strings are now cut out by one pattern that never backtracks, and the brackets left are counted as a running sum: 61 ms on the same file, and still linear on a string left open and full of escaped quotes (17 ms at 1 MB). Its answers were held to 0.156.1's on 500,000 random texts; none differed.
+
 ## 0.156.2 (2026-11-27)
 
 - **Fixed: `calendar.format_duration` no longer raises on a `step_name` that is not a string.** Such a value reads as absent and the duration is worded in the grain, the calendar profile's rule for an optional key of the wrong kind (a `step_name` of `5` raised `TypeError`).

@@ -24,6 +24,7 @@ import json
 import math
 import re
 import sys
+from itertools import accumulate
 from typing import Any
 
 #: The deepest nesting read: a value at the top is depth 0, an object or array there depth 1, what it holds
@@ -51,8 +52,13 @@ def _int(text: str) -> int:
     return int(text)
 
 
-#: The characters the depth scan reads: the four brackets, the quote and the backslash.
-_SPECIAL = re.compile(r'[\[\]{}"\\]')
+#: A string as the depth scan reads it: from a quote to the next quote no backslash escapes, or to the end of
+#: the text when none closes it (a lone backslash at the very end included). Every quantifier is possessive, so a
+#: match never backtracks and every quote outside a string starts one that succeeds: one pass over the text.
+_STRING = re.compile(r'"(?:[^"\\]++|\\.?)*+(?:"|\Z)', re.DOTALL)
+#: Whatever is not a bracket, once the strings are cut out.
+_NOT_BRACKET = re.compile(r"[^\[\]{}]++")
+_STEP = {"[": 1, "{": 1, "]": -1, "}": -1}.__getitem__
 
 
 def _text_too_deep(text: str) -> bool:
@@ -60,32 +66,13 @@ def _text_too_deep(text: str) -> bool:
     one opens, before any parse (the folder format's rule since serial 148): so each value of a repeated key
     counts, and a text past the line is too deep whatever else is wrong with it. Brackets inside a string are
     not counted, and a backslash in a string escapes the character after it; a string left open runs to the
-    end of the text, as the npm SDK's scan reads it. One pass, in time linear in the text's length."""
+    end of the text, as the npm SDK's scan reads it. In time linear in the text's length: the strings cut out by
+    one pattern that never backtracks, then the brackets left counted as a running sum."""
     # No text can open more levels than it has opening brackets.
     if text.count("[") + text.count("{") <= MAX_DEPTH:
         return False
-    depth = 0
-    in_string = False
-    escaped_at = -1
-    for m in _SPECIAL.finditer(text):
-        i = m.start()
-        if i == escaped_at:
-            continue
-        c = m.group()
-        if in_string:
-            if c == "\\":
-                escaped_at = i + 1
-            elif c == '"':
-                in_string = False
-        elif c == '"':
-            in_string = True
-        elif c == "[" or c == "{":
-            depth += 1
-            if depth > MAX_DEPTH:
-                return True
-        elif c == "]" or c == "}":
-            depth -= 1
-    return False
+    brackets = _NOT_BRACKET.sub("", _STRING.sub("", text))
+    return max(accumulate(map(_STEP, brackets)), default=0) > MAX_DEPTH
 
 
 def loads(text: str, **kwargs: Any) -> Any:
