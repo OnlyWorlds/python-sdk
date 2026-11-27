@@ -72,6 +72,15 @@ jobs:
         run: |
           uv run pytest -q -rs tests/test_okf.py::test_reference_parser_and_viewer | tee "$RUNNER_TEMP/okf.txt"
           grep -q -E '^1 passed' "$RUNNER_TEMP/okf.txt"
+      # The README calls the export a valid OKF bundle: OKF's own validator at the same commit reads
+      # the example world's export, and a warning fails as an error does (its notes pass).
+      - name: OKF's validator on the example world's bundle
+        run: |
+          VALIDATOR="$RUNNER_TEMP/okf/skills/okf-generate/scripts/validate.py"
+          test -f "$VALIDATOR" || { echo "no validator at the pinned commit: $VALIDATOR"; exit 1; }
+          uv run python -m onlyworlds.okf codegen/schema-dist/example/hyperion "$RUNNER_TEMP/hyperion-okf"
+          uv run python "$VALIDATOR" "$RUNNER_TEMP/hyperion-okf" --strict | tee "$RUNNER_TEMP/validate.txt"
+          grep -q -E ' 0 errors, 0 warnings' "$RUNNER_TEMP/validate.txt"
 
   folder-conformance:
     # The folder format's conformance fixture lives in Atlas, the reference implementation.
