@@ -30,6 +30,7 @@ from __future__ import annotations
 
 import datetime as _dt
 import json
+import math
 import re
 import time
 import urllib.error
@@ -41,6 +42,7 @@ from dataclasses import dataclass, field
 from typing import Any, Protocol
 
 from ._ids import uuid7
+from ._outside_json import MAX_DEPTH
 from ._schema import FIELD_KINDS
 from ._version import __version__
 from .errors import ApiError, api_error, error_code, parse_retry_after
@@ -195,6 +197,46 @@ def _segment(value: str, pattern: re.Pattern[str], what: str) -> str:
     if not isinstance(value, str) or not pattern.fullmatch(value):
         raise ValueError(f"{what} {value!r} is not a valid path segment")
     return value
+
+
+def _encode_body(payload: Any) -> bytes:
+    """A request body as the JSON bytes sent, or ``ValueError`` before anything is sent, in the npm SDK's
+    words (None where it says null), for the two bodies keel cannot read as written:
+
+    - nested more than ``MAX_DEPTH`` (200) deep, counted as the folder readers count it (an object or list
+      at the top is depth 1), however deep it goes: the walk keeps its own stack. keel reads 256, so a body
+      this sends is under its line.
+    - a non-finite float (NaN, either infinity) anywhere in it, named with its place: keel answers the bare
+      tokens ``json.dumps`` writes with a 500.
+
+    A body with both is refused for its depth. The place is the first in the order the body is written."""
+    stack: list[tuple[Any, int, str]] = [(payload, 0, "")]
+    non_finite: str | None = None
+    while stack:
+        value, parent, place = stack.pop()
+        if isinstance(value, Mapping):
+            children: list[tuple[Any, str]] = [(v, f"{place}.{k}" if place else str(k)) for k, v in value.items()]
+        elif isinstance(value, (list, tuple)):
+            children = [(v, f"{place}[{i}]") for i, v in enumerate(value)]
+        else:
+            if non_finite is None and isinstance(value, float) and not math.isfinite(value):
+                token = "NaN" if math.isnan(value) else ("Infinity" if value > 0 else "-Infinity")
+                non_finite = f"{token} at {place or 'the top'}"
+            continue
+        depth = parent + 1
+        if depth > MAX_DEPTH:
+            raise ValueError(
+                f"a request body is nested more than {MAX_DEPTH} deep (an object or list at the top is depth 1),"
+                " past what onlyworlds.com reads. Nothing was sent."
+            )
+        stack.extend((v, depth, p) for v, p in reversed(children))
+    if non_finite is not None:
+        raise ValueError(
+            f"a request body holds {non_finite}, which JSON cannot carry: send a finite number, or None to"
+            " clear the field. Nothing was sent."
+        )
+    # allow_nan off as a second layer: no bare token leaves this client.
+    return json.dumps(payload, ensure_ascii=True, allow_nan=False).encode("ascii")
 
 
 def _if_match(change_seq: int | None) -> dict[str, str] | None:
@@ -484,7 +526,8 @@ class Client:
         self, method: str, path: str, payload: Any, headers: Mapping[str, str] | None
     ) -> tuple[str, dict[str, str], bytes | None]:
         """The URL, headers and body of one request. Raises at once on a body it cannot send
-        (one carrying `world`, a value JSON cannot hold): the request was never made."""
+        (one carrying `world`, a value JSON cannot hold, a non-finite number, a nesting past 200 levels):
+        the request was never made."""
         sent = dict(self._headers)
         if path.split("?", 1)[0].strip("/") == "health":
             # The one route keel answers without a key (no security in its document): no credential rides.
@@ -497,7 +540,7 @@ class Client:
         if payload is not None:
             if isinstance(payload, Mapping) and "world" in payload:
                 raise ValueError("a request body never carries `world`; the key names the world")
-            body = json.dumps(payload, ensure_ascii=True).encode("ascii")
+            body = _encode_body(payload)
             sent["Content-Type"] = "application/json"
         return self.url(path), sent, body
 

@@ -4,6 +4,11 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+## 0.158.2 (2026-11-28)
+
+- **Fixed: a non-finite number in a request body is refused before sending, by name and with its place.** `json.dumps` wrote the bare tokens `NaN`, `Infinity` and `-Infinity`, which are not JSON, and the server answered them with a 500. Any write now raises `ValueError: a request body holds NaN at x_score, which JSON cannot carry: send a finite number, or None to clear the field. Nothing was sent.`, the place a list index in brackets (`items[1].element.x_weight` in a `bulk`). The body is then encoded with `allow_nan=False`, so no bare token leaves the client.
+- **Fixed: a body nested more than 200 deep is refused before sending**, counted as the folder readers count it (an object or list at the top is depth 1), however deep it goes: `ValueError: a request body is nested more than 200 deep (an object or list at the top is depth 1), past what onlyworlds.com reads. Nothing was sent.` A body with both faults is refused for its depth. The npm SDK refuses both in the same words (4.219.2).
+
 ## 0.158.1 (2026-11-27)
 
 - **Fixed: a body the client cannot send raises at once, under its own name.** A value JSON cannot hold (`patch_world({"x_tool": object()})`, the same inside a `bulk` item) or a body carrying `world` was built inside the retry loop, so its `TypeError` or `ValueError` was read as no response: retried five times with the policy's waits, then raised as `ConnectionError: gave up after 5 retries`. The request is now built once, before the first try, and only the transport's own exceptions are retried. The `Transport` protocol now says so, and that a transport refusing a request on purpose raises a `BaseException` that is not an `Exception`, which reaches the caller at once.

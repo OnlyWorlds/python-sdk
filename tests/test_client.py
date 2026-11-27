@@ -331,6 +331,54 @@ def test_a_body_the_client_cannot_send_raises_at_once(make_client: MakeClient, s
     assert t.calls == [] and sleeps == []
 
 
+def test_a_non_finite_number_anywhere_in_a_body_is_refused_by_name_with_its_place(
+    make_client: MakeClient, sleeps: list[float]
+) -> None:
+    """keel answers the bare tokens with a 500; nothing is sent, and the place is named as the npm SDK names it."""
+    t = FakeTransport()
+    c = make_client(t)
+    pid = "11111111-2222-4333-8444-555555555555"
+    cases: list[tuple[Callable[[], Any], str]] = [
+        (lambda: c.patch("character", pid, {"x_score": float("nan")}), "NaN at x_score"),
+        (lambda: c.patch_world({"x_tool": {"scale": [1, 2, float("inf")]}}), "Infinity at x_tool.scale[2]"),
+        (
+            lambda: c.bulk(
+                [
+                    {"type": "pin", "element": {"id": pid, "x": 1}},
+                    {"type": "pin", "element": {"id": pid, "x_weight": -float("inf")}},
+                ]
+            ),
+            "-Infinity at items[1].element.x_weight",
+        ),
+    ]
+    for call, want in cases:
+        with pytest.raises(ValueError, match=re.escape(f"a request body holds {want}")) as got:
+            call()
+        assert str(got.value).endswith("Nothing was sent.")
+    assert t.calls == [] and sleeps == []
+
+
+def _nest(levels: int) -> Any:
+    """``levels - 1`` lists inside the body's own object: the body is ``levels`` deep."""
+    v: Any = 1
+    for _ in range(levels - 1):
+        v = [v]
+    return v
+
+
+def test_a_body_nested_past_200_levels_is_refused_by_name_and_200_is_sent(make_client: MakeClient) -> None:
+    t = FakeTransport(script=[jresp(200, {})])
+    c = make_client(t)
+    for body in ({"x_tool": _nest(201)}, {"x_tool": _nest(200_000)}, {"x_score": float("nan"), "x_tool": _nest(201)}):
+        # Deeper than json.dumps can walk is the same refusal; past the line and holding NaN, the depth is named.
+        with pytest.raises(ValueError, match="a request body is nested more than 200 deep") as got:
+            c.patch_world(body)
+        assert str(got.value).endswith("Nothing was sent.")
+    assert t.calls == []
+    c.patch_world({"x_tool": _nest(200)})
+    assert len(t.calls) == 1
+
+
 def test_a_transport_refusal_that_is_not_an_exception_is_never_retried(make_client: MakeClient) -> None:
     """A wrapper that refuses a request on purpose raises a BaseException, as the Transport protocol says."""
 
