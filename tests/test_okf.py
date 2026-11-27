@@ -3,7 +3,7 @@
 Ported from schema-dist's walk/test_okf_export.py (branch okf-exporter, 8d0f92f): the same 24 tests,
 on the package's reader and generated schema tables. Needs PyYAML (the ``okf`` extra; the dev group has
 it); without it the module skips. OKF's reference parser and viewer
-(github.com/GoogleCloudPlatform/open-knowledge-format at the commit okf.py pins) run too when importable:
+(github.com/open-knowledge-format/open-knowledge-format at the commit okf.py pins) run too when importable:
 put a checkout's ``src/`` on OKF_REFERENCE_SRC; otherwise those checks skip and say so.
 """
 
@@ -246,7 +246,14 @@ def test_every_link_names_the_right_element(bundle: Bundle) -> None:
 
 def test_indexes(bundle: Bundle) -> None:
     root = bundle.files["index.md"].decode("utf-8")
-    assert root.startswith('---\nokf_version: "0.2"\n---\n')
+    assert root.startswith('---\nokf_version: "0.3"\ntitle: Hyperion\ndescription: ')
+    meta, _ = split(root)
+    assert meta == {
+        "okf_version": "0.3",
+        "title": "Hyperion",
+        "description": f"An OnlyWorlds world, Hyperion, as knowledge: {len(bundle.sources)} elements, "
+        "one concept each, in a directory for each element type.",
+    }
     assert "* [OnlyWorlds Character](character/index.md) - 3 elements" in root
     assert bundle.files["character/index.md"].startswith(b"# OnlyWorlds Character\n")
     listed = []
@@ -297,7 +304,7 @@ def test_reference_parser_and_viewer(bundle: Bundle, tmp_path: Path) -> None:
     for rel, data in bundle.files.items():
         doc = OKFDocument.parse(data.decode("utf-8"))
         if rel.endswith("index.md"):
-            allowed = {"okf_version"} if rel == "index.md" else set()
+            allowed = {"okf_version", "title", "description"} if rel == "index.md" else set()
             assert set(doc.frontmatter) <= allowed, rel
         else:
             doc.validate()
@@ -417,6 +424,23 @@ def test_2_2_every_line_break_is_quoted(world: World) -> None:
     if OKFDocument:
         doc = OKFDocument.parse(next(world.out.glob("character/a--*.md")).read_text(encoding="utf-8"))
         assert doc.frontmatter["description"] == text
+
+
+def test_strings_yaml_1_2_reads_as_numbers_are_quoted(world: World) -> None:
+    """OKF reads frontmatter by YAML 1.2's core schema (§4); PyYAML's 1.1 rules would write these plain."""
+    world.edit(
+        "elements/character/the-consul--*.json",
+        lambda b: b.update(name="1e5", supertype="0o17", subtype="1.5e3", description="+.5"),
+    )
+    code, err = world.run()
+    assert code == 0, err
+    path = next(world.out.glob("character/1e5--*.md"))
+    text = path.read_text(encoding="utf-8")
+    for line in ("title: '1e5'", "supertype: '0o17'", "subtype: '1.5e3'", "description: '+.5'"):
+        assert f"\n{line}\n" in text, line
+    fm, _ = split(text)
+    assert (fm["title"], fm["supertype"], fm["subtype"], fm["description"]) == ("1e5", "0o17", "1.5e3", "+.5")
+    assert "\nid: " in text and "\nid: '" not in text  # an ordinary string stays plain
 
 
 def test_2_3_unreadable_files_are_noted_and_skipped(world: World) -> None:

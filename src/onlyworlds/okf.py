@@ -4,16 +4,18 @@
 
 or ``export_okf(folder, out_dir, hidden=False)``. Needs PyYAML: ``pip install "onlyworlds[okf]"``.
 
-Writes OUT-DIR (which must not exist yet) as a bundle in Google Cloud's Open
-Knowledge Format (OKF) v0.2, as specified at one pinned commit:
+Writes OUT-DIR (which must not exist yet) as a bundle in the Open Knowledge
+Format (OKF) v0.3, as specified at one pinned commit:
 
-    repo:   https://github.com/GoogleCloudPlatform/open-knowledge-format
-    commit: ad30107c31c06aec8a7d5636e0d1058118604e6f  (SPEC.md "Version 0.2",
-            2026-08-21, the ISO 8601 timestamp edit)
+    repo:   https://github.com/open-knowledge-format/open-knowledge-format
+    commit: 527e81aff55992be21507e97004286789126f88c  (SPEC.md "Version 0.3",
+            2026-11-18)
 
 The bundle:
 
-    index.md                       root index; frontmatter `okf_version: "0.2"`
+    index.md                       root index; frontmatter `okf_version: "0.3"`,
+                                   the world's name as `title` and a
+                                   `description` of the bundle (§8.1)
     world.md                       the World as a concept (`type: OnlyWorlds
                                    World`), carrying the bundle metadata
     <type>/index.md                one per element type present
@@ -32,8 +34,10 @@ Each element concept:
     named once, in world.md's `onlyworlds_export` block.
   - scalar fields sit in the frontmatter under their OnlyWorlds names: `id`,
     `supertype`, `subtype`, `image_url` and every integer field. A field
-    whose name OKF defines (§4.1, §5, §10: `status` and the like) would be
-    written as `ow_<name>`; no frontmatter field needs it today.
+    whose name OKF defines (§4.1, §5, §8.1, §10: `status` and the like) would
+    be written as `ow_<name>`; no frontmatter field needs it today. These are
+    OnlyWorlds' names, not `x-onlyworlds-` ones: §4.1 says a producer SHOULD
+    prefix its own keys, and a consumer MUST NOT reject keys it does not know.
   - every link field is in the frontmatter, keyed by its OnlyWorlds field
     name, as bundle-absolute paths (`location: /location/barovia--1a2b3c4d.md`,
     a list for a multi link; `element` for a pin's generic link), so the kind
@@ -43,7 +47,8 @@ Each element concept:
     `## <Field>` headings in schema order, and every link again as a markdown
     link in a bullet (`- **location**: [Barovia](../location/....md)`), so
     viewers that draw the link graph from bodies draw it. Body links are
-    relative: the reference viewer at the pinned commit skips `/` links. A
+    relative: §6 makes both forms valid, and the reference viewer at v0.2
+    skipped `/` links. A
     text line markdown would read as a heading (`#`, or a `===`/`---`
     underline) is escaped with a backslash, so text cannot make a section;
     so is a line that already begins with a backslash, so a reader removes
@@ -163,16 +168,17 @@ from .push import NOT_SENT
 __all__ = ["EXPORTER", "OKF_COMMIT", "OKF_VERSION", "FolderError", "OkfReport", "build_bundle", "export_okf", "main"]
 
 EXPORTER = f"onlyworlds-py/{__version__}"
-OKF_VERSION = "0.2"
-OKF_REPO = "https://github.com/GoogleCloudPlatform/open-knowledge-format"
-OKF_COMMIT = "ad30107c31c06aec8a7d5636e0d1058118604e6f"
+OKF_VERSION = "0.3"
+OKF_REPO = "https://github.com/open-knowledge-format/open-knowledge-format"
+OKF_COMMIT = "527e81aff55992be21507e97004286789126f88c"
 
-# Frontmatter keys OKF v0.2 gives a meaning (SPEC §4.1, §5, §10, §12). An
+# Frontmatter keys OKF v0.3 gives a meaning (SPEC §4.1, §5, §8.1, §10, §12). An
 # OnlyWorlds field of the same name is written as `ow_<name>`.
 OKF_KEYS = frozenset(
     {
         "type", "title", "description", "resource", "tags", "sources", "usage_window", "generated", "verified",
-        "status", "stale_after", "runtime", "parameters", "computation", "executor", "attester", "okf_version",
+        "status", "superseded_by", "stale_after", "runtime", "parameters", "computation", "executor", "attester",
+        "okf_version", "license",
     }
 )  # fmt: skip
 WORLD_DROPPED = ("api", *WIRE_TO_DISK_WORLD_KEYS)
@@ -215,6 +221,16 @@ class OkfReport:
 
 # --- YAML: block style, line-break-bearing strings double-quoted on one line
 # (the breaks escaped), so no frontmatter line can read as the closing `---`.
+# OKF reads frontmatter by YAML 1.2's core schema (§4) and PyYAML writes 1.1,
+# which leaves some strings plain that 1.2 reads as a number (`1e5`, `0o17`):
+# those are quoted.
+
+_YAML12_NOT_STR = re.compile(
+    r"[-+]?[0-9]+|0o[0-7]+|0x[0-9a-fA-F]+"
+    r"|[-+]?(\.[0-9]+|[0-9]+(\.[0-9]*)?)([eE][-+]?[0-9]+)?"
+    r"|[-+]?\.(inf|Inf|INF)|\.(nan|NaN|NAN)"
+    r"|true|True|TRUE|false|False|FALSE|null|Null|NULL|~"
+)
 
 
 class _Dumper(yaml.SafeDumper):
@@ -222,7 +238,12 @@ class _Dumper(yaml.SafeDumper):
 
 
 def _str_rep(dumper: yaml.SafeDumper, value: str) -> yaml.ScalarNode:
-    style = '"' if any(c in value for c in LINE_BREAKS) else None
+    if any(c in value for c in LINE_BREAKS):
+        style: str | None = '"'
+    elif _YAML12_NOT_STR.fullmatch(value):
+        style = "'"
+    else:
+        style = None
     return dumper.represent_scalar("tag:yaml.org,2002:str", value, style=style)
 
 
@@ -602,8 +623,17 @@ def build_bundle(
     files["world.md"] = world_doc(
         folder.world, folder.time_current, len(elements), paths, names, report, noted, hidden_ids
     )
+    world_name = str(folder.world.get("name") or "").strip()
+    bundle_meta: dict[str, Any] = {}
+    if world_name:
+        bundle_meta["title"] = world_name
+    bundle_meta["description"] = (
+        f"An OnlyWorlds world{f', {_one_line(world_name)},' if world_name else ''} as knowledge: "
+        f"{len(elements)} element{'s' if len(elements) != 1 else ''}, one concept each, "
+        "in a directory for each element type."
+    )
     root = [
-        f'---\nokf_version: "{OKF_VERSION}"\n---\n',
+        f'---\nokf_version: "{OKF_VERSION}"\n{_frontmatter(bundle_meta)}---\n',
         "# World\n",
         index_entry(
             str(folder.world.get("name") or "World"),

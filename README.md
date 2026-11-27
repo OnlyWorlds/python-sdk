@@ -188,7 +188,7 @@ Every door names an element from the export's own text where it can. Where it ca
 
 ## Export to OKF
 
-A world folder can be exported as a valid [Open Knowledge Format](https://github.com/open-knowledge-format/open-knowledge-format) (OKF) 0.2 bundle, as the spec stands at one pinned commit (`onlyworlds.okf.OKF_COMMIT`): one markdown file per element, with its fields in the frontmatter, its text under headings and its links (in-prose `ow://` references included) as markdown links, plus an index per type. This needs PyYAML, which the rest of the package does not:
+A world folder can be exported as a valid [Open Knowledge Format](https://github.com/open-knowledge-format/open-knowledge-format) (OKF) 0.3 bundle, as the spec stands at one pinned commit (`onlyworlds.okf.OKF_COMMIT`): one markdown file per element, with its fields in the frontmatter, its text under headings and its links (in-prose `ow://` references included) as markdown links, plus an index per type and a root index carrying the world's name as the bundle's `title`. This needs PyYAML, which the rest of the package does not:
 
 ```bash
 pip install "onlyworlds[okf]"
