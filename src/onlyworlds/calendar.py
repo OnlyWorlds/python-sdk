@@ -1579,7 +1579,8 @@ def format_duration(cfg: Mapping[str, Any], steps: float) -> str:
     ``12 days`` in the calendar's word for a step."""
     n = abs(_in(steps))
     word = _prop(cfg, "step_name")
-    if not isinstance(word, str):  # a step_name that is not a string reads as absent (the profile's rule for an optional key of the wrong kind)
+    # a step_name that is not a string reads as absent (the profile's rule for an optional key of the wrong kind)
+    if not isinstance(word, str):
         word = _prop(cfg, "grain")
     if _nullish(word):
         word = "step"
