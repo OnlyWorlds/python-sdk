@@ -487,10 +487,10 @@ def test_every_key_of_the_error_envelope_reaches_apierror(doc: dict[str, Any]) -
     five = {"type", "code", "message", "param", "doc_url"}
     # With the hidden mark on, a 409 resync_required's envelope also carries `reason`; an AI use's
     # 422 answer_not_parsed carries `refusals`; a 422 on a read's `fields` list carries
-    # `unknown_fields`, `types_with_field` and `allowed_fields`. Each is allowed only when declared,
-    # and then read.
+    # `unknown_fields`, `types_with_field` and `allowed_fields`; a 422 for a size limit carries
+    # `limit`, a key of info.x-ow-limits. Each is allowed only when declared, and then read.
     fields_keys = ("unknown_fields", "types_with_field", "allowed_fields")
-    assert set(err["properties"]) - five <= {"reason", "refusals", *fields_keys}
+    assert set(err["properties"]) - five <= {"reason", "refusals", "limit", *fields_keys}
     assert five <= set(err["properties"])
     declared = [k for k in fields_keys if k in err["properties"]]
     if declared:
@@ -545,6 +545,18 @@ def test_every_key_of_the_error_envelope_reaches_apierror(doc: dict[str, Any]) -
             }
         }
         assert ApiError("GET", "x", jresp(409, resync)).resync_reason == "role"
+    if "limit" in err["properties"]:
+        limits = doc["info"].get("x-ow-limits", {})
+        flags = {
+            "element_bytes": "is_element_too_large",
+            "element_link_ids": "is_element_too_many_links",
+            "extensions_bytes": "is_extensions_too_large",
+        }
+        for name, flag in flags.items():
+            assert name in limits, f"{name} is not a key of info.x-ow-limits"
+            sized = {"error": {"type": "invalid_request", "code": "invalid_request", "message": "m", "limit": name}}
+            sized_err = ApiError("POST", "x", jresp(422, sized))
+            assert (sized_err.limit, getattr(sized_err, flag)) == (name, True), name
     first_type = err["properties"]["type"]["enum"][0]
     body = {"error": {"type": first_type, "code": "probe", "message": "m", "param": "p", "doc_url": "https://x/e"}}
     e = ApiError("GET", "x", jresp(422, body))

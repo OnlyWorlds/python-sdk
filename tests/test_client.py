@@ -724,6 +724,40 @@ def test_resync_reason_reads_the_409_envelope() -> None:
     assert ApiError("POST", "bulk/", jresp(409, other)).resync_reason is None
 
 
+def test_limit_names_the_size_limit_a_422_passed() -> None:
+    """keel's size refusals keep the code ``invalid_request`` and name their limit in ``limit``."""
+    flags = {
+        "element_bytes": "is_element_too_large",
+        "element_link_ids": "is_element_too_many_links",
+        "extensions_bytes": "is_extensions_too_large",
+    }
+    for limit, flag in flags.items():
+        body = {
+            "error": {
+                "type": "invalid_request",
+                "code": "invalid_request",
+                "message": "m",
+                "param": None,
+                "doc_url": "https://x/invalid_request",
+                "limit": limit,
+            }
+        }
+        e = ApiError("POST", "character/", jresp(422, body))
+        assert (e.code, e.limit) == ("invalid_request", limit)
+        assert {f: getattr(e, f) for f in flags.values()} == {f: f == flag for f in flags.values()}, limit
+    # an open string: a value the package does not know is read, and no predicate claims it
+    later = {"error": {"type": "invalid_request", "code": "invalid_request", "limit": "element_fields"}}
+    unknown = ApiError("POST", "character/", jresp(422, later))
+    assert unknown.limit == "element_fields"
+    assert not any(getattr(unknown, f) for f in flags.values())
+    plain = ApiError("POST", "character/", env(422, "invalid_request", "invalid_request"))
+    assert (plain.limit, plain.is_element_too_large) == (None, False)
+    # never off a 422
+    resync = {"error": {"type": "invalid_request", "code": "resync_required", "limit": "element_bytes"}}
+    off = ApiError("GET", "changes/", jresp(409, resync))
+    assert (off.limit, off.is_element_too_large) == (None, False)
+
+
 def test_retry_after_is_strict() -> None:
     assert parse_retry_after("5") == 5.0 and parse_retry_after(" 30 ") == 30.0
     for bad in ["1.5", "-1", "+5", "5.0", "soon", "", None]:

@@ -281,6 +281,38 @@ class ApiError(Exception):
         }
 
     @property
+    def limit(self) -> str | None:
+        """Which size limit a write passed, from the envelope's ``limit``: a key of the API
+        document's ``info.x-ow-limits``, where its number and unit are. Set on a 422
+        ``invalid_request`` only, and only for the limits keel names this way (an element's size, its
+        links, its extension fields); a full world, a file too large or a request body too large keep
+        their own codes. An open string: more values may come. None for any other error, or when the
+        server sends none (as the npm SDK's ``err.limit``)."""
+        if self.status != 422:
+            return None
+        raw_error = _envelope(self.response.body).get("error")
+        value = raw_error.get("limit") if isinstance(raw_error, dict) else None
+        return value if isinstance(value, str) else None
+
+    @property
+    def is_element_too_large(self) -> bool:
+        """A write would make the element larger than an element may be (422, ``limit``
+        ``element_bytes``). Nothing is saved."""
+        return self.limit == "element_bytes"
+
+    @property
+    def is_element_too_many_links(self) -> bool:
+        """A write would give the element more link ids, across all its link fields, than it may
+        hold (422, ``limit`` ``element_link_ids``). Nothing is saved."""
+        return self.limit == "element_link_ids"
+
+    @property
+    def is_extensions_too_large(self) -> bool:
+        """A write would put an element's or the World's extension fields past their cap (422,
+        ``limit`` ``extensions_bytes``). Nothing is saved."""
+        return self.limit == "extensions_bytes"
+
+    @property
     def is_busy(self) -> bool:
         """keel's admission control turned the request away (503 ``server_busy``); see ``retry_after``."""
         return self.status == 503 and self.code == "server_busy"
