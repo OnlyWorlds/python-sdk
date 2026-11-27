@@ -4,6 +4,9 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+## 0.156.5 (2026-11-27)
+
+- **The two deprecations say since which release and that they leave in onlyworlds 1.0**: `calendar.resolve_calendar_lens` (since 0.69.0; its warning now names the release) and the `version` key of `KindLayout` and `AroundLayout` (since 0.133.0), which said it would leave with the npm SDK.
 - **A check holds the package's promise: a patch fixes, a minor adds, and neither removes or renames a public name** (`scripts/verify_promise.py`, in CI). It reads each public module's names from the source against `scripts/public-names.json`, and fails on a listed name gone within a major, a public name the file does not list, and a deprecation mark that does not say since which release and that the name leaves in onlyworlds 1.0; when the major moves, a name may go only if it was marked at least six months before. The two marks now say so: `resolve_calendar_lens` is deprecated since 0.69.0 and its `DeprecationWarning` says it leaves in onlyworlds 1.0 (use `resolve_calendar`), and the `version` key of `KindLayout` and `AroundLayout` is deprecated since 0.133.0 and leaves in onlyworlds 1.0 (read `method`), where it said it would leave with the npm SDK's 5.0. Only those texts change.
 
 ## 0.156.4 (2026-11-27)
