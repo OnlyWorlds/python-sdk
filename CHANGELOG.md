@@ -4,6 +4,10 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+## 0.158.1 (2026-11-27)
+
+- **Fixed: a body the client cannot send raises at once, under its own name.** A value JSON cannot hold (`patch_world({"x_tool": object()})`, the same inside a `bulk` item) or a body carrying `world` was built inside the retry loop, so its `TypeError` or `ValueError` was read as no response: retried five times with the policy's waits, then raised as `ConnectionError: gave up after 5 retries`. The request is now built once, before the first try, and only the transport's own exceptions are retried. The `Transport` protocol now says so, and that a transport refusing a request on purpose raises a `BaseException` that is not an `Exception`, which reaches the caller at once.
+
 ## 0.158.0 (2026-11-27)
 
 - **`ApiError.limit` names the size limit a write passed, and three predicates read it**: `is_element_too_large` (`element_bytes`), `is_element_too_many_links` (`element_link_ids`) and `is_extensions_too_large` (`extensions_bytes`). keel will add `limit` to these three 422 `invalid_request` refusals, a key of the API document's `info.x-ow-limits`, where the number and its unit are; the code, `param` and the sentence stay as they are. `limit` is an open string, so a value this release does not know is read and no predicate claims it. Until keel sends the key, `limit` is None and the predicates are False: read the sentence as before. As the npm SDK's `err.limit` (4.219.0). The wire test allows `limit` on the document's error envelope once it is declared, and then requires it read and each predicate's name to be a key of `info.x-ow-limits`.

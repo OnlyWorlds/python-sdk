@@ -5,7 +5,7 @@ from __future__ import annotations
 import json
 import re
 import uuid
-from collections.abc import Callable
+from collections.abc import Callable, Mapping
 from typing import Any
 
 import pytest
@@ -316,6 +316,36 @@ def test_rate_limited_429_is_never_retried(make_client: MakeClient, sleeps: list
     with pytest.raises(ApiError) as e:
         make_client(t).get("character", "c-1")
     assert e.value.code == "rate_limited" and len(t.calls) == 1 and sleeps == []
+
+
+def test_a_body_the_client_cannot_send_raises_at_once(make_client: MakeClient, sleeps: list[float]) -> None:
+    """Only the transport's own exceptions are no response; the client's refusal of a body is never retried."""
+    t = FakeTransport()
+    c = make_client(t)
+    with pytest.raises(TypeError, match="not JSON serializable"):
+        c.patch_world({"x_tool": object()})
+    with pytest.raises(TypeError, match="not JSON serializable"):
+        c.bulk([{"type": "character", "element": {"name": "a", "x_tool": object()}}])
+    with pytest.raises(ValueError, match="never carries `world`"):
+        c.call("POST", "character/", {"name": "a", "world": "w"})
+    assert t.calls == [] and sleeps == []
+
+
+def test_a_transport_refusal_that_is_not_an_exception_is_never_retried(make_client: MakeClient) -> None:
+    """A wrapper that refuses a request on purpose raises a BaseException, as the Transport protocol says."""
+
+    class Refused(BaseException):
+        pass
+
+    calls: list[str] = []
+
+    def walled(method: str, url: str, headers: Mapping[str, str], body: bytes | None, timeout: float) -> Response:
+        calls.append(method)
+        raise Refused("not this write")
+
+    with pytest.raises(Refused):
+        make_client(walled).patch_world({"x_tool": 1})
+    assert calls == ["PATCH"]
 
 
 def test_a_timeout_then_in_flight_retries_to_the_replay(make_client: MakeClient, sleeps: list[float]) -> None:

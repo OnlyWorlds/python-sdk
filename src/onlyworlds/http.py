@@ -224,7 +224,11 @@ class Response:
 
 
 class Transport(Protocol):
-    """One HTTP exchange. Returns every HTTP status as a Response; raises only on no response at all."""
+    """One HTTP exchange. Returns every HTTP status as a Response; raises only on no response at all.
+
+    The client reads any ``Exception`` a transport raises as no response, and retries it under its
+    ``RetryPolicy``. A transport that refuses a request on purpose (a wrapper that allows only some
+    writes) raises a ``BaseException`` that is not an ``Exception``, which reaches the caller at once."""
 
     def __call__(
         self, method: str, url: str, headers: Mapping[str, str], body: bytes | None, timeout: float
@@ -473,6 +477,14 @@ class Client:
     def request(
         self, method: str, path: str, payload: Any = None, headers: Mapping[str, str] | None = None
     ) -> Response:
+        url, sent, body = self._prepare(method, path, payload, headers)
+        return self.transport(method, url, sent, body, self.timeout)
+
+    def _prepare(
+        self, method: str, path: str, payload: Any, headers: Mapping[str, str] | None
+    ) -> tuple[str, dict[str, str], bytes | None]:
+        """The URL, headers and body of one request. Raises at once on a body it cannot send
+        (one carrying `world`, a value JSON cannot hold): the request was never made."""
         sent = dict(self._headers)
         if path.split("?", 1)[0].strip("/") == "health":
             # The one route keel answers without a key (no security in its document): no credential rides.
@@ -487,14 +499,16 @@ class Client:
                 raise ValueError("a request body never carries `world`; the key names the world")
             body = json.dumps(payload, ensure_ascii=True).encode("ascii")
             sent["Content-Type"] = "application/json"
-        return self.transport(method, self.url(path), sent, body, self.timeout)
+        return self.url(path), sent, body
 
     def send(self, method: str, path: str, payload: Any = None, headers: Mapping[str, str] | None = None) -> Attempted:
         reasons: list[str] = []
+        # Built once, outside the retries: a body this client cannot send raises here, under its own name.
+        url, sent, body = self._prepare(method, path, payload, headers)
         for attempt in range(self.retry.attempts):
             response: Response | None
             try:
-                response = self.request(method, path, payload, headers)
+                response = self.transport(method, url, sent, body, self.timeout)
             except Exception as exc:  # no response at all: timeouts, resets, DNS
                 response, reason = None, f"{type(exc).__name__}: {exc}"
             else:
