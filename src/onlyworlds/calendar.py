@@ -173,13 +173,16 @@ class CalendarConfig(TypedDict, total=False):
 
 @dataclass(frozen=True)
 class StepBreakdown:
-    """A step taken apart; a part is None where the calendar has no such structure."""
+    """A step taken apart; a part is None where the calendar has no such structure, and every part but
+    ``step`` is None on a date past the exact range (its step, year index plus a leap rule's ``offset``, or
+    year outside -(2**53 - 1) to 2**53 - 1)."""
 
     step: int
-    #: Absolute year index, zero-based from step 0.
-    abs_year: int
-    #: The era's display year (its restart arithmetic applied), or ``abs_year`` with no era or ``restart`` false.
-    year: int
+    #: Absolute year index, zero-based from step 0; None on a date past the exact range.
+    abs_year: int | None
+    #: The era's display year (its restart arithmetic applied), or ``abs_year`` with no era or ``restart``
+    #: false; None on a date past the exact range.
+    year: int | None
     #: The era object from the config, or None.
     era: Mapping[str, Any] | None
     #: 1-based month, None on a day outside the months or with no months.
@@ -714,7 +717,54 @@ def read_calendar_config(value: object) -> CalendarConfig | None:
     month_count = len(_prop(months, "names")) if _truthy(months) else 0
     if any(_prop(i, "after_month") < 0 or _prop(i, "after_month") > month_count for i in entries):
         return None
+    if _past_a_bound(cfg, months, eras if isinstance(eras, list) else [], entries, week):
+        return None
     return cast(CalendarConfig, cfg)
+
+
+# The profile's size bounds (serial 149): past any of them the value is not a calendar.
+_MAX_ERAS: Final = 256
+_MAX_MONTHS: Final = 64
+_MAX_WEEK: Final = 64
+_MAX_INTERCALARY: Final = 16
+_MAX_EXCEPT: Final = 8
+_MAX_TEXT: Final = 256
+#: The exact range of a double's integers, 2**53 - 1: a year longer, or a date's number past it, is not worded.
+_SAFE: Final = 9007199254740991.0
+
+
+def _too_long(v: object) -> bool:
+    """A string longer than the profile's 256 characters, counted in code points as decoded, untrimmed."""
+    return isinstance(v, str) and len(v) > _MAX_TEXT
+
+
+def _past_a_bound(cfg: object, months: object, eras: list[Any], entries: list[Any], week: object) -> bool:
+    """Whether a value the reader has otherwise accepted is past one of the profile's size bounds, or its
+    longest year (the months' lengths and every entry in ``intercalary``) is past 2**53 - 1."""
+    if any(_too_long(_prop(cfg, k)) for k in ("grain", "step_name", "format", "format_intercalary")):
+        return True
+    if len(eras) > _MAX_ERAS or any(_too_long(_prop(e, "name")) or _too_long(_prop(e, "abbrev")) for e in eras):
+        return True
+    if len(entries) > _MAX_INTERCALARY or any(_too_long(_prop(i, "name")) for i in entries):
+        return True
+    # ``except`` is version 2's (an unknown key in version 1, never measured there).
+    v2 = _strict_eq(_prop(cfg, "version"), 2)
+    if v2 and any(len(_list_or_empty(_prop(i, "except"))) > _MAX_EXCEPT for i in entries):
+        return True
+    if not _nullish(week):
+        wnames = _prop(week, "names")
+        if _to_number(_prop(week, "length")) > _MAX_WEEK or len(wnames) > _MAX_WEEK or any(map(_too_long, wnames)):
+            return True
+    if _truthy(months):
+        names = _prop(months, "names")
+        if len(names) > _MAX_MONTHS or any(map(_too_long, names)):
+            return True
+        longest = 0.0
+        for length in _prop(months, "lengths"):
+            longest = longest + _to_number(length)  # left to right, as the year's base is summed
+        if longest + len(entries) > _SAFE:
+            return True
+    return False
 
 
 def _leap_rule_problem(ic: object) -> str | None:
@@ -1241,8 +1291,8 @@ class _Position(NamedTuple):
     slots: _Year | None
 
 
-def _position(cfg: object, step: float) -> _Position:
-    y = _abs_year(cfg, step)
+def _position(cfg: object, step: float, abs_year: float | None = None) -> _Position:
+    y = _abs_year(cfg, step) if abs_year is None else abs_year
     offset = step - _year_start(cfg, y)
     if not _truthy(_bundle(cfg, "months")):
         return _Position(y, offset, None, None)
@@ -1304,9 +1354,33 @@ class _Parts(NamedTuple):
     weekday: Any
 
 
-def _parts(cfg: object, step: float) -> _Parts:
-    pos = _position(cfg, step)
+def _outside(x: float) -> bool:
+    """Past the exact range, -(2**53 - 1) to 2**53 - 1 (NaN is not past it)."""
+    return x < -_SAFE or x > _SAFE
+
+
+def _dated(cfg: object, step: float) -> tuple[float, Any, float] | None:
+    """A step's year index, era and the year it shows, or None for a date past the exact range (the
+    profile, serial 149): its step, its year index plus each leap rule's ``offset``, or the year it shows
+    outside 2**53 - 1 either way. Each is read before what depends on it, so such a date never reaches the
+    year's days."""
+    if _outside(step):
+        return None
+    y = _abs_year(cfg, step)
+    if any(_outside(y + r.offset) for r in _year_shape(cfg)[1]):
+        return None
     era = _era_for(cfg, step)
+    year = _display_year(cfg, step, era)
+    return None if _outside(year) else (y, era, year)
+
+
+def _parts(cfg: object, step: float) -> _Parts | None:
+    """The step's parts, or None for a date past the exact range."""
+    dated = _dated(cfg, step)
+    if dated is None:
+        return None
+    y, era, year = dated
+    pos = _position(cfg, step, y)
     months = _bundle(cfg, "months")
     slot = pos.slot
     month_name = (
@@ -1314,13 +1388,16 @@ def _parts(cfg: object, step: float) -> _Parts:
         if slot is not None and slot.kind == "month" and _truthy(months)
         else None
     )
-    return _Parts(pos.abs_year, _display_year(cfg, step, era), era, slot, month_name, _weekday(cfg, step, pos))
+    return _Parts(pos.abs_year, year, era, slot, month_name, _weekday(cfg, step, pos))
 
 
 def breakdown_step(cfg: Mapping[str, Any], step: int) -> StepBreakdown:
-    """A step taken apart: absolute year, display year, era, month, day, the day outside the months, weekday."""
+    """A step taken apart: absolute year, display year, era, month, day, the day outside the months, weekday.
+    A date past the exact range keeps its ``step`` and every other part is None."""
     s = _in(step)
     p = _parts(cfg, s)
+    if p is None:
+        return StepBreakdown(_out(s), None, None, None, None, None, None, None, None)
     month = p.slot is not None and p.slot.kind == "month"
     return StepBreakdown(
         step=_out(s),
@@ -1406,9 +1483,12 @@ def _era_label(era: object) -> Any:
 
 def format_step(cfg: Mapping[str, Any], step: int) -> str:
     """A step in the calendar's words (its ``format``, else the profile's default). Total: every number
-    formats under every config ``read_calendar_value`` accepts."""
+    formats under every config ``read_calendar_value`` accepts. A date past the exact range (its step, year
+    index plus a leap rule's ``offset``, or year outside 2**53 - 1 either way) is its plain number."""
     s = _in(step)
     p = _parts(cfg, s)
+    if p is None:
+        return _js_num_str(s)
     month = p.slot is not None and p.slot.kind == "month"
     intercalary = _get(p.slot.intercalary, "name") if p.slot is not None and not month else None
     values: dict[str, Any] = {
@@ -1445,22 +1525,27 @@ def format_steps(cfg: Mapping[str, Any], steps: Iterable[int]) -> list[str]:
 
 
 def _year_label(cfg: object, step: float) -> str:
-    era = _era_for(cfg, step)
-    year = _display_year(cfg, step, era)
+    dated = _dated(cfg, step)
+    if dated is None:
+        return _js_num_str(step)
+    _, era, year = dated
     label = _era_label(era) if era is not None else ""
     return f"{_js_num_str(year)} {_js_string(label)}" if _truthy(label) else _js_num_str(year)
 
 
 def format_year_label(cfg: Mapping[str, Any], step: int) -> str:
-    """``{year} {era}`` for an axis tick zoomed wide; the absolute year alone outside every era."""
+    """``{year} {era}`` for an axis tick zoomed wide; the absolute year alone outside every era; the plain
+    number on a date past the exact range, as ``format_step``."""
     return _year_label(cfg, _in(step))
 
 
 def format_mid_label(cfg: Mapping[str, Any], step: int) -> str:
     """``11 Greening 454``: day, month and year with no era word (``Hearthmoot 454`` on a day outside the
-    months); the year label with no months."""
+    months); the year label with no months; the plain number on a date past the exact range."""
     s = _in(step)
     p = _parts(cfg, s)
+    if p is None:
+        return _js_num_str(s)
     intercalary = _get(p.slot.intercalary, "name") if p.slot is not None and p.slot.kind == "intercalary" else None
     if not _nullish(intercalary):
         return f"{_js_string(intercalary)} {_js_num_str(p.year)}"

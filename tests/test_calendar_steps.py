@@ -22,15 +22,17 @@ def steps_for(c: dict[str, Any], cfg: Any) -> list[int]:
     rng = random.Random(c["name"])
     length = cal.approx_year_length(cfg) or 365
     out = [s["step"] for s in c.get("steps", [])] + EDGES
-    for start in (0, -3 * length, 40 * length):  # a dense run: every step of a stretch inside a few years
-        out += list(range(start, start + 2 * length + 3))
+    # A dense run: every step of a stretch inside a few years, at most 2003 steps (a year of 2**53 - 1 steps
+    # is a calendar since serial 149; every calendar before it had a year of at most 365).
+    for start in (0, -3 * length, 40 * length):
+        out += list(range(start, start + min(2 * length + 3, 2003)))
     out += [rng.randint(-(2**40), 2**40) for _ in range(200)]  # one step in each of many years
     out += out[:50]  # a step asked twice in one call
     return out
 
 
 def test_every_fixture_calendar_says_the_same_words_as_format_step() -> None:
-    assert len(CASES) == 48  # counted, so a fixture that stops loading fails here rather than passing on nothing
+    assert len(CASES) == 95  # counted, so a fixture that stops loading fails here rather than passing on nothing
     compared = 0
     for c in CASES:
         cfg = cal.read_calendar_value(c["value"])

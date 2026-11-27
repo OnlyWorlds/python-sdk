@@ -35,10 +35,37 @@ def test_the_cases_are_the_sdks_bytes() -> None:
     assert hashlib.sha256(FIXTURE.read_bytes()).hexdigest() == FIXTURE_SHA256
 
 
+# Since serial 149 a template or a name longer than 256 code points is not a calendar, and five of the cases hold
+# one. The reader refuses them; the kernel is still timed on them as given, since a config built in code never
+# passes the reader, and the cost bound is what holds a label's cost there.
+def _past_the_bound(cfg: dict[str, Any]) -> str | None:
+    def long(s: object) -> bool:
+        return isinstance(s, str) and len(s) > 256
+
+    if long(cfg.get("format")):
+        return "its format is longer than 256 characters"
+    names = ((cfg.get("bundles") or {}).get("months") or {}).get("names") or []
+    if any(long(n) for n in names):
+        return "a month name is longer than 256 characters"
+    return None
+
+
+def test_five_of_the_cases_are_past_a_size_bound_three_inside_them() -> None:
+    assert sum(_past_the_bound(_expand(c["cfg"])) is not None for c in DATA["cases"]) == 5
+    assert len(DATA["cases"]) == 8
+
+
 @pytest.mark.parametrize("case", DATA["cases"], ids=[c["name"] for c in DATA["cases"]])
 def test_each_case_answers_its_words_inside_the_bound(case: dict[str, Any]) -> None:
-    cfg = cal.read_calendar_config(_expand(case["cfg"]))
-    assert cfg is not None, "the case's calendar is one the reader accepts"
+    value = _expand(case["cfg"])
+    read = cal.read_calendar_config(value)
+    bound = _past_the_bound(value)
+    if bound is not None:
+        assert read is None, f"the reader refuses it: {bound}"
+        cfg = value
+    else:
+        assert read is not None, "the case's calendar is one the reader accepts"
+        cfg = read
     start = time.perf_counter()
     if case["call"] == "format":
         got: Any = cal.format_step(cfg, case["step"])

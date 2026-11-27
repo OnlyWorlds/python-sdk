@@ -27,6 +27,7 @@ from onlyworlds.calendar import (
     format_duration,
     format_mid_label,
     format_step,
+    format_steps,
     format_year_label,
     intercalary_in_year,
     is_leap_year,
@@ -107,7 +108,7 @@ def test_the_vendored_fixture_reads_every_case_as_written() -> None:
                 failed.append(f"{c['name']} step {s['step']}: {words!r} {got} for {s['words']!r} {s['breakdown']}")
             replayed += 1
     assert failed == []
-    assert replayed == 256
+    assert replayed == 402
 
 
 def test_the_reader_returns_the_value_itself_unknown_keys_kept() -> None:
@@ -836,9 +837,34 @@ def test_numbers_are_doubles() -> None:
     assert format_step(year, 2**53 + 1) == "9007199254740992"
     assert format_step(year, 10**22) == "1e+22" and format_step(year, 10**21) == "1e+21"
     assert format_step(year, 10**20) == "100000000000000000000"
-    b = breakdown_step(year, 10**400)
-    assert (b.step, b.abs_year, format_step(year, 10**400)) == (math.inf, math.inf, "Infinity")
+    b = breakdown_step(year, 10**400)  # past the exact range: the plain number, every part but the step None
+    assert (b.step, b.abs_year, format_step(year, 10**400)) == (math.inf, None, "Infinity")
     assert format_duration(year, 0.005) == "0.01 years"  # Math.round: halves up, 0.5 -> 1, where round() goes to even
+
+
+def test_a_date_past_the_exact_range_is_its_plain_number_in_every_wording() -> None:
+    """Serial 149: a down era's year past 2**53 - 1 shows the step as a plain number in each wording, and the
+    breakdown keeps the step; the next step's year is at the line and is worded."""
+    before = {
+        "version": 1,
+        "grain": "year",
+        "eras": [{"name": "Before", "abbrev": "B", "start": 1, "direction": "down"}],
+    }
+    s = -(2**53 - 1)
+    assert [f(before, s) for f in (format_step, format_year_label, format_mid_label)] == [str(s)] * 3
+    assert format_steps(before, [s, s + 1]) == [str(s), "9007199254740991 B"]
+    assert format_year_label(before, s + 1) == "9007199254740991 B" == format_mid_label(before, s + 1)
+    b = breakdown_step(before, s)
+    assert (b.step, b.abs_year, b.year, b.era) == (s, None, None, None)
+    # Past the line on a leap rule's offset (year 1 and on): before, the rule read a rounded year, and step 5
+    # printed "1 A, 3" in a calendar where every year has its leap day.
+    leap = {
+        "version": 2,
+        "grain": "day",
+        "bundles": {"months": {"names": ["A"], "lengths": [1]}},
+        "intercalary": [{"name": "Leap", "after_month": 1, "every_years": 1, "offset": 2**53 - 1}],
+    }
+    assert [format_step(leap, n) for n in range(6)] == ["1 A, 0", "Leap, 0", "2", "3", "4", "5"]
 
 
 def test_floor_division_by_zero_is_not_an_error() -> None:
@@ -852,7 +878,8 @@ def test_a_sum_adds_left_to_right() -> None:
     """``reduce((a, b) => a + b, 0)``; Python's ``sum()`` of floats compensates and can answer otherwise."""
     lengths = [2**53 - 1, 2**53 - 1, 2**53 - 1, 2**52 + 1]
     cfg = {"version": 1, "grain": "day", "bundles": {"months": {"names": ["a", "b", "c", "d"], "lengths": lengths}}}
-    assert read_calendar_value(cfg) is not None
+    # A year past 2**53 - 1 is not a calendar (serial 149); the sum is still read left to right.
+    assert read_calendar_value(cfg) is None
     assert approx_year_length(cfg) == 31525197391593468 != int(sum(map(float, lengths)))
 
 
