@@ -392,6 +392,17 @@ def test_surface_helpers() -> None:
     assert format_duration({"version": 1, "grain": "day", "step_name": "sol"}, 14) == "14 sols"
 
 
+def test_duration_wrong_kind_step_name_and_whole_counts() -> None:
+    """A step_name that is not a string reads as absent; a whole count is exact up to the safe integers."""
+    day = {"version": 2, "grain": "day"}
+    assert format_duration({**day, "step_name": 5}, 3) == "3 days"
+    assert format_duration({**day, "step_name": None}, 1) == "1 day"
+    assert format_duration({**day, "step_name": ["sol"]}, 2) == "2 days"
+    assert format_duration(day, 9007199254740990) == "9007199254740990 days"
+    assert format_duration(day, 9007199254740991) == "9007199254740991 days"
+    assert format_duration(day, 0.333) == "0.33 days"
+
+
 def test_mid_labels_and_month_starts() -> None:
     """Not in the SDK's tests; the comparison against its built package covers them too."""
     assert format_mid_label(KIRROWMOSS, 7603) == "14 Thistlewane 22"

@@ -1579,7 +1579,7 @@ def format_duration(cfg: Mapping[str, Any], steps: float) -> str:
     ``12 days`` in the calendar's word for a step."""
     n = abs(_in(steps))
     word = _prop(cfg, "step_name")
-    if _nullish(word):
+    if not isinstance(word, str):  # a step_name that is not a string reads as absent (the profile's rule for an optional key of the wrong kind)
         word = _prop(cfg, "grain")
     if _nullish(word):
         word = "step"
@@ -1599,7 +1599,8 @@ def format_duration(cfg: Mapping[str, Any], steps: float) -> str:
         years = _div(n, _to_number(year_len))
         rounded = _round(years) if years >= 10 else _div(_round(years * 10), 10)
         return f"{_js_num_str(rounded)} {plural('year', rounded)}"
-    shown = _div(_round(n * 100), 100)
+    # a whole count is shown as it is: n * 100 is not exact past 2^53 / 100, and 9007199254740990 came back a day short
+    shown = n if n.is_integer() else _div(_round(n * 100), 100)
     return f"{_js_num_str(shown)} {plural(unit, shown)}"
 
 

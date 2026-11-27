@@ -4,6 +4,11 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+## 0.156.2 (2026-11-27)
+
+- **Fixed: `calendar.format_duration` no longer raises on a `step_name` that is not a string.** Such a value reads as absent and the duration is worded in the grain, the calendar profile's rule for an optional key of the wrong kind (a `step_name` of `5` raised `TypeError`).
+- **Fixed: `calendar.format_duration` words a whole count exactly up to the safe integers.** The count was rounded to two decimals through `n * 100`, which is not exact past 2^53 / 100, so `9007199254740990` steps were worded as `9007199254740989 days`. A whole count is now shown as it is; a fractional one is rounded as before. The npm SDK's `formatDuration` gives the same answers.
+
 ## 0.156.1 (2026-11-27)
 
 - **Fixed: the depth check before a parse took time growing with the square of a text's length.** Since 0.155.0 every reader of a file this package did not write (`read_folder`, `read_world_file`, the import doors) first counts the text's nesting, and that scan cut the strings out with a pattern that, on a string left open, retried from every quote to the end of the text: a 16 KB file of escaped quotes took about a second, and a 1 MB one would take about an hour. Valid JSON heavy with quotes read several times slower than before the check. The scan is now one pass over the brackets, quotes and backslashes, linear in the length, with the same answers: held to the old reading on 20,000 random texts, and a 40 KB text of that shape is timed (the old scan took 6.7 s on it).
