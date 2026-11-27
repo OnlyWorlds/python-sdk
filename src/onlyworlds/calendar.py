@@ -2050,12 +2050,12 @@ def resolve_calendar_lens(
     *,
     fallback_to_only: bool = False,
 ) -> WorldCalendar | None:
-    """Deprecated since 0.69.0: the old name of ``resolve_calendar``, with the same answers.
+    """Deprecated since 0.69.0, and leaves in onlyworlds 1.0: use ``resolve_calendar``, which answers the same.
 
     "Lens" now names a cut of a world, not a chosen calendar. Warns with ``DeprecationWarning``.
     """
     warnings.warn(
-        "resolve_calendar_lens is renamed resolve_calendar; the old name will be removed",
+        "resolve_calendar_lens is renamed resolve_calendar; the old name leaves in onlyworlds 1.0",
         DeprecationWarning,
         stacklevel=2,
     )

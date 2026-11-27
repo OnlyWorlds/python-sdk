@@ -4,6 +4,8 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+- **A check holds the package's promise: a patch fixes, a minor adds, and neither removes or renames a public name** (`scripts/verify_promise.py`, in CI). It reads each public module's names from the source against `scripts/public-names.json`, and fails on a listed name gone within a major, a public name the file does not list, and a deprecation mark that does not say since which release and that the name leaves in onlyworlds 1.0; when the major moves, a name may go only if it was marked at least six months before. The two marks now say so: `resolve_calendar_lens` is deprecated since 0.69.0 and its `DeprecationWarning` says it leaves in onlyworlds 1.0 (use `resolve_calendar`), and the `version` key of `KindLayout` and `AroundLayout` is deprecated since 0.133.0 and leaves in onlyworlds 1.0 (read `method`), where it said it would leave with the npm SDK's 5.0. Only those texts change.
+
 ## 0.156.4 (2026-11-27)
 
 - **Fixed: `calendar.validate_calendar_config` names the profile's size bounds.** Since 0.156.0 the reader refuses a calendar past a bound (more than 256 eras, 64 months, a week of more than 64 steps or names, 16 festival days, an `except` longer than 8, a name or template longer than 256 characters, a year longer than 2^53 - 1 steps), but the validator said nothing about it. It now gives the npm SDK's words for each, such as `A calendar holds at most 256 eras`; a calendar with no months whose `year.steps` is past 2^53 - 1 included, which the npm SDK names from 4.212.2. Held to the npm SDK's validator on 3,000 randomized calendars near each bound, none differing.

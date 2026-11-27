@@ -21,7 +21,10 @@ uv run python codegen/generate_directions.py --check
 uv run python codegen/generate_casefold.py --check
 uv run python codegen/generate_nfc.py --check
 uv run python scripts/public_words.py
+uv run python scripts/verify_promise.py
 ```
+
+`scripts/verify_promise.py` holds the package's promise: a patch fixes and a minor adds, and neither removes or renames a public name. It reads the source (never importing it) against `scripts/public-names.json`, the public names of each public module and their deprecation marks. A change that adds public names runs `uv run python scripts/verify_promise.py --write`, which adds them and never removes one within a major. A name that will go is marked first: its docstring says `Deprecated since X.Y.Z` and `onlyworlds 1.0`, and a function also warns with `DeprecationWarning`, whose text names its replacement and `onlyworlds 1.0`. It goes only in 1.0, six months or more after the release that marked it.
 
 `main` requires two checks: `gates (ubuntu-latest, 3.13)` and `wheel`. The `gates` job also runs on Windows and on Python 3.12 and 3.14. A pull request runs four more jobs that are not required: `commits` (the commit-message check below), `okf-reference`, `folder-conformance` and `wire`.
 
