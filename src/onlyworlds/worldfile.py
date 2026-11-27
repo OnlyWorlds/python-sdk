@@ -157,15 +157,23 @@ _MESSAGES: Mapping[WorldFileReason, str] = {
 }
 
 
+WorldFault = Literal["too_deep", "not_json", "number_out_of_range"]
+"""What is wrong with a ``world.json`` that is there and cannot be read, in the folder read report's words."""
+
+
 class WorldFileError(ValueError):
     """A world file was refused, or could not be written; nothing was returned or written.
 
-    ``reason`` is one of ``REASONS``, for a tool to word its own message.
+    ``reason`` is one of ``REASONS``, for a tool to word its own message. ``world_fault`` says, for a
+    ``not_a_world`` whose ``world.json`` is there but cannot be read, what is wrong with it (``too_deep``,
+    nested past the line; ``not_json``; ``number_out_of_range``, a number too large to read); it is None
+    otherwise.
     """
 
-    def __init__(self, reason: WorldFileReason, message: str | None = None):
+    def __init__(self, reason: WorldFileReason, message: str | None = None, world_fault: WorldFault | None = None):
         super().__init__(message or _MESSAGES[reason])
         self.reason: WorldFileReason = reason
+        self.world_fault: WorldFault | None = world_fault
 
 
 def _refuse(reason: WorldFileReason, message: str | None = None) -> NoReturn:
@@ -561,8 +569,15 @@ def _parse_world(data: bytes) -> dict[str, Any]:
     text = data.decode("utf-8", errors="replace").removeprefix(_BOM)
     try:
         meta = _outside_json.loads(text, parse_constant=_reject_constant)
-    except ValueError:
-        _refuse("not_a_world")
+    except ValueError as e:
+        fault: WorldFault = (
+            "too_deep"
+            if str(e) == _outside_json._TOO_DEEP
+            else "number_out_of_range"
+            if str(e).startswith("a number ")
+            else "not_json"
+        )
+        raise WorldFileError("not_a_world", None, fault) from None
     if not isinstance(meta, dict):
         _refuse("not_a_world")
     wid = meta.get("id")

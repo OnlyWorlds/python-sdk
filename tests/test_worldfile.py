@@ -901,3 +901,19 @@ def test_author_fields_a_share_and_a_tools_dot_folder(tmp_path: Path) -> None:
     assert copy["elements/character/latin.json"] == b'{"\xe9":1}'  # a copy carries it byte for byte
     assert out["elements/character/bo.json"] == encode({"id": "b"})
     assert out[".atlas/elements/character/c.json"] == encode({"id": "c", "created_by": "u"})
+
+
+def test_a_world_json_that_is_there_and_cannot_be_read_says_why_in_world_fault() -> None:
+    """``world_fault`` names what is wrong with a ``world.json`` the reader cannot read; any other refusal has None."""
+    wid = "0192a000-aaaa-7bbb-8ccc-000000000001"
+    deep = '{"id":"' + wid + '","name":"Deep","x":' + "[" * 200 + "]" * 200 + "}"
+    cases = [
+        ({"w/world.json": deep.encode()}, "too_deep"),
+        ({"w/world.json": b"{nope"}, "not_json"),
+        ({"w/world.json": ('{"id":"' + wid + '","n":1e400}').encode()}, "number_out_of_range"),
+        ({"w/elements/a.json": b"{}"}, None),
+        ({"w/world.json": encode({"name": "no id"})}, None),
+        ({"w/world.json": encode([wid])}, None),
+    ]
+    for files, fault in cases:
+        assert refuses("not_a_world", zip_of(files)).world_fault == fault, files
