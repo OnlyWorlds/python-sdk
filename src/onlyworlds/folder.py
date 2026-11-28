@@ -219,6 +219,12 @@ def _inside(folder: Path, rel: str) -> bool:
     return target != base and target.is_relative_to(base)
 
 
+def _one_file_in(filename: str, folders: Iterable[Path]) -> bool:
+    """True when ``filename`` joins as one plain name (a drive-relative ``C:evil.json`` joined to a path on
+    drive C keeps the folder but names ``evil.json``) and its path lies inside each of ``folders``."""
+    return Path(filename).name == filename and all(_inside(f, filename) for f in folders)
+
+
 def element_filename(element_id: str, name: str | None) -> str:
     """``<slug>--<tail8>.json``; an unsluggable name gives ``<full-id>.json`` (§3.2)."""
     slug = slugify(name)
@@ -364,15 +370,15 @@ def write_folder(
             slot.pop(eid, None)  # last wins, and takes the last position
             slot[eid] = body
 
-    # Every file's name, each held inside its type folder of the finished folder before anything is written.
+    # Every file's name, each held inside its type folder, in the temp folder it is written to and in the
+    # finished folder it is renamed to, before anything is written.
+    tmp = root.parent / f".{root.name}.tmp-{uuid.uuid4().hex[:8]}"
     names_by_type: dict[str, dict[str, str]] = {}
     for etype in ELEMENT_TYPES:
         if by_type.get(etype):
             names = resolve_filenames((eid, _name_of(b)) for eid, b in by_type[etype].items())
             for eid, filename in names.items():
-                # One plain name (a drive-relative `C:evil.json` joined to a path on drive C keeps the folder
-                # but names `evil.json`), whose path lies inside the type folder.
-                if Path(filename).name != filename or not _inside(root / ELEMENTS_DIR / etype, filename):
+                if not _one_file_in(filename, (tmp / ELEMENTS_DIR / etype, root / ELEMENTS_DIR / etype)):
                     raise ValueError(
                         f"{etype} element id {json.dumps(eid, ensure_ascii=False)} gives the file name "
                         f"{json.dumps(filename, ensure_ascii=False)}, which does not lie inside its type folder."
@@ -381,7 +387,6 @@ def write_folder(
 
     counts: dict[str, int] = {}
     collisions: list[str] = []
-    tmp = root.parent / f".{root.name}.tmp-{uuid.uuid4().hex[:8]}"
     tmp.mkdir(parents=True)
     try:
         for etype in ELEMENT_TYPES:
