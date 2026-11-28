@@ -15,6 +15,7 @@ Filenames are presentation only (§3.1). Identity is the ``id`` inside the file.
 
 from __future__ import annotations
 
+import json
 import os
 import re
 import shutil
@@ -185,6 +186,24 @@ def id_tail(element_id: str) -> str:
     return raw
 
 
+_SEPARATOR = re.compile(r"[/\\]")
+_CONTROL = re.compile(r"[\x00-\x1f]")
+
+
+def _unsafe_id_why(element_id: str) -> str | None:
+    """Why an element id cannot name a file, or None when it can: used as ``<id>.json`` (a name with
+    no slug, or the collision rule's full-id form) it must be one plain file name inside its type
+    folder. Checked in this order: a path separator, a control character (U+0000 to U+001F), ``.`` or
+    ``..``. The npm SDK's writer refuses the same ids in the same words (tests/fixtures/unsafe-ids.cases.json)."""
+    if _SEPARATOR.search(element_id):
+        return "it holds a path separator, / or \\"
+    if _CONTROL.search(element_id):
+        return "it holds a control character"
+    if element_id in (".", ".."):
+        return "it is . or .."
+    return None
+
+
 def element_filename(element_id: str, name: str | None) -> str:
     """``<slug>--<tail8>.json``; an unsluggable name gives ``<full-id>.json`` (§3.2)."""
     slug = slugify(name)
@@ -294,7 +313,10 @@ def write_folder(
     Within a type, a repeated id keeps its LAST body (id-keyed overwrite, the
     spec's answer to a keyset walk that met a mid-walk write), so a stub that later
     arrives whole is written whole, without ``known_of`` (§4.4 rule 4). The same id
-    under two types is an error.
+    under two types is an error, and so is an id that cannot name a file (one that
+    holds ``/``, ``\\`` or a control character, or is ``.`` or ``..``: as ``<id>.json``
+    it would leave its type folder), whatever the name, before anything is written.
+    The world's id names no path.
 
     ``root`` must not exist, or be an empty directory: this writes a folder's
     birth, never over another folder (stale files from renamed or deleted
@@ -316,6 +338,11 @@ def write_folder(
             eid = body.get("id")
             if not isinstance(eid, str) or not eid:
                 raise ValueError(f"{etype} element without a non-empty string id: {dict(body)!r:.200}")
+            why = _unsafe_id_why(eid)
+            if why is not None:
+                raise ValueError(
+                    f"{etype} element id {json.dumps(eid, ensure_ascii=False)} cannot be a file name: {why}."
+                )
             if owner.setdefault(eid, etype) != etype:
                 raise ValueError(f"id {eid} appears under both {owner[eid]} and {etype}")
             slot.pop(eid, None)  # last wins, and takes the last position

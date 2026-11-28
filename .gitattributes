@@ -32,3 +32,5 @@ src/onlyworlds/convert/kanka.json -text
 tests/fixtures/pins-known-to.cases.json -text
 # The most linked reader's shared cases, the same bytes as the npm SDK's copy (both tests hold its sha256).
 tests/fixtures/most-linked.fixture.json -text
+# The folder writers' refused and written ids, the same bytes as the npm SDK's copy (both tests hold its sha256).
+tests/fixtures/unsafe-ids.cases.json -text
