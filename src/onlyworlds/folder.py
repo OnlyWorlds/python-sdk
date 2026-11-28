@@ -193,15 +193,30 @@ _CONTROL = re.compile(r"[\x00-\x1f]")
 def _unsafe_id_why(element_id: str) -> str | None:
     """Why an element id cannot name a file, or None when it can: used as ``<id>.json`` (a name with
     no slug, or the collision rule's full-id form) it must be one plain file name inside its type
-    folder. Checked in this order: a path separator, a control character (U+0000 to U+001F), ``.`` or
-    ``..``. The npm SDK's writer refuses the same ids in the same words (tests/fixtures/unsafe-ids.cases.json)."""
+    folder. Checked in this order: empty (``.json``, a hidden file), a path separator, a colon (on Windows
+    ``C:evil.json`` is a path on drive C, and ``a:b.json`` names a stream of file ``a``), a control
+    character (U+0000 to U+001F), ``.`` or ``..``. The npm SDK's writer refuses the same ids in the same
+    words (tests/fixtures/unsafe-ids.cases.json). ``_inside`` is the second guard, on the path itself."""
+    if not element_id:
+        return "it is empty"
     if _SEPARATOR.search(element_id):
         return "it holds a path separator, / or \\"
+    if ":" in element_id:
+        return "it holds a colon"
     if _CONTROL.search(element_id):
         return "it holds a control character"
     if element_id in (".", ".."):
         return "it is . or .."
     return None
+
+
+def _inside(folder: Path, rel: str) -> bool:
+    """True when ``folder / rel``, resolved, is a path under ``folder``, resolved (neither need exist yet):
+    the second guard of every writer that names a file from an id, behind its character rule, so a path
+    the rule did not foresee is refused before anything is written."""
+    base = folder.resolve()
+    target = (folder / rel).resolve()
+    return target != base and target.is_relative_to(base)
 
 
 def element_filename(element_id: str, name: str | None) -> str:
@@ -314,9 +329,10 @@ def write_folder(
     spec's answer to a keyset walk that met a mid-walk write), so a stub that later
     arrives whole is written whole, without ``known_of`` (§4.4 rule 4). The same id
     under two types is an error, and so is an id that cannot name a file (one that
-    holds ``/``, ``\\`` or a control character, or is ``.`` or ``..``: as ``<id>.json``
-    it would leave its type folder), whatever the name, before anything is written.
-    The world's id names no path.
+    is empty, holds ``/``, ``\\``, ``:`` or a control character, or is ``.`` or ``..``:
+    as ``<id>.json`` it would leave its type folder or name a hidden file), whatever
+    the name, and a file name whose path would not lie inside its type folder, all
+    before anything is written. The world's id names no path.
 
     ``root`` must not exist, or be an empty directory: this writes a folder's
     birth, never over another folder (stale files from renamed or deleted
@@ -336,7 +352,7 @@ def write_folder(
         slot = by_type.setdefault(etype, {})
         for body in bodies:
             eid = body.get("id")
-            if not isinstance(eid, str) or not eid:
+            if not isinstance(eid, str):
                 raise ValueError(f"{etype} element without a non-empty string id: {dict(body)!r:.200}")
             why = _unsafe_id_why(eid)
             if why is not None:
@@ -347,6 +363,21 @@ def write_folder(
                 raise ValueError(f"id {eid} appears under both {owner[eid]} and {etype}")
             slot.pop(eid, None)  # last wins, and takes the last position
             slot[eid] = body
+
+    # Every file's name, each held inside its type folder of the finished folder before anything is written.
+    names_by_type: dict[str, dict[str, str]] = {}
+    for etype in ELEMENT_TYPES:
+        if by_type.get(etype):
+            names = resolve_filenames((eid, _name_of(b)) for eid, b in by_type[etype].items())
+            for eid, filename in names.items():
+                # One plain name (a drive-relative `C:evil.json` joined to a path on drive C keeps the folder
+                # but names `evil.json`), whose path lies inside the type folder.
+                if Path(filename).name != filename or not _inside(root / ELEMENTS_DIR / etype, filename):
+                    raise ValueError(
+                        f"{etype} element id {json.dumps(eid, ensure_ascii=False)} gives the file name "
+                        f"{json.dumps(filename, ensure_ascii=False)}, which does not lie inside its type folder."
+                    )
+            names_by_type[etype] = names
 
     counts: dict[str, int] = {}
     collisions: list[str] = []
@@ -359,7 +390,7 @@ def write_folder(
                 continue  # §4: empty type directories are omitted
             tdir = tmp / ELEMENTS_DIR / etype
             tdir.mkdir(parents=True)
-            names = resolve_filenames((eid, _name_of(b)) for eid, b in bodies_by_id.items())
+            names = names_by_type[etype]
             for eid, body in bodies_by_id.items():
                 filename = names[eid]
                 if filename != element_filename(eid, _name_of(body)):

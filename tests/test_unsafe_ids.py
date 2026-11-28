@@ -11,6 +11,7 @@ from __future__ import annotations
 import hashlib
 import json
 import re
+import sys
 from collections.abc import Callable, Mapping
 from pathlib import Path
 from typing import Any
@@ -19,11 +20,12 @@ from urllib.parse import urlparse
 import pytest
 from conftest import FakeTransport, jresp
 
-from onlyworlds import Client, export_world, write_folder
+from onlyworlds import Client, export_world, folder, legendkeeper, write_folder
 from onlyworlds.http import Response
+from onlyworlds.okf import write_bundle
 
 FIXTURE = Path(__file__).resolve().parent / "fixtures" / "unsafe-ids.cases.json"
-FIXTURE_SHA256 = "76de0404c2700b2d187490ad43a8593ab8af014ee8bb2e5e673dc5e10d905700"
+FIXTURE_SHA256 = "cc6c0c016b441c0ebdc2840304f28c69e05a7ddf6eb0a333b343188717eb5581"
 W = {"id": "w-1", "name": "W"}
 
 
@@ -40,7 +42,7 @@ def test_the_cases_file_is_the_pinned_bytes() -> None:
     assert hashlib.sha256(FIXTURE.read_bytes()).hexdigest() == FIXTURE_SHA256
     data = _data()
     assert data["version"] == 1
-    assert len(data["refused"]) == 12
+    assert len(data["refused"]) == 19
     assert len(data["written"]) == 5
 
 
@@ -76,6 +78,46 @@ def test_the_world_id_names_no_path(tmp_path: Path) -> None:
     write_folder(out, {"id": "../w", "name": "W"}, {"character": [{"id": "c", "name": "C"}]})
     files = sorted(p.relative_to(out).as_posix() for p in out.rglob("*") if p.is_file())
     assert files == ["elements/character/c--c.json", "world.json"]
+
+
+ESCAPES = ["../../x", "../x"] + (["C:evil", "D:/x"] if sys.platform == "win32" else [])
+
+
+@pytest.mark.parametrize("eid", ESCAPES)
+def test_the_second_guard_alone_refuses_a_path_outside_the_type_folder(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, eid: str
+) -> None:
+    """With the character rule taken out, the containment check still refuses, before anything is written."""
+    monkeypatch.setattr(folder, "_unsafe_id_why", lambda _eid: None)
+    out = tmp_path / "w" / "out"
+    with pytest.raises(ValueError, match="which does not lie inside its type folder"):
+        write_folder(out, W, {"character": [{"id": eid, "name": ""}]})
+    assert list(tmp_path.iterdir()) == []
+
+
+def test_the_second_guard_passes_a_plain_name(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    assert folder._inside(tmp_path / "out" / "elements" / "character", "v1.2.json")
+    assert not folder._inside(tmp_path / "out", "../x.json")
+    assert not folder._inside(tmp_path / "out", ".")
+    if sys.platform == "win32":
+        # A relative folder joined to a drive-relative name is that name alone: a path on drive C, outside.
+        monkeypatch.chdir(tmp_path)
+        assert not folder._inside(Path("w") / "out" / "elements" / "character", "C:evil.json")
+        assert not folder._inside(Path("w") / "out", "D:/x.json")
+
+
+def test_an_okf_bundle_path_outside_its_folder_is_refused(tmp_path: Path) -> None:
+    out = tmp_path / "bundle"
+    with pytest.raises(ValueError, match="does not lie inside"):
+        write_bundle({"index.md": "# W\n", "../escaped.md": "x"}, out)
+    assert list(tmp_path.iterdir()) == []
+
+
+def test_a_board_record_path_outside_its_folder_is_refused(tmp_path: Path) -> None:
+    with pytest.raises(ValueError, match="does not lie inside"):
+        legendkeeper._check_records(tmp_path / "out", {"records/legendkeeper/boards/../../../../x.json": {}})
+    legendkeeper._check_records(tmp_path / "out", {"records/legendkeeper/boards/doc-1.json": {}})
+    assert list(tmp_path.iterdir()) == []
 
 
 def test_export_world_refuses_an_id_from_the_server(tmp_path: Path, make_client: Callable[..., Client]) -> None:

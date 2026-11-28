@@ -159,6 +159,7 @@ from .folder import (
     WORLD_FILE,
     WORLD_FOLDER_KEYS,
     Folder,
+    _inside,
     is_hidden,
     is_known_of,
     read_folder,
@@ -659,8 +660,12 @@ def build_bundle(
 
 
 def write_bundle(files: Mapping[str, str], out: str | os.PathLike[str]) -> None:
-    """Write ``files`` under ``out``, which must not exist (``FileExistsError``)."""
+    """Write ``files`` under ``out``, which must not exist (``FileExistsError``). A path that would not lie
+    inside ``out`` (the element files are named from their ids) is a ValueError before anything is written."""
     out = Path(out)
+    for rel in files:
+        if not _inside(out, rel):
+            raise ValueError(f"the bundle path {rel!r} does not lie inside {out}; nothing was written")
     out.mkdir(parents=True, exist_ok=False)
     for rel in sorted(files):
         path = out / rel
