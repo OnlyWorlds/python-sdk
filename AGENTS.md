@@ -24,19 +24,19 @@ uv run python scripts/public_words.py
 uv run python scripts/verify_promise.py
 ```
 
-`scripts/verify_promise.py` holds the package's promise: a patch fixes and a minor adds, and neither removes or renames a public name. It reads the source (never importing it) against `scripts/public-names.json`, the public names of each public module and their deprecation marks. A change that adds public names runs `uv run python scripts/verify_promise.py --write`, which adds them and never removes one within a major. A name that will go is marked first: its docstring says `Deprecated since X.Y.Z` and `onlyworlds 1.0`, and a function also warns with `DeprecationWarning`, whose text names its replacement and `onlyworlds 1.0`. It goes only in 1.0, six months or more after the release that marked it.
+`scripts/verify_promise.py` holds the package's promise: a patch fixes and a minor adds, and neither removes or renames a public name. It reads the source (never importing it) against `scripts/public-names.json`, the public names of each public module and their deprecation marks. A change that adds public names runs `uv run python scripts/verify_promise.py --write`, which adds them and never removes one within a major. A name that will go is marked first: its docstring says `Deprecated since X.Y.Z` and `onlyworlds 1.0`, and a function also warns with `DeprecationWarning`, whose text names its replacement and `onlyworlds 1.0` (the script requires the docstring; it checks a warning's text when there is one, but not that there is one). It goes only in 1.0, six months or more after the release that marked it.
 
 `main` requires two checks: `gates (ubuntu-latest, 3.13)` and `wheel`. The `gates` job also runs on Windows and on Python 3.12 and 3.14. A pull request runs four more jobs that are not required: `commits` (the commit-message check below), `okf-reference`, `folder-conformance` and `wire`.
 
 The `wheel` job builds the wheel, checks it holds exactly the tracked files under `src/onlyworlds/`, installs it in place of the source tree and runs the suite against it. Read its steps in `ci.yml`; its import check asserts a `/site-packages/` path and fails on Windows. If you change packaging (`pyproject.toml`, files added or removed under `src/`), let CI run it.
 
-Skips: a plain `uv run pytest -q` skips some tests on purpose; `uv run pytest -q -rs` prints why, and most name the variable that turns them on. The README's develop section lists those variables. `OW_CONFORMANCE_FIXTURE` and `OKF_REFERENCE_SRC` take a checkout; the `folder-conformance` and `okf-reference` jobs in `ci.yml` show how to fetch each, and you can run them the same way. `OW_OPENAPI` and `OW_LIVE=1` reach onlyworlds.com, which rate-limits keyless requests: an HTTP 429 there is the limit, not your change, so wait a minute and run once more, never in a loop. `tests/test_staging_writes.py` needs `OW_STAGING_*` keys that are not public: its skip is expected. A few tests skip on Windows only (symlinks, NTFS names).
+Skips: a plain `uv run pytest -q` skips some tests on purpose; `uv run pytest -q -rs` prints why, and most name the variable that turns them on. The README's develop section lists those variables. `OW_CONFORMANCE_FIXTURE` and `OKF_REFERENCE_SRC` take a checkout; the `folder-conformance` and `okf-reference` jobs in `ci.yml` show how to fetch each, and you can run them the same way. `OW_LIVE=1`, and `OW_OPENAPI` set to the document's URL (it also takes a saved file), reach onlyworlds.com, which rate-limits keyless requests: an HTTP 429 there is the limit, not your change, so wait a minute and run once more, never in a loop. `tests/test_staging_writes.py` needs `OW_STAGING_*` keys that are not public: its skip is expected. A few tests skip on Windows only (symlinks, NTFS names).
 
 `tests/test_readme.py` type-checks every Python block in `README.md`, so a README example must match the code.
 
 ## How a change reaches main
 
-Work on a branch, open a pull request, and wait for the required checks to go green. `main` takes a commit only when those checks passed on it, with no bypass, so a direct push is refused. A maintainer merges; you never merge your own pull request.
+Work on a branch, open a pull request, and wait for the required checks to go green. `main` takes a commit only when those checks passed on it, with no bypass, so a push of a commit whose checks have not passed on it is refused. A maintainer merges; you never merge your own pull request.
 
 Never push to `main`. Never create or push a tag: a version tag publishes a release. Never edit a file under `.github/workflows/`. Never change `src/onlyworlds/_version.py` or `CHANGELOG.md` unless the job says so.
 
@@ -62,7 +62,7 @@ Text files are LF (`.gitattributes`), and the `--check` runs compare bytes: keep
 Everything in this repository is public, commit messages included. A commit message says what the change does. It names no private repository, person or internal ticket.
 
 ```bash
-uv run python scripts/public_words.py                               # the tracked tree
+uv run python scripts/public_words.py                               # the tracked published files (not CHANGELOG.md, codegen/schema-dist/, codegen/tools/ or tests/fixtures/)
 uv run python scripts/public_words.py AGENTS.md README.md           # named files, tracked or not
 uv run python scripts/public_words.py --commits origin/main..HEAD   # your commit messages
 ```
