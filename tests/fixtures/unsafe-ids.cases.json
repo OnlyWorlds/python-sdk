@@ -1,0 +1,128 @@
+{
+  "about": "Element ids a world folder writer refuses and ids it writes: the npm SDK's folder writer (worldFolderFiles, convertKanka) and the Python package's write_folder. The same bytes in both repositories; both suites hold its sha256. An id is refused when used as <id>.json it would not be one plain file name: it is empty, it holds / or a backslash, it holds a colon (on Windows C:evil.json is a path on drive C), it holds a control character U+0000 to U+001F, or it is . or .. (checked in that order), whatever the name, since the collision rule can fall back to the full id. A refusal names the type, the id as JSON text and the why given here; no file is written. A written case gives the file's path. Cases written by hand.",
+  "version": 1,
+  "refused": [
+    {
+      "id": "a/b",
+      "name": "",
+      "why": "it holds a path separator, / or \\"
+    },
+    {
+      "id": "a\\b",
+      "name": "",
+      "why": "it holds a path separator, / or \\"
+    },
+    {
+      "id": "../../x",
+      "name": "",
+      "why": "it holds a path separator, / or \\"
+    },
+    {
+      "id": "../../x",
+      "name": "Escape",
+      "why": "it holds a path separator, / or \\"
+    },
+    {
+      "id": "/abs",
+      "name": "Abs",
+      "why": "it holds a path separator, / or \\"
+    },
+    {
+      "id": "..",
+      "name": "",
+      "why": "it is . or .."
+    },
+    {
+      "id": ".",
+      "name": "",
+      "why": "it is . or .."
+    },
+    {
+      "id": "..",
+      "name": "Two Dots",
+      "why": "it is . or .."
+    },
+    {
+      "id": "a\u0000b",
+      "name": "",
+      "why": "it holds a control character"
+    },
+    {
+      "id": "tab\tid",
+      "name": "Tab",
+      "why": "it holds a control character"
+    },
+    {
+      "id": "\u001f",
+      "name": "",
+      "why": "it holds a control character"
+    },
+    {
+      "id": "../\u0000",
+      "name": "",
+      "why": "it holds a path separator, / or \\"
+    },
+    {
+      "id": "",
+      "name": "",
+      "why": "it is empty"
+    },
+    {
+      "id": "",
+      "name": "Named",
+      "why": "it is empty"
+    },
+    {
+      "id": "a:b",
+      "name": "",
+      "why": "it holds a colon"
+    },
+    {
+      "id": "C:evil",
+      "name": "",
+      "why": "it holds a colon"
+    },
+    {
+      "id": "C:evil",
+      "name": "Evil",
+      "why": "it holds a colon"
+    },
+    {
+      "id": "D:/x",
+      "name": "",
+      "why": "it holds a path separator, / or \\"
+    },
+    {
+      "id": ":\u0000",
+      "name": "",
+      "why": "it holds a colon"
+    }
+  ],
+  "written": [
+    {
+      "id": "v1.2",
+      "name": "",
+      "path": "elements/character/v1.2.json"
+    },
+    {
+      "id": "élan",
+      "name": "",
+      "path": "elements/character/élan.json"
+    },
+    {
+      "id": "...",
+      "name": "",
+      "path": "elements/character/....json"
+    },
+    {
+      "id": "a..b",
+      "name": "Dots",
+      "path": "elements/character/dots--a..b.json"
+    },
+    {
+      "id": "c-",
+      "name": "",
+      "path": "elements/character/c-.json"
+    }
+  ]
+}

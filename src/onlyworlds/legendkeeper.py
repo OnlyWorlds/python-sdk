@@ -389,7 +389,7 @@ from ._schema import ELEMENT_TYPES, FIELD_KINDS, LINK_TARGETS
 from ._version import __version__
 from .calendar import CALENDAR_FIELD, CALENDAR_SUPERTYPE
 from .errors import parse_retry_after
-from .folder import FORMAT_VERSION, ONE_SOURCE_ONE_WORLD, write_folder
+from .folder import FORMAT_VERSION, ONE_SOURCE_ONE_WORLD, _inside, write_folder
 from .http import Response, Transport, UrllibTransport
 from .worldfile import RECORDS_MANIFEST
 
@@ -4043,10 +4043,19 @@ def import_legendkeeper(
     if plan_only:
         return report
     assert out is not None
+    _check_records(out, conv.board_records)
     write_folder(out, report.world, elements)
     _write_records(out, conv.board_records, private=report.records_private)
     report.out = out
     return report
+
+
+def _check_records(out: Path, boards: Mapping[str, dict[str, Any]]) -> None:
+    """Every board's record path lies inside ``out`` (it is named from a document id, or the Map's when that is
+    not a plain name): a ValueError before the folder is written, the second guard behind ``_SAFE_NAME``."""
+    for rel in boards:
+        if not _inside(out, rel):
+            raise ValueError(f"the board record path {rel!r} does not lie inside {out}; nothing was written")
 
 
 def _write_records(out: Path, boards: Mapping[str, dict[str, Any]], *, private: bool) -> None:
