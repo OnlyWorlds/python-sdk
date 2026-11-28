@@ -355,6 +355,64 @@ def test_the_parser() -> None:
         parse_date(KIRROWMOSS, "12", Now=5)  # type: ignore[call-arg]  # an unknown option, as the SDK refuses one
 
 
+def test_a_weekday_beside_a_whole_date_is_read_and_a_wrong_one_refused_naming_both() -> None:
+    own = weekday_for_step(KIRROWMOSS, 7603)
+    assert own == "Tresk"
+    for s in (
+        f"{own}, 14 Thistlewane, Year 22 FT",
+        f"{own} 14 Thistlewane Year 22 FT",
+        f"14 Thistlewane, {own.upper()}. Year 22 FT",
+    ):
+        assert parse_date(KIRROWMOSS, s) == {"step": 7603}
+    assert parse_date(KIRROWMOSS, "Ondel, 14 Thistlewane, Year 22 FT") == {
+        "error": "that date falls on Tresk, not Ondel"
+    }
+    # With no year the date reads in the now's year, and is checked there.
+    assert parse_date(KIRROWMOSS, f"{own}, Thistlewane 14", now=7900) == {"step": 7603}
+    assert parse_date(KIRROWMOSS, "Volk, Thistlewane 14", now=7900) == {"error": "that date falls on Tresk, not Volk"}
+    # A refusal the date already had comes first.
+    assert parse_date(KIRROWMOSS, f"{own}, Thistlewane 14") == {"error": "add a year (the world clock has no now set)"}
+
+
+def test_a_weekday_names_no_date_alone_and_a_day_outside_the_week_has_none() -> None:
+    assert is_parse_error(parse_date(KIRROWMOSS, "Tresk"))
+    assert is_parse_error(parse_date(KIRROWMOSS, "Tresk FT"))
+    # Harptos' week is nested in the months: Shieldmeet, between them, has no weekday.
+    assert not is_parse_error(parse_date(HARPTOS, "Shieldmeet 1372"))
+    assert parse_date(HARPTOS, "1st, Shieldmeet 1372") == {"error": "that date has no weekday, not 1st"}
+    assert step_of(parse_date(HARPTOS, "3rd, 3 Hammer 1372")) == step_of(parse_date(HARPTOS, "3 Hammer 1372"))
+    assert parse_date(HARPTOS, "3rd Hammer 1372") == {"error": "that date falls on 1st, not 3rd"}
+
+
+def test_weekday_names_are_tried_last_never_as_numbers_and_only_when_printed() -> None:
+    months = {"names": ["Frost", "Thaw"], "lengths": [10, 10]}
+    # A word that is a month's and a weekday's reads as the month.
+    shared = {
+        "version": 1,
+        "grain": "day",
+        "bundles": {"months": months, "week": {"length": 2, "names": ["Frost", "Sunday"]}},
+    }
+    assert parse_date(shared, "3 Frost 4") == {"step": 4 * 20 + 2}
+    # A name that reads as a number is never tried: "1 Frost 4" stays day 1.
+    numeric = {"version": 1, "grain": "day", "bundles": {"months": months, "week": {"length": 2, "names": ["1", "2"]}}}
+    assert parse_date(numeric, "1 Frost 4") == {"step": 4 * 20}
+    # Fewer or more names than the week's length print no weekday, and read none.
+    for names in (["Moonday"], ["Moonday", "Sunday", "Starday"]):
+        ragged = {"version": 1, "grain": "day", "bundles": {"months": months, "week": {"length": 2, "names": names}}}
+        assert parse_date(ragged, "Moonday, 1 Frost 4") == {"error": 'unrecognized: "moonday"'}
+
+
+def test_a_template_with_the_weekday_parses_back_every_step_of_three_years() -> None:
+    for fmt in (
+        "{weekday}, {day} {month}, Year {year} {era}",
+        "{weekday} {day} {month} {year} {era}",
+        "{day} {month} {year} {era}, {weekday}",
+    ):
+        cfg = {**KIRROWMOSS, "format": fmt}
+        misses = [n for n in range(7200, 7200 + 3 * 360) if parse_date(cfg, format_step(cfg, n)) != {"step": n}]
+        assert misses == [], (fmt, misses[:5])
+
+
 def test_format_parse_format_is_stable() -> None:
     for cfg in (KIRROWMOSS, HARPTOS, SHIRE, DUNE, VESSACH):
         for n in (-3601, -108, -1, 0, 30, 213, 7603, 500596):

@@ -1387,7 +1387,7 @@ def _week_skipped(cfg: object) -> tuple[int, list[_LeapRule]]:
 
 def weekday_for_step(cfg: Mapping[str, Any], step: int) -> str | None:
     """The weekday of a step, or None: no week, a nested week outside the months, a day out of the week,
-    or fewer names than the week's length."""
+    or a count of names other than the week's length."""
     s = _in(step)
     return cast("str | None", _weekday(cfg, s, _position(cfg, s)))
 
@@ -1724,9 +1724,10 @@ def parse_date(cfg: Mapping[str, Any], text: str, *, now: int | None = None) -> 
 
     A bare number (``"-454"``) is always the raw step. Otherwise calendar words are matched without
     regard to case: ``"454 AE"``, ``"Year 12 FT"``, ``"Frostwane 454"``, ``"12 Frostwane 454"``,
-    ``"Shieldmeet 1372"``; a partial date opens its period. A month and a day with no year read in the
-    year holding ``now``, and with no ``now`` are refused, never guessed. ``format_step`` of the result is
-    ``format_step`` of the step that was written; the step itself is not promised back.
+    ``"Shieldmeet 1372"``, ``"Moonday, 12 Frostwane 454"``; a partial date opens its period. A weekday beside
+    a whole date is refused when it is not that date's own, and names no date alone. A month and a day with no
+    year read in the year holding ``now``, and with no ``now`` are refused, never guessed. ``format_step`` of
+    the result is ``format_step`` of the step that was written; the step itself is not promised back.
     """
     if not isinstance(text, str):
         raise TypeError(f"parse_date: the text is a string, got {text!r}")
@@ -1775,6 +1776,35 @@ def parse_date(cfg: Mapping[str, Any], text: str, *, now: int | None = None) -> 
                 month_index = m
                 break
             m += 1
+
+    # A weekday name last, longest first, and only from a calendar that prints one (as many names as the
+    # week's length): a word that is a month's and a weekday's reads as the month, and a name that reads as
+    # a number is never tried. It names no date alone; the date must be whole without it, and a weekday
+    # that is not that date's own is refused (``checked`` below), never guessed past.
+    weekday: str | None = None
+    week = _bundle(cfg, "week")
+    if _truthy(week):
+        week_length, week_names = _get(week, "length"), _get(week, "names")
+        if _js_le(1, week_length) and isinstance(week_names, list) and _strict_eq(len(week_names), week_length):
+            day_names = [
+                n
+                for n in week_names
+                if isinstance(n, str) and _js_trim(_normalize(n)) != "" and not _INT.fullmatch(_js_trim(_normalize(n)))
+            ]
+            for n in _js_sorted(day_names, lambda a, b: _length_of(b) - _length_of(a)):
+                if eat(n):
+                    weekday = n
+                    break
+
+    def checked(r: ParseResult | ParseError) -> ParseResult | ParseError:
+        if weekday is None or "error" in r:
+            return r
+        own = weekday_for_step(cfg, r["step"])
+        if own == weekday:
+            return r
+        if own is None:
+            return {"error": f"that date has no weekday, not {weekday}"}
+        return {"error": f"that date falls on {_js_string(own)}, not {weekday}"}
 
     # What remains must be numbers only.
     numbers: list[float] = []
@@ -1835,11 +1865,11 @@ def parse_date(cfg: Mapping[str, Any], text: str, *, now: int | None = None) -> 
     if year is None:
         if now_n is None:
             return {"error": "add a year (the world clock has no now set)"}
-        return resolve_in_year(_abs_year(cfg, now_n))
+        return checked(resolve_in_year(_abs_year(cfg, now_n)))
 
     target = era if era is not None else _default_era(cfg, now_n)
     if target is None:
-        return resolve_in_year(year)
+        return checked(resolve_in_year(year))
 
     # The era's reading first; a step outside the era's own range (format shows absolute years outside
     # every era) falls back to the absolute reading, so format(parse(format(n))) holds.
@@ -1847,13 +1877,13 @@ def parse_date(cfg: Mapping[str, Any], text: str, *, now: int | None = None) -> 
     if "error" in via_era:
         return via_era
     if _era_for(cfg, _num(via_era["step"])) is target:
-        return via_era
+        return checked(via_era)
     via_abs = resolve_in_year(year)
     # A typed era names the date's era: an absolute reading that lands in an era is a date the input
     # never named, and is refused; the fallback stays for a step in no era.
     if era is not None and "error" not in via_abs and _era_for(cfg, _num(via_abs["step"])) is not None:
         return {"error": f"not a date in {_js_string(_get(era, 'name'))}"}
-    return via_abs
+    return checked(via_abs)
 
 
 def is_parse_error(result: ParseResult | ParseError) -> bool:

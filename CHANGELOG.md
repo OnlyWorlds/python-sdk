@@ -4,6 +4,10 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+## 0.158.4 (2026-11-28)
+
+- **Fixed: a date written with its weekday parses back.** `parse_date` read era, month and intercalary names and never a weekday's, so a world whose `format` prints `{weekday}` could not read its own dates: `"Moonday, 3 Frost 454"` answered `unrecognized: "moonday"`. A weekday name is now read after every other name, longest first, as a whole word: a word that is both a month's and a weekday's still reads as the month, a name that reads as a number is never tried, and a calendar whose names do not match its week's length (it prints no weekday) reads none. A weekday that is not the date's own is refused, naming both (`that date falls on Sunday, not Moonday`; `that date has no weekday, not Moonday` for a day outside the week), and a weekday alone names no date. The separators stay whitespace, the comma, the period and the word `year`. Nothing that parsed before parses differently. The npm SDK 4.220.1 reads the same.
+
 ## 0.158.3 (2026-11-28)
 
 - **Fixed: a request body is refused for its depth only past 256 levels, where onlyworlds.com stops reading a body**, its top counted as 1: `ValueError: a request body is nested more than 256 deep (an object or list at the top is depth 1), past what onlyworlds.com reads. Nothing was sent.` 0.158.2 drew the line at 200 counted from the body's top, which refused a `bulk` item whose element held a value 199 or 200 levels deep. The server stores that value, since it counts a stored value's 200 from the element it sits in, and the folder readers read it back. A value nested past 200 in an element is still refused, by the server, with a 422 that names its key. As the npm SDK (4.219.3).
