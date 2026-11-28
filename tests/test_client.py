@@ -359,24 +359,32 @@ def test_a_non_finite_number_anywhere_in_a_body_is_refused_by_name_with_its_plac
 
 
 def _nest(levels: int) -> Any:
-    """``levels - 1`` lists inside the body's own object: the body is ``levels`` deep."""
+    """``levels - 1`` lists inside the object that holds it: that object is ``levels`` deep."""
     v: Any = 1
     for _ in range(levels - 1):
         v = [v]
     return v
 
 
-def test_a_body_nested_past_200_levels_is_refused_by_name_and_200_is_sent(make_client: MakeClient) -> None:
-    t = FakeTransport(script=[jresp(200, {})])
+def test_a_body_nested_past_256_levels_past_what_keel_reads_is_refused_by_name_and_256_is_sent(
+    make_client: MakeClient,
+) -> None:
+    ok = {"errors": False, "items": [{"status": 201, "id": "11111111-2222-4333-8444-555555555555"}]}
+    t = FakeTransport(script=[jresp(200, {}), jresp(200, ok)])
     c = make_client(t)
-    for body in ({"x_tool": _nest(201)}, {"x_tool": _nest(200_000)}, {"x_score": float("nan"), "x_tool": _nest(201)}):
+    for body in ({"x_tool": _nest(257)}, {"x_tool": _nest(200_000)}, {"x_score": float("nan"), "x_tool": _nest(257)}):
         # Deeper than json.dumps can walk is the same refusal; past the line and holding NaN, the depth is named.
-        with pytest.raises(ValueError, match="a request body is nested more than 200 deep") as got:
+        with pytest.raises(ValueError, match="a request body is nested more than 256 deep") as got:
             c.patch_world(body)
         assert str(got.value).endswith("Nothing was sent.")
     assert t.calls == []
-    c.patch_world({"x_tool": _nest(200)})
+    c.patch_world({"x_tool": _nest(256)})
     assert len(t.calls) == 1
+    # A bulk item's element 200 deep, counted from the element as keel stores it, is sent: the element
+    # sits at depth 4 of the body ({"items": [{"element": ...}]}), so the body is 203 deep.
+    pid = "11111111-2222-4333-8444-555555555555"
+    c.bulk([{"type": "character", "element": {"id": pid, "name": "K", "x_tool": _nest(200)}}])
+    assert len(t.calls) == 2
 
 
 def test_a_transport_refusal_that_is_not_an_exception_is_never_retried(make_client: MakeClient) -> None:

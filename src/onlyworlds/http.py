@@ -42,7 +42,6 @@ from dataclasses import dataclass, field
 from typing import Any, Protocol
 
 from ._ids import uuid7
-from ._outside_json import MAX_DEPTH
 from ._schema import FIELD_KINDS
 from ._version import __version__
 from .errors import ApiError, api_error, error_code, parse_retry_after
@@ -199,13 +198,19 @@ def _segment(value: str, pattern: re.Pattern[str], what: str) -> str:
     return value
 
 
+#: The deepest request body keel's reader takes, its top counted as 1 (it answers 422 past it).
+_BODY_MAX_DEPTH = 256
+
+
 def _encode_body(payload: Any) -> bytes:
     """A request body as the JSON bytes sent, or ``ValueError`` before anything is sent, in the npm SDK's
     words (None where it says null), for the two bodies keel cannot read as written:
 
-    - nested more than ``MAX_DEPTH`` (200) deep, counted as the folder readers count it (an object or list
-      at the top is depth 1), however deep it goes: the walk keeps its own stack. keel reads 256, so a body
-      this sends is under its line.
+    - nested more than ``_BODY_MAX_DEPTH`` (256) deep (an object or list at the top is depth 1), however
+      deep it goes: the walk keeps its own stack. keel's reader of a body takes no more and answers 422.
+      What keel stores is held to the standard's 200, counted from the level a value is stored at (an
+      element, inside a ``bulk`` item too), and keel refuses past that by name: so no value keel would
+      store is refused here.
     - a non-finite float (NaN, either infinity) anywhere in it, named with its place: keel answers the bare
       tokens ``json.dumps`` writes with a 500.
 
@@ -224,9 +229,9 @@ def _encode_body(payload: Any) -> bytes:
                 non_finite = f"{token} at {place or 'the top'}"
             continue
         depth = parent + 1
-        if depth > MAX_DEPTH:
+        if depth > _BODY_MAX_DEPTH:
             raise ValueError(
-                f"a request body is nested more than {MAX_DEPTH} deep (an object or list at the top is depth 1),"
+                f"a request body is nested more than {_BODY_MAX_DEPTH} deep (an object or list at the top is depth 1),"
                 " past what onlyworlds.com reads. Nothing was sent."
             )
         stack.extend((v, depth, p) for v, p in reversed(children))
@@ -526,7 +531,7 @@ class Client:
         self, method: str, path: str, payload: Any, headers: Mapping[str, str] | None
     ) -> tuple[str, dict[str, str], bytes | None]:
         """The URL, headers and body of one request. Raises at once on a body it cannot send
-        (one carrying `world`, a value JSON cannot hold, a non-finite number, a nesting past 200 levels):
+        (one carrying `world`, a value JSON cannot hold, a non-finite number, a nesting past 256 levels):
         the request was never made."""
         sent = dict(self._headers)
         if path.split("?", 1)[0].strip("/") == "health":

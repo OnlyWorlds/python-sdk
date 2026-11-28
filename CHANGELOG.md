@@ -4,6 +4,10 @@ The package version runs on its own semver; the schema it is generated from is `
 
 ## Unreleased
 
+## 0.158.3 (2026-11-28)
+
+- **Fixed: a request body is refused for its depth only past 256 levels, where onlyworlds.com stops reading a body**, its top counted as 1: `ValueError: a request body is nested more than 256 deep (an object or list at the top is depth 1), past what onlyworlds.com reads. Nothing was sent.` 0.158.2 drew the line at 200 counted from the body's top, which refused a `bulk` item whose element held a value 199 or 200 levels deep. The server stores that value, since it counts a stored value's 200 from the element it sits in, and the folder readers read it back. A value nested past 200 in an element is still refused, by the server, with a 422 that names its key. As the npm SDK (4.219.3).
+
 ## 0.158.2 (2026-11-28)
 
 - **Fixed: a non-finite number in a request body is refused before sending, by name and with its place.** `json.dumps` wrote the bare tokens `NaN`, `Infinity` and `-Infinity`, which are not JSON, and the server answered them with a 500. Any write now raises `ValueError: a request body holds NaN at x_score, which JSON cannot carry: send a finite number, or None to clear the field. Nothing was sent.`, the place a list index in brackets (`items[1].element.x_weight` in a `bulk`). The body is then encoded with `allow_nan=False`, so no bare token leaves the client.
